@@ -175,6 +175,7 @@ module Substitutors
   # returns - The text with the passthrough region substituted with placeholders
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
+    passes = @passthroughs
     text = text.gsub(InlinePassMacroRx) {
       # alias match for Ruby 1.8.7 compat
       m = $~
@@ -213,15 +214,15 @@ module Substitutors
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
-        pass_key = @passthroughs.size
+        pass_key = passes.size
         if attributes
           if old_behavior
-            @passthroughs[pass_key] = {:text => content, :subs => NORMAL_SUBS, :type => :monospaced, :attributes => attributes}
+            passes[pass_key] = {:text => content, :subs => NORMAL_SUBS, :type => :monospaced, :attributes => attributes}
           else
-            @passthroughs[pass_key] = {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
+            passes[pass_key] = {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
           end
         else
-          @passthroughs[pass_key] = {:text => content, :subs => subs}
+          passes[pass_key] = {:text => content, :subs => subs}
         end
       else # pass:[]
         if m[6] == RS
@@ -229,7 +230,7 @@ module Substitutors
           next m[0][1..-1]
         end
 
-        @passthroughs[pass_key = @passthroughs.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : nil)}
+        passes[pass_key = passes.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : nil)}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -277,18 +278,18 @@ module Substitutors
         next %(#{preceding}#{m[3][1..-1]})
       end
 
-      pass_key = @passthroughs.size
+      pass_key = passes.size
       if compat_mode
-        @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :monospaced}
+        passes[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :monospaced}
       elsif attributes
         if old_behavior
           subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
-          @passthroughs[pass_key] = {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
+          passes[pass_key] = {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
         else
-          @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted}
+          passes[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted}
         end
       else
-        @passthroughs[pass_key] = {:text => content, :subs => BASIC_SUBS}
+        passes[pass_key] = {:text => content, :subs => BASIC_SUBS}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -308,7 +309,7 @@ module Substitutors
       end
       content = unescape_brackets m[3]
       subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      @passthroughs[pass_key = @passthroughs.size] = {:text => content, :subs => subs, :type => type}
+      passes[pass_key = passes.size] = {:text => content, :subs => subs, :type => type}
       %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
@@ -337,13 +338,14 @@ module Substitutors
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs text, outer = true
-    if outer && (@passthroughs.empty? || !text.include?(PASS_START))
+    passes = @passthroughs
+    if outer && (passes.empty? || !text.include?(PASS_START))
       return text
     end
 
     text.gsub(PassSlotRx) {
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
-      pass = @passthroughs[$1.to_i]
+      pass = passes[$1.to_i]
       subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
@@ -352,7 +354,7 @@ module Substitutors
     }
   ensure
     # free memory if in outer call...we don't need these anymore
-    @passthroughs.clear if outer
+    passes.clear if outer
   end
 
 
