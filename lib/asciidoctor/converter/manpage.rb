@@ -357,26 +357,24 @@ r lw(\n(.lu*75u/100u).'
       result = []
       if node.title?
         result << %(.sp
-.in +.3i
+.RS 3
 .B #{manify node.title}
 .br
-.in)
+.RE)
       end
       attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
       attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
-      result << %(.in +.3i
-.ll -.3i
-.nf
+      result << %(.RS 3
+.ll -.6i
 #{resolve_content node}
-.fi
 .br
-.in
+.RE
 .ll)
       if attribution_line
-        result << %(.in +.5i
-.ll -.5i
+        result << %(.RS 5
+.ll -.10i
 #{attribution_line}
-.in
+.RE
 .ll)
       end
       result.join LF

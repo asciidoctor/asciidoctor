@@ -467,6 +467,32 @@ The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org
     end
   end
 
+  context 'Quote Block' do
+    test 'should indent quote block' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+[,James Baldwin]
+____
+Not everything that is faced can be changed.
+But nothing can be changed until it is faced.
+____)
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert output.end_with? '.RS 3
+.ll -.6i
+.sp
+Not everything that is faced can be changed.
+But nothing can be changed until it is faced.
+.br
+.RE
+.ll
+.RS 5
+.ll -.10i
+\(em James Baldwin
+.RE
+.ll'
+    end
+  end
+
   context 'Callout List' do
     test 'should generate callout list using proper formatting commands' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
