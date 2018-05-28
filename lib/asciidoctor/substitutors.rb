@@ -339,9 +339,10 @@ module Substitutors
   # returns The String text with the passthrough text restored
   def restore_passthroughs text, outer = true
     passes = @passthroughs
-    if outer && (passes.empty? || !text.include?(PASS_START))
-      return text
-    end
+    # passthroughs may have been eagerly restored (e.g., footnotes)
+    #if outer && (passes.empty? || !text.include?(PASS_START))
+    #  return text
+    #end
 
     text.gsub(PassSlotRx) {
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
