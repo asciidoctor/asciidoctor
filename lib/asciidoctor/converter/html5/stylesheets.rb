@@ -14,10 +14,10 @@ module Asciidoctor
         def to_html
           result = []
 
-          if default_stylesheet?
-            result << web_font_include_html if web_fonts?
+          if DEFAULT_STYLESHEET_KEYS.include?(stylesheet)
+            result << web_font_include_html if web_fonts
             result << default_stylesheet_html
-          elsif stylesheet?
+          elsif document.attr?('stylesheet')
             result << custom_stylesheet_html
           end
 
@@ -72,6 +72,7 @@ module Asciidoctor
 
         def icon_font_import_html
           if document.attr?('iconfont-remote')
+            cdn_base = "#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs"
             font_awesome_uri = "#{cdn_base}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css"
             icon_font_uri = document.attr('iconfont-cdn', font_awesome_uri)
             %(<link rel="stylesheet" href="#{icon_font_uri}"#{void_element_slash}>)
@@ -126,6 +127,7 @@ module Asciidoctor
         end
 
         def web_font_include_html
+          web_font_family = web_fonts || DEFAULT_WEB_FONT
           web_font_uri = "#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{web_font_family}"
           %(<link rel="stylesheet" href="#{web_font_uri}"#{void_element_slash}>)
         end
@@ -148,28 +150,8 @@ module Asciidoctor
           end
         end
 
-        def stylesheet?
-          document.attr?('stylesheet')
-        end
-
-        def default_stylesheet?
-          DEFAULT_STYLESHEET_KEYS.include?(stylesheet)
-        end
-
         def web_fonts
           document.attr('webfonts')
-        end
-
-        def web_fonts?
-          !!web_fonts
-        end
-
-        def web_font_family
-          web_fonts || DEFAULT_WEB_FONT
-        end
-
-        def cdn_base
-          "#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs"
         end
       end
     end
