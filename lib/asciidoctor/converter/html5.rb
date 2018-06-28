@@ -1,3 +1,5 @@
+require "asciidoctor/converter/html5/stylesheets"
+
 # encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
@@ -31,6 +33,10 @@ module Asciidoctor
       @stylesheets = Stylesheets.instance
     end
 
+    def stylesheets(node)
+      Converter::Html5::Stylesheets.new(node, @stylesheets, :void_element_slash => @void_element_slash)
+    end
+
     def document node
       slash = @void_element_slash
       br = %(<br#{slash}>)
@@ -62,24 +68,7 @@ module Asciidoctor
       end
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
-      if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
-        if (webfonts = node.attr 'webfonts')
-          result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
-        end
-        if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
-        else
-          result << @stylesheets.embed_primary_stylesheet
-        end
-      elsif node.attr? 'stylesheet'
-        if linkcss
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
-        else
-          result << %(<style>
-#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), :warn_on_failure => true, :label => 'stylesheet'}
-</style>)
-        end
-      end
+      result.push(*stylesheets(node).to_html)
 
       if node.attr? 'icons', 'font'
         if node.attr? 'iconfont-remote'
