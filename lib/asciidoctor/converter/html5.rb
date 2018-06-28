@@ -44,7 +44,7 @@ module Asciidoctor
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
-      linkcss = node.attr? 'linkcss'
+      highlighter = node.attr('source-highlighter')
       result = ['<!DOCTYPE html>']
       lang_attribute = (node.attr? 'nolang') ? '' : %( lang="#{node.attr 'lang', 'en'}")
       result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : ''}#{lang_attribute}>)
@@ -69,35 +69,6 @@ module Asciidoctor
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
       result.push(*stylesheets(node).to_html)
-
-      if node.attr? 'icons', 'font'
-        if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css]}"#{slash}>)
-        else
-          iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-          result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
-        end
-      end
-
-      case (highlighter = node.attr 'source-highlighter')
-      when 'coderay'
-        if (node.attr 'coderay-css', 'class') == 'class'
-          if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', ''), false}"#{slash}>)
-          else
-            result << @stylesheets.embed_coderay_stylesheet
-          end
-        end
-      when 'pygments'
-        if (node.attr 'pygments-css', 'class') == 'class'
-          pygments_style = node.attr 'pygments-style'
-          if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', ''), false}"#{slash}>)
-          else
-            result << (@stylesheets.embed_pygments_stylesheet pygments_style)
-          end
-        end
-      end
 
       unless (docinfo_content = node.docinfo).empty?
         result << docinfo_content
