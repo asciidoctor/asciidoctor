@@ -64,7 +64,7 @@ module Asciidoctor
       end
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
-      result.push(*Converter::Html5::Stylesheets.new(node, @void_element_slash, @stylesheets).to_html)
+      result << Converter::Html5::Stylesheets.new(node, @void_element_slash, @stylesheets).to_html
 
       unless (docinfo_content = node.docinfo).empty?
         result << docinfo_content

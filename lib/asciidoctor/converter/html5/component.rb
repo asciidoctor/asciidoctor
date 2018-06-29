@@ -10,7 +10,7 @@ module Asciidoctor
         def to_html
           @output = []
           render
-          @output
+          @output.join(Asciidoctor::LF)
         end
 
         protected
