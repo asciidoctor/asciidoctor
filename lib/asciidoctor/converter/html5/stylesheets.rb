@@ -14,22 +14,16 @@ module Asciidoctor
           @stylesheets = stylesheets
         end
 
-        def to_html
-          result = []
-
+        def render
           if DEFAULT_STYLESHEET_KEYS.include?(stylesheet)
-            result << web_font_include_html if web_fonts
-            result << default_stylesheet_html
+            output(web_font_include_html) if web_fonts
+            output(default_stylesheet_html)
           elsif document.attr?('stylesheet')
-            result << custom_stylesheet_html
+            output(custom_stylesheet_html)
           end
 
-          highlighter_html = source_highlighter_import_html
-          result << highlighter_html if highlighter_html
-
-          result << icon_font_import_html if document.attr?('icons', 'font')
-
-          result
+          output(source_highlighter_import_html)
+          output(icon_font_import_html) if document.attr?('icons', 'font')
         end
 
         private
