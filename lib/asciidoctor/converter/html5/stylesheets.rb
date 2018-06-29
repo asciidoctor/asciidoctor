@@ -1,13 +1,16 @@
+require 'asciidoctor/converter/html5/component'
+
 module Asciidoctor
   module Converter
     module Html5
-      class Stylesheets
+      class Stylesheets < Component
         DEFAULT_WEB_FONT = 'Open+Sans:300,300italic,400,400italic,600,600italic%7C'\
-                         'Noto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700'
+                           'Noto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700'
 
-        def initialize(document, stylesheets, opts = {})
-          @document = document
-          @opts = opts
+        alias_method :document, :node
+
+        def initialize(document, void_element_slash, stylesheets)
+          super(document, void_element_slash)
           @stylesheets = stylesheets
         end
 
@@ -122,18 +125,10 @@ module Asciidoctor
           document.attr('stylesheet')
         end
 
-        def void_element_slash
-          @opts[:void_element_slash]
-        end
-
         def web_font_include_html
           web_font_family = web_fonts || DEFAULT_WEB_FONT
           web_font_uri = "#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{web_font_family}"
           %(<link rel="stylesheet" href="#{web_font_uri}"#{void_element_slash}>)
-        end
-
-        def document
-          @document
         end
 
         def link_css?

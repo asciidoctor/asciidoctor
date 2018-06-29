@@ -33,10 +33,6 @@ module Asciidoctor
       @stylesheets = Stylesheets.instance
     end
 
-    def stylesheets(node)
-      Converter::Html5::Stylesheets.new(node, @stylesheets, :void_element_slash => @void_element_slash)
-    end
-
     def document node
       slash = @void_element_slash
       br = %(<br#{slash}>)
@@ -68,7 +64,7 @@ module Asciidoctor
       end
       result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
 
-      result.push(*stylesheets(node).to_html)
+      result.push(*Converter::Html5::Stylesheets.new(node, @void_element_slash, @stylesheets).to_html)
 
       unless (docinfo_content = node.docinfo).empty?
         result << docinfo_content
