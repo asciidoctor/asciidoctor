@@ -92,13 +92,16 @@ class Parser
   def self.parse(reader, document, options = {})
     block_attributes = parse_document_header(reader, document)
 
-    while reader.has_more_lines?
-      new_section, block_attributes = next_section(reader, document, block_attributes)
-      if new_section
-        document.assign_numeral new_section
-        document.blocks << new_section
+    # NOTE don't use a postfix conditional here as it's known to confuse JRuby in certain circumstances
+    unless options[:header_only]
+      while reader.has_more_lines?
+        new_section, block_attributes = next_section(reader, document, block_attributes)
+        if new_section
+          document.assign_numeral new_section
+          document.blocks << new_section
+        end
       end
-    end unless options[:header_only]
+    end
 
     document
   end
