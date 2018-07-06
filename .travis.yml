@@ -13,7 +13,7 @@ rvm:
 - 2.0.0-p648
 - 1.9.3-p551
 - 1.8.7-p374
-- jruby-9.1.13.0
+- jruby-9.1.17.0
 - jruby-9.0.5.0
 - jruby-1.7.27
 #- rbx-3 # NOTE not currently recognized
