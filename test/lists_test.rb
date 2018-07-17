@@ -806,7 +806,7 @@ This is a cross-reference to <<step-4>>.
       assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
     end
 
-      test 'should discover anchor at start of callout list item text and register it as a reference' do
+    test 'should discover anchor at start of callout list item text and register it as a reference' do
       input = <<-EOS
 This is a cross-reference to <<url-mapping>>.
 
@@ -829,7 +829,7 @@ end
       output = doc.convert :header_footer => false
       assert_xpath '(//p)[1]/a[@href="#url-mapping"][text()="url mapping"]', output, 1
     end
-end
+  end
 
   context "Nested lists" do
     test "asterisk element mixed with dash elements should be nested" do
