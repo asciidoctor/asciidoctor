@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# encoding: utf-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -805,7 +805,31 @@ This is a cross-reference to <<step-4>>.
       assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step 2"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
     end
-  end
+
+      test 'should discover anchor at start of callout list item text and register it as a reference' do
+      input = <<-EOS
+This is a cross-reference to <<url-mapping>>.
+
+[source,ruby]
+----
+require 'sinatra' <1>
+
+get '/hi' do <2> <3>
+  "Hello World!"
+end
+----
+<1> Library import
+<2> [[url-mapping,url mapping]]URL mapping
+<3> Response block
+      EOS
+
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('url-mapping')
+      output = doc.convert :header_footer => false
+      assert_xpath '(//p)[1]/a[@href="#url-mapping"][text()="url mapping"]', output, 1
+    end
+end
 
   context "Nested lists" do
     test "asterisk element mixed with dash elements should be nested" do
