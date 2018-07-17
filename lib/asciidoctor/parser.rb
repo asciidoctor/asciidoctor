@@ -1287,39 +1287,29 @@ class Parser
       has_text = true
       list_item = ListItem.new(list_block, (item_text = match[2]))
       list_item.source_location = reader.cursor if list_block.document.sourcemap
+      if item_text.start_with?('[')
+        if style && style == 'bibliography'
+          if InlineBiblioAnchorRx =~ item_text
+            catalog_inline_biblio_anchor $1, $2, list_item, reader
+          end
+        elsif item_text.start_with?('[[')
+          if LeadingInlineAnchorRx =~ item_text
+            catalog_inline_anchor $1, $2, list_item, reader
+          end
+        end
+      end
       if list_type == :ulist
         list_item.marker = (sibling_trait ||= match[1])
-        if item_text.start_with?('[')
-          if style && style == 'bibliography'
-            if InlineBiblioAnchorRx =~ item_text
-              catalog_inline_biblio_anchor $1, $2, list_item, reader
-            end
-          elsif item_text.start_with?('[[')
-            if LeadingInlineAnchorRx =~ item_text
-              catalog_inline_anchor $1, $2, list_item, reader
-            end
-          elsif item_text.start_with?('[ ] ', '[x] ', '[*] ')
-            # FIXME next_block wipes out update to options attribute
-            #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
-            list_block.attributes['checklist-option'] = ''
-            list_item.attributes['checkbox'] = ''
-            list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
-            list_item.text = item_text.slice(4, item_text.length)
-          end
+        if item_text.start_with?('[ ] ', '[x] ', '[*] ')
+          # FIXME next_block wipes out update to options attribute
+          #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
+          list_block.attributes['checklist-option'] = ''
+          list_item.attributes['checkbox'] = ''
+          list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
+          list_item.text = item_text.slice(4, item_text.length)
         end
       elsif list_type == :olist
         list_item.marker = (sibling_trait ||= resolve_ordered_list_marker(match[1], list_block.items.size, true, reader))
-        if item_text.start_with?('[')
-          if style && style == 'bibliography'
-            if InlineBiblioAnchorRx =~ item_text
-              catalog_inline_biblio_anchor $1, $2, list_item, reader
-            end
-          elsif item_text.start_with?('[[')
-            if LeadingInlineAnchorRx =~ item_text
-              catalog_inline_anchor $1, $2, list_item, reader
-            end
-          end
-        end
       else # :colist
         list_item.marker = (sibling_trait ||= '<1>')
       end
