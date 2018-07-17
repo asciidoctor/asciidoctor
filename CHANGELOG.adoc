@@ -27,7 +27,7 @@ Fixes::
   * use ::File.open instead of ::IO.binread in Reader for Asciidoctor.js compatibility
   * add fallback for timezone when setting doctime
   * fix formatting of quote block (indentation) in manpage output (#2792)
-  * catalog inline anchors in ordered list items (#2812)
+  * catalog inline anchors in ordered and callout list items (#2812)
 
 Improvements::
 
