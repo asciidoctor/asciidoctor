@@ -19,6 +19,7 @@ Enhancements::
 
   * allow position (float) and alignment (align) to be set on video block (#2425)
   * substitute attribute references in attrlist of include directive (#2761)
+  * catalog inline anchors in callout list items (#2812)
 
 Fixes::
 
