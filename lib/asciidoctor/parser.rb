@@ -1314,6 +1314,9 @@ class Parser
         end
       else # :colist
         list_item.marker = (sibling_trait ||= '<1>')
+        if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
+          catalog_inline_anchor $1, $2, list_item, reader
+        end
       end
     end
 
