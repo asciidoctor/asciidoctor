@@ -36,6 +36,7 @@ Improvements::
   * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
   * read file in binary mode whenever contents are being normalized
 
+// tag::compact[]
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
 Fixes::
@@ -226,8 +227,8 @@ Distribution Packages::
   * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
   * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
   * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
+// end::compact[]
 
-// tag::compact[]
 == 1.5.6.2 (2018-03-20) - @mojavelinux
 
 Bug fixes::
@@ -262,7 +263,6 @@ Distribution Packages::
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1...v1.5.6.2[full diff]
-// end::compact[]
 
 == 1.5.6.1 (2017-07-23) - @mojavelinux
 
