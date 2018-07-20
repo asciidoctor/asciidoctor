@@ -58,10 +58,11 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}[Asciidoctor] is a _fast_ text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook, PDF, and other formats.
-Asciidoctor is written in Ruby, packaged and distributed as a gem to {uri-rubygem}[RubyGems.org], and packaged for popular Linux distributions, including Fedora, Debian, Ubuntu, and Alpine.
-Asciidoctor can be run on the JVM using AsciidoctorJ and in all JavaScript environments using Asciidoctor.js.
-Asciidoctor is {uri-license}[open source software] and {uri-repo}[hosted on GitHub].
+{uri-project}[Asciidoctor] is a _fast_, {uri-license}[open source] text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook, PDF, and other formats.
+Asciidoctor is written in Ruby and runs on all major operation systems.
+To simplify installation, Asciidoctor is packaged and distributed as a gem to {uri-rubygem}[RubyGems.org] and is packaged for popular Linux distributions and macOS.
+Asciidoctor can also be run in a JVM using AsciidoctorJ or in any JavaScript environment using Asciidoctor.js.
+The Asciidoctor project is {uri-repo}[hosted on GitHub].
 
 ifndef::env-site[]
 This document is also available in the following languages: +
@@ -97,7 +98,7 @@ image:https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_Bri
 &nbsp; &nbsp; &nbsp;
 image:https://secure.gravatar.com/avatar/823717a797dbd78ceff7b26aa397f383.png?size=200[OpenDevise,100,link=https://opendevise.com,title="Let the Creators of Asciidoctor and Antora Help You to Accelerate Your Docs"]
 
-Major funding for Asciidoctor is provided by our *Change Makers*, https://developer.okta.com/signup?utm_source=asciidoctor&utm_medium=text-link&utm_campaign=sponsor[Okta] and https://opendevise.com[OpenDevise], and our *Strategy Sponsors*, Khronos Group and Linda Roberts.
+Major funding for Asciidoctor is provided by our *Change Makers*, https://developer.okta.com/signup?utm_source=asciidoctor&utm_medium=text-link&utm_campaign=sponsor[Okta] and https://opendevise.com[OpenDevise], and our *Strategy Sponsors*, https://www.khronos.org/[Khronos Group] and Linda Roberts.
 Additional funding is provided by our https://asciidoctor.org/supporters[Community Backers].
 
 You can support this project by becoming a sponsor on https://opencollective.com/asciidoctor[OpenCollective].
@@ -111,10 +112,10 @@ image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rende
 
 == AsciiDoc Processing
 
-Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree to a set of built-in converters to produce HTML5, DocBook 5 (or 4.5) or man(ual) page output.
+Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree to a set of built-in converters to produce HTML5, DocBook 5, and man(ual) page output.
 You have the option of using your own converter or loading {uri-tilt}[Tilt]-supported templates to customize the generated output or produce additional formats.
 
-NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
+Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
 The Asciidoctor test suite has {uri-tests}[> 2,000 tests] to ensure compatibility with the AsciiDoc syntax.
 
 In addition to the classic AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., `+icon:fire[]+`) and UI elements (e.g., `+button:[Save]+`).
@@ -139,9 +140,6 @@ Asciidoctor works on Linux, macOS and Windows and requires one of the following 
 * Rubinius 2.2.x
 * Opal (JavaScript)
 
-We welcome your help testing Asciidoctor on these and other platforms.
-Refer to the <<Contributing>> section to learn how to get involved.
-
 [CAUTION]
 ====
 If you're using a non-English Windows environment, you may bump into an `Encoding::UndefinedConversionError` when invoking Asciidoctor.
@@ -156,15 +154,62 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 == Installation
 
-Asciidoctor can be installed using (a) the `gem install` command, (b) Bundler, (c) package managers for popular Linux distributions, or (d) Homebrew for macOS.
+Asciidoctor can be installed using (a) package managers for popular Linux distributions, (b) Homebrew for macOS, (c) the `gem install` command (recommended for Windows users), (d) the Asciidoctor Docker image, or (e) Bundler.
 
-TIP: The benefit of using a Linux package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
-The drawback is that the package may not be available immediately after the release of the gem.
-If you need the latest version, you can always fallback to using the `gem` command.
+The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
 
-=== (a) gem install
+=== (a) Linux package managers
 
-Open a terminal and type (excluding the leading `$`):
+The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
+Consult the package repository for your distribution to find out which version is packaged per distribution release.
+
+* https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
+* https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
+* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
+* https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
+* https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
+
+If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, see the <<gem-install,gem installation instructions>>.
+
+==== apk (Alpine Linux)
+
+To install the gem on Alpine Linux, open a terminal and type:
+
+ $ sudo apk add asciidoctor
+
+==== APT
+
+On Debian and Debian-based distributions such as Ubuntu, use APT to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo apt-get install -y asciidoctor
+
+==== DNF
+
+On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo dnf install -y asciidoctor
+
+=== (b) Homebrew (macOS)
+
+You can use Homebrew, the macOS package manager, to install Asciidoctor.
+If you don’t have Homebrew on your computer, complete the installation instructions at https://brew.sh/[brew.sh] first.
+Once Homebrew is installed, you’re ready to install the `asciidoctor` gem.
+Open a terminal and type:
+
+ $ brew install asciidoctor
+
+Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
+
+[#gem-install]
+=== (c) gem install
+
+Before installing Asciidoctor using `gem install`, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
+Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
+When using RVM, gems are installed in a location isolated from the system.
+
+Open a terminal and type:
 
  $ gem install asciidoctor
 
@@ -172,20 +217,11 @@ If you want to install a pre-release version (e.g., a release candidate), use:
 
  $ gem install asciidoctor --pre
 
-.Upgrading your installation
-[TIP]
-====
-If you have an earlier version of Asciidoctor installed, you can update it using:
+=== (d) Docker
 
- $ gem update asciidoctor
+See {uri-install-docker}[Installing Asciidoctor using Docker].
 
-If you install a new version of the gem using `gem install` instead of gem update, you'll have multiple versions installed.
-If that's the case, use the following gem command to remove the old versions:
-
- $ gem cleanup asciidoctor
-====
-
-=== (b) Bundler
+=== (e) Bundler
 
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
@@ -204,86 +240,48 @@ gem 'asciidoctor'
  $ bundle
 
 To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
-Using `bundle update` is *not* recommended as it will also update other gems, which may not be the desired result.
+Using `bundle update` (without specifying a gem) is *not* recommended as it will also update other gems, which may not be the desired result.
 
-=== (c) Linux package managers
+== Upgrade
 
-==== DNF (Fedora 21 or greater)
+If you installed Asciidoctor using a package manager, your operating system is probably configured to automatically update packages, in which case you don't need to update the gem manually.
 
-To install the gem on Fedora 21 or greater using dnf, open a terminal and type:
-
- $ sudo dnf install -y asciidoctor
-
-To upgrade the gem, use:
-
- $ sudo dnf update -y asciidoctor
-
-TIP: Your system may be configured to automatically update rpm packages, in which case no action is required by you to update the gem.
-
-==== apt-get (Debian or Ubuntu)
-
-To install the gem on Debian or Ubuntu, open a terminal and type:
-
- $ sudo apt-get install -y asciidoctor
-
-To upgrade the gem, use:
-
- $ sudo apt-get upgrade -y asciidoctor
-
-TIP: Your system may be configured to automatically update deb packages, in which case no action is required by you to update the gem.
-
-The version of Asciidoctor installed by the package manager (apt-get) may not match the latest release of Asciidoctor.
-Consult the package repository for your distribution to find out which version is packaged per distribution release.
-
-* https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Debian release]
-* https://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
-
-[CAUTION]
-====
-You're advised against using the `gem update` command to update a gem managed by the package manager.
-Doing so puts the system into an inconsistent state as the package manager can no longer track the files (which get installed under /usr/local).
-Simply put, system gems should only be managed by the package manager.
-
-If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
-Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
-When using RVM, gems are installed in a location isolated from the system.
-====
-
-==== apk (Alpine Linux)
-
-To install the gem on Alpine Linux, open a terminal and type:
-
- $ sudo apk add asciidoctor
+=== apk (Alpine Linux)
 
 To upgrade the gem, use:
 
  $ sudo apk add -u asciidoctor
 
-TIP: Your system may be configured to automatically update apk packages, in which case no action is required by you to update the gem.
+=== APT
 
-=== (d) Homebrew (macOS)
+To upgrade the gem, use:
 
-You can use Homebrew to install Asciidoctor on macOS.
-If you haven't yet installed Homebrew, follow the instructions at https://brew.sh/[brew.sh].
+ $ sudo apt-get upgrade -y asciidoctor
 
-Once Homebrew is installed, you can install the `asciidoctor` gem using the http://brewformulas.org/Asciidoctor[asciidoctor] package.
-To do so, open a terminal and type:
+=== DNF
 
- $ brew install asciidoctor
+To upgrade the gem, use:
+
+ $ sudo dnf update -y asciidoctor
+
+=== Homebrew (macOS)
 
 To upgrade the gem, use:
 
  $ brew update
  $ brew upgrade asciidoctor
 
-TIP: Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
+=== gem install
 
-=== Other installation options
+If you previously installed Asciidoctor using the `gem` command, you'll need to manually upgrade Asciidoctor when a new version is released.
+You can upgrade the gem by typing:
 
-* {uri-install-docker}[Installing Asciidoctor using Docker]
-* {uri-install-macos-doc}[Installing Asciidoctor on macOS]
-// at the moment, the following entry is just a reiteration of the information in this README
-//* {uri-install-doc}[Installing the Asciidoctor toolchain]
+ $ gem install asciidoctor
+
+When you install a new version of the gem using `gem install`, you end up with multiple versions installed.
+Use the following command to remove the old versions:
+
+ $ gem cleanup asciidoctor
 
 == Usage
 
@@ -297,7 +295,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 [.output,subs=attributes+]
 ....
 Asciidoctor {release-version} [https://asciidoctor.org]
-Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 2.5.1p57 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor also provides an API.
@@ -380,9 +378,8 @@ For more information about how to use the API or to customize the output, refer 
 
 == Contributing
 
-In the spirit of {uri-freesoftware}[free software], _everyone_ is encouraged to help improve this project.
-If you discover errors or omissions in the source code, documentation, or website content, please don't hesitate to submit an issue or open a pull request with a fix.
 New contributors are always welcome!
+If you discover errors or omissions in the source code, documentation, or website content, please don't hesitate to submit an issue or open a pull request with a fix.
 
 Here are some ways *you* can contribute:
 
@@ -390,8 +387,7 @@ Here are some ways *you* can contribute:
 * by reporting bugs
 * by suggesting new features
 * by writing or editing documentation
-* by writing specifications
-* by writing code -- _No patch is too small._
+* by writing code with tests -- _No patch is too small._
 ** fix typos
 ** add comments
 ** clean up inconsistent whitespace
@@ -404,16 +400,13 @@ The {uri-contribute}[Contributing] guide provides information on how to create, 
 
 == Getting Help
 
-The Asciidoctor project is developed to help you easily write and publish your content.
+Asciidoctor is developed to help you easily write and publish your content.
 But we can't do it without your feedback!
 We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
 
+Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 Discussion list (Nabble):: {uri-discuss}
 Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag or https://twitter.com/asciidoctor[@asciidoctor] mention
-Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
-////
-Chat (IRC):: {uri-irc}[#asciidoctor] on FreeNode IRC
-////
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
@@ -427,19 +420,19 @@ Source repository (git):: {uri-repo}
 Issue tracker:: {uri-issues}
 Asciidoctor organization on GitHub:: {uri-org}
 
-== Copyright and Licensing
+== License
 
-Copyright (C) 2012-2018 Dan Allen, Ryan Waldron and the Asciidoctor Project.
-Free use of this software is granted under the terms of the MIT License.
+Copyright (C) 2012-2018 Dan Allen, Sarah White and the individual contributors to Asciidoctor.
+Use of this software is granted under the terms of the MIT License.
 
-See the {uri-license}[LICENSE] file for details.
+See the {uri-license}[LICENSE] for the full license text.
 
 == Authors
 
-*Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {uri-contributors}[many other individuals] in Asciidoctor's awesome community.
+*Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {uri-contributors}[many individuals] in Asciidoctor's awesome community.
 The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and based on {uri-prototype}[a prototype] written by https://github.com/nickh[Nick Hengeveld].
 
-*AsciiDoc* was started by Stuart Rackham and has received contributions from many other individuals in the AsciiDoc community.
+*AsciiDoc* was started by Stuart Rackham and has received contributions from many individuals in the AsciiDoc community.
 
 ifndef::env-site[]
 == Changelog
