@@ -104,7 +104,7 @@ context 'Tables' do
       assert_xpath '(/table)[3]/caption[text()="Table 2. Second numbered table"]', output, 1
     end
 
-    test 'renders explicit caption on simple psv table' do
+    test 'uses explicit caption in front of title in place of default caption and number' do
       input = <<-EOS
 [caption="All the Data. "]
 .Simple psv table
@@ -116,6 +116,52 @@ context 'Tables' do
       EOS
       output = render_embedded_string input
       assert_xpath '/table/caption[@class="title"][text()="All the Data. Simple psv table"]', output, 1
+      assert_xpath '/table/caption/following-sibling::colgroup', output, 1
+    end
+
+    test 'disables caption when caption attribute on table is empty' do
+      input = <<-EOS
+[caption=]
+.Simple psv table
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
+      assert_xpath '/table/caption/following-sibling::colgroup', output, 1
+    end
+
+    test 'disables caption when caption attribute on table is empty string' do
+      input = <<-EOS
+[caption=""]
+.Simple psv table
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
+      assert_xpath '/table/caption/following-sibling::colgroup', output, 1
+    end
+
+    test 'disables caption on table when table-caption document attribute is unset' do
+      input = <<-EOS
+:!table-caption:
+
+.Simple psv table
+|=======
+|A |B |C
+|a |b |c
+|1 |2 |3
+|=======
+      EOS
+      output = render_embedded_string input
+      assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
       assert_xpath '/table/caption/following-sibling::colgroup', output, 1
     end
 
