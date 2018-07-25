@@ -140,7 +140,7 @@ class AttributeList
             single_quoted_value = true
           # example: foo=,
           elsif c == @delimiter
-            value = nil
+            value = ''
           # example: foo=bar (all spaces ignored)
           else
             value = %(#{c}#{scan_to_delimiter})

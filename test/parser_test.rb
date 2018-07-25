@@ -216,6 +216,22 @@ context "Parser" do
     assert_equal expected, attributes
   end
 
+  test 'collect single named attribute with empty value' do
+    attributes = {}
+    line = 'foo='
+    expected = {'foo' => ''}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'collect single named attribute with empty value when followed by other attributes' do
+    attributes = {}
+    line = 'foo=,bar=baz'
+    expected = {'foo' => '', 'bar' => 'baz'}
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
   test "collect named attributes unquoted" do
     attributes = {}
     line = "first=value, second=two, third=3"

@@ -22,6 +22,7 @@ Enhancements::
 
 Fixes::
 
+  * treat empty/missing value of named block attribute followed by other attributes (e.g., caption=,cols=2*) as empty string
   * AbstractNode#set_option does nothing if option is already set (PR #2778)
   * allow revnumber to be an attribute reference in revision info line (#2785)
   * use ::File.open instead of ::IO.binread in Reader for Asciidoctor.js compatibility
