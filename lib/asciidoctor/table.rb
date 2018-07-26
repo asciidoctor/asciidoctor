@@ -248,7 +248,7 @@ class Table::Cell < AbstractNode
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
     end
-    # NOTE if attributes is defined, we know this is a psv cell; implies text should be stripped
+    # NOTE if attributes is defined, we know this is a psv cell; implies text needs to be stripped
     if attributes
       if attributes.empty?
         @colspan = @rowspan = nil
@@ -280,6 +280,10 @@ class Table::Cell < AbstractNode
       end
     else
       @colspan = @rowspan = nil
+      if cell_style == :asciidoc
+        asciidoc = true
+        inner_document_cursor = opts[:cursor]
+      end
     end
     # NOTE only true for non-header rows
     if asciidoc
