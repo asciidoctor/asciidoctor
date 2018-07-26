@@ -1636,6 +1636,97 @@ eof
         assert_message logger, :WARN, '<stdin>: line 9: unterminated example block', Hash
       end
     end
+
+    test 'custom separator for an AsciiDoc table cell' do
+      input = <<-EOS
+[cols=2,separator=!]
+|===
+!Pipe output to vim
+a!
+----
+asciidoctor -o - -s test.adoc | view -
+----
+|===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > tbody > tr', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1) p', output, 1
+      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2) .listingblock', output, 1
+    end
+
+    test 'table with breakable option docbook 4.5' do
+      input = <<-EOS
+.Table with breakable
+[%breakable]
+|===
+|Item       |Quantity
+|Item 1     |1
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook45'
+      assert_includes output, '<?dbfo keep-together="auto"?>'
+    end
+
+    test 'table with breakable option docbook 5' do
+      input = <<-EOS
+.Table with breakable
+[%breakable]
+|===
+|Item       |Quantity
+|Item 1     |1
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert_includes output, '<?dbfo keep-together="auto"?>'
+    end
+
+    test 'table with unbreakable option docbook 5' do
+      input = <<-EOS
+.Table with unbreakable
+[%unbreakable]
+|===
+|Item       |Quantity
+|Item 1     |1
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook5'
+      assert_includes output, '<?dbfo keep-together="always"?>'
+    end
+
+    test 'table with unbreakable option docbook 4.5' do
+      input = <<-EOS
+.Table with unbreakable
+[%unbreakable]
+|===
+|Item       |Quantity
+|Item 1     |1
+|===
+      EOS
+      output = render_embedded_string input, :backend => 'docbook45'
+      assert_includes output, '<?dbfo keep-together="always"?>'
+    end
+
+    test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
+      input = <<-EOS
+[cols=2*l]
+,===
+"A1
+
+A1 continued",B1
+A2,B2
+,===
+      EOS
+      output = render_embedded_string input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'table > thead', output, 0
+      assert_css 'table > tbody', output, 1
+      assert_css 'table > tbody > tr', output, 2
+      assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
+    end
   end
 
   context 'DSV' do
@@ -1868,26 +1959,6 @@ a\tb\tc
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
     end
 
-    test 'custom separator for an AsciiDoc table cell' do
-      input = <<-EOS
-[cols=2,separator=!]
-|===
-!Pipe output to vim
-a!
-----
-asciidoctor -o - -s test.adoc | view -
-----
-|===
-      EOS
-      output = render_embedded_string input
-      assert_css 'table', output, 1
-      assert_css 'table > colgroup > col', output, 2
-      assert_css 'table > tbody > tr', output, 1
-      assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
-      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(1) p', output, 1
-      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2) .listingblock', output, 1
-    end
-
     test 'single cell in CSV table should only produce single row' do
       input = <<-EOS
 ,===
@@ -1897,77 +1968,6 @@ single cell
 
       output = render_embedded_string input
       assert_css 'table td', output, 1
-    end
-
-    test 'table with breakable db45' do
-      input = <<-EOS
-.Table with breakable
-[options="breakable"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
-      EOS
-      output = render_embedded_string input, :backend => 'docbook45'
-      assert_includes output, '<?dbfo keep-together="auto"?>'
-    end
-
-    test 'table with breakable db5' do
-      input = <<-EOS
-.Table with breakable
-[options="breakable"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
-      EOS
-      output = render_embedded_string input, :backend => 'docbook5'
-      assert_includes output, '<?dbfo keep-together="auto"?>'
-    end
-
-    test 'table with unbreakable db5' do
-      input = <<-EOS
-.Table with unbreakable
-[options="unbreakable"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
-      EOS
-      output = render_embedded_string input, :backend => 'docbook5'
-      assert_includes output, '<?dbfo keep-together="always"?>'
-    end
-
-    test 'table with unbreakable db45' do
-      input = <<-EOS
-.Table with unbreakable
-[options="unbreakable"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
-      EOS
-      output = render_embedded_string input, :backend => 'docbook45'
-      assert_includes output, '<?dbfo keep-together="always"?>'
-    end
-
-    test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
-      input = <<-EOS
-[cols=2*l]
-,===
-"A1
-
-A1 continued",B1
-A2,B2
-,===
-      EOS
-      output = render_embedded_string input
-      assert_css 'table', output, 1
-      assert_css 'table > colgroup > col', output, 2
-      assert_css 'table > thead', output, 0
-      assert_css 'table > tbody', output, 1
-      assert_css 'table > tbody > tr', output, 2
-      assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
     end
   end
 end
