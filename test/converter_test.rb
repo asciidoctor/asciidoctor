@@ -171,8 +171,8 @@ Sidebar content
         doc = Asciidoctor::Document.new [], :template_dir => template_dir
         doc.converter
         caches = Asciidoctor::Converter::TemplateConverter.caches
-        if defined? ::ThreadSafe::Cache
-          assert_kind_of ::ThreadSafe::Cache, caches[:templates]
+        if defined? ::Concurrent::Hash
+          assert_kind_of ::Concurrent::Hash, caches[:templates]
           refute_empty caches[:templates]
           paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
           refute_nil paragraph_template_before

@@ -39,6 +39,10 @@ Improvements::
   * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
   * read file in binary mode whenever contents are being normalized
 
+Build / Infrastructure::
+
+  * replace thread_safe with concurrent-ruby (PR #2822) (*@junaruga*)
+
 // tag::compact[]
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
