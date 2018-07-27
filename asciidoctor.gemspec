@@ -5,8 +5,6 @@ rescue LoadError
   require 'asciidoctor/version'
 end
 
-require 'open3' unless defined? Open3
-
 Gem::Specification.new do |s|
   s.name = 'asciidoctor'
   s.version = Asciidoctor::VERSION
@@ -23,15 +21,13 @@ Gem::Specification.new do |s|
     'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
   }
 
-  files = begin
-    (result = Open3.popen3('git ls-files -z') {|_, out| out.read }.split %(\0)).empty? ? Dir['**/*'] : result
-  rescue
-    Dir['**/*']
+  s.files = `git ls-files -- data/* lib/* man/* *.adoc`.split("\n")
+  s.files += %w[Gemfile Rakefile LICENSE]
+  s.executables = `git ls-files -- bin/*`.split("\n").map do |f|
+    File.basename f
   end
-  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTING|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
-  s.executables = files.grep(/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
-  s.test_files = files.grep(/^(?:(?:features|test)\/.+)$/)
+  s.test_files = `git ls-files -- features/* test/*`.split("\n")
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE']
