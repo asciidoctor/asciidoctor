@@ -1969,5 +1969,35 @@ single cell
       output = render_embedded_string input
       assert_css 'table td', output, 1
     end
+
+    test 'cell formatted with AsciiDoc style' do
+      input = <<-EOS
+[cols="1,1,1a",separator=;]
+,===
+element;description;example
+
+thematic break,a visible break; also known as a horizontal rule;---
+,===
+      EOS
+
+      output = render_embedded_string input
+      assert_css 'table tbody hr', output, 1
+    end
+
+    test 'should strip whitespace around contents of AsciiDoc cell' do
+      input = <<-EOS
+[cols="1,1,1a",separator=;]
+,===
+element;description;example
+
+paragraph;contiguous lines of words and phrases;"
+  one sentence, one line
+  "
+,===
+      EOS
+
+      output = render_embedded_string input
+      assert_xpath '/table/tbody//*[@class="paragraph"]/p[text()="one sentence, one line"]', output, 1
+    end
   end
 end
