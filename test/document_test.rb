@@ -1782,7 +1782,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
         doc = empty_document
         secure_path = doc.normalize_asset_path naughty_path
         refute_equal naughty_path, secure_path
-        assert_equal (::File.join doc.base_dir, 'etc/passwd'), secure_path
+        assert_equal ::File.join(doc.base_dir, 'etc/passwd'), secure_path
         assert_message logger, :WARN, 'path is outside of jail; recovering automatically'
       end
     end
