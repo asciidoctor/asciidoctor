@@ -1,5 +1,3 @@
-autoload :Concurrent, 'concurrent'
-
 # encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
@@ -36,7 +34,9 @@ module Asciidoctor
     }
 
     begin
-      # triggers autoload of concurrent
+      unless defined? ::Concurrent::Hash
+        require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
+      end
       @caches = { :scans => ::Concurrent::Hash.new, :templates => ::Concurrent::Hash.new }
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }

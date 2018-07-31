@@ -44,10 +44,12 @@ module Asciidoctor
         # Returns the default [Factory] singleton instance
         def default initialize_singleton = true
           return @__default__ || new unless initialize_singleton
-          # FIXME this assignment is not concurrent-ruby, may need to use a ::Threadsafe helper here
+          # FIXME this assignment itself may not be thread safe; may need to use a helper here
           @__default__ ||= begin
-            # NOTE .to_s hides require from Opal
-            require 'concurrent'.to_s unless defined? ::Concurrent
+            unless defined? ::Concurrent::Hash
+              # NOTE .to_s hides require from Opal
+              require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash'.to_s : 'asciidoctor/core_ext/1.8.7/concurrent/hash'.to_s
+            end
             new ::Concurrent::Hash.new
           rescue ::LoadError
             include Logging unless include? Logging
