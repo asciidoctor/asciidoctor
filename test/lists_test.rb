@@ -766,7 +766,7 @@ B. And it ends here.
       assert_xpath '//ol/li', output, 2
     end
 
-    test 'should discover anchor at start of list item text and register it as a reference' do
+    test 'should discover anchor at start of unordered list item text and register it as a reference' do
       input = <<-EOS
 The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
 
@@ -784,6 +784,26 @@ Grays Peak rises to 14,278 feet, making it the highest summit in the Front Range
       output = doc.convert :header_footer => false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
+    end
+
+    test 'should discover anchor at start of ordered list item text and register it as a reference' do
+      input = <<-EOS
+This is a cross-reference to <<step-2>>.
+This is a cross-reference to <<step-4>>.
+
+. Ordered list, item 1, without anchor
+. [[step-2,Step 2]]Ordered list, item 2, with anchor
+. Ordered list, item 3, without anchor
+. [[step-4,Step 4]]Ordered list, item 4, with anchor
+      EOS
+
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('step-2')
+      assert refs.key?('step-4')
+      output = doc.convert :header_footer => false
+      assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step 2"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
     end
   end
 

@@ -1309,6 +1309,9 @@ class Parser
         end
       elsif list_type == :olist
         list_item.marker = (sibling_trait ||= resolve_ordered_list_marker(match[1], list_block.items.size, true, reader))
+        if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
+          catalog_inline_anchor $1, $2, list_item, reader
+        end
       else # :colist
         list_item.marker = (sibling_trait ||= '<1>')
       end
