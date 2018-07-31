@@ -1,3 +1,5 @@
+autoload :ThreadSafe, 'thread_safe'
+
 # encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
@@ -33,9 +35,8 @@ module Asciidoctor
       :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
     }
 
-    # QUESTION are we handling how we load the thread_safe support correctly?
     begin
-      require 'thread_safe' unless defined? ::ThreadSafe
+      # triggers autoload of thread_safe
       @caches = { :scans => ::ThreadSafe::Cache.new, :templates => ::ThreadSafe::Cache.new }
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }
@@ -75,7 +76,7 @@ module Asciidoctor
       end
       case opts[:template_cache]
       when true
-        logger.warn 'gem \'thread_safe\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::ThreadSafe
+        logger.warn 'gem \'thread_safe\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::ThreadSafe::Cache
         @caches = self.class.caches
       when ::Hash
         @caches = opts[:template_cache]
