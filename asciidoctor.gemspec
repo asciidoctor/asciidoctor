@@ -23,15 +23,17 @@ Gem::Specification.new do |s|
     'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
   }
 
+  # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
   files = begin
+    # NOTE popen3 is used instead of backticks to fail properly when used with JRuby
     (result = Open3.popen3('git ls-files -z') {|_, out| out.read }.split %(\0)).empty? ? Dir['**/*'] : result
   rescue
     Dir['**/*']
   end
-  s.files = files.grep(/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTING|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/)
-  s.executables = files.grep(/^bin\//).map {|f| File.basename f }
+  s.files = files.grep %r/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTING|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/
+  s.executables = (files.grep %r/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
-  s.test_files = files.grep(/^(?:(?:features|test)\/.+)$/)
+  s.test_files = files.grep %r/^(?:(?:features|test)\/.+)$/
   s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE']
