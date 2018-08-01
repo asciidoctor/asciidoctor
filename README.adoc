@@ -164,6 +164,7 @@ The version of Asciidoctor installed by the package manager may not match the la
 Consult the package repository for your distribution to find out which version is packaged per distribution release.
 
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
+* https://www.archlinux.org/packages/?name=asciidoctor[Arch Linux (asciidoctor)]
 * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
 * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
 * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
@@ -176,6 +177,12 @@ If you want to use a version of Asciidoctor that is newer than what is installed
 To install the gem on Alpine Linux, open a terminal and type:
 
  $ sudo apk add asciidoctor
+ 
+==== pacman (Arch Linux)
+
+To install the gem on Arch-based distributions, open a terminal and type:
+
+ $ sudo pacman -S asciidoctor
 
 ==== APT
 
