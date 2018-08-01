@@ -38,6 +38,7 @@ Improvements::
   * allow hyphen to be used custom block macro name as long as it's not the first character (#2620)
   * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
   * read file in binary mode whenever contents are being normalized
+  * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
 
 // tag::compact[]
 == 1.5.7.1 (2018-05-10) - @mojavelinux

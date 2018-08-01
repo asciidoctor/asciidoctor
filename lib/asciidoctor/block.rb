@@ -61,7 +61,7 @@ class Block < AbstractBlock
         # e.g., :subs => [:quotes]
         # subs attribute is not honored
         elsif ::Array === subs
-          @default_subs = subs.dup
+          @default_subs = subs.drop 0
           @attributes.delete 'subs'
         # e.g., :subs => :normal or :subs => 'normal'
         # subs attribute is not honored
@@ -90,7 +90,7 @@ class Block < AbstractBlock
     elsif ::String === raw_source
       @lines = Helpers.normalize_lines_from_string raw_source
     else
-      @lines = raw_source.dup
+      @lines = raw_source.drop 0
     end
   end
 

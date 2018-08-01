@@ -1357,7 +1357,7 @@ module Substitutors
       end
 
       if modifier_operation
-        candidates ||= (defaults ? defaults.dup : [])
+        candidates ||= (defaults ? (defaults.drop 0) : [])
         case modifier_operation
         when :append
           candidates += resolved_keys
@@ -1614,7 +1614,7 @@ module Substitutors
     if (custom_subs = @attributes['subs'])
       @subs = (resolve_block_subs custom_subs, default_subs, @context) || []
     else
-      @subs = default_subs.dup
+      @subs = default_subs.drop 0
     end
 
     # QUESION delegate this logic to a method?
