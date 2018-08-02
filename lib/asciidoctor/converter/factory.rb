@@ -23,7 +23,7 @@ module Asciidoctor
     # DocBook 5} and {DocBook45Converter DocBook 4.5}, as well as any custom
     # converters that have been discovered or explicitly registered.
     #
-    # If the {https://rubygems.org/gems/thread_safe thread_safe} gem is
+    # If the {https://rubygems.org/gems/concurrent-ruby concurrent-ruby} gem is
     # installed, access to the default factory is guaranteed to be thread safe.
     # Otherwise, a warning is issued to the user.
     class Factory
@@ -32,8 +32,8 @@ module Asciidoctor
 
         # Public: Retrieves a singleton instance of {Factory Converter::Factory}.
         #
-        # If the thread_safe gem is installed, the registry of converters is
-        # initialized as a ThreadSafe::Cache. Otherwise, a warning is issued and
+        # If the concurrent-ruby gem is installed, the registry of converters is
+        # initialized as a Concurrent::Hash. Otherwise, a warning is issued and
         # the registry of converters is initialized using a normal Hash.
         #
         # initialize_singleton - A Boolean to indicate whether the singleton should
@@ -44,14 +44,16 @@ module Asciidoctor
         # Returns the default [Factory] singleton instance
         def default initialize_singleton = true
           return @__default__ || new unless initialize_singleton
-          # FIXME this assignment is not thread_safe, may need to use a ::Threadsafe helper here
+          # FIXME this assignment itself may not be thread safe; may need to use a helper here
           @__default__ ||= begin
-            # NOTE .to_s hides require from Opal
-            require 'thread_safe'.to_s unless defined? ::ThreadSafe
-            new ::ThreadSafe::Cache.new
+            unless defined? ::Concurrent::Hash
+              # NOTE .to_s hides require from Opal
+              require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash'.to_s : 'asciidoctor/core_ext/1.8.7/concurrent/hash'.to_s
+            end
+            new ::Concurrent::Hash.new
           rescue ::LoadError
             include Logging unless include? Logging
-            logger.warn 'gem \'thread_safe\' is not installed. This gem is recommended when registering custom converters.'
+            logger.warn 'gem \'concurrent-ruby\' is not installed. This gem is recommended when registering custom converters.'
             new
           end
         end

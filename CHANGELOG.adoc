@@ -40,6 +40,10 @@ Improvements::
   * read file in binary mode whenever contents are being normalized
   * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
 
+Build / Infrastructure::
+
+  * replace thread_safe with concurrent-ruby (PR #2822) (*@junaruga*)
+
 // tag::compact[]
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 

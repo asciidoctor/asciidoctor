@@ -1,5 +1,3 @@
-autoload :ThreadSafe, 'thread_safe'
-
 # encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
@@ -22,8 +20,8 @@ module Asciidoctor
   # backend format (e.g., "html5").
   #
   # As an optimization, scan results and templates are cached for the lifetime
-  # of the Ruby process. If the {https://rubygems.org/gems/thread_safe
-  # thread_safe} gem is installed, these caches are guaranteed to be thread
+  # of the Ruby process. If the {https://rubygems.org/gems/concurrent-ruby
+  # concurrent-ruby} gem is installed, these caches are guaranteed to be thread
   # safe. If this gem is not present, there is no such guarantee and a warning
   # will be issued.
   class Converter::TemplateConverter < Converter::Base
@@ -36,8 +34,10 @@ module Asciidoctor
     }
 
     begin
-      # triggers autoload of thread_safe
-      @caches = { :scans => ::ThreadSafe::Cache.new, :templates => ::ThreadSafe::Cache.new }
+      unless defined? ::Concurrent::Hash
+        require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
+      end
+      @caches = { :scans => ::Concurrent::Hash.new, :templates => ::Concurrent::Hash.new }
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }
     end
@@ -76,7 +76,7 @@ module Asciidoctor
       end
       case opts[:template_cache]
       when true
-        logger.warn 'gem \'thread_safe\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::ThreadSafe::Cache
+        logger.warn 'gem \'concurrent-ruby\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::Concurrent::Hash
         @caches = self.class.caches
       when ::Hash
         @caches = opts[:template_cache]

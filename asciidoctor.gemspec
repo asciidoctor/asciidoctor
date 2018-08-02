@@ -53,7 +53,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   # slim is needed for testing custom templates
   s.add_development_dependency 'slim', '~> 3.0.0'
-  s.add_development_dependency 'thread_safe', '~> 0.3.0'
+  # concurrent-ruby is defined in Gemfile due to enforcement of minimum required Ruby version
+  #s.add_development_dependency 'concurrent-ruby', '~> 1.0.0'
   # tilt is needed for testing custom templates
   s.add_development_dependency 'tilt', '~> 2.0.0'
   s.add_development_dependency 'minitest', '~> 5.3.0'
