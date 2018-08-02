@@ -47,8 +47,8 @@ module Asciidoctor
           # FIXME this assignment itself may not be thread safe; may need to use a helper here
           @__default__ ||= begin
             unless defined? ::Concurrent::Hash
-              # NOTE .to_s hides require from Opal
-              require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash'.to_s : 'asciidoctor/core_ext/1.8.7/concurrent/hash'.to_s
+              # NOTE dynamic require is ignored by Opal
+              require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
             end
             new ::Concurrent::Hash.new
           rescue ::LoadError
