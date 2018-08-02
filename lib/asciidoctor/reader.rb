@@ -60,7 +60,7 @@ class Reader
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
     @lines = data ? (prepare_lines data, opts) : []
-    @source_lines = @lines.dup
+    @source_lines = @lines.drop 0
     @mark = nil
     @look_ahead = 0
     @process_lines = true
@@ -91,7 +91,7 @@ class Reader
     elsif opts[:normalize]
       Helpers.normalize_lines_array data
     else
-      data.dup
+      data.drop 0
     end
   end
 
@@ -556,7 +556,7 @@ class Reader
   #
   # Returns A copy of the String Array of lines remaining in this Reader
   def lines
-    @lines.dup
+    @lines.drop 0
   end
 
   # Public: Get a copy of the remaining lines managed by this Reader joined as a String
@@ -1195,9 +1195,9 @@ class PreprocessorReader < Reader
   def skip_front_matter! data, increment_linenos = true
     front_matter = nil
     if data[0] == '---'
-      original_data = data.dup
-      front_matter = []
+      original_data = data.drop 0
       data.shift
+      front_matter = []
       @lineno += 1 if increment_linenos
       while !data.empty? && data[0] != '---'
         front_matter << data.shift

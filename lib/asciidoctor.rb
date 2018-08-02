@@ -1211,7 +1211,7 @@ module Asciidoctor
     [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/]
   ]
 
-  compat_quote_subs = quote_subs.dup
+  compat_quote_subs = quote_subs.drop 0
   # ``quoted''
   compat_quote_subs[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
   # `quoted'
@@ -1352,7 +1352,7 @@ module Asciidoctor
     elsif ::String === input
       lines = ::RUBY_MIN_VERSION_2 ? input.lines : input.each_line.to_a
     elsif ::Array === input
-      lines = input.dup
+      lines = input.drop 0
     else
       raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
