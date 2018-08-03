@@ -1993,6 +1993,22 @@ image::circle.svg[Tiger,100]
       assert_match(/<svg\s[^>]*width="100px">/, output, 1)
     end
 
+    test 'embeds remote inline SVG when allow-uri-read is set' do
+      input = <<-EOS
+image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=inline]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+      end
+
+      assert_css 'svg', output, 1
+      assert_css 'svg[style]', output, 0
+      assert_css 'svg[width="100px"]', output, 1
+      assert_css 'svg[height="100px"]', output, 1
+      assert_css 'svg circle', output, 1
+    end
+
     test 'renders alt text for inline svg element if svg cannot be read' do
       input = <<-EOS
 [%inline]
