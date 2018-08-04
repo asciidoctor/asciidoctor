@@ -508,7 +508,8 @@ module Asciidoctor
     #     log(e);
     #   }
     #   // end::try-catch[]
-    TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+?)\[\][\n \r]/
+    # NOTE m flag is required for Asciidoctor.js
+    TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+?)\[\](?=$|[ \r])/m
 
     ## Attribute entries and references
 
