@@ -1003,6 +1003,26 @@ include::#{tmp_include_path}[tag=include-me]
         end 
       end
 
+      test 'include directive finds closing tag on last line of file without a trailing newline' do
+        begin
+          tmp_include = Tempfile.new %w(include- .adoc)
+          tmp_include_dir, tmp_include_path = File.split tmp_include.path
+          tmp_include.write %(line not included\ntag::include-me[]\nline included\nend::include-me[])
+          tmp_include.close
+          input = <<-EOS
+include::#{tmp_include_path}[tag=include-me]
+          EOS
+          using_memory_logger do |logger|
+            output = render_embedded_string input, :safe => :safe, :base_dir => tmp_include_dir
+            assert_empty logger.messages
+            assert_includes output, 'line included'
+            refute_includes output, 'line not included'
+          end
+        ensure
+          tmp_include.close!
+        end 
+      end
+
       test 'include directive does not select lines with tag directives within selected tag region' do
         input = <<-EOS
 ++++
