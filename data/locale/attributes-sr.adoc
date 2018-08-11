@@ -8,12 +8,13 @@
 :figure-caption: Слика
 :important-caption: Важно
 :last-update-label: Последње ажурирано
-ifdef::listing-caption[:listing-caption: Списак]
+ifdef::listing-caption[:listing-caption: Листинг]
 //:manname-title: НАЗИВ
 :note-caption: Белешка
-//:part-refsig: ???
+:part-label: Део
+:part-refsig: {part-label}
 ifdef::preface-title[:preface-title: Предговор]
-//:section-refsig: ???
+:section-refsig: Секција
 :table-caption: Табела
 :tip-caption: Савет
 :toc-title: Садржај
