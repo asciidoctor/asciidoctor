@@ -1210,11 +1210,13 @@ content
       input = <<-EOS
 ---
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       doc = document_from_string input, :safe => :safe, :attributes => { 'htmlsyntax' => 'xml' }
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
       result = doc.convert :header_footer => false
       assert_equal '<hr/>', result
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'honor htmlsyntax attribute in document header if followed by backend attribute' do
@@ -1224,11 +1226,13 @@ content
 
 ---
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       doc = document_from_string input, :safe => :safe
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
       result = doc.convert :header_footer => false
       assert_equal '<hr/>', result
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'does not honor htmlsyntax attribute in document header if not followed by backend attribute' do
@@ -1238,8 +1242,10 @@ content
 
 ---
       EOS
+      Asciidoctor::Compliance.markdown_syntax = true
       result = render_embedded_string input, :safe => :safe
       assert_equal '<hr>', result
+      Asciidoctor::Compliance.markdown_syntax = false
     end
 
     test 'should close all short tags when htmlsyntax is xml' do

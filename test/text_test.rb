@@ -118,11 +118,13 @@ This line is separated by a horizontal rule...
 
 ...from this line.
         EOS
+        Asciidoctor::Compliance.markdown_syntax = true
         output = render_embedded_string input
         assert_xpath "//hr", output, 1
         assert_xpath "/*[@class='paragraph']", output, 2
         assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
         assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+        Asciidoctor::Compliance.markdown_syntax = false
       end
     end
   end
@@ -151,8 +153,10 @@ This line is separated by something that is not a horizontal rule...
 
 ...from this line.
         EOS
+        Asciidoctor::Compliance.markdown_syntax = true
         output = render_embedded_string input
         assert_xpath '//hr', output, 0
+        Asciidoctor::Compliance.markdown_syntax = false
       end
     end
 
