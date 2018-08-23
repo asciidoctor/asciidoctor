@@ -159,7 +159,7 @@ module Extensions
       Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
     end
 
-    # Public: Creates a list block node and links it to the specified parent.
+    # Public: Creates a list node and links it to the specified parent.
     #
     # parent - The parent Block (Block, Section, or Document) of this new list block.
     # context - The list context (e.g., :ulist, :olist, :colist, :dlist)
@@ -170,6 +170,16 @@ module Extensions
       list = List.new parent, context
       list.update_attributes attrs if attrs
       list
+    end
+
+    # Public: Creates a list item node and links it to the specified parent.
+    #
+    # parent - The parent List of this new list item block.
+    # text   - The text of the list item.
+    #
+    # Returns a [ListItem] node with all properties properly initialized.
+    def create_list_item parent, text = nil
+      ListItem.new parent, text
     end
 
     # Public: Creates an image block node and links it to the specified parent.
