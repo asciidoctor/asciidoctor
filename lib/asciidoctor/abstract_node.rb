@@ -187,7 +187,7 @@ class AbstractNode
   # the attributes argument.
   #
   # If an attribute already exists with the same key, it's value will
-  # be overridden.
+  # be overwritten.
   #
   # attributes - A Hash of attributes to assign to this node.
   #
