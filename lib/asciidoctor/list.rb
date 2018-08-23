@@ -10,7 +10,7 @@ class List < AbstractBlock
   # Public: Create alias to check if this list has blocks
   alias items? blocks?
 
-  def initialize parent, context
+  def initialize parent, context, opts = {}
     super
   end
 
