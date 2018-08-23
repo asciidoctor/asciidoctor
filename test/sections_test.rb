@@ -11,6 +11,17 @@ context 'Sections' do
       assert_equal '_section_one', sec.id
     end
 
+    test 'duplicate synthetic id is automatically enumerated' do
+      doc = document_from_string <<-EOS
+== Section One
+
+== Section One
+      EOS
+      assert_equal 2, doc.blocks.size
+      assert_equal '_section_one', doc.blocks[0].id
+      assert_equal '_section_one_2', doc.blocks[1].id
+    end
+
     test 'synthetic id removes non-word characters' do
       sec = block_from_string("== We’re back!")
       assert_equal '_were_back', sec.id
