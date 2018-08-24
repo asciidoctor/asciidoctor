@@ -305,6 +305,28 @@ content
       end
     end
 
+    test 'should warn if explicit section ID matches auto-generated section ID' do
+      input = <<-EOS
+== Do Not Repeat Yourself
+
+content
+
+[#_do_not_repeat_yourself]
+== Do Not Repeat Yourself
+
+content
+      EOS
+
+      using_memory_logger do |logger|
+        doc = document_from_string input
+        reftext = doc.catalog[:ids]['_do_not_repeat_yourself']
+        refute_nil reftext
+        assert_equal 'Do Not Repeat Yourself', reftext
+        assert_message logger, :WARN, '<stdin>: line 6: id assigned to section already in use: _do_not_repeat_yourself', Hash
+        assert_equal 2, (doc.convert.scan 'id="_do_not_repeat_yourself"').size
+      end
+    end
+
     test 'duplicate block id should not overwrite existing section id entry in references table' do
       input = <<-EOS
 [#install]
