@@ -1087,7 +1087,7 @@ target="target", attributes=[]
       end
     end
 
-    test 'wip should not carry over attributes if block processor returns nil' do
+    test 'should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
           block do
