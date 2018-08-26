@@ -327,7 +327,7 @@ class Document < AbstractBlock
     end
 
     @parsed = false
-    @header = nil
+    @header = @header_attributes = nil
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -966,6 +966,27 @@ class Document < AbstractBlock
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked?(name)
     @attribute_overrides.key?(name)
+  end
+
+  # Public: Assign a value to the specified attribute in the document header.
+  #
+  # The assignment will be visible when the header attributes are restored,
+  # typically between processor phases (e.g., between parse and convert).
+  #
+  # name      - The String attribute name to assign
+  # value     - The Object value to assign to the attribute (default: '')
+  # overwrite - A Boolean indicating whether to assign the attribute
+  #             if already present in the attributes Hash (default: true)
+  #
+  # Returns a [Boolean] indicating whether the assignment was performed
+  def set_header_attribute name, value = '', overwrite = true
+    attrs = @header_attributes || @attributes
+    if overwrite == false && (attrs.key? name)
+      false
+    else
+      attrs[name] = value
+      true
+    end
   end
 
   # Internal: Apply substitutions to the attribute value
