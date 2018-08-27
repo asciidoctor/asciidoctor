@@ -143,7 +143,7 @@ Asciidoctor läuft auf Linux, MacOS und Windows und erforderte eine der folgende
 * Rubinius 2.2.x
 * Opal (JavaScript)
 
-[VORSICHT]
+[CAUTION]
 ====
 Wenn Sie eine nicht-englische Windows-Umgebung nutzen, könnten sie in einen `Encoding::UndefinedConversionError` laufen wenn sie Asciidoctor aufrufen.
 Um dieses Problem zu lösen, empfehlen wir die aktive Zeichensatztabelle in ihrer Windows Konsole auf UTF-8 zu ändern:
