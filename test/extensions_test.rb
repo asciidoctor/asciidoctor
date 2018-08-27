@@ -950,6 +950,39 @@ custom-toc::[]
       end
     end
 
+    test 'should be able to set header attribute in block macro processor' do
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro do
+            named :attribute
+            resolves_attributes '1:value'
+            process do |parent, target, attrs|
+              parent.document.set_attr target, attrs['value']
+              nil
+            end
+          end
+          block_macro do
+            named :header_attribute
+            resolves_attributes '1:value'
+            process do |parent, target, attrs|
+              parent.document.set_header_attribute target, attrs['value']
+              nil
+            end
+          end
+        end
+        input = <<-EOS
+attribute::yin[yang]
+
+header_attribute::foo[bar]
+        EOS
+        doc = document_from_string input
+        assert_nil doc.attr 'yin'
+        assert_equal 'bar', (doc.attr 'foo')
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom inline macro' do
       begin
         Asciidoctor::Extensions.register do
