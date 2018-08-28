@@ -358,7 +358,6 @@ module Substitutors
     passes.clear if outer
   end
 
-
   if RUBY_ENGINE == 'opal'
     def sub_quotes text
       if QuotedTextSniffRx[compat = @document.compat_mode].match? text
