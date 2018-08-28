@@ -19,6 +19,8 @@ Enhancements::
 
   * allow position (float) and alignment (align) to be set on video block (#2425)
   * substitute attribute references in attrlist of include directive (#2761)
+  * add Document#set_header_attribute method for adding method directly to document header during parsing (#2820)
+  * add helper method to extension processor classes to create lists and list items
 
 Fixes::
 
@@ -30,6 +32,7 @@ Fixes::
   * add fallback for timezone when setting doctime
   * fix formatting of quote block (indentation) in manpage output (#2792)
   * catalog inline anchors in ordered list items (#2812)
+  * detect closing tag on last line with no trailing newline (#2830)
 
 Improvements::
 
@@ -39,6 +42,11 @@ Improvements::
   * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
   * read file in binary mode whenever contents are being normalized
   * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
+
+Documentation::
+
+  * translate README into German (#2829) (*@jwehmschulte*)
+  * sync French translation of README (*@mogztter*)
 
 Build / Infrastructure::
 
