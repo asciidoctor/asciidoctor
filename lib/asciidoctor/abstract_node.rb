@@ -1,7 +1,7 @@
 # encoding: UTF-8
 module Asciidoctor
 # Public: An abstract base class that provides state and methods for managing a
-# node of AsciiDoc content. The state and methods on this class are comment to
+# node of AsciiDoc content. The state and methods on this class are common to
 # all content segments in an AsciiDoc document.
 class AbstractNode
   include Logging
