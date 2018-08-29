@@ -69,6 +69,8 @@ ifndef::env-site[]
 This document is also available in the following languages: +
 {uri-rel-file-base}README-zh_CN.adoc[汉语]
 |
+{uri-rel-file-base}README-de.adoc[Deutsch]
+|
 {uri-rel-file-base}README-fr.adoc[Français]
 |
 {uri-rel-file-base}README-jp.adoc[日本語]
