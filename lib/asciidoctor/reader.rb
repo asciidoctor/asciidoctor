@@ -167,7 +167,7 @@ class Reader
   # Returns nothing if there is no more data.
   def peek_line direct = false
     if direct || @look_ahead > 0
-      @unescape_next_line ? @lines[0][1..-1] : @lines[0]
+      @unescape_next_line ? ((line = @lines[0]).slice 1, line.length) : @lines[0]
     elsif @lines.empty?
       @look_ahead = 0
       nil
@@ -633,7 +633,7 @@ class PreprocessorReader < Reader
         if $1 == '\\'
           @unescape_next_line = true
           @look_ahead += 1
-          line[1..-1]
+          line.slice 1, line.length
         elsif preprocess_conditional_directive $2, $3, $4, $5
           # move the pointer past the conditional line
           shift
@@ -653,7 +653,7 @@ class PreprocessorReader < Reader
         if $1 == '\\'
           @unescape_next_line = true
           @look_ahead += 1
-          line[1..-1]
+          line.slice 1, line.length
         # QUESTION should we strip whitespace from raw attributes in Substitutors#parse_attributes? (check perf)
         elsif preprocess_include_directive $2, $3
           # peek again since the content has changed
@@ -1185,7 +1185,7 @@ class PreprocessorReader < Reader
   def shift
     if @unescape_next_line
       @unescape_next_line = false
-      super[1..-1]
+      (line = super).slice 1, line.length
     else
       super
     end
@@ -1251,7 +1251,7 @@ class PreprocessorReader < Reader
     if ((val.start_with? '"') && (val.end_with? '"')) ||
         ((val.start_with? '\'') && (val.end_with? '\''))
       quoted = true
-      val = val[1...-1]
+      val = val.slice 1, (val.length - 1)
     else
       quoted = false
     end
