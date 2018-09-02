@@ -133,6 +133,8 @@ class Document < AbstractBlock
     end
   end
 
+  RESERVED_IDS = { 'header' => nil, 'content' => nil, 'preamble' => nil, 'footer' => nil, 'footer-text' => nil }
+
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
@@ -270,7 +272,7 @@ class Document < AbstractBlock
     else
       @parent_document = nil
       @catalog = {
-        :ids => {},
+        :ids => (ids = options[:ids]) || RESERVED_IDS.dup,
         :refs => {},
         :footnotes => [],
         :links => [],

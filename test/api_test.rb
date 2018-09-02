@@ -632,6 +632,42 @@ term without description::
       refute_equal '0.00000', '%05.5f' % timings.convert.to_f
       refute_equal timings.read_parse, timings.total
     end
+
+    test 'does not assign a built-in reserved ID' do
+      input = <<-EOS
+== Header
+
+A section about the header.
+
+== Footer
+
+A section about the footer.
+      EOS
+
+      doc = Asciidoctor.load input, :attributes => { 'idprefix' => '', 'idseparator' => '-' }
+      assert_empty doc.find_by(:context => :section, :id => 'header')
+      refute_empty doc.find_by(:context => :section, :id => 'header-2')
+      assert_empty doc.find_by(:context => :section, :id => 'footer')
+      refute_empty doc.find_by(:context => :section, :id => 'footer-2')
+    end
+
+    test 'does not assign an explicit reserved ID' do
+      input = <<-EOS
+== Header
+
+A section about the header.
+
+== Footer
+
+A section about the footer.
+      EOS
+
+      doc = Asciidoctor.load input, :ids => { '_header' => nil, '_footer' => nil }
+      assert_empty doc.find_by(:context => :section, :id => '_header')
+      refute_empty doc.find_by(:context => :section, :id => '_header_2')
+      assert_empty doc.find_by(:context => :section, :id => '_footer')
+      refute_empty doc.find_by(:context => :section, :id => '_footer_2')
+    end
   end
 
   context 'Convert' do

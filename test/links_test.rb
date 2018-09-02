@@ -811,21 +811,21 @@ See <<test.adoc#foobaz>>.
 
   test 'anchor creates reference' do
     doc = document_from_string "[[tigers]]Tigers roam here."
-    assert_equal({'tigers' => '[tigers]'}, doc.catalog[:ids])
+    assert_equal '[tigers]', doc.catalog[:ids]['tigers']
   end
 
   test 'anchor with label creates reference' do
     doc = document_from_string "[[tigers,Tigers]]Tigers roam here."
-    assert_equal({'tigers' => 'Tigers'}, doc.catalog[:ids])
+    assert_equal 'Tigers', doc.catalog[:ids]['tigers']
   end
 
   test 'anchor with quoted label creates reference with quoted label text' do
     doc = document_from_string %([[tigers,"Tigers roam here"]]Tigers roam here.)
-    assert_equal({'tigers' => '"Tigers roam here"'}, doc.catalog[:ids])
+    assert_equal '"Tigers roam here"', doc.catalog[:ids]['tigers']
   end
 
   test 'anchor with label containing a comma creates reference' do
     doc = document_from_string %([[tigers,Tigers, scary tigers, roam here]]Tigers roam here.)
-    assert_equal({'tigers' => 'Tigers, scary tigers, roam here'}, doc.catalog[:ids])
+    assert_equal 'Tigers, scary tigers, roam here', doc.catalog[:ids]['tigers']
   end
 end
