@@ -59,7 +59,7 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}[Asciidoctor] ist ein schneller, {uri-license}[Open Source] Textverarbeitungs- und Publishing-Toolchain für die Konvertierung von {uri-what-is-asciidoc}[AsciiDoc]-Inhalten in HTML5, DocBook, PDF und andere Formate.
+{uri-project}[Asciidoctor] ist ein _schneller_, {uri-license}[Open Source] Textverarbeitungs- und Publishing-Toolchain für die Konvertierung von {uri-what-is-asciidoc}[AsciiDoc]-Inhalten in HTML5, DocBook, PDF und andere Formate.
 Asciidoctor ist in Ruby geschrieben und läuft auf allen gängigen Betriebsystemen.
 Um die Installation zu vereinfachen wird Asciidoctor als Gem auf {uri-rubygem}[RubyGems.org] verpackt und ist als Paket für gängige Linux-Distributionen und MacOS erhältlich.
 Asciidoctor kann auch in einer JVM mit {uri-asciidoctorj}[AsciidoctorJ] oder einer beliebigen Javascript-Umgebung mit {uri-asciidoctorjs}[Asciidoctor.js] ausgeführt werden.
@@ -213,8 +213,27 @@ Sobald Homebrew installiert ist, können sie das Asciidoctor gem installieren.
 
 Homebrew installiert das `asciidoctor` Gem in ein exklusives Präfix, das unabhängig von den System-Gems ist.
 
+=== (c) Windows
+
+Um Asciidoctor unter Windows zu installieren, gibt es zwei einfache Möglichkeiten.
+
+==== Chocolatey
+
+Wenn sie bereits https://chocolatey.org[chocolatey] verwenden, können sie folgenden Befehl verwenden:
+
+[source]
+----
+choco install ruby
+----
+
+Danach folgen sie der <<gem-install,Gem Installation>>.
+
+==== Rubyinstaller
+
+Oder sie benutzen den https://rubyinstaller.org/downloads/[Rubyinstaller], laden sie das für ihre Windows Version passende Paket herunter und nach der Installation folgen sie ebenfalls der <<gem-install, Gem Installation>>.
+
 [#gem-install]
-=== (c) gem install
+=== (d) gem install
 
 Bevor sie Asciidoctor mit `gem install` installieren, sollten sie https://rvm.io[RVM] verwenden, um Ruby in Ihrem Home-Verzeichnis zu installieren (z.B. Userspace).
 Dann können sie den Befehl `gem` sicher verwenden, um den Asciidoctor Gem zu installieren oder zu aktualisieren.
@@ -228,11 +247,11 @@ Wenn sie eine Vorabversion (z.B. einen Release-Kandidaten) installieren möchten
 
  $ gem install asciidoctor --pre
 
-=== (d) Docker
+=== (e) Docker
 
 Siehe {uri-install-docker}[Installing Asciidoctor using Docker].
 
-=== (e) Bundler
+=== (f) Bundler
 
 . Erstellen sie ein Gemfile im Stammordner Ihres Projekts (oder im aktuellen Verzeichnis).
 . Fügen sie den `asciidoctor` Gem wie folgt zu Ihrem Gemfile hinzu:
