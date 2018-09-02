@@ -181,7 +181,7 @@ If you want to use a version of Asciidoctor that is newer than what is installed
 To install the gem on Alpine Linux, open a terminal and type:
 
  $ sudo apk add asciidoctor
- 
+
 ==== pacman (Arch Linux)
 
 To install the gem on Arch-based distributions, open a terminal and type:
@@ -213,8 +213,27 @@ Open a terminal and type:
 
 Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
 
+=== (c) Windows
+
+To use Asciidoctor with Windows, you have two easy options.
+
+==== Chocolatey
+
+When you already use https://chocolatey.org[chocolatey] on your machine, you can use:
+
+[source]
+----
+choco install ruby
+----
+
+Then follow <<gem-install,gem installation instructions>>.
+
+==== Rubyinstaller
+
+Or you use the https://rubyinstaller.org/downloads/[Rubyinstaller], download the package for your Windows Version and after the installation go ahead with <<gem-install,gem installation instructions>>.
+
 [#gem-install]
-=== (c) gem install
+=== (d) gem install
 
 Before installing Asciidoctor using `gem install`, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
 Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
@@ -228,11 +247,11 @@ If you want to install a pre-release version (e.g., a release candidate), use:
 
  $ gem install asciidoctor --pre
 
-=== (d) Docker
+=== (e) Docker
 
 See {uri-install-docker}[Installing Asciidoctor using Docker].
 
-=== (e) Bundler
+=== (f) Bundler
 
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
