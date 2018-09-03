@@ -728,9 +728,9 @@ class Parser
           attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
           block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
         elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
-          lines.map! {|line| line == '>' ? line[1..-1] : ((line.start_with? '> ') ? line[2..-1] : line) }
+          lines.map! {|line| line == '>' ? (line.slice 1, line.length) : ((line.start_with? '> ') ? (line.slice 2, line.length) : line) }
           if lines[-1].start_with? '-- '
-            credit_line = (credit_line = lines.pop[3..-1])
+            credit_line = (credit_line = lines.pop).slice 3, credit_line.length
             lines.pop while lines[-1].empty?
           end
           attributes['style'] = 'quote'
@@ -744,10 +744,10 @@ class Parser
             attributes['citetitle'] = citetitle if citetitle
           end
         elsif ch0 == '"' && lines.size > 1 && (lines[-1].start_with? '-- ') && (lines[-2].end_with? '"')
-          lines[0] = this_line[1..-1] # strip leading quote
-          credit_line = (credit_line = lines.pop).slice(3, credit_line.length)
+          lines[0] = this_line.slice 1, this_line.length # strip leading quote
+          credit_line = (credit_line = lines.pop).slice 3, credit_line.length
           lines.pop while lines[-1].empty?
-          lines[-1] = lines[-1].chop # strip trailing quote
+          lines << lines.pop.chop # strip trailing quote
           attributes['style'] = 'quote'
           block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
           attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
@@ -969,7 +969,7 @@ class Parser
         else
           true
         end
-      elsif %(#{tip}#{tip[-1..-1] * (line_len - tl)}) == line
+      elsif %(#{tip}#{(tip.slice -1, 1) * (line_len - tl)}) == line
         if return_match_data
           context, masq = DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, line)
@@ -1824,7 +1824,7 @@ class Parser
           unless (component = match[2].strip).empty?
             # version must begin with 'v' if date is absent
             if !match[1] && (component.start_with? 'v')
-              rev_metadata['revnumber'] = component[1..-1]
+              rev_metadata['revnumber'] = component.slice 1, component.length
             else
               rev_metadata['revdate'] = component
             end
@@ -2099,7 +2099,7 @@ class Parser
       if (value = match[2]).nil_or_empty?
         value = ''
       elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
-        con, value = value.slice(-2, 2), value.slice(0, value.length - 2).rstrip
+        con, value = (value.slice -2, 2), (value.slice 0, value.length - 2).rstrip
         while reader.advance && !(next_line = reader.peek_line.lstrip).empty?
           if (keep_open = next_line.end_with? con)
             next_line = (next_line.slice 0, next_line.length - 2).rstrip
@@ -2142,9 +2142,9 @@ class Parser
         if name == 'leveloffset'
           # support relative leveloffset values
           if value.start_with? '+'
-            value = ((doc.attr 'leveloffset', 0).to_i + (value[1..-1] || 0).to_i).to_s
+            value = ((doc.attr 'leveloffset', 0).to_i + (value.slice 1, value.length).to_i).to_s
           elsif value.start_with? '-'
-            value = ((doc.attr 'leveloffset', 0).to_i - (value[1..-1] || 0).to_i).to_s
+            value = ((doc.attr 'leveloffset', 0).to_i - (value.slice 1, value.length).to_i).to_s
           end
         end
         # QUESTION should we set value to locked value if set_attribute returns false?
@@ -2729,12 +2729,12 @@ class Parser
     # NOTE gutter_width is > 0 if not nil
     if indent == 0
       if gutter_width
-        lines.map! {|line| line.empty? ? line : line[gutter_width..-1] }
+        lines.map! {|line| line.empty? ? line : (line.slice gutter_width, line.length) }
       end
     else
       padding = ' ' * indent
       if gutter_width
-        lines.map! {|line| line.empty? ? line : padding + line[gutter_width..-1] }
+        lines.map! {|line| line.empty? ? line : padding + (line.slice gutter_width, line.length) }
       else
         lines.map! {|line| line.empty? ? line : padding + line }
       end
