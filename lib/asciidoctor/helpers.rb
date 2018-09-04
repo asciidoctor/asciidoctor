@@ -82,9 +82,7 @@ module Helpers
       data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
     else
       # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      if leading_bytes == BOM_BYTES_UTF_8
-        data[0] = first_line[3..-1]
-      end
+      data[0] = first_line.slice 3, first_line.length if leading_bytes == BOM_BYTES_UTF_8
       data.map {|line| line.rstrip }
     end
   end
@@ -117,9 +115,7 @@ module Helpers
       end
     else
       # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      if leading_bytes == BOM_BYTES_UTF_8
-        data = data[3..-1]
-      end
+      data = data.slice 3, data.length if leading_bytes == BOM_BYTES_UTF_8
     end
     data.each_line.map {|line| line.rstrip }
   end

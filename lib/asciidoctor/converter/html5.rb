@@ -56,7 +56,7 @@ module Asciidoctor
         if (icon_href = node.attr 'favicon').empty?
           icon_href, icon_type = 'favicon.ico', 'image/x-icon'
         else
-          icon_type = (icon_ext = ::File.extname icon_href) == '.ico' ? 'image/x-icon' : %(image/#{icon_ext[1..-1]})
+          icon_type = (icon_ext = ::File.extname icon_href) == '.ico' ? 'image/x-icon' : %(image/#{icon_ext.slice 1, icon_ext.length})
         end
         result << %(<link rel="icon" type="#{icon_type}" href="#{icon_href}"#{slash}>)
       end

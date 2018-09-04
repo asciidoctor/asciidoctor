@@ -369,7 +369,7 @@ class AbstractNode
   def generate_data_uri(target_image, asset_dir_key = nil)
     ext = ::File.extname target_image
     # QUESTION what if ext is empty?
-    mimetype = (ext == '.svg' ? 'image/svg+xml' : %(image/#{ext[1..-1]}))
+    mimetype = (ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length}))
     if asset_dir_key
       image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, :target_name => 'image')
     else
