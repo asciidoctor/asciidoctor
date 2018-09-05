@@ -932,6 +932,16 @@ List
       assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
     end
 
+    test 'nested arbitrary depth with asterisks' do
+      input = []
+      ('a'..'z').each_with_index do |ch, i|
+        input << %(#{'*' * (i + 1)} #{ch})
+      end
+      output = render_embedded_string input.join(%(\n))
+      refute_includes output, '*'
+      assert_css 'li', output, 26
+    end
+
     test 'nested elements (5) with unicode bullet' do
       input = <<-EOS
 List
@@ -951,6 +961,16 @@ List
       assert_xpath '(((//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
       assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
       assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
+    end if ::RUBY_MIN_VERSION_1_9
+
+    test 'nested arbitrary depth with unicode bullet' do
+      input = []
+      ('a'..'z').each_with_index do |ch, i|
+        input << %(#{'•' * (i + 1)} #{ch})
+      end
+      output = render_embedded_string input.join(%(\n))
+      refute_includes output, '•'
+      assert_css 'li', output, 26
     end if ::RUBY_MIN_VERSION_1_9
 
     test "nested ordered elements (2)" do
@@ -984,6 +1004,16 @@ List
       assert_xpath '(//ol)[1]/li', output, 2
       assert_xpath '((//ol)[1]/li//ol)[1]/li', output, 1
       assert_xpath '(((//ol)[1]/li//ol)[1]/li//ol)[1]/li', output, 1
+    end
+
+    test 'nested arbitrary depth with dot marker' do
+      input = []
+      ('a'..'z').each_with_index do |ch, i|
+        input << %(#{'.' * (i + 1)} #{ch})
+      end
+      output = render_embedded_string input.join(%(\n))
+      refute_includes output, '.'
+      assert_css 'li', output, 26
     end
 
     test "nested unordered inside ordered elements" do
