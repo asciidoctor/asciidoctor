@@ -21,6 +21,7 @@ Enhancements::
   * substitute attribute references in attrlist of include directive (#2761)
   * add Document#set_header_attribute method for adding method directly to document header during parsing (#2820)
   * add helper method to extension processor classes to create lists and list items
+  * allow ordered and unordered lists to be nested to an arbitrary / unlimited depth (#2854)
 
 Fixes::
 
