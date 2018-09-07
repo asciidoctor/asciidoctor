@@ -204,7 +204,7 @@ module Substitutors
           else
             if boundary == '++' && (attributes.end_with? 'x-')
               old_behavior = true
-              attributes = attributes[0...-2]
+              attributes = attributes.slice 0, attributes.length - 2
             end
             attributes = parse_attributes attributes
           end
@@ -250,7 +250,7 @@ module Substitutors
         old_behavior = true
       else
         if (old_behavior = (attributes && (attributes.end_with? 'x-')))
-          attributes = attributes[0...-2]
+          attributes = attributes.slice 0, attributes.length - 2
         end
       end
 
@@ -577,7 +577,7 @@ module Substitutors
           m = $~
           # honor the escape
           if (captured = m[0]).start_with? RS
-            next captured[1..-1]
+            next captured.slice 1, captured.length
           end
 
           menu, items = m[1], m[2]
@@ -604,7 +604,7 @@ module Substitutors
           m = $~
           # honor the escape
           if (captured = m[0]).start_with? RS
-            next captured[1..-1]
+            next captured.slice 1, captured.length
           end
 
           input = m[1]
@@ -660,7 +660,7 @@ module Substitutors
         m = $~
         # honor the escape
         if (captured = $&).start_with? RS
-          next captured[1..-1]
+          next captured.slice 1, captured.length
         end
 
         if captured.start_with? 'icon:'
@@ -774,8 +774,8 @@ module Substitutors
           when ';'
             # strip <> around URI
             if prefix.start_with?('&lt;') && target.end_with?('&gt;')
-              prefix = prefix[4..-1]
-              target = target[0...-4]
+              prefix = prefix.slice 4, prefix.length
+              target = target.slice 0, target.length - 4
             # strip trailing ;
             # check for trailing );
             elsif (target = target.chop).end_with?(')')
@@ -914,7 +914,7 @@ module Substitutors
       text = text.gsub(InlineEmailRx) {
         address, tip = $&, $1
         if tip
-          next (tip == RS ? address[1..-1] : address)
+          next (tip == RS ? (address.slice 1, address.length) : address)
         end
 
         target = %(mailto:#{address})
@@ -1329,10 +1329,10 @@ module Substitutors
       if modifiers_present
         if (first = key.chr) == '+'
           modifier_operation = :append
-          key = key[1..-1]
+          key = key.slice 1, key.length
         elsif first == '-'
           modifier_operation = :remove
-          key = key[1..-1]
+          key = key.slice 1, key.length
         elsif key.end_with? '+'
           modifier_operation = :prepend
           key = key.chop
@@ -1548,7 +1548,7 @@ module Substitutors
     ((spec.include? ' ') ? (spec.delete ' ') : spec).split(DataDelimiterRx).map do |entry|
       negate = false
       if entry.start_with? '!'
-        entry = entry[1..-1]
+        entry = entry.slice 1, entry.length
         negate = true
       end
       if entry.include? '-'
