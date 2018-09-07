@@ -671,7 +671,7 @@ module Asciidoctor
     # Detects the start of any list item.
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
-    AnyListRx = /^(?:[ \t]*(?:-|\*\*{0,4}|\.\.{0,4}|\u2022\u2022{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t])/
+    AnyListRx = /^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022\u2022*|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|[ \t]*.*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t])/
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -681,7 +681,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^[ \t]*(-|\*\*{0,4}|\u2022\u2022{0,4})[ \t]+(.*)$/
+    UnorderedListRx = /^[ \t]*(-|\*\**|\u2022\u2022*)[ \t]+(.*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -697,7 +697,7 @@ module Asciidoctor
     #
     # NOTE leading space match is not always necessary, but is used for list reader
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    OrderedListRx = /^[ \t]*(\.\.{0,4}|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
+    OrderedListRx = /^[ \t]*(\.\.*|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
