@@ -551,11 +551,11 @@ Your browser does not support the audio tag.
         if svg
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-          img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{encode_quotes node.image_uri(node.attr 'fallback')}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+          img = %(<object type="image/svg+xml" data="#{encode_quotes node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
         end
       end
-      img ||= %(<img src="#{node.image_uri target}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img ||= %(<img src="#{encode_quotes node.image_uri target}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       if node.attr? 'link', nil, false
         img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
       end
