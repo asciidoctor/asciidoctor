@@ -74,7 +74,7 @@ module Helpers
         return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).each_line.map {|line| line.rstrip }
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
         data[0] = (first_line.force_encoding ::Encoding::UTF_16BE)[1..-1]
-        return data.map {|line| %(#{((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip}) }
+        return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
       elsif leading_bytes == BOM_BYTES_UTF_8
         data[0] = (first_line.force_encoding utf8)[1..-1]
       end
