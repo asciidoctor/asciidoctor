@@ -70,13 +70,14 @@ module Helpers
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
       if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        # HACK Ruby messes up trailing whitespace on UTF-16LE, so take a different route
-        return ((data.join.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8).each_line.map {|line| line.rstrip }
+        # HACK Ruby messes up trailing whitespace on UTF-16LE, so reencode whole document first
+        data = data.join
+        return (((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8).each_line.map {|line| line.rstrip }
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data[0] = (first_line.force_encoding ::Encoding::UTF_16BE)[1..-1]
+        data[0] = (first_line.force_encoding ::Encoding::UTF_16BE).slice 1, first_line.length
         return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
       elsif leading_bytes == BOM_BYTES_UTF_8
-        data[0] = (first_line.force_encoding utf8)[1..-1]
+        data[0] = (first_line.force_encoding utf8).slice 1, first_line.length
       end
 
       data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
@@ -105,11 +106,11 @@ module Helpers
     if COERCE_ENCODING
       utf8 = ::Encoding::UTF_8
       if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        data = (data.force_encoding ::Encoding::UTF_16LE)[1..-1].encode utf8
+        data = ((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8
       elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data = (data.force_encoding ::Encoding::UTF_16BE)[1..-1].encode utf8
+        data = ((data.force_encoding ::Encoding::UTF_16BE).slice 1, data.length).encode utf8
       elsif leading_bytes == BOM_BYTES_UTF_8
-        data = data.encoding == utf8 ? data[1..-1] : (data.force_encoding utf8)[1..-1]
+        data = data.encoding == utf8 ? (data.slice 1, data.length) : ((data.force_encoding utf8).slice 1, data.length)
       else
         data = data.force_encoding utf8 unless data.encoding == utf8
       end
