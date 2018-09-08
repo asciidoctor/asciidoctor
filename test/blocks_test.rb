@@ -2446,6 +2446,18 @@ image::#{image_uri}[Dot]
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
+    test 'escapes image uri when quotes are used in URI' do
+      input = <<-EOS
+image::"foo.png"[Dot]
+      EOS
+
+      output = using_test_webserver do
+        render_embedded_string input, :safe => :safe
+      end
+
+      assert_xpath %(/*[@class="imageblock"]//img[@src='"foo.png"'][@alt="Dot"]), output, 1
+    end
+
     test 'can handle embedded data uri images' do
       input = <<-EOS
 image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
