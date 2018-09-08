@@ -84,10 +84,6 @@ Example: asciidoctor -b html5 source.asciidoc
                   'defined in the source document') do |attr|
             key, val = attr.split '=', 2
             val = val ? (FORCE_ENCODING ? (val.force_encoding ::Encoding::UTF_8) : val) : ''
-            # move leading ! to end for internal processing
-            #if !val && key.start_with?('!')
-            #  key = %(#{key[1..-1]}!)
-            #end
             self[:attributes][key] = val
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
