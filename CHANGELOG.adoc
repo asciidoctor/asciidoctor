@@ -44,6 +44,7 @@ Improvements::
   * use shorthands %F and %T instead of %Y-%m-%d and %H:%M:%S to format time
   * read file in binary mode whenever contents are being normalized
   * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
+  * only recognize a bullet glyph which is non-repeating as an unordered list marker
 
 Documentation::
 

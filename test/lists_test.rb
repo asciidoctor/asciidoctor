@@ -942,35 +942,13 @@ List
       assert_css 'li', output, 26
     end
 
-    test 'nested elements (5) with unicode bullet' do
+    test 'does not recognize lists with repeating unicode bullets' do
       input = <<-EOS
-List
-====
-
-• Foo
 •• Boo
-••• Snoo
-•••• Froo
-••••• Groo
-• Blech
       EOS
       output = render_string input
-      assert_xpath '//ul', output, 5
-      assert_xpath '(//ul)[1]/li', output, 2
-      assert_xpath '((//ul)[1]/li//ul)[1]/li', output, 1
-      assert_xpath '(((//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
-      assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
-      assert_xpath '(((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
-    end if ::RUBY_MIN_VERSION_1_9
-
-    test 'nested arbitrary depth with unicode bullet' do
-      input = []
-      ('a'..'z').each_with_index do |ch, i|
-        input << %(#{'•' * (i + 1)} #{ch})
-      end
-      output = render_embedded_string input.join(%(\n))
-      refute_includes output, '•'
-      assert_css 'li', output, 26
+      assert_xpath '//ul', output, 0
+      assert_includes output, '•'
     end if ::RUBY_MIN_VERSION_1_9
 
     test "nested ordered elements (2)" do
