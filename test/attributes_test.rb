@@ -356,6 +356,23 @@ endif::holygrail[]
       end
     end
 
+    test 'can soft unset built-in attribute from API and still override in document' do
+      [
+        { 'sectids!@' => '' },
+        { '!sectids@' => '' },
+        { 'sectids!' => '@' },
+        { '!sectids' => '@' },
+        { 'sectids' => false },
+      ].each do |attributes|
+        doc = document_from_string '== Heading', :attributes => attributes
+        refute doc.attr?('sectids')
+        assert_css '#_heading', (doc.convert :header_footer => false), 0
+        doc = document_from_string %(:sectids:\n\n== Heading), :attributes => attributes
+        assert doc.attr?('sectids')
+        assert_css '#_heading', (doc.convert :header_footer => false), 1
+      end
+    end
+
     test 'backend and doctype attributes are set by default in default configuration' do
       input = <<-EOS
 = Document Title

@@ -287,7 +287,7 @@ class Document < AbstractBlock
       (options[:attributes] || {}).each do |key, val|
         if key.end_with? '@'
           if key.start_with? '!'
-            key, val = (key.slice 1, key.length), false
+            key, val = (key.slice 1, key.length - 2), false
           elsif key.end_with? '!@'
             key, val = (key.slice 0, key.length - 2), false
           else

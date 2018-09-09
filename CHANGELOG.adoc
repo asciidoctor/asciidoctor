@@ -34,6 +34,7 @@ Fixes::
   * fix formatting of quote block (indentation) in manpage output (#2792)
   * catalog inline anchors in ordered list items (#2812)
   * detect closing tag on last line with no trailing newline (#2830)
+  * process `!name@` attribute syntax property; follow-up to #642
 
 Improvements::
 
