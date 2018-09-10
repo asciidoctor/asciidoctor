@@ -266,6 +266,14 @@ module Extensions
     end
   end
 
+  module DocumentProcessorDsl
+    include ProcessorDsl
+
+    def prefer
+      option :position, :>>
+    end
+  end
+
   module SyntaxProcessorDsl
     include ProcessorDsl
 
@@ -366,7 +374,7 @@ module Extensions
       raise ::NotImplementedError, %(Asciidoctor::Extensions::Preprocessor subclass must implement ##{__method__} method)
     end
   end
-  Preprocessor::DSL = ProcessorDsl
+  Preprocessor::DSL = DocumentProcessorDsl
 
   # Public: TreeProcessors are run on the Document after the source has been
   # parsed into an abstract syntax tree (AST), as represented by the Document
@@ -383,7 +391,7 @@ module Extensions
       raise ::NotImplementedError, %(Asciidoctor::Extensions::TreeProcessor subclass must implement ##{__method__} method)
     end
   end
-  TreeProcessor::DSL = ProcessorDsl
+  TreeProcessor::DSL = DocumentProcessorDsl
 
   # Alias deprecated class name for backwards compatibility
   Treeprocessor = TreeProcessor
@@ -408,7 +416,7 @@ module Extensions
       raise ::NotImplementedError, %(Asciidoctor::Extensions::Postprocessor subclass must implement ##{__method__} method)
     end
   end
-  Postprocessor::DSL = ProcessorDsl
+  Postprocessor::DSL = DocumentProcessorDsl
 
   # Public: IncludeProcessors are used to process `include::<target>[]`
   # directives in the source document.
@@ -432,7 +440,7 @@ module Extensions
   end
 
   module IncludeProcessorDsl
-    include ProcessorDsl
+    include DocumentProcessorDsl
 
     def handles? *args, &block
       if block_given?
@@ -474,7 +482,7 @@ module Extensions
   end
 
   module DocinfoProcessorDsl
-    include ProcessorDsl
+    include DocumentProcessorDsl
 
     def at_location value
       option :location, value
@@ -1274,6 +1282,26 @@ module Extensions
     # Returns an [Array] of Extension proxy objects.
     def inline_macros
       @inline_macro_extensions.values
+    end
+
+    # Public: Inserts the document processor {Extension} instance as the first
+    # processor of its kind in the extension registry.
+    #
+    # Examples
+    #
+    #   prefer :include_processor do
+    #     process do |document, reader, target, attrs|
+    #       ...
+    #     end
+    #   end
+    #
+    # Returns the [Extension] stored in the registry that proxies the instance
+    # of this processor.
+    def prefer *args, &block
+      extension = ProcessorExtension === (arg0 = args.shift) ? arg0 : (send arg0, *args, &block)
+      extensions_store = instance_variable_get(%(@#{extension.kind}_extensions).to_sym)
+      extensions_store.unshift extensions_store.delete extension
+      extension
     end
 
     private

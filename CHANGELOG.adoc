@@ -22,6 +22,7 @@ Enhancements::
   * add Document#set_header_attribute method for adding method directly to document header during parsing (#2820)
   * add helper method to extension processor classes to create lists and list items
   * allow ordered and unordered lists to be nested to an arbitrary / unlimited depth (#2854)
+  * add `prefer` DSL method to extension registry and document processor to flag extension as preferred (#2848)
 
 Fixes::
 

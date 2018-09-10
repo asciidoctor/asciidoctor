@@ -104,6 +104,13 @@ class ReplaceTreeTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   end
 end
 
+class SelfSigningTreeProcessor < Asciidoctor::Extensions::TreeProcessor
+  def process document
+    document << (create_paragraph document, self.class.name, {})
+    nil
+  end
+end
+
 class StripAttributesPostprocessor < Asciidoctor::Extensions::Postprocessor
   def process document, output
     output.gsub(/<(\w+).*?>/m, "<\\1>")
@@ -792,6 +799,48 @@ example block content
         doc = document_from_string input
         assert_equal 'Old block title', old_title
         assert_equal 'New block title', (doc.find_by :context => :example)[0].title
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should be able to register preferred tree processor' do
+      begin
+        Asciidoctor::Extensions.register do
+          tree_processor do
+            process do |doc|
+              doc << (create_paragraph doc, 'd', {})
+              nil
+            end
+          end
+
+          tree_processor do
+            prefer
+            process do |doc|
+              doc << (create_paragraph doc, 'c', {})
+              nil
+            end
+          end
+
+          prefer :tree_processor do
+            process do |doc|
+              doc << (create_paragraph doc, 'b', {})
+              nil
+            end
+          end
+
+          prefer tree_processor {
+            process do |doc|
+              doc << (create_paragraph doc, 'a', {})
+              nil
+            end
+          }
+
+          prefer :tree_processor, SelfSigningTreeProcessor
+        end
+
+        (doc = empty_document).convert
+        assert_equal %w(SelfSigningTreeProcessor a b c d), doc.blocks.map {|b| b.lines[0] }
       ensure
         Asciidoctor::Extensions.unregister_all
       end
