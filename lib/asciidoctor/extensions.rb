@@ -1321,11 +1321,8 @@ module Extensions
         end
       end
 
-      if extension.config[:position] == :>>
-        kind_store.unshift extension
-      else
-        kind_store << extension
-      end
+      extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
+      extension
     end
 
     def add_syntax_processor kind, args, &block

@@ -1367,6 +1367,25 @@ sample content
       end
     end
 
+    test 'should return extension instance after registering' do
+      begin
+        exts = []
+        Asciidoctor::Extensions.register do
+          exts.push preprocessor SamplePreprocessor
+          exts.push include_processor SampleIncludeProcessor
+          exts.push tree_processor SampleTreeProcessor
+          exts.push docinfo_processor SampleDocinfoProcessor
+          exts.push postprocessor SamplePostprocessor
+        end
+        empty_document
+        exts.each do |ext|
+          assert_kind_of Asciidoctor::Extensions::ProcessorExtension, ext
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should raise an exception if mandatory target attribute is not provided for image block' do
       input = <<-EOS
 .Cat in Sink?
