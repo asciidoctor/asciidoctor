@@ -227,7 +227,7 @@ module Substitutors
       else # pass:[]
         if m[6] == RS
           # NOTE we don't look for nested pass:[] macros
-          next m[0][1..-1]
+          next m[0].slice 1, m[0].length
         end
 
         passes[pass_key = passes.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : nil)}
@@ -242,7 +242,7 @@ module Substitutors
       m = $~
       preceding = m[1]
       attributes = m[2]
-      escape_mark = RS if m[3].start_with? RS
+      escape_mark = RS if (quoted_text = m[3]).start_with? RS
       format_mark = m[4]
       content = m[5]
 
@@ -262,7 +262,7 @@ module Substitutors
 
         if escape_mark
           # honor the escape of the formatting mark
-          next %(#{preceding}[#{attributes}]#{m[3][1..-1]})
+          next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
         elsif preceding == RS
           # honor the escape of the attributes
           preceding = %([#{attributes}])
@@ -275,7 +275,7 @@ module Substitutors
         next (extract_inner_passthrough content, %(#{preceding}#{escape_mark}))
       elsif escape_mark
         # honor the escape of the formatting mark
-        next %(#{preceding}#{m[3][1..-1]})
+        next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
       end
 
       pass_key = passes.size
@@ -300,8 +300,8 @@ module Substitutors
       # alias match for Ruby 1.8.7 compat
       m = $~
       # honor the escape
-      if m[0].start_with? RS
-        next m[0][1..-1]
+      if $&.start_with? RS
+        next m[0].slice 1, m[0].length
       end
 
       if (type = m[1].to_sym) == :stem
@@ -576,8 +576,8 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if (captured = m[0]).start_with? RS
-            next captured.slice 1, captured.length
+          if $&.start_with? RS
+            next m[0].slice 1, m[0].length
           end
 
           menu, items = m[1], m[2]
@@ -603,8 +603,8 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if (captured = m[0]).start_with? RS
-            next captured.slice 1, captured.length
+          if $&.start_with? RS
+            next m[0].slice 1, m[0].length
           end
 
           input = m[1]
@@ -624,8 +624,8 @@ module Substitutors
           # alias match for Ruby 1.8.7 compat
           m = $~
           # honor the escape
-          if m[0].start_with? RS
-            next m[0][1..-1]
+          if $&.start_with? RS
+            next m[0].slice 1, m[0].length
           end
 
           if (m.names rescue []).empty?
@@ -661,9 +661,7 @@ module Substitutors
         # honor the escape
         if (captured = $&).start_with? RS
           next captured.slice 1, captured.length
-        end
-
-        if captured.start_with? 'icon:'
+        elsif captured.start_with? 'icon:'
           type, posattrs = 'icon', ['size']
         else
           type, posattrs = 'image', ['alt', 'width', 'height']
@@ -685,12 +683,13 @@ module Substitutors
       # ((Tigers))
       # indexterm2:[Tigers]
       text = text.gsub(InlineIndextermMacroRx) {
+        captured = $&
         case $1
         when 'indexterm'
           text = $2
           # honor the escape
-          if (m0 = $&).start_with? RS
-            next m0.slice 1, m0.length
+          if captured.start_with? RS
+            next captured.slice 1, captured.length
           end
           # indexterm:[Tigers,Big cats]
           terms = split_simple_csv normalize_string text, true
@@ -699,8 +698,8 @@ module Substitutors
         when 'indexterm2'
           text = $2
           # honor the escape
-          if (m0 = $&).start_with? RS
-            next m0.slice 1, m0.length
+          if captured.start_with? RS
+            next captured.slice 1, captured.length
           end
           # indexterm2:[Tigers]
           term = normalize_string text, true
@@ -709,13 +708,13 @@ module Substitutors
         else
           text = $3
           # honor the escape
-          if (m0 = $&).start_with? RS
+          if captured.start_with? RS
             # escape concealed index term, but process nested flow index term
             if (text.start_with? '(') && (text.end_with? ')')
               text = text.slice 1, text.length - 2
               visible, before, after = true, '(', ')'
             else
-              next m0.slice 1, m0.length
+              next captured.slice 1, captured.length
             end
           else
             visible = true
@@ -751,11 +750,11 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[2].start_with? RS
-          next %(#{m[1]}#{m[2][1..-1]}#{m[3]})
+        if (target = $2).start_with? RS
+          next %(#{m[1]}#{target.slice 1, target.length}#{m[3]})
         end
         # NOTE if text is non-nil, then we've matched a formal macro (i.e., trailing square brackets)
-        prefix, target, text, suffix = m[1], m[2], (macro = m[3]) || '', ''
+        prefix, text, suffix = m[1], (macro = m[3]) || '', ''
         if prefix == 'link:'
           if macro
             prefix = ''
@@ -846,8 +845,8 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
+        if $&.start_with? RS
+          next m[0].slice 1, m[0].length
         end
         target = (mailto = m[1]) ? %(mailto:#{m[2]}) : m[2]
         attrs, link_opts = nil, { :type => :link }
@@ -930,8 +929,8 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
+        if $&.start_with? RS
+          next m[0].slice 1, m[0].length
         end
         if m[1] # footnoteref (legacy)
           id, text = (m[3] || '').split(',', 2)
@@ -1008,8 +1007,8 @@ module Substitutors
         # alias match for Ruby 1.8.7 compat
         m = $~
         # honor the escape
-        if m[0].start_with? RS
-          next m[0][1..-1]
+        if $&.start_with? RS
+          next m[0].slice 1, m[0].length
         end
         attrs, doc = {}, @document
         if (refid = m[1])
@@ -1142,7 +1141,7 @@ module Substitutors
       if scope == :constrained && (attrs = match[2])
         unescaped_attrs = %([#{attrs}])
       else
-        return match[0][1..-1]
+        return match[0].slice 1, match[0].length
       end
     end
 
