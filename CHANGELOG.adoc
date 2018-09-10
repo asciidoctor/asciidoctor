@@ -46,6 +46,7 @@ Improvements::
   * read file in binary mode whenever contents are being normalized
   * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
   * only recognize a bullet glyph which is non-repeating as an unordered list marker
+  * rename SyntaxDsl module to SyntaxProcessorDsl (internal)
 
 Documentation::
 

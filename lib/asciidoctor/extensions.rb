@@ -266,7 +266,7 @@ module Extensions
     end
   end
 
-  module SyntaxDsl
+  module SyntaxProcessorDsl
     include ProcessorDsl
 
     def named value
@@ -530,7 +530,7 @@ module Extensions
   end
 
   module BlockProcessorDsl
-    include SyntaxDsl
+    include SyntaxProcessorDsl
 
     def contexts *value
       option :contexts, value.flatten.to_set
@@ -556,7 +556,7 @@ module Extensions
   end
 
   module MacroProcessorDsl
-    include SyntaxDsl
+    include SyntaxProcessorDsl
 
     def resolves_attributes *args
       if args.size == 1 && !args[0]
