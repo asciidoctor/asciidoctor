@@ -202,7 +202,7 @@ first paragraph
 another first paragraph
       EOS
       messages = redirect_streams do |_, err|
-        render_embedded_string input
+        convert_string_to_embedded input
         err.string
       end
       assert_equal 'asciidoctor: WARNING: <stdin>: line 5: id assigned to block already in use: first', messages.chomp

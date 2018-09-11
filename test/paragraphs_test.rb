@@ -12,7 +12,7 @@ Plain text for the win!
 
 Yep. Text. Plain and simple.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'p', output, 2
       assert_xpath '(//p)[1][text() = "Plain text for the win!"]', output, 1
       assert_xpath '(//p)[2][text() = "Yep. Text. Plain and simple."]', output, 1
@@ -25,7 +25,7 @@ Paragraph.
 
 Winning.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
 
       assert_css 'p', output, 2
       assert_xpath '(//p)[1]/preceding-sibling::*[@class = "title"]', output, 1
@@ -50,7 +50,7 @@ Paragraph 2
 Last words
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//p[text() = "Paragraph 2"]', output, 1
     end
 
@@ -60,7 +60,7 @@ paragraph
 . wrapped line
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n. wrapped line"]), output, 1
     end
@@ -71,7 +71,7 @@ paragraph
 .wrapped line
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="paragraph\n.wrapped line"]), output, 1
     end
@@ -83,7 +83,7 @@ Normal paragraph.
 Nothing special.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'p', output, 1
     end
 
@@ -95,7 +95,7 @@ Nothing special.
   Last line.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'p', output, 1
       assert_xpath %(//p[text()="Normal paragraph.\n  Nothing special.\nLast line."]), output, 1
     end
@@ -106,7 +106,7 @@ normal text
 [literal]
 literal text
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 1
       assert_css '.literalblock:root', output, 1
     end
@@ -118,7 +118,7 @@ normal text
 text in open block
 --
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 1
       assert_css '.openblock:root', output, 1
     end
@@ -128,7 +128,7 @@ text in open block
 normal text
 +
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 2
       assert_xpath %((/*[@class="paragraph"])[1]/p[text() = "normal text"]), output, 1
       assert_xpath %((/*[@class="paragraph"])[2]/p[text() = "+"]), output, 1
@@ -141,7 +141,7 @@ normal text
  despite the leading indent
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '.paragraph:root > p', output, 1
     end
 
@@ -154,7 +154,7 @@ Here is an index entry for indexterm2:[Linux].
 Note that multi-entry terms generate separate index entries.
       EOS
 
-      output = render_embedded_string input, :attributes => {'backend' => 'docbook45'}
+      output = convert_string_to_embedded input, :attributes => {'backend' => 'docbook45'}
       assert_xpath '/simpara', output, 1
       term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
       assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
@@ -193,7 +193,7 @@ Note that multi-entry terms generate separate index entries.
 *<Hey Jude>*
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_includes output, '*&lt;Hey Jude&gt;*'
     end
 
@@ -203,7 +203,7 @@ Note that multi-entry terms generate separate index entries.
 *<Hey Jude>*
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_includes output, '*&lt;Hey Jude&gt;*'
     end
 
@@ -215,7 +215,7 @@ my
 lips
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'br', output, 2
       assert_xpath '//p', output, 1
       assert_includes output, "<p>read<br>\nmy<br>\nlips</p>"
@@ -231,7 +231,7 @@ lips
 
  AWESOME!
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//pre', output, 3
     end
 
@@ -244,7 +244,7 @@ Install instructions:
 
 You're good to go!
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//pre', output, 1
       # indentation should be trimmed from literal block
       assert_xpath %(//pre[text() = "yum install ruby rubygems\ngem install asciidoctor"]), output, 1
@@ -255,7 +255,7 @@ You're good to go!
 [literal]
 this text is literally literal
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]//pre[text()="this text is literally literal"]), output, 1
     end
 
@@ -264,7 +264,7 @@ this text is literally literal
 [literal]
 image::not-an-image-block[]
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]//pre[text()="image::not-an-image-block[]"]), output, 1
       assert_css 'img', output, 0
     end
@@ -274,7 +274,7 @@ image::not-an-image-block[]
 [listing]
 this text is a listing
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[text()="this text is a listing"]), output, 1
     end
 
@@ -283,7 +283,7 @@ this text is a listing
 [source]
 use the source, luke!
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[text()="use the source, luke!"]), output, 1
     end
 
@@ -292,7 +292,7 @@ use the source, luke!
 [source, perl]
 die 'zomg perl sucks';
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="language-perl"][@data-lang="perl"][text()="die 'zomg perl sucks';"]), output, 1
     end
 
@@ -302,7 +302,7 @@ die 'zomg perl sucks';
 [normal]
 normal text
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
       assert_xpath %(/*[@class="paragraph"]), output, 1
     end
@@ -314,7 +314,7 @@ normal text
 normal text
 --
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
       assert_xpath %(/*[@class="openblock"]), output, 1
     end
@@ -324,7 +324,7 @@ normal text
  literal text
 +
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
       assert_xpath %(/*[@class="literalblock"]//pre[text() = "literal text"]), output, 1
       assert_xpath %(/*[@class="paragraph"]), output, 1
@@ -338,7 +338,7 @@ normal text
 [quote]
 Famous quote.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@class = "quoteblock"]', output, 1
       assert_xpath '//*[@class = "quoteblock"]//p', output, 0
       assert_xpath '//*[@class = "quoteblock"]//*[contains(text(), "Famous quote.")]', output, 1
@@ -350,14 +350,14 @@ Famous quote.
 A famouse quote.
 +
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '.quoteblock:root', output, 1
       assert_css '.paragraph:root', output, 1
       assert_xpath %(/*[@class="paragraph"]/p[text() = "+"]), output, 1
     end
 
     test "verse paragraph" do
-      output = render_string("[verse]\nFamous verse.")
+      output = convert_string("[verse]\nFamous verse.")
       assert_xpath '//*[@class = "verseblock"]', output, 1
       assert_xpath '//*[@class = "verseblock"]/pre', output, 1
       assert_xpath '//*[@class = "verseblock"]//p', output, 0
@@ -370,7 +370,7 @@ A famouse quote.
 _GET /groups/link:#group-id[\{group-id\}]_
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_includes output, '<pre class="content"><em>GET /groups/<a href="#group-id">{group-id}</a></em></pre>'
     end
 
@@ -381,7 +381,7 @@ _GET /groups/link:#group-id[\{group-id\}]_
 *Hey Jude*
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_includes output, '*Hey Jude*'
     end
   end
@@ -389,19 +389,19 @@ _GET /groups/link:#group-id[\{group-id\}]_
   context "special" do
     test "note multiline syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("[#{style}]\nThis is a winner.")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\nThis is a winner.")
       end
     end
 
     test "note block syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("[#{style}]\n====\nThis is a winner.\n====")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\n====\nThis is a winner.\n====")
       end
     end
 
     test "note inline syntax" do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", render_string("#{style}: This is important, fool!")
+        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("#{style}: This is important, fool!")
       end
     end
 
@@ -414,7 +414,7 @@ _GET /groups/link:#group-id[\{group-id\}]_
 Content goes here
 ****
       EOS
-      result = render_string(input)
+      result = convert_string(input)
       assert_xpath "//*[@class='sidebarblock']//p", result, 1
     end
 
@@ -428,7 +428,7 @@ Last line of sidebar.
 endif::[]
       EOS
 
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_equal %(<div class="sidebarblock">
 <div class="content">
 First line of sidebar.
@@ -439,7 +439,7 @@ Last line of sidebar.
     end
 
     context 'Styled Paragraphs' do
-      test 'should wrap text in simpara for styled paragraphs when rendered to DocBook' do
+      test 'should wrap text in simpara for styled paragraphs when converted to DocBook' do
         input = <<-EOS
 = Book
 :doctype: book
@@ -470,7 +470,7 @@ Wise words from a wise person.
 Make it what you want.
         EOS
 
-        output = render_string input, :backend => 'docbook'
+        output = convert_string input, :backend => 'docbook'
         assert_css 'abstract > simpara', output, 1
         assert_css 'partintro > simpara', output, 1
         assert_css 'sidebar > simpara', output, 1
@@ -485,12 +485,12 @@ Make it what you want.
 Make it what you want.
         EOS
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_css '.openblock', output, 1
         assert_css '.openblock p', output, 0
       end
 
-      test 'should wrap text in simpara for styled paragraphs with title when rendered to DocBook' do
+      test 'should wrap text in simpara for styled paragraphs with title when converted to DocBook' do
         input = <<-EOS
 = Book
 :doctype: book
@@ -523,7 +523,7 @@ As you can see here.
 Wise words from a wise person.
         EOS
 
-        output = render_string input, :backend => 'docbook'
+        output = convert_string input, :backend => 'docbook'
         assert_css 'abstract > title', output, 1
         assert_xpath '//abstract/title[text() = "Abstract title"]', output, 1
         assert_css 'abstract > title + simpara', output, 1
@@ -545,14 +545,14 @@ Wise words from a wise person.
     context 'Inline doctype' do
       test 'should only format and output text in first paragraph when doctype is inline' do
         input = "http://asciidoc.org[AsciiDoc] is a _lightweight_ markup language...\n\nignored"
-        output = render_string input, :doctype => 'inline'
+        output = convert_string input, :doctype => 'inline'
         assert_equal '<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;&#8203;', output
       end
 
       test 'should output nil and warn if first block is not a paragraph' do
         input = '* bullet'
         using_memory_logger do |logger|
-          output =  render_string input, :doctype => 'inline'
+          output = convert_string input, :doctype => 'inline'
           assert_nil output
           assert_message logger, :WARN, '~no inline candidate'
         end

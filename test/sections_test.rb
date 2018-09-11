@@ -352,22 +352,22 @@ content
     test "document title with multiline syntax" do
       title = "My Title"
       chars = "=" * title.length
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
     end
 
     test "document title with multiline syntax, give a char" do
       title = "My Title"
       chars = "=" * (title.length + 1)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
     end
 
     test "document title with multiline syntax, take a char" do
       title = "My Title"
       chars = "=" * (title.length - 1)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string(title + "\n" + chars + "\n")
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
     end
 
     test 'document title with multiline syntax and unicode characters' do
@@ -379,7 +379,7 @@ Author Name
 preamble
       EOS
 
-      result = render_string input
+      result = convert_string input
       assert_xpath '//h1', result, 1
       assert_xpath '//h1[text()="AsciiDoc Writer’s Guide"]', result, 1
     end
@@ -388,11 +388,11 @@ preamble
       title = "My Title"
       chars = "=" * (title.length - 2)
       using_memory_logger do |logger|
-        output = render_string(title + "\n" + chars)
+        output = convert_string(title + "\n" + chars)
         assert_xpath '//h1', output, 0
         refute logger.empty?
         logger.clear
-        output = render_string(title + "\n" + chars + "\n")
+        output = convert_string(title + "\n" + chars + "\n")
         assert_xpath '//h1', output, 0
         refute logger.empty?
       end
@@ -402,11 +402,11 @@ preamble
       title = "My Title"
       chars = "=" * (title.length + 2)
       using_memory_logger do |logger|
-        output = render_string(title + "\n" + chars)
+        output = convert_string(title + "\n" + chars)
         assert_xpath '//h1', output, 0
         refute logger.empty?
         logger.clear
-        output = render_string(title + "\n" + chars + "\n")
+        output = convert_string(title + "\n" + chars + "\n")
         assert_xpath '//h1', output, 0
         refute logger.empty?
       end
@@ -416,26 +416,26 @@ preamble
       title = ".My Title"
       chars = "=" * title.length
       using_memory_logger do |logger|
-        output = render_string(title + "\n" + chars)
+        output = convert_string(title + "\n" + chars)
         assert_xpath '//h1', output, 0
         refute logger.empty?
       end
     end
 
     test "document title with atx syntax" do
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title")
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title")
     end
 
     test "document title with symmetric syntax" do
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", render_string("= My Title =")
+      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title =")
     end
 
     test 'document title created from leveloffset shift defined in document' do
-      assert_xpath "//h1[not(@id)][text() = 'Document Title']", render_string(%(:leveloffset: -1\n== Document Title))
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string(%(:leveloffset: -1\n== Document Title))
     end
 
     test 'document title created from leveloffset shift defined in API' do
-      assert_xpath "//h1[not(@id)][text() = 'Document Title']", render_string('== Document Title', :attributes => { 'leveloffset' => '-1@' })
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string('== Document Title', :attributes => { 'leveloffset' => '-1@' })
     end
 
     test 'should assign id on document title to body' do
@@ -445,7 +445,7 @@ preamble
 
 content
       EOS
-      output = render_string input
+      output = convert_string input
       assert_css 'body#idname', output, 1
     end
 
@@ -456,7 +456,7 @@ content
 
 content
       EOS
-      output = render_string input
+      output = convert_string input
       assert_css 'body#idname', output, 1
     end
 
@@ -467,7 +467,7 @@ content
 
 content
       EOS
-      output = render_string input
+      output = convert_string input
       assert_css 'body#idname-block', output, 1
     end
 
@@ -518,7 +518,7 @@ content
 
   context "level 1" do
     test "with multiline syntax" do
-      assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", render_string("My Section\n-----------")
+      assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", convert_string("My Section\n-----------")
     end
 
     test 'should not recognize underline containing a mix of characters as setext section title' do
@@ -527,7 +527,7 @@ My Section
 ----^^----
       EOS
 
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_xpath '//h2[@id="_my_section"][text() = "My Section"]', result, 0
       assert_includes result, '----^^----'
     end
@@ -539,7 +539,7 @@ ifdef::asciidoctor[]
 -------------
 endif::[]
       EOS
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_xpath '//h2', result, 1
     end
 
@@ -547,53 +547,53 @@ endif::[]
       title = ".My Title"
       chars = "-" * title.length
       using_memory_logger do |logger|
-        output = render_string(title + "\n" + chars)
+        output = convert_string(title + "\n" + chars)
         assert_xpath '//h2', output, 0
         refute logger.empty?
       end
     end
 
     test "with atx syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title")
+      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title")
     end
 
     test "with atx symmetric syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title ==")
+      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ==")
     end
 
     test "with atx non-matching symmetric syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", render_string("== My Title ===")
+      assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", convert_string("== My Title ===")
     end
 
     test "with XML entity" do
-      assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", render_string("== What's new?")
+      assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", convert_string("== What's new?")
     end
 
     test "with non-word character" do
-      assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", render_string("== What’s new?")
+      assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", convert_string("== What’s new?")
     end
 
     test "with sequential non-word characters" do
-      assert_xpath "//h2[@id='_what_the_is_this'][text() = 'What the \#@$ is this?']", render_string('== What the #@$ is this?')
+      assert_xpath "//h2[@id='_what_the_is_this'][text() = 'What the \#@$ is this?']", convert_string('== What the #@$ is this?')
     end
 
     test "with trailing whitespace" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", render_string("== My Title ")
+      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ")
     end
 
     test "with custom blank idprefix" do
-      assert_xpath "//h2[@id='my_title'][text() = 'My Title']", render_string(":idprefix:\n\n== My Title ")
+      assert_xpath "//h2[@id='my_title'][text() = 'My Title']", convert_string(":idprefix:\n\n== My Title ")
     end
 
     test "with custom non-blank idprefix" do
-      assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", render_string(":idprefix: ref_\n\n== My Title ")
+      assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", convert_string(":idprefix: ref_\n\n== My Title ")
     end
 
     test 'with multibyte characters' do
       input = <<-EOS
 == Asciidoctor in 中文
       EOS
-      output = render_string input
+      output = convert_string input
       if ::RUBY_MIN_VERSION_1_9
         assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
       else
@@ -605,7 +605,7 @@ endif::[]
       input = <<-EOS
 == 视图
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[@id="_视图"][text()="视图"]', output
     end if ::RUBY_MIN_VERSION_1_9
 
@@ -621,7 +621,7 @@ content
 
 content
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[@id="_视图"][text()="视图"]', output
       assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
     end if ::RUBY_MIN_VERSION_1_9
@@ -629,37 +629,37 @@ content
 
   context "level 2" do
     test "with multiline syntax" do
-      assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n~~~~~~~~~~~")
+      assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n~~~~~~~~~~~")
     end
 
     test "with atx line syntax" do
-      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n=== My Title")
+      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n=== My Title")
     end
   end
 
   context "level 3" do
     test "with multiline syntax" do
-      assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n^^^^^^^^^^")
+      assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n^^^^^^^^^^")
     end
 
     test "with atx line syntax" do
-      assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n==== My Title")
+      assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n==== My Title")
     end
   end
 
   context "level 4" do
     test "with multiline syntax" do
-      assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", render_string(":fragment:\nMy Section\n++++++++++")
+      assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n++++++++++")
     end
 
     test "with atx line syntax" do
-      assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n===== My Title")
+      assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n===== My Title")
     end
   end
 
   context "level 5" do
     test "with atx line syntax" do
-      assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", render_string(":fragment:\n====== My Title")
+      assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n====== My Title")
     end
   end
 
@@ -680,7 +680,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        result = render_embedded_string input
+        result = convert_string_to_embedded input
         assert_xpath '//h4[text()="Nested Section"]', result, 1
         assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 2, got level 3', Hash
       end
@@ -697,7 +697,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        result = render_embedded_string input
+        result = convert_string_to_embedded input
         assert_xpath '//h3[text()="Not a Chapter"]', result, 1
         assert_message logger, :WARN, '<stdin>: line 4: section title out of sequence: expected levels 0 or 1, got level 2', Hash
       end
@@ -713,7 +713,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        render_embedded_string input, :attributes => { 'fragment' => '' }
+        convert_string_to_embedded input, :attributes => { 'fragment' => '' }
         assert logger.empty?
       end
     end
@@ -728,7 +728,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        render_embedded_string input, :attributes => { 'fragment' => '' }
+        convert_string_to_embedded input, :attributes => { 'fragment' => '' }
         assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 3, got level 4', Hash
       end
     end
@@ -765,7 +765,7 @@ not allowed
       EOS
 
       using_memory_logger do |logger|
-        render_embedded_string input
+        convert_string_to_embedded input
         assert_messages logger, [
           [:ERROR, '<stdin>: line 19: glossary sections do not support nested sections', Hash],
           [:ERROR, '<stdin>: line 26: bibliography sections do not support nested sections', Hash],
@@ -837,7 +837,7 @@ not allowed
       EOS
 
       using_memory_logger do |logger|
-        render_embedded_string input
+        convert_string_to_embedded input
         assert_messages logger, [
           [:ERROR, '<stdin>: line 14: colophon sections do not support nested sections', Hash],
           [:ERROR, '<stdin>: line 21: dedication sections do not support nested sections', Hash],
@@ -853,7 +853,7 @@ not allowed
       input = <<-EOS
 # Document Title
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
     end
 
@@ -861,7 +861,7 @@ not allowed
       input = <<-EOS
 # Document Title #
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h1[not(@id)][text() = 'Document Title']", output, 1
     end
 
@@ -871,7 +871,7 @@ not allowed
 
 blah blah
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
     end
 
@@ -881,7 +881,7 @@ blah blah
 
 blah blah
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2[@id='_section_one'][text() = 'Section One']", output, 1
     end
 
@@ -889,7 +889,7 @@ blah blah
       input = <<-EOS
 =#= My Title
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", output, 0
       assert_includes output, '<p>=#= My Title</p>'
     end
@@ -904,7 +904,7 @@ blah blah
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h1[@id="_independent_heading"]', output, 1
       assert_xpath '/h1[@class="float"]', output, 1
       assert_xpath %(/h1[@class="float"][text()="Independent Heading!"]), output, 1
@@ -921,7 +921,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h3', output, 1
       assert_xpath '/h3[@id="_independent_heading"]', output, 1
       assert_xpath '/h3[@class="discrete"]', output, 1
@@ -939,7 +939,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h3', output, 1
       assert_xpath '/h3[@class="discrete"][@id="_heading"]', output, 1
       assert_xpath '/h3[@class="discrete"][@id="_heading"][text()=" Heading "]', output, 1
@@ -953,7 +953,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h1[@id="first"]', output, 1
       assert_xpath '/h1[@class="float independent"]', output, 1
       assert_xpath %(/h1[@class="float independent"][text()="Independent Heading!"]), output, 1
@@ -970,7 +970,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h1[@id="first"]', output, 1
       assert_xpath '/h1[@class="discrete independent"]', output, 1
       assert_xpath %(/h1[@class="discrete independent"][text()="Independent Heading!"]), output, 1
@@ -1003,7 +1003,7 @@ ifdef::asciidoctor[]
 -------------
 endif::[]
       EOS
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_xpath '//h2', result, 1
     end
 
@@ -1034,7 +1034,7 @@ not in section
 == Section Two
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]', output, 1
       assert_xpath %(//*[@id="toc"]//a[contains(text(), "Section ")]), output, 2
       assert_xpath %(//*[@id="toc"]//a[text()="Miss Independent"]), output, 0
@@ -1048,7 +1048,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input, :attributes => {'sectids' => nil}
+      output = convert_string_to_embedded input, :attributes => {'sectids' => nil}
       assert_xpath '/h3', output, 1
       assert_xpath '/h3[@id="_independent_heading"]', output, 0
       assert_xpath '/h3[@class="float"]', output, 1
@@ -1063,7 +1063,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h2', output, 1
       assert_xpath '/h2[@id="free"]', output, 1
       assert_xpath '/h2[@class="float"]', output, 1
@@ -1077,7 +1077,7 @@ not in section
 not in section
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h2', output, 1
       assert_xpath '/h2[@id="_independent_heading"]', output, 1
       assert_xpath '/h2[@class="float isolated"]', output, 1
@@ -1159,7 +1159,7 @@ text in standalone
       EOS
 
       using_memory_logger do |logger|
-        render_string input
+        convert_string input
         assert_message logger, :ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash
       end
     end
@@ -1193,7 +1193,7 @@ Master section text.
 
       output = nil
       using_memory_logger do |logger|
-        output = render_string input
+        output = convert_string input
         assert logger.empty?
       end
 
@@ -1215,7 +1215,7 @@ Doc Writer
 = Discrete Heading
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h2[@class="float"][text() = "Discrete Heading"]', output, 1
     end
 
@@ -1237,7 +1237,7 @@ Standalone preamble.
 == Level 1 Section
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@class = "sect1"]/h2[text() = "Standalone Document"]', output, 1
       assert_xpath '//*[@class = "sect1"]/h2[text() = "Level 1 Section"]', output, 1
     end
@@ -1262,7 +1262,7 @@ content
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@class = "sect1"]/h2[text() = "Chapter 1"]', output, 1
       assert_xpath '//*[@class = "sect2"]/h3[text() = "Standalone Section"]', output, 1
     end
@@ -1319,7 +1319,7 @@ content
       assert_equal '1:1:1', sect1_1_1.sectnum(':', false)
     end
 
-    test 'should render section numbers when sectnums attribute is set' do
+    test 'should output section numbers when sectnums attribute is set' do
       input = <<-EOS
 = Title
 :sectnums:
@@ -1349,7 +1349,7 @@ text
 text
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
       assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
       assert_xpath '//h4[@id="_section_1_1_1"][starts-with(text(), "1.1.1. ")]', output, 1
@@ -1358,7 +1358,7 @@ text
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
     end
 
-    test 'should render section numbers when numbered attribute is set' do
+    test 'should output section numbers when numbered attribute is set' do
       input = <<-EOS
 = Title
 :numbered:
@@ -1388,7 +1388,7 @@ text
 text
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
       assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
       assert_xpath '//h4[@id="_section_1_1_1"][starts-with(text(), "1.1.1. ")]', output, 1
@@ -1417,7 +1417,7 @@ content
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h1[@id="_language"][text() = "I. Language"]', output, 1
       assert_xpath '//h1[@id="_processor"][text() = "II. Processor"]', output, 1
     end
@@ -1468,7 +1468,7 @@ paragraph
 == Section Three
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1502,7 +1502,7 @@ paragraph
 == Section Three
       EOS
 
-      output = render_string input, :attributes => {'numbered' => ''}
+      output = convert_string input, :attributes => {'numbered' => ''}
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1536,7 +1536,7 @@ paragraph
 == Section Three
       EOS
 
-      output = render_string input, :attributes => {'numbered!' => ''}
+      output = convert_string input, :attributes => {'numbered!' => ''}
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1570,7 +1570,7 @@ paragraph
 == Section Three
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1599,7 +1599,7 @@ a|content
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h2[@id="_section_one"]', output, 1
       assert_xpath '//h2[@id="_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '//h2[@id="_section_two"]', output, 1
@@ -1625,7 +1625,7 @@ content
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '(//h1)[1][text()="Document Title"]', output, 1
       assert_xpath '(//h1)[2][text()="Part 1"]', output, 1
       assert_xpath '(//h1)[3][text()="Part 2"]', output, 1
@@ -1660,7 +1660,7 @@ content
 content
       EOS
 
-      result = render_string input
+      result = convert_string input
       (1..4).each do |num|
         assert_xpath %(//h2[@id="_chapter_#{num}"]), result, 1
         assert_xpath %(//h2[@id="_chapter_#{num}"][text()="#{num}. Chapter #{num}"]), result, 1
@@ -1704,7 +1704,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = render_embedded_string input, :attributes => {'sectanchors' => ''}
+      output = convert_string_to_embedded input, :attributes => {'sectanchors' => ''}
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="anchor"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a/following-sibling::text()="Installation"', output, true
@@ -1724,7 +1724,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = render_embedded_string input, :attributes => {'sectanchors' => 'after'}
+      output = convert_string_to_embedded input, :attributes => {'sectanchors' => 'after'}
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="anchor"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a/preceding-sibling::text()="Installation"', output, true
@@ -1744,7 +1744,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = render_embedded_string input, :attributes => {'sectlinks' => ''}
+      output = convert_string_to_embedded input, :attributes => {'sectlinks' => ''}
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="link"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[text()="Installation"]', output, 1
@@ -1778,7 +1778,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
     end
 
@@ -1791,7 +1791,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
     end
 
@@ -1804,7 +1804,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[@id="attribute-options"][text()="Appendix A: Attribute Options"]', output, 1
     end
 
@@ -1818,7 +1818,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[text()="App A: Attribute Options"]', output, 1
     end
 
@@ -1833,7 +1833,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2[text()="A. Attribute Options"]', output, 1
     end
 
@@ -1850,7 +1850,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[2][text()="Appendix B: Migration"]', output, 1
     end
@@ -1873,7 +1873,7 @@ content
 content
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="1. First Section"]', output, 1
       assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[3][text()="2. Migration"]', output, 1
@@ -1893,7 +1893,7 @@ Details
 Details
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h3)[1][text()="A.1. Optional Attributes"]', output, 1
     end
@@ -1912,7 +1912,7 @@ Details
 
 text
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h5', output, 1
       assert_xpath '//h5[text()="Level_4"]', output, 1
     end
@@ -1932,7 +1932,7 @@ text
 
 text
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//h2', output, 1
       assert_xpath '//h2[text()="1. Level_1"]', output, 1
       assert_xpath '//h3', output, 1
@@ -1971,7 +1971,7 @@ Details
 Terms
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="1. Section One"]', output, 1
       assert_xpath '(//h2)[2][text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '(//h2)[3][text()="Appendix B: Migration"]', output, 1
@@ -2008,7 +2008,7 @@ Details
 Terms
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix A: Attribute Options"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Appendix B: Migration"]', output, 1
@@ -2030,7 +2030,7 @@ Terms
 ==== Level 3
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]//a[@href="#_level_1"][text()="1. Level 1"]', output, 1
       assert_xpath '//*[@id="toc"]//a[@href="#_level_2"][text()="1.1. Level 2"]', output, 1
       assert_xpath '//*[@id="toc"]//a[@href="#_level_3"][text()="Level 3"]', output, 1
@@ -2072,7 +2072,7 @@ Details
 Terms
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="Preface"]', output, 1
       assert_xpath '(//h3)[1][text()="Preface Subsection"]', output, 1
       assert_xpath '(//h2)[2][text()="1. Section One"]', output, 1
@@ -2119,7 +2119,7 @@ Details
 Terms
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Preface"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="Preface Subsection"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Section One"]', output, 1
@@ -2165,7 +2165,7 @@ Details
 Terms
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//h2)[1][text()="1. Preface"]', output, 1
       assert_xpath '(//h3)[1][text()="1.1. Preface Subsection"]', output, 1
       assert_xpath '(//h2)[2][text()="2. Section One"]', output, 1
@@ -2212,7 +2212,7 @@ Details
 Terms
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1. Preface"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="1.1. Preface Subsection"]', output, 1
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="2. Section One"]', output, 1
@@ -2222,7 +2222,7 @@ Terms
       assert_xpath '//*[@id="toc"]/ul//li/a[text()="3. Glossary"]', output, 1
     end
 
-    test 'level 0 special sections in multipart book should be rendered as level 1' do
+    test 'level 0 special sections in multipart book should be coerced to level 1' do
       input = <<-EOS
 = Multipart Book
 Doc Writer
@@ -2239,7 +2239,7 @@ Preface text
 Appendix text
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//h2[@id = "_preface"]', output, 1
       assert_xpath '//h2[@id = "_appendix"]', output, 1
     end
@@ -2324,7 +2324,7 @@ Colophon content
 = Index Title
       EOS
 
-      output = render_embedded_string input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, :backend => 'docbook45'
       assert_xpath '/chapter[@id="abstract_title"]', output, 1
       assert_xpath '/chapter[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
       assert_xpath '/chapter/following-sibling::dedication[@id="dedication_title"]', output, 1
@@ -2364,7 +2364,7 @@ Colophon content
 Abstract content
       EOS
 
-      output = render_embedded_string input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, :backend => 'docbook45'
       assert_xpath '/abstract[@id="abstract_title"]', output, 1
       assert_xpath '/abstract[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
@@ -2390,7 +2390,7 @@ A second glossary term::
 The corresponding definition.
       EOS
 
-      output = render_string input, :backend => :docbook
+      output = convert_string input, :backend => :docbook
       assert_xpath '//glossary', output, 1
       assert_xpath '//chapter/glossary', output, 1
       assert_xpath '//glossary/title[text()="Glossary A"]', output, 1
@@ -2405,7 +2405,7 @@ The corresponding definition.
 content
       EOS
 
-      output = render_embedded_string input, :backend => :docbook
+      output = convert_string_to_embedded input, :backend => :docbook
       assert_xpath '/dedication', output, 1
       assert_xpath '/dedication/title', output, 0
     end
@@ -2423,7 +2423,7 @@ code
 
 fin.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2", output, 1
     end
 
@@ -2438,7 +2438,7 @@ ha
 
 fin.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2", output, 1
     end
 
@@ -2454,7 +2454,7 @@ preamble
 This should be a tip, not a heading.
 ====
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//*[@class='admonitionblock tip']//p[text() = 'This should be a tip, not a heading.']", output, 1
     end
 
@@ -2476,7 +2476,7 @@ term3:: def
 
 fin.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2", output, 1
       assert_xpath "//dl", output, 1
     end
@@ -2498,7 +2498,7 @@ list = [1, 2, 3];
 
 fin.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2", output, 1
       assert_xpath "//ul", output, 1
     end
@@ -2511,14 +2511,14 @@ fin.
 
 ====
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath "//h2", output, 0
       assert_xpath "//*[@class='exampleblock']//p[text() = '== not a heading']", output, 1
     end
   end
 
   context 'Table of Contents' do
-    test 'should render unnumbered table of contents in header if toc attribute is set' do
+    test 'should output unnumbered table of contents in header if toc attribute is set' do
       input = <<-EOS
 = Article
 :toc:
@@ -2539,7 +2539,7 @@ While they were waiting...
 
 That's all she wrote!
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
@@ -2554,7 +2554,7 @@ That's all she wrote!
       assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
-    test 'should render numbered table of contents in header if toc and numbered attributes are set' do
+    test 'should output numbered table of contents in header if toc and numbered attributes are set' do
       input = <<-EOS
 = Article
 :toc:
@@ -2576,7 +2576,7 @@ While they were waiting...
 
 That's all she wrote!
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
@@ -2588,7 +2588,7 @@ That's all she wrote!
       assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
     end
 
-    test 'should render a table of contents that honors numbered setting at position of section in document' do
+    test 'should output a table of contents that honors numbered setting at position of section in document' do
       input = <<-EOS
 = Article
 :toc:
@@ -2612,7 +2612,7 @@ While they were waiting...
 
 That's all she wrote!
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
@@ -2646,7 +2646,7 @@ blah
 blah
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]', output, 1
       assert_xpath '//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]', output, 1
@@ -2659,7 +2659,7 @@ blah
       assert_xpath '((//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
     end
 
-    test 'should render table of contents in header if toc2 attribute is set' do
+    test 'should output table of contents in header if toc2 attribute is set' do
       input = <<-EOS
 = Article
 :toc2:
@@ -2674,7 +2674,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//body[@class="article toc2 toc-left"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
@@ -2695,7 +2695,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
@@ -2717,7 +2717,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
@@ -2739,7 +2739,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
@@ -2760,7 +2760,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//body[@class="article toc2 toc-right"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
@@ -2782,7 +2782,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css '#preamble #toc', output, 1
       assert_css '#preamble .sectionbody + #toc', output, 1
     end
@@ -2809,7 +2809,7 @@ They couldn't believe their eyes when...
 
 Fin.
       EOS
-      output = render_string input
+      output = convert_string input
       assert_css '#header #toc', output, 1
       assert_css '#header #toc.toc2', output, 1
       assert_css '#header #toc li', output, 2
@@ -2817,7 +2817,7 @@ Fin.
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
     end
 
-    test 'should not render table of contents if toc-placement attribute is unset' do
+    test 'should not output table of contents if toc-placement attribute is unset' do
       input = <<-EOS
 = Article
 :toc:
@@ -2832,11 +2832,11 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="toc"]', output, 0
     end
 
-    test 'should render table of contents at location of toc macro' do
+    test 'should output table of contents at location of toc macro' do
       input = <<-EOS
 = Article
 :toc:
@@ -2855,12 +2855,12 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css '#preamble #toc', output, 1
       assert_css '#preamble .paragraph + #toc', output, 1
     end
 
-    test 'should render table of contents at location of toc macro in embedded document' do
+    test 'should output table of contents at location of toc macro in embedded document' do
       input = <<-EOS
 = Article
 :toc:
@@ -2879,12 +2879,12 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '#preamble:root #toc', output, 1
       assert_css '#preamble:root .paragraph + #toc', output, 1
     end
 
-    test 'should render table of contents at default location in embedded document if toc attribute is set' do
+    test 'should output table of contents at default location in embedded document if toc attribute is set' do
       input = <<-EOS
 = Article
 :showtitle:
@@ -2901,7 +2901,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css 'h1:root', output, 1
       assert_css 'h1:root + #toc:root', output, 1
       assert_css 'h1:root + #toc:root + #preamble:root', output, 1
@@ -2925,7 +2925,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
 
       assert_css '#toc', output, 1
       assert_css '#toctitle', output, 1
@@ -2951,7 +2951,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-      output = render_string input
+      output = convert_string input
 
       assert_css '#toc', output, 1
       assert_css '#toctitle', output, 1
@@ -2987,7 +2987,7 @@ toc::[]
 Fin.
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css '#toc', output, 1
       assert_css '#toctitle', output, 1
       assert_css '#preamble #toc', output, 1
@@ -3030,7 +3030,7 @@ toc::[levels={tocdepth}]
 Fin.
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css '#toc', output, 0
       assert_css '#toctitle', output, 0
       assert_css '#preamble #contents', output, 1
@@ -3062,7 +3062,7 @@ While they were waiting...
 
 That's all she wrote!
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
@@ -3089,7 +3089,7 @@ It only has content.
 
       ['', 'left', 'preamble', 'macro'].each do |placement|
         input = input_src.gsub(':toc:', "\\& #{placement}")
-        output = render_string input
+        output = convert_string input
         assert_css '#toctitle', output, 0
       end
     end
@@ -3112,7 +3112,7 @@ content
 content
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/*[@id="toc"]', output, 1
       toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
       assert_equal 3, toc_links.size
@@ -3140,7 +3140,7 @@ content
 content
       EOS
 
-      output = render_embedded_string input, :safe => :safe
+      output = convert_string_to_embedded input, :safe => :safe
       assert_xpath '/*[@id="toc"]', output, 1
       toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
       assert_equal 3, toc_links.size
@@ -3181,7 +3181,7 @@ While they were returning...
 That's all she wrote!
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = convert_string input, :backend => 'docbook'
       assert_xpath '//part', output, 0
       assert_xpath '//chapter', output, 0
       assert_xpath '/article/section', output, 2
@@ -3225,7 +3225,7 @@ While they were waiting...
 That's all she wrote!
       EOS
 
-      output = render_string(input)
+      output = convert_string(input)
       assert_css 'body.book', output, 1
       assert_css 'h1', output, 4
       assert_css '#header h1', output, 1
@@ -3250,7 +3250,7 @@ That's all she wrote!
       EOS
 
       using_memory_logger do |logger|
-        render_string input
+        convert_string input
         assert_message logger, :ERROR, '<stdin>: line 7: level 0 sections can only be used when doctype is book', Hash
       end
     end
@@ -3274,7 +3274,7 @@ content
 content
       EOS
 
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_css 'h1.sect0', result, 2
       assert_css 'h1.sect0.newbie', result, 1
       assert_css 'h1.sect0.newbie#_part_1', result, 1
@@ -3423,7 +3423,7 @@ While they were returning...
 That's all she wrote!
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = convert_string input, :backend => 'docbook'
       assert_xpath '//chapter/chapter', output, 0
       assert_xpath '/book/part', output, 2
       assert_xpath '/book/part[1]/title[text() = "Part 1"]', output, 1
@@ -3470,7 +3470,7 @@ Appendix subsection content
 
       output = nil
       using_memory_logger do |logger|
-        output = render_string input, :backend => 'docbook'
+        output = convert_string input, :backend => 'docbook'
         assert logger.empty?
       end
       assert_xpath '/book/preface', output, 1

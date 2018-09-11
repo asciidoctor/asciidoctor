@@ -783,7 +783,7 @@ include::#{url}[]
         EOS
         expect = /\{"name": "asciidoctor"\}/
         output = using_test_webserver do
-          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+          convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
         end
 
         refute_nil output
@@ -797,7 +797,7 @@ include::fixtures/outer-include.adoc[]
 ....
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = 'first line of outer
 
 first line of middle
@@ -820,7 +820,7 @@ include::#{url}[]
 ....
         EOS
         output = using_test_webserver do
-          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+          convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
         end
 
         expected = 'first line of outer
@@ -848,7 +848,7 @@ include::#{include_url}[]
         begin
           using_memory_logger do |logger|
             result = using_test_webserver do
-              render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+              convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
             end
             assert_includes result, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
             assert_message logger, :ERROR, %(#{include_url}: line 1: include uri not readable: http://#{resolve_localhost}:9876/fixtures/#{nested_include_url}), Hash
@@ -867,7 +867,7 @@ include::#{url}[tag=init,indent=0]
 ----
         EOS
         output = using_test_webserver do
-          render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+          convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
         end
 
         expected = '<code class="language-ruby" data-lang="ruby">def initialize breed
@@ -887,7 +887,7 @@ include::#{url}[]
         begin
           using_memory_logger do |logger|
             output = using_test_webserver do
-              render_embedded_string input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+              convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
             end
             refute_nil output
             assert_match(/Unresolved directive/, output)
@@ -903,7 +903,7 @@ include::#{url}[]
 include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
         assert_match(/third line/, output)
@@ -920,7 +920,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
 include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line/, output)
         refute_match(/second line/, output)
         assert_match(/third line/, output)
@@ -939,7 +939,7 @@ include::fixtures/include-file.asciidoc[lines=]
 ++++
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_includes output, 'first line of included content'
         assert_includes output, 'last line of included content'
       end
@@ -949,7 +949,7 @@ include::fixtures/include-file.asciidoc[lines=]
 include::fixtures/include-file.asciidoc[tag=snippetA]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
@@ -961,7 +961,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
 include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         assert_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)
@@ -995,7 +995,7 @@ include::fixtures/#{filename}[tag=snippet,indent=0]
           input = <<-EOS
 include::#{tmp_include_path}[tag=include-me]
           EOS
-          output = render_embedded_string input, :safe => :safe, :base_dir => tmp_include_dir
+          output = convert_string_to_embedded input, :safe => :safe, :base_dir => tmp_include_dir
           assert_includes output, 'included line'
           refute_includes output, 'do not include'
         ensure
@@ -1013,7 +1013,7 @@ include::#{tmp_include_path}[tag=include-me]
 include::#{tmp_include_path}[tag=include-me]
           EOS
           using_memory_logger do |logger|
-            output = render_embedded_string input, :safe => :safe, :base_dir => tmp_include_dir
+            output = convert_string_to_embedded input, :safe => :safe, :base_dir => tmp_include_dir
             assert_empty logger.messages
             assert_includes output, 'line included'
             refute_includes output, 'line not included'
@@ -1030,7 +1030,7 @@ include::fixtures/include-file.asciidoc[tags=snippet]
 ++++
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expect = %(snippetA content
 
 non-tagged content
@@ -1046,7 +1046,7 @@ include::fixtures/tagged-class-enclosed.rb[tags=all;!bark]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
   def initialize breed
     @breed = breed
@@ -1062,7 +1062,7 @@ include::fixtures/tagged-class.rb[tags=**]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
   def initialize breed
     @breed = breed
@@ -1086,7 +1086,7 @@ include::fixtures/tagged-class.rb[tags=**;!bark]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
   def initialize breed
     @breed = breed
@@ -1102,7 +1102,7 @@ include::fixtures/tagged-class-enclosed.rb[tags=*]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
   def initialize breed
     @breed = breed
@@ -1126,7 +1126,7 @@ include::fixtures/tagged-class-enclosed.rb[tags=*;!init]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
 
   def bark
@@ -1147,7 +1147,7 @@ include::fixtures/tagged-class.rb[tags=!*]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(class Dog
 end)
         assert_includes output, expected
@@ -1161,7 +1161,7 @@ include::fixtures/tagged-class.rb[tags=bark;!bark-other]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         expected = %(def bark
   if @breed == 'beagle'
     'woof woof woof woof woof'
@@ -1176,7 +1176,7 @@ include::fixtures/include-file.asciidoc[tag=no-such-tag]
         EOS
 
         using_memory_logger do |logger|
-          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           assert_message logger, :WARN, %(~<stdin>: line 1: tag 'no-such-tag' not found in include file), Hash
         end
       end
@@ -1189,7 +1189,7 @@ include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
         EOS
 
         using_memory_logger do |logger|
-          render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           # NOTE Ruby 1.8 swaps the order of the list for some silly reason
           expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
           assert_message logger, :WARN, %(~<stdin>: line 2: tags '#{expected_tags}' not found in include file), Hash
@@ -1204,7 +1204,7 @@ include::fixtures/unclosed-tag.adoc[tag=a]
         EOS
 
         using_memory_logger do |logger|
-          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          result = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 'a', result
           assert_message logger, :WARN, %(~<stdin>: line 2: detected unclosed tag 'a' starting at line 2 of include file), Hash
           refute_nil logger.messages[0][:message][:include_location]
@@ -1220,7 +1220,7 @@ include::fixtures/mismatched-end-tag.adoc[tags=a;b]
 
         inc_path = File.join DIRNAME, 'fixtures/mismatched-end-tag.adoc'
         using_memory_logger do |logger|
-          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          result = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           assert_equal %(a\nb), result
           assert_message logger, :WARN, %(<stdin>: line 2: mismatched end tag (expected 'b' but found 'a') at line 5 of include file: #{inc_path}), Hash
           refute_nil logger.messages[0][:message][:include_location]
@@ -1236,7 +1236,7 @@ include::fixtures/unexpected-end-tag.adoc[tags=a]
 
         inc_path = File.join DIRNAME, 'fixtures/unexpected-end-tag.adoc'
         using_memory_logger do |logger|
-          result = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          result = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           assert_equal 'a', result
           assert_message logger, :WARN, %(<stdin>: line 2: unexpected end tag 'a' at line 4 of include file: #{inc_path}), Hash
           refute_nil logger.messages[0][:message][:include_location]
@@ -1251,7 +1251,7 @@ include::fixtures/include-file.xml[#{attr_name}=]
 ++++
           EOS
 
-          output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+          output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
           assert_match(/(?:tag|end)::/, output, 2)
         end
       end
@@ -1261,7 +1261,7 @@ include::fixtures/include-file.xml[#{attr_name}=]
 include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/first line of included content/, output)
         refute_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
@@ -1275,7 +1275,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
 ----
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         result = xmlnodes_at_xpath('//pre', output, 1).text
         assert_equal "<year>2013</year>\n<holder>Acme™, Inc.</holder>", result
       end
@@ -1286,7 +1286,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
 include::fixtures/include-file.asciidoc[tag={name-of-tag}]
         EOS
 
-        output = render_embedded_string input, :safe => :safe, :base_dir => DIRNAME
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
         assert_match(/snippetA content/, output)
         refute_match(/snippetB content/, output)
         refute_match(/non-tagged content/, output)

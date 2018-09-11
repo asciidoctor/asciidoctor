@@ -658,7 +658,7 @@ after
           include_processor BoilerplateTextIncludeProcessor
         end
 
-        result = render_string input, :safe => :server
+        result = convert_string input, :safe => :server
         assert_css '.paragraph > p', result, 3
         assert_includes result, 'before'
         assert_includes result, 'Lorem ipsum'
@@ -797,7 +797,7 @@ example block content
       end
     end
 
-    test 'should invoke postprocessors after rendering document' do
+    test 'should invoke postprocessors after converting document' do
       input = <<-EOS
 * one
 * two
@@ -809,7 +809,7 @@ example block content
           postprocessor StripAttributesPostprocessor
         end
 
-        output = render_string input
+        output = convert_string input
         refute_match(/<div class="ulist">/, output)
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -827,7 +827,7 @@ Hi there!
           block UppercaseBlock
         end
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_xpath '//p', output, 1
         assert_xpath '//p[text()="HI THERE!"]', output, 1
       ensure
@@ -849,7 +849,7 @@ Hi there!
           block UppercaseBlock
         end
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_xpath '/table//p', output, 1
         assert_xpath '/table//p[text()="HI THERE!"]', output, 1
       ensure
@@ -877,7 +877,7 @@ sidebar
           end
         end
 
-        render_embedded_string input
+        convert_string_to_embedded input
         assert_equal :sidebar, cloaked_context
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -894,7 +894,7 @@ snippet::12345[mode=edit]
           block_macro SnippetMacro, :snippet
         end
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_includes output, '<script src="http://example.com/12345.js?_mode=edit"></script>'
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -917,7 +917,7 @@ a|message::hi[]
           end
         end
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_xpath '/table//p[text()="HI"]', output, 1
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -942,7 +942,7 @@ custom-toc::[]
           end
         end
 
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_equal '<!-- custom toc goes here -->', output
         assert_equal '', resolved_target
       ensure
@@ -989,10 +989,10 @@ header_attribute::foo[bar]
           inline_macro TemperatureMacro, :deg
         end
 
-        output = render_embedded_string 'Room temperature is deg:25[C,precision=0].', :attributes => { 'temperature-unit' => 'F' }
+        output = convert_string_to_embedded 'Room temperature is deg:25[C,precision=0].', :attributes => { 'temperature-unit' => 'F' }
         assert_includes output, 'Room temperature is 25 &#176;C.'
 
-        output = render_embedded_string 'Normal body temperature is deg:37[].', :attributes => { 'temperature-unit' => 'F' }
+        output = convert_string_to_embedded 'Normal body temperature is deg:37[].', :attributes => { 'temperature-unit' => 'F' }
         assert_includes output, 'Normal body temperature is 98.6 &#176;F.'
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1012,7 +1012,7 @@ header_attribute::foo[bar]
           end
         end
 
-        output = render_embedded_string 'label:[Checkbox]'
+        output = convert_string_to_embedded 'label:[Checkbox]'
         assert_includes output, '<label>Checkbox</label>'
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1091,7 +1091,7 @@ target="target", attributes=[["text", ""]]
 target="target", attributes=[["text", "[text]"]]
 target="target", attributes=[]
         EOS
-        output = render_embedded_string input
+        output = convert_string_to_embedded input
         assert_equal expected, output
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1113,7 +1113,7 @@ target="target", attributes=[]
           end
         end
 
-        output = render_embedded_string 'mention:mojavelinux[Dan]'
+        output = convert_string_to_embedded 'mention:mojavelinux[Dan]'
         assert_includes output, '<a href="https://github.com/mojavelinux">Dan</a>'
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1135,10 +1135,10 @@ target="target", attributes=[]
         input = <<-EOS
 .unused title
 [skip-me]
-not rendered
+not shown
 
 --
-rendered
+shown
 --
         EOS
         doc = document_from_string input
@@ -1166,10 +1166,10 @@ rendered
         input = <<-EOS
 .unused title
 [ignore]
-not rendered
+not shown
 
 --
-rendered
+shown
 --
         EOS
         doc = document_from_string input
@@ -1392,7 +1392,7 @@ sample content
 cat_in_sink::[]
       EOS
       exception = assert_raises ArgumentError do
-        render_embedded_string input, :extension_registry => create_cat_in_sink_block_macro
+        convert_string_to_embedded input, :extension_registry => create_cat_in_sink_block_macro
       end
       assert_match(/target attribute is required/, exception.message)
     end

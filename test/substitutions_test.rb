@@ -690,7 +690,7 @@ context 'Substitutions' do
     test 'should encode special characters in alt text of inline image' do
       input = 'A tiger\'s "roar" is < a bear\'s "growl"'
       expected = 'A tiger&#8217;s &quot;roar&quot; is &lt; a bear&#8217;s &quot;growl&quot;'
-      output = (render_embedded_string %(image:tiger-roar.png[#{input}]), :doctype => :inline).gsub(/>\s+</, '><')
+      output = (convert_inline_string %(image:tiger-roar.png[#{input}])).gsub(/>\s+</, '><')
       assert_equal %(<span class="image"><img src="tiger-roar.png" alt="#{expected}"></span>), output
     end
 
@@ -857,7 +857,7 @@ context 'Substitutions' do
       assert_equal %{<span class="icon">[github]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
-    test 'an icon macro should render alt text if icons are disabled and alt is given' do
+    test 'an icon macro should output alt text if icons are disabled and alt is given' do
       para = block_from_string 'icon:github[alt="GitHub"]'
       assert_equal %{<span class="icon">[GitHub]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
@@ -877,7 +877,7 @@ context 'Substitutions' do
       assert_equal %{<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
-    test 'a single-line footnote macro should be registered and rendered as a footnote' do
+    test 'a single-line footnote macro should be registered and output as a footnote' do
       para = block_from_string('Sentence text footnote:[An example footnote.].')
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -887,7 +887,7 @@ context 'Substitutions' do
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a multi-line footnote macro should be registered and rendered as a footnote without endline' do
+    test 'a multi-line footnote macro should be registered and output as a footnote without endline' do
       para = block_from_string("Sentence text footnote:[An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -897,7 +897,7 @@ context 'Substitutions' do
       assert_equal "An example footnote with wrapped text.", footnote.text
     end
 
-    test 'an escaped closing square bracket in a footnote should be unescaped when rendered' do
+    test 'an escaped closing square bracket in a footnote should be unescaped when converted' do
       para = block_from_string(%(footnote:[a #{BACKSLASH}] b].))
       assert_equal %(<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -973,7 +973,7 @@ context 'Substitutions' do
 foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       EOS
 
-      result = render_embedded_string input, :doctype => 'inline', :backend => 'docbook'
+      result = convert_string_to_embedded input, :doctype => 'inline', :backend => 'docbook'
       assert_equal 'foo<footnote><simpara>http://example.com</simpara></footnote>bar<footnote><simpara>http://acme.com</simpara></footnote>baz', result
     end
 
@@ -991,7 +991,7 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal "Another footnote.", footnote2.text
     end
 
-    test 'a footnoteref macro with id and single-line text should be registered and rendered as a footnote' do
+    test 'a footnoteref macro with id and single-line text should be registered and output as a footnote' do
       para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.].')
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -1001,7 +1001,7 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a footnoteref macro with id and multi-line text should be registered and rendered as a footnote without endlines' do
+    test 'a footnoteref macro with id and multi-line text should be registered and output as a footnote without endlines' do
       para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -1039,7 +1039,7 @@ You can also file a support request.footnote:sub[]
 If all else fails, you can give us a call.footnoteref:[sub]
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '#_footnotedef_1', output, 1
       assert_css 'p a[href="#_footnotedef_1"]', output, 3
       assert_css '#footnotes .footnote', output, 1
@@ -1050,7 +1050,7 @@ If all else fails, you can give us a call.footnoteref:[sub]
 notable text.footnote:id[about this [text\]], footnote:id[], footnote:id[]
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '(//p)[1]/sup[starts-with(@class,"footnote")]', output, 3
       assert_xpath '(//p)[1]/sup[@class="footnote"]', output, 1
       assert_xpath '(//p)[1]/sup[@class="footnoteref"]', output, 2
@@ -1065,7 +1065,7 @@ The footnote:[] macro can be used for defining and referencing footnotes.
 The footnoteref:[] macro is now deprecated.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_includes output, 'The footnote:[] macro'
       assert_includes output, 'The footnoteref:[] macro'
     end
@@ -1075,7 +1075,7 @@ The footnoteref:[] macro is now deprecated.
 You can download the software from the product page.footnote:1[Option only available if you have an active subscription.]
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '#_footnote_1', output, 1
       assert_css 'p sup#_footnote_1', output, 1
       assert_css 'p a#_footnoteref_1', output, 1
@@ -1592,7 +1592,7 @@ EOS
 
     test 'should find and replace placeholder duplicated by substitution' do
       input = %q(+first passthrough+ followed by link:$$http://example.com/__u_no_format_me__$$[] with passthrough)
-      result = render_embedded_string input, :doctype => :inline
+      result = convert_inline_string input
       assert_equal 'first passthrough followed by <a href="http://example.com/__u_no_format_me__" class="bare">http://example.com/__u_no_format_me__</a> with passthrough', result
     end
 
@@ -1638,12 +1638,12 @@ EOS
     end
 
     test 'should restore nested passthroughs' do
-      result = render_embedded_string %q(+Sometimes you feel pass:q[`mono`].+ Sometimes you +$$don't$$+.), :doctype => :inline
+      result = convert_inline_string %q(+Sometimes you feel pass:q[`mono`].+ Sometimes you +$$don't$$+.)
       assert_equal %q(Sometimes you feel <code>mono</code>. Sometimes you don't.), result
     end
 
     test 'should honor role on double plus passthrough' do
-      result = render_embedded_string 'Print the version using [var]++{asciidoctor-version}++.', :doctype => :inline
+      result = convert_inline_string 'Print the version using [var]++{asciidoctor-version}++.'
       assert_equal 'Print the version using <span class="var">{asciidoctor-version}</span>.', result
     end
 
@@ -1870,13 +1870,13 @@ foo&#8201;&#8212;&#8201;'
 
     test 'preserves entity references' do
       input = '&amp; &#169; &#10004; &#128512; &#x2022; &#x1f600;'
-      result = render_embedded_string input, :doctype => :inline
+      result = convert_inline_string input
       assert_equal input, result
     end
 
     test 'only preserves named entities with two or more letters' do
       input = '&amp; &a; &gt;'
-      result = render_embedded_string input, :doctype => :inline
+      result = convert_inline_string input
       assert_equal '&amp; &amp;a; &gt;', result
     end
 

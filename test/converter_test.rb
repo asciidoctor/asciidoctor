@@ -154,7 +154,7 @@ Sidebar content
 ****
       EOS
 
-      output = render_embedded_string input, :template_dir => (fixture_path 'custom-backends/haml'), :template_cache => false
+      output = convert_string_to_embedded input, :template_dir => (fixture_path 'custom-backends/haml'), :template_cache => false
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p', output, 1
       assert_xpath '//aside', output, 1
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p/following-sibling::aside', output, 1
@@ -293,7 +293,7 @@ Sidebar content
 ****
       EOS
 
-      output = render_embedded_string input, :template_dir => (fixture_path 'custom-backends/slim'), :template_cache => false
+      output = convert_string_to_embedded input, :template_dir => (fixture_path 'custom-backends/slim'), :template_cache => false
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p', output, 1
       assert_xpath '//aside', output, 1
       assert_xpath '/*[@class="sect1"]/*[@class="sectionbody"]/p/following-sibling::aside', output, 1
@@ -325,7 +325,7 @@ content
         end
       end
 
-      output = render_string input, :converter => CustomConverterA
+      output = convert_string input, :converter => CustomConverterA
       assert 'document', output
     end
 
@@ -348,7 +348,7 @@ content
         converters = Asciidoctor::Converter::Factory.converters
         assert converters.size == 1
         assert converters['foobar'] == CustomConverterB
-        output = render_string input, :backend => 'foobar'
+        output = convert_string input, :backend => 'foobar'
         assert 'foobar content', output
       ensure
         Asciidoctor::Converter::Factory.unregister_all
@@ -460,7 +460,7 @@ content
 
         converters = Asciidoctor::Converter::Factory.converters
         assert converters['*'] == CustomConverterF
-        output = render_string input, :backend => 'foobaz'
+        output = convert_string input, :backend => 'foobaz'
         assert 'foobaz content', output
       ensure
         Asciidoctor::Converter::Factory.unregister_all

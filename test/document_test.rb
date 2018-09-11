@@ -116,7 +116,7 @@ context 'Document' do
 
 content
       EOS
-      result = render_string input, :backend => 'docbook'
+      result = convert_string input, :backend => 'docbook'
       assert_xpath '/article', result, 1
       assert_xpath '/article/info', result, 0
     end
@@ -364,7 +364,7 @@ content
 
   context 'MathJax' do
     test 'should add MathJax script to HTML head if stem attribute is set' do
-      output = render_string '', :attributes => {'stem' => ''}
+      output = convert_string '', :attributes => {'stem' => ''}
       assert_match('<script type="text/x-mathjax-config">', output)
       assert_match('inlineMath: [["\\\\(", "\\\\)"]]', output)
       assert_match('displayMath: [["\\\\[", "\\\\]"]]', output)
@@ -420,7 +420,7 @@ content
         '/favicon.ico' => %w(/favicon.ico image/x-icon),
         '/img/favicon.png' => %w(/img/favicon.png image/png)
       }.each {|val, (href, type)|
-        result = render_string %(= Untitled), :attributes => { 'favicon' => val }
+        result = convert_string %(= Untitled), :attributes => { 'favicon' => val }
         assert_css 'link[rel="icon"]', result, 1
         assert_css %(link[rel="icon"][href="#{href}"]), result, 1
         assert_css %(link[rel="icon"][type="#{type}"]), result, 1
@@ -679,7 +679,7 @@ preamble
 
 text
       EOS
-      output = render_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE
       assert_css '#header h1', output, 1
       assert_css '#content h1', output, 0
     end
@@ -691,7 +691,7 @@ text
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '/html/head/title[text()="Document Title"]', output, 1
       nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output)
       assert_equal 1, nodes.size
@@ -727,7 +727,7 @@ v8.6.8, 2012-07-12: See changelog.
 
 more info...
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
       assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
       assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
@@ -764,7 +764,7 @@ Author Name
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = convert_string input, :backend => 'docbook'
       assert_css 'revhistory', output, 1
       assert_css 'revhistory > revision', output, 1
       assert_css 'revhistory > revision > date', output, 1
@@ -781,7 +781,7 @@ Author Name
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = convert_string input, :backend => 'docbook'
       assert_css 'revhistory', output, 1
       assert_css 'revhistory > revision', output, 1
       assert_css 'revhistory > revision > date', output, 1
@@ -797,7 +797,7 @@ Author Name
 content
       EOS
 
-      output = render_string input, :backend => 'docbook'
+      output = convert_string input, :backend => 'docbook'
       assert_css 'revhistory', output, 0
     end
 
@@ -811,7 +811,7 @@ v8.6.8, 2012-07-12: See changelog.
 
 more info...
       EOS
-      output = render_string input, :backend => 'docbook45'
+      output = convert_string input, :backend => 'docbook45'
       assert_xpath '/article/articleinfo', output, 1
       assert_xpath '/article/articleinfo/title[text() = "AsciiDoc"]', output, 1
       assert_xpath '/article/articleinfo/date[text() = "2012-07-12"]', output, 1
@@ -835,7 +835,7 @@ Stuart Rackham <founder@asciidoc.org>
 
 more info...
       EOS
-      output = render_string input, :backend => 'docbook5'
+      output = convert_string input, :backend => 'docbook5'
       assert_xpath '/article/info', output, 1
       assert_xpath '/article/info/title[text() = "AsciiDoc"]', output, 1
       assert_xpath '/article/info/author/personname', output, 1
@@ -853,7 +853,7 @@ more info...
 content
       EOS
 
-      output = render_string input, :backend => 'docbook45'
+      output = convert_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 1
       assert_xpath '//articleinfo/author/firstname[text() = "Doc"]', output, 1
       assert_xpath '//articleinfo/author/surname[text() = "Writer"]', output, 1
@@ -869,7 +869,7 @@ content
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//meta[@name="author"][@content="Ze Product team"]', output, 1
     end
 
@@ -881,7 +881,7 @@ R&D Lab
 {author}
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_includes output, 'R&amp;D Lab', 2
     end
 
@@ -893,7 +893,7 @@ Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 content
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_xpath '//span[@id="author"]', output, 1
       assert_xpath '//span[@id="author"][text()="Doc Writer"]', output, 1
       assert_xpath '//span[@id="email"]', output, 1
@@ -914,7 +914,7 @@ Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 content
       EOS
 
-      output = render_string input, :backend => 'docbook45'
+      output = convert_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 0
       assert_xpath '//articleinfo/authorgroup', output, 1
       assert_xpath '//articleinfo/authorgroup/author', output, 2
@@ -945,7 +945,7 @@ content
 content
       EOS
 
-      output = render_string input, :backend => 'docbook45'
+      output = convert_string input, :backend => 'docbook45'
       assert_xpath '//articleinfo/author', output, 0
       assert_xpath '//articleinfo/authorgroup', output, 1
       assert_xpath '//articleinfo/authorgroup/author', output, 2
@@ -962,7 +962,7 @@ content
 
 Essential for catching road runners.
       EOS
-      output = render_string input, :backend => 'docbook5'
+      output = convert_string input, :backend => 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
       assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
     end
@@ -974,7 +974,7 @@ Essential for catching road runners.
 
 Essential for catching road runners.
       EOS
-      output = render_string input, :backend => 'docbook5'
+      output = convert_string input, :backend => 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
       assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
       assert_xpath '/article/info/copyright/year', output, 1
@@ -988,7 +988,7 @@ Essential for catching road runners.
 
 Essential for catching road runners.
       EOS
-      output = render_string input, :backend => 'docbook5'
+      output = convert_string input, :backend => 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
       assert_xpath '/article/info/copyright/holder[text()="ACME, Inc."]', output, 1
       assert_xpath '/article/info/copyright/year', output, 1
@@ -1006,14 +1006,14 @@ Essential for catching road runners.
       assert_xpath '//*[@id="content"]', result, 1
     end
 
-    test 'does not render footer if nofooter is set' do
+    test 'does not output footer if nofooter is set' do
       input = <<-EOS
 :nofooter:
 
 content
       EOS
 
-      result = render_string input
+      result = convert_string input
       assert_xpath '//*[@id="footer"]', result, 0
     end
 
@@ -1042,7 +1042,7 @@ content
 content
       EOS
 
-      result = render_embedded_string input, :attributes => {'notitle!' => ''}
+      result = convert_string_to_embedded input, :attributes => {'notitle!' => ''}
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
@@ -1059,7 +1059,7 @@ content
 content
       EOS
 
-      result = render_embedded_string input, :attributes => {'showtitle' => ''}
+      result = convert_string_to_embedded input, :attributes => {'showtitle' => ''}
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
@@ -1086,14 +1086,14 @@ preamble
       assert_equal 0, doc.blocks.size
     end
 
-    test 'renders footnotes in footer' do
+    test 'outputs footnotes in footer' do
       input = <<-EOS
 A footnote footnote:[An example footnote.];
 a second footnote with a reference ID footnoteref:[note2,Second footnote.];
 finally a reference to the second footnote footnoteref:[note2].
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css '#footnotes', output, 1
       assert_css '#footnotes .footnote', output, 2
       assert_css '#footnotes .footnote#_footnotedef_1', output, 1
@@ -1106,12 +1106,12 @@ finally a reference to the second footnote footnoteref:[note2].
       assert_equal '. Second footnote.', text.text.strip
     end
 
-    test 'renders footnotes block in embedded document by default' do
+    test 'outputs footnotes block in embedded document by default' do
       input = <<-EOS
 Text that has supporting information{empty}footnote:[An example footnote.].
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_css '#footnotes', output, 1
       assert_css '#footnotes .footnote', output, 1
       assert_css '#footnotes .footnote#_footnotedef_1', output, 1
@@ -1120,12 +1120,12 @@ Text that has supporting information{empty}footnote:[An example footnote.].
       assert_equal '. An example footnote.', text.text.strip
     end
 
-    test 'does not render footnotes block in embedded document if nofootnotes attribute is set' do
+    test 'does not output footnotes block in embedded document if nofootnotes attribute is set' do
       input = <<-EOS
 Text that has supporting information{empty}footnote:[An example footnote.].
       EOS
 
-      output = render_embedded_string input, :attributes => {'nofootnotes' => ''}
+      output = convert_string_to_embedded input, :attributes => {'nofootnotes' => ''}
       assert_css '#footnotes', output, 0
     end
   end
@@ -1173,7 +1173,7 @@ image::inner.png[]
 
   context 'Backends and Doctypes' do
     test 'html5 backend doctype article' do
-      result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5'})
+      result = convert_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
@@ -1181,7 +1181,7 @@ image::inner.png[]
     end
 
     test 'html5 backend doctype book' do
-      result = render_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5', 'doctype' => 'book'})
+      result = convert_string("= Title\n\nparagraph", :attributes => {'backend' => 'html5', 'doctype' => 'book'})
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
@@ -1238,7 +1238,7 @@ content
 
 ---
       EOS
-      result = render_embedded_string input, :safe => :safe
+      result = convert_string_to_embedded input, :safe => :safe
       assert_equal '<hr>', result
     end
 
@@ -1289,7 +1289,7 @@ two
 
 '''
       EOS
-      result = render_string input, :safe => :safe, :backend => :xhtml
+      result = convert_string input, :safe => :safe, :backend => :xhtml
       begin
         Nokogiri::XML::Document.parse(result) {|config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
@@ -1303,7 +1303,7 @@ two
       input = <<-EOS
 content
       EOS
-      result = render_string input, :safe => :safe, :backend => :xhtml, :keep_namespaces => true
+      result = convert_string input, :safe => :safe, :backend => :xhtml, :keep_namespaces => true
       assert_xpath '//*[not(namespace-uri() = "http://www.w3.org/1999/xhtml")]', result, 0
     end
 
@@ -1317,7 +1317,7 @@ preamble
 
 section body
       EOS
-      result = render_string(input, :attributes => {'backend' => 'docbook45'})
+      result = convert_string(input, :attributes => {'backend' => 'docbook45'})
       assert_xpath '/article', result, 1
       assert_xpath '/article/articleinfo/title[text() = "Title"]', result, 1
       assert_xpath '/article/simpara[text() = "preamble"]', result, 1
@@ -1327,14 +1327,14 @@ section body
     end
 
     test 'docbook45 backend doctype article no title' do
-      result = render_string('text', :attributes => {'backend' => 'docbook45'})
+      result = convert_string('text', :attributes => {'backend' => 'docbook45'})
       assert_xpath '/article', result, 1
       assert_xpath '/article/articleinfo/date', result, 1
       assert_xpath '/article/simpara[text() = "text"]', result, 1
     end
 
     test 'docbook45 backend doctype article no xmlns' do
-      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article'})
+      result = convert_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'article'})
       refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
@@ -1354,7 +1354,7 @@ some text
 
 section body
       EOS
-      result = render_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'manpage'})
+      result = convert_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'manpage'})
       assert_xpath '/refentry', result, 1
       assert_xpath '/refentry/refentryinfo/title[text() = "asciidoctor(1)"]', result, 1
       assert_xpath '/refentry/refmeta/refentrytitle[text() = "asciidoctor"]', result, 1
@@ -1378,7 +1378,7 @@ preamble
 
 chapter body
       EOS
-      result = render_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
+      result = convert_string(input, :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/title[text() = "Title"]', result, 1
       assert_xpath '/book/preface/simpara[text() = "preamble"]', result, 1
@@ -1388,7 +1388,7 @@ chapter body
     end
 
     test 'docbook45 backend doctype book no title' do
-      result = render_string('text', :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
+      result = convert_string('text', :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/date', result, 1
       # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
@@ -1396,7 +1396,7 @@ chapter body
     end
 
     test 'docbook45 backend doctype book no xmlns' do
-      result = render_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
+      result = convert_string('text', :keep_namespaces => true, :attributes => {'backend' => 'docbook45', 'doctype' => 'book'})
       refute_match(RE_XMLNS_ATTRIBUTE, result)
     end
 
@@ -1407,7 +1407,7 @@ chapter body
 
 text
       EOS
-      result = render_string input, :backend => 'docbook45'
+      result = convert_string input, :backend => 'docbook45'
       assert_xpath '/book', result, 1
       assert_xpath '/book/bookinfo/title[text() = "Document Title"]', result, 1
       assert_xpath '/book/bookinfo/subtitle[text() = "Subtitle"]', result, 1
@@ -1424,7 +1424,7 @@ preamble
 
 section body
       EOS
-      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5'})
+      result = convert_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5'})
       assert_xpath '/xmlns:article', result, 1
       doc = xmlnodes_at_xpath('/xmlns:article', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
@@ -1460,7 +1460,7 @@ some text
 
 section body
       EOS
-      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
+      result = convert_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
       assert_xpath '/xmlns:refentry', result, 1
       doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
@@ -1497,7 +1497,7 @@ asciidoctor - Process text
 
 some text
       EOS
-      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
+      result = convert_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'manpage'})
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text() = "#{decode_char 160}"]), result, 1
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text() = "#{decode_char 160}"]), result, 1
     end
@@ -1513,7 +1513,7 @@ preamble
 
 chapter body
       EOS
-      result = render_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'book'})
+      result = convert_string(input, :keep_namespaces => true, :attributes => {'backend' => 'docbook5', 'doctype' => 'book'})
       assert_xpath '/xmlns:book', result, 1
       doc = xmlnodes_at_xpath('/xmlns:book', result, 1)
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
@@ -1549,7 +1549,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
 *eve* ['OPTION']... 'FILE'...
       EOS
 
-      result = render_string input, :backend => 'docbook5'
+      result = convert_string input, :backend => 'docbook5'
       assert_xpath '/refentry/refnamediv/refname', result, 2
       assert_xpath '(/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
       assert_xpath '(/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
@@ -1570,7 +1570,7 @@ preamble
 chapter body
       EOS
 
-      result = render_string input, :attributes => {'backend' => 'docbook5'}
+      result = convert_string input, :attributes => {'backend' => 'docbook5'}
       assert_xpath '//info/cover[@role="front"]', result, 1
       assert_xpath '//info/cover[@role="front"]//imagedata[@fileref="images/front-cover.jpg"]', result, 1
       assert_xpath '//info/cover[@role="back"]', result, 1
@@ -1605,7 +1605,7 @@ Stuart Rackham <founder@asciidoc.org>
 
 more info...
       EOS
-      output = render_string input, :attributes => {'backend' => 'docbook45'}
+      output = convert_string input, :attributes => {'backend' => 'docbook45'}
       assert_xpath '/article/articleinfo/authorinitials[text()="SJR"]', output, 1
     end
 
@@ -1735,7 +1735,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
-      output = render_string input
+      output = convert_string input
       assert_css 'body.manpage', output, 1
       assert_xpath '//body/*[@id="header"]/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '//body/*[@id="header"]/h1/following-sibling::h2[text()="NAME"]', output, 1
@@ -1760,7 +1760,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/h1[text()="asciidoctor(1) Manual Page"]', output, 1
       assert_xpath '/h1/following-sibling::h2[text()="NAME"]', output, 1
       assert_xpath '/h2[@id="_name"][text()="NAME"]', output, 1

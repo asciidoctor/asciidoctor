@@ -16,7 +16,7 @@ Preamble paragraph 1.
 
 Section paragraph 1.
     EOS
-    result = render_string(input)
+    result = convert_string(input)
     assert_xpath '//p', result, 2
     assert_xpath '//*[@id="preamble"]', result, 1
     assert_xpath '//*[@id="preamble"]//p', result, 1
@@ -35,7 +35,7 @@ Preface content.
 
 Section content.
     EOS
-    result = render_string input, :backend => :docbook
+    result = convert_string input, :backend => :docbook
     assert_xpath '//preface/title', result, 1
     title_node = xmlnodes_at_xpath '//preface/title', result, 1
     assert_equal '', title_node.text
@@ -53,7 +53,7 @@ Preface content.
 
 Section content.
     EOS
-    result = render_string input, :backend => :docbook
+    result = convert_string input, :backend => :docbook
     assert_xpath '//preface/title[text()="Preface"]', result, 1
   end
 
@@ -69,7 +69,7 @@ Preamble paragraph 2.
 
 Section paragraph 1.
     EOS
-    result = render_string(input)
+    result = convert_string(input)
     assert_xpath '//p', result, 3
     assert_xpath '//*[@id="preamble"]', result, 1
     assert_xpath '//*[@id="preamble"]//p', result, 2
@@ -83,7 +83,7 @@ Section paragraph 1.
 
 paragraph
     EOS
-    result = render_string(input)
+    result = convert_string(input)
     assert_xpath '//p', result, 1
     assert_xpath '//*[@id="content"]/*[@class="paragraph"]/p', result, 1
     assert_xpath '//*[@id="content"]/*[@class="paragraph"]/following-sibling::*', result, 0
@@ -97,7 +97,7 @@ paragraph
 
 Section paragraph 1.
     EOS
-    result = render_string(input)
+    result = convert_string(input)
     assert_xpath '//p', result, 1
     assert_xpath '//*[@id="preamble"]', result, 0
     assert_xpath '//h2[@id="_first_section"]', result, 1
@@ -111,7 +111,7 @@ Preamble paragraph 1.
 
 Section paragraph 1.
     EOS
-    result = render_string(input)
+    result = convert_string(input)
     assert_xpath '//p', result, 2
     assert_xpath '//*[@id="preamble"]', result, 0
     assert_xpath '//h2[@id="_first_section"]/preceding::p', result, 1
@@ -150,7 +150,7 @@ The axe came swinging.
       assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
   end
 
-  test 'should render table of contents in preamble if toc-placement attribute value is preamble' do
+  test 'should output table of contents in preamble if toc-placement attribute value is preamble' do
     input = <<-EOS
 = Article
 :toc:
@@ -167,7 +167,7 @@ It was a dark and stormy night...
 They couldn't believe their eyes when...
       EOS
 
-    output = render_string input
+    output = convert_string input
     assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
   end
 end

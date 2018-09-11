@@ -56,7 +56,7 @@ context 'Attributes' do
 
 {#{name}}
         EOS
-        result = render_embedded_string str
+        result = convert_string_to_embedded str
         assert_includes result, %(<p>#{value}</p>)
       end
 
@@ -167,7 +167,7 @@ linus.torvalds@example.com
 {bigfoot}
       EOS
 
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_includes result, 'bigfoot'
     end
 
@@ -182,7 +182,7 @@ content
 {bigfoot}
       EOS
 
-      result = render_embedded_string input
+      result = convert_string_to_embedded input
       assert_includes result, '<em>big</em>foot'
     end
 
@@ -194,7 +194,7 @@ content
 {name}
       EOS
 
-      result = render_embedded_string input, :doctype => :inline
+      result = convert_inline_string input
       assert_equal expected, result
       assert_equal 4096, result.bytesize
     end
@@ -207,7 +207,7 @@ content
 {name}
       EOS
 
-      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => 6 }
+      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => 6 }
       assert_equal expected, result
       assert_equal 6, result.bytesize
     end
@@ -220,7 +220,7 @@ content
 {name}
       EOS
 
-      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => 8 }
+      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => 8 }
       assert_equal expected, result
       assert_equal 6, result.bytesize
     end
@@ -233,7 +233,7 @@ content
 {name}
       EOS
 
-      result = render_embedded_string input, :doctype => :inline, :attributes => { 'max-attribute-value-size' => nil }
+      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => nil }
       assert_equal expected, result
       assert_equal 5000, result.bytesize
     end
@@ -244,7 +244,7 @@ content
 
 {imagesdir}
 EOS
-      output = render_embedded_string input, :doctype => :inline, :safe => :safe
+      output = convert_inline_string input, :safe => :safe
       if RUBY_VERSION >= '1.9'
         assert_equal %(#{Dir.home}/etc/images), output
       else
@@ -258,12 +258,8 @@ EOS
 
 {imagesdir}
 EOS
-      output = render_embedded_string input, :doctype => :inline, :safe => :server
-      if RUBY_VERSION >= '1.9'
-        assert_equal %(./etc/images), output
-      else
-        assert_equal %(./etc/images), output
-      end
+      output = convert_inline_string input, :safe => :server
+      assert_equal './etc/images', output
     end
 
     test "apply custom substitutions to text in passthrough macro and assign to attribute" do
@@ -294,7 +290,7 @@ ifndef::holygrail[]
 Buggers! What happened to the grail?
 endif::holygrail[]
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '//p', output, 2
       assert_xpath '(//p)[1][text() = "The holy grail has been found!"]', output, 1
       assert_xpath '(//p)[2][text() = "Buggers! What happened to the grail?"]', output, 1
@@ -580,8 +576,8 @@ toc toc-placement!                        |   |content     |macro        |nil
 
   context 'Interpolation' do
 
-    test "render properly with simple names" do
-      html = render_string(":frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!")
+    test "convert properly with simple names" do
+      html = convert_string(":frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!")
       result = Nokogiri::HTML(html)
       assert_equal "Yo, Tanglefoot!\nBeat Spiderman!", result.css("p").first.content.strip
     end
@@ -594,13 +590,13 @@ He-Man: {He-Man}
 
 She-Ra: {She-Ra}
       EOS
-      result = render_embedded_string input, :attributes => {'She-Ra' => 'The Princess of Power'}
+      result = convert_string_to_embedded input, :attributes => {'She-Ra' => 'The Princess of Power'}
       assert_xpath '//p[text()="He-Man: The most powerful man in the universe"]', result, 1
       assert_xpath '//p[text()="She-Ra: The Princess of Power"]', result, 1
     end
 
-    test "render properly with single character name" do
-      html = render_string(":r: Ruby\n\nR is for {r}!")
+    test "convert properly with single character name" do
+      html = convert_string(":r: Ruby\n\nR is for {r}!")
       result = Nokogiri::HTML(html)
       assert_equal 'R is for Ruby!', result.css("p").first.content.strip
     end
@@ -613,7 +609,7 @@ Main Header
 
 Yo, {myfrog}!
       EOS
-      output = render_string input
+      output = convert_string input
       assert_xpath '(//p)[1][text()="Yo, Tanglefoot!"]', output, 1
     end
 
@@ -625,13 +621,13 @@ This is
 blah blah {foobarbaz}
 all there is.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       para = xmlnodes_at_css 'p', output, 1
       refute_includes 'blah blah', para.content
       assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
-    test "attribute value gets interpretted when rendering" do
+    test "attribute value gets interpretted when converting" do
       doc = document_from_string(":google: http://google.com[Google]\n\n{google}")
       assert_equal 'http://google.com[Google]', doc.attributes['google']
       output = doc.convert
@@ -646,7 +642,7 @@ Line 1: This line should appear in the output.
 Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
       assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus-attribute'
@@ -658,7 +654,7 @@ Line 1: This line should appear in the output.
 Line 2: A {bogus-attribute}! This time, this line should appear in the output.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_match(/Line 1/, output)
       assert_match(/Line 2/, output)
       assert_match(/\{bogus-attribute\}/, output)
@@ -672,7 +668,7 @@ Line 1: This line should appear in the output.
 Line 2: {set:a!}This line should not appear in the output.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
     end
@@ -686,7 +682,7 @@ Line 1: This line should appear in the output.
 Line 2: {set:a!}This line should appear in the output.
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_match(/Line 1/, output)
       assert_match(/Line 2/, output)
       refute_match(/\{set:a!\}/, output)
@@ -699,7 +695,7 @@ Line 1
 Line 2
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
     end
 
@@ -710,18 +706,18 @@ Line 1
 Line 2
       EOS
 
-      output = render_embedded_string input, :attributes => { 'attribute-missing' => 'drop' }
+      output = convert_string_to_embedded input, :attributes => { 'attribute-missing' => 'drop' }
       assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
     end
 
     test "substitutes inside unordered list items" do
-      html = render_string(":foo: bar\n* snort at the {foo}\n* yawn")
+      html = convert_string(":foo: bar\n* snort at the {foo}\n* yawn")
       result = Nokogiri::HTML(html)
       assert_match(/snort at the bar/, result.css("li").first.content.strip)
     end
 
     test 'substitutes inside section title' do
-      output = render_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
+      output = convert_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
       result = Nokogiri::HTML(output)
       assert_match(/Cool Title/, result.css('h2').first.content)
       assert_match(/_cool_title/, result.css('h2').first.attr('id'))
@@ -811,7 +807,7 @@ content
 .Require the +{gem_name}+ gem
 To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
-      output = render_embedded_string input, :attributes => {'compat-mode' => ''}
+      output = convert_string_to_embedded input, :attributes => {'compat-mode' => ''}
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
 
       input = <<-EOS
@@ -820,11 +816,11 @@ To use {gem_name}, the first thing to do is to import it in your Ruby source fil
 .Require the `{gem_name}` gem
 To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
     end
 
-    test 'renders attribute until it is deleted' do
+    test 'sets attribute until it is deleted' do
       input = <<-EOS
 :foo: bar
 
@@ -834,7 +830,7 @@ Crossing the {foo}.
 
 Belly up to the {foo}.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//p[text()="Crossing the bar."]', output, 1
       assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
@@ -857,20 +853,20 @@ Belly up to the {foo}.
 `{foo}`
       EOS
 
-      result = render_embedded_string input, :attributes => {'compat-mode' => '@'}
+      result = convert_string_to_embedded input, :attributes => {'compat-mode' => '@'}
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
       assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
     end
 
     test 'does not disturb attribute-looking things escaped with backslash' do
-      html = render_string(":foo: bar\nThis is a \\{foo} day.")
+      html = convert_string(":foo: bar\nThis is a \\{foo} day.")
       result = Nokogiri::HTML(html)
       assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
     end
 
     test 'does not disturb attribute-looking things escaped with literals' do
-      html = render_string(":foo: bar\nThis is a +++{foo}+++ day.")
+      html = convert_string(":foo: bar\nThis is a +++{foo}+++ day.")
       result = Nokogiri::HTML(html)
       assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
     end
@@ -883,7 +879,7 @@ Belly up to the {foo}.
 puts 'The forecast for today is {forecast}'
 ----
       EOS
-      output = render_string(input)
+      output = convert_string(input)
       assert_match(/\{forecast\}/, output)
     end
 
@@ -896,7 +892,7 @@ You insert the text {foo} to expand the value
 of the attribute named foo in your document.
 ....
       EOS
-      output = render_string(input)
+      output = convert_string(input)
       assert_match(/\{foo\}/, output)
     end
 
@@ -908,7 +904,7 @@ of the attribute named foo in your document.
 
       docdir = Dir.pwd
       docfile = File.join(docdir, 'sample.asciidoc')
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docdir' => docdir, 'docfile' => docfile}
       assert_xpath '//li[1]/p[text()="docdir: "]', output, 1
       assert_xpath '//li[2]/p[text()="docfile: sample.asciidoc"]', output, 1
     end
@@ -921,28 +917,28 @@ of the attribute named foo in your document.
 
       docdir = Dir.pwd
       docfile = File.join(docdir, 'sample.asciidoc')
-      output = render_embedded_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => docdir, 'docfile' => docfile}
       assert_xpath %(//li[1]/p[text()="docdir: #{docdir}"]), output, 1
       assert_xpath %(//li[2]/p[text()="docfile: #{docfile}"]), output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and value' do
       input = '{set:foo:bar}{foo}'
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p[text()="bar"]', output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and no value' do
       input = "{set:foo}\n{foo}yes"
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and empty value' do
       input = "{set:foo:}\n{foo}yes"
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
     end
@@ -955,7 +951,7 @@ of the attribute named foo in your document.
 {set:foo!}
 {foo}yes
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p/child::text()', output, 0
     end
@@ -965,19 +961,19 @@ of the attribute named foo in your document.
 
     test "substitute intrinsics" do
       Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
-        html = render_string("Look, a {#{key}} is here")
+        html = convert_string("Look, a {#{key}} is here")
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
         assert_match(/Look, a #{Regexp.escape(value)} is here/, html)
       end
     end
 
     test "don't escape intrinsic substitutions" do
-      html = render_string('happy{nbsp}together')
+      html = convert_string('happy{nbsp}together')
       assert_match(/happy&#160;together/, html)
     end
 
     test "escape special characters" do
-      html = render_string('<node>&</node>')
+      html = convert_string('<node>&</node>')
       assert_match(/&lt;node&gt;&amp;&lt;\/node&gt;/, html)
     end
 
@@ -1106,7 +1102,7 @@ image::baz.jpg[]
 image::qux.jpg[]
       EOS
 
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//div[@class="title"]', output, 4
       assert_xpath '//div[@class="title"][text() = "Figure 1. Title for Foo"]', output, 1
       assert_xpath '//div[@class="title"][text() = "Figure 2. Title for Bar"]', output, 1
@@ -1183,7 +1179,7 @@ ____
 [title='*title*']
 content
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '//*[@class="title"]/strong[text()="title"]', output, 1
     end
 
@@ -1535,7 +1531,7 @@ A normal paragraph
 == Section
 Content.
       EOS
-      output = render_embedded_string input
+      output = convert_string_to_embedded input
       assert_xpath '/div[@class="sect1 small"]', output, 1
       assert_xpath '/div[@class="sect1 small"]/h2[@id="dedication"]', output, 1
     end

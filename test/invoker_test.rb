@@ -7,7 +7,7 @@ require 'asciidoctor/cli/options'
 require 'asciidoctor/cli/invoker'
 
 context 'Invoker' do
-  test 'should parse source and render as html5 article by default' do
+  test 'should parse source and convert to html5 article by default' do
     invoker = nil
     output = nil
     redirect_streams do |out, err|
@@ -362,7 +362,7 @@ context 'Invoker' do
     end
   end
 
-  test 'should render all passed files' do
+  test 'should convert all passed files' do
     basic_outpath = fixture_path 'basic.html'
     sample_outpath = fixture_path 'sample.html'
     begin
@@ -390,7 +390,7 @@ context 'Invoker' do
     end
   end
 
-  test 'should render all files that matches a glob expression' do
+  test 'should convert all files that matches a glob expression' do
     basic_outpath = fixture_path 'basic.html'
     begin
       invoke_cli_to_buffer [], "ba*.asciidoc"
@@ -400,7 +400,7 @@ context 'Invoker' do
     end
   end
 
-  test 'should render all files that matches an absolute path glob expression' do
+  test 'should convert all files that matches an absolute path glob expression' do
     basic_outpath = fixture_path 'basic.html'
     glob = fixture_path 'ba*.asciidoc'
     # test Windows using backslash-style pathname
@@ -642,7 +642,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
       _, out, _ = Open3.popen3 cmd
       #stderr_lines = stderr.readlines
       # warnings may be issued, so don't assert on stderr
-      #assert_empty stderr_lines, 'Command failed. Expected to receive a rendered document.'
+      #assert_empty stderr_lines, 'Command failed. Expected to receive a converted document.'
       stdout_lines = out.readlines
       refute_empty stdout_lines
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
