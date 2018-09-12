@@ -1192,7 +1192,7 @@ Your browser does not support the video tag.
     end
 
     def generate_manname_section node
-      manname_title = (node.attr 'manname-title') || 'Name'
+      manname_title = node.attr 'manname-title', 'Name'
       if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
         manname_title = manname_title.upcase
       end
