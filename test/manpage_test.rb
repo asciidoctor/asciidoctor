@@ -43,7 +43,7 @@ context 'Manpage' do
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
-    test 'should skip line comments in NAME section' do
+    test 'should not parse NAME section if manname and manpurpose attributes are set' do
       input = <<-EOS
 = foobar (1)
 Author Name
@@ -51,9 +51,35 @@ Author Name
 :man manual: Foo Bar Manual
 :man source: Foo Bar 1.0
 
+== SYNOPSIS
+
+*foobar* [_OPTIONS_]...
+
+== DESCRIPTION
+
+When you need to put some foo on the bar.
+      EOS
+
+      attrs = { 'manname' => 'foobar', 'manpurpose' => 'puts some foo on the bar' }
+      doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true, :attributes => attrs
+      assert_equal 'foobar', (doc.attr 'manname')
+      assert_equal ['foobar'], (doc.attr 'mannames')
+      assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
+      assert_equal 'SYNOPSIS', doc.sections[0].title
+    end
+
+    test 'should skip line comments before and inside NAME section' do
+      input = <<-EOS
+= foobar (1)
+Author Name
+:doctype: manpage
+:man manual: Foo Bar Manual
+:man source: Foo Bar 1.0
+
+// this is the name section
 == NAME
 
-// follows the form `name - description`
+// it follows the form `name - description`
 foobar - puts some foo on the bar
 // a little bit of this, a little bit of that
 
