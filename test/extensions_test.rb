@@ -950,6 +950,51 @@ snippet::12345[mode=edit]
       end
     end
 
+    test 'should substitute attributes in target of custom block macro' do
+      input = <<-EOS
+snippet::{gist-id}[mode=edit]
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro SnippetMacro, :snippet
+        end
+
+        output = convert_string_to_embedded input, :attributes => { 'gist-id' => '12345' }
+        assert_includes output, '<script src="http://example.com/12345.js?_mode=edit"></script>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should drop block macro line if target references missing attribute and attribute-missing is drop-line' do
+      input = <<-EOS
+[.rolename]
+snippet::{gist-ns}12345[mode=edit]
+
+following paragraph
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro SnippetMacro, :snippet
+        end
+
+        doc, output = nil, nil
+        using_memory_logger do |logger|
+          doc = document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
+          assert_equal 1, doc.blocks.size
+          assert_equal :paragraph, doc.blocks[0].context
+          output = doc.convert
+          assert_message logger, :WARN, 'dropping line containing reference to missing attribute: gist-ns'
+        end
+        assert_css '.paragraph', output, 1
+        assert_css '.rolename', output, 0
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom block macro in an AsciiDoc table cell' do
       input = <<-EOS
 |===

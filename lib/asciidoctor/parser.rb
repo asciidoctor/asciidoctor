@@ -591,6 +591,11 @@ class Parser
             elsif block_macro_extensions && CustomBlockMacroRx =~ this_line &&
                 (extension = extensions.registered_for_block_macro? $1)
               target, content = $2, $3
+              if (target.include? ATTR_REF_HEAD) && (target = parent.sub_attributes target).empty? &&
+                (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line'
+                attributes.clear
+                return
+              end
               if extension.config[:content_model] == :attributes
                 if content
                   document.parse_attributes content, extension.config[:pos_attrs] || [], :sub_input => true, :sub_result => false, :into => attributes
