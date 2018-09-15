@@ -622,8 +622,8 @@ class Parser
       if !indented && CALLOUT_LIST_HEADS.include?(ch0 ||= this_line.chr) &&
           (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
         reader.unshift_line this_line
-        attributes['style'] = 'arabic'
         block = next_callout_list(reader, match, parent, document.callouts)
+        attributes['style'] = 'arabic'
         break
 
       elsif UnorderedListRx.match? this_line
@@ -636,19 +636,8 @@ class Parser
 
       elsif (match = OrderedListRx.match(this_line))
         reader.unshift_line this_line
-        block = next_list(reader, :olist, parent)
-        # FIXME move this logic into next_list
-        unless style
-          marker = block.items[0].marker
-          if marker.start_with? '.'
-            # first one makes more sense, but second one is AsciiDoc-compliant
-            # TODO control behavior using a compliance setting
-            #attributes['style'] = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
-            attributes['style'] = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
-          else
-            attributes['style'] = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
-          end
-        end
+        block = next_list(reader, :olist, parent, style)
+        attributes['style'] = block.style if block.style
         break
 
       elsif (match = DescriptionListRx.match(this_line))
@@ -1129,6 +1118,17 @@ class Parser
       list_item = nil
 
       reader.skip_blank_lines || break
+    end
+
+    if list_type == :olist && !style
+      if (marker = list_block.items[0].marker).start_with? '.'
+        # first one makes more sense, but second one is AsciiDoc Python-compliant
+        # TODO control behavior using a compliance setting
+        #list_block.style = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
+        list_block.style = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
+      else
+        list_block.style = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
+      end
     end
 
     list_block
