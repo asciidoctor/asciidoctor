@@ -621,29 +621,9 @@ class Parser
       # haven't found anything yet, continue
       if !indented && CALLOUT_LIST_HEADS.include?(ch0 ||= this_line.chr) &&
           (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
-        block = List.new(parent, :colist)
-        attributes['style'] = 'arabic'
         reader.unshift_line this_line
-        next_index = 1
-        # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
-        while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
-          # might want to move this check to a validate method
-          unless match[1] == next_index.to_s
-            logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{match[1]}), :source_location => reader.cursor_at_mark
-          end
-          if (list_item = next_list_item reader, block, match)
-            block.items << list_item
-            if (coids = document.callouts.callout_ids block.items.size).empty?
-              logger.warn message_with_context %(no callout found for <#{block.items.size}>), :source_location => reader.cursor_at_mark
-            else
-              list_item.attributes['coids'] = coids
-            end
-          end
-          next_index += 1
-          match = nil
-        end
-
-        document.callouts.next_list
+        attributes['style'] = 'arabic'
+        block = next_callout_list(reader, match, parent, document.callouts)
         break
 
       elsif UnorderedListRx.match? this_line
@@ -1260,6 +1240,40 @@ class Parser
       match = nil
     end
 
+    list_block
+  end
+
+  # Internal: Parse and construct a callout list Block from the current position of the Reader and
+  # advance the document callouts catalog to the next list.
+  #
+  # reader   - The Reader from which to retrieve the callout list.
+  # match    - The Regexp match containing the head of the list.
+  # parent   - The parent Block to which this callout list belongs.
+  # callouts - The document callouts catalog.
+  #
+  # Returns the Block that represents the parsed callout list.
+  def self.next_callout_list reader, match, parent, callouts
+    list_block = List.new(parent, :colist)
+    next_index = 1
+    # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
+    while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
+      # might want to move this check to a validate method
+      unless match[1] == next_index.to_s
+        logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{match[1]}), :source_location => reader.cursor_at_mark
+      end
+      if (list_item = next_list_item reader, list_block, match)
+        list_block.items << list_item
+        if (coids = callouts.callout_ids list_block.items.size).empty?
+          logger.warn message_with_context %(no callout found for <#{list_block.items.size}>), :source_location => reader.cursor_at_mark
+        else
+          list_item.attributes['coids'] = coids
+        end
+      end
+      next_index += 1
+      match = nil
+    end
+
+    callouts.next_list
     list_block
   end
 
