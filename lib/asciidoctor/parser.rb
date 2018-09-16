@@ -2240,7 +2240,6 @@ class Parser
   # Returns the String of the first marker in this number series
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
     return marker if marker.start_with? '.'
-    expected = actual = nil
     case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
     when :arabic
       if validate
