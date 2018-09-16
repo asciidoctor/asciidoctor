@@ -1081,13 +1081,14 @@ class Parser
   def self.parse_list(reader, list_type, parent, style = nil)
     list_block = List.new(parent, list_type)
     list_block.level = parent.context == list_type ? (parent.level + 1) : 1
+    first_list_item = nil
 
     while reader.has_more_lines? && ListRxMap[list_type] =~ reader.peek_line
       match, marker = $~, resolve_list_marker(list_type, $1)
 
       # if we are moving to the next item, and the marker is different
       # determine if we are moving up or down in nesting
-      if list_block.items? && marker != list_block.items[0].marker
+      if first_list_item && marker != first_list_item.marker
         # assume list is nested by default, but then check to see if we are
         # popping out of a nested list by matching an ancestor's list marker
         this_item_level = list_block.level + 1
@@ -1103,7 +1104,7 @@ class Parser
         this_item_level = list_block.level
       end
 
-      if !list_block.items? || this_item_level == list_block.level
+      if !first_list_item || this_item_level == list_block.level
         list_item = parse_list_item(reader, list_block, match, nil, style)
       elsif this_item_level < list_block.level
         # leave this block
@@ -1115,6 +1116,7 @@ class Parser
       end
 
       if list_item
+        first_list_item ||= list_item
         list_block.items << list_item
         list_item = nil
       end
