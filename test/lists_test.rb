@@ -1724,6 +1724,19 @@ List
       assert_css '.olist ol.arabic', output, 1
     end
 
+    test 'should base list style on marker length rather than list depth' do
+      input = <<-EOS
+... parent
+.. child
+. grandchild
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.olist.lowerroman', output, 1
+      assert_css '.olist.lowerroman .olist.loweralpha', output, 1
+      assert_css '.olist.lowerroman .olist.loweralpha .olist.arabic', output, 1
+    end
+
     test 'should represent custom numbering and explicit role attribute as style classes' do
       input = <<-EOS
 [loweralpha, role="dry"]
