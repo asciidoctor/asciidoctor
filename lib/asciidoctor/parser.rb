@@ -622,7 +622,7 @@ class Parser
       if !indented && CALLOUT_LIST_HEADS.include?(ch0 ||= this_line.chr) &&
           (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
         reader.unshift_line this_line
-        block = next_callout_list(reader, match, parent, document.callouts)
+        block = parse_callout_list(reader, match, parent, document.callouts)
         attributes['style'] = 'arabic'
         break
 
@@ -631,18 +631,18 @@ class Parser
         if Section === parent && parent.sectname == 'bibliography'
           style = attributes['style'] = 'bibliography'
         end unless style
-        block = next_list(reader, :ulist, parent, style)
+        block = parse_list(reader, :ulist, parent, style)
         break
 
       elsif (match = OrderedListRx.match(this_line))
         reader.unshift_line this_line
-        block = next_list(reader, :olist, parent, style)
+        block = parse_list(reader, :olist, parent, style)
         attributes['style'] = block.style if block.style
         break
 
       elsif (match = DescriptionListRx.match(this_line))
         reader.unshift_line this_line
-        block = next_description_list(reader, match, parent)
+        block = parse_description_list(reader, match, parent)
         break
 
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
@@ -835,7 +835,7 @@ class Parser
           # NOTE infer dsv once all other format hint chars are ruled out
           attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
         end
-        block = next_table(block_reader, parent, attributes)
+        block = parse_table(block_reader, parent, attributes)
 
       when :quote, :verse
         AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
@@ -1078,7 +1078,7 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
-  def self.next_list(reader, list_type, parent, style = nil)
+  def self.parse_list(reader, list_type, parent, style = nil)
     list_block = List.new(parent, list_type)
     list_block.level = parent.context == list_type ? (parent.level + 1) : 1
 
@@ -1104,7 +1104,7 @@ class Parser
       end
 
       if !list_block.items? || this_item_level == list_block.level
-        list_item = next_list_item(reader, list_block, match, nil, style)
+        list_item = parse_list_item(reader, list_block, match, nil, style)
       elsif this_item_level < list_block.level
         # leave this block
         break
@@ -1221,7 +1221,7 @@ class Parser
   # parent    - The parent Block to which this description list belongs
   #
   # Returns the Block encapsulating the parsed description list
-  def self.next_description_list(reader, match, parent)
+  def self.parse_description_list(reader, match, parent)
     list_block = List.new(parent, :dlist)
     previous_pair = nil
     # allows us to capture until we find a description item
@@ -1230,7 +1230,7 @@ class Parser
 
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || (reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line)))
-      term, item = next_list_item(reader, list_block, match, sibling_pattern)
+      term, item = parse_list_item(reader, list_block, match, sibling_pattern)
       if previous_pair && !previous_pair[1]
         previous_pair[0] << term
         previous_pair[1] = item
@@ -1252,7 +1252,7 @@ class Parser
   # callouts - The document callouts catalog.
   #
   # Returns the Block that represents the parsed callout list.
-  def self.next_callout_list reader, match, parent, callouts
+  def self.parse_callout_list reader, match, parent, callouts
     list_block = List.new(parent, :colist)
     next_index = 1
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
@@ -1261,7 +1261,7 @@ class Parser
       unless match[1] == next_index.to_s
         logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{match[1]}), :source_location => reader.cursor_at_mark
       end
-      if (list_item = next_list_item reader, list_block, match)
+      if (list_item = parse_list_item reader, list_block, match)
         list_block.items << list_item
         if (coids = callouts.callout_ids list_block.items.size).empty?
           logger.warn message_with_context %(no callout found for <#{list_block.items.size}>), :source_location => reader.cursor_at_mark
@@ -1295,7 +1295,7 @@ class Parser
   #
   # Returns the next ListItem or ListItem pair (depending on the list type)
   # for the parent list Block.
-  def self.next_list_item(reader, list_block, match, sibling_trait = nil, style = nil)
+  def self.parse_list_item(reader, list_block, match, sibling_trait = nil, style = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
       list_term = ListItem.new(list_block, (term_text = match[1]))
@@ -2312,7 +2312,7 @@ class Parser
   # attributes   - attributes captured from above this Block
   #
   # returns an instance of Asciidoctor::Table parsed from the provided reader
-  def self.next_table(table_reader, parent, attributes)
+  def self.parse_table(table_reader, parent, attributes)
     table = Table.new(parent, attributes)
     if attributes.key? 'title'
       table.title = attributes.delete 'title'
