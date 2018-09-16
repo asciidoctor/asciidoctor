@@ -1290,7 +1290,7 @@ class Parser
   # reader        - The Reader from which to retrieve the next list item
   # list_block    - The parent list Block of this ListItem. Also provides access to the list type.
   # match         - The match Array which contains the marker and text (first-line) of the ListItem
-  # sibling_trait - The list marker or the Regexp to match a sibling item (optional, default: nil)
+  # sibling_trait - The Regexp to match a sibling description list item (optional, default: nil)
   # style         - The block style assigned to this list (optional, default: nil)
   #
   # Returns the next ListItem or ListItem pair (depending on the list type)
@@ -1317,7 +1317,7 @@ class Parser
       list_item = ListItem.new(list_block, (item_text = match[2]))
       list_item.source_location = reader.cursor if list_block.document.sourcemap
       if list_type == :ulist
-        list_item.marker = (sibling_trait ||= match[1])
+        list_item.marker = sibling_trait = match[1]
         if item_text.start_with?('[')
           if style && style == 'bibliography'
             if InlineBiblioAnchorRx =~ item_text
@@ -1337,12 +1337,12 @@ class Parser
           end
         end
       elsif list_type == :olist
-        list_item.marker = (sibling_trait ||= resolve_ordered_list_marker(match[1], list_block.items.size, true, reader))
+        list_item.marker = sibling_trait = resolve_ordered_list_marker(match[1], list_block.items.size, true, reader)
         if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
           catalog_inline_anchor $1, $2, list_item, reader
         end
       else # :colist
-        list_item.marker = (sibling_trait ||= '<1>')
+        list_item.marker = sibling_trait = '<1>'
       end
     end
 
