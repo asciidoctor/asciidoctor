@@ -1114,8 +1114,10 @@ class Parser
         list_block.items[-1] << next_block(reader, list_block)
       end
 
-      list_block.items << list_item if list_item
-      list_item = nil
+      if list_item
+        list_block.items << list_item
+        list_item = nil
+      end
 
       reader.skip_blank_lines || break
     end
