@@ -1737,6 +1737,19 @@ List
       assert_css '.olist.lowerroman .olist.loweralpha .olist.arabic', output, 1
     end
 
+    test 'should allow list style to be specified explicitly when using markers with implicit style' do
+      input = <<-EOS
+[loweralpha]
+i) 1
+ii) 2
+iii) 3
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.olist.loweralpha', output, 1
+      assert_css '.olist.lowerroman', output, 0
+    end
+
     test 'should represent custom numbering and explicit role attribute as style classes' do
       input = <<-EOS
 [loweralpha, role="dry"]
