@@ -141,13 +141,6 @@ module Asciidoctor
     # Compliance value: false
     define :strict_verbatim_paragraphs, true
 
-    # NOT CURRENTLY USED
-    # AsciiDoc allows start and end delimiters around
-    # a block to be different lengths
-    # Enabling this option requires matching lengths
-    # Compliance value: false
-    #define :congruent_block_delimiters, true
-
     # AsciiDoc supports both atx (single-line) and setext (underlined) section titles.
     # This option can be used to disable the setext variant.
     # Compliance value: true
