@@ -1124,17 +1124,6 @@ class Parser
       reader.skip_blank_lines || break
     end
 
-    if list_type == :olist && !style
-      if (marker = list_block.items[0].marker).start_with? '.'
-        # first one makes more sense, but second one is AsciiDoc Python-compliant
-        # TODO control behavior using a compliance setting
-        #list_block.style = (ORDERED_LIST_STYLES[block.level - 1] || 'arabic').to_s
-        list_block.style = (ORDERED_LIST_STYLES[marker.length - 1] || 'arabic').to_s
-      else
-        list_block.style = (ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker } || 'arabic').to_s
-      end
-    end
-
     list_block
   end
 
@@ -1341,7 +1330,13 @@ class Parser
           end
         end
       elsif list_type == :olist
-        list_item.marker = sibling_trait = resolve_ordered_list_marker(match[1], list_block.items.size, true, reader)
+        list_item_marker, implicit_style = resolve_ordered_list_marker(match[1], (ordinal = list_block.items.size), true, reader)
+        list_item.marker = sibling_trait = list_item_marker
+        if ordinal == 0 && !style
+          # using list level makes more sense, but we don't track it
+          # basing style on marker level is compliant with AsciiDoc Python
+          list_block.style = implicit_style || ((ORDERED_LIST_STYLES[list_item_marker.length - 1] || 'arabic').to_s)
+        end
         if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
           catalog_inline_anchor $1, $2, list_item, reader
         end
@@ -2215,7 +2210,7 @@ class Parser
     if list_type == :ulist
       marker
     elsif list_type == :olist
-      resolve_ordered_list_marker(marker, ordinal, validate, reader)
+      resolve_ordered_list_marker(marker, ordinal, validate, reader)[0]
     else # :colist
       '<1>'
     end
@@ -2238,13 +2233,19 @@ class Parser
   # Examples
   #
   #  marker = 'B.'
-  #  Parser.resolve_ordered_list_marker(marker, 1, true)
-  #  # => 'A.'
+  #  Parser.resolve_ordered_list_marker(marker, 1, true, reader)
+  #  # => ['A.', :upperalpha]
   #
-  # Returns the String of the first marker in this number series
+  #  marker = '.'
+  #  Parser.resolve_ordered_list_marker(marker, 1, true, reader)
+  #  # => ['.']
+  #
+  # Returns a tuple that contains the String of the first marker in this number
+  # series and the implicit list style, if applicable
   def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
-    return marker if marker.start_with? '.'
-    case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
+    return [marker] if marker.start_with? '.'
+    # NOTE case statement is guaranteed to match one of the conditions
+    case (style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker })
     when :arabic
       if validate
         expected = ordinal + 1
@@ -2281,7 +2282,7 @@ class Parser
       logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), :source_location => reader.cursor
     end
 
-    marker
+    [marker, style]
   end
 
   # Internal: Determine whether the this line is a sibling list item
