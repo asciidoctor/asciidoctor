@@ -280,6 +280,10 @@ context 'Path Resolver' do
       assert_equal '//QA/c$/users/asciidoctor/assets/stylesheet.css', @resolver.system_path('assets/stylesheet.css', '//QA/c$/users/asciidoctor')
     end
 
+    test 'resolves UNC path if target is UNC path' do
+      assert_equal '//server/docs/output.html', @resolver.system_path('//server/docs/output.html')
+    end
+
     test 'resolves relative target relative to current directory if start is empty' do
       pwd = File.expand_path(Dir.pwd)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
