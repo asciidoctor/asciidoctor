@@ -13,10 +13,14 @@ class AbstractBlock < AbstractNode
   # Public: Set the Integer level of this Section or the Section level in which this Block resides
   attr_accessor :level
 
-  # Public: Get/Set the number of this block (if section, relative to parent, otherwise absolute)
+  # Public: Get/Set the numeral of this block (if section, relative to parent, otherwise absolute)
   # Only assigned to section if automatic section numbering is enabled
   # Only assigned to formal block (block with title) if corresponding caption attribute is present
-  attr_accessor :number
+  attr_accessor :numeral
+
+  # Deprecated: Legacy property to get/set the numeral of this block
+  alias number numeral
+  alias number= numeral=
 
   # Public: Gets/Sets the location in the AsciiDoc source where this block begins
   attr_accessor :source_location
@@ -32,7 +36,7 @@ class AbstractBlock < AbstractNode
     @content_model = :compound
     @blocks = []
     @subs = []
-    @id = @title = @title_converted = @caption = @number = @style = @default_subs = @source_location = nil
+    @id = @title = @title_converted = @caption = @numeral = @style = @default_subs = @source_location = nil
     if context == :document
       @level = 0
     elsif parent && context != :section
@@ -41,7 +45,7 @@ class AbstractBlock < AbstractNode
       @level = nil
     end
     @next_section_index = 0
-    @next_section_number = 1
+    @next_section_ordinal = 1
   end
 
   def block?
@@ -358,14 +362,14 @@ class AbstractBlock < AbstractNode
       case xrefstyle
       when 'full'
         quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
-        if @number && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
-          %(#{prefix} #{@number}, #{quoted_title})
+        if @numeral && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
+          %(#{prefix} #{@numeral}, #{quoted_title})
         else
           %(#{@caption.chomp '. '}, #{quoted_title})
         end
       when 'short'
-        if @number && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
-          %(#{prefix} #{@number})
+        if @numeral && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
+          %(#{prefix} #{@numeral})
         else
           @caption.chomp '. '
         end
@@ -397,7 +401,7 @@ class AbstractBlock < AbstractNode
   def assign_caption value = nil, key = nil
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
       if (prefix = @document.attributes[%(#{key ||= @context}-caption)])
-        @caption = %(#{prefix} #{@number = @document.increment_and_store_counter "#{key}-number", self}. )
+        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter "#{key}-number", self}. )
         nil
       end
     end
@@ -417,17 +421,18 @@ class AbstractBlock < AbstractNode
     @next_section_index = (section.index = @next_section_index) + 1
     if (like = section.numbered)
       if (sectname = section.sectname) == 'appendix'
-        section.number = @document.counter 'appendix-number', 'A'
+        section.numeral = @document.counter 'appendix-number', 'A'
         if (caption = @document.attributes['appendix-caption'])
-          section.caption = %(#{caption} #{section.number}: )
+          section.caption = %(#{caption} #{section.numeral}: )
         else
-          section.caption = %(#{section.number}. )
+          section.caption = %(#{section.numeral}. )
         end
       # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
       elsif sectname == 'chapter' || like == :chapter
-        section.number = @document.counter 'chapter-number', 1
+        section.numeral = @document.counter 'chapter-number', 1
       else
-        @next_section_number = (section.number = @next_section_number) + 1
+        section.numeral = @next_section_ordinal
+        @next_section_ordinal += 1
       end
     end
     nil
@@ -445,7 +450,7 @@ class AbstractBlock < AbstractNode
   # Returns nothing
   def reindex_sections
     @next_section_index = 0
-    @next_section_number = 1
+    @next_section_ordinal = 1
     @blocks.each do |block|
       if block.context == :section
         assign_numeral block
