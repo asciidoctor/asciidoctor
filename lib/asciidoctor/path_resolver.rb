@@ -109,7 +109,7 @@ class PathResolver
   SLASH = '/'
   BACKSLASH = '\\'
   DOUBLE_SLASH = '//'
-  WindowsRootRx = /^[a-zA-Z]:(?:\\|\/)/
+  WindowsRootRx = /^(?:[a-zA-Z]:)?[\\\/]/
 
   attr_accessor :file_separator
   attr_accessor :working_dir
@@ -132,11 +132,11 @@ class PathResolver
 
   # Public: Check whether the specified path is an absolute path.
   #
-  # This operation considers both posix paths and Windows paths. It does not
-  # consider URIs.
+  # This operation considers both posix paths and Windows paths. The path does
+  # not have to be posixified beforehand. This operation does not handle URIs.
   #
-  # Unix absolute paths and UNC paths both start with slash. Windows roots can
-  # start with a drive letter.
+  # Unix absolute paths start with a slash. UNC paths can start with a slash or
+  # backslash. Windows roots can start with a drive letter.
   #
   # path - the String path to check
   #

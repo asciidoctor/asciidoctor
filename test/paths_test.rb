@@ -284,11 +284,16 @@ context 'Path Resolver' do
       assert_equal File.dirname('//server/docs/file.html'), '//server/docs'
     end if windows?
 
-    test 'resolves absolute UNC path if start is absolute and target is relative' do
+    test 'resolves UNC path if start is absolute and target is relative' do
       assert_equal '//QA/c$/users/asciidoctor/assets/stylesheet.css', @resolver.system_path('assets/stylesheet.css', '//QA/c$/users/asciidoctor')
     end
 
     test 'resolves UNC path if target is UNC path' do
+      @resolver.file_separator = '\\'
+      assert_equal '//server/docs/output.html', @resolver.system_path('\\\\server\\docs\\output.html')
+    end
+
+    test 'resolves UNC path if target is posix-style UNC path' do
       assert_equal '//server/docs/output.html', @resolver.system_path('//server/docs/output.html')
     end
 
