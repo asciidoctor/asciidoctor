@@ -595,11 +595,17 @@ class Table::ParserContext
         # this may not be perfect logic, but it hits the 99%
         if cell_text.start_with?('"') && cell_text.end_with?('"')
           # unquote
-          cell_text = cell_text.slice(1, cell_text.length - 2).strip
+          if (cell_text = cell_text.slice(1, cell_text.length - 2))
+            # trim whitespace and collapse escaped quotes
+            cell_text = cell_text.strip.squeeze('"')
+          else
+            logger.error message_with_context 'unclosed quote in CSV data; setting cell to empty', :source_location => @reader.cursor_at_prev_line
+            cell_text = ''
+          end
+        else
+          # collapse escaped quotes
+          cell_text = cell_text.squeeze('"')
         end
-
-        # collapse escaped quotes
-        cell_text = cell_text.squeeze('"')
       end
     end
 

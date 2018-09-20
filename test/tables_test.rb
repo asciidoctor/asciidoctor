@@ -1820,6 +1820,22 @@ C1,C2
       assert_xpath '/table/tbody/tr[2]/td[1]/p[text()="B1"]', output, 1
     end
 
+    test 'should log error but not crash if cell data has unclosed quote' do
+      input = <<-EOS
+,===
+a,b
+c,"
+,===
+      EOS
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'table', output, 1
+        assert_css 'table td', output, 4
+        assert_xpath '(/table/td)[4]/p', output, 0
+        assert_message logger, :ERROR, '<stdin>: line 3: unclosed quote in CSV data; setting cell to empty', Hash
+      end
+    end
+
     test 'should preserve newlines in quoted CSV values' do
       input = <<-EOS
 [cols="1,1,1l"]
