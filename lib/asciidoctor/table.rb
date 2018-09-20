@@ -591,11 +591,18 @@ class Table::ParserContext
       @buffer = ''
       cellspec = nil
       repeat = 1
-      if @format == 'csv' && !cell_text.empty? && cell_text.include?('"')
-        # this may not be perfect logic, but it hits the 99%
-        if cell_text.start_with?('"') && cell_text.end_with?('"')
-          # unquote
-          cell_text = cell_text.slice(1, cell_text.length - 2).strip
+      if @format == 'csv'
+        if 2 > cell_text.length
+          logger.error message_with_context 'malformed csv cell data', :source_location => @reader.cursor_at_prev_line
+        elsif !cell_text.empty? && cell_text.include?('"')
+          # this may not be perfect logic, but it hits the 99%
+          if cell_text.start_with?('"') && cell_text.end_with?('"')
+            # unquote
+            cell_text = cell_text.slice(1, cell_text.length - 2).strip
+          end
+
+          # collapse escaped quotes
+          cell_text = cell_text.squeeze('"')
         end
 
         # collapse escaped quotes
