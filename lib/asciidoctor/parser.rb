@@ -1078,47 +1078,13 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
-  def self.parse_list(reader, list_type, parent, style = nil)
+  def self.parse_list(reader, list_type, parent, style)
     list_block = List.new(parent, list_type)
-    list_block.level = parent.context == list_type ? (parent.level + 1) : 1
-    first_list_item = nil
 
-    while reader.has_more_lines? && ListRxMap[list_type] =~ reader.peek_line
-      match, marker = $~, resolve_list_marker(list_type, $1)
-
-      # if we are moving to the next item, and the marker is different
-      # determine if we are moving up or down in nesting
-      if first_list_item && marker != first_list_item.marker
-        # assume list is nested by default, but then check to see if we are
-        # popping out of a nested list by matching an ancestor's list marker
-        this_item_level = list_block.level + 1
-        ancestor = parent
-        while ancestor.context == list_type
-          if marker == ancestor.items[0].marker
-            this_item_level = ancestor.level
-            break
-          end
-          ancestor = ancestor.parent
-        end
-      else
-        this_item_level = list_block.level
-      end
-
-      if !first_list_item || this_item_level == list_block.level
-        list_item = parse_list_item(reader, list_block, match, nil, style)
-      elsif this_item_level < list_block.level
-        # leave this block
-        break
-      elsif this_item_level > list_block.level
-        # If this next list level is down one from the
-        # current Block's, append it to content of the current list item
-        list_block.items[-1] << next_block(reader, list_block)
-      end
-
-      if list_item
-        first_list_item ||= list_item
+    while reader.has_more_lines? && (list_rx ||= ListRxMap[list_type]) =~ reader.peek_line
+      # NOTE parse_list_item will stop at sibling item or end of list; never sees ancestor items
+      if (list_item = parse_list_item reader, list_block, $~, $1, style)
         list_block.items << list_item
-        list_item = nil
       end
 
       reader.skip_blank_lines || break
@@ -1254,7 +1220,7 @@ class Parser
       unless match[1] == next_index.to_s
         logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{match[1]}), :source_location => reader.cursor_at_mark
       end
-      if (list_item = parse_list_item reader, list_block, match)
+      if (list_item = parse_list_item reader, list_block, match, '<1>')
         list_block.items << list_item
         if (coids = callouts.callout_ids list_block.items.size).empty?
           logger.warn message_with_context %(no callout found for <#{list_block.items.size}>), :source_location => reader.cursor_at_mark
@@ -1270,25 +1236,25 @@ class Parser
     list_block
   end
 
-  # Internal: Parse and construct the next ListItem for the current list Block
-  # (unordered, ordered, or callout list) or the term ListItem and description
-  # ListItem pair for the description list Block.
+  # Internal: Parse and construct the next ListItem (unordered, ordered, or callout list) or next
+  # term ListItem and description ListItem pair (description list) for the specified list Block.
   #
-  # First collect and process all the lines that constitute the next list
-  # item for the parent list (according to its type). Next, parse those lines
-  # into blocks and associate them with the ListItem (in the case of a
-  # description list, the description ListItem). Finally, fold the first block
-  # into the item's text attribute according to rules described in ListItem.
+  # First, collect and process all the lines that constitute the next list item for the specified
+  # list (according to its type). Next, create a ListItem (in the case of a description list, a
+  # description ListItem), parse the lines into blocks, and associate those blocks with that
+  # ListItem. Finally, fold the first block into the item's text attribute according to rules
+  # described in ListItem.
   #
   # reader        - The Reader from which to retrieve the next list item
-  # list_block    - The parent list Block of this ListItem. Also provides access to the list type.
-  # match         - The match Array which contains the marker and text (first-line) of the ListItem
-  # sibling_trait - The Regexp to match a sibling description list item (optional, default: nil)
+  # list_block    - The parent list Block for this ListItem. Also provides access to the list type.
+  # match         - The MatchData that contains the list item marker and first line text of the ListItem
+  # sibling_trait - The trait to match a sibling list item. For ordered and unordered lists, this is
+  #                 a String marker (e.g., '**' or 'ii)'). For description lists, this is a Regexp
+  #                 marker pattern.
   # style         - The block style assigned to this list (optional, default: nil)
   #
-  # Returns the next ListItem or ListItem pair (depending on the list type)
-  # for the parent list Block.
-  def self.parse_list_item(reader, list_block, match, sibling_trait = nil, style = nil)
+  # Returns the next ListItem or ListItem pair (description list) for the parent list Block.
+  def self.parse_list_item(reader, list_block, match, sibling_trait, style = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
       list_term = ListItem.new(list_block, (term_text = match[1]))
@@ -1310,7 +1276,7 @@ class Parser
       list_item = ListItem.new(list_block, (item_text = match[2]))
       list_item.source_location = reader.cursor if list_block.document.sourcemap
       if list_type == :ulist
-        list_item.marker = sibling_trait = match[1]
+        list_item.marker = sibling_trait
         if item_text.start_with?('[')
           if style && style == 'bibliography'
             if InlineBiblioAnchorRx =~ item_text
@@ -1330,18 +1296,18 @@ class Parser
           end
         end
       elsif list_type == :olist
-        list_item_marker, implicit_style = resolve_ordered_list_marker(match[1], (ordinal = list_block.items.size), true, reader)
-        list_item.marker = sibling_trait = list_item_marker
+        sibling_trait, implicit_style = resolve_ordered_list_marker(sibling_trait, (ordinal = list_block.items.size), true, reader)
+        list_item.marker = sibling_trait
         if ordinal == 0 && !style
           # using list level makes more sense, but we don't track it
           # basing style on marker level is compliant with AsciiDoc Python
-          list_block.style = implicit_style || ((ORDERED_LIST_STYLES[list_item_marker.length - 1] || 'arabic').to_s)
+          list_block.style = implicit_style || ((ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s)
         end
         if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
           catalog_inline_anchor $1, $2, list_item, reader
         end
       else # :colist
-        list_item.marker = sibling_trait = '<1>'
+        list_item.marker = sibling_trait
       end
     end
 
