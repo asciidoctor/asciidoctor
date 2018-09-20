@@ -44,6 +44,7 @@ Fixes::
 
 Improvements::
 
+  * rename number property on AbstractBlock to numeral, but keep number as deprecated alias
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)
   * use CSS class instead of hard-coded inline text-align style on block images (#2753)
   * allow hyphen to be used custom block macro name as long as it's not the first character (#2620)

@@ -724,7 +724,7 @@ How crazy is that?
       assert_xpath '//*[@class="exampleblock"]//p', output, 2
     end
 
-    test "assigns sequential numbered caption to example block with title" do
+    test 'assigns sequential numbered caption to example block with title' do
       input = <<-EOS
 .Writing Docs with AsciiDoc
 ====
@@ -742,7 +742,9 @@ You futz with XML.
       EOS
 
       doc = document_from_string input
+      assert_equal 1, doc.blocks[0].numeral
       assert_equal 1, doc.blocks[0].number
+      assert_equal 2, doc.blocks[1].numeral
       assert_equal 2, doc.blocks[1].number
       output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example 1. Writing Docs with AsciiDoc"]', output, 1
@@ -750,7 +752,7 @@ You futz with XML.
       assert_equal 2, doc.attributes['example-number']
     end
 
-    test "assigns sequential character caption to example block with title" do
+    test 'assigns sequential character caption to example block with title' do
       input = <<-EOS
 :example-number: @
 
@@ -770,7 +772,9 @@ You futz with XML.
       EOS
 
       doc = document_from_string input
+      assert_equal 'A', doc.blocks[0].numeral
       assert_equal 'A', doc.blocks[0].number
+      assert_equal 'B', doc.blocks[1].numeral
       assert_equal 'B', doc.blocks[1].number
       output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example A. Writing Docs with AsciiDoc"]', output, 1
@@ -790,7 +794,7 @@ You just write.
       EOS
 
       doc = document_from_string input
-      assert_nil doc.blocks[0].number
+      assert_nil doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
       refute doc.attributes.has_key?('example-number')
@@ -2192,7 +2196,7 @@ image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
-      assert_equal 1, doc.blocks[0].number
+      assert_equal 1, doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
@@ -2207,7 +2211,7 @@ image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
-      assert_nil doc.blocks[0].number
+      assert_nil doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1
