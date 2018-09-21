@@ -942,6 +942,29 @@ List
       assert_css 'li', output, 26
     end
 
+    test 'level of unordered list should match section level' do
+      input = <<-EOS
+== Parent Section
+
+* item 1.1
+ ** item 2.1
+  *** item 3.1
+ ** item 2.2
+* item 1.2
+
+=== Nested Section
+
+* item 1.1
+      EOS
+
+      doc = document_from_string input
+      lists = doc.find_by :context => :ulist
+      assert_equal 1, lists[0].level
+      assert_equal 1, lists[1].level
+      assert_equal 1, lists[2].level
+      assert_equal 2, lists[3].level
+    end
+
     test 'does not recognize lists with repeating unicode bullets' do
       input = <<-EOS
 •• Boo
@@ -992,6 +1015,29 @@ List
       output = convert_string_to_embedded input.join(%(\n))
       refute_includes output, '.'
       assert_css 'li', output, 26
+    end
+
+    test 'level of ordered list should match section level' do
+      input = <<-EOS
+== Parent Section
+
+. item 1.1
+ .. item 2.1
+  ... item 3.1
+ .. item 2.2
+. item 1.2
+
+=== Nested Section
+
+. item 1.1
+      EOS
+
+      doc = document_from_string input
+      lists = doc.find_by :context => :olist
+      assert_equal 1, lists[0].level
+      assert_equal 1, lists[1].level
+      assert_equal 1, lists[2].level
+      assert_equal 2, lists[3].level
     end
 
     test "nested unordered inside ordered elements" do
