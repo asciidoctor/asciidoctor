@@ -3088,6 +3088,28 @@ exit 0 # <5><6>
       assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/code>/, output)
     end
 
+    test 'should support autonumbered callout marks if source-highlighter attribute is coderay' do
+      input = <<-EOS
+:source-highlighter: coderay
+
+[source, ruby]
+----
+require 'coderay' # <0><0>
+
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <0>
+puts html # <0>
+----
+<0> Load library
+<0> Gem must be installed
+<0> Highlight source
+<0> Print to stdout
+      EOS
+      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(3\)<\/b>$/, output)
+      assert_match(/puts html * <b class="conum">\(4\)<\/b><\/code>/, output)
+    end
+
     test 'should restore callout marks to correct lines if source highlighter is coderay and table line numbering is enabled' do
       input = <<-EOS
 :source-highlighter: coderay
