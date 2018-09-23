@@ -4592,6 +4592,21 @@ hello_world() -> io:fwrite("hello, world\n"). % <1>
     assert_equal %(hello_world() -> io:fwrite("hello, world\n"). (1)), nodes[0].text
   end
 
+  test 'should allow line comment chars preceding callout number to be configurable when source-highlighter is coderay' do
+    input = <<-EOS
+[source,html,line-comment=-#]
+----
+-# <1>
+%p Hello
+----
+<1> Prints a paragraph with the text "Hello"
+    EOS
+    output = convert_string_to_embedded input, :attributes => { 'source-highlighter' => 'coderay' }
+    assert_xpath '//b', output, 1
+    nodes = xmlnodes_at_css 'pre', output
+    assert_equal %((1)\n%p Hello), nodes[0].text
+  end
+
   test 'literal block with callouts' do
     input = <<-EOS
 ....

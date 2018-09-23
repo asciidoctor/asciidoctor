@@ -1098,8 +1098,7 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_callouts(text)
-    # FIXME cache this dynamic regex
-    callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutSourceRxt}/ : CalloutSourceRx
+    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
     autonum = '0'
     text.gsub(callout_rx) {
       if $1
@@ -1434,8 +1433,7 @@ module Substitutors
     if process_callouts
       callout_marks = {}
       last = -1
-      # FIXME cache this dynamic regex
-      callout_rx = (attr? 'line-comment') ? /(?:#{::Regexp.escape(attr 'line-comment')} )?#{CalloutExtractRxt}/ : CalloutExtractRx
+      callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
       # extract callout marks, indexed by line number
       source = source.split(LF, -1).map {|line|
         lineno = lineno + 1
