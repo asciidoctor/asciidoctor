@@ -25,6 +25,7 @@ Enhancements::
   * add `prefer` DSL method to extension registry and document processor to flag extension as preferred (#2848)
   * allow manname and manpurpose to be set using document attributes; don't look for NAME section in this case (#2810)
   * substitute attribute references in target of custom block macro (honoring attribute-missing setting) (#2839)
+  * autonumber `<0>` callouts in verbatim block and callout list
 
 Fixes::
 

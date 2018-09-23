@@ -4403,6 +4403,27 @@ require 'asciidoctor' # \\<1>
     assert_xpath '//co', output, 0
   end
 
+  test 'should autonumber <0> callouts' do
+    input = <<-EOS
+[source, ruby]
+----
+require 'asciidoctor' # <0>
+doc = Asciidoctor::Document.new('Hello, World!') # <0>
+puts doc.convert # <0>
+----
+<0> Describe the first line
+<0> Describe the second line
+<0> Describe the third line
+    EOS
+    output = convert_string_to_embedded input
+    pre_html = (xmlnodes_at_css 'pre', output)[0].inner_html
+    assert_includes pre_html, '(1)'
+    assert_includes pre_html, '(2)'
+    assert_includes pre_html, '(3)'
+    assert_css '.colist ol', output, 1
+    assert_css '.colist ol li', output, 3
+  end
+
   test 'should not recognize callouts in middle of line' do
     input = <<-EOS
 [source, ruby]
