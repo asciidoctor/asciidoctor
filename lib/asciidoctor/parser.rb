@@ -1099,14 +1099,11 @@ class Parser
   # Returns A Boolean indicating whether callouts were found
   def self.catalog_callouts(text, document)
     found = false
-    autonum = '0'
+    autonum = 0
     text.scan(CalloutScanRx) {
       # lead with assignments for Ruby 1.8.7 compat
       captured, num = $&, $2
-      unless captured.start_with? '\\'
-        num = autonum.next! if num == '0'
-        document.callouts.register num
-      end
+      document.callouts.register num == '.' ? (autonum += 1).to_s : num unless captured.start_with? '\\'
       # we have to mark as found even if it's escaped so it can be unescaped
       found = true
     } if text.include? '<'
@@ -1216,11 +1213,11 @@ class Parser
   def self.parse_callout_list reader, match, parent, callouts
     list_block = List.new(parent, :colist)
     next_index = 1
-    autonum = '0'
+    autonum = 0
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
-      if (num = match[1]) == '0'
-        num = autonum.next!
+      if (num = match[1]) == '.'
+        num = (autonum += 1).to_s
       end
       # might want to move this check to a validate method
       unless num == next_index.to_s

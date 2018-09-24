@@ -741,13 +741,17 @@ module Asciidoctor
     #
     # Examples
     #
-    #   <1> Foo
+    #   <1> Explanation
+    #
+    # or
+    #
+    #   <.> Explanation with automatic number
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    CalloutListRx = /^<?(\d+)>[ \t]+(.*)$/
+    CalloutListRx = /^<?(\d+|\.)>[ \t]+(.*)$/
 
     # Detects a potential callout list item.
-    CalloutListSniffRx = /^<?\d+>/
+    CalloutListSniffRx = /^<?(?:\d+|\.)>/
 
     # Matches a callout reference inside literal text.
     #
@@ -755,16 +759,17 @@ module Asciidoctor
     #   <1> (optionally prefixed by //, #, -- or ;; line comment chars)
     #   <1> <2> (multiple callouts on one line)
     #   <!--1--> (for XML-based languages)
+    #   <.> (auto-numbered)
     #
     # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
-    CalloutExtractRx = %r((?:(?://|#|--|;;) ?)?(\\)?<!?(|--)(\d+)\2>(?=(?: ?\\?<!?\2\d+\2>)*$))
-    CalloutExtractRxt = '(\\\\)?<()(\\d+)>(?=(?: ?\\\\?<\\d+>)*$)'
+    CalloutExtractRx = %r((?:(?://|#|--|;;) ?)?(\\)?<!?(|--)(\d+|\.)\2>(?=(?: ?\\?<!?\2(?:\d+|\.)\2>)*$))
+    CalloutExtractRxt = '(\\\\)?<()(\\d+|\\.)>(?=(?: ?\\\\?<(?:\\d+|\\.)>)*$)'
     CalloutExtractRxMap = ::Hash.new {|h, k| h[k] = /(?:#{::Regexp.escape k} )?#{CalloutExtractRxt}/ }
     # NOTE special characters have not been replaced when scanning
-    CalloutScanRx = /\\?<!?(|--)(\d+)\1>(?=(?: ?\\?<!?\1\d+\1>)*#{CC_EOL})/
+    CalloutScanRx = /\\?<!?(|--)(\d+|\.)\1>(?=(?: ?\\?<!?\1(?:\d+|\.)\1>)*#{CC_EOL})/
     # NOTE special characters have already been replaced when converting to an SGML format
-    CalloutSourceRx = %r((?:(?://|#|--|;;) ?)?(\\)?&lt;!?(|--)(\d+)\2&gt;(?=(?: ?\\?&lt;!?\2\d+\2&gt;)*#{CC_EOL}))
-    CalloutSourceRxt = "(\\\\)?&lt;()(\\d+)&gt;(?=(?: ?\\\\?&lt;\\d+&gt;)*#{CC_EOL})"
+    CalloutSourceRx = %r((?:(?://|#|--|;;) ?)?(\\)?&lt;!?(|--)(\d+|\.)\2&gt;(?=(?: ?\\?&lt;!?\2(?:\d+|\.)\2&gt;)*#{CC_EOL}))
+    CalloutSourceRxt = "(\\\\)?&lt;()(\\d+|\\.)&gt;(?=(?: ?\\\\?&lt;(?:\\d+|\\.)&gt;)*#{CC_EOL})"
     CalloutSourceRxMap = ::Hash.new {|h, k| h[k] = /(?:#{::Regexp.escape k} )?#{CalloutSourceRxt}/ }
 
     # A Hash of regexps for lists used for dynamic access.

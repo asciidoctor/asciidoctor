@@ -4403,17 +4403,17 @@ require 'asciidoctor' # \\<1>
     assert_xpath '//co', output, 0
   end
 
-  test 'should autonumber <0> callouts' do
+  test 'should autonumber <.> callouts' do
     input = <<-EOS
 [source, ruby]
 ----
-require 'asciidoctor' # <0>
-doc = Asciidoctor::Document.new('Hello, World!') # <0>
-puts doc.convert # <0>
+require 'asciidoctor' # <.>
+doc = Asciidoctor::Document.new('Hello, World!') # <.>
+puts doc.convert # <.>
 ----
-<0> Describe the first line
-<0> Describe the second line
-<0> Describe the third line
+<.> Describe the first line
+<.> Describe the second line
+<.> Describe the third line
     EOS
     output = convert_string_to_embedded input
     pre_html = (xmlnodes_at_css 'pre', output)[0].inner_html

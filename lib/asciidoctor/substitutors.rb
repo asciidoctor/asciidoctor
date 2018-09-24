@@ -1099,13 +1099,13 @@ module Substitutors
   # Returns the converted String text
   def sub_callouts(text)
     callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
-    autonum = '0'
+    autonum = 0
     text.gsub(callout_rx) {
       if $1
         # we have to use sub since we aren't sure it's the first char
         next $&.sub(RS, '')
       end
-      Inline.new(self, :callout, $3 == '0' ? autonum.next! : $3, :id => @document.callouts.read_next_id).convert
+      Inline.new(self, :callout, $3 == '.' ? (autonum += 1).to_s : $3, :id => @document.callouts.read_next_id).convert
     }
   end
 
@@ -1516,7 +1516,7 @@ module Substitutors
 
     if process_callouts && callout_marks
       lineno = 0
-      autonum = '0'
+      autonum = 0
       reached_code = linenums_mode != :table
       result.split(LF, -1).map {|line|
         unless reached_code
@@ -1534,9 +1534,9 @@ module Substitutors
             end
           end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums[0] == '0' ? autonum.next! : conums[0], :id => @document.callouts.read_next_id).convert}#{tail})
+            %(#{line}#{Inline.new(self, :callout, conums[0] == '.' ? (autonum += 1).to_s : conums[0], :id => @document.callouts.read_next_id).convert}#{tail})
           else
-            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum == '0' ? autonum.next! : conum, :id => @document.callouts.read_next_id).convert }.join ' '
+            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id).convert }.join ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else
