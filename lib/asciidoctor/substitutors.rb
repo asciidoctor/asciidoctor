@@ -206,7 +206,7 @@ module Substitutors
               old_behavior = true
               attributes = attributes.slice 0, attributes.length - 2
             end
-            attributes = parse_attributes attributes
+            attributes = parse_attributes attributes, ['role']
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
@@ -268,7 +268,7 @@ module Substitutors
           preceding = %([#{attributes}])
           attributes = nil
         else
-          attributes = parse_attributes attributes
+          attributes = parse_attributes attributes, ['role']
         end
       elsif format_mark == '`' && !old_behavior
         # extract nested single-plus passthrough; otherwise return unprocessed
@@ -1206,23 +1206,30 @@ module Substitutors
     end
   end
 
-  # Internal: Parse the attributes in the attribute line
+  # Internal: Parse attributes in name or name=value format from a comma-separated String
   #
-  # attrline  - A String of unprocessed attributes (key/value pairs)
-  # posattrs  - The keys for positional attributes
+  # attrlist - A comma-separated String list of attributes in name or name=value format.
+  # posattrs - An Array of positional attribute names (default: []).
+  # opts     - A Hash of options to control how the string is parsed (default: {}):
+  #            :into           - The Hash to parse the attributes into (optional, default: false).
+  #            :sub_input      - A Boolean that indicates whether to substitute attributes prior to
+  #                              parsing (optional, default: false).
+  #            :sub_result     - A Boolean that indicates whether to apply substitutions
+  #                              single-quoted attribute values (optional, default: true).
+  #            :unescape_input - A Boolean that indicates whether to unescape square brackets prior
+  #                              to parsing (optional, default: false).
   #
-  # returns nil if attrline is nil, an empty Hash if attrline is empty, otherwise a Hash of parsed attributes
-  def parse_attributes(attrline, posattrs = ['role'], opts = {})
-    return unless attrline
-    return {} if attrline.empty?
-    attrline = @document.sub_attributes attrline if opts[:sub_input] && (attrline.include? ATTR_REF_HEAD)
-    attrline = unescape_bracketed_text attrline if opts[:unescape_input]
+  # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
+  def parse_attributes attrlist, posattrs = [], opts = {}
+    return {} unless attrlist && !attrlist.empty?
+    attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
+    attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
     # substitutions are only performed on attribute values if block is not nil
     block = opts.fetch(:sub_result, true) ? self : nil
     if (into = opts[:into])
-      AttributeList.new(attrline, block).parse_into(into, posattrs)
+      AttributeList.new(attrlist, block).parse_into(into, posattrs)
     else
-      AttributeList.new(attrline, block).parse(posattrs)
+      AttributeList.new(attrlist, block).parse(posattrs)
     end
   end
 
