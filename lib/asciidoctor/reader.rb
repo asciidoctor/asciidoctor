@@ -842,21 +842,22 @@ class PreprocessorReader < Reader
   # Returns a [Boolean] indicating whether the line under the cursor was changed. To skip over the
   # directive, call shift and return true.
   def preprocess_include_directive target, attrlist
+    doc = @document
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
-        (expanded_target = @document.sub_attributes target, :attribute_missing => 'drop-line').empty?
+        (expanded_target = doc.sub_attributes target, :attribute_missing => 'drop-line').empty?
       shift
-      if (@document.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
+      if (doc.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
       true
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
-      ext.process_method[@document, self, expanded_target, (@document.parse_attributes attrlist, [], :sub_input => true, :sub_result => false)]
+      ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], :sub_input => true, :sub_result => false)]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
-    elsif @document.safe >= SafeMode::SECURE
+    elsif doc.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
@@ -865,7 +866,7 @@ class PreprocessorReader < Reader
         return
       end
 
-      parsed_attrs = @document.parse_attributes attrlist, [], :sub_input => true, :sub_result => false
+      parsed_attrs = doc.parse_attributes attrlist, [], :sub_input => true, :sub_result => false
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
       return inc_path unless target_type
 
