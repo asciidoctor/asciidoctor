@@ -852,9 +852,7 @@ class PreprocessorReader < Reader
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
-      # QUESTION should we use (@document.parse_attributes attrlist, [])?
-      parsed_attrs = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
-      ext.process_method[@document, self, expanded_target, parsed_attrs]
+      ext.process_method[@document, self, expanded_target, (@document.parse_attributes attrlist, [], :sub_input => true, :sub_result => false)]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
@@ -867,8 +865,7 @@ class PreprocessorReader < Reader
         return
       end
 
-      # QUESTION should we use (@document.parse_attributes attrlist, [])?
-      parsed_attrs = attrlist ? AttributeList.new((attrlist.include? ATTR_REF_HEAD) ? (@document.sub_attributes attrlist) : attrlist).parse : {}
+      parsed_attrs = @document.parse_attributes attrlist, [], :sub_input => true, :sub_result => false
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
       return inc_path unless target_type
 
