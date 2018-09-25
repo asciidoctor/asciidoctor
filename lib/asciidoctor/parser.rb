@@ -628,9 +628,7 @@ class Parser
 
       elsif UnorderedListRx.match? this_line
         reader.unshift_line this_line
-        if Section === parent && parent.sectname == 'bibliography'
-          style = attributes['style'] = 'bibliography'
-        end unless style
+        attributes['style'] = (style = 'bibliography') if !style && Section === parent && parent.sectname == 'bibliography'
         block = parse_list(reader, :ulist, parent, style)
         break
 
