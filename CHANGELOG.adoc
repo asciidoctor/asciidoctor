@@ -26,6 +26,7 @@ Enhancements::
   * allow manname and manpurpose to be set using document attributes; don't look for NAME section in this case (#2810)
   * substitute attribute references in target of custom block macro (honoring attribute-missing setting) (#2839)
   * interpret `<.>` as an auto-numbered callout in verbatim blocks and callout lists (#2871)
+  * require marker for items in callout list to have circumfix brackets (e.g., `<1>` instead of `1>`) (#2871)
 
 Fixes::
 

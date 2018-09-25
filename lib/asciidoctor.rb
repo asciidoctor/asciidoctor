@@ -283,8 +283,6 @@ module Asciidoctor
 
   ADMONITION_STYLE_HEADS = ['N', 'T', 'I', 'W', 'C'].to_set
 
-  CALLOUT_LIST_HEADS = ['<', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].to_set
-
   PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
@@ -748,10 +746,7 @@ module Asciidoctor
     #   <.> Explanation with automatic number
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    CalloutListRx = /^<?(\d+|\.)>[ \t]+(.*)$/
-
-    # Detects a potential callout list item.
-    CalloutListSniffRx = /^<?(?:\d+|\.)>/
+    CalloutListRx = /^<(\d+|\.)>[ \t]+(.*)$/
 
     # Matches a callout reference inside literal text.
     #

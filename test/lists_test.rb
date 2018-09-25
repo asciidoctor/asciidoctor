@@ -4178,6 +4178,18 @@ term2:: def2
 end
 
 context 'Callout lists' do
+  test 'does not recognize callout list denoted by markers that only have a trailing bracket' do
+    input  = <<-EOS
+----
+require 'asciidoctor' # <1>
+----
+1> Not a callout list item
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_css '.colist', output, 0
+  end
+
   test 'listing block with sequential callouts followed by adjacent callout list' do
     input = <<-EOS
 [source, ruby]

@@ -619,10 +619,9 @@ class Parser
       end
 
       # haven't found anything yet, continue
-      if !indented && CALLOUT_LIST_HEADS.include?(ch0 ||= this_line.chr) &&
-          (CalloutListSniffRx.match? this_line) && (match = CalloutListRx.match this_line)
+      if !indented && (ch0 ||= this_line.chr) == '<' && CalloutListRx =~ this_line
         reader.unshift_line this_line
-        block = parse_callout_list(reader, match, parent, document.callouts)
+        block = parse_callout_list(reader, $~, parent, document.callouts)
         attributes['style'] = 'arabic'
         break
 
