@@ -3094,20 +3094,22 @@ exit 0 # <5><6>
 
 [source, ruby]
 ----
-require 'coderay' # <0><0>
+require 'coderay' # <.><.>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <0>
-puts html # <0>
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <.>
+puts html # <.>
 ----
-<0> Load library
-<0> Gem must be installed
-<0> Highlight source
-<0> Print to stdout
+<.> Load library
+<.> Gem must be installed
+<.> Highlight source
+<.> Print to stdout
       EOS
       output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
       assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
       assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(3\)<\/b>$/, output)
       assert_match(/puts html * <b class="conum">\(4\)<\/b><\/code>/, output)
+      assert_css '.colist ol', output, 1
+      assert_css '.colist ol li', output, 4
     end
 
     test 'should restore callout marks to correct lines if source highlighter is coderay and table line numbering is enabled' do
