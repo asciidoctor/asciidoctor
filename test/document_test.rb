@@ -684,6 +684,12 @@ text
       assert_css '#content h1', output, 0
     end
 
+    test 'document with multiline attribute entry but only one line should not crash' do
+      input = ':foo: bar' + Asciidoctor::LINE_CONTINUATION
+      doc = document_from_string input
+      assert_equal 'bar', doc.attributes['foo']
+    end
+
     test 'should sanitize contents of HTML title element' do
       input = <<-EOS
 = *Document* image:logo.png[] _Title_ image:another-logo.png[another logo]
