@@ -20,6 +20,7 @@ module Asciidoctor
     MockBoundaryRx = /<\/?BOUNDARY>/
     EmDashCharRefRx = /&#8212;(?:&#8203;)?/
     EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
+    WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
 
     # Converts HTML entity references back to their original form, escapes
     # special man characters and strips trailing whitespace.
@@ -28,11 +29,21 @@ module Asciidoctor
     #
     # str  - the String to convert
     # opts - an Hash of options to control processing (default: {})
-    #        * :preserve_space a Boolean that indicates whether to preserve spaces (only expanding tabs) if true
-    #          or to collapse all adjacent whitespace to a single space if false (default: true)
+    #        * :whitespace an enum that indicates how to handle whitespace; supported options are:
+    #          :preserve - preserve spaces (only expanding tabs); :normalize - normalize whitespace
+    #          (remove spaces around newlines); :collapse - collapse adjacent whitespace to a single
+    #          space (default: :collapse)
     #        * :append_newline a Boolean that indicates whether to append an endline to the result (default: false)
     def manify str, opts = {}
-      str = ((opts.fetch :preserve_space, true) ? (str.gsub TAB, ET) : (str.tr_s WHITESPACE, ' ')).
+      case opts.fetch :whitespace, :collapse
+      when :preserve
+        str = str.gsub TAB, ET
+      when :normalize
+        str = str.gsub WrappedIndentRx, LF
+      else
+        str = str.tr_s WHITESPACE, ' '
+      end
+      str = str.
         gsub(LiteralBackslashRx, '\&(rs'). # literal backslash (not a troff escape sequence)
         gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
         # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
@@ -78,6 +89,8 @@ module Asciidoctor
       mantitle = node.attr 'mantitle'
       manvolnum = node.attr 'manvolnum', '1'
       manname = node.attr 'manname', mantitle
+      manmanual = node.attr 'manmanual'
+      mansource = node.attr 'mansource'
       docdate = (node.attr? 'reproducible') ? nil : (node.attr 'docdate')
       # NOTE the first line enables the table (tbl) preprocessor, necessary for non-Linux systems
       result = [%('\\" t
@@ -85,12 +98,12 @@ module Asciidoctor
 .\\"    Author: #{(node.attr? 'authors') ? (node.attr 'authors') : '[see the "AUTHOR(S)" section]'}
 .\\" Generator: Asciidoctor #{node.attr 'asciidoctor-version'})]
       result << %(.\\"      Date: #{docdate}) if docdate
-      result << %(.\\"    Manual: #{(manual = node.attr 'manmanual') || '\ \&'}
-.\\"    Source: #{(source = node.attr 'mansource') || '\ \&'}
+      result << %(.\\"    Manual: #{manmanual ? (manmanual.tr_s WHITESPACE, ' ') : '\ \&'}
+.\\"    Source: #{mansource ? (mansource.tr_s WHITESPACE, ' ') : '\ \&'}
 .\\"  Language: English
 .\\")
       # TODO add document-level setting to disable capitalization of manname
-      result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{source ? (manify source) : '\ \&'}" "#{manual ? (manify manual) : '\ \&'}")
+      result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{mansource ? (manify mansource) : '\ \&'}" "#{manmanual ? (manify manmanual) : '\ \&'}")
       # define portability settings
       # see http://bugs.debian.org/507673
       # see http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
@@ -132,7 +145,7 @@ module Asciidoctor
         if node.attr? 'manpurpose'
           mannames = node.attr 'mannames', [manname]
           result << %(.SH "#{(node.attr 'manname-title', 'NAME').upcase}"
-#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr 'manpurpose'})
+#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), :whitespace => :normalize})
         end
       end
 
@@ -223,7 +236,7 @@ r lw(\n(.lu*75u/100u).'
       num = 0
       node.items.each do |item|
         result << %(\\fB(#{num += 1})\\fP\\h'-2n':T{)
-        result << (manify item.text)
+        result << (manify item.text, :whitespace => :normalize)
         result << item.content if item.blocks?
         result << 'T}'
       end
@@ -243,15 +256,15 @@ r lw(\n(.lu*75u/100u).'
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify([*terms].map {|dt| dt.text }.join ' ')}
+#{counter}. #{manify [*terms].map {|dt| dt.text }.join ' '}
 .RS 4)
         else
           result << %(.sp
-#{manify([*terms].map {|dt| dt.text }.join ', ')}
+#{manify [*terms].map {|dt| dt.text }.join(', '), :whitespace => :normalize}
 .RS 4)
         end
         if dd
-          result << (manify dd.text) if dd.text?
+          result << (manify dd.text, :whitespace => :normalize) if dd.text?
           result << dd.content if dd.blocks?
         end
         result << '.RE'
@@ -284,7 +297,7 @@ r lw(\n(.lu*75u/100u).'
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content}
+#{manify node.content, :whitespace => :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -298,7 +311,7 @@ r lw(\n(.lu*75u/100u).'
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content}
+#{manify node.content, :whitespace => :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -320,7 +333,7 @@ r lw(\n(.lu*75u/100u).'
 .  sp -1
 .  IP " #{idx + 1}." 4.2
 .\\}
-#{manify item.text})
+#{manify item.text, :whitespace => :normalize})
         result << item.content if item.blocks?
         result << '.RE'
       end
@@ -344,10 +357,10 @@ r lw(\n(.lu*75u/100u).'
         %(.sp
 .B #{manify node.title}
 .br
-#{manify node.content})
+#{manify node.content, :whitespace => :normalize})
       else
         %(.sp
-#{manify node.content})
+#{manify node.content, :whitespace => :normalize})
       end
     end
 
@@ -446,7 +459,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text, :whitespace => :normalize}#{LF})
             elsif tsec == :body
               if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}t)
@@ -458,11 +471,11 @@ allbox tab(:);'
               when :asciidoc
                 cell_content = cell.content
               when :literal
-                cell_content = %(.nf#{LF}#{manify cell.text}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{manify cell.text, :whitespace => :preserve}#{LF}.fi)
               when :verse
-                cell_content = %(.nf#{LF}#{manify cell.text}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{manify cell.text, :whitespace => :preserve}#{LF}.fi)
               else
-                cell_content = manify cell.content.join
+                cell_content = manify cell.content.join, :whitespace => :normalize
               end
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
@@ -472,7 +485,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text}#{LF})
+              row_text[row_index] << %(#{manify cell.text, :whitespace => :normalize}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
@@ -548,7 +561,7 @@ allbox tab(:);'
 .  sp -1
 .  IP \\(bu 2.3
 .\\}
-#{manify item.text}]
+#{manify item.text, :whitespace => :normalize}]
         result << item.content if item.blocks?
         result << '.RE'
       }
@@ -567,7 +580,7 @@ allbox tab(:);'
       attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
       result << %(.sp
 .nf
-#{manify node.content}
+#{manify node.content, :whitespace => :preserve}
 .fi
 .br)
       if attribution_line
@@ -689,7 +702,7 @@ allbox tab(:);'
     end
 
     def resolve_content node
-      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content})
+      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, :whitespace => :normalize})
     end
 
     def write_alternate_pages mannames, manvolnum, target

@@ -45,6 +45,7 @@ Fixes::
   * process `!name@` attribute syntax property; follow-up to #642
   * change document extension processor DSL methods to return registered extension instance instead of array of instances
   * use fallback value for manname-title to prevent crash in manpage converter
+  * consolidate inner whitespace in prose in manpage output (#2890)
 
 Improvements::
 

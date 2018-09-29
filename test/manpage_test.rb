@@ -160,6 +160,44 @@ BBB this line and the one above it should be visible)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
     end
+
+    test 'should normalize whitespace in a paragraph' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Oh, here it goes again
+  I should have known,
+    should have known,
+should have known again)
+
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
+    end
+
+    test 'should normalize whitespace in a list item' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+* Oh, here it goes again
+    I should have known,
+  should have known,
+should have known again)
+
+      output = Asciidoctor.convert input, :backend => :manpage
+      assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
+    end
+
+    test 'should collapse whitespace in the man manual and man source' do
+      input = %(#{SAMPLE_MANPAGE_HEADER}
+
+Describe this thing.)
+
+      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true, :attributes => {
+        'manmanual' => %(General\nCommands\nManual),
+        'mansource' => %(Control\nAll\nThe\nThings\n5.0)
+      }
+      assert_includes output, 'Manual: General Commands Manual'
+      assert_includes output, 'Source: Control All The Things 5.0'
+      assert_includes output, '"Control All The Things 5.0" "General Commands Manual"'
+    end
   end
 
   context 'Backslash' do
