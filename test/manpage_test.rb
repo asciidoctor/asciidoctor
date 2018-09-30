@@ -68,7 +68,7 @@ When you need to put some foo on the bar.
       assert_equal 'SYNOPSIS', doc.sections[0].title
     end
 
-    test 'should skip line comments before and inside NAME section' do
+    test 'should normalize whitespace and skip line comments before and inside NAME section' do
       input = <<-EOS
 = foobar (1)
 Author Name
@@ -80,7 +80,8 @@ Author Name
 == NAME
 
 // it follows the form `name - description`
-foobar - puts some foo on the bar
+foobar - puts some foo
+ on the bar
 // a little bit of this, a little bit of that
 
 == SYNOPSIS
