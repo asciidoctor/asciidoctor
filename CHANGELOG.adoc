@@ -58,6 +58,7 @@ Improvements::
   * use .drop(0) to duplicate arrays (roughly 1.5x as fast as .dup)
   * only recognize a bullet glyph which is non-repeating as an unordered list marker
   * rename SyntaxDsl module to SyntaxProcessorDsl (internal)
+  * fail if name given to block macro contains illegal characters
   * normalize all whitespace in manpurpose
 
 Documentation::

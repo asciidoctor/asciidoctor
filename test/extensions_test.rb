@@ -1044,6 +1044,27 @@ custom-toc::[]
       end
     end
 
+    test 'should fail to convert if name of block macro is illegal' do
+      input = 'illegal name::target[]'
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro do
+            named 'illegal name'
+            process do |parent, target, attrs|
+              nil
+            end
+          end
+        end
+
+        assert_raises ArgumentError do
+          convert_string_to_embedded input
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should be able to set header attribute in block macro processor' do
       begin
         Asciidoctor::Extensions.register do

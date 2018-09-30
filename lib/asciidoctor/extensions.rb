@@ -583,6 +583,10 @@ module Extensions
   #
   # BlockMacroProcessor implementations must extend BlockMacroProcessor.
   class BlockMacroProcessor < MacroProcessor
+    def name
+      raise ::ArgumentError, %(invalid name for block macro: #{@name}) unless MacroNameRx.match? @name.to_s
+      @name
+    end
   end
   BlockMacroProcessor::DSL = MacroProcessorDsl
 
