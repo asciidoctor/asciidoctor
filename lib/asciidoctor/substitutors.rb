@@ -1447,14 +1447,12 @@ module Substitutors
       source = source.split(LF, -1).map {|line|
         lineno = lineno + 1
         line.gsub(callout_rx) {
-          # alias match for Ruby 1.8.7 compat
-          m = $~
           # honor the escape
-          if m[1] == RS
-            # we have to use sub since we aren't sure it's the first char
-            m[0].sub RS, ''
+          if $1
+            # use sub since it might be behind a line comment
+            $&.sub(RS, '')
           else
-            (callout_marks[lineno] ||= []) << m[3]
+            (callout_marks[lineno] ||= []) << $3
             last = lineno
             nil
           end
