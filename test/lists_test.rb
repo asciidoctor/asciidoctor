@@ -4594,14 +4594,16 @@ main = putStrLn "Hello, World!" -- <1>
     input = <<-EOS
 [source,erlang,line-comment=%]
 ----
-hello_world() -> io:fwrite("hello, world\n"). % <1>
+hello_world() -> % <1>
+  io:fwrite("hello, world~n"). %<2>
 ----
-<1> Erlang
+<1> Erlang function clause head.
+<2> ~n adds a new line to the output.
     EOS
     output = convert_string_to_embedded input
-    assert_xpath '//b', output, 1
+    assert_xpath '//b', output, 2
     nodes = xmlnodes_at_css 'pre', output
-    assert_equal %(hello_world() -> io:fwrite("hello, world\n"). (1)), nodes[0].text
+    assert_equal %(hello_world() -> (1)\n  io:fwrite("hello, world~n"). (2)), nodes[0].text
   end
 
   test 'should allow line comment chars preceding callout number to be configurable when source-highlighter is coderay' do

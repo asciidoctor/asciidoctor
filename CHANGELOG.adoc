@@ -59,7 +59,8 @@ Improvements::
   * only recognize a bullet glyph which is non-repeating as an unordered list marker
   * rename SyntaxDsl module to SyntaxProcessorDsl (internal)
   * fail if name given to block macro contains illegal characters
-  * normalize all whitespace in manpurpose
+  * normalize all whitespace in value of manpurpose attribute
+  * make space before callout number after custom line comment character optional
 
 Documentation::
 
