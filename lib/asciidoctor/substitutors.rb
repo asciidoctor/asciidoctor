@@ -1101,11 +1101,13 @@ module Substitutors
     callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
     autonum = 0
     text.gsub(callout_rx) {
+      # honor the escape
       if $1
-        # we have to use sub since we aren't sure it's the first char
-        next $&.sub(RS, '')
+        # use sub since it might be behind a line comment
+        $&.sub(RS, '')
+      else
+        Inline.new(self, :callout, $3 == '.' ? (autonum += 1).to_s : $3, :id => @document.callouts.read_next_id).convert
       end
-      Inline.new(self, :callout, $3 == '.' ? (autonum += 1).to_s : $3, :id => @document.callouts.read_next_id).convert
     }
   end
 
