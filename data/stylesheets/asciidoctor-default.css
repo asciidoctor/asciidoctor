@@ -225,7 +225,7 @@ pre.pygments .lineno{display:inline-block;margin-right:.25em}
 table.pyhltable .linenodiv{background:none!important;padding-right:0!important}
 .quoteblock{margin:0 1em 1.25em 1.5em;display:table}
 .quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
-.quoteblock blockquote,.quoteblock blockquote p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
 .quoteblock blockquote{margin:0;padding:0;border:0}
 .quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
 .quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
@@ -242,8 +242,8 @@ table.pyhltable .linenodiv{background:none!important;padding-right:0!important}
 .quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
 .quoteblock.abstract{margin:0 1em 1.25em;display:block}
 .quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
-.quoteblock.abstract blockquote,.quoteblock.abstract blockquote p{word-spacing:0;line-height:1.6}
-.quoteblock.abstract blockquote::before,.quoteblock.abstract p::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p{word-spacing:0;line-height:1.6}
+.quoteblock.abstract blockquote::before{display:none}
 table.tableblock{max-width:100%;border-collapse:separate}
 p.tableblock:last-child{margin-bottom:0}
 td.tableblock>.content{margin-bottom:-1.25em}
