@@ -1102,11 +1102,11 @@ module Substitutors
     autonum = 0
     text.gsub(callout_rx) {
       # honor the escape
-      if $1
+      if $2
         # use sub since it might be behind a line comment
         $&.sub(RS, '')
       else
-        Inline.new(self, :callout, $3 == '.' ? (autonum += 1).to_s : $3, :id => @document.callouts.read_next_id).convert
+        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, :id => @document.callouts.read_next_id, :attributes => { 'guard' => $1 }).convert
       end
     }
   end
@@ -1448,11 +1448,11 @@ module Substitutors
         lineno = lineno + 1
         line.gsub(callout_rx) {
           # honor the escape
-          if $1
+          if $2
             # use sub since it might be behind a line comment
             $&.sub(RS, '')
           else
-            (callout_marks[lineno] ||= []) << $3
+            (callout_marks[lineno] ||= []) << [$1, $4]
             last = lineno
             nil
           end
@@ -1534,9 +1534,10 @@ module Substitutors
             end
           end
           if conums.size == 1
-            %(#{line}#{Inline.new(self, :callout, conums[0] == '.' ? (autonum += 1).to_s : conums[0], :id => @document.callouts.read_next_id).convert}#{tail})
+            guard, conum = conums[0]
+            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard }).convert}#{tail})
           else
-            conums_markup = conums.map {|conum| Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id).convert }.join ' '
+            conums_markup = conums.map {|guard, conum| Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard }).convert }.join ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else

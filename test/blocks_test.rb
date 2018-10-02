@@ -3082,10 +3082,10 @@ exit 0 # <5><6>
 <6> Reports success
       EOS
       output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b>$/, output)
-      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(2\)<\/b>$/, output)
-      assert_match(/puts html * <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
-      assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/code>/, output)
+      assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/puts html.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+      assert_match(/exit.* # <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/code>/, output)
     end
 
     test 'should support autonumbered callout marks if source-highlighter attribute is coderay' do
@@ -3105,9 +3105,9 @@ puts html # <.>
 <.> Print to stdout
       EOS
       output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
-      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(3\)<\/b>$/, output)
-      assert_match(/puts html * <b class="conum">\(4\)<\/b><\/code>/, output)
+      assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(3\)<\/b>$/, output)
+      assert_match(/puts html.* # <b class="conum">\(4\)<\/b><\/code>/, output)
       assert_css '.colist ol', output, 1
       assert_css '.colist ol li', output, 4
     end
@@ -3133,10 +3133,10 @@ exit 0 # <5><6>
 <6> Reports success
       EOS
       output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
-      assert_match(/<span class="content">coderay<\/span>.* <b class="conum">\(1\)<\/b>$/, output)
-      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* <b class="conum">\(2\)<\/b>$/, output)
-      assert_match(/puts html * <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
-      assert_match(/exit.* <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/pre>/, output)
+      assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
+      assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
+      assert_match(/puts html.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+      assert_match(/exit.* # <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/pre>/, output)
     end
 
     test 'should preserve space before callout on final line' do
@@ -3172,7 +3172,7 @@ print 'value' #<1>
       inputs.each do |input|
         output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'source-highlighter' => 'coderay' }
         output = output.gsub(/<\/?span.*?>/, '')
-        assert_includes output, '\'value\' <b class="conum">(1)</b>'
+        assert_includes output, '\'value\' #<b class="conum">(1)</b>'
       end
     end
 

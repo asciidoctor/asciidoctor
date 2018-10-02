@@ -1083,7 +1083,7 @@ Your browser does not support the video tag.
         src = node.icon_uri("callouts/#{node.text}")
         %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
       else
-        %(<b class="conum">(#{node.text})</b>)
+        %(#{node.attributes['guard']}<b class="conum">(#{node.text})</b>)
       end
     end
 

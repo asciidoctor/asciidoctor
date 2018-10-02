@@ -4406,13 +4406,18 @@ You can write this to file rather than printing to stdout.
 
   test 'escaped callout should not be interpreted as a callout' do
     input = <<-EOS
-[source, ruby]
+[source,text]
 ----
 require 'asciidoctor' # \\<1>
+Asciidoctor.convert 'convert me!' \\<2>
 ----
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
-    assert_xpath '//co', output, 0
+    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
+      output = convert_string_to_embedded input, :attributes => attributes
+      assert_css 'pre b', output, 0
+      assert_includes output, ' # &lt;1&gt;'
+      assert_includes output, ' &lt;2&gt;'
+    end
   end
 
   test 'should autonumber <.> callouts' do
@@ -4552,7 +4557,7 @@ Beans are fun.
     end
   end
 
-  test 'should remove line comment chars that precedes callout number' do
+  test 'should preserve line comment chars that precede callout number if icons is not set' do
     input = <<-EOS
 [source,ruby]
 ----
@@ -4583,6 +4588,45 @@ main = putStrLn "Hello, World!" -- <1>
       output = convert_string_to_embedded input, :attributes => attributes
       assert_xpath '//b', output, 4
       nodes = xmlnodes_at_css 'pre', output
+      assert_equal %(puts 'Hello, world!' # (1)), nodes[0].text
+      assert_equal %(println 'Hello, world!' // (1)), nodes[1].text
+      assert_equal %((def hello (fn [] "Hello, world!")) ;; (1)\n(hello)), nodes[2].text
+      assert_equal %(main = putStrLn "Hello, World!" -- (1)), nodes[3].text
+    end
+  end
+
+  test 'should remove line comment chars that precede callout number if icons is font' do
+    input = <<-EOS
+[source,ruby]
+----
+puts 'Hello, world!' # <1>
+----
+<1> Ruby
+
+[source,groovy]
+----
+println 'Hello, world!' // <1>
+----
+<1> Groovy
+
+[source,clojure]
+----
+(def hello (fn [] "Hello, world!")) ;; <1>
+(hello)
+----
+<1> Clojure
+
+[source,haskell]
+----
+main = putStrLn "Hello, World!" -- <1>
+----
+<1> Haskell
+    EOS
+    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
+      output = convert_string_to_embedded input, :attributes => attributes.merge({ 'icons' => 'font' })
+      assert_css 'pre b', output, 4
+      assert_css 'pre i.conum', output, 4
+      nodes = xmlnodes_at_css 'pre', output
       assert_equal %(puts 'Hello, world!' (1)), nodes[0].text
       assert_equal %(println 'Hello, world!' (1)), nodes[1].text
       assert_equal %((def hello (fn [] "Hello, world!")) (1)\n(hello)), nodes[2].text
@@ -4603,7 +4647,7 @@ hello_world() -> % <1>
     output = convert_string_to_embedded input
     assert_xpath '//b', output, 2
     nodes = xmlnodes_at_css 'pre', output
-    assert_equal %(hello_world() -> (1)\n  io:fwrite("hello, world~n"). (2)), nodes[0].text
+    assert_equal %(hello_world() -> % (1)\n  io:fwrite("hello, world~n"). %(2)), nodes[0].text
   end
 
   test 'should allow line comment chars preceding callout number to be configurable when source-highlighter is coderay' do
@@ -4618,7 +4662,7 @@ hello_world() -> % <1>
     output = convert_string_to_embedded input, :attributes => { 'source-highlighter' => 'coderay' }
     assert_xpath '//b', output, 1
     nodes = xmlnodes_at_css 'pre', output
-    assert_equal %((1)\n%p Hello), nodes[0].text
+    assert_equal %(-# (1)\n%p Hello), nodes[0].text
   end
 
   test 'literal block with callouts' do
