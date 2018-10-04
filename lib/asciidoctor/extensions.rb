@@ -452,7 +452,8 @@ module Extensions
       #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
       #  @handles_block = block
       elsif defined? @handles_block
-        @handles_block.call args[0]
+        # QUESTION could we redefine method with correct arity?
+        @handles_block.call(*args)
       else
         true
       end
