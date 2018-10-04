@@ -1537,7 +1537,7 @@ module Substitutors
             guard, conum = conums[0]
             %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard }).convert}#{tail})
           else
-            conums_markup = conums.map {|guard, conum| Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard }).convert }.join ' '
+            conums_markup = conums.map {|guard_it, conum_it| Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard_it }).convert }.join ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else
