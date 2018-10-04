@@ -34,6 +34,7 @@ Enhancements::
   * change AbstractBlock#find_by to honor return values :skip and :skip_children from filter block to skip node and its descendants or just its descendants, respectively (#2067)
   * add API to retrieve authors as array; use API in converters (#1042) (*@mogztter*)
   * add support for start attribute on source block to set starting line number when converting to DocBook (#2915)
+  * track imagesdir for image on node and in catalog (#2779)
 
 Fixes::
 

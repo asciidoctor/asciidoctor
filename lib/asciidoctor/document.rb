@@ -82,6 +82,10 @@ module Asciidoctor
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
 
+  ImageReference = ::Struct.new :target, :imagesdir do
+    alias to_s target
+  end
+
   Footnote = ::Struct.new :index, :id, :text
 
   class AttributeEntry
@@ -646,7 +650,9 @@ class Document < AbstractBlock
     when :footnotes, :indexterms
       @catalog[type] << value
     else
-      @catalog[type] << value if @options[:catalog_assets]
+      if @options[:catalog_assets]
+        @catalog[type] << (type == :images ? (ImageReference.new value[0], value[1]) : value)
+      end
     end
   end
 
