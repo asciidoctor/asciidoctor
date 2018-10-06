@@ -474,6 +474,23 @@ three
       assert_css 'table > tbody > tr', output, 3
     end
 
+    test 'cols may be separated by semi-colon instead of comma' do
+      input = <<-EOS
+[cols="1s;3m"]
+|===
+| strong
+| mono
+|===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table', output, 1
+      assert_css 'table > colgroup > col', output, 2
+      assert_css 'col[style="width: 25%;"]', output, 1
+      assert_css 'col[style="width: 75%;"]', output, 1
+      assert_xpath '(//td)[1]//strong', output, 1
+      assert_xpath '(//td)[2]//code', output, 1
+    end
+
     test 'cols attribute may include spaces' do
       input = <<-EOS
 [cols=" 1, 1 "]
