@@ -2438,7 +2438,7 @@ class Parser
 
     specs = []
     # NOTE -1 argument ensures we don't drop empty records
-    records.split(',', -1).each {|record|
+    ((records.include? ',') ? (records.split ',', -1) : (records.split ';', -1)).each do |record|
       if record.empty?
         specs << { 'width' => 1 }
       # TODO might want to use scan rather than this mega-regexp
@@ -2475,7 +2475,7 @@ class Parser
           specs << spec
         end
       end
-    }
+    end
     specs
   end
 

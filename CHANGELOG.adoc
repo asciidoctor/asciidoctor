@@ -29,6 +29,7 @@ Enhancements::
   * require marker for items in callout list to have circumfix brackets (e.g., `<1>` instead of `1>`) (#2871)
   * preserve comment guard in front of callout number in verbatim block if icons is not enabled (#1360)
   * add more conventional styles to quote block when it has the excerpt role (#2092)
+  * colspecs can be separated by semi-colon instead of comma (#2798)
 
 Fixes::
 
