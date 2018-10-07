@@ -1552,7 +1552,8 @@ module Substitutors
   # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
   def resolve_highlight_lines spec
     lines = []
-    ((spec.include? ' ') ? (spec.delete ' ') : spec).split(DataDelimiterRx).map do |entry|
+    spec = spec.delete ' ' if spec.include? ' '
+    spec.split(DataDelimiterRx).map do |entry|
       negate = false
       if entry.start_with? '!'
         entry = entry.slice 1, entry.length
