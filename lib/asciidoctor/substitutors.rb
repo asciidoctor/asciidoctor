@@ -1553,7 +1553,7 @@ module Substitutors
   def resolve_highlight_lines spec
     lines = []
     spec = spec.delete ' ' if spec.include? ' '
-    spec.split(DataDelimiterRx).map do |entry|
+    ((spec.include? ',') ? (spec.split ',') : (spec.split ';')).map do |entry|
       negate = false
       if entry.start_with? '!'
         entry = entry.slice 1, entry.length

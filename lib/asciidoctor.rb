@@ -1062,7 +1062,7 @@ module Asciidoctor
     #   one,two
     #   three;four
     #
-    DataDelimiterRx = /[,;]/
+    #DataDelimiterRx = /[,;]/
 
     # Matches one or more consecutive digits at the end of a line.
     #

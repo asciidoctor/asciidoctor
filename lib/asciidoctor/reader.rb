@@ -874,7 +874,7 @@ class PreprocessorReader < Reader
       if attrlist
         if parsed_attrs.key? 'lines'
           inc_linenos = []
-          parsed_attrs['lines'].split(DataDelimiterRx).each do |linedef|
+          (split_delimited_value parsed_attrs['lines']).each do |linedef|
             if linedef.include?('..')
               from, to = linedef.split('..', 2).map {|it| it.to_i }
               inc_linenos += to < 0 ? [from, 1.0/0.0] : ::Range.new(from, to).to_a
@@ -889,7 +889,7 @@ class PreprocessorReader < Reader
           end
         elsif parsed_attrs.key? 'tags'
           inc_tags = {}
-          parsed_attrs['tags'].split(DataDelimiterRx).each do |tagdef|
+          (split_delimited_value parsed_attrs['tags']).each do |tagdef|
             if tagdef.start_with? '!'
               inc_tags[tagdef.slice 1, tagdef.length] = false
             else
@@ -1187,6 +1187,11 @@ class PreprocessorReader < Reader
     else
       super
     end
+  end
+
+  # Private: Split delimited value on comma (if found), otherwise semi-colon
+  def split_delimited_value val
+    (val.include? ',') ? (val.split ',') : (val.split ';')
   end
 
   # Private: Ignore front-matter, commonly used in static site generators
