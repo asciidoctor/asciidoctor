@@ -991,6 +991,21 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal "Another footnote.", footnote2.text
     end
 
+        test 'footnotes on heading text are numbered correctly' do
+      input = <<-EOS
+== H2
+
+Para1.footnote:[fn #1]
+
+=== H3footnote:[fn #2]
+
+Para2.footnote:[fn #3]
+      EOS
+      result = convert_string_to_embedded input
+      assert_xpath '//a[@id="_footnoteref_1"]', result, 1
+      assert_includes result, '_footnoteref_3';
+    end
+
     test 'a footnoteref macro with id and single-line text should be registered and output as a footnote' do
       para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.].')
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
