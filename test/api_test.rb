@@ -576,6 +576,56 @@ content
       assert_equal 'Section', result[0].title
     end
 
+    test 'find_by should skip node and its children if block returns :skip' do
+      input = <<-EOS
+paragraph 1
+
+====
+paragraph 2
+
+term::
++
+paragraph 3
+====
+
+paragraph 4
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by do |candidate|
+        ctx = candidate.context
+        if ctx == :example
+          :skip
+        elsif ctx == :paragraph
+          true
+        end
+      end
+      refute_nil result
+      assert_equal 2, result.size
+      assert_equal :paragraph, result[0].context
+      assert_equal :paragraph, result[1].context
+    end
+
+    test 'find_by should accept node but skip its children if block returns :skip_children' do
+      input = <<-EOS
+====
+paragraph 2
+
+term::
++
+paragraph 3
+====
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by do |candidate|
+        if candidate.context == :example
+          :skip_children
+        end
+      end
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal :example, result[0].context
+    end
+
     test 'find_by should stop looking for blocks when StopIteration is raised' do
       input = <<-EOS
 paragraph 1
