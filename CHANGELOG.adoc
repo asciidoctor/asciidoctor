@@ -30,6 +30,7 @@ Enhancements::
   * preserve comment guard in front of callout number in verbatim block if icons is not enabled (#1360)
   * add more conventional styles to quote block when it has the excerpt role (#2092)
   * colspecs can be separated by semi-colon instead of comma (#2798)
+  * change AbstractBlock#find_by to respond to StopIteration exception; stop traversal after matching ID (#2900)
 
 Fixes::
 

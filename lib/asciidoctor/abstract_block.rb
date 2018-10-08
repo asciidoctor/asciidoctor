@@ -157,18 +157,22 @@ class AbstractBlock < AbstractNode
   #--
   # TODO support jQuery-style selector (e.g., image.thumb)
   def find_by selector = {}, &block
-    result = []
+    find_by_internal selector, (result = []), &block
+  rescue ::StopIteration
+    result
+  end
 
+  alias query find_by
+
+  # Internal: Performs the work for find_by, but does not handle the StopIteration exception.
+  def find_by_internal selector = {}, result = [], &block
     if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
       if id_selector
-        if block_given?
-          return (yield self) ? [self] : result
-        else
-          return [self]
-        end
+        result.replace block_given? ? ((yield self) ? [self] : []) : [self]
+        raise ::StopIteration
       elsif block_given?
         result << self if (yield self)
       else
@@ -178,7 +182,7 @@ class AbstractBlock < AbstractNode
 
     # process document header as a section if present
     if @context == :document && (any_context || context_selector == :section) && header?
-      result.concat(@header.find_by selector, &block)
+      @header.find_by_internal selector, result, &block
     end
 
     unless context_selector == :document # optimization
@@ -187,20 +191,18 @@ class AbstractBlock < AbstractNode
         if any_context || context_selector != :section # optimization
           @blocks.flatten.each do |li|
             # NOTE the list item of a dlist can be nil, so we have to check
-            result.concat(li.find_by selector, &block) if li
+            li.find_by_internal selector, result, &block if li
           end
         end
       elsif
         @blocks.each do |b|
           next if (context_selector == :section && b.context != :section) # optimization
-          result.concat(b.find_by selector, &block)
+          b.find_by_internal selector, result, &block
         end
       end
     end
     result
   end
-
-  alias query find_by
 
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
