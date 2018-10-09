@@ -53,6 +53,42 @@ context 'AttributeList' do
     assert_equal expected, attributes
   end
 
+  test 'collect isolated single quote positional attribute' do
+    attributes = {}
+    line = '\''
+    expected = { 1 => '\'' }
+    doc = empty_document
+    def doc.apply_subs *args
+      fail 'apply_subs should not be called'
+    end
+    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'collect isolated single quote attribute value' do
+    attributes = {}
+    line = 'name=\''
+    expected = { 'name' => '\'' }
+    doc = empty_document
+    def doc.apply_subs *args
+      fail 'apply_subs should not be called'
+    end
+    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'collect attribute value as is if it has only leading single quote' do
+    attributes = {}
+    line = 'name=\'{val}'
+    expected = { 'name' => '\'{val}' }
+    doc = empty_document :attributes => { 'val' => 'val' }
+    def doc.apply_subs *args
+      fail 'apply_subs should not be called'
+    end
+    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
   test 'collect unnamed attribute single-quoted containing escaped quote' do
     attributes = {}
     line = '\'ba\\\'zaar\''

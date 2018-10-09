@@ -23,18 +23,19 @@ module Asciidoctor
 #
 class AttributeList
   BACKSLASH = '\\'
+  APOS = '\''
 
   # Public: Regular expressions for detecting the boundary of a value
   BoundaryRxs = {
     '"' => /.*?[^\\](?=")/,
-    '\'' => /.*?[^\\](?=')/,
+    APOS => /.*?[^\\](?=')/,
     ',' => /.*?(?=[ \t]*(,|$))/
   }
 
   # Public: Regular expressions for unescaping quoted characters
   EscapedQuotes = {
     '"' => '\\"',
-    '\'' => '\\\''
+    APOS => '\\\''
   }
 
   # Public: A regular expression for an attribute name (approx. name token from XML)
@@ -105,10 +106,10 @@ class AttributeList
       name = parse_attribute_value @scanner.get_byte
       value = nil
     # example: 'quote'
-    elsif first == '\''
+    elsif first == APOS
       name = parse_attribute_value @scanner.get_byte
       value = nil
-      single_quoted_value = true
+      single_quoted_value = true unless name.start_with? APOS
     else
       name = scan_name
 
@@ -135,9 +136,9 @@ class AttributeList
           if (c = @scanner.get_byte) == '"'
             value = parse_attribute_value c
           # example: foo='bar' || foo='ba\'zaar' || foo='ba"zaar'
-          elsif c == '\''
+          elsif c == APOS
             value = parse_attribute_value c
-            single_quoted_value = true
+            single_quoted_value = true unless value.start_with? APOS
           # example: foo=,
           elsif c == @delimiter
             value = ''

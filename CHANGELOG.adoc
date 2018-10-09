@@ -50,6 +50,7 @@ Fixes::
   * change document extension processor DSL methods to return registered extension instance instead of array of instances
   * use fallback value for manname-title to prevent crash in manpage converter
   * consolidate inner whitespace in prose in manpage output (#2890)
+  * only apply subs to node attribute value if enclosed in single quotes (#2905)
 
 Improvements::
 
