@@ -1174,7 +1174,7 @@ module Substitutors
   # Returns a Hash of attributes (role and id only)
   def parse_quoted_text_attributes str
     # NOTE attributes are typically resolved after quoted text, so substitute eagerly
-    str = sub_attributes str, :multiline => true if str.include? ATTR_REF_HEAD
+    str = sub_attributes str if str.include? ATTR_REF_HEAD
     # for compliance, only consider first positional attribute
     str = str.slice 0, (str.index ',') if str.include? ','
 
