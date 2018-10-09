@@ -576,6 +576,40 @@ content
       assert_equal 'Section', result[0].title
     end
 
+    test 'find_by should stop looking for blocks when StopIteration is raised' do
+      input = <<-EOS
+paragraph 1
+
+====
+paragraph 2
+
+****
+paragraph 3
+****
+====
+
+paragraph 4
+
+* item
++
+paragraph 5
+      EOS
+      doc = Asciidoctor.load input
+
+      stop_at_next = false
+      result = doc.find_by do |candidate|
+        raise StopIteration if stop_at_next
+        if candidate.context == :paragraph
+          candidate.parent.context == :sidebar ? (stop_at_next = true) : true
+        end
+      end
+      refute_nil result
+      assert_equal 3, result.size
+      assert_equal 'paragraph 1', result[0].content
+      assert_equal 'paragraph 2', result[1].content
+      assert_equal 'paragraph 3', result[2].content
+    end
+
     test 'find_by should only return one result when matching by id' do
       input = <<-EOS
 == Section
@@ -593,6 +627,29 @@ content
       assert_equal 1, result.size
       assert_equal :section, result[0].context
       assert_equal 'Subsection', result[0].title
+    end
+
+    test 'find_by should stop seeking once match is found' do
+      input = <<-EOS
+== Section
+
+content
+
+[#subsection]
+=== Subsection
+
+[#last]
+content
+      EOS
+      doc = Asciidoctor.load input
+      visited_last = false
+      result = doc.find_by(:id => 'subsection') do |candidate|
+        visited_last = true if candidate.id == 'last'
+        true
+      end
+      refute_nil result
+      assert_equal 1, result.size
+      refute visited_last
     end
 
     test 'find_by should return an empty Array if the id criteria matches but the block argument yields false' do
