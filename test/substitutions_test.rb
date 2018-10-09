@@ -1542,6 +1542,16 @@ EOS
       assert_equal [:specialcharacters], para.passthroughs[0][:subs]
     end
 
+    test 'should not crash if role on passthrough is enclosed in quotes' do
+      %W(
+        ['role']#{BACKSLASH}++This++++++++++++
+        ['role']#{BACKSLASH}+++++++++This++++++++++++
+      ).each do |input|
+        para = block_from_string input
+        assert_includes para.content, '<span class="role">'
+      end
+    end
+
     test 'should allow inline double plus passthrough to be escaped using backslash' do
       para = block_from_string("you need to replace `int a = n#{BACKSLASH}++;` with `int a = ++n;`!")
       result = para.apply_subs para.source

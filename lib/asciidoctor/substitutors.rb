@@ -206,7 +206,7 @@ module Substitutors
               old_behavior = true
               attributes = attributes.slice 0, attributes.length - 2
             end
-            attributes = parse_attributes attributes, ['role']
+            attributes = parse_attributes attributes, ['role'], :sub_result => false
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
@@ -268,7 +268,7 @@ module Substitutors
           preceding = %([#{attributes}])
           attributes = nil
         else
-          attributes = parse_attributes attributes, ['role']
+          attributes = parse_attributes attributes, ['role'], :sub_result => false
         end
       elsif format_mark == '`' && !old_behavior
         # extract nested single-plus passthrough; otherwise return unprocessed
@@ -671,7 +671,7 @@ module Substitutors
           target = sub_attributes target
         end
         doc.register(:images, target) unless type == 'icon'
-        attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
+        attrs = parse_attributes m[2], posattrs, :unescape_input => true, :sub_result => false
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
