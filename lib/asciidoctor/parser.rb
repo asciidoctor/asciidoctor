@@ -555,7 +555,7 @@ class Parser
                 else # :image
                   posattrs = ['alt', 'width', 'height']
                 end
-                block.parse_attributes blk_attrs, posattrs, :sub_input => true, :sub_result => false, :into => attributes
+                block.parse_attributes blk_attrs, posattrs, :sub_input => true, :into => attributes
               end
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
@@ -585,7 +585,7 @@ class Parser
 
             elsif ch0 == 't' && (this_line.start_with? 'toc:') && BlockTocMacroRx =~ this_line
               block = Block.new parent, :toc, :content_model => :empty
-              block.parse_attributes($1, [], :sub_result => false, :into => attributes) if $1
+              block.parse_attributes $1, [], :into => attributes if $1
               break
 
             elsif block_macro_extensions && CustomBlockMacroRx =~ this_line &&
@@ -597,9 +597,7 @@ class Parser
                 return
               end
               if extension.config[:content_model] == :attributes
-                if content
-                  document.parse_attributes content, extension.config[:pos_attrs] || [], :sub_input => true, :sub_result => false, :into => attributes
-                end
+                document.parse_attributes content, extension.config[:pos_attrs] || [], :sub_input => true, :into => attributes if content
               else
                 attributes['text'] = content || ''
               end
@@ -2047,7 +2045,7 @@ class Parser
         elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line
           current_style = attributes[1]
           # extract id, role, and options from first positional attribute and remove, if present
-          if (document.parse_attributes $1, [], :sub_input => true, :into => attributes)[1]
+          if (document.parse_attributes $1, [], :sub_input => true, :sub_result => true, :into => attributes)[1]
             attributes[1] = (parse_style_attribute attributes, reader) || current_style
           end
           return true
