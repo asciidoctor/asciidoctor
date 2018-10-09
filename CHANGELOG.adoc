@@ -69,6 +69,7 @@ Improvements::
   * fail if name given to block macro contains illegal characters
   * normalize all whitespace in value of manpurpose attribute
   * make space before callout number after custom line comment character optional
+  * parse attrlist on inline passthrough as a shorthand attribute syntax or literal role (#2910)
 
 Documentation::
 

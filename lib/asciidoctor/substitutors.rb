@@ -206,7 +206,7 @@ module Substitutors
               old_behavior = true
               attributes = attributes.slice 0, attributes.length - 2
             end
-            attributes = parse_attributes attributes, ['role']
+            attributes = parse_quoted_text_attributes attributes
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
@@ -268,7 +268,7 @@ module Substitutors
           preceding = %([#{attributes}])
           attributes = nil
         else
-          attributes = parse_attributes attributes, ['role']
+          attributes = parse_quoted_text_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
         # extract nested single-plus passthrough; otherwise return unprocessed

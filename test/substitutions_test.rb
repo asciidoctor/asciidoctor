@@ -568,6 +568,12 @@ context 'Substitutions' do
       assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
     end
 
+    test 'inline passthrough with id and role set using shorthand' do
+      para = block_from_string '[#id.role]+pass+'
+      # FIXME id should be propogated
+      assert_equal '<span class="role">pass</span>', para.content
+    end
+
     test 'should assign role attribute when shorthand style contains a role' do
       para = block_from_string 'blah'
       result = para.parse_quoted_text_attributes '.red#idref'
@@ -1548,7 +1554,7 @@ EOS
         ['role']#{BACKSLASH}+++++++++This++++++++++++
       ).each do |input|
         para = block_from_string input
-        assert_includes para.content, '<span class="role">'
+        assert_includes para.content, %(<span class="'role'">)
       end
     end
 
