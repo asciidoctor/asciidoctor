@@ -648,20 +648,15 @@ module Asciidoctor
       nil
     end
 
-    def author_tag doc, index = nil
-      firstname_key = index ? %(firstname_#{index}) : 'firstname'
-      middlename_key = index ? %(middlename_#{index}) : 'middlename'
-      lastname_key = index ? %(lastname_#{index}) : 'lastname'
-      email_key = index ? %(email_#{index}) : 'email'
-
+    def author_tag author
       result = []
       result << '<author>'
       result << '<personname>'
-      result << %(<firstname>#{doc.attr firstname_key}</firstname>) if doc.attr? firstname_key
-      result << %(<othername>#{doc.attr middlename_key}</othername>) if doc.attr? middlename_key
-      result << %(<surname>#{doc.attr lastname_key}</surname>) if doc.attr? lastname_key
+      result << %(<firstname>#{author.firstname}</firstname>) if author.firstname
+      result << %(<othername>#{author.middlename}</othername>) if author.middlename
+      result << %(<surname>#{author.lastname}</surname>) if author.lastname
       result << '</personname>'
-      result << %(<email>#{doc.attr email_key}</email>) if doc.attr? email_key
+      result << %(<email>#{author.email}</email>) if author.email
       result << '</author>'
       result.join LF
     end
@@ -682,14 +677,15 @@ module Asciidoctor
         result << '</copyright>'
       end
       if doc.has_header?
-        if doc.attr? 'author'
-          if (authorcount = (doc.attr 'authorcount').to_i) < 2
-            result << (author_tag doc)
-            result << %(<authorinitials>#{doc.attr 'authorinitials'}</authorinitials>) if doc.attr? 'authorinitials'
+        authors = doc.authors
+        unless authors.empty?
+          if authors.size < 2
+            result << (author_tag authors[0])
+            result << %(<authorinitials>#{authors[0].initials}</authorinitials>) if authors[0].initials
           else
             result << '<authorgroup>'
-            authorcount.times do |index|
-              result << (author_tag doc, index + 1)
+            authors.each do |author|
+              result << (author_tag author)
             end
             result << '</authorgroup>'
           end

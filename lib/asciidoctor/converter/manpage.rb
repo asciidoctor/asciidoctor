@@ -157,18 +157,17 @@ module Asciidoctor
         result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
       end
 
-      # FIXME we really need an API that returns the authors as an array
-      if (num_authors = (node.attr 'authorcount') || 0) > 0
-        if num_authors == 1
+      unless node.authors.empty?
+        if node.authors.size > 1
+          result << '.SH "AUTHORS"'
+          node.authors.each do |author|
+            result << %(.sp
+#{author.name})
+          end
+        else
           result << %(.SH "AUTHOR"
 .sp
-#{node.attr 'author'})
-        else
-          result << '.SH "AUTHORS"'
-          (1.upto num_authors).each do |i|
-            result << %(.sp
-#{node.attr "author_#{i}"})
-          end
+#{node.authors[0].name})
         end
       end
 
