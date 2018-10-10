@@ -825,6 +825,7 @@ module Substitutors
         end
 
         if text.empty?
+          # NOTE it's not possible for the URI scheme to be bare in this case
           text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
           if attrs
             attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
@@ -893,7 +894,13 @@ module Substitutors
           if mailto
             text = m[2]
           else
-            text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+            if doc_attrs.key? 'hide-uri-scheme'
+              if (text = target.sub UriSniffRx, '').empty?
+                text = target
+              end
+            else
+              text = target
+            end
             if attrs
               attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
             else
