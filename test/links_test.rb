@@ -26,6 +26,15 @@ context 'Links' do
     assert_xpath "//a[@href='file:///etc/app.conf'][text() = '/etc/app.conf']", convert_string('Edit the configuration file link:file:///etc/app.conf[]', :attributes => {'hide-uri-scheme' => ''})
   end
 
+  test 'should not hide bare URI scheme in implicit text of link macro when hide-uri-scheme is set' do
+    {
+      'link:https://[]' => 'https://',
+      'link:ssh://[]' => 'ssh://'
+    }.each do |input, expected|
+      assert_xpath %(/a[text() = "#{expected}"]), (convert_inline_string input, :attributes => { 'hide-uri-scheme' => '' })
+    end
+  end
+
   test 'qualified url with label' do
     assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", convert_string("We're parsing http://asciidoc.org[AsciiDoc] markup")
   end
