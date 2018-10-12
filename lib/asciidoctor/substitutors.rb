@@ -206,7 +206,7 @@ module Substitutors
               old_behavior = true
               attributes = attributes.slice 0, attributes.length - 2
             end
-            attributes = parse_attributes attributes, ['role']
+            attributes = parse_quoted_text_attributes attributes
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
@@ -268,7 +268,7 @@ module Substitutors
           preceding = %([#{attributes}])
           attributes = nil
         else
-          attributes = parse_attributes attributes, ['role']
+          attributes = parse_quoted_text_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
         # extract nested single-plus passthrough; otherwise return unprocessed
@@ -640,8 +640,8 @@ module Substitutors
             content = unescape_bracketed_text content
             if extconf[:content_model] == :attributes
               # QUESTION should we store the text in the _text key?
-              # QUESTION why is the sub_result option false? why isn't the unescape_input option true?
-              parse_attributes content, extconf[:pos_attrs] || [], :sub_result => false, :into => attributes
+              # QUESTION shouldn't the unescape_input option be true?
+              parse_attributes content, extconf[:pos_attrs] || [], :into => attributes
             else
               attributes['text'] = content
             end
@@ -671,7 +671,7 @@ module Substitutors
           target = sub_attributes target
         end
         doc.register(:images, target) unless type == 'icon'
-        attrs = parse_attributes(m[2], posattrs, :unescape_input => true)
+        attrs = parse_attributes m[2], posattrs, :unescape_input => true
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
@@ -1234,7 +1234,7 @@ module Substitutors
     attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
     attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
     # substitutions are only performed on attribute values if block is not nil
-    block = opts.fetch(:sub_result, true) ? self : nil
+    block = self if opts[:sub_result]
     if (into = opts[:into])
       AttributeList.new(attrlist, block).parse_into(into, posattrs)
     else
