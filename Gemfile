@@ -25,8 +25,13 @@ group :development do
       end
     else
       gem 'nokogiri', '~> 1.7.0' if Gem::Platform.local =~ 'x86-mingw32' || Gem::Platform.local =~ 'x64-mingw32'
+      # pin nokogiri because XPath behavior changed on JRuby starting in 1.8.3 (see sparklemotion/nokogiri#1803)
+      gem 'nokogiri', '1.8.2' if RUBY_ENGINE == 'jruby'
       gem 'racc', '~> 1.4.0' if RUBY_VERSION == '2.1.0' && RUBY_ENGINE == 'rbx'
     end
+  else
+    # pin nokogiri because XPath behavior changed on JRuby starting in 1.8.3 (see sparklemotion/nokogiri#1803)
+    gem 'nokogiri', '1.8.2' if RUBY_ENGINE == 'jruby'
   end
 end
 

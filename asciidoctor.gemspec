@@ -47,8 +47,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'erubis', '~> 2.7.0'
   # haml is needed for testing custom templates
   s.add_development_dependency 'haml', '~> 5.0.0'
-  # nokogiri is pinned because xpath behavior changed on JRuby starting with 1.8.3
-  s.add_development_dependency 'nokogiri', '1.8.2'
+  s.add_development_dependency 'nokogiri', '~> 1.8.5'
   s.add_development_dependency 'rake', '~> 10.0.0'
   s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
   # slim is needed for testing custom templates
