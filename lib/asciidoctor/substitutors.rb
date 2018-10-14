@@ -1478,7 +1478,7 @@ module Substitutors
     when 'coderay'
       if (linenums_mode = (attr? 'linenums', nil, false) ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
         if attr? 'highlight', nil, false
-          highlight_lines = resolve_highlight_lines(attr 'highlight', nil, false)
+          highlight_lines = resolve_lines_to_highlight(attr 'highlight', nil, false)
         end
       end
       result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
@@ -1496,7 +1496,7 @@ module Substitutors
         opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
       end
       if attr? 'highlight', nil, false
-        unless (highlight_lines = resolve_highlight_lines(attr 'highlight', nil, false)).empty?
+        unless (highlight_lines = resolve_lines_to_highlight(attr 'highlight', nil, false)).empty?
           opts[:hl_lines] = highlight_lines.join ' '
         end
       end
@@ -1557,7 +1557,7 @@ module Substitutors
   end
 
   # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
-  def resolve_highlight_lines spec
+  def resolve_lines_to_highlight spec
     lines = []
     spec = spec.delete ' ' if spec.include? ' '
     ((spec.include? ',') ? (spec.split ',') : (spec.split ';')).map do |entry|
