@@ -58,6 +58,7 @@ Fixes::
 
 Improvements::
 
+  * interpret open line range as infinite (#2914)
   * rename number property on AbstractBlock to numeral, but keep number as deprecated alias
   * use CSS class instead of hard-coded inline float style on tables and images (#2753)
   * use CSS class instead of hard-coded inline text-align style on block images (#2753)

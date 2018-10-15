@@ -932,6 +932,23 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
         assert_match(/last line of included content/, output)
       end
 
+      test 'include directive supports implicit endless range' do
+        input = <<-EOS
+include::fixtures/include-file.asciidoc[lines=6..]
+        EOS
+
+        output = convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
+        refute_match(/first line/, output)
+        refute_match(/second line/, output)
+        refute_match(/third line/, output)
+        refute_match(/fourth line/, output)
+        refute_match(/fifth line/, output)
+        assert_match(/sixth line/, output)
+        assert_match(/seventh line/, output)
+        assert_match(/eighth line/, output)
+        assert_match(/last line of included content/, output)
+      end
+
       test 'include directive ignores empty lines attribute' do
         input = <<-EOS
 ++++
