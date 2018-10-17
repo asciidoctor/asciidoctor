@@ -1189,11 +1189,14 @@ class Document < AbstractBlock
       @converter.write output, target
     else
       if target.respond_to? :write
+        # QUESTION should we set encoding using target.set_encoding?
         unless output.nil_or_empty?
           target.write output.chomp
           # ensure there's a trailing endline
           target.write LF
         end
+      elsif COERCE_ENCODING
+        ::IO.write target, output, :encoding => ::Encoding::UTF_8
       else
         ::IO.write target, output
       end
