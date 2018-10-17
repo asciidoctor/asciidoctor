@@ -22,6 +22,9 @@ endif::[]
 :uri-repo: {uri-org}/asciidoctor
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
+:uri-gradle-plugin: {uri-org}/asciidoctor-gradle-plugin
+:uri-maven-plugin: {uri-org}/asciidoctor-maven-plugin
+:uri-asciidoclet: {uri-org}/asciidoclet
 :uri-project: https://asciidoctor.org
 ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
@@ -128,7 +131,7 @@ Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Fou
 
 You can run Asciidoctor on the JVM using JRuby.
 To invoke the Asciidoctor API directly from Java and other JVM languages, use {uri-asciidoctorj}[AsciidoctorJ].
-There are plugins available, based on AsciidoctorJ, that integrate the Asciidoctor processor into Apache Maven, Gradle or Javadoc builds.
+There are plugins available for {uri-maven-plugin}[Apache Maven], {uri-gradle-plugin}[Gradle], and {uri-asciidoclet}[Javadoc], which allow you to integrate AsciiDoc processing directly into your build using AsciidoctorJ.
 
 Asciidoctor also runs in JavaScript.
 {uri-opal}[Opal] is used to transcompile the Ruby source to JavaScript to produce {uri-asciidoctorjs}[Asciidoctor.js].
