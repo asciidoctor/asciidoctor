@@ -2565,6 +2565,22 @@ section text
       assert_xpath '/*[@class="ulist"]/following-sibling::*[@class="sect1"]', output, 1
     end
 
+    test 'should not match comment line that looks like sibling description list term' do
+      input = <<-EOS
+before
+
+foo:: bar
+//yin:: yang
+
+after
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.dlist', output, 1
+      assert_css '.dlist dt', output, 1
+      refute_includes output, 'yin'
+    end
+
     test 'more than 4 consecutive colons should become part of description list term' do
       input = <<-EOS
 A term::::: a description
