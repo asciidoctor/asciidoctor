@@ -662,7 +662,8 @@ module Asciidoctor
     # Detects the start of any list item.
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
-    AnyListRx = /^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|.*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t])/
+    # IMPORTANT if this regexp does not agree with the regexp for each list type, the parser will hang.
+    AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/]).*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -723,16 +724,16 @@ module Asciidoctor
     #   {foo-term}:: {foo-desc}
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    # NOTE negative match for comment line is intentional since that isn't handled when looking for next list item
-    # TODO check for line comment when scanning lines instead of in regex
-    DescriptionListRx = %r(^(?!//)[ \t]*(.*?)(:::{0,2}|;;)(?:$|[ \t]+(.*)$))
+    # NOTE must skip line comment when looking for next list item inside list
+    DescriptionListRx = %r(^(?!//[^/])[ \t]*(.*?)(:::{0,2}|;;)(?:$|[ \t]+(.*)$))
 
     # Matches a sibling description list item (which does not include the type in the key).
+    # NOTE must skip line comment when looking for sibling list item
     DescriptionListSiblingRx = {
-      '::' => %r(^(?!//)[ \t]*(.*[^:]|)(::)(?:$|[ \t]+(.*)$)),
-      ':::' => %r(^(?!//)[ \t]*(.*[^:]|)(:::)(?:$|[ \t]+(.*)$)),
-      '::::' => %r(^(?!//)[ \t]*(.*[^:]|)(::::)(?:$|[ \t]+(.*)$)),
-      ';;' => %r(^(?!//)[ \t]*(.*?)(;;)(?:$|[ \t]+(.*)$))
+      '::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(::)(?:$|[ \t]+(.*)$)),
+      ':::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(:::)(?:$|[ \t]+(.*)$)),
+      '::::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(::::)(?:$|[ \t]+(.*)$)),
+      ';;' => %r(^(?!//[^/])[ \t]*(.*?)(;;)(?:$|[ \t]+(.*)$))
     }
 
     # Matches a callout list item.

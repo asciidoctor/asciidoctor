@@ -35,6 +35,7 @@ Enhancements::
 
 Fixes::
 
+  * don't hang on description list item that begins with /// (#2888)
   * don't crash when using AsciiDoc table cell style on column in CSV table (#2817)
   * show friendly error if CSV data for table contains unclosed quote (#2878) (*@zelivans*)
   * don't crash when attribute entry continuation is used on last line of file (#2880) (*@zelivans*)
