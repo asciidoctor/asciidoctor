@@ -502,7 +502,7 @@ class Parser
       end
     end
 
-    # this loop is used for flow control; it only executes once, and only when delimited_block is set
+    # this loop is used for flow control; it only executes once, and only when delimited_block is not set
     # break once a block is found or at end of loop
     # returns nil if the line should be dropped
     while true
