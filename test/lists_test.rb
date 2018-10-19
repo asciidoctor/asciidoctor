@@ -2550,6 +2550,19 @@ A new paragraph.
 
     test 'should not match comment line that looks like description list term' do
       input = <<-EOS
+before
+
+//key:: val
+
+after
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 0
+    end
+
+    test 'should not match comment line following list that looks like description list term' do
+      input = <<-EOS
 * item
 
 //::
