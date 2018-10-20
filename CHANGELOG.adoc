@@ -74,6 +74,8 @@ Improvements::
   * normalize all whitespace in value of manpurpose attribute
   * make space before callout number after custom line comment character optional
   * parse attrlist on inline passthrough as a shorthand attribute syntax or literal role (#2910)
+  * add support for range syntax (.. delimiter) to highlight attribute on source block (#2918)
+  * add support for unbounded range to highlight attribute on source block (#2918)
 
 Documentation::
 
