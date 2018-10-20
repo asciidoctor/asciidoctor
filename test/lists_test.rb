@@ -2594,6 +2594,48 @@ after
       refute_includes output, 'yin'
     end
 
+    test 'should not hang on description list item in list that begins with ///' do
+      input = <<-EOS
+* x
+///::
+y
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.ulist', output, 1
+      assert_css '.ulist .dlist', output, 1
+      assert_xpath '//dt[text()="///"]', output, 1
+      assert_xpath '//dd/p[text()="y"]', output, 1
+    end
+
+    test 'should not hang on sibling description list item that begins with ///' do
+      input = <<-EOS
+::
+///::
+y
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.dlist', output, 1
+      assert_xpath '(//dl/dt)[1][not(text())]', output, 1
+      assert_xpath '(//dl/dt)[2][text()="///"]', output, 1
+      assert_xpath '//dl/dd/p[text()="y"]', output, 1
+    end
+
+    test 'should skip dlist term that begins with // unless it begins with ///' do
+      input = <<-EOS
+category a::
+//ignored term:: def
+
+category b::
+///term:: def
+      EOS
+
+      output = convert_string_to_embedded input
+      refute_includes output, 'ignored term'
+      assert_xpath '//dt[text()="///term"]', output, 1
+    end
+
     test 'more than 4 consecutive colons should become part of description list term' do
       input = <<-EOS
 A term::::: a description
