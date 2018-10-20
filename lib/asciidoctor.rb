@@ -1065,15 +1065,6 @@ module Asciidoctor
     #
     #DataDelimiterRx = /[,;]/
 
-    # Matches one or more consecutive digits at the end of a line.
-    #
-    # Examples
-    #
-    #   docbook45
-    #   html5
-    #
-    TrailingDigitsRx = /\d+$/
-
     # Matches whitespace (space, tab, newline) escaped by a backslash.
     #
     # Examples
@@ -1100,6 +1091,15 @@ module Asciidoctor
     # Matches a + or - modifier in a subs list
     #
     SubModifierSniffRx = /[+-]/
+
+    # Matches one or more consecutive digits at the end of a line.
+    #
+    # Examples
+    #
+    #   docbook45
+    #   html5
+    #
+    TrailingDigitsRx = /\d+$/
 
     # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
     #
