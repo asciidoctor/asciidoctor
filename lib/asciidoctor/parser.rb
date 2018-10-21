@@ -577,8 +577,10 @@ class Parser
                   # NOTE assume % units if not specified
                   attributes['scaledwidth'] = (TrailingDigitsRx.match? scaledwidth) ? %(#{scaledwidth}%) : scaledwidth
                 end
-                block.title = attributes.delete 'title'
-                block.assign_caption((attributes.delete 'caption'), 'figure')
+                if attributes.key? 'title'
+                  block.title = attributes.delete 'title'
+                  block.assign_caption((attributes.delete 'caption'), 'figure')
+                end
               end
               attributes['target'] = target
               break
