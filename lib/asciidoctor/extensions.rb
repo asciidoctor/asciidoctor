@@ -196,7 +196,13 @@ module Extensions
         raise ::ArgumentError, 'Unable to create an image block, target attribute is required'
       end
       attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
-      create_block parent, :image, nil, attrs, opts
+      title = (attrs.key? 'title') ? (attrs.delete 'title') : nil
+      block = create_block parent, :image, nil, attrs, opts
+      if title
+        block.title = title
+        block.assign_caption((attrs.delete 'caption'), (opts[:caption_context] || 'figure'))
+      end
+      block
     end
 
     def create_inline parent, context, text, opts = {}
