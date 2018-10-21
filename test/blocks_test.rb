@@ -3028,6 +3028,34 @@ puts 'Hello, World!'
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
+    test 'should highlight lines specified in highlight attribute if linenums is set and source-highlighter is coderay' do
+      %w(highlight="1,4-6" highlight=1;4..6 highlight=1;4..;!7).each do |highlight_attr|
+        input = <<-EOS
+:source-highlighter: coderay
+
+[source%linenums,java,#{highlight_attr}]
+----
+import static java.lang.System.out;
+
+public class HelloWorld {
+  public static void main(String[] args) {
+    out.println("Hello, World!");
+  }
+}
+----
+        EOS
+        output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+        assert_css 'strong.highlighted', output, 4
+        assert_xpath '//strong[@class="highlighted"][text()="1"]', output, 1
+        assert_xpath '//strong[@class="highlighted"][text()="2"]', output, 0
+        assert_xpath '//strong[@class="highlighted"][text()="3"]', output, 0
+        assert_xpath '//strong[@class="highlighted"][text()="4"]', output, 1
+        assert_xpath '//strong[@class="highlighted"][text()="5"]', output, 1
+        assert_xpath '//strong[@class="highlighted"][text()="6"]', output, 1
+        assert_xpath '//strong[@class="highlighted"][text()="7"]', output, 0
+      end
+    end
+
     test 'should read source language from source-language document attribute if not specified on source block' do
       input = <<-EOS
 :source-highlighter: coderay
