@@ -640,7 +640,7 @@ module Substitutors
             content = unescape_bracketed_text content
             if extconf[:content_model] == :attributes
               # QUESTION should we store the text in the _text key?
-              # QUESTION shouldn't the unescape_input option be true?
+              # NOTE bracked text has already been escaped
               parse_attributes content, extconf[:pos_attrs] || [], :into => attributes
             else
               attributes['text'] = content
