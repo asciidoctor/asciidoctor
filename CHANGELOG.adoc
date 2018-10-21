@@ -57,6 +57,7 @@ Fixes::
   * fix crash when restoring passthroughs if passthrough role is enclosed in single quotes (#2882, #2883)
   * don't eagerly apply subs to inline attributes in general
   * make sure encoding of output file is UTF-8
+  * prevent warning about invalid `:asciidoc` option when using custom templates with Slim 4 (#2928)
 
 Improvements::
 

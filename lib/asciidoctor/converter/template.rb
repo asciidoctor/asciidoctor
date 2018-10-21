@@ -256,6 +256,7 @@ module Asciidoctor
             unless @active_engines[extsym]
               # NOTE slim doesn't get automatically loaded by Tilt
               Helpers.require_library 'slim' unless defined? ::Slim
+              ::Slim::Engine.define_options :asciidoc => {}
               # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
               # NOTE safe mode won't get updated if using template cache and changing safe mode
               (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
