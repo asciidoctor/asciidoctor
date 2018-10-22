@@ -83,6 +83,7 @@ Documentation::
 
   * translate README into German (#2829) (*@jwehmschulte*)
   * sync French translation of README (*@mogztter*)
+  * add Swedish translation of built-in attributes (PR #2930) (*@jonasbjork*)
 
 Build / Infrastructure::
 
