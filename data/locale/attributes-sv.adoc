@@ -1,0 +1,23 @@
+// Swedish translation, Jonas Björk <jonas.bjork@gmail.com>
+:appendix-caption: Bilaga
+:appendix-refsig: {appendix-caption}
+:caution-caption: Var uppmärksam
+:chapter-label: Kapitel
+:chapter-refsig: {chapter-label}
+:example-caption: Exempel
+:figure-caption: Figur
+:important-caption: Viktigt
+:last-update-label: Senast uppdaterad
+ifdef::listing-caption[:listing-caption: Lista]
+//:manname-title: Namn
+:note-caption: Notera
+:part-label: Del
+:part-refsig: {part-label}
+ifdef::preface-title[:preface-title: Förord]
+:section-refsig: Avsnitt
+:table-caption: Tabell
+:tip-caption: Tips
+:toc-title: Innehållsförteckning
+:untitled-label: Odöpt
+:version-label: Version
+:warning-caption: Varning
