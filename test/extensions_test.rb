@@ -199,6 +199,9 @@ def create_cat_in_sink_block_macro
         unless target.nil_or_empty?
           image_attrs['target'] = %(cat-in-sink-day-#{target}.png)
         end
+        if (title = attrs.delete 'title')
+          image_attrs['title'] = title
+        end
         if (alt = attrs.delete 1)
           image_attrs['alt'] = alt
         end
@@ -1503,7 +1506,6 @@ sample content
 
     test 'should raise an exception if mandatory target attribute is not provided for image block' do
       input = <<-EOS
-.Cat in Sink?
 cat_in_sink::[]
       EOS
       exception = assert_raises ArgumentError do
@@ -1514,7 +1516,6 @@ cat_in_sink::[]
 
     test 'should assign alt attribute to image block if alt is not provided' do
       input = <<-EOS
-.Cat in Sink?
 cat_in_sink::25[]
       EOS
       doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
@@ -1527,7 +1528,6 @@ cat_in_sink::25[]
 
     test 'should create an image block if mandatory attributes are provided' do
       input = <<-EOS
-.Cat in Sink?
 cat_in_sink::30[cat in sink (yes)]
       EOS
       doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
@@ -1536,6 +1536,25 @@ cat_in_sink::30[cat in sink (yes)]
       refute(image.attr? 'default-alt')
       output = doc.convert
       assert_includes output, '<img src="cat-in-sink-day-30.png" alt="cat in sink (yes)">'
+    end
+
+    test 'should not assign caption on image block if title is not set on custom block macro' do
+      input = <<-EOS
+cat_in_sink::30[]
+      EOS
+      doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
+      output = doc.convert
+      assert_xpath '/*[@class="imageblock"]/*[@class="title"]', output, 0
+    end
+
+    test 'should assign caption on image block if title is set on custom block macro' do
+      input = <<-EOS
+.Cat in Sink?
+cat_in_sink::30[]
+      EOS
+      doc = document_from_string input, :header_footer => false, :extension_registry => create_cat_in_sink_block_macro
+      output = doc.convert
+      assert_xpath '/*[@class="imageblock"]/*[@class="title"][text()="Figure 1. Cat in Sink?"]', output, 1
     end
   end
 end
