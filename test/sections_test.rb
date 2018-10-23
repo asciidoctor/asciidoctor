@@ -1397,6 +1397,24 @@ text
       assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
     end
 
+    test 'should not crash if child section of part is out of sequence and part numbering is disabled' do
+      input = <<-EOS
+= Document Title
+:doctype: book
+:sectnums:
+
+= Part
+
+=== Out of Sequence Section
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string input
+        assert_xpath '//h1[text()="Part"]', output, 1
+        assert_xpath '//h3[text()=".1. Out of Sequence Section"]', output, 1 
+      end
+    end
+
     test 'should number parts when doctype is book and partnums attributes is set' do
       input = <<-EOS
 = Book Title

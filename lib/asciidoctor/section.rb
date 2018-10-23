@@ -116,7 +116,8 @@ class Section < AbstractBlock
     elsif @level > 1
       Section === @parent ? %(#{@parent.sectnum(delimiter, delimiter)}#{@numeral}#{append}) : %(#{@numeral}#{append})
     else # @level == 0
-      %(#{Helpers.int_to_roman @numeral}#{append})
+      # NOTE coerce @numeral to int just in case not set; can happen if section nesting is out of sequence
+      %(#{Helpers.int_to_roman @numeral.to_i}#{append})
     end
   end
 

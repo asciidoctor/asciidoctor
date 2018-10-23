@@ -54,6 +54,7 @@ Fixes::
   * consolidate inner whitespace in prose in manpage output (#2890)
   * only apply subs to node attribute value if enclosed in single quotes (#2905)
   * don't hide URI scheme if target of link macro is a bare URI scheme
+  * fix crash when child section of part is out of sequence and section numbering is enabled (#2931)
   * fix crash when restoring passthroughs if passthrough role is enclosed in single quotes (#2882, #2883)
   * don't eagerly apply subs to inline attributes in general
   * make sure encoding of output file is UTF-8
