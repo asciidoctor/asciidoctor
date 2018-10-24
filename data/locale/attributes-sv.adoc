@@ -9,7 +9,7 @@
 :important-caption: Viktigt
 :last-update-label: Senast uppdaterad
 ifdef::listing-caption[:listing-caption: Lista]
-//:manname-title: Namn
+ifdef::manname-title[:manname-title: Namn]
 :note-caption: Notera
 :part-label: Del
 :part-refsig: {part-label}

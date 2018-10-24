@@ -9,7 +9,7 @@
 :important-caption: Önemli
 :last-update-label: Son güncelleme
 ifdef::listing-caption[:listing-caption: Listeleme]
-//:manname-title: İSİM
+ifdef::manname-title[:manname-title: İsim]
 :note-caption: Not
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Ön söz]

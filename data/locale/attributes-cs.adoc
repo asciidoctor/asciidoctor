@@ -9,7 +9,7 @@
 :important-caption: Důležité
 :last-update-label: Změněno
 ifdef::listing-caption[:listing-caption: Seznam]
-//:manname-title: Název
+ifdef::manname-title[:manname-title: Název]
 :note-caption: Poznámka
 :part-refsig: Část
 ifdef::preface-title[:preface-title: Úvod]

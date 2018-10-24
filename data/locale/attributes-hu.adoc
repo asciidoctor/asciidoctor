@@ -9,7 +9,7 @@
 :important-caption: Fontos
 :last-update-label: Utolsó frissítés
 ifdef::listing-caption[:listing-caption: Lista]
-//:manname-title: NÉV
+ifdef::manname-title[:manname-title: Név]
 :note-caption: Megjegyzés
 //:part-refsig: ???
 ifdef::preface-title[:preface-title: Előszó]
