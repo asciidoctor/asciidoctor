@@ -705,6 +705,30 @@ item
       assert_includes output, '== Not a section'
       assert_xpath %((//li)[2]/p[text() = "second\n== Not a section"]), output, 1
     end
+
+    test 'should match trailing line separator in text of list item' do
+      input = <<-EOS.chomp
+* a
+* b#{decode_char 8232}
+* c
+      EOS
+
+      output = convert_string input
+      assert_css 'li', output, 3
+      assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}"]), output, 1
+    end
+
+    test 'should match line separator in text of list item' do
+      input = <<-EOS.chomp
+* a
+* b#{decode_char 8232}b
+* c
+      EOS
+
+      output = convert_string input
+      assert_css 'li', output, 3
+      assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}b"]), output, 1
+    end
   end
 
   context "Lists with inline markup" do
@@ -1965,6 +1989,30 @@ List
       assert_xpath '(//orderedlist)/listitem', output, 2
       assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
     end
+
+    test 'should match trailing line separator in text of list item' do
+      input = <<-EOS.chomp
+. a
+. b#{decode_char 8232}
+. c
+      EOS
+
+      output = convert_string input
+      assert_css 'li', output, 3
+      assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}"]), output, 1
+    end
+
+    test 'should match line separator in text of list item' do
+      input = <<-EOS.chomp
+. a
+. b#{decode_char 8232}b
+. c
+      EOS
+
+      output = convert_string input
+      assert_css 'li', output, 3
+      assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}b"]), output, 1
+    end
   end
 
   test 'should warn if explicit uppercase roman numerals in list are out of sequence' do
@@ -2658,6 +2706,30 @@ paragraph
       doc = document_from_string input
       dd = doc.blocks[0].items[0][1]
       assert_nil dd.text
+    end
+
+    test 'should match trailing line separator in text of list item' do
+      input = <<-EOS.chomp
+A:: a
+B:: b#{decode_char 8232}
+C:: c
+      EOS
+
+      output = convert_string input
+      assert_css 'dd', output, 3
+      assert_xpath %((//dd)[2]/p[text()="b#{decode_char 8232}"]), output, 1
+    end
+
+    test 'should match line separator in text of list item' do
+      input = <<-EOS.chomp
+A:: a
+B:: b#{decode_char 8232}b
+C:: c
+      EOS
+
+      output = convert_string input
+      assert_css 'dd', output, 3
+      assert_xpath %((//dd)[2]/p[text()="b#{decode_char 8232}b"]), output, 1
     end
   end
 
@@ -4805,6 +4877,40 @@ puts doc.convert #<3>
       assert_xpath %((/div[@class="colist arabic"]//td/i)[#{i}][@class="conum"][@data-value = "#{i}"]), output, 1
       assert_xpath %((/div[@class="colist arabic"]//td/i)[#{i}]/following-sibling::b[text() = "#{i}"]), output, 1
     end
+  end
+
+  test 'should match trailing line separator in text of list item' do
+    input = <<-EOS.chomp
+----
+A <1>
+B <2>
+C <3>
+----
+<1> a
+<2> b#{decode_char 8232}
+<3> c
+    EOS
+
+    output = convert_string input
+    assert_css 'li', output, 3
+    assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}"]), output, 1
+  end
+
+  test 'should match line separator in text of list item' do
+    input = <<-EOS.chomp
+----
+A <1>
+B <2>
+C <3>
+----
+<1> a
+<2> b#{decode_char 8232}b
+<3> c
+    EOS
+
+    output = convert_string input
+    assert_css 'li', output, 3
+    assert_xpath %((//li)[2]/p[text()="b#{decode_char 8232}b"]), output, 1
   end
 end
 
