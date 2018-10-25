@@ -677,17 +677,14 @@ module Asciidoctor
         result << '</copyright>'
       end
       if doc.has_header?
-        authors = doc.authors
-        unless authors.empty?
-          if authors.size < 2
-            result << (author_tag authors[0])
-            result << %(<authorinitials>#{authors[0].initials}</authorinitials>) if authors[0].initials
-          else
+        unless (authors = doc.authors).empty?
+          if authors.size > 1
             result << '<authorgroup>'
-            authors.each do |author|
-              result << (author_tag author)
-            end
+            authors.each {|author| result << (author_tag author) }
             result << '</authorgroup>'
+          else
+            result << author_tag(author = authors[0])
+            result << %(<authorinitials>#{author.initials}</authorinitials>) if author.initials
           end
         end
         if (doc.attr? 'revdate') && ((doc.attr? 'revnumber') || (doc.attr? 'revremark'))

@@ -157,17 +157,17 @@ module Asciidoctor
         result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
       end
 
-      unless node.authors.empty?
-        if node.authors.size > 1
+      unless (authors = node.authors).empty?
+        if authors.size > 1
           result << '.SH "AUTHORS"'
-          node.authors.each do |author|
+          authors.each do |author|
             result << %(.sp
 #{author.name})
           end
         else
           result << %(.SH "AUTHOR"
 .sp
-#{node.authors[0].name})
+#{authors[0].name})
         end
       end
 

@@ -1095,6 +1095,94 @@ text
   end
 
   context 'AST' do
+    test 'with no author' do
+      input = <<-EOS
+= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+
+Getting Real details the business, design, programming, and marketing principles of 37signals.
+      EOS
+
+      doc = document_from_string input
+      assert_equal 0, doc.authors.size
+    end
+
+    test 'with one author' do
+      input = <<-EOS
+= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+David Heinemeier Hansson <david@37signals.com>
+
+Getting Real details the business, design, programming, and marketing principles of 37signals.
+      EOS
+
+      doc = document_from_string input
+      authors = doc.authors
+      assert_equal 1, authors.size
+      author_1 = authors[0]
+      assert_equal 'david@37signals.com', author_1.email
+      assert_equal 'David Heinemeier Hansson', author_1.name
+      assert_equal 'David', author_1.firstname
+      assert_equal 'Heinemeier', author_1.middlename
+      assert_equal 'Hansson', author_1.lastname
+      assert_equal 'DHH', author_1.initials
+    end
+
+    test 'with two authors' do
+      input = <<-EOS
+= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+David Heinemeier Hansson <david@37signals.com>; Jason Fried <jason@37signals.com>
+
+Getting Real details the business, design, programming, and marketing principles of 37signals.
+      EOS
+
+      doc = document_from_string input
+      authors = doc.authors
+      assert_equal 2, authors.size
+      author_1 = authors[0]
+      assert_equal 'david@37signals.com', author_1.email
+      assert_equal 'David Heinemeier Hansson', author_1.name
+      assert_equal 'David', author_1.firstname
+      assert_equal 'Heinemeier', author_1.middlename
+      assert_equal 'Hansson', author_1.lastname
+      assert_equal 'DHH', author_1.initials
+      author_2 = authors[1]
+      assert_equal 'jason@37signals.com', author_2.email
+      assert_equal 'Jason Fried', author_2.name
+      assert_equal 'Jason', author_2.firstname
+      assert_nil author_2.middlename
+      assert_equal 'Fried', author_2.lastname
+      assert_equal 'JF', author_2.initials
+    end
+
+    test 'with authors as attributes' do
+      input = <<-EOS
+= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+:author_1: David Heinemeier Hansson
+:email_1: david@37signals.com
+:author_2: Jason Fried
+:email_2: jason@37signals.com
+
+Getting Real details the business, design, programming, and marketing principles of 37signals.
+      EOS
+
+      doc = document_from_string input
+      authors = doc.authors
+      assert_equal 2, authors.size
+      author_1 = authors[0]
+      assert_equal 'david@37signals.com', author_1.email
+      assert_equal 'David Heinemeier Hansson', author_1.name
+      assert_equal 'David', author_1.firstname
+      assert_equal 'Heinemeier', author_1.middlename
+      assert_equal 'Hansson', author_1.lastname
+      assert_equal 'DHH', author_1.initials
+      author_2 = authors[1]
+      assert_equal 'jason@37signals.com', author_2.email
+      assert_equal 'Jason Fried', author_2.name
+      assert_equal 'Jason', author_2.firstname
+      assert_nil author_2.middlename
+      assert_equal 'Fried', author_2.lastname
+      assert_equal 'JF', author_2.initials
+    end
+
     test 'should not crash if nil cell text is passed to Cell constructor' do
       input = <<-EOS
 |===

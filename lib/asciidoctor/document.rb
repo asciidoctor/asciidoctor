@@ -133,24 +133,8 @@ class Document < AbstractBlock
     end
   end
 
-  # Public: The Author class represents an author extracted from the document header.
-  class Author
-    attr_reader :name
-    attr_reader :initials
-    attr_reader :firstname
-    attr_reader :middlename
-    attr_reader :lastname
-    attr_reader :email
-
-    def initialize name, initials, firstname, middlename, lastname, email
-      @name = name
-      @initials = initials
-      @firstname = firstname
-      @middlename = middlename
-      @lastname = lastname
-      @email = email
-    end
-  end
+  # Public: The Author class represents information about an author extracted from document attributes
+  Author = ::Struct.new :name, :firstname, :middlename, :lastname, :initials, :email
 
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
@@ -245,9 +229,6 @@ class Document < AbstractBlock
 
   # Public: Get the activated Extensions::Registry associated with this document.
   attr_reader :extensions
-
-  # Public: Get the authors of this Document.
-  attr_reader :authors
 
   # Public: Initialize a {Document} object.
   #
@@ -348,7 +329,6 @@ class Document < AbstractBlock
       @extensions = nil # initialize furthur down
     end
 
-    @authors = []
     @parsed = false
     @header = @header_attributes = nil
     @counters = {}
@@ -775,6 +755,27 @@ class Document < AbstractBlock
     @attributes['author']
   end
 
+  # Public: Convenience method to retrieve the authors of this document as an Array of Author objects.
+  #
+  # This method is backed by the author-related attributes on the document.
+  #
+  # returns the authors of this document as an Array
+  def authors
+    if (attrs = @attributes).key? 'author'
+      authors = [(Author.new attrs['author'], attrs['firstname'], attrs['middlename'], attrs['lastname'], attrs['authorinitials'], attrs['email'])]
+      if (num_authors = attrs['authorcount'] || 0) > 1
+        idx = 1
+        while idx < num_authors
+          idx += 1
+          authors << (Author.new attrs[%(author_#{idx})], attrs[%(firstname_#{idx})], attrs[%(middlename_#{idx})], attrs[%(lastname_#{idx})], attrs[%(authorinitials_#{idx})], attrs[%(email_#{idx})])
+        end
+      end
+      authors
+    else
+      []
+    end
+  end
+
   # Public: Convenience method to retrieve the document attribute 'revdate'
   #
   # returns the date of last revision for the document as a String
@@ -1028,21 +1029,6 @@ class Document < AbstractBlock
     else
       apply_header_subs value
     end
-  end
-
-  # Internal: Update the document authors
-  def update_authors
-    attrs = @attributes
-    authors = []
-    if author
-      authors.push Author.new attrs['author'], attrs['authorinitials'], attrs['firstname'], attrs['middlename'], attrs['lastname'], attrs['email']
-      if (authorcount = (attr 'authorcount').to_i) > 1
-        (2..authorcount).each do |idx|
-          authors.push Author.new attrs["author_#{idx}"], attrs["authorinitials_#{idx}"], attrs["firstname_#{idx}"], attrs["middlename_#{idx}"], attrs["lastname_#{idx}"], attrs["email_#{idx}"]
-        end
-      end
-    end
-    @authors = authors
   end
 
   # Public: Update the backend attributes to reflect a change in the active backend.

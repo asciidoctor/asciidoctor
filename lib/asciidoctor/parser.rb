@@ -1903,8 +1903,6 @@ class Parser
           document.attributes['email'] = document.attributes['email_1']
         end
       end
-
-      document.update_authors
     end
 
     metadata
