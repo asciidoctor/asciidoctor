@@ -1,7 +1,4 @@
 = Horizontal Rules and Page Breaks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // hr.adoc
 
 == Horizontal rules

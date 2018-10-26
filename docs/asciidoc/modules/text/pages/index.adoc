@@ -1,7 +1,4 @@
 = Text Formatting
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // text.adoc
 
 Just as we emphasize certain words and phrases when we speak, we can emphasize them in text with formatting.

@@ -1,7 +1,4 @@
 = Abstract Block Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 An abstract is a concise overview of a document.
 The `abstract` block style can be placed on an open block or paragraph.

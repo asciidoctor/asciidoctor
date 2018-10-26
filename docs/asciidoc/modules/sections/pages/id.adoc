@@ -1,7 +1,4 @@
 = Section IDs, Anchors and Links
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-ntname: https://www.w3.org/TR/REC-xml/#NT-Name
 :url-adoc-a2x: http://aerostitch.github.io/misc/asciidoc/asciidoc-title_uft8.html
 // New page, content taken from sections.adoc

@@ -1,7 +1,4 @@
 = Callouts
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 //callouts-intro.adoc, in user manual (peamble to Copy and paste friendly callouts)
 
 Callout numbers (aka callouts) provide a means to add annotations to lines in a verbatim block.

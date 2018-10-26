@@ -1,7 +1,4 @@
 = Abstract Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // anchor um: user-abstract
 
 An abstract is a concise overview of an article.

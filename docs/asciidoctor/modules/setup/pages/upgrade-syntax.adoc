@@ -1,8 +1,5 @@
 = Upgrade Syntax, Attributes and Commands
 //Syntax, Attributes, and Commands: What's Changed?
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
 If your migrating from AsciiDoc Python, see the xref:ROOT:migrate/from-asciidoc-python.adoc[documentation for migrating from AsciiDoc Python to Asciidoctor].

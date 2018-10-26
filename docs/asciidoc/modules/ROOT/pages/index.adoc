@@ -1,7 +1,4 @@
 = AsciiDoc Syntax Documentation
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 [caption="IN MIGRATION"]
 TIP: This documentation is in migration.

@@ -1,7 +1,4 @@
 = Set Attributes on an Element
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 attr-element.adoc, included in:
 - user-manual: Attributes: Setting attributes on an element

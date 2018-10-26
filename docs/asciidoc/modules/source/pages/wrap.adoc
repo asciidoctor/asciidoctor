@@ -1,8 +1,5 @@
 = Wrap or Scroll
 //To Wrap or to Scroll
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: source code
 // user-manual: Listing and Source Code Blocks: To wrap or to scroll
 

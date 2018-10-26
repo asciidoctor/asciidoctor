@@ -1,7 +1,4 @@
 = Document Metadata
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // meta.adoc
 
 Document metadata, such as a description of the document, keywords, and the title, can be assigned to attributes in the header.

@@ -1,7 +1,4 @@
 = Preamble and Lead Paragraphs
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // new page
 
 == Preamble

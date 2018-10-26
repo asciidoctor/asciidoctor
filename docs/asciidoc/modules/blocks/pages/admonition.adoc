@@ -1,7 +1,4 @@
 = Admonition Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 Included in:
 - user-manual: Admonition

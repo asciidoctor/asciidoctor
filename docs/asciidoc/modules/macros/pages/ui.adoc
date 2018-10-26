@@ -1,7 +1,4 @@
 = User Interface Macros
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 IMPORTANT: You *must* set the `experimental` attribute to enable the UI macros.
 

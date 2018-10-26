@@ -1,7 +1,4 @@
 = Highlight
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 New page, content from text-css.adoc, included in:
 - user-manual: text formatting: Custom styling with attributes

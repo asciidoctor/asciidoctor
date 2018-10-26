@@ -1,7 +1,4 @@
 = Asciidoctor Command Line Interface (CLI)
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-manpage: {url-project}/man/asciidoctor
 ////
 command-line-usage.adoc

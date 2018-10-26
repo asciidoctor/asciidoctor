@@ -1,7 +1,4 @@
 = Glossary Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // anchor from um: user-glossary
 
 You can include a glossary in an article, book, and book part by setting the `glossary` style on a section.

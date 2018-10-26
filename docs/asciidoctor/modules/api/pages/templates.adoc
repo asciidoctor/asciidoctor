@@ -1,7 +1,4 @@
 = Load Custom Templates Using the API
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-tests: {url-org}/asciidoctor/tree/master/test
 // templates-api.adoc
 

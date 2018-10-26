@@ -1,7 +1,4 @@
 = Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :y: Yes
 :n: No
 // block.adoc, included in um

@@ -1,7 +1,4 @@
 = What's New in {adoc-version}
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :adoc-version: 1.5.7
 
 == Sections and book parts

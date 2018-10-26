@@ -1,7 +1,4 @@
 = Docinfo Processor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 exten-docinfo.adoc, included in:
 - user-manual: Extensions: Docinfo Processor example

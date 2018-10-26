@@ -1,7 +1,4 @@
 = Static Website Generators
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 static-front.adoc, included in:
 - user-manual: Static website generators: Front matter added for static site generators

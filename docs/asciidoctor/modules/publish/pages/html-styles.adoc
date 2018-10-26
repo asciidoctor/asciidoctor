@@ -1,7 +1,4 @@
 = Style the HTML with CSS
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 html-styles.adoc, included in:
 - convert-documents

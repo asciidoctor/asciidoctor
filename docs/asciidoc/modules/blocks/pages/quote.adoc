@@ -1,7 +1,4 @@
 = Quote and Excerpt Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-air: http://en.wikipedia.org/wiki/Air_quotes
 // quote-alt.adoc, included in user-manual: quote: Quoted paragraph
 

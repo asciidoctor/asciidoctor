@@ -1,9 +1,6 @@
 = Migrate from Asciidoctor 0.1.4 to Asciidoctor 1.5.0
 //Dan Allen
 //v1.1, 2014-08-10
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 //:page-layout!:
 :description: A guide that assists with migration from Asciidoctor 0.1.4 to 1.5.0.
 :keywords: Asciidoctor 1.5, migrate to Asciidoctor 1.5, Asciidoctor 1.5 migration, migrating to Asciidoctor 1.5, migrating to Asciidoctor, compat mode, Asciidoctor compat mode, compat-mode

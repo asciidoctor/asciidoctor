@@ -1,7 +1,4 @@
 = Inline Passthroughs
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: pass-macros
 pass-macro.adoc, included in:

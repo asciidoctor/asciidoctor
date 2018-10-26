@@ -1,7 +1,4 @@
 = Icons
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-fontawesome-icons: https://fontawesome.com/icons?d=gallery
 // icons.adoc
 

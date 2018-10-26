@@ -1,11 +1,6 @@
 = Convert Strings Using the API
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-string-api.adoc
-Convert Strings the user-manual document
-////
+// string-api.adoc
+// Convert Strings the user-manual document
 
 To convert an AsciiDoc-formatted string:
 

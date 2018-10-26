@@ -1,7 +1,4 @@
 = Block Processor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 exten-block.adoc, included in:
 - user-manual: Extensions: Block processor example

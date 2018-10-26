@@ -1,7 +1,4 @@
 = Migrate to Asciidoctor
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 In this part, you'll learn how to migrate documents written in other markup languages to AsciiDoc.
 We'll start with the simplest migration, switching from AsciiDoc Python, the original implementation of AsciiDoc, to Asciidoctor, the modern implementation.

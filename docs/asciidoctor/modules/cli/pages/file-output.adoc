@@ -1,11 +1,5 @@
 = Specify an Output File from the CLI
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-Included in:
-- user-manual: Specifying an output file
-////
+// Included in user-manual: Specifying an output file
 
 Using the `-` flag, you can pipe content to the `asciidoctor` command.
 This flag tells Asciidoctor read the source from standard input (STDIN).

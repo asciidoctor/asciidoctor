@@ -1,12 +1,6 @@
 = Highlight.js
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-highlightjs-cdn: https://cdnjs.com/libraries/highlight.js
-////
-From src-highlightjs.adoc, included in:
-- user-manual: Source Code Syntax Highlighting: highlight.js installation
-////
+// From src-highlightjs.adoc, included in user-manual: Source Code Syntax Highlighting: highlight.js installation
 
 {url-highlightjs}[Highlight.js^] is a popular client-side syntax highlighter that supports a broad range of {url-highlightjs-lang}[languages^].
 

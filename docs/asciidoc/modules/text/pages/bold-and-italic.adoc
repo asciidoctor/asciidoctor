@@ -1,7 +1,4 @@
 = Bold and Italic
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // text-bold-italic.adoc
 
 The two most common ways of emphasizing a word is to format it as bold or italic.

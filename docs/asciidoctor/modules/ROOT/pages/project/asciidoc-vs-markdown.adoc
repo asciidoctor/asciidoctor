@@ -1,7 +1,4 @@
 = AsciiDoc Versus Markdown
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 The most compelling reason to choose a lightweight markup language for writing is to minimize the number of technical concepts an author must grasp in order to be immediately productive.
 In other words, the goal is to be able to _write without friction_.

@@ -1,7 +1,4 @@
 = Sections
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 From sections.adoc, included in user-manual
 

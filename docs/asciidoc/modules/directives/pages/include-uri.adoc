@@ -1,7 +1,4 @@
 = Include Content from a URI
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-http: http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
 :url-uri: https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
 ////

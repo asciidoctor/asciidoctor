@@ -1,7 +1,4 @@
 = Document Header
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // um anchor: doc-header
 
 The document header is a special set of contiguous lines at the start of the document that encapsulates the document title, author and revision information, and document-wide attributes (either built-in or user-defined).

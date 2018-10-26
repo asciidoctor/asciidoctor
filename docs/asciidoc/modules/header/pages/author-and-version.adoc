@@ -1,7 +1,4 @@
 = Author, Version and Date
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // from author.adoc and revision.adoc
 
 == Author syntax

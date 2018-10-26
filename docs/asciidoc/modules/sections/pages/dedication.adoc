@@ -1,7 +1,4 @@
 = Dedication Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: respect, homage, front matter
 // anchor from um: user-dedication
 

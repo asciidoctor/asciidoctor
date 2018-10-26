@@ -1,7 +1,4 @@
 = Set Attributes By Safe Mode
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 anchor: set-safe-attrs
 content from secure-attr.adoc, included in:

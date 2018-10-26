@@ -1,7 +1,4 @@
 = The Role Attribute
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // directly from um
 
 An element can be assigned numerous roles.

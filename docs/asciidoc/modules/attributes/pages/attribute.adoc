@@ -1,7 +1,4 @@
 = Attributes
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 attr.adoc, included in:
 - user-manual: Attributes

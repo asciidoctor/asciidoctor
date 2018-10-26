@@ -1,7 +1,4 @@
 = Table Data Formats
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-dsv: https://en.wikipedia.org/wiki/Delimiter-separated_values
 :url-rfc-4180: http://tools.ietf.org/html/rfc4180
 // table-formats.adoc, included in user-manual: tables

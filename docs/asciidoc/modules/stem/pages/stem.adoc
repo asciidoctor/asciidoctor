@@ -1,7 +1,4 @@
 = Equations and Formulas with STEM
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :stem:
 // um anchor: stem
 // stem.adoc, used in user manual: Equations and Formulas

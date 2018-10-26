@@ -1,7 +1,4 @@
 = Advanced Attribute Entries
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // taken from attr-doc.adoc
 
 == Split attribute values over multiple lines

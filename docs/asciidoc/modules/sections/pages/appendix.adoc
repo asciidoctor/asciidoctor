@@ -1,7 +1,4 @@
 = Appendix Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // anchor um: user-appendix
 
 The `appendix` section style can be used in books and articles, and it can have subsections.

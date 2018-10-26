@@ -1,7 +1,4 @@
 = Subscript and Superscript
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // text-sub-sup.adoc
 
 Subscript and superscript text is common in mathematical expressions and chemical formulas.

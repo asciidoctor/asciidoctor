@@ -1,7 +1,4 @@
 = Create a Custom Theme
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-sass-settings: https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/master/sass/settings/_settings.scss.dist
 :url-sass-defaults: https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/master/sass/settings/_defaults.scss
 // create-theme.adoc

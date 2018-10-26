@@ -1,7 +1,4 @@
 = Discrete Titles
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // um anchor: discrete-headings
 // um section title: Discrete Headings (aka Floating Titles)
 // discrete-heading.adoc

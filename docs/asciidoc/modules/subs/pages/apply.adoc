@@ -1,7 +1,4 @@
 = Apply Substitutions
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // subs-apply.adoc, included in user-manual: Text Substitutions: Applying substitutions
 
 == The subs attribute

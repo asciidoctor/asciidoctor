@@ -1,7 +1,4 @@
 = Inline Macro Processor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 exten-in-macro.adoc, included in:
 - user-manual: Extensions: Inline macro processor example

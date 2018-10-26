@@ -1,7 +1,4 @@
 = Ordered Lists
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: numbered list
 ////
 From first p to nested section, included in:

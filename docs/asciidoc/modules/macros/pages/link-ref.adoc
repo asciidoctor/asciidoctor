@@ -1,7 +1,4 @@
 = Link Attributes Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 //sum-url.adoc
 
 [cols="1l,1,2,2"]

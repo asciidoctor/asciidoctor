@@ -1,12 +1,6 @@
 = Highlight PHP Source Code
-//Highlighting PHP source code
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-From src.adoc, was originally a sidebar at the bottom of the page, included in:
-- user-manual: Syntax Highlighting Source Code
-////
+// Highlighting PHP source code
+// From src.adoc, was originally a sidebar at the bottom of the page, included in user-manual: Syntax Highlighting Source Code
 
 The PHP language has two modes.
 It can either be used as a standalone language (pure mode) or it can be mixed with HTML (mixed mode) by putting it inside PHP tags (a form that resembles an XML processing instruction).

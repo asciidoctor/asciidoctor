@@ -1,7 +1,4 @@
 = The Asciidoctor Ruby API
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 API introduction for Asciidoctor
 included in the user-manual Quickstarts, Using the Ruby API

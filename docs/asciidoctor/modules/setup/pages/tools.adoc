@@ -1,8 +1,5 @@
 = Edit and Preview Tools
 Dan Allen; Guillaume Grossetie
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :y: Yes
 :n: No
 :url-chrome-extension: https://chrome.google.com/webstore/detail/asciidoctorjs-live-previe/iaalpfgpbocpdfblpnhhgllgbdbchmia

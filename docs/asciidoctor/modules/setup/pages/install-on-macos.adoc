@@ -1,7 +1,4 @@
 = Install Asciidoctor on macOS
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :release-version: 1.5.7
 :url-homebrew: https://brew.sh/
 // http://brewformulas.org/Asciidoctor

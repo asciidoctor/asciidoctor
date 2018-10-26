@@ -1,7 +1,4 @@
 = Document Titles and Subtitles
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // header-title.adoc
 
 The document title resembles a level-0 section title, which is written using a single equal sign followed by at least one space (i.e., `={sp}`), then the text of the title.

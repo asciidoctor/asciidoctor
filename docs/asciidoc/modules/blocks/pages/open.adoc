@@ -1,7 +1,4 @@
 = Open Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // open.adoc, included in user-manual
 
 The most versatile block of all is the open block.

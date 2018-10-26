@@ -1,7 +1,4 @@
 = Asciidoctor Version and Lifecycle Policies
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: release policy
 
 == 1.5.7 Version Policy

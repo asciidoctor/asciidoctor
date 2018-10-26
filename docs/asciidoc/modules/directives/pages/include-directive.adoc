@@ -1,7 +1,4 @@
 = Include Directive
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // include-directive.adoc, included in user-manual
 
 The include directive (`include::path[attributes]`) let's you import content from another file into the current document.

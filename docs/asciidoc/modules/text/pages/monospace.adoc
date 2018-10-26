@@ -1,7 +1,4 @@
 = Monospace
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: mono
 text-mono.adoc, included in:

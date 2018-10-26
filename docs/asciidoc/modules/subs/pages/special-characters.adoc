@@ -1,7 +1,4 @@
 = Special Character Substitutions
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 //subs-specchar.adoc, included in um: Text Substitutions: Special characters
 
 When applicable, the first text substitution to occur is the replacement of any special characters.

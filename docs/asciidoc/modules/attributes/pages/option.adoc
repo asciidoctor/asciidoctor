@@ -1,7 +1,4 @@
 = The Options Attribute
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // directly from um
 
 The options attribute is a versatile named attribute that can contain a comma-separated list of values.

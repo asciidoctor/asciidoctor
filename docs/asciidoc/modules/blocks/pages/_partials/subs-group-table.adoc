@@ -1,8 +1,4 @@
-////
-Included in:
-
-- user-manual: Blocks, Substitutions
-////
+// Included in user-manual: Blocks, Substitutions
 
 .Substitution groups
 [cols="2h,6*^"]

@@ -1,8 +1,4 @@
 = Checklists
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-:keywords: check list
 // Included in user-manual: Unordered lists: Checklists
 
 List items can be marked complete using checklists.

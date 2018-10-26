@@ -1,7 +1,4 @@
 = URLs and Links
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: url
 url.adoc, included in:

@@ -1,7 +1,4 @@
 = CLI Messages
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: appendix#app-messages
 

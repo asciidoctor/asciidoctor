@@ -1,11 +1,5 @@
 = Block Macro Processor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-exten-macro.adoc, included in:
-- user-manual: Extensions: Block macro processor example
-////
+// exten-macro.adoc, included in user-manual: Extensions: Block macro processor example
 
 Purpose::
 Create a block macro named `gist` for embedding a gist.

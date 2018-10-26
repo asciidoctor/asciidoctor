@@ -1,7 +1,4 @@
 = Custom Text Styles
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // text-css.adoc
 
 == Custom style syntax

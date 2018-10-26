@@ -1,7 +1,4 @@
 = Table of Contents Positioning
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // toc-layout.adoc
 
 [#left-or-right-column-layout]
