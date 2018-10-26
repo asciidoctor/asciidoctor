@@ -49,12 +49,12 @@ context 'Invoker' do
 
   test 'should allow docdate and doctime to be overridden' do
     sample_filepath = fixture_path 'sample.asciidoc'
-    invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-07:00), sample_filepath
+    invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-0700), sample_filepath
     doc = invoker.document
     assert doc.attr?('docdate', '2015-01-01')
     assert doc.attr?('docyear', '2015')
-    assert doc.attr?('doctime', '10:00:00-07:00')
-    assert doc.attr?('docdatetime', '2015-01-01 10:00:00-07:00')
+    assert doc.attr?('doctime', '10:00:00-0700')
+    assert doc.attr?('docdatetime', '2015-01-01 10:00:00-0700')
   end
 
   test 'should accept document from stdin and write to stdout' do
@@ -664,6 +664,48 @@ Sample *AsciiDoc*
     assert_match(/Total time/, error)
   end
 
+  test 'should show timezone as UTC if system TZ is set to UTC' do
+    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
+    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    input_path = fixture_path 'doctime-localtime.adoc'
+    cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
+    old_tz = ENV['TZ']
+    begin
+      ENV['TZ'] = 'UTC'
+      result = Open3.popen3(cmd) {|_, out| out.read }
+      doctime, localtime = result.lines.map {|l| l.chomp }
+      assert doctime.end_with?(' UTC')
+      assert localtime.end_with?(' UTC')
+    rescue
+      if old_tz
+        ENV['TZ'] = old_tz
+      else
+        ENV.delete 'TZ'
+      end
+    end
+  end
+
+  test 'should show timezone as offset if system TZ is not set to UTC' do
+    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
+    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    input_path = fixture_path 'doctime-localtime.adoc'
+    cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
+    old_tz = ENV['TZ']
+    begin
+      ENV['TZ'] = 'EST+5'
+      result = Open3.popen3(cmd) {|_, out| out.read }
+      doctime, localtime = result.lines.map {|l| l.chomp }
+      assert doctime.end_with?(' -0500')
+      assert localtime.end_with?(' -0500')
+    ensure
+      if old_tz
+        ENV['TZ'] = old_tz
+      else
+        ENV.delete 'TZ'
+      end
+    end
+  end
+
   test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
@@ -673,10 +715,10 @@ Sample *AsciiDoc*
       doc = invoker.document
       assert_equal '2009-02-08', (doc.attr 'docdate')
       assert_equal '2009', (doc.attr 'docyear')
-      assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'docdatetime'))
+      assert_match(/2009-02-08 20:03:32 UTC/, (doc.attr 'docdatetime'))
       assert_equal '2009-02-08', (doc.attr 'localdate')
       assert_equal '2009', (doc.attr 'localyear')
-      assert_match(/2009-02-08 20:03:32 (GMT|UTC)/, (doc.attr 'localdatetime'))
+      assert_match(/2009-02-08 20:03:32 UTC/, (doc.attr 'localdatetime'))
     ensure
       if old_source_date_epoch
         ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch

@@ -499,11 +499,9 @@ class Document < AbstractBlock
         localdate = attrs['localdate'] = (now.strftime '%F')
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
-      localtime = (attrs['localtime'] ||= begin
-          now.strftime '%T %Z'
-        rescue # Asciidoctor.js fails if timezone string has characters outside basic Latin (see asciidoctor.js#23)
-          now.strftime '%T %z'
-        end)
+      # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
+      # Ruby 1.8 doesn't support %:z
+      localtime = (attrs['localtime'] ||= now.strftime %(%T #{now.utc_offset == 0 ? 'UTC' : '%z'}))
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
       # docdate, doctime and docdatetime should default to
