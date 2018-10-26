@@ -373,47 +373,51 @@ module Asciidoctor
 
   # A collection of regular expressions used by the parser.
   #
-  # NOTE: The following pattern, which appears frequently, captures the
+  # NOTE The following pattern, which appears frequently, captures the
   # contents between square brackets, ignoring escaped closing brackets
   # (closing brackets prefixed with a backslash '\' character)
   #
-  #   Pattern: \[(|.*?[^\\])\]
+  #   Pattern: \[(|#{CC_ALL}*?[^\\])\]
   #   Matches: [enclosed text] and [enclosed [text\]], not [enclosed text \\] or [\\] (as these require a trailing space)
   #
+  # NOTE \w only matches ASCII word characters, whereas [[:word:]] or \p{Word} matches any character in the Unicode word category.
   #(pseudo)module Rx
 
     ## Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
     ## CC stands for "character class", CG stands for "character class group"
 
-    # NOTE \w matches only the ASCII word characters, whereas [[:word:]] or \p{Word} matches any character in the Unicode word category.
-
-    # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
-    if ::RUBY_MIN_VERSION_2
-      CC_ALPHA = CG_ALPHA = '\p{Alpha}'
-      CC_ALNUM = CG_ALNUM = '\p{Alnum}'
-      CC_ALL   = '.'
-      CG_BLANK = '\p{Blank}'
-      CC_EOL   = '$'
-      CC_WORD  = CG_WORD = '\p{Word}'
-    # character classes for the Regexp engine in Ruby < 2
+    if RUBY_ENGINE == 'opal'
+      CC_ANY = '[^\n]' unless defined? CC_ANY
     else
-      CC_ALPHA = '[:alpha:]'
-      CG_ALPHA = '[[:alpha:]]'
-      CC_ALL   = '.'
-      CC_ALNUM = '[:alnum:]'
-      CG_ALNUM = '[[:alnum:]]'
-      CC_EOL   = '$'
-      if ::RUBY_MIN_VERSION_1_9
-        CG_BLANK = '[[:blank:]]'
-        CC_WORD = '[:word:]'
-        CG_WORD = '[[:word:]]'
+      # CC_ALL is any character, including newlines (must be accompanied by multiline regexp flag)
+      CC_ALL = '.'
+      # CC_ANY is any character except newlines
+      CC_ANY = '.'
+      CC_EOL = '$'
+      # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
+      if ::RUBY_MIN_VERSION_2
+        CC_ALPHA = CG_ALPHA = '\p{Alpha}'
+        CC_ALNUM = CG_ALNUM = '\p{Alnum}'
+        CG_BLANK = '\p{Blank}'
+        CC_WORD  = CG_WORD = '\p{Word}'
+      # character classes for the Regexp engine in Ruby < 2
       else
-        # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
-        CG_BLANK = '[ \t]'
-        CC_WORD = '[:alnum:]_'
-        CG_WORD = '[[:alnum:]_]'
+        CC_ALPHA = '[:alpha:]'
+        CG_ALPHA = '[[:alpha:]]'
+        CC_ALNUM = '[:alnum:]'
+        CG_ALNUM = '[[:alnum:]]'
+        if ::RUBY_MIN_VERSION_1_9
+          CG_BLANK = '[[:blank:]]'
+          CC_WORD = '[:word:]'
+          CG_WORD = '[[:word:]]'
+        else
+          # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
+          CG_BLANK = '[ \t]'
+          CC_WORD = '[:alnum:]_'
+          CG_WORD = '[[:alnum:]_]'
+        end
       end
-    end unless RUBY_ENGINE == 'opal'
+    end
 
     ## Document header
 
@@ -436,7 +440,7 @@ module Asciidoctor
     #   v1.0, 2013-01-01: Ring in the new year release
     #   1.0, Jan 01, 2013
     #
-    RevisionInfoLineRx = /^(?:[^\d{]*(.*?),)? *(?!:)(.*?)(?: *(?!^),?: *(.*))?$/
+    RevisionInfoLineRx = /^(?:[^\d{]*(#{CC_ANY}*?),)? *(?!:)(#{CC_ANY}*?)(?: *(?!^),?: *(#{CC_ANY}*))?$/
 
     # Matches the title and volnum in the manpage doctype.
     #
@@ -445,7 +449,7 @@ module Asciidoctor
     #   = asciidoctor(1)
     #   = asciidoctor ( 1 )
     #
-    ManpageTitleVolnumRx = /^(.+?) *\( *(.+?) *\)$/
+    ManpageTitleVolnumRx = /^(#{CC_ANY}+?) *\( *(#{CC_ANY}+?) *\)$/
 
     # Matches the name and purpose in the manpage doctype.
     #
@@ -453,7 +457,7 @@ module Asciidoctor
     #
     #   asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     #
-    ManpageNamePurposeRx = /^(.+?) +- +(.+)$/
+    ManpageNamePurposeRx = /^(#{CC_ANY}+?) +- +(#{CC_ANY}+)$/
 
     ## Preprocessor directives
 
@@ -469,7 +473,7 @@ module Asciidoctor
     #   endif::basebackend-html[]
     #   endif::[]
     #
-    ConditionalDirectiveRx = /^(\\)?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,+])\S*?)?)\[(.+)?\]$/
+    ConditionalDirectiveRx = /^(\\)?(ifdef|ifndef|ifeval|endif)::(\S*?(?:([,+])\S*?)?)\[(#{CC_ANY}+)?\]$/
 
     # Matches a restricted (read as safe) eval expression.
     #
@@ -477,7 +481,7 @@ module Asciidoctor
     #
     #   "{asciidoctor-version}" >= "0.1.0"
     #
-    EvalExpressionRx = /^(.+?) *([=!><]=|[><]) *(.+)$/
+    EvalExpressionRx = /^(#{CC_ANY}+?) *([=!><]=|[><]) *(#{CC_ANY}+)$/
 
     # Matches an include preprocessor directive.
     #
@@ -486,7 +490,7 @@ module Asciidoctor
     #   include::chapter1.ad[]
     #   include::example.txt[lines=1;2;5..10]
     #
-    IncludeDirectiveRx = /^(\\)?include::([^\[][^\[]*)\[(.+)?\]$/
+    IncludeDirectiveRx = /^(\\)?include::([^\[][^\[]*)\[(#{CC_ANY}+)?\]$/
 
     # Matches a trailing tag directive in an include file.
     #
@@ -517,7 +521,7 @@ module Asciidoctor
     #                collapsing the line breaks and indentation to \
     #                a single space.
     #
-    AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(.*))?$/
+    AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(#{CC_ANY}*))?$/
 
     # Matches invalid characters in an attribute name.
     InvalidAttributeNameCharsRx = /[^-#{CC_WORD}]/
@@ -531,7 +535,7 @@ module Asciidoctor
     #   pass:a[{a} {b} {c}]
     #
     if RUBY_ENGINE == 'opal'
-      # In JavaScript, ^ and $ match the boundaries of the string when the m flag is not set
+      # NOTE In JavaScript, ^ and $ match the boundaries of the string when the m flag is not set
       AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[([\S\s]*)\]$/
     else
       AttributeEntryPassMacroRx = /\Apass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]\Z/m
@@ -546,7 +550,7 @@ module Asciidoctor
     #   {set:foo:bar}
     #   {set:name!}
     #
-    AttributeReferenceRx = /(\\)?\{(#{CG_WORD}[-#{CC_WORD}]*|(set|counter2?):.+?)(\\)?\}/
+    AttributeReferenceRx = /(\\)?\{(#{CG_WORD}[-#{CC_WORD}]*|(set|counter2?):#{CC_ANY}+?)(\\)?\}/
 
     ## Paragraphs and delimited blocks
 
@@ -557,7 +561,7 @@ module Asciidoctor
     #   [[idname]]
     #   [[idname,Reference Text]]
     #
-    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+))?)\]\]$/
+    BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+))?)\]\]$/
 
     # Matches an attribute list above a block element.
     #
@@ -572,12 +576,12 @@ module Asciidoctor
     #   # as attribute reference
     #   [{lead}]
     #
-    BlockAttributeListRx = /^\[(|[#{CC_WORD}.#%{,"'].*)\]$/
+    BlockAttributeListRx = /^\[(|[#{CC_WORD}.#%{,"']#{CC_ANY}*)\]$/
 
     # A combined pattern that matches either a block anchor or a block attribute list.
     #
     # TODO this one gets hit a lot, should be optimized as much as possible
-    BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"'].*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}:.-]*(?:, *.+)?)\])\]$/
+    BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"']#{CC_ANY}*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}:.-]*(?:, *#{CC_ANY}+)?)\])\]$/
 
     # Matches a title above a block.
     #
@@ -585,7 +589,7 @@ module Asciidoctor
     #
     #   .Title goes here
     #
-    BlockTitleRx = /^\.(\.?[^ \t.].*)$/
+    BlockTitleRx = /^\.(\.?[^ \t.]#{CC_ANY}*)$/
 
     # Matches an admonition label at the start of a paragraph.
     #
@@ -602,7 +606,7 @@ module Asciidoctor
     #
     #   <SPACE>Foo
     #   <TAB>Foo
-    LiteralParagraphRx = /^([ \t]+.*)$/
+    LiteralParagraphRx = /^([ \t]+#{CC_ANY}*)$/
 
     # Matches a comment block.
     #
@@ -634,14 +638,14 @@ module Asciidoctor
     #   == Foo ==
     #   // ^ also a level 1 (h2) section title
     #
-    AtxSectionTitleRx = /^(=={0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
+    AtxSectionTitleRx = /^(=={0,5})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
 
     # Matches an extended Atx section title that includes support for the Markdown variant.
-    ExtAtxSectionTitleRx = /^(=={0,5}|#\#{0,5})[ \t]+(.+?)(?:[ \t]+\1)?$/
+    ExtAtxSectionTitleRx = /^(=={0,5}|#\#{0,5})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
 
     # Matches the title only (first line) of an Setext (two-line) section title.
     # The title cannot begin with a dot and must have at least one alphanumeric character.
-    SetextSectionTitleRx = /^((?!\.).*?#{CG_WORD}.*)$/
+    SetextSectionTitleRx = /^((?!\.)#{CC_ANY}*?#{CG_WORD}#{CC_ANY}*)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #
@@ -650,7 +654,7 @@ module Asciidoctor
     #   Section Title [[idname]]
     #   Section Title [[idname,Reference Text]]
     #
-    InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+))?\]\]$/
+    InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+))?\]\]$/
 
     # Matches invalid ID characters in a section title.
     #
@@ -663,7 +667,7 @@ module Asciidoctor
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
     # IMPORTANT if this regexp does not agree with the regexp for each list type, the parser will hang.
-    AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/]).*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
+    AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/])#{CC_ANY}*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -673,7 +677,7 @@ module Asciidoctor
     #   - Foo
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    UnorderedListRx = /^[ \t]*(-|\*\**|\u2022)[ \t]+(.*)$/
+    UnorderedListRx = /^[ \t]*(-|\*\**|\u2022)[ \t]+(#{CC_ANY}*)$/
 
     # Matches an ordered list item (explicit numbering or up to 5 consecutive dots).
     #
@@ -689,7 +693,7 @@ module Asciidoctor
     #
     # NOTE leading space match is not always necessary, but is used for list reader
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    OrderedListRx = /^[ \t]*(\.\.*|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(.*)$/
+    OrderedListRx = /^[ \t]*(\.\.*|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]+(#{CC_ANY}*)$/
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
@@ -725,15 +729,15 @@ module Asciidoctor
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     # NOTE must skip line comment when looking for next list item inside list
-    DescriptionListRx = %r(^(?!//[^/])[ \t]*(.*?)(:::{0,2}|;;)(?:$|[ \t]+(.*)$))
+    DescriptionListRx = %r(^(?!//[^/])[ \t]*(#{CC_ANY}*?)(:::{0,2}|;;)(?:$|[ \t]+(#{CC_ANY}*)$))
 
     # Matches a sibling description list item (which does not include the type in the key).
     # NOTE must skip line comment when looking for sibling list item
     DescriptionListSiblingRx = {
-      '::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(::)(?:$|[ \t]+(.*)$)),
-      ':::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(:::)(?:$|[ \t]+(.*)$)),
-      '::::' => %r(^(?!//[^/])[ \t]*(.*[^:]|)(::::)(?:$|[ \t]+(.*)$)),
-      ';;' => %r(^(?!//[^/])[ \t]*(.*?)(;;)(?:$|[ \t]+(.*)$))
+      '::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      ':::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(:::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      '::::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(::::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      ';;' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$))
     }
 
     # Matches a callout list item.
@@ -747,7 +751,7 @@ module Asciidoctor
     #   <.> Explanation with automatic number
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
-    CalloutListRx = /^<(\d+|\.)>[ \t]+(.*)$/
+    CalloutListRx = /^<(\d+|\.)>[ \t]+(#{CC_ANY}*)$/
 
     # Matches a callout reference inside literal text.
     #
@@ -806,7 +810,7 @@ module Asciidoctor
     #
     #--
     # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-    CustomBlockMacroRx = /^(#{CG_WORD}[-#{CC_WORD}]*)::(|\S|\S.*?\S)\[(.+)?\]$/
+    CustomBlockMacroRx = /^(#{CG_WORD}[-#{CC_WORD}]*)::(|\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
     # Matches an image, video or audio block macro.
     #
@@ -815,7 +819,7 @@ module Asciidoctor
     #   image::filename.png[Caption]
     #   video::http://youtube.com/12345[Cats vs Dogs]
     #
-    BlockMediaMacroRx = /^(image|video|audio)::(\S|\S.*?\S)\[(.+)?\]$/
+    BlockMediaMacroRx = /^(image|video|audio)::(\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
     # Matches the TOC block macro.
     #
@@ -824,7 +828,7 @@ module Asciidoctor
     #   toc::[]
     #   toc::[levels=2]
     #
-    BlockTocMacroRx = /^toc::\[(.+)?\]$/
+    BlockTocMacroRx = /^toc::\[(#{CC_ANY}+)?\]$/
 
     ## Inline macros
 
@@ -837,13 +841,13 @@ module Asciidoctor
     #   anchor:idname[]
     #   anchor:idname[Reference Text]
     #
-    InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\]))/
+    InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(#{CC_ANY}*?[^\\])\]))/
 
     # Scans for a non-escaped anchor (i.e., id + optional reference text) in the flow of text.
-    InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(.*?[^\\])\])/
+    InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(#{CC_ANY}*?[^\\])\])/
 
     # Scans for a leading, non-escaped anchor (i.e., id + optional reference text).
-    LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]/
+    LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]/
 
     # Matches a bibliography anchor at the start of the list item text (in a bibliography list).
     #
@@ -851,7 +855,7 @@ module Asciidoctor
     #
     #   [[[Fowler_1997]]] Fowler M. ...
     #
-    InlineBiblioAnchorRx = /^\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(.+?))?\]\]\]/
+    InlineBiblioAnchorRx = /^\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]\]/
 
     # Matches an inline e-mail address.
     #
@@ -1016,9 +1020,10 @@ module Asciidoctor
     #   Humpty Dumpty had a great fall.
     #
     if RUBY_ENGINE == 'opal'
-      # NOTE In Ruby, ^ and $ always match start and end of line, respectively; JavaScript only does so in multiline mode
-      HardLineBreakRx = /^(.*) \+$/m
+      # NOTE In JavaScript, ^ and $ only match the start and end of line if the multiline flag is present
+      HardLineBreakRx = /^(#{CC_ANY}*) \+$/m
     else
+      # NOTE In Ruby, ^ and $ always match start and end of line
       HardLineBreakRx = /^(.*) \+$/
     end
 
