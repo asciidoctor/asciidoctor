@@ -3028,6 +3028,23 @@ puts 'Hello, World!'
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
+    test 'should set starting line number in DocBook output if linenums option is enabled and start attribute is set' do
+      input = <<-EOS
+[source%linenums,java,start=3]
+----
+public class HelloWorld {
+  public static void main(String[] args) {
+    out.println("Hello, World!");
+  }
+}
+----
+      EOS
+
+      output = convert_string_to_embedded input, :backend => :docbook, :safe => Asciidoctor::SafeMode::SAFE
+      assert_css 'programlisting[startinglinenumber]', output, 1
+      assert_css 'programlisting[startinglinenumber="3"]', output, 1
+    end
+
     test 'should highlight lines specified in highlight attribute if linenums is set and source-highlighter is coderay' do
       %w(highlight="1,4-6" highlight=1;4..6 highlight=1;4..;!7).each do |highlight_attr|
         input = <<-EOS
