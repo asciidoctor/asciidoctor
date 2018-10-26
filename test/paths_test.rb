@@ -347,11 +347,11 @@ context 'Path Resolver' do
       assert_equal 'part1/chapter1/section1.adoc', @resolver.relative_path(filename, JAIL)
     end
 
-    test 'should resolve relative path to filename if does not share common root with base directory' do
-      filename = '/docs/partials'
+    test 'should resolve relative path to filename outside of base directory' do
+      filename = '/home/shared/partials'
       base_dir = '/home/user/docs'
       result = @resolver.relative_path filename, base_dir
-      assert_equal filename, result
+      assert_equal '../../shared/partials', result
     end
 
     test 'should resolve relative path relative to base dir in unsafe mode' do

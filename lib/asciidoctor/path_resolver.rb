@@ -214,7 +214,15 @@ class PathResolver
   #
   # Return the [String] relative path of the specified path calculated from the base directory.
   def relative_path path, base
-    (root? path) && (offset = descends_from? path, base) ? (path.slice offset, path.length) : path
+    if root? path
+      if (offset = descends_from? path, base)
+        path.slice offset, path.length
+      else
+        (Pathname.new path).relative_path_from(Pathname.new base).to_s
+      end
+    else
+      path
+    end
   end
 
   # Public: Normalize path by converting any backslashes to forward slashes

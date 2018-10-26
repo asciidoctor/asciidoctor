@@ -800,6 +800,21 @@ See <<test.adoc#foobaz>>.
     end
   end
 
+  test 'should produce an internal anchor for inter-document xref to file outside of base directory' do
+    input = <<-EOS
+= Document Title
+
+See <<../section-a.adoc#section-a>>.
+
+include::../section-a.adoc[]
+    EOS
+
+    doc = document_from_string input, :safe => :unsafe, :base_dir => (File.join fixturedir, 'subdir')
+    assert_includes doc.catalog[:includes], '../section-a'
+    output = doc.convert :header_footer => false
+    assert_xpath '//a[@href="#section-a"][text()="Section A"]', output, 1
+  end
+
   test 'xref uses title of target as label for forward and backward references in html output' do
     input = <<-EOS
 == Section A

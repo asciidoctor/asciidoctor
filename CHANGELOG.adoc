@@ -61,6 +61,7 @@ Fixes::
   * don't eagerly apply subs to inline attributes in general
   * make sure encoding of output file is UTF-8
   * prevent warning about invalid `:asciidoc` option when using custom templates with Slim 4 (#2928)
+  * use Pathname#relative_path_from to compute relative path to file outside of base directory (#2108)
 
 Improvements::
 
