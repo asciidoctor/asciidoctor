@@ -1,6 +1,6 @@
 name: asciidoc
 title: AsciiDoc
-version: '1.5.7'
+version: '1.5'
 nav:
 - modules/ROOT/nav.adoc
 - modules/attributes/nav.adoc
