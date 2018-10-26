@@ -133,6 +133,9 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: The Author class represents information about an author extracted from document attributes
+  Author = ::Struct.new :name, :firstname, :middlename, :lastname, :initials, :email
+
   # Public A read-only integer value indicating the level of security that
   # should be enforced while processing this document. The value must be
   # set in the Document constructor using the :safe option.
@@ -750,6 +753,27 @@ class Document < AbstractBlock
   # returns the full name of the author as a String
   def author
     @attributes['author']
+  end
+
+  # Public: Convenience method to retrieve the authors of this document as an Array of Author objects.
+  #
+  # This method is backed by the author-related attributes on the document.
+  #
+  # returns the authors of this document as an Array
+  def authors
+    if (attrs = @attributes).key? 'author'
+      authors = [(Author.new attrs['author'], attrs['firstname'], attrs['middlename'], attrs['lastname'], attrs['authorinitials'], attrs['email'])]
+      if (num_authors = attrs['authorcount'] || 0) > 1
+        idx = 1
+        while idx < num_authors
+          idx += 1
+          authors << (Author.new attrs[%(author_#{idx})], attrs[%(firstname_#{idx})], attrs[%(middlename_#{idx})], attrs[%(lastname_#{idx})], attrs[%(authorinitials_#{idx})], attrs[%(email_#{idx})])
+        end
+      end
+      authors
+    else
+      []
+    end
   end
 
   # Public: Convenience method to retrieve the document attribute 'revdate'

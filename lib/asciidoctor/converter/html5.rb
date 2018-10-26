@@ -141,19 +141,11 @@ module Asciidoctor
           if node.has_header?
             result << %(<h1>#{node.header.title}</h1>) unless node.notitle
             details = []
-            if node.attr? 'author'
-              details << %(<span id="author" class="author">#{node.attr 'author'}</span>#{br})
-              if node.attr? 'email'
-                details << %(<span id="email" class="email">#{node.sub_macros(node.attr 'email')}</span>#{br})
-              end
-              if (authorcount = (node.attr 'authorcount').to_i) > 1
-                (2..authorcount).each do |idx|
-                  details << %(<span id="author#{idx}" class="author">#{node.attr "author_#{idx}"}</span>#{br})
-                  if node.attr? %(email_#{idx})
-                    details << %(<span id="email#{idx}" class="email">#{node.sub_macros(node.attr "email_#{idx}")}</span>#{br})
-                  end
-                end
-              end
+            idx = 1
+            node.authors.each do |author|
+              details << %(<span id="author#{idx > 1 ? idx : ''}" class="author">#{author.name}</span>#{br})
+              details << %(<span id="email#{idx > 1 ? idx : ''}" class="email">#{node.sub_macros author.email}</span>#{br}) if author.email
+              idx += 1
             end
             if node.attr? 'revnumber'
               details << %(<span id="revnumber">#{((node.attr 'version-label') || '').downcase} #{node.attr 'revnumber'}#{(node.attr? 'revdate') ? ',' : ''}</span>)
