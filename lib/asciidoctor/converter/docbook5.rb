@@ -36,9 +36,12 @@ class Converter::DocBook5Converter < Converter::Base
     lang_attribute = (node.attr? 'nolang') ? '' : %( xml:lang="#{node.attr 'lang', 'en'}")
     result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{_common_attributes node.id}>)
     result << (_document_info_tag node) unless node.noheader
+    unless (docinfo_content = node.docinfo :header).empty?
+      result << docinfo_content
+    end
     result << node.content if node.blocks?
-    unless (footer_docinfo = node.docinfo :footer).empty?
-      result << footer_docinfo
+    unless (docinfo_content = node.docinfo :footer).empty?
+      result << docinfo_content
     end
     result << %(</#{root_tag_name}>)
     result.join LF
@@ -709,10 +712,10 @@ class Converter::DocBook5Converter < Converter::Base
           result << front_cover_tag
         end
       end
-      unless (head_docinfo = doc.docinfo).empty?
-        result << head_docinfo
-      end
       result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
+      unless (docinfo_content = doc.docinfo).empty?
+        result << docinfo_content
+      end
     end
     result << '</info>'
 

@@ -121,6 +121,10 @@ class Converter::Html5Converter < Converter::Base
     body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
     result << %(<body #{body_attrs.join ' '}>)
 
+    unless (docinfo_content = node.docinfo :header).empty?
+      result << docinfo_content
+    end
+
     unless node.noheader
       result << '<div id="header">'
       if node.doctype == 'manpage'

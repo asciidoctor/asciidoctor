@@ -1,0 +1,26 @@
+<info>
+<title>{doctitle}</title>
+<date>{docdate}</date>
+<author>
+<personname>
+<firstname>{firstname}</firstname>
+<surname>{lastname}</surname>
+</personname>
+<email>{email}</email>
+</author>
+<authorinitials>{authorinitials}</authorinitials>
+<revhistory>
+<revision>
+<revnumber>1.0</revnumber>
+<date>2000-01-01</date>
+<authorinitials>jwz</authorinitials>
+<revremark>New millennium, new release.</revremark>
+</revision>
+<revision>
+<revnumber>2.0</revnumber>
+<date>2010-12-25</date>
+<authorinitials>why</authorinitials>
+<revremark>Why not? A new release.</revremark>
+</revision>
+</revhistory>
+</info>
