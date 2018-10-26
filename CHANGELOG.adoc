@@ -32,6 +32,7 @@ Enhancements::
   * colspecs can be separated by semi-colon instead of comma (#2798)
   * change AbstractBlock#find_by to respond to StopIteration exception; stop traversal after matching ID (#2900)
   * change AbstractBlock#find_by to honor return values :skip and :skip_children from filter block to skip node and its descendants or just its descendants, respectively (#2067)
+  * add API to retrieve authors as array; use API in converters (#1042) (*@mogztter*)
 
 Fixes::
 
