@@ -1,11 +1,5 @@
 = Sidebar Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-sidebar.adoc, included in:
-- user-manual: sidebar
-////
+// sidebar.adoc, included in user-manual: sidebar
 
 Use a sidebar for ancillary content that doesn't fit into the flow of the document's narrative.
 

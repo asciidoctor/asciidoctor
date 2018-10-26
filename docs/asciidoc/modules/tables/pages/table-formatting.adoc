@@ -1,7 +1,4 @@
 = Table Width, Borders and Orientation
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // table-formatting.adoc, included in user-manual: tables: header
 
 == Table width

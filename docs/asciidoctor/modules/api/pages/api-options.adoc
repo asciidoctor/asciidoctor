@@ -1,7 +1,4 @@
 = Asciidoctor Ruby API Options
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // from ruby-api-options.adco
 // um anchor: appendix#ruby-api-options
 

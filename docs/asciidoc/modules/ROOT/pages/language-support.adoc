@@ -1,7 +1,4 @@
 = Language Support
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-docbook-i8n: http://www.sagehill.net/docbookxsl/Localizations.html
 :url-lang-attributes: {url-org}/asciidoctor/blob/master/data/locale/attributes.adoc
 // um anchor: language-support

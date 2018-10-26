@@ -1,7 +1,4 @@
 = Process Multiple Source Files from the CLI
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 process-multi.adoc, included in:
 - user-manual: Process multiple source files from the CLI

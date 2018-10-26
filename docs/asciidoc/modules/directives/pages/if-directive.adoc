@@ -1,7 +1,4 @@
 = If Conditional Preprocessor Directives
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // conditional-preprocessor-directives.adoc
 
 You can include or exclude lines of text in your document using one of the following conditional preprocessor directives:

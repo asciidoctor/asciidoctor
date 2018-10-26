@@ -1,7 +1,4 @@
 = Document to Document Cross References
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 //xref-interdoc.adoc, included in user-manual: Inter-document cross references
 
 The inline xref macro can also link to IDs in other AsciiDoc documents.

@@ -1,7 +1,4 @@
 = CodeRay and Pygments Stylesheets
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // um anchor: hl-css
 // html-code-styles.adoc, included in convert-documents and the user-manual.
 

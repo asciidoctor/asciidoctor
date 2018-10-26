@@ -1,7 +1,4 @@
 = Set Global Attributes on a Document
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 attr-doc.adoc, included in:
 - user-manual: Attributes: Setting attributes on a document

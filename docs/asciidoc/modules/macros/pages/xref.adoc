@@ -1,7 +1,4 @@
 = Cross References
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // direct for um, um anchor: xref
 
 A link to another location within the current AsciiDoc document or in another AsciiDoc document is called a [.term]_cross reference_ (also referred to as an [.term]_xref_).

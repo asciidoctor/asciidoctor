@@ -1,7 +1,4 @@
 = Include Processor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 exten-include.adoc, included in:
 - user-manual: Extensions: Include processor example

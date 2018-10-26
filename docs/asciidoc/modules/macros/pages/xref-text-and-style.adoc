@@ -1,7 +1,4 @@
 = Cross Reference Text and Styles
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // xrefstyle.adoc, included in user-manual: Customizing the Cross Reference
 
 Starting in Asciidoctor 1.5.6, when you use one of the native converters (HTML, PDF, and EPUB3), you can customize the style of the automatic cross reference text using the `xrefstyle` document attribute.

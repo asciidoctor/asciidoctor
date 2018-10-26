@@ -1,12 +1,5 @@
 = Counters
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-Included in:
-- user-manual: Counters
-////
-
+// Included in user-manual: Counters
 // document attributes and counters are NOT the same thing, but modifying a document attribute with the same name as the counter modifies the counter at the same time.
 
 Counters are used to store and display ad-hoc sequences of numbers or latin characters.

@@ -1,7 +1,4 @@
 = Migrate from Confluence XHTML
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-pandoc: https://pandoc.org
 
 You can convert Atlassian Confluence XHTML pages to Asciidoctor using this Groovy script.

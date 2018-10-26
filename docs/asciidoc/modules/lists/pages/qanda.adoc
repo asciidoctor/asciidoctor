@@ -1,7 +1,4 @@
 = Question and Answer Lists
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: Q&A, Q and A
 //dlist-qa.adic file, included in user-manual: Question and answer style list
 

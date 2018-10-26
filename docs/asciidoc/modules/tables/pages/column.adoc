@@ -1,7 +1,4 @@
 = Table Columns
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // table-cols.adoc, included in um: tables: columns
 
 [#cols]

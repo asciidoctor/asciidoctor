@@ -1,9 +1,6 @@
 = Blocks
 // This page will become the index for the blocks section
 //Quotes, Prose Excerpts and Verses
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // quote.adoc, included in um: Quote
 
 // tag::intro[]

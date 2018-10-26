@@ -1,7 +1,4 @@
 = Parts and Chapters
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // from file book-parts.adoc
 // anchor from user manual: book-parts-and-chapters
 

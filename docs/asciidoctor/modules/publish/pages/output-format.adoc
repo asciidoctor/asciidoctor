@@ -1,7 +1,4 @@
 = Processing Your Content
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // partinro from Processing your content and all content from output-format.adoc and HTML
 // output-format.adoc is included in convert-documents and the user-manual
 

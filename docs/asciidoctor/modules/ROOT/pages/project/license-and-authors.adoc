@@ -1,8 +1,5 @@
 = License
 //License and Contributors
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-license: {url-org}/asciidoctor/blob/master/LICENSE
 :mojavelinux: https://github.com/mojavelinux
 :erebor: https://github.com/erebor

@@ -1,7 +1,4 @@
 = Migrate from MS Word
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :description: This document presents various tools and strategies for migrating from MS Word to AsciiDoc.
 :url-pandoc: https://pandoc.org
 :url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/

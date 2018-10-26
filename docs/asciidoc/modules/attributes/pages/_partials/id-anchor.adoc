@@ -1,7 +1,4 @@
 = Define an ID
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: anchordef
 xref-anchor.adoc, included in:

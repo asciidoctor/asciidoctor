@@ -1,7 +1,4 @@
 = Unordered Lists
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: bulleted list
 ////
 From first p to nested section, included in:

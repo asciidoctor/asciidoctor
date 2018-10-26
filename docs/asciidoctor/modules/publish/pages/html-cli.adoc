@@ -1,7 +1,4 @@
 = Convert to HTML using the CLI
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // html-command-line.adoc, included in convert-documents and user-manual
 
 == HTML

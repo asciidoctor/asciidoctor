@@ -1,7 +1,4 @@
 = Register Extensions
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // exten-point.adoc, included in user-manual: Extensions: Extension Points
 // Here are the extension points that are available in Asciidoctor 0.1.4.
 

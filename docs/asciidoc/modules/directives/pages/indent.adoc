@@ -1,7 +1,4 @@
 = Normalize Block Indentation
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 aka Normalize Block Indentation
 From indent-include.adoc, included in:

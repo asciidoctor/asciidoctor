@@ -1,7 +1,4 @@
 = Get Asciidoctor
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :release-version: 1.5.7
 
 Asciidoctor operates on macOS, Windows, and Linux.

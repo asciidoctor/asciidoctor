@@ -1,7 +1,4 @@
 = Formatting Marks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 
 There are two categories of formatting marks for applying styles (i.e., formatting) to text, _constrained_ and _unconstrained_.
 These formatting marks are referred to as _quotes_ in the AsciiDoc syntax.

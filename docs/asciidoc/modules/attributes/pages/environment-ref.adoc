@@ -1,7 +1,4 @@
 = Environment Attributes Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-epoch: https://reproducible-builds.org/specs/source-date-epoch
 ////
 doc anchor: env-attributes

@@ -1,7 +1,4 @@
 = Docinfo Files
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-docbook-info-ref: http://www.docbook.org/tdg5/en/html/info.html
 :url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/master/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
 // um anchor: docinfo-file

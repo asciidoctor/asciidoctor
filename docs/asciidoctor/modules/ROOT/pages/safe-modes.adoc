@@ -1,11 +1,5 @@
 = Run Securely with Safe Modes
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-secure.adoc, included in:
-- user-manual: Running Asciidoctor Securely
-////
+// secure.adoc, included in user-manual: Running Asciidoctor Securely
 
 Asciidoctor provides security levels that control the read and write access of attributes, the include directive, macros, and scripts while a document is processing.
 Each level includes the restrictions enabled in the prior security level.

@@ -1,7 +1,4 @@
 = Preface Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: front matter, forward, introduction, proem, pref
 // anchor from um: user-preface
 

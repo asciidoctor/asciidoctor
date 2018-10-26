@@ -1,7 +1,4 @@
 = Section Levels and Titles
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 This is a new page extracted from sections.adoc.
 The tag "intro" begins on that page, at "Sections partition the document into a content hierarchy." and ends on this page right before Titles as HTML headings.

@@ -1,7 +1,4 @@
 = Source Code Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: source code snippets
 ////
 From src.adoc, included in:

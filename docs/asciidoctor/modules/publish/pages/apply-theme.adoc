@@ -1,7 +1,4 @@
 = Apply a Custom Theme
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 apply-theme.adoc, included in:
 - user-manual

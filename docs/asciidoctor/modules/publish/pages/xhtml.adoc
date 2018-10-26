@@ -1,7 +1,4 @@
 = XHTML
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // xhtml.adoc, included in convert-documents and user-manual
 
 To convert AsciiDoc to XHTML, set the backend to `xhtml5`.

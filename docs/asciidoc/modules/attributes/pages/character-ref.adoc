@@ -1,7 +1,4 @@
 = Character Replacement Attributes Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 attrs-charref.adoc
 doc anchor: charref-attributes

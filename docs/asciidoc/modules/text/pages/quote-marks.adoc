@@ -1,7 +1,4 @@
 = Quotation Marks and Apostrophes
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 um anchor: curved
 text-quote-apos.adoc, included in:

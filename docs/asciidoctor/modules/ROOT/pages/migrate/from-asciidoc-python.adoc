@@ -1,7 +1,4 @@
 = Migrate from AsciiDoc.py to Asciidoctor
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-diagram: {url-org}/asciidoctor-diagram
 :url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: https://github.com/asciidoctor/asciidoctor-doctest

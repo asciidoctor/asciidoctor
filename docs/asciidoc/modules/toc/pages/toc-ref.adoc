@@ -1,7 +1,4 @@
 = Table of Contents Syntax and Attributes Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // sum-toc.adoc
 
 [cols="1m,1,2,2,1"]

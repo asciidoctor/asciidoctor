@@ -1,11 +1,6 @@
 = Table of Contents
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-um anchor: user-toc
-toc-intro.adoc
-////
+// um anchor: user-toc
+// toc-intro.adoc
 
 A table of contents (TOC) is an index of section and subsection titles that is automatically generated from the document's structure.
 

@@ -1,7 +1,4 @@
 = Preprocessor Extension Example
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 exten-pre.adoc,Included in:
 - user-manual: Extensions: Preprocessor example

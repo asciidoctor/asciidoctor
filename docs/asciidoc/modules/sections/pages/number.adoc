@@ -1,7 +1,4 @@
 = Section Numbers
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // New page, content taken from sections.adoc
 
 == Turn on section numbers

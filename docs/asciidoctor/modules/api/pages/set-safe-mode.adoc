@@ -1,11 +1,5 @@
 = Set the Safe Mode Using the API
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-secure-api.adoc, included in:
-- user-manual: Running Asciidoctor Securely: Set the safe mode in the API
-////
+// secure-api.adoc, included in user-manual: Running Asciidoctor Securely: Set the safe mode in the API
 
 The default xref:ROOT:safe-modes.adoc[safe level] in the API is `SECURE`.
 

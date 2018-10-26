@@ -1,7 +1,4 @@
 = Colophon Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :keywords: edition notice, impressum, masthead, imprint, disclosure, imprint
 
 Book colophons list information such as the ISBN, publishing house, edition and copyright dates, legal notices and disclaimers, cover art, book layout credits, and any significant production notes.

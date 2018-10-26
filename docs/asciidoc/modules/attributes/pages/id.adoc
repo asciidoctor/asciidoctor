@@ -1,9 +1,5 @@
 = The ID Attribute
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // from attr-style.adoc
-
 
 The id attribute specifies a unique name for an element.
 That name can only be used once in a document.

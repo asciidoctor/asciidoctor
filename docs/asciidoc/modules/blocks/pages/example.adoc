@@ -1,7 +1,4 @@
 = Example Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // example.adoc, included in user-manual
 
 == Example block sytax

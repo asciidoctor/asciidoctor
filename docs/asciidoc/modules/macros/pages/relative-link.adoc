@@ -1,7 +1,4 @@
 = Link to Relative Files
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 ////
 url-relative.adoc, included in:
 - user-manual: relative links

@@ -1,7 +1,4 @@
 = Index Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // anchor from um: user-index
 
 You can mark index terms explicitly in AsciiDoc content.

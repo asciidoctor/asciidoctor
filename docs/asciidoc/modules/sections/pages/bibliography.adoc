@@ -1,7 +1,4 @@
 = Bibliography Section Style
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // biblio.adoc
 // anchor from um: user-biblio
 

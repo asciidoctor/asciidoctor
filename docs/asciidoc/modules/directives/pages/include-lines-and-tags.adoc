@@ -1,7 +1,4 @@
 = Include Content Selected by Lines or Tags
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // aka Select Portions of a Document to Include
 // include-lines-tags.adoc, included in user manual
 

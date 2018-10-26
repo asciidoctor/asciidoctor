@@ -1,11 +1,5 @@
 = Set, Assign, and Reference Attributes
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-attr-use.adoc, included in:
-- user-manual: Using attributes: set, assign, and reference
-////
+// attr-use.adoc, included in: user-manual: Using attributes: set, assign, and reference
 
 == Set an attribute and assign it a value
 

@@ -1,11 +1,5 @@
 = Literal Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
-////
-literal.adoc, included in:
-- user-manual: Literal Text and Blocks
-////
+// literal.adoc, included in user-manual: Literal Text and Blocks
 
 Literal blocks display the text you write exactly as you enter it.
 Literal text is treated as preformatted text.

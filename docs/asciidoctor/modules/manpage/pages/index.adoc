@@ -1,7 +1,4 @@
 = Man Pages
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-man7: http://man7.org/linux/man-pages/man7/roff.7.html
 :url-docbook-refmisc: https://www.docbook.org/tdg5/en/html/refmiscinfo.html
 :url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc

@@ -1,7 +1,4 @@
 = Document Attributes Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :y: Yes
 :n: No
 :en: &#8211;

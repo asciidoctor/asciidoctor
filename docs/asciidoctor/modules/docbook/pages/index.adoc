@@ -1,7 +1,4 @@
 = DocBook
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 :url-yelp: https://wiki.gnome.org/action/show/Apps/Yelp
 // docbook.adoc
 

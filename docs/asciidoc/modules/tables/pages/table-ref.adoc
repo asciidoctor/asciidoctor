@@ -1,7 +1,4 @@
 = Table Syntax and Attribute Reference
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // sum-table.adoc
 
 [cols="1m,2,1m,2,2"]

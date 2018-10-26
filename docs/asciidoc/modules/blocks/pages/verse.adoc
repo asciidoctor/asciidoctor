@@ -1,7 +1,4 @@
 = Verse Blocks
-ifndef::env-site,env-github[]
-include::_attributes.adoc[]
-endif::[]
 // verse.adoc, included in user-manual: verse
 
 == Verse syntax
