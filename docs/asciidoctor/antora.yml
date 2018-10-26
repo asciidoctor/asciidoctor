@@ -1,6 +1,6 @@
 name: asciidoctor
 title: Asciidoctor
-version: '1.5.7'
+version: '1.5'
 nav:
 - modules/setup/nav.adoc
 - modules/cli/nav.adoc
