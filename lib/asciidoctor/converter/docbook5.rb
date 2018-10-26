@@ -220,9 +220,17 @@ module Asciidoctor
     def listing node
       informal = !node.title?
       listing_attributes = (common_attributes node.id, node.role, node.reftext)
-      if node.style == 'source' && (node.attr? 'language')
-        numbering = (node.attr? 'linenums', nil, false) ? 'numbered' : 'unnumbered'
-        listing_content = %(<programlisting#{informal ? listing_attributes : ''} language="#{node.attr 'language', '', false}" linenumbering="#{numbering}">#{node.content}</programlisting>)
+      if node.style == 'source' && ((attrs = node.attributes).key? 'language')
+        if attrs.key? 'linenums'
+          if attrs.key? 'start'
+            numbering_attributes = %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}")
+          else
+            numbering_attributes = ' linenumbering="numbered"'
+          end
+        else
+          numbering_attributes = ' linenumbering="unnumbered"'
+        end
+        listing_content = %(<programlisting#{informal ? listing_attributes : ''} language="#{attrs['language']}"#{numbering_attributes}>#{node.content}</programlisting>)
       else
         listing_content = %(<screen#{informal ? listing_attributes : ''}>#{node.content}</screen>)
       end
