@@ -1477,16 +1477,19 @@ module Substitutors
     case highlighter
     when 'coderay'
       if (linenums_mode = (attr? 'linenums', nil, false) ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
+        start = 1 if (start = (attr 'start', nil, 1).to_i) < 1
         if attr? 'highlight', nil, false
           highlight_lines = resolve_lines_to_highlight source, (attr 'highlight', nil, false)
         end
       end
       result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
-          :css => (@document.attributes['coderay-css'] || :class).to_sym,
-          :line_numbers => linenums_mode,
-          :line_number_anchors => false,
-          :highlight_lines => highlight_lines,
-          :bold_every => false}].highlight source
+        :css => (@document.attributes['coderay-css'] || :class).to_sym,
+        :line_numbers => linenums_mode,
+        :line_number_start => start,
+        :line_number_anchors => false,
+        :highlight_lines => highlight_lines,
+        :bold_every => false
+      }].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
       opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :stripnl => false }
@@ -1502,7 +1505,8 @@ module Substitutors
       end
       # NOTE highlight can return nil if something goes wrong; fallback to source if this happens
       # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-      if (attr? 'linenums', nil, false) && (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
+      if (attr? 'linenums', nil, false) && (opts[:linenostart] = (start = attr 'start', 1, false).to_i < 1 ? 1 : start) &&
+          (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
         linenums_mode = :table
         if (result = lexer.highlight source, :options => opts)
           result = (result.sub PygmentsWrapperDivRx, '\1').gsub PygmentsWrapperPreRx, '\1'

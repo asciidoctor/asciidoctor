@@ -3028,6 +3028,21 @@ puts 'Hello, World!'
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
+    test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
+      input = <<-EOS
+:source-highlighter: coderay
+:coderay-linenums-mode: inline
+
+[source%linenums,ruby,start=10]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      assert_xpath '//span[@class="line-numbers"]', output, 1
+      assert_xpath '//span[@class="line-numbers"][text()="10"]', output, 1
+    end
+
     test 'should set starting line number in DocBook output if linenums option is enabled and start attribute is set' do
       input = <<-EOS
 [source%linenums,java,start=3]
