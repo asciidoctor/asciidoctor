@@ -848,7 +848,9 @@ context 'Substitutions' do
 
       using_memory_logger do |logger|
         sect = block_from_string input, :attributes => { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, :safe => :server, :catalog_assets => true
-        assert_includes sect.document.catalog[:images], 'fixtures/dot.gif'
+        assert 1, sect.document.catalog[:images].size
+        assert_equal 'fixtures/dot.gif', sect.document.catalog[:images][0].to_s
+        assert_nil sect.document.catalog[:images][0].imagesdir
         assert logger.empty?
       end
     end

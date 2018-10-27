@@ -670,8 +670,8 @@ module Substitutors
           # TODO remove this special case once titles use normal substitution order
           target = sub_attributes target
         end
-        doc.register(:images, target) unless type == 'icon'
         attrs = parse_attributes m[2], posattrs, :unescape_input => true
+        doc.register :images, [target, (attrs['imagesdir'] = doc_attrs['imagesdir'])] unless type == 'icon'
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
       }
