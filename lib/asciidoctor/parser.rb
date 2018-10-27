@@ -192,7 +192,7 @@ class Parser
       doc_attrs['mantitle'] = doc_attrs['doctitle']
       doc_attrs['manvolnum'] = '1'
     end
-    if (manname = doc_attrs['manname']) && (manpurpose = doc_attrs['manpurpose'])
+    if (manname = doc_attrs['manname']) && doc_attrs['manpurpose']
       doc_attrs['manname-title'] ||= 'Name'
       doc_attrs['mannames'] = [manname]
       if document.backend == 'manpage'
