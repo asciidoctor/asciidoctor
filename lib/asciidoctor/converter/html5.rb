@@ -295,7 +295,7 @@ MathJax.Hub.Config({
         stitle = section.caption && slevel > 0 ? section.captioned_title :
           (section.numbered && slevel <= sectnumlevels ? %(#{section.sectnum} #{section.title}) : section.title)
         stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
-        if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
+        if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :sectnumlevels => sectnumlevels)
           result << %(<li><a href="##{section.id}">#{stitle}</a>)
           result << child_toc_level
           result << '</li>'
