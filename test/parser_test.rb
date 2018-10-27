@@ -704,4 +704,19 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
     assert_equal expected, lines
   end
 
+  test 'should warn if inline anchor is already in use' do
+    input = <<-EOS
+[#in-use]
+A paragraph with an id.
+
+Another paragraph
+[[in-use]]that uses an id
+which is already in use.
+    EOS
+
+    using_memory_logger do |logger|
+      document_from_string input
+      assert_message logger, :WARN, '<stdin>: line 5: id assigned to anchor already in use: in-use', Hash
+    end
+  end
 end
