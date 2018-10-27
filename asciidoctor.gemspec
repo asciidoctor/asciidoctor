@@ -34,7 +34,6 @@ Gem::Specification.new do |s|
   s.executables = (files.grep %r/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
   s.test_files = files.grep %r/^(?:(?:features|test)\/.+)$/
-  s.has_rdoc = true
   s.rdoc_options = ['--charset=UTF-8']
   s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE']
 
