@@ -1,0 +1,2 @@
+{doctime}
+{localtime}

@@ -82,6 +82,7 @@ Improvements::
   * add support for range syntax (.. delimiter) to highlight attribute on source block (#2918)
   * add support for unbounded range to highlight attribute on source block (#2918)
   * automatically assign title and caption on image block if title is set on custom block source (#2926)
+  * use OS independent timezone (UTC or time offset) in doctime and localtime attributes (#2770)
 
 Documentation::
 
