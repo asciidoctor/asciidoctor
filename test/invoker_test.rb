@@ -629,6 +629,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
   end
 
   test 'should force default external encoding to UTF-8' do
+    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
     executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
     input_path = fixture_path 'encoding.asciidoc'
     old_lang = ENV['LANG']
@@ -636,14 +637,9 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     begin
       # using open3 to work around a bug in JRuby process_manager.rb,
       # which tries to run a gsub on stdout prematurely breaking the test
-      require 'open3'
-      #cmd = "#{executable} -o - --trace #{input_path}"
-      cmd = "#{File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']} #{executable} -o - --trace #{input_path}"
-      _, out, _ = Open3.popen3 cmd
-      #stderr_lines = stderr.readlines
+      cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
       # warnings may be issued, so don't assert on stderr
-      #assert_empty stderr_lines, 'Command failed. Expected to receive a converted document.'
-      stdout_lines = out.readlines
+      stdout_lines = Open3.popen3(cmd) {|_, out| out.readlines }
       refute_empty stdout_lines
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
       stdout_str = stdout_lines.join
@@ -655,11 +651,11 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
 
   test 'should print timings when -t flag is specified' do
     input = <<-EOS
-    Sample *AsciiDoc*
+Sample *AsciiDoc*
     EOS
     invoker = nil
     error = nil
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoker = invoke_cli(%w(-t -o /dev/null), '-') { input }
       error = err.string
     end

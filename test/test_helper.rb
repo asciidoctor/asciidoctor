@@ -19,6 +19,7 @@ require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
 autoload :Pathname,  'pathname'
+autoload :Open3, 'open3'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
