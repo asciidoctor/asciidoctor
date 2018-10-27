@@ -741,7 +741,7 @@ class Parser
           block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
         end
 
-        catalog_inline_anchors((lines.join LF), block, document)
+        catalog_inline_anchors((lines.join LF), block, document, reader)
       end
 
       break # forbid loop from executing more than once
@@ -1135,8 +1135,10 @@ class Parser
   # document - The current Document on which the references are stored
   #
   # Returns nothing
-  def self.catalog_inline_anchors text, block, document
+  def self.catalog_inline_anchors text, block, document, reader
     text.scan(InlineAnchorScanRx) do
+      # alias match for Ruby 1.8.7 compat
+      m = $~
       if (id = $1)
         if (reftext = $2)
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
@@ -1149,7 +1151,11 @@ class Parser
         end
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
-        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => document.reader.cursor_at_prev_line
+        location = reader.cursor_at_mark
+        if (offset = (m.pre_match.count LF) + ((m[0].start_with? LF) ? 1 : 0)) > 0
+          (location = location.dup).advance offset
+        end
+        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => location
       end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
