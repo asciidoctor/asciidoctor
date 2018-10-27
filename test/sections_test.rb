@@ -1436,8 +1436,60 @@ content
       EOS
 
       output = convert_string input
-      assert_xpath '//h1[@id="_language"][text() = "I. Language"]', output, 1
-      assert_xpath '//h1[@id="_processor"][text() = "II. Processor"]', output, 1
+      assert_xpath '//h1[@id="_language"][text() = "I: Language"]', output, 1
+      assert_xpath '//h1[@id="_processor"][text() = "II: Processor"]', output, 1
+    end
+
+    test 'should prepend value of part-signifier attribute to title of numbered part' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:sectnums:
+:partnums:
+:part-signifier: Part
+
+= Language
+
+== Syntax
+
+content
+
+= Processor
+
+== CLI
+
+content
+      EOS
+
+      output = convert_string input
+      assert_xpath '//h1[@id="_language"][text() = "Part I: Language"]', output, 1
+      assert_xpath '//h1[@id="_processor"][text() = "Part II: Processor"]', output, 1
+    end
+
+    test 'should prepend value of chapter-signifier attribute to title of numbered chapter' do
+      input = <<-EOS
+= Book Title
+:doctype: book
+:sectnums:
+:partnums:
+:chapter-signifier: Chapter
+
+= Language
+
+== Syntax
+
+content
+
+= Processor
+
+== CLI
+
+content
+      EOS
+
+      output = convert_string input
+      assert_xpath '//h2[@id="_syntax"][text() = "Chapter 1. Syntax"]', output, 1
+      assert_xpath '//h2[@id="_cli"][text() = "Chapter 2. CLI"]', output, 1
     end
 
     test 'blocks should have level' do
