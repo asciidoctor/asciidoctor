@@ -292,13 +292,8 @@ MathJax.Hub.Config({
       result = [%(<ul class="sectlevel#{sections[0].level}">)]
       sections.each do |section|
         slevel = section.level
-        if section.caption
-          stitle = section.captioned_title
-        elsif section.numbered && slevel <= sectnumlevels
-          stitle = %(#{section.sectnum} #{section.title})
-        else
-          stitle = section.title
-        end
+        stitle = section.caption && slevel > 0 ? section.captioned_title :
+          (section.numbered && slevel <= sectnumlevels ? %(#{section.sectnum} #{section.title}) : section.title)
         stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
         if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :secnumlevels => sectnumlevels)
           result << %(<li><a href="##{section.id}">#{stitle}</a>)
@@ -313,12 +308,9 @@ MathJax.Hub.Config({
     end
 
     def section node
-      if (level = node.level) == 0
-        sect0 = true
-        title = node.numbered && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.title
-      else
-        title = node.numbered && !node.caption && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.captioned_title
-      end
+      sect0 = (level = node.level) == 0
+      title = node.caption && !sect0 ? node.captioned_title :
+        (node.numbered && level <= (node.document.attr 'sectnumlevels', 3).to_i ? %(#{node.sectnum} #{node.title}) : node.title)
       if node.id
         id_attr = %( id="#{id = node.id}")
         if (doc_attrs = node.document.attributes).key? 'sectlinks'
