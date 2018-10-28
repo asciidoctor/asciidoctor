@@ -359,6 +359,26 @@ context "Parser" do
     assert_equal 'Scherer, Jr.', doc.attributes['lastname']
   end
 
+  test 'use explicit authorinitials if set after implicit author line' do
+    input = <<-EOS.chomp
+Jean-Claude Van Damme
+:authorinitials: JCVD
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 'JCVD', doc.attributes['authorinitials']
+  end
+
+  test 'use explicit authorinitials if set after author attribute' do
+    input = <<-EOS.chomp
+:author: Jean-Claude Van Damme
+:authorinitials: JCVD
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 'JCVD', doc.attributes['authorinitials']
+  end
+
   test 'sets authorcount to 0 if document has no authors' do
     input = ''
     doc = empty_document

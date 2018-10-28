@@ -90,6 +90,7 @@ Improvements::
   * use OS independent timezone (UTC or time offset) in doctime and localtime attributes (#2770)
   * report correct line number for inline anchor with id already in use (#2769)
   * generate manpage even if input is non-conforming or malformed (#1639)
+  * allow authorinitials for single author to be overridden (#669)
 
 Documentation::
 

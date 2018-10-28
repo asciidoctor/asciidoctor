@@ -1808,7 +1808,7 @@ class Parser
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
 
-    metadata, implicit_author, implicit_authors = {}, nil, nil
+    metadata, implicit_author, implicit_authorinitials = implicit_authors = {}, nil, nil
 
     if reader.has_more_lines? && !reader.next_line_empty?
       unless (author_metadata = process_authors reader.read_line).empty?
@@ -1821,6 +1821,7 @@ class Parser
           end
 
           implicit_author = document.attributes['author']
+          implicit_authorinitials = document.attributes['authorinitials']
           implicit_authors = document.attributes['authors']
         end
 
@@ -1877,6 +1878,7 @@ class Parser
       if document.attributes.key?('author') && (author_line = document.attributes['author']) != implicit_author
         # do not allow multiple, process as names only
         author_metadata = process_authors author_line, true, false
+        author_metadata.delete 'authorinitials' if document.attributes['authorinitials'] != implicit_authorinitials
       elsif document.attributes.key?('authors') && (author_line = document.attributes['authors']) != implicit_authors
         # allow multiple, process as names only
         author_metadata = process_authors author_line, true
