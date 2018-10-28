@@ -184,23 +184,24 @@ class Parser
   # returns Nothing
   def self.parse_manpage_header(reader, document, block_attributes)
     if ManpageTitleVolnumRx =~ (doc_attrs = document.attributes)['doctitle']
-      doc_attrs['manvolnum'] = $2
+      doc_attrs['manvolnum'] = manvolnum = $2
       doc_attrs['mantitle'] = (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle).downcase
     else
-      logger.error message_with_context 'malformed manpage title', :source_location => reader.cursor_at_prev_line
+      logger.error message_with_context 'non-conforming manpage title', :source_location => (reader.cursor_at_line 1)
       # provide sensible fallbacks
-      doc_attrs['mantitle'] = doc_attrs['doctitle']
-      doc_attrs['manvolnum'] = '1'
+      doc_attrs['mantitle'] = doc_attrs['doctitle'] || doc_attrs['docname'] || 'command'
+      doc_attrs['manvolnum'] = manvolnum = '1'
     end
     if (manname = doc_attrs['manname']) && doc_attrs['manpurpose']
       doc_attrs['manname-title'] ||= 'Name'
       doc_attrs['mannames'] = [manname]
       if document.backend == 'manpage'
         doc_attrs['docname'] = manname
-        doc_attrs['outfilesuffix'] = %(.#{doc_attrs['manvolnum']})
+        doc_attrs['outfilesuffix'] = %(.#{manvolnum})
       end
     else
       reader.skip_blank_lines
+      reader.save
       block_attributes.update parse_block_metadata_lines reader, document
       if (name_section_level = is_next_line_section? reader, {})
         if name_section_level == 1
@@ -222,16 +223,28 @@ class Parser
             doc_attrs['mannames'] = mannames
             if document.backend == 'manpage'
               doc_attrs['docname'] = manname
-              doc_attrs['outfilesuffix'] = %(.#{doc_attrs['manvolnum']})
+              doc_attrs['outfilesuffix'] = %(.#{manvolnum})
             end
           else
-            logger.error message_with_context 'malformed name section body', :source_location => reader.cursor_at_prev_line
+            error_msg = 'non-conforming name section body'
           end
         else
-          logger.error message_with_context 'name section title must be at level 1', :source_location => reader.cursor_at_prev_line
+          error_msg = 'name section must be at level 1'
         end
       else
-        logger.error message_with_context 'name section expected', :source_location => reader.cursor_at_prev_line
+        error_msg = 'name section expected'
+      end
+      if error_msg
+        reader.restore_save
+        logger.error message_with_context error_msg, :source_location => reader.cursor
+        doc_attrs['manname'] = (manname = doc_attrs['docname'] || 'command')
+        doc_attrs['mannames'] = [manname]
+        if document.backend == 'manpage'
+          doc_attrs['docname'] = manname
+          doc_attrs['outfilesuffix'] = %(.#{manvolnum})
+        end
+      else
+        reader.discard_save
       end
     end
     nil

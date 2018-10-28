@@ -66,6 +66,7 @@ class Reader
     @process_lines = true
     @unescape_next_line = false
     @unterminated = nil
+    @saved = nil
   end
 
   # Internal: Prepare the lines from the provided data
@@ -567,6 +568,28 @@ class Reader
   # Public: Get the source lines for this Reader joined as a String
   def source
     @source_lines.join LF
+  end
+
+  def save
+    accum = {}
+    instance_variables.each do |name|
+      accum[name] = ::Array === (val = instance_variable_get name) ? val.dup : val unless name == :@saved || name == :@source_lines
+    end
+    @saved = accum
+    nil
+  end
+
+  def restore_save
+    if @saved
+      @saved.each do |name, val|
+        instance_variable_set name, val
+      end
+      @saved = nil
+    end
+  end
+
+  def discard_save
+    @saved = nil
   end
 
   # Public: Get a summary of this Reader.
