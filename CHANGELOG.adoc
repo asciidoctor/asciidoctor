@@ -37,6 +37,7 @@ Enhancements::
   * add support for start attribute on source block to set starting line number when converting to DocBook (#2915)
   * track imagesdir for image on node and in catalog (#2779)
   * allow starting line number to be set using start attribute when highighting source block with Pygments or CodeRay (#1742)
+  * upgrade highlight.js to 9.13.1
 
 Fixes::
 
