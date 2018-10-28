@@ -1805,6 +1805,7 @@ class Parser
   #  # => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
   def self.parse_header_metadata(reader, document = nil)
+    doc_attrs = document && document.attributes
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
 
@@ -1815,14 +1816,14 @@ class Parser
         if document
           # apply header subs and assign to document
           author_metadata.each do |key, val|
-            unless document.attributes.key? key
-              document.attributes[key] = ::String === val ? (document.apply_header_subs val) : val
+            unless doc_attrs.key? key
+              doc_attrs[key] = ::String === val ? (document.apply_header_subs val) : val
             end
           end
 
-          implicit_author = document.attributes['author']
-          implicit_authorinitials = document.attributes['authorinitials']
-          implicit_authors = document.attributes['authors']
+          implicit_author = doc_attrs['author']
+          implicit_authorinitials = doc_attrs['authorinitials']
+          implicit_authors = doc_attrs['authors']
         end
 
         metadata = author_metadata
@@ -1856,8 +1857,8 @@ class Parser
         if document
           # apply header subs and assign to document
           rev_metadata.each do |key, val|
-            unless document.attributes.key? key
-              document.attributes[key] = document.apply_header_subs(val)
+            unless doc_attrs.key? key
+              doc_attrs[key] = document.apply_header_subs val
             end
           end
         end
@@ -1875,19 +1876,19 @@ class Parser
 
     # process author attribute entries that override (or stand in for) the implicit author line
     if document
-      if document.attributes.key?('author') && (author_line = document.attributes['author']) != implicit_author
+      if doc_attrs.key?('author') && (author_line = doc_attrs['author']) != implicit_author
         # do not allow multiple, process as names only
         author_metadata = process_authors author_line, true, false
-        author_metadata.delete 'authorinitials' if document.attributes['authorinitials'] != implicit_authorinitials
-      elsif document.attributes.key?('authors') && (author_line = document.attributes['authors']) != implicit_authors
+        author_metadata.delete 'authorinitials' if doc_attrs['authorinitials'] != implicit_authorinitials
+      elsif doc_attrs.key?('authors') && (author_line = doc_attrs['authors']) != implicit_authors
         # allow multiple, process as names only
         author_metadata = process_authors author_line, true
       else
         authors, author_idx, author_key, explicit, sparse = [], 1, 'author_1', false, false
-        while document.attributes.key? author_key
+        while doc_attrs.key? author_key
           # only use indexed author attribute if value is different
           # leaves corner case if line matches with underscores converted to spaces; use double space to force
-          if (author_override = document.attributes[author_key]) == author_metadata[author_key]
+          if (author_override = doc_attrs[author_key]) == author_metadata[author_key]
             authors << nil
             sparse = true
           else
@@ -1915,13 +1916,13 @@ class Parser
       end
 
       if author_metadata.empty?
-        metadata['authorcount'] ||= (document.attributes['authorcount'] = 0)
+        metadata['authorcount'] ||= (doc_attrs['authorcount'] = 0)
       else
-        document.attributes.update author_metadata
+        doc_attrs.update author_metadata
 
         # special case
-        if !document.attributes.key?('email') && document.attributes.key?('email_1')
-          document.attributes['email'] = document.attributes['email_1']
+        if !doc_attrs.key?('email') && doc_attrs.key?('email_1')
+          doc_attrs['email'] = doc_attrs['email_1']
         end
       end
     end
