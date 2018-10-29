@@ -19,6 +19,10 @@ Enhancements::
 
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
 
+Fixes::
+
+  * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
+
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
 
