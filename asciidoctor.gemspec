@@ -16,6 +16,8 @@ Gem::Specification.new do |s|
   s.email = ['dan.j.allen@gmail.com']
   s.homepage = 'http://asciidoctor.org'
   s.license = 'MIT'
+  # NOTE the required ruby version is informational only; we don't enforce it because it can't be overridden and can cause builds to break
+  #s.required_ruby_version = '>= 2.3.0'
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc',
