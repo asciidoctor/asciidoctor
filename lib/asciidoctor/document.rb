@@ -385,6 +385,14 @@ class Document < AbstractBlock
     attr_overrides['asciidoctor'] = ''
     attr_overrides['asciidoctor-version'] = VERSION
 
+    # Ruby constants added by Paulo França Lacerda (BlaisePoint Informática)
+    attr_overrides['ruby-engine']       = RUBY_ENGINE
+    attr_overrides['ruby-version']      = RUBY_VERSION
+    attr_overrides['ruby-revision']     = RUBY_REVISION
+    attr_overrides['ruby-patchlevel']   = RUBY_PATCHLEVEL
+    attr_overrides['ruby-platform']     = RUBY_PLATFORM
+    attr_overrides['ruby-release-date'] = RUBY_RELEASE_DATE
+
     attr_overrides['safe-mode-name'] = (safe_mode_name = SafeMode.name_for_value @safe)
     attr_overrides["safe-mode-#{safe_mode_name}"] = ''
     attr_overrides['safe-mode-level'] = @safe
