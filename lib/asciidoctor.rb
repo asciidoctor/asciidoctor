@@ -387,9 +387,7 @@ module Asciidoctor
     ## Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
     ## CC stands for "character class", CG stands for "character class group"
 
-    if RUBY_ENGINE == 'opal'
-      CC_ANY = '[^\n]' unless defined? CC_ANY
-    else
+    unless RUBY_ENGINE == 'opal'
       # CC_ALL is any character, including newlines (must be accompanied by multiline regexp flag)
       CC_ALL = '.'
       # CC_ANY is any character except newlines
