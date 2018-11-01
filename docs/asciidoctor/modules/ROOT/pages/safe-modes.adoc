@@ -48,7 +48,7 @@ Additionally, it:
 * disables `docdir` and `docfile`
 * disables source highlighting
 
-xref:extensions::index.adoc[Asciidoctor extensions] may still embed content into the document depending whether they honor the safe mode setting.
+xref:extensions:index.adoc[Asciidoctor extensions] may still embed content into the document depending whether they honor the safe mode setting.
 
 *This is the default safe mode for the API.*
 Its integer value is `20`.

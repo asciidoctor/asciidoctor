@@ -33,7 +33,7 @@ AsciiDoc.py provided a theming mechanism that encapsulated CSS, JavaScript, and 
 The `--theme` option activated one of these themes, which was resolved from your home directory.
 In Asciidoctor, you control the theme using CSS stylesheets, which you specify using `-a stylesheet=<stylesheet>`.
 
-If you require more advanced theming, you can inject additional resources using a xref:asciidoctor:publish:docinfo.adoc[docinfo file] or a xref:extensions::postprocessor.adoc[postprocessor extension].
+If you require more advanced theming, you can inject additional resources using a xref:asciidoctor:publish:docinfo.adoc[docinfo file] or a xref:extensions:postprocessor.adoc[postprocessor extension].
 
 [#migrate-stylesheet]
 === Default HTML stylesheet
@@ -257,7 +257,7 @@ In Asciidoctor, you'll need to activate STEM support first using the xref:asciid
 == Configuration files
 
 Asciidoctor does not use [.path]_.conf_ files or filters, so `--conf-file`, `--dump-conf`, and `--filter` are not applicable.
-Instead, Asciidoctor provides an xref:extensions::index.adoc[extension API] that replaces the configuration-based extension and filter mechanisms in AsciiDoc.py.
+Instead, Asciidoctor provides an xref:extensions:index.adoc[extension API] that replaces the configuration-based extension and filter mechanisms in AsciiDoc.py.
 
 === Internationalization
 
@@ -293,7 +293,7 @@ a|
 === Custom extensions
 
 AsciiDoc.py custom extensions are Python commands, so they don't work with Asciidoctor.
-Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions::index.adoc[extensions in Ruby, Java, or JavaScript].
+Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions:index.adoc[extensions in Ruby, Java, or JavaScript].
 
 == Doctest
 

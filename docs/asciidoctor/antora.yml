@@ -6,5 +6,6 @@ nav:
 - modules/cli/nav.adoc
 - modules/publish/nav.adoc
 - modules/api/nav.adoc
+- modules/extensions/nav.adoc
 - modules/ROOT/nav-migrate.adoc
 - modules/ROOT/nav-project.adoc

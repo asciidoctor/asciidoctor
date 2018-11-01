@@ -62,14 +62,14 @@ _(Can be emulated using a combination of `-r` and `-b`)._
 |`-e`, `--eruby`
 
 |:extensions
-|A Ruby block that registers (and possibly defines) xref:extensions::index.adoc[Asciidoctor extensions] for this instance of the processor.
+|A Ruby block that registers (and possibly defines) xref:extensions:index.adoc[Asciidoctor extensions] for this instance of the processor.
 |_not set_
 |A Ruby block that conforms to the Asciidoctor extensions API (the same code that would be passed to the `Extensions.register` method).
 |_n/a_
 _(Can be emulated using `-r`)._
 
 |:extensions_registry
-|Overrides the xref:extensions::register.adoc[extensions registry] instance.
+|Overrides the xref:extensions:register.adoc[extensions registry] instance.
 Instead of providing a Ruby block containing extensions to register, this option lets you replace the extension registry itself, giving you complete control over how extensions are registered for this processor.
 |_not set_
 |`Extensions::Registry` instance
