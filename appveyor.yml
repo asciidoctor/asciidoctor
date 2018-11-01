@@ -1,29 +1,28 @@
+# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
 version: '{build}'
 skip_tags: true
-# AppVeyor automatically skips the build if the commit contains [ci skip] or [skip ci]
-#skip_commits:
-#  message: /\[ci skip\]/
-clone_depth: 10
+clone_depth: 2
 environment:
   matrix:
-    - ruby_version: '24'
-    - ruby_version: '24-x64'
-    - ruby_version: '23'
-    - ruby_version: '23-x64'
+  # see https://www.appveyor.com/docs/linux-images-software/#ruby for list of installed Ruby runtimes
+  - ruby_version: '25'
+  - ruby_version: '25-x64'
+  - ruby_version: '24'
+  - ruby_version: '24-x64'
+  - ruby_version: '23'
+  - ruby_version: '23-x64'
+init:
+# Prepend Ruby path from matrix while removing original Ruby entry (C:\Ruby193\bin)
+- set PATH=C:\Ruby%ruby_version%\bin;%PATH:C:\Ruby193\bin;=%
+- echo %PATH%
+- ruby -v
+- gem -v
+- bundler --version
 install:
-  # Take default Ruby out of path
-  - SET PATH=%PATH:C:\Ruby193\bin;=%
-  # Add Ruby to path from build matrix
-  - SET PATH=C:\Ruby%ruby_version%\bin;%PATH%
-  - echo %PATH%
-  - ruby --version
-  - gem --version
-  #- gem install bundler --force --quiet --no-ri --no-rdoc
-  - bundler --version
-  - bundle
+- bundle --jobs=3 --path=.bundle\gems
 build_script:
-  - bundle exec rake build
+- bundle exec rake build
 test_script:
-  - bundle exec rake test:all
+- cmd: bundle exec rake test:all
 artifacts:
-  - path: pkg\*.gem
+- path: pkg\*.gem
