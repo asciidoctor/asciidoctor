@@ -3320,6 +3320,19 @@ puts "foo"
       assert_css 'pre > code.language-ruby[data-lang="ruby"]', output, 1
     end
 
+    test 'should set linenums start if linenums are enabled and start attribute is set when source-highlighter is prettify' do
+      input = <<-EOS
+[source%linenums,ruby,start=5]
+----
+puts "foo"
+----
+      EOS
+
+      output = convert_string_to_embedded input, :attributes => {'source-highlighter' => 'prettify'}
+      assert_css 'pre[class="prettyprint highlight linenums:5"]', output, 1
+      assert_css 'pre > code.language-ruby[data-lang="ruby"]', output, 1
+    end
+
     test 'should set lang attribute on pre when source-highlighter is html-pipeline' do
       input = <<-EOS
 [source,ruby]

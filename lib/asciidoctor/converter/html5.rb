@@ -609,7 +609,8 @@ Your browser does not support the audio tag.
           pre_class = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")
           code_attrs = %( class="language-#{language} hljs"#{code_attrs}) if language
         when 'prettify'
-          pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{(node.attr? 'linenums', nil, false) ? ' linenums' : ''}")
+          linenums = (node.attr? 'linenums', nil, false) ? ((start = node.attr 'start', nil, false) ? %( linenums:#{start}) : ' linenums') : ''
+          pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{linenums}")
           code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         when 'html-pipeline'
           pre_class = language ? %( lang="#{language}") : ''

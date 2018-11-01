@@ -15,6 +15,10 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Enhancements::
+
+  * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
+
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
 
