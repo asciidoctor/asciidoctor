@@ -1,5 +1,0 @@
-name: extensions
-title: Asciidoctor Extensions
-version: '1.5'
-nav:
-- modules/ROOT/nav.adoc
