@@ -19,7 +19,7 @@ Enhancements::
 
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
 
-Fixes::
+Bug Fixes::
 
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
 
@@ -50,7 +50,7 @@ Enhancements::
   * allow starting line number to be set using start attribute when highighting source block with Pygments or CodeRay (#1742)
   * upgrade highlight.js to 9.13.1
 
-Fixes::
+Bug Fixes::
 
   * don't hang on description list item that begins with /// (#2888)
   * don't crash when using AsciiDoc table cell style on column in CSV table (#2817)
@@ -116,7 +116,7 @@ Build / Infrastructure::
 
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
-Fixes::
+Bug Fixes::
 
   * fix regression where block attributes where being inherited by sibling blocks in a complex list item (#2771)
   * don't apply lead styling to first paragraph in nested document (AsciiDoc table cell) if role is present (#2624)
@@ -181,7 +181,7 @@ Enhancements::
   * upgrade to Font Awesome 4.7.0 (#2569)
   * upgrade to MathJax 4.7.4
 
-Bug fixes::
+Bug Fixes::
 
   * set `:to_dir` option value correctly when output file is specified (#2382)
   * preserve leading indentation in contents of AsciiDoc table cell if contents starts with a newline (#2712)
@@ -307,7 +307,7 @@ Distribution Packages::
 
 == 1.5.6.2 (2018-03-20) - @mojavelinux
 
-Bug fixes::
+Bug Fixes::
 
   * fix match for multiple xref macros w/ implicit text in same line (#2450)
   * PathResolver#root? returns true for absolute URL in browser env (#2595)
@@ -346,7 +346,7 @@ Enhancements::
 
   * Don't include title of special section in DocBook output if untitled option is set (e.g., dedication%untitled)
 
-Bug fixes::
+Bug Fixes::
 
   * continue to read blocks inside a delimited block after content is skipped (PR #2318)
   * don't create an empty paragraph for skipped content inside a delimited block (PR #2319)
@@ -400,6 +400,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.6\...v1.5.6.1[full diff]
 == 1.5.6 (2017-07-12) - @mojavelinux
 
 Enhancements::
+
   * use custom cross reference text if xrefstyle attribute is set (full, short, basic) (#858, #1132)
   * store referenceable nodes under refs key in document catalog (PR #2220)
   * apply reftext substitutions (specialchars, quotes, replacements) to value returned by reftext method (PR #2220)
@@ -436,6 +437,7 @@ Enhancements::
   * add Cell#text= method
 
 Improvements::
+
   * significant improvements to performance, especially in parser and substitutors
   * process include directive inside text of short form preprocessor conditional (#2146)
   * add support for include tags in languages that only support only circumfix comments (#1729)
@@ -497,6 +499,7 @@ Improvements::
   * rename macro regexp constants so name follows type (e.g., InlineImageMacroRx)
 
 Compliance::
+
   * retain block content in items of callout list when converting to HTML and man page (#1478)
   * only substitute specialchars for content in literal table cells (#1912)
   * fix operator logic for ifndef directive with multiple attributes (#1983)
@@ -540,7 +543,8 @@ Compliance::
   * remove regexp hacks for Opal (#2110)
   * drop outdated quoting exceptions for Opal (PR #2081)
 
-Bug fixes::
+Bug Fixes::
+
   * don't allow table borders to cascade to nested tables (#2151)
   * escape special characters in reftext of anchor (#1694)
   * sanitize content of authors meta tag in HTML output (#2112)
@@ -576,6 +580,7 @@ Bug fixes::
   * handle cases when there are no lines for include directive to select
 
 Documentation::
+
   * enable admonition icons in README when displayed on GitHub
   * add German translation of chapter-label (PR #1920) (*@fapdash*)
   * add Ukrainian translation of built-in attributes (PR #1955) (*@hedrok*)
@@ -586,6 +591,7 @@ Documentation::
   * add Bahasa Indonesia translation of built-in labels (*@triyanwn*)
 
 Build / Infrastructure::
+
   * upgrade highlight.js to 9.12.0 (#1652)
   * include entire test suite in gem (PR #1952) (*@voxik*)
   * upgrade Slim development dependency to 3.0.x (PR #1953) (*@voxik*)
@@ -617,6 +623,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.5\...v1.5.6[full diff]
 == 1.5.5 (2016-10-05) - @mojavelinux
 
 Enhancements::
+
   * Add preference to limit the maximum size of an attribute value (#1861)
   * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (#1721) (*@JojoBoulix*)
   * Add reversed attribute to ordered list if reversed option is enabled (#1830)
@@ -628,6 +635,7 @@ Enhancements::
   * Translate README to Japanese (*@Mizuho32*)
 
 Improvements::
+
   * Style nested emphasized phrases properly when using default stylesheet (#1691)
   * Honor explicit table width even when autowidth option is set (#1843)
   * Only explicit noheader option on table should disable implicit table header (#1849)
@@ -648,11 +656,12 @@ Improvements::
   * Rename definition list to description list internally
 
 Compliance::
+
   * Support 6-digit decimal char refs, 5-digit hexidecimal char refs (#1824)
   * Compatibility fixes for Opal
   * Check for number using Integer instead of Fixnum class for compatibility with Ruby 2.4
 
-Bug fixes::
+Bug Fixes::
   * Use method_defined? instead of respond_to? to check if method is already defined when patching (#1838)
   * Fix invalid conditional in HTML5 converter when handling of SVG
   * Processor#parse_content helper no longer shares attribute list between blocks (#1651)
@@ -664,6 +673,7 @@ Bug fixes::
   * Don't duplicate forward slash for path relative to root (#1822)
 
 Infrastructure::
+
   * Build gem properly in the absense of a git workspace, make compatible with JRuby (#1779)
   * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (*@ferdinandrosario*)
 
@@ -682,10 +692,12 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.4\...v1.5.5[full diff]
 == 1.5.4 (2016-01-03) - @mojavelinux
 
 Enhancements::
+
   * translate README into French (#1630) (*@anthonny*, *@mogztter*, *@gscheibel*, *@mgreau*)
   * allow linkstyle in manpage output to be configured (#1610)
 
 Improvements::
+
   * upgrade to MathJax 2.6.0 and disable loading messages
   * upgrade to Font Awesome 4.5.0
   * disable toc if document has no sections (#1633)
@@ -697,12 +709,14 @@ Improvements::
   * allow asciidoctor cli to resolve library path when invoked without leading ./
 
 Compliance::
+
   * allow special section to be nested at any depth (#1591)
   * ensure colpcwidth values add up to 100%; increase precision of values to 4 decimal places (#1647)
   * ignore blank cols attribute on table (#1647)
   * support shorthand syntax for block attributes on document title (#1650)
 
-Bug fixes::
+Bug Fixes::
+
   * don't include default toc in AsciiDoc table cell; don't pass toc location attributes to nested document (#1582)
   * guard against nil dlist list item in find_by (#1618)
   * don't swallow trailing line when include file is not readable (#1602)
@@ -720,6 +734,7 @@ Bug fixes::
   * don't fail if library is loaded more than once
 
 Infrastructure::
+
   * remove trailing endlines in project source code
   * update contributing guidelines
   * explicitly test ifeval scenario raised in issue #1585
@@ -741,6 +756,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.3\...v1.5.4[full diff]
 == 1.5.3 (2015-10-31) - @mojavelinux
 
 Enhancements::
+
   * add support for interactive & inline SVGs (#1301, #1224)
   * add built-in manpage backend (#651) (*@davidgamba*)
   * create Mallard backend; asciidoctor/asciidoctor-mallard (#425) (*@bk2204*)
@@ -753,6 +769,7 @@ Enhancements::
   * make XrefInlineRx regexp more permissive (Mathieu Boespflug) (#844)
 
 Improvements::
+
   * load JavaScript and CSS at bottom of HTML document (#1238) (*@mogztter*)
   * list available backends in help text (#1271) (*@plaindocs*)
   * properly expand tabs in literal text (#1170, #841)
@@ -795,6 +812,7 @@ Improvements::
   * prevent CodeRay from bolding every 10th line number
 
 Compliance::
+
   * use `<sup>` for footnote reference in text instead of `<span>` (#1523)
   * fix alignment of wrapped text in footnote (#1524)
   * include full stop after footnote number in embeddable HTML
@@ -802,7 +820,8 @@ Compliance::
   * resolve missing attribute in ifeval to empty string (#1387)
   * support unbreakable & breakable options on table (rockyallen) (#1140)
 
-Bug fixes::
+Bug Fixes::
+
   * don't truncate exception stack in `Asciidoctor.load` (#1248)
   * don't fail to save cause of Java exception (#1458) (*@robertpanzer*)
   * fix precision error in timings report (#1342)
@@ -829,6 +848,7 @@ Bug fixes::
   * fix grammar in warning messages regarding thread_safe gem
 
 Infrastructure::
+
   * migrate opal_ext from core to Asciidoctor.js (#1517)
   * add Ruby 2.2 to CI build; only specify minor Ruby versions
   * enable containerized builds on Travis CI
@@ -883,7 +903,7 @@ Compliance::
   * allow empty cell to appear at end of table row (#1106)
   * only produce one row for table in CSV or DSV format with a single cell (#1180)
 
-Bug fixes::
+Bug Fixes::
 
   * add explicit to_s call to generate delimiter settings for MathJax config (#1198)
   * fix includes that reference absolute Windows paths (#1144)
@@ -902,7 +922,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.1\...v1.5.2[full diff]
 
 == 1.5.1 (2014-09-29) - @mojavelinux
 
-Bug fixes::
+Bug Fixes::
 
   * recognize tag directives inside comments within XML files for including tagged regions
   * restore passthroughs inside footnotes when more than one footnote appears on the same line
