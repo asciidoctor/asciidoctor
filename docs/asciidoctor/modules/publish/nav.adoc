@@ -1,13 +1,37 @@
-* xref:output-format.adoc[Publish]
-** xref:html-cli.adoc[HTML CLI]
-*** xref:html-styles.adoc[HTML Styles]
-*** xref:html-code-styles.adoc[HTML Code Styles]
-*** xref:html-manage-images.adoc[HTML Images]
-** xref:ROOT:safe-modes.adoc[Run Securely with Safe Modes]
-** xref:static-site-generators.adoc[Static Site Generators]
-** xref:xhtml.adoc[XHTML]
+.Getting Started
+* File Processing Overview
+* xref:output-format.adoc[Select a Converter]
+* xref:cli:cli.adoc[Run Asciidoctor]
+* xref:html-cli.adoc[Generate HTML]
+
+.Processing Files
+* xref:cli:file-output.adoc[Specify an Output File]
+* xref:cli:multiple-files.adoc[Process Multiple Files]
+* xref:docinfo.adoc[Configure Docinfo Files]
+//** Adding Header Content
+//** Adding Footer Content
+
+.Generating HTML
+* xref:html-cli.adoc[Convert AsciiDoc to HTML]
+** xref:html-manage-images.adoc[Manage Images]
+** xref:html-styles.adoc[Modify the Default Stylesheet]
+** xref:html-code-styles.adoc[Apply a Syntax Highlighting Stylesheet]
+** xref:apply-theme.adoc[Apply a Custom Stylesheet]
 ** xref:create-theme.adoc[Create a Custom Theme]
-** xref:apply-theme.adoc[Apply a Theme]
-** xref:docinfo.adoc[Docinfo]
-** xref:docbook:index.adoc[DocBook]
-** xref:manpage:index.adoc[Man Page]
+* xref:xhtml.adoc[Convert AsciiDoc to XHTML]
+
+.Generating Man Pages
+* xref:manpage:index.adoc[Convert AsciiDoc to Man Pages]
+
+.Generating DocBook
+* xref:docbook:index.adoc[Convert AsciiDoc to DocBook]
+
+.Preview & Publishing Tools
+* xref:setup:tools.adoc[Preview Tools]
+* HTML Slidedecks
+* xref:static-site-generators.adoc[Static Site Generators]
+* Antora Documentation Sites
+
+.Managing Security
+** xref:cli:set-safe-mode.adoc[Set the Safe Mode]
+//** xref:ROOT:safe-modes.adoc[Set a Safe Mode]
