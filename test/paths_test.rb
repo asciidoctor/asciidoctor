@@ -354,6 +354,13 @@ context 'Path Resolver' do
       assert_equal '../../shared/partials', result
     end
 
+    test 'should return original path if relative path cannot be computed' do
+      filename = 'D:/path/to/include/file.txt'
+      base_dir = 'C:/docs'
+      result = @resolver.relative_path filename, base_dir
+      assert_equal 'D:/path/to/include/file.txt', result
+    end if windows?
+
     test 'should resolve relative path relative to base dir in unsafe mode' do
       base_dir = fixture_path 'base'
       doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE

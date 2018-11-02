@@ -206,8 +206,9 @@ class PathResolver
 
   # Public: Calculate the relative path to this absolute path from the specified base directory
   #
-  # If neither path or base are absolute paths, or the path is not contained
-  # within the base directory, no work is done.
+  # If neither path or base are absolute paths, the path is not contained
+  # within the base directory, or the relative path cannot be computed, the
+  # original path is returned work is done.
   #
   # path - [String] an absolute filename.
   # base - [String] an absolute base directory.
@@ -218,7 +219,11 @@ class PathResolver
       if (offset = descends_from? path, base)
         path.slice offset, path.length
       else
-        (Pathname.new path).relative_path_from(Pathname.new base).to_s
+        begin
+          (Pathname.new path).relative_path_from(Pathname.new base).to_s
+        rescue
+          path
+        end
       end
     else
       path
