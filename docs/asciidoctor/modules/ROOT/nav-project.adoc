@@ -1,5 +1,5 @@
-* Project
-** xref:project/benefits.adoc[Why AsciiDoc & Asciidoctor]
-*** xref:project/asciidoc-vs-markdown.adoc[AsciiDoc vs Markdown]
-** xref:project/license-and-authors.adoc[License]
-** xref:project/version-and-lifecycle-policies.adoc[Version & Lifecycle Policies]
+.Policies & Governance
+* xref:project/benefits.adoc[Why AsciiDoc & Asciidoctor]
+** xref:project/asciidoc-vs-markdown.adoc[AsciiDoc vs Markdown]
+* xref:project/version-and-lifecycle-policies.adoc[Version Lifecycle Policy]
+* xref:project/license-and-authors.adoc[Licenses]

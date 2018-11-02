@@ -1,4 +1,4 @@
-* xref:migrate/migrate.adoc[Migrate to Asciidoctor]
+.Migrating to Asciidoctor
 ** xref:migrate/from-asciidoc-python.adoc[Migrate from AsciiDoc.py]
 ** xref:migrate/from-docbook-xml.adoc[Migrate from DocBook XML]
 ** xref:migrate/from-markdown.adoc[Migrate from Markdown]

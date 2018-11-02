@@ -1,0 +1,1 @@
+* xref:asciidoctor::new-features.adoc[What's New]
