@@ -1,9 +1,7 @@
 = Set the Safe Mode Using the API
-// secure-api.adoc, included in user-manual: Running Asciidoctor Securely: Set the safe mode in the API
 
-The default xref:ROOT:safe-modes.adoc[safe level] in the API is `SECURE`.
-
-In the API, you can set the safe mode using a string, symbol or integer value.
+The default xref:ROOT:safe-modes.adoc[safe mode] in the API is `SECURE`.
+You can change the safe mode using a string, symbol or integer value.
 The value must be set in the document constructor using the `:safe` option.
 
  result = Asciidoctor.convert_file('master.adoc', :safe => 'server')
@@ -16,4 +14,4 @@ or
 
  result = Asciidoctor.convert_file('master.adoc', :safe => 10)
 
-You can also set the xref:cli:set-safe-mode.adoc[safe mode from the CLI] and xref:asciidoc:directives:safe-modes.adoc[manage attributes by safe mode].
+You can also set the xref:ROOT:set-safe-mode.adoc[safe mode from the CLI] and xref:asciidoc:directives:safe-modes.adoc[manage attributes by safe mode].

@@ -5,7 +5,7 @@ included in the user-manual Quickstarts, Using the Ruby API
 doc-asciidoctorj is now url-asciidoctorj-docs but! that means I need to fix docref: link:/docs and doc-asciidoctorj: {docref}/asciidoctorj
 ////
 
-In addition to the xref:cli:cli.adoc[command line interface], Asciidoctor provides a Ruby API.
+In addition to the xref:ROOT:cli.adoc[command line interface], Asciidoctor provides a Ruby API.
 The API is intended for integration with other software projects and is suitable for server-side applications, such as Rails, Sinatra and GitHub.
 
 Asciidoctor also has a Java API that mirrors the Ruby API.
