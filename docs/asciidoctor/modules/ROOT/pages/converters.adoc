@@ -1,0 +1,105 @@
+= Choose a Converter
+
+Asciidoctor provides several built-in converters and the ability to add on other converters.
+In addition to generating traditional articles and books from AsciiDoc documents, you can also use Asciidoctor to create HTML-based slide decks, static websites, and documentation sites.
+When using these web publishing converters, you may need to add some additional structure rules to a document.
+However, nothing in this structure restricts you from still being able to publish the content as a normal document too.
+
+Converter:: Generates a specific output format from AsciiDoc.
+Each converter is mapped to a name that you specify using the `-b` (`--backend`) command line option or `backend` API option.
+
+== Built-in converters
+
+These built-in converters are bundled with Asciidoctor.
+
+HTML 5::
+The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
+This is the converter Asciidoctor uses by default.
+
+XHTML 5::
+The XHTML variant (`xhtml` or `xhtml5`) of the HTML 5 converter.
+
+DocBook 5.0::
+The DocBook 5.0 converter (`docbook` or `docbook5`) generates DocBook 5.0 XML.
+
+DocBook 4.5::
+This DocBook converter (`docbook45`) generates DocBook 4.5 XML.
+
+xref:manpage:convert-to-man-page.adoc[Man page]::
+The man page converter (`manpage`) generates manual pages for software used on Unix and Unix-like operating systems.
+
+== Document and book converters
+
+You can use add-on converters, which plug into Asciidoctor by adding the appropriate library to the runtime path (e.g., `-r asciidoctor-pdf`).
+
+PDF::
+The PDF converter (`pdf`) generates a portable document format.
+Requires the https://rubygems.org/gems/asciidoctor-pdf[asciidoctor-pdf^] gem.
+
+EPUB3::
+The EPUB3 converter (`epub3`) generates a distribution and interchange format standard for digital publications and documents.
+Requires the https://rubygems.org/gems/asciidoctor-epub3[asciidoctor-epub3^] gem.
+
+////
+LaTeX::
+The LaTeX, a document preparation system for high-quality typesetting.
+Requires the https://rubygems.org/gems/asciidoctor-latex[asciidoctor-latex^] gem.
+
+mallard::
+Mallard 1.0 XML.
+Requires the https://github.com/asciidoctor/asciidoctor-mallard[asciidoctor-mallard^] gem (not yet released).
+////
+
+== HTML slide deck converters
+
+Reveal.js::
+The Reveal.js converter generates a Reveal.js presentation from an AsciiDoc document.
+Requires https://github.com/asciidoctor/asciidoctor-reveal.js[Asciidoctor Reveal.js^].
+
+Bespoke::
+The Bespoke converter generates a Bespoke presentation from an AsciiDoc document.
+Requires https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke^].
+
+////
+=== Static site generators
+
+* Jekyll
+* Middleman
+* Antora
+////
+
+== What's next?
+
+Learn how to xref:html:convert-asciidoc-file.adoc[convert an AsciiDoc document to HTML].
+
+// TODO describe the role of template converters (e.g., asciidoctor-backends)
+
+////
+Pulled directly from the user manual - need to decide where this information goes and how it should be presented.
+
+== PDFs
+
+Conversion from AsciiDoc to PDF is made possible by a number of tools.
+
+{uri-asciidoctor-pdf}[Asciidoctor PDF]::
+A native PDF converter for Asciidoctor (converts directly from AsciiDoc to PDF using Prawn).
++
+Instructions for installing and using Asciidoctor PDF are documented in the project's {uri-asciidoctor-pdf-readme}[README].
+The tool provides built-in theming via a YAML configuration file, which is documented in the {uri-asciidoctor-pdf-theming-guide}[theming guide].
++
+TIP: Asciidoctor PDF is the preferred tool for converting to PDF and is fully supported by the Asciidoctor community.
+
+a2x::
+A DocBook toolchain frontend provided by that AsciiDoc Python project.
++
+To use this tool, you should first convert to DocBook using Asciidoctor, then convert the DocBook to PDF using a2x.
+a2x accepts a DocBook file as input and can convert it to a PDF using either Apache FOP or dblatex.
+Instructions for using a2x are documented in the project's {uri-a2x-manpage}[man page].
+
+{fopub-ref}[asciidoctor-fopub]::
+A DocBook toolchain frontend similar to a2x, but which only requires Java to be installed on your machine.
++
+Instructions for using asciidoctor-fopub are documented in the project's {fopub-doc-ref}[README].
+To alter the look and feel of the PDF, it's necessary to pass XSL parameters or modify the XSLT.
+More information about customization can be found in http://www.sagehill.net/docbookxsl/[DocBook XSL: The Complete Guide].
+////

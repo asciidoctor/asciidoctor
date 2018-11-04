@@ -64,7 +64,7 @@ Unlike when you link to the default Asciidoctor stylesheet, any custom styleshee
 [#style-nested]
 .Stylesheets and processing multiple nested documents
 ****
-When you are xref:cli:multiple-files.adoc[running Asciidoctor once across a nested set of documents], it's currently not possible to specify a single relative path for the `stylesdir` attribute that would work for all of the documents.
+When you are xref:ROOT:multiple-files.adoc[running Asciidoctor once across a nested set of documents], it's currently not possible to specify a single relative path for the `stylesdir` attribute that would work for all of the documents.
 This is because the relative depth of the stylesheet's location differs for the documents in the subdirectories.
 One way to solve this problem is to maintain the path to `stylesdir` in each document.
 
