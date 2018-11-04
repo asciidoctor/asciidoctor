@@ -1,6 +1,0 @@
-* xref:cli.adoc[Run Asciidoctor]
-** xref:multiple-files.adoc[Process Multiple Files]
-** xref:file-output.adoc[Specify an Output File]
-** xref:set-safe-mode.adoc[Set the Safe Mode]
-** xref:cli-options.adoc[CLI Options]
-** xref:messages.adoc[CLI Messages]
