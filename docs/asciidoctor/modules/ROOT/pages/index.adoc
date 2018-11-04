@@ -20,7 +20,6 @@ You have the option of writing your own converter or loading Tilt-supported temp
 Asciidoctor also offers a responsive theme based on {url-foundation}[Foundation^] to style the HTML5 output.
 
 ////
-NOTE: Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
 The Asciidoctor test suite has > 2,000 tests to ensure compatibility with the AsciiDoc syntax.
 ////
 

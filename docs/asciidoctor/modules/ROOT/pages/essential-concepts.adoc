@@ -1,0 +1,27 @@
+= Essential Concepts
+
+Asciidoctor parses AsciiDoc documents and then uses a converter to generate the output format of your choice, such as HTML, DocBook, or PDF.
+During this process, Asciidoctor applies its default stylesheet or the stylesheets you provide.
+
+== What's a converter?
+
+A converter takes AsciiDoc and transforms it into another format.
+Each converter produces a specific output format, such as HTML or DocBook XML.
+
+Asciidoctor comes with built-in HTML, DocBook, and manual page (man page) converters.
+You can also plug in EPUB, PDF, LaTeX, HTML slide deck, and static website converters.
+See xref:converters.adoc[Choose a Converter] for descriptions of all of the supported converters.
+
+//Converter:: Generates the specified output format from AsciiDoc.
+//Each converter is mapped to a name that you specify using the `-b` (`--backend`) command line option or `backend` API option.
+
+== What's the default stylesheet?
+
+Asciidoctor comes with a stylesheet that's applied to the output of the built-in converters.
+This stylesheet is applied by default unless you tell Asciidoctor to use another stylesheet.
+See #Style the HTML with CSS# to learn about the default and custom stylesheet options.
+
+== What's next?
+
+* xref:converters.adoc[Choose a converter] that produces the output format you want.
+* Learn how to xref:html:convert-asciidoc-file.adoc[convert an AsciiDoc file to HTML] using the default converter.
