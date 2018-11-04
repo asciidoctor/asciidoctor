@@ -1,11 +1,11 @@
-= Upgrade Syntax, Attributes and Commands
+= Before You Upgrade
 //Syntax, Attributes, and Commands: What's Changed?
 
 IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
 If your migrating from AsciiDoc Python, see the xref:ROOT:migrate/from-asciidoc-python.adoc[documentation for migrating from AsciiDoc Python to Asciidoctor].
 
 When you upgrade Asciidoctor you may also need to update some of the syntax and attributes in your AsciiDoc documents.
-Major version releases can include reworkings of some of the AsciiDoc syntax in an effort to make it more consistent, deterministic and easy to learn.
+Major version releases can include new AsciiDoc syntax capabilities as well as syntax changes that make it more consistent.
 
 == Updated and deprecated features
 
@@ -112,7 +112,7 @@ If you want to use the new Asciidoctor syntax, make sure to use `= Title` or exp
 
 == New features
 
-Visit #What's New# for a complete list of new Asciidoctor and AsciiDoc features.
+Visit xref:ROOT:new-features.adoc[What's New] for a complete list of new Asciidoctor and AsciiDoc features.
 
 == Proposed changes for future versions
 

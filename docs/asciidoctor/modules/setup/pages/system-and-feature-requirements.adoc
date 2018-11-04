@@ -1,10 +1,10 @@
-= Get Asciidoctor
-:release-version: 1.5.7
+= System and Feature Requirements
+:release-version: 1.5.8
 
 Asciidoctor operates on macOS, Windows, and Linux.
 //AsciidoctorJ, Asciidoctor.js, as well as the Asciidoctor build integrations, alternate converters, and extensions may have additional requirements.
 
-== System requirements for Asciidoctor {release-version}
+== System requirements
 
 While we only test on Alpine Linux, Debian, and Fedora, Asciidoctor should operate as expected on most Linux distributions.
 
