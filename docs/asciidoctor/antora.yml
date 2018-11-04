@@ -2,9 +2,10 @@ name: asciidoctor
 title: Asciidoctor
 version: '1.5'
 nav:
-- modules/ROOT/nav.adoc
+- modules/ROOT/nav-top.adoc
 - modules/setup/nav.adoc
-- modules/publish/nav.adoc
+- modules/ROOT/nav-start.adoc
+- modules/html/nav.adoc
 - modules/api/nav.adoc
 - modules/extensions/nav.adoc
 - modules/ROOT/nav-cli-api.adoc
