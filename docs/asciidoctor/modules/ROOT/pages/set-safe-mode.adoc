@@ -1,11 +1,7 @@
 = Set the Safe Mode Using the CLI
-////
-content from secure-cli.adoc, included in:
-- user-manual: Running Asciidoctor Securely: Set the safe mode in the CLI
-////
 
-When Asciidoctor is invoked via the CLI, the safe mode is set to `UNSAFE` by default.
-You can change the safe level by executing one of the following commands in the CLI.
+When Asciidoctor is invoked via the CLI, the xref:safe-modes.adoc[safe mode] is set to `UNSAFE` by default.
+You can change the security level by executing one of the following commands:
 
 `-S`, `--safe-mode=SAFE_MODE`::
 Sets the safe mode level of the document according to the assigned level (`UNSAFE`, `SAFE`, `SERVER`, `SECURE`).
