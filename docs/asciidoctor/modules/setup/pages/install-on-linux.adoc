@@ -1,5 +1,5 @@
 = Install Asciidoctor on Linux
-:release-version: 1.5.7
+:release-version: 1.5.8
 :url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
 :url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
 

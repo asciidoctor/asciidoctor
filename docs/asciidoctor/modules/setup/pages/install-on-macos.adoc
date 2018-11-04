@@ -1,5 +1,5 @@
 = Install Asciidoctor on macOS
-:release-version: 1.5.7
+:release-version: 1.5.8
 :url-homebrew: https://brew.sh/
 // http://brewformulas.org/Asciidoctor
 
@@ -14,7 +14,3 @@ Open a terminal and type:
 Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
 
 include::{partialsdir}/success.adoc[]
-
-== Upgrade Asciidoctor with Homebrew
-
-include::{partialsdir}/upgrade-on-macos.adoc[]

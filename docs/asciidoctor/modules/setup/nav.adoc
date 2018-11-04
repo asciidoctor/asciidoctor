@@ -1,11 +1,11 @@
 .Installing Asciidoctor
-* xref:get-asciidoctor.adoc[System & Feature Requirements]
+* xref:system-and-feature-requirements.adoc[System & Feature Requirements]
 * xref:install-on-linux.adoc[Install on Linux]
 * xref:install-on-macos.adoc[Install on macOS]
 //* Install on Windows
 * xref:ROOT:migrate/migrate.adoc[Migrate to Asciidoctor]
 
 .Upgrading Asciidoctor
-* xref:upgrade-syntax.adoc[Upgrade Requirements]
+* xref:upgrade-requirements.adoc[Before You Upgrade]
 * xref:upgrade.adoc[Upgrade Asciidoctor]
 //* xref:ROOT:language-support.adoc[Language Support]
