@@ -3,7 +3,6 @@
 * xref:install-on-linux.adoc[Install on Linux]
 * xref:install-on-macos.adoc[Install on macOS]
 //* Install on Windows
-* xref:ROOT:migrate/migrate.adoc[Migrate to Asciidoctor]
 
 .Upgrading Asciidoctor
 * xref:upgrade-requirements.adoc[Before You Upgrade]
