@@ -13,4 +13,4 @@ Open a terminal and type:
 
 Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]

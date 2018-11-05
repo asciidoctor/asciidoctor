@@ -14,7 +14,7 @@ In this section, we'll create a sample document, then process and convert it wit
 
 [source]
 ----
-include::{examplesdir}/mysample.adoc[]
+include::example$mysample.adoc[]
 ----
 
 To convert [.path]_mysample.adoc_ to HTML from the command line:

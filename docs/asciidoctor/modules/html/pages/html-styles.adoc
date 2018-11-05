@@ -17,7 +17,7 @@ To have your document link to the stylesheet, set the `linkcss` attribute in the
 
 [source]
 ----
-include::{examplesdir}/mysample-link.adoc[]
+include::example$mysample-link.adoc[]
 ----
 
 You can also set linkcss with the CLI.

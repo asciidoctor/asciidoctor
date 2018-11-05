@@ -1,5 +1,5 @@
 = What's New in {adoc-version}
-:adoc-version: 1.5.7
+:adoc-version: 1.5.8
 
 == Sections and book parts
 

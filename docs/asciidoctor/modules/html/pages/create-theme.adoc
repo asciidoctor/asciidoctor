@@ -1,7 +1,6 @@
 = Create a Custom Theme
 :url-sass-settings: https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/master/sass/settings/_settings.scss.dist
 :url-sass-defaults: https://github.com/asciidoctor/asciidoctor-stylesheet-factory/blob/master/sass/settings/_defaults.scss
-// create-theme.adoc
 
 You can create your own themes to apply to your documents.
 

@@ -12,7 +12,7 @@ To install the package, open a terminal and type:
 
  $ sudo dnf install -y asciidoctor
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]
 
 == APT
 
@@ -21,7 +21,7 @@ To install the package, open a terminal and type:
 
  $ sudo apt-get install -y asciidoctor
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]
 
 == Alpine Linux
 
@@ -30,7 +30,7 @@ To install the Asciidoctor package, open a terminal and type:
 
  $ sudo apk add asciidoctor
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]
 
 == The package manager versus the gem command
 
@@ -50,7 +50,7 @@ To install Asciidoctor using the `gem` command, open a terminal and type:
 
  $ gem install asciidoctor
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]
 
 [#pre-release]
 === Install a pre-release version
@@ -75,4 +75,4 @@ To install Asciidoctor for a project using Bundler:
 
  $ bundle
 
-include::{partialsdir}/success.adoc[]
+include::partial$success.adoc[]
