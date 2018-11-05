@@ -1,8 +1,4 @@
 = Docinfo Processor Extension Example
-////
-exten-docinfo.adoc, included in:
-- user-manual: Extensions: Docinfo Processor example
-////
 
 Purpose::
 Appends the Google Analytics tracking code to the bottom of an HTML document.

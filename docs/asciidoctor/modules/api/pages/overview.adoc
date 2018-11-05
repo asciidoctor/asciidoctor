@@ -1,32 +1,29 @@
-= The Asciidoctor Ruby API
+= Asciidoctor Ruby API Overview
 ////
 API introduction for Asciidoctor
 included in the user-manual Quickstarts, Using the Ruby API
 doc-asciidoctorj is now url-asciidoctorj-docs but! that means I need to fix docref: link:/docs and doc-asciidoctorj: {docref}/asciidoctorj
 ////
 
-In addition to the xref:ROOT:cli.adoc[command line interface], Asciidoctor provides a Ruby API.
+In addition to its xref:ROOT:cli.adoc[command line interface], Asciidoctor provides a Ruby API.
 The API is intended for integration with other software projects and is suitable for server-side applications, such as Rails, Sinatra and GitHub.
 
 Asciidoctor also has a Java API that mirrors the Ruby API.
 The Java API calls through to the Ruby API using an embedded JRuby runtime.
-See the #AsciidoctorJ documentation# for more information.
+See the AsciidoctorJ documentation for more information.
 
 == Load and convert a document using the API
-////
-included in the user-manual document
-////
 
 To use Asciidoctor in your application, you first need to require the gem:
 
 [source,ruby]
 require 'asciidoctor'
 
-With that in place, you can start processing AsciiDoc documents.
+Now you can start processing AsciiDoc documents.
 To parse a file into an `Asciidoctor::Document` object:
 
 [source,ruby]
-doc = Asciidoctor.load_file 'mysample.adoc'
+doc = Asciidoctor.load_file 'my-sample.adoc'
 
 You can get information about the document:
 
@@ -34,19 +31,25 @@ You can get information about the document:
 puts doc.doctitle
 puts doc.attributes
 
-More than likely, you will want to convert the document.
 To convert a file containing AsciiDoc markup to HTML 5, use:
 
 [source,ruby]
-Asciidoctor.convert_file 'mysample.adoc'
+Asciidoctor.convert_file 'my-sample.adoc'
 
-The command will output to the file [.path]_mysample.html_ in the same directory.
+The command will output to the file [.path]_my-sample.html_ in the same directory.
 
 You can convert the file to DocBook 5.0 by setting the `:backend` option to `'docbook'`:
 
 [source,ruby]
-Asciidoctor.convert_file 'mysample.adoc', backend: 'docbook'
+Asciidoctor.convert_file 'my-sample.adoc', backend: 'docbook'
 
-The command will output to the file [.path]_mysample.xml_ in the same directory.
+The command will output to the file [.path]_my-sample.xml_ in the same directory.
 
-You can also use the API to xref:strings.adoc[convert strings] and xref:templates.adoc[load custom templates].
+== Next
+
+You can use the API to:
+
+* xref:convert-strings.adoc[Convert strings]
+* xref:load-templates.adoc[Load custom templates]
+* xref:set-safe-mode.adoc[Set the safe mode]
+* xref:register-extensions.adoc[Register extensions]

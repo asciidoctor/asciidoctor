@@ -1,8 +1,14 @@
 = Register Extensions
-// exten-point.adoc, included in user-manual: Extensions: Extension Points
-// Here are the extension points that are available in Asciidoctor 0.1.4.
 
-These extension points are currently available.
+Extensions are central to the success of AsciiDoc because they open up the language to new use cases.
+//Asciidoctor provides an extension API that offers a xref:register.adoc[superset of extension points].
+//As a result, extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
+Asciidoctor also allows extensions to be written using the full power of a programming language (whether it be Ruby, Java, Groovy or JavaScript).
+You don't have to shave yaks to get the functionality you want, and you can distribute the extension using defacto-standard packaging mechanisms like RubyGems or JARs.
+
+== Available extension points
+
+Asciidoctor provides the following extension points:
 
 Preprocessor::
 Processes the raw source lines before they are passed to the parser.
@@ -36,11 +42,11 @@ Include processor::
 Processes the `include::<filename>[]` directive.
 See xref:include-processor.adoc[Include Processor Example].
 
-You can see additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
+There are additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
 
 == Register one or more extensions
 
-These extensions are registered per document using a callback that feels sort of like a DSL:
+These extensions are registered per document using a callback that feels like a DSL:
 
 ```ruby
 Asciidoctor::Extensions.register do |document|
@@ -66,6 +72,19 @@ NOTE: There is currently no extension point for processing a built-in block, suc
 Look for that feature in a future Asciidoctor release.
 
 ////
+See if this warning is still necessary:
+
+WARNING: The extension API in Asciidoctor is stable with the exception of inline macros.
+Since inline content is not parsed until the convert phase, the inline macro processor must return converted text (e.g., HTML) rather than an AST node.
+Once Asciidoctor is changed to https://github.com/asciidoctor/asciidoctor/issues/61[process inline content during the parse phase^], the inline macro processor will need to return an inline node.
+When that switch occurs, there will either be some sort of adapter or required migration for inline macro processors, but that has yet to be determined.
+
+However, the way extensions are implemented in AsciiDoc Python presents a number of problems:
+
+* They are challenging to write because they work at such a low-level (read as: nasty regular expressions).
+* They are fragile since they often rely on system commands to do anything significant.
+* They are hard to distribute due to the lack of integration with a formal distribution system.
+
 For now, you need to use the Asciidoctor API (not the CLI) in order to register the extensions and invoke Asciidoctor.
 Eventually, we'll be able to load extensions packaged in a RubyGem (Ruby) or JAR (Java) by scanning
 the LOAD_PATH (Ruby) or classpath (Java), respectively.
