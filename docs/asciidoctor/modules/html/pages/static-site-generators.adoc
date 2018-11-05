@@ -6,7 +6,7 @@ static-front.adoc, included in:
 
 == Front matter for static site generators
 
-Many static site generators (i.e., Jekyll, Middleman, Awestruct) rely on "`front matter`" added to the top of the document to determine how to convert the content.
+Many static site generators (i.e., Jekyll, Middleman) rely on "`front matter`" added to the top of the document to determine how to convert the content.
 Front matter typically starts on the first line of a file and is bounded by block delimiters (e.g., `+---+`).
 
 Here's an example of a document that contains front matter:

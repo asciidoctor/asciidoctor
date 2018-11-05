@@ -48,6 +48,6 @@ As a result, you could save [.path]_my-sample.html_ to any computer and it will 
 
 TIP: Most of the examples in the general documentation use the CLI, but there are usually corresponding API examples under Working with the API.
 
-== What's next?
+== Next
 
 Learn more.
