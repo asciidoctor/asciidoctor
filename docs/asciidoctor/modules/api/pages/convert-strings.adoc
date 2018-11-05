@@ -1,6 +1,4 @@
 = Convert Strings Using the API
-// string-api.adoc
-// Convert Strings the user-manual document
 
 To convert an AsciiDoc-formatted string:
 

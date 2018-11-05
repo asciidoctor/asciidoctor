@@ -6,8 +6,6 @@ Command line usage quick start for Asciidoctor
 included in the install-toolchain and user-manual documents
 ////
 
-Asciidoctor's command line interface (CLI) is a drop-in replacement for the `asciidoc.py` command from the Python implementation.
-
 If the Asciidoctor gem installed successfully, the `asciidoctor` command line interface (CLI) will be available on your PATH.
 To confirm that Asciidoctor is available, execute:
 
@@ -15,7 +13,7 @@ To confirm that Asciidoctor is available, execute:
 
 The following information should be output in your terminal:
 
- Asciidoctor 1.5.7 [https://asciidoctor.org]
+ Asciidoctor 1.5.8 [https://asciidoctor.org]
 
 To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
@@ -23,11 +21,10 @@ To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
 This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the `.html` extension.
 
-There are numerous, available options listed in xref:cli-options.adoc[Asciidoctor CLI options reference].
+All of the available options are listed in xref:cli-options.adoc[Asciidoctor CLI options reference].
 
 Full help is provided in the {url-manpage}[Asciidoctor man page^] or via:
 
  $ asciidoctor --help
 
 There is also an `asciidoctor-safe` command, which turns on safe mode by default, preventing access to files outside the parent directory of the source file.
-This mode is very similar to the safe mode of `asciidoc.py`.

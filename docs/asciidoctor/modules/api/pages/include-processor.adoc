@@ -1,8 +1,4 @@
 = Include Processor Extension Example
-////
-exten-include.adoc, included in:
-- user-manual: Extensions: Include processor example
-////
 
 Purpose::
 Include a file from a URI.

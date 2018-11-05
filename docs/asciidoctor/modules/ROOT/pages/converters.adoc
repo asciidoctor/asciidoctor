@@ -68,7 +68,7 @@ Requires https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke^
 * Antora
 ////
 
-== What's next?
+== Next
 
 Learn how to xref:html:convert-asciidoc-file.adoc[convert an AsciiDoc document to HTML].
 

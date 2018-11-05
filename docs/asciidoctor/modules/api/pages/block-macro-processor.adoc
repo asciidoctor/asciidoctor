@@ -1,5 +1,4 @@
 = Block Macro Processor Extension Example
-// exten-macro.adoc, included in user-manual: Extensions: Block macro processor example
 
 Purpose::
 Create a block macro named `gist` for embedding a gist.
