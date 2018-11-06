@@ -1,11 +1,9 @@
 = Convert AsciiDoc to DocBook
 :url-yelp: https://wiki.gnome.org/action/show/Apps/Yelp
 
-Asciidoctor can produce DocBook 5.0 and 4.5 output.
-Since the AsciiDoc syntax was designed with DocBook output in mind, the conversion is very good.
-There's a corresponding DocBook element for each AsciiDoc element.
-
-== DocBook 5.0
+Asciidoctor can produce DocBook 5.0 XML output.
+//Since the AsciiDoc syntax was designed with DocBook output in mind, the conversion is very good.
+//There's a corresponding DocBook element for each AsciiDoc element.
 
 To convert the [.path]_mysample.adoc_ document to DocBook 5.0 format, call the processor with the backend flag set to `docbook`.
 
@@ -57,15 +55,7 @@ On Linux, you can view the DocBook file with {url-yelp}[Yelp^].
 
  $ yelp mysample.xml
 
-If you're using the Asciidoctor API, you can generate a DocBook document directly from your application.
-
-.Generate DocBook output from the API
-[source,ruby]
-----
-Asciidoctor.convert_file 'mysample.adoc', backend: 'docbook'
-----
-
-By default, the DocBook 5.0 converter produces output that is compliant to the DocBook 5.0 specification.
+The DocBook converter produces output that is compliant to the DocBook 5.0 specification.
 
 A summary of the differences are as follows:
 
@@ -76,13 +66,19 @@ A summary of the differences are as follows:
 * `<link>` is used for links instead of `<ulink>`
 * the URL for a link is defined using the `xl:href` attribute
 
-//Refer to {url-docbook5}[What's new in DocBook v5.0?] for more details about how DocBook 5.0 differs from DocBook 4.5.
+If you're using the Asciidoctor API, you can generate a DocBook document directly from your application.
 
-== DocBook 4.5
+.Generate DocBook output from the API
+[source,ruby]
+----
+Asciidoctor.convert_file 'mysample.adoc', backend: 'docbook'
+----
 
+////
 Set the backend to `docbook45` to generate DocBook 4.5 XML.
 
  $ asciidoctor -b docbook45 mysample.adoc
 
 By default, the `xmlns` attribute is not added to the root element of a DocBook 4.5 document.
 To enable it, assign an empty value to the `xmlns` attribute.
+////
