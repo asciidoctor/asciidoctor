@@ -32,7 +32,7 @@ To install the Asciidoctor package, open a terminal and type:
 
 include::partial$success.adoc[]
 
-== The package manager versus the gem command
+== Package manager versus gem command
 
 The benefit of installing Asciidoctor using a Linux package manager is that it will install and manage the corresponding Ruby and RubyGems versions if they're not already on your machine.
 However, some Linux distributions don't have the latest version of Asciidoctor packaged immediately after a new Asciidoctor gem is released.
@@ -53,7 +53,7 @@ To install Asciidoctor using the `gem` command, open a terminal and type:
 include::partial$success.adoc[]
 
 [#pre-release]
-=== Install a pre-release version
+== Install a pre-release version
 
 To install a pre-release version of Asciidoctor, open a terminal and type:
 
@@ -76,3 +76,7 @@ To install Asciidoctor for a project using Bundler:
  $ bundle
 
 include::partial$success.adoc[]
+
+== Next
+
+Get started with Asciidoctor and learn its xref:ROOT:core-concepts.adoc[core concepts].

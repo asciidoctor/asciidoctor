@@ -37,7 +37,7 @@ Windows Server 2016 +
 Windows Server 2012 R2
 |===
 
-=== Feature requirements
+== Feature requirements
 
 The following platforms *are only required if you're using certain AsciiDoc features*.
 
@@ -64,7 +64,7 @@ The following platforms *are only required if you're using certain AsciiDoc feat
 |4.7
 |===
 
-== What's next?
+== Next
 
 xref:install-on-linux.adoc[Linux]::
 Install Asciidoctor using the package manager on many Linux distributions including Fedora, RHEL, Debian, Ubuntu, and Alpine Linux.
@@ -74,5 +74,3 @@ Install Asciidoctor using Homebrew on macOS.
 
 //xref:install-on-windows.adoc[Windows]::
 //Install Asciidoctor using Chocolatey on Windows.
-
-//Bundler::

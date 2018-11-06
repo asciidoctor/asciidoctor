@@ -1,5 +1,6 @@
 = Upgrade Asciidoctor
 
+[#upgrade-on-linux]
 == Upgrade on Linux
 
 Some Linux distributions may not have the latest stable version of Asciidoctor packaged immediately after a release of a new gem.
@@ -26,11 +27,13 @@ On Fedora and other RPM-based distributions, you can update the package using:
 
  $ sudo dnf update -y asciidoctor
 
+[#upgrade-on-macos]
 == Upgrade on macOS with Homebrew
 
 include::partial$upgrade-on-macos.adoc[]
 
-== Update using gem
+[#gem-update]
+== Upgrade using gem update
 
 [CAUTION]
 ====

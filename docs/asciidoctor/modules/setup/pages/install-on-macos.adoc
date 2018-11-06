@@ -14,3 +14,7 @@ Open a terminal and type:
 Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
 
 include::partial$success.adoc[]
+
+== Next
+
+Get started with Asciidoctor and learn its xref:ROOT:core-concepts.adoc[core concepts].

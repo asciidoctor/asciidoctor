@@ -1,4 +1,4 @@
-If the Asciidoctor gem installed successfully, the `asciidoctor` command line interface (CLI) will be available on your PATH.
+If the gem installed successfully, its xref:ROOT:cli.adoc[command line interface (CLI)] will be available on your PATH.
 To confirm that Asciidoctor is available, execute:
 
  $ asciidoctor --version
