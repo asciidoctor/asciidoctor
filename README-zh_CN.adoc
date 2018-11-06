@@ -281,7 +281,7 @@ Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:U
 ....
 
 Asciidoctor 还提供了一套 API。
-这套 API 是为了整合其他的 Ruby 软件，例如 Rails、Sinatra、Github，甚至其他语言，比如 Java （通过 {uri-asciidoctorj}[AsciidoctorJ]） 和 JavaScript （通过 {uri-asciidoctorjs}[Asciidoctor.js]）。
+这套 API 是为了整合其他的 Ruby 软件，例如 Rails、Sinatra、GitHub，甚至其他语言，比如 Java （通过 {uri-asciidoctorj}[AsciidoctorJ]） 和 JavaScript （通过 {uri-asciidoctorjs}[Asciidoctor.js]）。
 
 [#command-line-interface-cli]
 === 命令行（CLI）
@@ -402,7 +402,7 @@ Further information and documentation about Asciidoctor can be found on the proj
 {uri-project}/[Home] | {uri-news}[News] | {uri-docs}[Docs]
 endif::[]
 
-Asciidoctor 组织在 Github 托管代码、议案跟踪和相关子项目。
+Asciidoctor 组织在 GitHub 托管代码、议案跟踪和相关子项目。
 
 代码库 (git):: {uri-repo}
 议案跟踪:: {uri-issues}
