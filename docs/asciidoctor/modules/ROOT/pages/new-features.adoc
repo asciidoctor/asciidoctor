@@ -1,4 +1,4 @@
-= What's New in {adoc-version}
+= What's New in Asciidoctor
 :adoc-version: 1.5.8
 
 == Sections and book parts

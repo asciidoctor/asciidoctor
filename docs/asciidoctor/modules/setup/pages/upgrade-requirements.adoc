@@ -160,3 +160,14 @@ When it isn't feasibly to update your documents prior to upgrading Asciidoctor, 
 Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
 However, *not all deprecated syntax or behavior is available under the compatibility mode*.
 ////
+
+== Next
+
+xref:upgrade.adoc#upgrade-on-linux[Upgrade on Linux]::
+Upgrade Asciidoctor using the package manager on many Linux distributions including Fedora, RHEL, Debian, Ubuntu, and Alpine Linux.
+
+xref:upgrade.adoc#upgrade-on-macos[Upgrade on macOS]::
+Upgrade Asciidoctor using Homebrew on macOS.
+
+xref:upgrade.adoc#gem-update[Upgrade using gem update]::
+Upgrade Asciidoctor using the `gem update` command.
