@@ -1,12 +1,11 @@
 = Manage Images
-// html-manage-images.adoc, included in convert-documents and user-manual
 
 Images are not embedded in the HTML output by default.
 If you have image references in your document, you'll have to save the image files in the same directory as your converted document.
 
 As an alternative, you can embed the images directly into the document by setting the `data-uri` document attribute.
 
- $ asciidoctor -a data-uri mysample.adoc
+ $ asciidoctor -a data-uri my-sample.adoc
 
 [source]
 ----
@@ -20,6 +19,6 @@ include::example$mysample-data-uri.adoc[]
 
 If the target of one or more images in the document is a URI, you must also set the `allow-uri-read` attribute securely and run Asciidoctor in `SECURE` mode or less.
 
- $ asciidoctor -a data-uri -a allow-uri-read mysample.adoc
+ $ asciidoctor -a data-uri -a allow-uri-read my-sample.adoc
 
 The same is true when converting the document to PDF using Asciidoctor PDF, even if the `allow-uri-read` attribute is not set (since the behavior is implied).

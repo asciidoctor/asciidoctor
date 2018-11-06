@@ -1,8 +1,4 @@
 = Static Website Generators
-////
-static-front.adoc, included in:
-- user-manual: Static website generators: Front matter added for static site generators
-////
 
 == Front matter for static site generators
 
