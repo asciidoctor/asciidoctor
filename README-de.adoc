@@ -63,7 +63,7 @@ endif::[]
 Asciidoctor ist in Ruby geschrieben und läuft auf allen gängigen Betriebsystemen.
 Um die Installation zu vereinfachen wird Asciidoctor als Gem auf {uri-rubygem}[RubyGems.org] verpackt und ist als Paket für gängige Linux-Distributionen und MacOS erhältlich.
 Asciidoctor kann auch in einer JVM mit {uri-asciidoctorj}[AsciidoctorJ] oder einer beliebigen Javascript-Umgebung mit {uri-asciidoctorjs}[Asciidoctor.js] ausgeführt werden.
-Das Asciidoctor-Projekt wird {uri-repo}[auf Github] gehostet.
+Das Asciidoctor-Projekt wird {uri-repo}[auf GitHub] gehostet.
 
 ifndef::env-site[]
 Dieses Dokument ist auch in folgenden Sprachen erhältlich: +

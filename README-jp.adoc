@@ -62,7 +62,7 @@ endif::[]
 {uri-project}/[Asciidoctor]は _高速な_ テキストプロセッサで {uri-what-is-asciidoc}[AsciiDoc] をHTML5, DocBook 5(4.5)や他のフォーマットに変換するツールチェインを配布しています.
 AsciidoctorはRubyで書かれており, RubyGemとしてパッケージされ,  {uri-rubygem}[RubyGems.org] で配布されています.
 gemはいくつかのLinuxディストリビューション, Fedora, Debian, Ubuntuにも含まれています.
-Asciidoctorはオープンソース {uri-repo}[hosted on Github] で {uri-license}[the MIT licence]のもとに配布されます.
+Asciidoctorはオープンソース {uri-repo}[hosted on GitHub] で {uri-license}[the MIT licence]のもとに配布されます.
 
 ifndef::env-site[]
 Translations of this document are available in the following languages:
