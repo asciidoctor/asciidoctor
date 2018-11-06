@@ -1,5 +1,4 @@
-= Asciidoctor Ruby API Options
-// um anchor: appendix#ruby-api-options
+= Ruby API Options
 
 [cols="15m,15,15,15,15"]
 |===
@@ -21,7 +20,7 @@ String: +
 |:backend
 |Selects the converter to use (as registered with this keyword).
 |html5
-|html5, docbook5, docbook45, manpage, or any backend registered through an active converter
+|html5, docbook5, manpage, or any backend registered through an active converter
 |`-b`, `--backend`
 
 |:base_dir
@@ -96,7 +95,7 @@ If false, parsing is deferred until the `parse` method is explicitly invoked.
 |_n/a_
 
 |:safe
-|Sets the safe mode.
+|Sets the xref:ROOT:safe-modes.adoc[safe mode].
 |:secure
 |:unsafe, :safe, :server, :secure
 |`-S`, `--safe-mode`
