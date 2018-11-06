@@ -3,24 +3,22 @@
 :url-docbook-refmisc: https://www.docbook.org/tdg5/en/html/refmiscinfo.html
 :url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
 
-One specialized use of AsciiDoc is to serve as a shorthand for generating man pages (short for manual pages) for Unix and Unix-like operating systems.
+Asciidoctor's built-in man page converter generates {url-man7}[roff-formatted^] manual pages from AsciiDoc documents.
 
 == What is a man page?
 
-A man page is coded in the roff typesetting language.
-By adhering to a specific structure in the man page file, the `man` command can parse the content and present a formatted document in a textual (command line) pager.
-Manual pages provide a unified help catalog for all commands in the system.
-For a full description, see the {url-man7}[roff man page^] (or type `man roff` or `man 7 man`).
+A manual page, often abbreviated to man page, is a form of software documentation found on Unix-based operating systems.
+The formalized structure of its content allows the `man` command to present the man page as a formatted document in a terminal pager.
 
 == Generate a man page with the manpage converter
 
-Asciidoctor can produce roff-formatted man pages if the structure of the AsciiDoc document adheres to the <<man-page-doctype,manpage doctype structure>>.
+Before running Asciidoctor, make sure your source document adheres to the <<man-page-doctype,manpage doctype structure>> and has the doctype attribute set to `manpage`.
 
-To produce a roff-formatted man page from an AsciiDoc file that declares the manpage doctype, run:
+To generate a man page, run:
 
  $ asciidoctor -b manpage source.adoc
 
-Note that the manpage converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document.
+The manpage converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document.
 
 When converting to the man page format, Asciidoctor uppercases the titles of all level-0 and level-1 sections.
 This saves you from having to type section titles in all uppercase.
@@ -30,7 +28,7 @@ CAUTION: If you're using Ruby 2.4 or greater, Asciidoctor will uppercase any let
 Prior to Ruby 2.4, Ruby could only uppercase Latin letters.
 
 Asciidoctor can also produce HTML and PDF versions similar to the `manpage` output for viewing in other contexts.
-To see the man page in HTML instead, run:
+To see the man page in HTML, run:
 
  $ asciidoctor source.adoc
 
@@ -62,8 +60,8 @@ Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`B
 
 == Man page attributes
 
-There are several built-in document attributes that affect only manpages.
-If used, they must be set in the document header.
+Several built-in document attributes only affect man pages.
+These attributes must be set in the document header.
 
 [cols="<15,<30,<30"]
 .Built-in document attributes specific to the manpage doctype
@@ -111,5 +109,5 @@ When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^]
 |===
 
 Refer to {url-manpage-raw}[the AsciiDoc source of the Asciidoctor man page^] to see a complete example.
-The man page for Asciidoctor is produced using its built-in manpage converter.
+The man page for Asciidoctor is produced using the `manpage` converter.
 The man pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.

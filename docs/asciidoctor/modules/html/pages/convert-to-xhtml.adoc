@@ -1,5 +1,4 @@
-= XHTML
-// xhtml.adoc, included in convert-documents and user-manual
+= Convert AsciiDoc to XHTML
 
 To convert AsciiDoc to XHTML, set the backend to `xhtml5`.
 
