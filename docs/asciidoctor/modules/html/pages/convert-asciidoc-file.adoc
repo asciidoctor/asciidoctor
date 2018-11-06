@@ -47,7 +47,3 @@ The document's text, titles, and link is styled by the default Asciidoctor style
 As a result, you could save [.path]_my-sample.html_ to any computer and it will look the same.
 
 TIP: Most of the examples in the general documentation use the CLI, but there are usually corresponding API examples under Working with the API.
-
-== Next
-
-Learn more.

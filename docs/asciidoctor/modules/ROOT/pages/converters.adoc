@@ -12,18 +12,15 @@ Each converter is mapped to a name that you specify using the `-b` (`--backend`)
 
 These built-in converters are bundled with Asciidoctor.
 
-HTML 5::
+HTML::
 The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
 This is the converter Asciidoctor uses by default.
 
-XHTML 5::
+xref:html:convert-to-xhtml.adoc[XHTML]::
 The XHTML variant (`xhtml` or `xhtml5`) of the HTML 5 converter.
 
-DocBook 5.0::
+xref:docbook:convert-to-docbook.adoc[DocBook]::
 The DocBook 5.0 converter (`docbook` or `docbook5`) generates DocBook 5.0 XML.
-
-DocBook 4.5::
-This DocBook converter (`docbook45`) generates DocBook 4.5 XML.
 
 xref:manpage:convert-to-man-page.adoc[Man page]::
 The man page converter (`manpage`) generates manual pages for software used on Unix and Unix-like operating systems.
@@ -70,7 +67,8 @@ Requires https://github.com/asciidoctor/asciidoctor-bespoke[Asciidoctor Bespoke^
 
 == Next
 
-Learn how to xref:html:convert-asciidoc-file.adoc[convert an AsciiDoc document to HTML].
+* Learn how to use the xref:cli.adoc[Asciidoctor command line interface].
+* xref:html:convert-asciidoc-file.adoc[Convert your first AsciiDoc file to HTML] using the default converter.
 
 // TODO describe the role of template converters (e.g., asciidoctor-backends)
 
