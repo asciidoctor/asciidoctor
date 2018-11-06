@@ -1,8 +1,8 @@
-= CodeRay and Pygments Stylesheets
+= Apply CodeRay and Pygments Stylesheets
 // um anchor: hl-css
 // html-code-styles.adoc, included in convert-documents and the user-manual.
 
-Asciidoctor will also embed the theme stylesheet for the CodeRay or Pygments syntax highlighter.
+Asciidoctor can embed the stylesheet for the CodeRay or Pygments syntax highlighters.
 
 [#coderay]
 == CodeRay

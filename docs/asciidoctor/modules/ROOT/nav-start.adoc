@@ -1,11 +1,12 @@
 .Getting Started
-* xref:essential-concepts.adoc[Essential Concepts]
+* xref:core-concepts.adoc[Core Concepts]
 * xref:converters.adoc[Choose a Converter]
+* xref:cli.adoc[Command Line Interface Basics]
 * xref:html:convert-asciidoc-file.adoc[Convert Your First File]
 
 .Processing Files
-* xref:file-output.adoc[Specify an Output File]
-* xref:multiple-files.adoc[Process Multiple Files]
+* xref:output-file-name.adoc[Specify an Output File]
+* xref:process-multiple-files.adoc[Process Multiple Files]
 * xref:docinfo.adoc[Configure Docinfo Files]
 //** Adding Header Content
 //** Adding Footer Content

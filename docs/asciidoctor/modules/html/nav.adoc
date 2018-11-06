@@ -1,17 +1,17 @@
 .Generating HTML
-* xref:html-cli.adoc[Convert AsciiDoc to HTML]
+* xref:convert-to-html.adoc[Convert AsciiDoc to HTML]
 ** xref:manage-images.adoc[Manage Images]
-** xref:html-styles.adoc[Modify the Default Stylesheet]
-** xref:source-code-stylesheets.adoc[Apply a Syntax Highlighting Stylesheet]
-** xref:apply-theme.adoc[Apply a Custom Stylesheet]
-** xref:create-theme.adoc[Create a Custom Theme]
-* xref:xhtml.adoc[Convert AsciiDoc to XHTML]
+** xref:manage-stylesheets.adoc[Manage Stylesheets]
+** xref:apply-code-stylesheets.adoc[Apply CodeRay & Pygments Stylesheets]
+** xref:create-stylesheet.adoc[Create a Custom Stylesheet]
+** xref:apply-stylesheet.adoc[Apply a Custom Stylesheet]
+* xref:convert-to-xhtml.adoc[Convert AsciiDoc to XHTML]
 
 .Generating Man Pages
 * xref:manpage:convert-to-man-page.adoc[Convert AsciiDoc to Man Pages]
 
 .Generating DocBook
-* xref:docbook:convert-to-docbook5.adoc[Convert AsciiDoc to DocBook]
+* xref:docbook:convert-to-docbook.adoc[Convert AsciiDoc to DocBook]
 
 .Preview & Publishing Tools
 * xref:ROOT:preview-tools.adoc[Preview Tools]
