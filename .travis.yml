@@ -22,9 +22,8 @@ after_success: bundle exec rake build:dependents
 deploy:
   provider: rubygems
   gem: asciidoctor
+  api_key: ${RUBYGEMS_API_KEY}
   on:
     tags: true
     repo: asciidoctor/asciidoctor
     rvm: *release_ruby
-  api_key:
-    secure: p0mMZ7Fl5IdIv3ZIH8/4nK3C/6pRjpT8nHnsvAcgBk8TyEMYQO0gZExwMVpk8kB4Nm4Y6dXJqjoHOb1x7dpylEOqyF5fB+mJ8wfWTbGYI4kLYS7O/pkW8XAvH9BqaSnvLb7jZirxxu936ehCw+VlxZfn1n8lC8+jrIoDKMZkKmk=
