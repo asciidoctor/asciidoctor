@@ -215,6 +215,10 @@ class Table::Column < AbstractNode
     end
     col_pcwidth
   end
+
+  def block?
+    false
+  end
 end
 
 # Public: Methods for managing the a cell in an AsciiDoc table.
@@ -362,6 +366,10 @@ class Table::Cell < AbstractNode
   # Public: Get the source line number where this block started
   def lineno
     @source_location && @source_location.lineno
+  end
+
+  def block?
+    false
   end
 
   def to_s

@@ -1196,6 +1196,28 @@ Getting Real details the business, design, programming, and marketing principles
       assert_equal '', cell.text
     end
 
+    test 'should not crash if block? is called on Table Cell' do
+      input = <<-EOS
+|===
+|a
+|===
+      EOS
+      table = (document_from_string input).blocks[0]
+      cell = table.rows.body[0][0]
+      assert_equal false, cell.block?
+    end
+
+    test 'should not crash if block? is called on Table Column' do
+      input = <<-EOS
+|===
+|a
+|===
+      EOS
+      table = (document_from_string input).blocks[0]
+      column = table.rows.body[0][0].column
+      assert_equal false, column.block?
+    end
+
     test 'should set option on node when set_option is called' do
       input = <<-EOS
 . three
