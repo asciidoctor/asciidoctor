@@ -632,21 +632,15 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
     executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
     input_path = fixture_path 'encoding.asciidoc'
-    old_lang = ENV['LANG']
-    ENV['LANG'] = 'US-ASCII'
-    begin
-      # using open3 to work around a bug in JRuby process_manager.rb,
-      # which tries to run a gsub on stdout prematurely breaking the test
-      cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
-      # warnings may be issued, so don't assert on stderr
-      stdout_lines = Open3.popen3(cmd) {|_, out| out.readlines }
-      refute_empty stdout_lines
-      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
-      stdout_str = stdout_lines.join
-      assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
-    ensure
-      ENV['LANG'] = old_lang
-    end
+    # using open3 to work around a bug in JRuby process_manager.rb,
+    # which tries to run a gsub on stdout prematurely breaking the test
+    cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
+    # warnings may be issued, so don't assert on stderr
+    stdout_lines = Open3.popen3({'LANG' => 'US-ASCII'}, cmd) {|_, out| out.readlines }
+    refute_empty stdout_lines
+    stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
+    stdout_str = stdout_lines.join
+    assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
   end
 
   test 'should print timings when -t flag is specified' do
@@ -669,20 +663,10 @@ Sample *AsciiDoc*
     executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
-    old_tz = ENV['TZ']
-    begin
-      ENV['TZ'] = 'UTC'
-      result = Open3.popen3(cmd) {|_, out| out.read }
-      doctime, localtime = result.lines.map {|l| l.chomp }
-      assert doctime.end_with?(' UTC')
-      assert localtime.end_with?(' UTC')
-    rescue
-      if old_tz
-        ENV['TZ'] = old_tz
-      else
-        ENV.delete 'TZ'
-      end
-    end
+    result = Open3.popen3({'TZ' => 'UTC'}, cmd) {|_, out| out.read }
+    doctime, localtime = result.lines.map {|l| l.chomp }
+    assert doctime.end_with?(' UTC')
+    assert localtime.end_with?(' UTC')
   end
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
@@ -690,20 +674,10 @@ Sample *AsciiDoc*
     executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
-    old_tz = ENV['TZ']
-    begin
-      ENV['TZ'] = 'EST+5'
-      result = Open3.popen3(cmd) {|_, out| out.read }
-      doctime, localtime = result.lines.map {|l| l.chomp }
-      assert doctime.end_with?(' -0500')
-      assert localtime.end_with?(' -0500')
-    ensure
-      if old_tz
-        ENV['TZ'] = old_tz
-      else
-        ENV.delete 'TZ'
-      end
-    end
+    result = Open3.popen3({'TZ' => 'EST+5'}, cmd) {|_, out| out.read }
+    doctime, localtime = result.lines.map {|l| l.chomp }
+    assert doctime.end_with?(' -0500')
+    assert localtime.end_with?(' -0500')
   end
 
   test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
