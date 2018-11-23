@@ -70,10 +70,10 @@ module Asciidoctor
 
     module BackendInfo
       def backend_info
-        @backend_info ||= setup_backend_info
+        @backend_info ||= init_backend_info
       end
 
-      def setup_backend_info
+      def init_backend_info
         raise ::ArgumentError, %(Cannot determine backend for converter: #{self.class}) unless @backend
         base = @backend.sub TrailingDigitsRx, ''
         if (ext = DEFAULT_EXTENSIONS[base])
@@ -156,7 +156,7 @@ module Asciidoctor
     # Returns a new instance of [Converter]
     def initialize backend, opts = {}
       @backend = backend
-      setup_backend_info
+      init_backend_info
     end
 
 =begin
