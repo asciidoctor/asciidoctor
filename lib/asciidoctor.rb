@@ -660,6 +660,10 @@ module Asciidoctor
     # NOTE uppercase chars not included since expression is only run on a lowercase string
     InvalidSectionIdCharsRx = /<[^>]+>|&(?:[a-z][a-z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-f][\da-f][\da-f]{0,3});|[^ #{CC_WORD}\-.]+?/
 
+    # Matches an explicit section level style like sect1
+    #
+    SectionLevelStyleRx = /^sect\d$/
+
     ## Lists
 
     # Detects the start of any list item.
