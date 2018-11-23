@@ -676,8 +676,8 @@ Sample *AsciiDoc*
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     result = Open3.popen3({'TZ' => 'EST+5'}, cmd) {|_, out| out.read }
     doctime, localtime = result.lines.map {|l| l.chomp }
-    assert doctime.end_with?(' -0500')
-    assert localtime.end_with?(' -0500')
+    assert doctime.end_with?(' -0500'), %(doctime is supposed to end with ' -0500' but is equal to #{doctime})
+    assert localtime.end_with?(' -0500'), %(localtime is supposed to end with ' -0500' but is equal to #{localtime})
   end
 
   test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
