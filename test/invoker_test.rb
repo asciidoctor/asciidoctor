@@ -694,7 +694,7 @@ Sample *AsciiDoc*
     # If this env variable is not unset, the timezone will always be the one set there
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
-      ENV['TZ'] = 'EST'
+      ENV['TZ'] = 'EST+5'
       sample_filepath = fixture_path 'sample.asciidoc'
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
