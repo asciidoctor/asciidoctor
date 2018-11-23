@@ -670,6 +670,8 @@ Sample *AsciiDoc*
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
+    # If this env variable is not unset, the timezone will always be the one set there
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['TZ'] = 'UTC'
       result = Open3.popen3(cmd) {|_, out| out.read }
@@ -682,6 +684,11 @@ Sample *AsciiDoc*
       else
         ENV.delete 'TZ'
       end
+      if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+          ENV.delete 'SOURCE_DATE_EPOCH'
+      end
     end
   end
 
@@ -691,6 +698,8 @@ Sample *AsciiDoc*
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
+    # If this env variable is not unset, the timezone will always be the one set there
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['TZ'] = 'EST+5'
       result = Open3.popen3(cmd) {|_, out| out.read }
@@ -702,6 +711,11 @@ Sample *AsciiDoc*
         ENV['TZ'] = old_tz
       else
         ENV.delete 'TZ'
+      end
+      if old_source_date_epoch
+          ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+          ENV.delete 'SOURCE_DATE_EPOCH'
       end
     end
   end
