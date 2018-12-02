@@ -22,6 +22,7 @@ Enhancements::
 Bug Fixes::
 
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
+  * ignore explicit section level style (#1852)
 
 Build / Infrastructure::
 

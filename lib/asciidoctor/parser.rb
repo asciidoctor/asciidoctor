@@ -1593,10 +1593,12 @@ class Parser
     if sect_style
       if book && sect_style == 'abstract'
         sect_name, sect_level = 'chapter', 1
+      elsif (sect_style.start_with? 'sect') && (SectionLevelStyleRx.match? sect_style)
+        sect_name = 'section'
       else
         sect_name, sect_special = sect_style, true
         sect_level = 1 if sect_level == 0
-        sect_numbered = sect_style == 'appendix'
+        sect_numbered = sect_name == 'appendix'
       end
     elsif book
       sect_name = sect_level == 0 ? 'part' : (sect_level > 1 ? 'section' : 'chapter')

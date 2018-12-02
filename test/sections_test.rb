@@ -1843,6 +1843,27 @@ Linux installation instructions.
   end
 
   context 'Special sections' do
+    test 'should ignore style if it matches sectN' do
+      input = <<-EOS
+= Document Title
+
+[sect1]
+== Section Level 1
+
+content
+
+[sect2]
+== Section Level 2
+
+content
+      EOS
+
+      output = convert_string input, :backend => :docbook
+      assert_xpath '//section', output, 2
+      assert_xpath '//sect1', output, 0
+      assert_xpath '//sect2', output, 0
+    end
+
     test 'should assign sectname, caption, and numeral to appendix section by default' do
       input = <<-EOS
 [appendix]
