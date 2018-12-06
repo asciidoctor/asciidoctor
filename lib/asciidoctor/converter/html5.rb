@@ -1125,17 +1125,17 @@ Your browser does not support the video tag.
         # load icon svg
         class_attr_val = font_awesome5["#{node.target}"]
 
-        if node.attr? 'height' and node.attr? 'width' and node.attr? 'title'
-          class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\" title=#{node.attr("title")}")
-        elsif node.attr? 'height' and node.attr? 'width'
+        # define height width
+        if node.attr? 'height' and node.attr? 'width'
           class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\"")
-        elsif node.attr? 'title'
-          class_attr_val.insert(4, " title=#{node.attr("title")}")
-        elsif node.attr? 'height' and node.attr? 'width'
         end
         
-        title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
-        img = %(#{class_attr_val} #{title_attr}</i>)
+        # add title
+        if node.attr? 'title'
+          class_attr_val.insert(class_attr_val.index("\">")+2 ,"<title>#{node.attr("title")}</title>")
+        end
+
+        img = %(#{class_attr_val})
       elsif type == 'icon' && !(node.document.attr? 'icons')
         img = %([#{node.alt}])
       else
