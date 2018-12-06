@@ -1,3 +1,5 @@
+require 'yaml'
+
 # encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
@@ -1117,12 +1119,20 @@ Your browser does not support the video tag.
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        class_attr_val = %(fa fa-#{node.target})
-        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |key, prefix|
-          class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+        # load font awesome5 list
+        font_awesome5 = YAML.load_file(File.dirname(__FILE__)+ '/const/font_awesome5.yml')
+
+        # load icon svg
+        class_attr_val = font_awesome5["#{node.target}"]
+
+        ['width', 'height'].each do |key, prefix|
+          if node.attr? key
+            class_attr_val.insert(4, " #{key} = \"#{node.attr key}\"")
+          end
         end
+        
         title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
-        img = %(<i class="#{class_attr_val}"#{title_attr}></i>)
+        img = %(#{class_attr_val} #{title_attr}</i>)
       elsif type == 'icon' && !(node.document.attr? 'icons')
         img = %([#{node.alt}])
       else
