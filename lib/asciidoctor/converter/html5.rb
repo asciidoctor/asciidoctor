@@ -1125,10 +1125,8 @@ Your browser does not support the video tag.
         # load icon svg
         class_attr_val = font_awesome5["#{node.target}"]
 
-        ['width', 'height'].each do |key, prefix|
-          if node.attr? key
-            class_attr_val.insert(4, " #{key} = \"#{node.attr key}\"")
-          end
+        if node.attr? 'height' and node.attr? 'width'
+          class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\"")
         end
         
         title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
