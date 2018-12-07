@@ -1,4 +1,4 @@
-require 'yaml'
+require_relative 'font_awesome'
 
 # encoding: UTF-8
 module Asciidoctor
@@ -1119,12 +1119,10 @@ Your browser does not support the video tag.
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        # load font awesome5 list
-        font_awesome5 = YAML.load_file(File.dirname(__FILE__)+ '/const/font_awesome5.yml')
-
         # load icon svg
-        class_attr_val = font_awesome5["#{node.target}"]
-
+        font_awesome = FontAwesome.new
+        class_attr_val = font_awesome.get_constant["#{node.target}"]
+        
         # define height width
         if node.attr? 'height' and node.attr? 'width'
           class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\"")
