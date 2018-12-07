@@ -31,6 +31,7 @@ module Asciidoctor
       @xml_mode = opts[:htmlsyntax] == 'xml'
       @void_element_slash = @xml_mode ? '/' : nil
       @stylesheets = Stylesheets.instance
+      @font_awesome = FontAwesome.new
     end
 
     def document node
@@ -1120,8 +1121,7 @@ Your browser does not support the video tag.
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
         # load icon svg
-        font_awesome = FontAwesome.new
-        class_attr_val = font_awesome.get_constant["#{node.target}"]
+        class_attr_val = @font_awesome.get_constant["#{node.target}"]
         
         # define height width
         if node.attr? 'height' and node.attr? 'width'
