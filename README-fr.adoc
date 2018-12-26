@@ -136,7 +136,7 @@ Asciidoctor.js est utilisé pour faire fonctionner les extensions AsciiDoc Previ
 
 Asciidoctor fonctionne sur Linux, macOS et Windows et requiert une des implémentations suivantes de {uri-ruby}[Ruby] :
 
-* Ruby (MRI/CRuby 1.8.7 - 2.5)
+* Ruby (MRI/CRuby 1.8.7 - 2.6)
 * JRuby (1.7 en mode Ruby 1.8 et 1.9, 9000)
 * Rubinius 2.2.x
 * Opal (JavaScript)

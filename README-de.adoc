@@ -139,7 +139,7 @@ Es wird für die AsciiDoc Vorschau-Erweiterungen für Chrome, Atom, Brackets und
 
 Asciidoctor arbeitet unter Linux, MacOS und Windows und benötigt eine der folgenden Implementierungen von {uri-ruby}[Ruby]:
 
-* Ruby (MRI/CRuby 1.8.7 - 2.5)
+* Ruby (MRI/CRuby 1.8.7 - 2.6)
 * JRuby (1.7 in Ruby 1.8 und 1.9 modes, 9000)
 * Rubinius 2.2.x
 * Opal (JavaScript)
@@ -327,7 +327,7 @@ Sie sollten Informationen über die Asciidoctor-Version und Ihre Ruby-Umgebung i
 [.output,subs=attributes+]
 ....
 Asciidoctor 1.5.7 [https://asciidoctor.org]
-Laufzeitumgebung (ruby 2.5.1p57 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Laufzeitumgebung (ruby 2.6.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor bietet auch eine API.

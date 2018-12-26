@@ -28,6 +28,7 @@ Build / Infrastructure::
 
   * stop running CI job on unsupported versions of Ruby
   * remove compat folder (removes the AsciiDoc Python config file that provides pseudo-compliance with Asciidoctor and a stylesheet for an old Font Awesome migration)
+  * add Ruby 2.6.0 to build matrix
 
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
