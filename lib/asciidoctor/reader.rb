@@ -977,8 +977,9 @@ class PreprocessorReader < Reader
               # must force encoding since we're performing String operations on line
               l.force_encoding encoding if encoding
               if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
+                this_tag = $2
                 if $1 # end tag
-                  if (this_tag = $2) == active_tag
+                  if this_tag == active_tag
                     tag_stack.pop
                     active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
                   elsif inc_tags.key? this_tag
@@ -990,7 +991,7 @@ class PreprocessorReader < Reader
                       logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
                     end
                   end
-                elsif inc_tags.key?(this_tag = $2)
+                elsif inc_tags.key? this_tag
                   tags_used << this_tag
                   # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
                   tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
