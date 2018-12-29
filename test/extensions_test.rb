@@ -668,7 +668,8 @@ after
           include_processor BoilerplateTextIncludeProcessor
         end
 
-        result = convert_string input, :safe => :server
+        # a custom include processor is not affected by the safe mode
+        result = convert_string input, :safe => :secure
         assert_css '.paragraph > p', result, 3
         assert_includes result, 'before'
         assert_includes result, 'Lorem ipsum'
@@ -678,11 +679,14 @@ after
       end
     end
 
-    test 'should call include processor to process include directive' do
+    test 'should invoke include processor if it offers to handle include directive' do
       input = <<-EOS
-first line
+include::skip-me.asciidoc[]
+line after skip
 
 include::include-file.asciidoc[]
+
+include::fixtures/grandchild-include.adoc[]
 
 last line
       EOS
@@ -690,21 +694,31 @@ last line
       registry = Asciidoctor::Extensions.create do
         include_processor do
           handles? do |target|
+            target == 'skip-me.asciidoc'
+          end
+
+          process do |doc, reader, target, attributes|
+          end
+        end
+
+        include_processor do
+          handles? do |target|
             target == 'include-file.asciidoc'
           end
 
           process do |doc, reader, target, attributes|
-            # demonstrate that push_include normalizes endlines
+            # demonstrates that push_include normalizes endlines
             content = ["include target:: #{target}\n", "\n", "middle line\n"]
             reader.push_include content, target, target, 1, attributes
           end
         end
       end
-      # Safe Mode is not required here
-      document = empty_document :base_dir => testdir, :extension_registry => registry
+      # safe mode only required for built-in include processor
+      document = empty_document :base_dir => testdir, :extension_registry => registry, :safe => :safe
       reader = Asciidoctor::PreprocessorReader.new document, input, nil, :normalize => true
       lines = []
       lines << reader.read_line
+      assert_equal 'line after skip', lines.last
       lines << reader.read_line
       lines << reader.read_line
       assert_equal 'include target:: include-file.asciidoc', lines.last
@@ -715,6 +729,8 @@ last line
       source = lines * ::Asciidoctor::LF
       assert_match(/^include target:: include-file.asciidoc$/, source)
       assert_match(/^middle line$/, source)
+      assert_match(/^last line of grandchild$/, source)
+      assert_match(/^last line$/, source)
     end
 
     test 'should invoke tree processors after parsing document' do
