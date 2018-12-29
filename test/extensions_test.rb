@@ -654,7 +654,7 @@ sample content
       end
     end
 
-    test 'should invoke include processor to process include macro' do
+    test 'should invoke include processor to process include directive' do
       input = <<-EOS
 before
 
