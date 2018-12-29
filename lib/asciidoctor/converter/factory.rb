@@ -42,21 +42,26 @@ module Asciidoctor
         #                        initialized, a fresh instance is returned.
         #
         # Returns the default [Factory] singleton instance
-        def default initialize_singleton = true
-          return @__default__ || new unless initialize_singleton
-          if RUBY_ENGINE == 'opal'
-            @__default__ ||= new
-          else
-            # FIXME this assignment itself may not be thread safe; may need to use a helper here
-            @__default__ ||= begin
-              unless defined? ::Concurrent::Hash
-                require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
+        if RUBY_ENGINE == 'opal'
+          def default initialize_singleton = true
+            initialize_singleton ? (@__default__ ||= new) : (@__default || new)
+          end
+        else
+          def default initialize_singleton = true
+            if initialize_singleton
+              # FIXME this assignment itself may not be thread safe; may need to use a helper here
+              @__default__ ||= begin
+                unless defined? ::Concurrent::Hash
+                  require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
+                end
+                new ::Concurrent::Hash.new
+              rescue ::LoadError
+                include Logging unless include? Logging
+                logger.warn 'gem \'concurrent-ruby\' is not installed. This gem is recommended when registering custom converters.'
+                new
               end
-              new ::Concurrent::Hash.new
-            rescue ::LoadError
-              include Logging unless include? Logging
-              logger.warn 'gem \'concurrent-ruby\' is not installed. This gem is recommended when registering custom converters.'
-              new
+            else
+              @__default__ || new
             end
           end
         end
