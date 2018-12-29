@@ -44,7 +44,7 @@ module Asciidoctor
         # Returns the default [Factory] singleton instance
         if RUBY_ENGINE == 'opal'
           def default initialize_singleton = true
-            initialize_singleton ? (@__default__ ||= new) : (@__default || new)
+            initialize_singleton ? (@__default__ ||= new) : (@__default__ || new)
           end
         else
           def default initialize_singleton = true
