@@ -708,7 +708,11 @@ last line
 
           process do |doc, reader, target, attributes|
             # demonstrates that push_include normalizes endlines
-            content = ["include target:: #{target}\n", "\n", "middle line\n"]
+            content = [
+              %(found include target '#{target}' at line #{reader.cursor_at_prev_line.lineno}\r\n),
+              %(\r\n),
+              %(middle line\r\n)
+            ]
             reader.push_include content, target, target, 1, attributes
           end
         end
@@ -721,13 +725,13 @@ last line
       assert_equal 'line after skip', lines.last
       lines << reader.read_line
       lines << reader.read_line
-      assert_equal 'include target:: include-file.asciidoc', lines.last
+      assert_equal 'found include target \'include-file.asciidoc\' at line 4', lines.last
       assert_equal 'include-file.asciidoc: line 2', reader.line_info
       while reader.has_more_lines?
         lines << reader.read_line
       end
       source = lines * ::Asciidoctor::LF
-      assert_match(/^include target:: include-file.asciidoc$/, source)
+      assert_match(/^found include target 'include-file.asciidoc' at line 4$/, source)
       assert_match(/^middle line$/, source)
       assert_match(/^last line of grandchild$/, source)
       assert_match(/^last line$/, source)
