@@ -891,6 +891,7 @@ class PreprocessorReader < Reader
 
       parsed_attrs = doc.parse_attributes attrlist, [], :sub_input => true
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
+      # NOTE if target_type is not set, inc_path is a boolean to skip over (false) or reevaluate (true) the current line
       return inc_path unless target_type
 
       inc_linenos = inc_tags = nil
