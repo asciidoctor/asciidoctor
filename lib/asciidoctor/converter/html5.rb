@@ -44,7 +44,7 @@ module Asciidoctor
       result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : ''}#{lang_attribute}>)
       result << %(<head>
 <meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
-<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}><![endif]-->
+<meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
       result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
