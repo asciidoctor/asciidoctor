@@ -1,3 +1,5 @@
+require_relative 'font_awesome'
+
 # encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
@@ -29,6 +31,7 @@ module Asciidoctor
       @xml_mode = opts[:htmlsyntax] == 'xml'
       @void_element_slash = @xml_mode ? '/' : nil
       @stylesheets = Stylesheets.instance
+      @font_awesome = FontAwesome.new
     end
 
     def document node
@@ -1117,12 +1120,20 @@ Your browser does not support the video tag.
 
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
-        class_attr_val = %(fa fa-#{node.target})
-        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |key, prefix|
-          class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+        # load icon svg
+        class_attr_val = @font_awesome.get_constant["#{node.target}"]
+        
+        # define height width
+        if node.attr? 'height' and node.attr? 'width'
+          class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\"")
         end
-        title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
-        img = %(<i class="#{class_attr_val}"#{title_attr}></i>)
+        
+        # add title
+        if node.attr? 'title'
+          class_attr_val.insert(class_attr_val.index("\">")+2 ,"<title>#{node.attr("title")}</title>")
+        end
+
+        img = %(#{class_attr_val})
       elsif type == 'icon' && !(node.document.attr? 'icons')
         img = %([#{node.alt}])
       else
