@@ -240,7 +240,7 @@ Example: asciidoctor -b html5 source.asciidoc
 
         if self[:template_dirs]
           begin
-            require 'tilt' unless defined? ::Tilt::VERSION
+            require 'tilt' unless defined? ::Tilt.new
           rescue ::LoadError
             raise $! if self[:trace]
             $stderr.puts 'asciidoctor: FAILED: \'tilt\' could not be loaded'

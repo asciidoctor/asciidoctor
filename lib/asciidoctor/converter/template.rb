@@ -52,7 +52,7 @@ module Asciidoctor
     end
 
     def initialize backend, template_dirs, opts = {}
-      Helpers.require_library 'tilt' unless defined? ::Tilt
+      Helpers.require_library 'tilt' unless defined? ::Tilt.new
       @backend = backend
       @templates = {}
       @template_dirs = template_dirs
@@ -255,7 +255,7 @@ module Asciidoctor
           when :slim
             unless @active_engines[extsym]
               # NOTE slim doesn't get automatically loaded by Tilt
-              Helpers.require_library 'slim' unless defined? ::Slim
+              Helpers.require_library 'slim' unless defined? ::Slim::Engine
               ::Slim::Engine.define_options :asciidoc => {}
               # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
               # NOTE safe mode won't get updated if using template cache and changing safe mode
@@ -266,7 +266,7 @@ module Asciidoctor
             end
           when :haml
             unless @active_engines[extsym]
-              Helpers.require_library 'haml' unless defined? ::Haml
+              Helpers.require_library 'haml' unless defined? ::Haml::Engine
               # NOTE Haml 5 dropped support for pretty printing
               @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
               @active_engines[extsym] = true
@@ -296,7 +296,7 @@ module Asciidoctor
     # and a Hash of additional options to pass to the initializer
     def load_eruby name
       if !name || name == 'erb'
-        require 'erb' unless defined? ::ERB
+        require 'erb' unless defined? ::ERB.version
         [::Tilt::ERBTemplate, {}]
       elsif name == 'erubis'
         Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby

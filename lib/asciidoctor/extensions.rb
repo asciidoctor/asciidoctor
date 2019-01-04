@@ -1,5 +1,5 @@
 # NOTE .to_s hides require from Opal
-require 'asciidoctor'.to_s unless defined? Asciidoctor
+require 'asciidoctor'.to_s unless defined? Asciidoctor.load
 
 # encoding: UTF-8
 module Asciidoctor

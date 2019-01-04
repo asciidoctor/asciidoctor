@@ -5,7 +5,7 @@ rescue LoadError
   require 'asciidoctor/version'
 end
 
-require 'open3' unless defined? Open3
+require 'open3' unless defined? Open3.popen3
 
 Gem::Specification.new do |s|
   s.name = 'asciidoctor'
