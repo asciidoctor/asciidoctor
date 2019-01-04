@@ -68,12 +68,12 @@ module Extensions
       def use_dsl
         if self.name.nil_or_empty?
           # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #include const_get :DSL if constants(false).grep :DSL
-          include const_get :DSL if constants.grep :DSL
+          #include const_get :DSL if constants(false).include? :DSL
+          include const_get :DSL if constants.include? :DSL
         else
           # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #extend const_get :DSL if constants(false).grep :DSL
-          extend const_get :DSL if constants.grep :DSL
+          #extend const_get :DSL if constants(false).include? :DSL
+          extend const_get :DSL if constants.include? :DSL
         end
       end
       alias extend_dsl use_dsl
@@ -1332,7 +1332,7 @@ module Extensions
         #  include_dsl
         #end
         # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
-        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1378,7 +1378,7 @@ module Extensions
         #  include_dsl
         #end
         # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
-        processor.extend kind_class.const_get :DSL if kind_class.constants.grep :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
         if block.arity == 1
           yield processor
         else
