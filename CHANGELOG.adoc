@@ -34,6 +34,7 @@ Bug Fixes::
   * ignore explicit section level style (#1852)
   * check if type is defined in a way that's compatible with autoload
   * fix invalid check for DSL in extension class (previously always returned true)
+  * scope constant lookups (#2764)
 
 Build / Infrastructure::
 

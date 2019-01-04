@@ -65,7 +65,7 @@ module Extensions
       #
       # Returns nothing
       def use_dsl
-        if constants.include? :DSL
+        if const_defined? :DSL
           if self.name.nil_or_empty?
             include const_get :DSL
           else
@@ -1316,8 +1316,8 @@ module Extensions
     def add_document_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
       kind_class_symbol = kind_name.split.map {|it| it.capitalize }.join.to_sym
-      kind_class = Extensions.const_get kind_class_symbol
-      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
+      kind_class = Extensions.const_get kind_class_symbol, false
+      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
       # style 1: specified as block
       extension = if block_given?
@@ -1328,7 +1328,7 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1362,8 +1362,8 @@ module Extensions
     def add_syntax_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
       kind_class_symbol = (kind_name.split.map {|it| it.capitalize }.push 'Processor').join.to_sym
-      kind_class = Extensions.const_get kind_class_symbol
-      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
+      kind_class = Extensions.const_get kind_class_symbol, false
+      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, {})
       # style 1: specified as block
       if block_given?
@@ -1373,7 +1373,7 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
         if block.arity == 1
           yield processor
         else

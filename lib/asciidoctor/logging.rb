@@ -34,7 +34,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c] }]
+  SEVERITY_LABELS = ::Hash[(Severity.constants false).map {|c| [(Severity.const_get c, false), c] }]
 
   attr_reader :messages
 
@@ -58,7 +58,7 @@ class MemoryLogger < ::Logger
   end
 
   def max_severity
-    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity] }.max
+    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity], false }.max
   end
 end
 

@@ -83,12 +83,11 @@ module Asciidoctor
     # enforced)!
     #PARANOID = 100;
 
-    rec = {}
-    constants.each {|sym| rec[const_get sym] = sym.to_s.downcase }
-    @names_by_value = rec
+    @names_by_value = accum = {}
+    (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase }
 
     def self.value_for_name name
-      const_get name.upcase
+      const_get name.upcase, false
     end
 
     def self.name_for_value value
