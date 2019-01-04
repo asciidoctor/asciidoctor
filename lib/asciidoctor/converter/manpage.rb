@@ -710,7 +710,7 @@ allbox tab(:);'
         manvolext = %(.#{manvolnum})
         dir, basename = ::File.split target
         mannames.each do |manname|
-          ::IO.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename})
+          ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
         end
       end
     end

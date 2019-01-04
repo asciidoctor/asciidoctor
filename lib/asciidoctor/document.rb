@@ -1220,10 +1220,8 @@ class Document < AbstractBlock
           # ensure there's a trailing endline
           target.write LF
         end
-      elsif FORCE_ENCODING
-        ::IO.write target, output, :encoding => ::Encoding::UTF_8
       else
-        ::IO.write target, output
+        ::File.write target, output, mode: FILE_WRITE_MODE
       end
       if @backend == 'manpage' && ::String === target && (@converter.respond_to? :write_alternate_pages)
         @converter.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target

@@ -269,26 +269,25 @@ content
 
     # WARNING this test manipulates runtime settings; should probably be run in forked process
     test 'should force encoding of docinfo files to UTF-8' do
-      sample_input_path = fixture_path('basic.asciidoc')
-
-      default_external_old = Encoding.default_external
-      force_encoding_old = Asciidoctor::FORCE_ENCODING
-      verbose_old = $VERBOSE
+      old_external = Encoding.default_external
+      old_internal = Encoding.default_internal
+      old_verbose = $VERBOSE
       begin
         $VERBOSE = nil # disable warnings since we have to modify constants
-        Encoding.default_external = 'ISO-8859-1'
-        Asciidoctor::FORCE_ENCODING = true
-        output = Asciidoctor.convert_file sample_input_path, :to_file => false,
-            :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''}
+        Encoding.default_external = Encoding.default_internal = Encoding::IBM437
+        sample_input_path = fixture_path('basic.asciidoc')
+        output = Asciidoctor.convert_file sample_input_path, :to_file => false, :header_footer => true,
+            :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docinfo' => 'private,shared' }
         refute_empty output
         assert_css 'productname', output, 1
+        assert_includes output, '<productname>Asciidoctor™</productname>'
         assert_css 'edition', output, 1
         assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
         assert_css 'copyright', output, 1
       ensure
-        Encoding.default_external = default_external_old
-        Asciidoctor::FORCE_ENCODING = force_encoding_old
-        $VERBOSE = verbose_old
+        Encoding.default_external = old_external
+        Encoding.default_internal = old_internal
+        $VERBOSE = old_verbose
       end
     end
 

@@ -628,19 +628,23 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'encoding.asciidoc'
     old_lang = ENV['LANG']
-    ENV['LANG'] = 'US-ASCII'
     begin
+      ENV['LANG'] = 'US-ASCII'
       # using open3 to work around a bug in JRuby process_manager.rb,
       # which tries to run a gsub on stdout prematurely breaking the test
       cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
       # warnings may be issued, so don't assert on stderr
       stdout_lines = Open3.popen3(cmd) {|_, out| out.readlines }
       refute_empty stdout_lines
-      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
+      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless stdout_lines[0].encoding == Encoding::UTF_8
       stdout_str = stdout_lines.join
       assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
     ensure
-      ENV['LANG'] = old_lang
+      if old_lang
+        ENV['LANG'] = old_lang
+      else
+        ENV.delete 'LANG'
+      end
     end
   end
 

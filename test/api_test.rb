@@ -72,6 +72,7 @@ context 'API' do
         tmp_input = Tempfile.new %w(test-ＵＴＦ８- .adoc)
         tmp_input.write %(ＵＴＦ８\n)
         tmp_input.close
+        Encoding.default_external = Encoding.default_internal = Encoding::IBM437
         tmp_output = tmp_input.path.sub '.adoc', '.html'
         Asciidoctor.convert_file tmp_input.path, :safe => :safe, :attributes => 'linkcss !copycss'
         assert File.exist? tmp_output
@@ -81,7 +82,7 @@ context 'API' do
         assert_includes output, 'ＵＴＦ８'
       ensure
         tmp_input.close!
-        FileUtils.rm tmp_output
+        FileUtils.rm_f tmp_output
         Encoding.default_external = old_external
         Encoding.default_internal = old_internal
         $VERBOSE = old_verbose

@@ -81,9 +81,9 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
                   'unless @ is appended to the value, this attributes takes precedence over attributes',
                   'defined in the source document') do |attr|
+            attr = attr.encode ::Encoding::UTF_8 unless attr.encoding == ::Encoding::UTF_8
             key, val = attr.split '=', 2
-            val = val ? (FORCE_ENCODING ? (val.force_encoding ::Encoding::UTF_8) : val) : ''
-            self[:attributes][key] = val
+            self[:attributes][key] = val || ''
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|

@@ -54,7 +54,7 @@ module Helpers
 
   # Public: Normalize the array of lines to prepare them for parsing
   #
-  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
+  # Encodes the data to UTF-8 and removes trailing whitespace from each line.
   #
   # If a BOM is present at the beginning of the data, a best attempt
   # is made to encode from the specified encoding to UTF-8.
@@ -65,23 +65,23 @@ module Helpers
   def self.normalize_lines_array data
     return data if data.empty?
     utf8 = ::Encoding::UTF_8
-    if (leading_2_bytes = (leading_bytes = (first_line = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
-      # HACK Ruby messes up trailing whitespace on UTF-16LE, so reencode whole document first
-      data = data.join
-      return (((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8).lines.map {|line| line.rstrip }
+    if (leading_2_bytes = (leading_bytes = (first = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
+      data[0] = first.byteslice 2, first.bytesize
+      # HACK Ruby messes up trailing whitespace on UTF-16LE, so encode whole document first; assume newlines are present
+      return (data.join.encode utf8, ::Encoding::UTF_16LE).lines.map {|line| line.rstrip }
     elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-      data[0] = (first_line.force_encoding ::Encoding::UTF_16BE).slice 1, first_line.length
-      return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
+      data[0] = first.byteslice 2, first.bytesize
+      return data.map {|line| (line.encode utf8, ::Encoding::UTF_16BE).rstrip }
     elsif leading_bytes == BOM_BYTES_UTF_8
-      data[0] = (first_line.force_encoding utf8).slice 1, first_line.length
+      data[0] = first.byteslice 3, first.bytesize
     end
-    data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
+    data.map {|line| (line.encoding == utf8 ? line : (line.encode utf8)).rstrip }
   end
 
   # Public: Normalize the String and split into lines to prepare them for parsing
   #
-  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
-  # Converts the data to a String Array.
+  # Encodes the data to UTF-8, converts the data to a String Array, and removes
+  # trailing whitespace from each line.
   #
   # If a BOM is present at the beginning of the data, a best attempt
   # is made to encode from the specified encoding to UTF-8.
@@ -93,13 +93,14 @@ module Helpers
     return [] if data.nil_or_empty?
     utf8 = ::Encoding::UTF_8
     if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
-      data = ((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8
+      data = (data.byteslice 2, data.bytesize).encode utf8, ::Encoding::UTF_16LE
     elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-      data = ((data.force_encoding ::Encoding::UTF_16BE).slice 1, data.length).encode utf8
+      data = (data.byteslice 2, data.bytesize).encode utf8, ::Encoding::UTF_16BE
     elsif leading_bytes == BOM_BYTES_UTF_8
-      data = data.encoding == utf8 ? (data.slice 1, data.length) : ((data.force_encoding utf8).slice 1, data.length)
-    else
-      data = data.force_encoding utf8 unless data.encoding == utf8
+      data = data.byteslice 3, data.bytesize
+      data = data.encode utf8 unless data.encoding == utf8
+    elsif data.encoding != utf8
+      data = data.encode utf8
     end
     data.lines.map {|line| line.rstrip }
   end

@@ -888,8 +888,16 @@ class PreprocessorReader < Reader
 
       parsed_attrs = doc.parse_attributes attrlist, [], :sub_input => true
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
-      # NOTE if target_type is not set, inc_path is a boolean to skip over (false) or reevaluate (true) the current line
-      return inc_path unless target_type
+      if target_type == :file
+        reader = ::File.method :open
+        read_mode = FILE_READ_MODE
+      elsif target_type == :uri
+        reader = ::OpenURI.method :open_uri
+        read_mode = URI_READ_MODE
+      else
+        # NOTE if target_type is not set, inc_path is a boolean to skip over (false) or reevaluate (true) the current line
+        return inc_path
+      end
 
       inc_linenos = inc_tags = nil
       if attrlist
@@ -924,7 +932,7 @@ class PreprocessorReader < Reader
       if inc_linenos
         inc_lines, inc_offset, inc_lineno = [], nil, 0
         begin
-          open(inc_path, 'rb') do |f|
+          reader.call inc_path, read_mode do |f|
             select_remaining = nil
             f.each_line do |l|
               inc_lineno += 1
@@ -967,13 +975,10 @@ class PreprocessorReader < Reader
           wildcard = inc_tags.delete '*'
         end
         begin
-          open(inc_path, 'rb') do |f|
+          reader.call inc_path, read_mode do |f|
             dbl_co, dbl_sb = '::', '[]'
-            utf8 = ::Encoding::UTF_8
             f.each_line do |l|
               inc_lineno += 1
-              # must force encoding since we're performing String operations on line
-              l.force_encoding utf8
               if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
                 this_tag = $2
                 if $1 # end tag
@@ -1024,8 +1029,8 @@ class PreprocessorReader < Reader
         end
       else
         begin
-          # NOTE read content first so that we only advance cursor if IO operation succeeds
-          inc_content = target_type == :file ? ::File.open(inc_path, 'rb') {|f| f.read } : open(inc_path, 'rb') {|f| f.read }
+          # NOTE read content before shift so cursor is only advanced if IO operation succeeds
+          inc_content = reader.call(inc_path, read_mode) {|f| f.read }
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue

@@ -19,6 +19,8 @@ Enhancements::
 
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
+  * use String#encode to encode String as UTF-8 instead of using String#force_encoding (#2764)
+  * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
 
 Improvements::
 
@@ -35,6 +37,7 @@ Bug Fixes::
   * check if type is defined in a way that's compatible with autoload
   * fix invalid check for DSL in extension class (previously always returned true)
   * scope constant lookups (#2764)
+  * use byteslice instead of slice to remove BOM from string (#2764)
 
 Build / Infrastructure::
 
