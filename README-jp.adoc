@@ -394,7 +394,7 @@ Asciidoctor organization on GitHub:: {uri-org}
 
 == Copyright and Licensing
 
-Copyright (C) 2012-2018 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright (C) 2012-2019 Dan Allen, Ryan Waldron and the Asciidoctor Project.
 本ソフトウェアはMITライセンスのもとで自由に使用できます.
 
 詳細は {uri-license}[LICENSE] ファイルを参照してください.
