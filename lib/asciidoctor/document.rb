@@ -498,7 +498,7 @@ class Document < AbstractBlock
       if (localdate = attrs['localdate'])
         localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
       else
-        localdate = attrs['localdate'] = (now.strftime '%F')
+        localdate = attrs['localdate'] = now.strftime '%F'
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
@@ -591,11 +591,11 @@ class Document < AbstractBlock
   def counter name, seed = nil
     return @parent_document.counter name, seed if @parent_document
     if (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
-      @attributes[name] = @counters[name] = (nextval attr_val)
+      @attributes[name] = @counters[name] = nextval attr_val
     elsif seed
-      @attributes[name] = @counters[name] = (seed == seed.to_i.to_s ? seed.to_i : seed)
+      @attributes[name] = @counters[name] = seed == seed.to_i.to_s ? seed.to_i : seed
     else
-      @attributes[name] = @counters[name] = nextval(attr_seed ? attr_val : 0)
+      @attributes[name] = @counters[name] = nextval attr_seed ? attr_val : 0
     end
   end
 
@@ -846,7 +846,7 @@ class Document < AbstractBlock
     # css-signature cannot be updated after header attributes are processed
     @id = attrs['css-signature'] unless @id
 
-    toc_position_val = if (toc_val = (attrs.delete('toc2') ? 'left' : attrs['toc']))
+    toc_position_val = if (toc_val = attrs.delete('toc2') ? 'left' : attrs['toc'])
       # toc-placement allows us to separate position from using fitted slot vs macro
       (toc_placement = attrs.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : attrs['toc-position']
     else

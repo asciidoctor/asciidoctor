@@ -1285,7 +1285,7 @@ module Asciidoctor
       if (docdate = attrs['docdate'])
         attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
       else
-        docdate = attrs['docdate'] = (input_mtime.strftime '%F')
+        docdate = attrs['docdate'] = input_mtime.strftime '%F'
         attrs['docyear'] ||= input_mtime.year.to_s
       end
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)

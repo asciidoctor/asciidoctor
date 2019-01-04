@@ -125,7 +125,7 @@ module Asciidoctor
         if (scan_cache = @caches[:scans])
           template_cache = @caches[:templates]
           unless (templates = scan_cache[pattern])
-            templates = (scan_cache[pattern] = (scan_dir template_dir, pattern, template_cache))
+            templates = scan_cache[pattern] = scan_dir template_dir, pattern, template_cache
           end
           templates.each do |name, template|
             @templates[name] = template_cache[template.file] = template

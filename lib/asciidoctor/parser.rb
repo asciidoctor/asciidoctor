@@ -296,7 +296,7 @@ class Parser
         (attributes.delete 'invalid-header') || !(is_next_line_section? reader, attributes))
       book = (document = parent).doctype == 'book'
       if has_header || (book && attributes[1] != 'abstract')
-        preamble = intro = (Block.new parent, :preamble, :content_model => :compound)
+        preamble = intro = Block.new parent, :preamble, :content_model => :compound
         preamble.title = parent.attr 'preface-title' if book && (parent.attr? 'preface-title')
         parent.blocks << preamble
       end

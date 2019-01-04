@@ -513,7 +513,7 @@ module Substitutors
     #return text if text.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
     found = {}
-    found_square_bracket = found[:square_bracket] = (text.include? '[')
+    found_square_bracket = found[:square_bracket] = text.include? '['
     found_colon = text.include? ':'
     found_macroish = found[:macroish] = found_square_bracket && found_colon
     found_macroish_short = found_macroish && (text.include? ':[')

@@ -957,10 +957,10 @@ class PreprocessorReader < Reader
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
           if inc_tags.key? '*'
-            select = base_select = (inc_tags.delete '**')
+            select = base_select = inc_tags.delete '**'
             wildcard = inc_tags.delete '*'
           else
-            select = base_select = wildcard = (inc_tags.delete '**')
+            select = base_select = wildcard = inc_tags.delete '**'
           end
         else
           select = base_select = !(inc_tags.value? true)
