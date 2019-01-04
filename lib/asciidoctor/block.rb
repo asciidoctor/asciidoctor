@@ -87,7 +87,7 @@ class Block < AbstractBlock
     if (raw_source = opts[:source]).nil_or_empty?
       @lines = []
     elsif ::String === raw_source
-      @lines = Helpers.normalize_lines_from_string raw_source
+      @lines = Helpers.prepare_source_string raw_source
     else
       @lines = raw_source.drop 0
     end

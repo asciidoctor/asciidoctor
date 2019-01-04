@@ -54,7 +54,10 @@ third line
 
       test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding(start_encoding).lines.to_a
+          # NOTE can't split a UTF-16LE string using .lines when encoding is set to UTF-8
+          data = SAMPLE_DATA.dup
+          data.unshift %(\ufeff#{data.shift})
+          data.each {|line| (line.encode 'UTF-16LE').force_encoding start_encoding }
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -74,7 +77,9 @@ third line
 
       test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding(start_encoding).lines.to_a
+          data = SAMPLE_DATA.dup
+          data.unshift %(\ufeff#{data.shift})
+          data = data.map {|line| (line.encode 'UTF-16BE').force_encoding start_encoding }
           reader = Asciidoctor::Reader.new data, nil, :normalize => true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -381,7 +386,7 @@ This is a paragraph outside the block.
       end
 
       test 'read lines until terminator' do
-        lines = <<-EOS.each_line.to_a
+        lines = <<-EOS.lines
 ****
 captured
 
@@ -402,7 +407,7 @@ not captured
       end
 
       test 'should flag reader as unterminated if reader reaches end of source without finding terminator' do
-        lines = <<-EOS.each_line.to_a
+        lines = <<-EOS.lines
 ****
 captured
 
@@ -469,7 +474,7 @@ CRLF\r
 endlines\r
       EOS
 
-        [input, input.lines.to_a, input.split(::Asciidoctor::LF), input.split(::Asciidoctor::LF).join(::Asciidoctor::LF)].each do |lines|
+        [input, input.lines, input.split(::Asciidoctor::LF), input.split(::Asciidoctor::LF).join(::Asciidoctor::LF)].each do |lines|
           doc = Asciidoctor::Document.new lines
           reader = doc.reader
           reader.lines.each do |line|
@@ -1504,7 +1509,7 @@ include::fixtures/parent-include-restricted.adoc[depth=3]
       end
 
       test 'read_lines_until should not process lines if process option is false' do
-        lines = <<-EOS.each_line.to_a
+        lines = <<-EOS.lines
 ////
 include::fixtures/no-such-file.adoc[]
 ////
@@ -1518,7 +1523,7 @@ include::fixtures/no-such-file.adoc[]
       end
 
       test 'skip_comment_lines should not process lines read' do
-        lines = <<-EOS.each_line.to_a
+        lines = <<-EOS.lines
 ////
 include::fixtures/no-such-file.adoc[]
 ////

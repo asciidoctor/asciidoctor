@@ -71,8 +71,8 @@ context 'Invoker' do
   test 'should not fail to rewind input if reading document from stdin' do
     io = STDIN.dup
     class << io
-      def readlines
-        ['paragraph']
+      def read
+        'paragraph'
       end
     end
     invoker = invoke_cli_to_buffer(%w(-s), '-') { io }

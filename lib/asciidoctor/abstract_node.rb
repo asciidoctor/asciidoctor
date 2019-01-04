@@ -505,7 +505,7 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        (Helpers.normalize_lines_array ::File.open(path, FILE_READ_MODE) {|f| f.each_line.to_a }).join LF
+        (Helpers.prepare_source_string ::File.open(path, FILE_READ_MODE) {|f| f.read }).join LF
       else
         # QUESTION should we chomp or rstrip content?
         ::IO.read path
@@ -540,7 +540,7 @@ class AbstractNode
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           if opts[:normalize]
-            (Helpers.normalize_lines_array ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.each_line.to_a }).join LF
+            (Helpers.prepare_source_string ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.read }).join LF
           else
             ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.read }
           end

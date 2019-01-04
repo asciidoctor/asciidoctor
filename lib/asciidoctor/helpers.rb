@@ -42,65 +42,58 @@ module Helpers
     nil
   end
 
-  # Public: Normalize the data to prepare for parsing
+  # Public: Prepare the source data Array for parsing.
   #
-  # Delegates to Helpers#normalize_lines_from_string if data is a String.
-  # Delegates to Helpers#normalize_lines_array if data is a String Array.
+  # Encodes the data to UTF-8, if necessary, and removes any trailing
+  # whitespace from every line.
   #
-  # returns a String Array of normalized lines
-  def self.normalize_lines data
-    ::String === data ? (normalize_lines_from_string data) : (normalize_lines_array data)
-  end
-
-  # Public: Normalize the array of lines to prepare them for parsing
+  # If a BOM is found at the beginning of the data, a best attempt is made to
+  # encode it to UTF-8 from the specified source encoding.
   #
-  # Encodes the data to UTF-8 and removes trailing whitespace from each line.
+  # data - the source data Array to prepare (no nil entries allowed)
   #
-  # If a BOM is present at the beginning of the data, a best attempt
-  # is made to encode from the specified encoding to UTF-8.
-  #
-  # data - a String Array of lines to normalize
-  #
-  # returns a String Array of normalized lines
-  def self.normalize_lines_array data
-    return data if data.empty?
-    utf8 = ::Encoding::UTF_8
+  # returns a String Array of prepared lines
+  def self.prepare_source_array data
+    return [] if data.empty?
     if (leading_2_bytes = (leading_bytes = (first = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
       data[0] = first.byteslice 2, first.bytesize
-      # HACK Ruby messes up trailing whitespace on UTF-16LE, so encode whole document first; assume newlines are present
-      return (data.join.encode utf8, ::Encoding::UTF_16LE).lines.map {|line| line.rstrip }
+      # NOTE you can't split a UTF-16LE string using .lines when encoding is UTF-8; doing so will cause this line to fail
+      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16LE).rstrip }
     elsif leading_2_bytes == BOM_BYTES_UTF_16BE
       data[0] = first.byteslice 2, first.bytesize
-      return data.map {|line| (line.encode utf8, ::Encoding::UTF_16BE).rstrip }
+      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16BE).rstrip }
     elsif leading_bytes == BOM_BYTES_UTF_8
       data[0] = first.byteslice 3, first.bytesize
     end
-    data.map {|line| (line.encoding == utf8 ? line : (line.encode utf8)).rstrip }
+    if first.encoding == UTF_8
+      data.map {|line| line.rstrip }
+    else
+      data.map {|line| (line.encode UTF_8).rstrip }
+    end
   end
 
-  # Public: Normalize the String and split into lines to prepare them for parsing
+  # Public: Prepare the source data String for parsing.
   #
-  # Encodes the data to UTF-8, converts the data to a String Array, and removes
-  # trailing whitespace from each line.
+  # Encodes the data to UTF-8, if necessary, splits it into an array, and
+  # removes any trailing whitespace from every line.
   #
-  # If a BOM is present at the beginning of the data, a best attempt
-  # is made to encode from the specified encoding to UTF-8.
+  # If a BOM is found at the beginning of the data, a best attempt is made to
+  # encode it to UTF-8 from the specified source encoding.
   #
-  # data - a String of lines to normalize
+  # data - the source data String to prepare
   #
-  # returns a String Array of normalized lines
-  def self.normalize_lines_from_string data
+  # returns a String Array of prepared lines
+  def self.prepare_source_string data
     return [] if data.nil_or_empty?
-    utf8 = ::Encoding::UTF_8
     if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
-      data = (data.byteslice 2, data.bytesize).encode utf8, ::Encoding::UTF_16LE
+      data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16LE
     elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-      data = (data.byteslice 2, data.bytesize).encode utf8, ::Encoding::UTF_16BE
+      data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16BE
     elsif leading_bytes == BOM_BYTES_UTF_8
       data = data.byteslice 3, data.bytesize
-      data = data.encode utf8 unless data.encoding == utf8
-    elsif data.encoding != utf8
-      data = data.encode utf8
+      data = data.encode UTF_8 unless data.encoding == UTF_8
+    elsif data.encoding != UTF_8
+      data = data.encode UTF_8
     end
     data.lines.map {|line| line.rstrip }
   end

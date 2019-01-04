@@ -81,7 +81,7 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
                   'unless @ is appended to the value, this attributes takes precedence over attributes',
                   'defined in the source document') do |attr|
-            attr = attr.encode ::Encoding::UTF_8 unless attr.encoding == ::Encoding::UTF_8
+            attr = attr.encode UTF_8 unless attr.encoding == UTF_8
             key, val = attr.split '=', 2
             self[:attributes][key] = val || ''
           end

@@ -193,6 +193,9 @@ module Asciidoctor
   # Maximum integer value for "boundless" operations; equal to MAX_SAFE_INTEGER in JavaScript
   MAX_INT = 9007199254740991
 
+  # Alias UTF_8 encoding for convenience / speed
+  UTF_8 = ::Encoding::UTF_8
+
   # Byte arrays for UTF-* Byte Order Marks
   BOM_BYTES_UTF_8 = [0xef, 0xbb, 0xbf]
   BOM_BYTES_UTF_16LE = [0xff, 0xfe]
@@ -1272,14 +1275,13 @@ module Asciidoctor
       raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
     end
 
-    lines = nil
     if ::File === input
       # TODO cli checks if input path can be read and is file, but might want to add check to API
       input_path = ::File.expand_path input.path
       # See https://reproducible-builds.org/specs/source-date-epoch/
       # NOTE Opal can't call key? on ENV
       input_mtime = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
-      lines = input.readlines
+      source = input.read
       # hold off on setting infile and indir until we get a better sense of their purpose
       attrs['docfile'] = input_path
       attrs['docdir'] = ::File.dirname input_path
@@ -1293,18 +1295,15 @@ module Asciidoctor
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
       doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
       attrs['docdatetime'] = %(#{docdate} #{doctime})
-    elsif input.respond_to? :readlines
+    elsif input.respond_to? :read
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
       # just fail the rewind operation silently to handle all cases
-      begin
-        input.rewind
-      rescue
-      end
-      lines = input.readlines
+      input.rewind rescue nil
+      source = input.read
     elsif ::String === input
-      lines = input.lines
+      source = input
     elsif ::Array === input
-      lines = input.drop 0
+      source = input.drop 0
     else
       raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
@@ -1315,7 +1314,7 @@ module Asciidoctor
     end
 
     options[:attributes] = attrs
-    doc = options[:parse] == false ? (Document.new lines, options) : (Document.new lines, options).parse
+    doc = options[:parse] == false ? (Document.new source, options) : (Document.new source, options).parse
 
     timings.record :parse if timings
     doc

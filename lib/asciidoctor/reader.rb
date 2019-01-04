@@ -82,14 +82,10 @@ class Reader
   #
   # Returns The String lines extracted from the data
   def prepare_lines data, opts = {}
-    if ::String === data
-      if opts[:normalize]
-        Helpers.normalize_lines_from_string data
-      else
-        data.split LF, -1
-      end
-    elsif opts[:normalize]
-      Helpers.normalize_lines_array data
+    if opts[:normalize]
+      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data)
+    elsif ::String === data
+      data.split LF, -1
     else
       data.drop 0
     end
