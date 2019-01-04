@@ -6,11 +6,11 @@ module Asciidoctor
   #
   # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
   class Converter::ManPageConverter < Converter::BuiltIn
-    LF = %(\n)
-    TAB = %(\t)
+    LF = ?\n
+    TAB = ?\t
     WHITESPACE = %(#{LF}#{TAB} )
     ET = ' ' * 8
-    ESC = %(\u001b) # troff leader marker
+    ESC = ?\u001b # troff leader marker
     ESC_BS = %(#{ESC}\\) # escaped backslash (indicates troff formatting sequence)
     ESC_FS = %(#{ESC}.)  # escaped full stop (indicates troff macro)
 

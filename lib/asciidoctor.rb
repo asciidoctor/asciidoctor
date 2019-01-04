@@ -194,13 +194,13 @@ module Asciidoctor
   BOM_BYTES_UTF_16BE = [0xfe, 0xff]
 
   # The endline character used for output; stored in constant table as an optimization
-  LF = EOL = "\n"
+  LF = EOL = ?\n
 
   # The null character to use for splitting attribute values
-  NULL = "\0"
+  NULL = ?\0
 
   # String for matching tab character
-  TAB = "\t"
+  TAB = ?\t
 
   # Maximum integer value for "boundless" operations; equal to MAX_SAFE_INTEGER in JavaScript
   MAX_INT = 9007199254740991

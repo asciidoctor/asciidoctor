@@ -4,7 +4,7 @@ require_relative 'test_helper'
 # - test negatives
 # - test role on every quote type
 context 'Substitutions' do
-  BACKSLASH = %(\x5c)
+  BACKSLASH = ?\\
   context 'Dispatcher' do
     test 'apply normal substitutions' do
       para = block_from_string("[blue]_http://asciidoc.org[AsciiDoc]_ & [red]*Ruby*\n&#167; Making +++<u>documentation</u>+++ together +\nsince (C) {inception_year}.")

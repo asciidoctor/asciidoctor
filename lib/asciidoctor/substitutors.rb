@@ -42,17 +42,17 @@ module Substitutors
 
   SUB_HIGHLIGHT = ['coderay', 'pygments']
 
-  CAN = %(\u0018)
-  DEL = %(\u007f)
+  CAN = ?\u0018
+  DEL = ?\u007f
 
   # Delimiters and matchers for the passthrough placeholder
   # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
 
   # SPA, start of guarded protected area (\u0096)
-  PASS_START = %(\u0096)
+  PASS_START = ?\u0096
 
   # EPA, end of guarded protected area (\u0097)
-  PASS_END = %(\u0097)
+  PASS_END = ?\u0097
 
   # match passthrough slot
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
