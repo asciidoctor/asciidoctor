@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -158,7 +157,7 @@ context 'Links' do
 
   test 'qualified url following no-break space' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="AsciiDoc"]', convert_string(%(#{[0xa0].pack 'U1'}http://asciidoc.org[AsciiDoc] project page.)), 1
-  end if ::RUBY_MIN_VERSION_1_9
+  end
 
   test 'qualified url following smart apostrophe' do
     output = convert_string_to_embedded("l&#8217;http://www.irit.fr[IRIT]")

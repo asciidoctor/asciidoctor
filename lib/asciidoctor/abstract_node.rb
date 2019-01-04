@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: An abstract base class that provides state and methods for managing a
 # node of AsciiDoc content. The state and methods on this class are common to
@@ -404,7 +403,7 @@ class AbstractNode
       # caching requires the open-uri-cached gem to be installed
       # processing will be automatically aborted if these libraries can't be opened
       Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-    elsif !::RUBY_ENGINE_OPAL
+    elsif !RUBY_ENGINE_OPAL
       # autoload open-uri
       ::OpenURI
     end
@@ -510,7 +509,6 @@ class AbstractNode
     opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        # NOTE Opal does not yet support File#readlines
         (Helpers.normalize_lines_array ::File.open(path, 'rb') {|f| f.each_line.to_a }).join LF
       else
         # QUESTION should we chomp or rstrip content?
@@ -546,7 +544,6 @@ class AbstractNode
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           if opts[:normalize]
-            # NOTE Opal does not yet support File#readlines
             (Helpers.normalize_lines_array ::OpenURI.open_uri(target) {|f| f.each_line.to_a }).join LF
           else
             ::OpenURI.open_uri(target) {|f| f.read }

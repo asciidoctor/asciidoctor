@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: The Document class represents a parsed AsciiDoc document.
 #
@@ -317,9 +316,8 @@ class Document < AbstractBlock
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
-        # NOTE: not using infix rescue for performance reasons, see https://github.com/jruby/jruby/issues/1816
         begin
-          @safe = SafeMode.value_for_name safe_mode.to_s
+          @safe = SafeMode.value_for_name safe_mode
         rescue
           @safe = SafeMode::SECURE
         end
@@ -504,7 +502,6 @@ class Document < AbstractBlock
         localyear = (attrs['localyear'] ||= now.year.to_s)
       end
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
-      # Ruby 1.8 doesn't support %:z
       localtime = (attrs['localtime'] ||= now.strftime %(%T #{now.utc_offset == 0 ? 'UTC' : '%z'}))
       attrs['localdatetime'] ||= %(#{localdate} #{localtime})
 
@@ -522,7 +519,7 @@ class Document < AbstractBlock
       if initialize_extensions
         if (ext_registry = options[:extension_registry])
           # QUESTION should we warn if the value type of this option is not a registry
-          if Extensions::Registry === ext_registry || (::RUBY_ENGINE_JRUBY &&
+          if Extensions::Registry === ext_registry || ((defined? ::AsciidoctorJ::Extensions::ExtensionRegistry) &&
               ::AsciidoctorJ::Extensions::ExtensionRegistry === ext_registry)
             @extensions = ext_registry.activate self
           end
@@ -1152,7 +1149,7 @@ class Document < AbstractBlock
       converter_opts[:safe] = @safe
     end
     if (converter = @options[:converter])
-      converter_factory = Converter::Factory.new ::Hash[backend, converter]
+      converter_factory = Converter::Factory.new backend => converter
     else
       converter_factory = Converter::Factory.default false
     end
@@ -1223,7 +1220,7 @@ class Document < AbstractBlock
           # ensure there's a trailing endline
           target.write LF
         end
-      elsif COERCE_ENCODING
+      elsif FORCE_ENCODING
         ::IO.write target, output, :encoding => ::Encoding::UTF_8
       else
         ::IO.write target, output

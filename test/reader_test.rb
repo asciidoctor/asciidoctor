@@ -1,11 +1,10 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
 end
 
 class ReaderTest < Minitest::Test
-  DIRNAME = File.expand_path File.dirname __FILE__
+  DIRNAME = ASCIIDOCTOR_TEST_DIR
 
   SAMPLE_DATA = <<-EOS.chomp.split(::Asciidoctor::LF)
 first line
@@ -40,34 +39,32 @@ third line
         assert_equal SAMPLE_DATA, reader.lines
       end
 
-      if Asciidoctor::COERCE_ENCODING
-        test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8')
-          reader = Asciidoctor::Reader.new data, nil, :normalize => true
-          assert_equal 'f', reader.lines.first.chr
-          assert_equal SAMPLE_DATA, reader.lines
-        end
+      test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
+        data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8')
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first.chr
+        assert_equal SAMPLE_DATA, reader.lines
+      end
 
-        test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8').lines.to_a
-          reader = Asciidoctor::Reader.new data, nil, :normalize => true
-          assert_equal 'f', reader.lines.first.chr
-          assert_equal SAMPLE_DATA, reader.lines
-        end
+      test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
+        data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding('UTF-8').lines.to_a
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first.chr
+        assert_equal SAMPLE_DATA, reader.lines
+      end
 
-        test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8')
-          reader = Asciidoctor::Reader.new data, nil, :normalize => true
-          assert_equal 'f', reader.lines.first.chr
-          assert_equal SAMPLE_DATA, reader.lines
-        end
+      test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
+        data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8')
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first.chr
+        assert_equal SAMPLE_DATA, reader.lines
+      end
 
-        test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8').lines.to_a
-          reader = Asciidoctor::Reader.new data, nil, :normalize => true
-          assert_equal 'f', reader.lines.first.chr
-          assert_equal SAMPLE_DATA, reader.lines
-        end
+      test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
+        data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding('UTF-8').lines.to_a
+        reader = Asciidoctor::Reader.new data, nil, :normalize => true
+        assert_equal 'f', reader.lines.first.chr
+        assert_equal SAMPLE_DATA, reader.lines
       end
     end
 
@@ -269,7 +266,7 @@ third line
 
     context 'Read lines until' do
       test 'Read lines until until end' do
-        lines = <<-EOS.lines.entries
+        lines = <<-EOS.lines
 This is one paragraph.
 
 This is another paragraph.
@@ -284,7 +281,7 @@ This is another paragraph.
       end
 
       test 'Read lines until until blank line' do
-        lines = <<-EOS.lines.entries
+        lines = <<-EOS.lines
 This is one paragraph.
 
 This is another paragraph.
@@ -1207,8 +1204,7 @@ include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
 
         using_memory_logger do |logger|
           convert_string_to_embedded input, :safe => :safe, :base_dir => DIRNAME
-          # NOTE Ruby 1.8 swaps the order of the list for some silly reason
-          expected_tags = ::RUBY_MIN_VERSION_1_9 ? 'no-such-tag-b, no-such-tag-a' : 'no-such-tag-a, no-such-tag-b'
+          expected_tags = 'no-such-tag-b, no-such-tag-a'
           assert_message logger, :WARN, %(~<stdin>: line 2: tags '#{expected_tags}' not found in include file), Hash
         end
       end

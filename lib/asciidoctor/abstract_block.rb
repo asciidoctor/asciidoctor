@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 class AbstractBlock < AbstractNode
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block

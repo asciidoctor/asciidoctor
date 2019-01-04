@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
   # languages supported by {https://github.com/rtomayko/tilt Tilt} to convert
@@ -34,9 +33,7 @@ module Asciidoctor
     }
 
     begin
-      unless defined? ::Concurrent::Hash
-        require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
-      end
+      require 'concurrent/hash' unless defined? ::Concurrent::Hash
       @caches = { :scans => ::Concurrent::Hash.new, :templates => ::Concurrent::Hash.new }
     rescue ::LoadError
       @caches = { :scans => {}, :templates => {} }

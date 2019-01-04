@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   class Timings
     def initialize

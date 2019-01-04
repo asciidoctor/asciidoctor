@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -228,7 +227,7 @@ context 'Substitutions' do
     test 'constrained strong string containing an asterisk and multibyte word chars' do
       para = block_from_string(%q{*黑*眼圈*})
       assert_equal '<strong>黑*眼圈</strong>', para.sub_quotes(para.source)
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'single-line constrained quote variation emphasized string' do
       para = block_from_string(%q{_a few emphasized words_})
@@ -1486,12 +1485,12 @@ EOS
       test 'should process menu macro with items containing multibyte characters' do
         para = block_from_string('menu:视图[放大, 重置]', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="menuseq"><b class="menu">视图</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">放大</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">重置</b></span>}, para.sub_macros(para.source)
-      end if ::RUBY_MIN_VERSION_1_9
+      end
 
       test 'should process inline menu with items containing multibyte characters' do
         para = block_from_string('"视图 &gt; 放大 &gt; 重置"', :attributes => {'experimental' => ''})
         assert_equal %q{<span class="menuseq"><b class="menu">视图</b>&#160;<b class="caret">&#8250;</b> <b class="submenu">放大</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">重置</b></span>}, para.sub_macros(para.source)
-      end if ::RUBY_MIN_VERSION_1_9
+      end
 
       test 'should process a menu macro with a target that begins with a character reference' do
         para = block_from_string('menu:&#8942;[More Tools, Extensions]', :attributes => {'experimental' => ''})
@@ -1879,7 +1878,7 @@ foo&#8201;&#8212;&#8201;'
       para = block_from_string %(富--巴)
       expected = '富&#8212;&#8203;巴'
       assert_equal expected, para.sub_replacements(para.source)
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'replaces marks' do
       para = block_from_string '(C) (R) (TM) \(C) \(R) \(TM)'

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -239,7 +238,7 @@ second wrapped line
       assert_css 'ul', output, 1
       assert_css 'ul li', output, 2
       # NOTE for some reason, we're getting an extra line after the indented line
-      lines = xmlnodes_at_xpath('(//ul/li)[1]/p', output, 1).text.gsub(/\n[[:space:]]*\n/, "\n").lines.entries
+      lines = xmlnodes_at_xpath('(//ul/li)[1]/p', output, 1).text.gsub(/\n[[:space:]]*\n/, "\n").lines
       assert_equal 3, lines.size
       assert_equal 'list item 1', lines[0].chomp
       assert_equal '  // not line comment', lines[1].chomp
@@ -539,7 +538,7 @@ List
       output = convert_string input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'indented asterisk elements using tabs' do
       input = <<-EOS
@@ -996,7 +995,7 @@ List
       output = convert_string input
       assert_xpath '//ul', output, 0
       assert_includes output, '•'
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test "nested ordered elements (2)" do
       input = <<-EOS

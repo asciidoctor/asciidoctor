@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 5 output
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the

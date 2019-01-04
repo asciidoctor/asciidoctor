@@ -18,6 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Enhancements::
 
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
+  * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
 
 Bug Fixes::
 

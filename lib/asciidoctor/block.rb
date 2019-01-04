@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for managing blocks of Asciidoc content in a section.
 #

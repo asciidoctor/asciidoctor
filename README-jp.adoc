@@ -120,9 +120,8 @@ AsciidoctorはHTML5出力をスタイルするため, モダンで,  {uri-founda
 
 AsciidoctorはLinux, OS X (Mac)とWindowsで動き, 下記の {uri-ruby}[Ruby]実装の一つを必要とします.
 
-* MRI (Ruby 1.8.7, 1.9.3, 2.0, 2.1, 2.2 & 2.3)
-* JRuby (1.7 in Ruby 1.8 and 1.9 modes, 9000)
-* Rubinius 2.2.x
+* CRuby (aka MRI) 2.3 - 2.6
+* JRuby 9.1 - 9.2
 * Opal (JavaScript)
 
 [CAUTION]

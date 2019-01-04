@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -1101,10 +1100,10 @@ I wouldn't have it any other way.
       assert_css 'table > tbody > tr > td:nth-child(1).halign-left.valign-top > p.tableblock', output, 7
       assert_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.verse', output, 1
       verse = xmlnodes_at_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.verse', output, 1
-      assert_equal 26, verse.text.lines.entries.size
+      assert_equal 26, verse.text.lines.size
       assert_css 'table > tbody > tr > td:nth-child(3).halign-center.valign-top > div.literal > pre', output, 1
       literal = xmlnodes_at_css 'table > tbody > tr > td:nth-child(3).halign-center.valign-top > div.literal > pre', output, 1
-      assert_equal 26, literal.text.lines.entries.size
+      assert_equal 26, literal.text.lines.size
     end
 
     test 'should strip trailing endline when splitting paragraphs' do

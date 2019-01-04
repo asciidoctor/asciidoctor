@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
   # consistent with the html5 backend from AsciiDoc Python.

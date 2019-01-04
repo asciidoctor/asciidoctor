@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 module Helpers
   # Internal: Require the specified library using Kernel#require.
@@ -65,27 +64,18 @@ module Helpers
   # returns a String Array of normalized lines
   def self.normalize_lines_array data
     return data if data.empty?
-
-    leading_bytes = (first_line = data[0]).unpack 'C3'
-    if COERCE_ENCODING
-      utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        # HACK Ruby messes up trailing whitespace on UTF-16LE, so reencode whole document first
-        data = data.join
-        return (((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8).each_line.map {|line| line.rstrip }
-      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data[0] = (first_line.force_encoding ::Encoding::UTF_16BE).slice 1, first_line.length
-        return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
-      elsif leading_bytes == BOM_BYTES_UTF_8
-        data[0] = (first_line.force_encoding utf8).slice 1, first_line.length
-      end
-
-      data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
-    else
-      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      data[0] = first_line.slice 3, first_line.length if leading_bytes == BOM_BYTES_UTF_8
-      data.map {|line| line.rstrip }
+    utf8 = ::Encoding::UTF_8
+    if (leading_2_bytes = (leading_bytes = (first_line = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
+      # HACK Ruby messes up trailing whitespace on UTF-16LE, so reencode whole document first
+      data = data.join
+      return (((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8).lines.map {|line| line.rstrip }
+    elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+      data[0] = (first_line.force_encoding ::Encoding::UTF_16BE).slice 1, first_line.length
+      return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
+    elsif leading_bytes == BOM_BYTES_UTF_8
+      data[0] = (first_line.force_encoding utf8).slice 1, first_line.length
     end
+    data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
   end
 
   # Public: Normalize the String and split into lines to prepare them for parsing
@@ -101,24 +91,17 @@ module Helpers
   # returns a String Array of normalized lines
   def self.normalize_lines_from_string data
     return [] if data.nil_or_empty?
-
-    leading_bytes = data.unpack 'C3'
-    if COERCE_ENCODING
-      utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        data = ((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8
-      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data = ((data.force_encoding ::Encoding::UTF_16BE).slice 1, data.length).encode utf8
-      elsif leading_bytes == BOM_BYTES_UTF_8
-        data = data.encoding == utf8 ? (data.slice 1, data.length) : ((data.force_encoding utf8).slice 1, data.length)
-      else
-        data = data.force_encoding utf8 unless data.encoding == utf8
-      end
+    utf8 = ::Encoding::UTF_8
+    if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
+      data = ((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8
+    elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+      data = ((data.force_encoding ::Encoding::UTF_16BE).slice 1, data.length).encode utf8
+    elsif leading_bytes == BOM_BYTES_UTF_8
+      data = data.encoding == utf8 ? (data.slice 1, data.length) : ((data.force_encoding utf8).slice 1, data.length)
     else
-      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      data = data.slice 3, data.length if leading_bytes == BOM_BYTES_UTF_8
+      data = data.force_encoding utf8 unless data.encoding == utf8
     end
-    data.each_line.map {|line| line.rstrip }
+    data.lines.map {|line| line.rstrip }
   end
 
   # Public: Efficiently checks whether the specified String resembles a URI

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -275,17 +274,13 @@ content
     test 'should force encoding of docinfo files to UTF-8' do
       sample_input_path = fixture_path('basic.asciidoc')
 
-      if RUBY_VERSION >= '1.9'
-        default_external_old = Encoding.default_external
-        force_encoding_old = Asciidoctor::FORCE_ENCODING
-        verbose_old = $VERBOSE
-      end
+      default_external_old = Encoding.default_external
+      force_encoding_old = Asciidoctor::FORCE_ENCODING
+      verbose_old = $VERBOSE
       begin
-        if RUBY_VERSION >= '1.9'
-          $VERBOSE = nil # disable warnings since we have to modify constants
-          Encoding.default_external = 'US-ASCII'
-          Asciidoctor::FORCE_ENCODING = true
-        end
+        $VERBOSE = nil # disable warnings since we have to modify constants
+        Encoding.default_external = 'ISO-8859-1'
+        Asciidoctor::FORCE_ENCODING = true
         output = Asciidoctor.convert_file sample_input_path, :to_file => false,
             :header_footer => true, :backend => 'docbook', :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docinfo2' => ''}
         refute_empty output
@@ -294,11 +289,9 @@ content
         assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
         assert_css 'copyright', output, 1
       ensure
-        if RUBY_VERSION >= '1.9'
-          Encoding.default_external = default_external_old
-          Asciidoctor::FORCE_ENCODING = force_encoding_old
-          $VERBOSE = verbose_old
-        end
+        Encoding.default_external = default_external_old
+        Asciidoctor::FORCE_ENCODING = force_encoding_old
+        $VERBOSE = verbose_old
       end
     end
 

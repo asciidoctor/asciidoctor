@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems' unless defined? Gem
-
 if File.exist?(asciidoctor = (File.expand_path '../../lib/asciidoctor', __FILE__))
   require asciidoctor
 else

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
@@ -807,16 +806,14 @@ class PreprocessorReader < Reader
         # don't honor match if it doesn't meet this criteria
         return false unless no_target && EvalExpressionRx =~ text.strip
 
-        # NOTE save values eagerly for Ruby 1.8.7 compat
-        lhs, op, rhs = $1, $2, $3
-        lhs = resolve_expr_val lhs
-        rhs = resolve_expr_val rhs
+        lhs = resolve_expr_val $1
+        rhs = resolve_expr_val $3
 
         # regex enforces a restricted set of math-related operations
-        if op == '!='
+        if $2 == '!='
           skip = lhs.send :==, rhs
         else
-          skip = !(lhs.send op.to_sym, rhs)
+          skip = !(lhs.send $2.to_sym, rhs)
         end
       end
     end
@@ -972,11 +969,11 @@ class PreprocessorReader < Reader
         begin
           open(inc_path, 'rb') do |f|
             dbl_co, dbl_sb = '::', '[]'
-            encoding = ::Encoding::UTF_8 if COERCE_ENCODING
+            utf8 = ::Encoding::UTF_8
             f.each_line do |l|
               inc_lineno += 1
               # must force encoding since we're performing String operations on line
-              l.force_encoding encoding if encoding
+              l.force_encoding utf8
               if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
                 this_tag = $2
                 if $1 # end tag
@@ -1016,7 +1013,7 @@ class PreprocessorReader < Reader
             logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => (create_include_cursor inc_path, expanded_target, tag_lineno)
           end
         end
-        unless (missing_tags = inc_tags.keys.to_a - tags_used.to_a).empty?
+        unless (missing_tags = inc_tags.keys - tags_used.to_a).empty?
           logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
         end
         shift
@@ -1066,7 +1063,7 @@ class PreprocessorReader < Reader
         # caching requires the open-uri-cached gem to be installed
         # processing will be automatically aborted if these libraries can't be opened
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
-      elsif !::RUBY_ENGINE_OPAL
+      elsif !RUBY_ENGINE_OPAL
         # autoload open-uri
         ::OpenURI
       end
@@ -1110,7 +1107,7 @@ class PreprocessorReader < Reader
       # NOTE if file is not a string, assume it's a URI
       if ::String === file
         @dir = ::File.dirname file
-      elsif ::RUBY_ENGINE_OPAL
+      elsif RUBY_ENGINE_OPAL
         @dir = ::URI.parse ::File.dirname(file = file.to_s)
       else
         # NOTE this intentionally throws an error if URI has no path
@@ -1170,7 +1167,7 @@ class PreprocessorReader < Reader
   def create_include_cursor file, path, lineno
     if ::String === file
       dir = ::File.dirname file
-    elsif ::RUBY_ENGINE_OPAL
+    elsif RUBY_ENGINE_OPAL
       dir = ::File.dirname(file = file.to_s)
     else
       dir = (dir = ::File.dirname file.path) == '' ? '/' : dir

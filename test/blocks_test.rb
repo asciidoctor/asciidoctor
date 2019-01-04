@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -927,9 +926,9 @@ EOS
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
-        lines = text.lines.entries
+        lines = text.lines
         assert_equal 5, lines.size
-        expected = "line one\n\nline two\n\nline three".lines.entries
+        expected = "line one\n\nline two\n\nline three".lines
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2
@@ -952,9 +951,9 @@ EOS
         assert_xpath '//pre/code', output, 1
         assert_xpath '//pre/code/text()', output, 1
         text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
-        lines = text.lines.entries
+        lines = text.lines
         assert_equal 5, lines.size
-        expected = "line one\n\nline two\n\nline three".lines.entries
+        expected = "line one\n\nline two\n\nline three".lines
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2
@@ -979,9 +978,9 @@ EOS
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
         text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
-        lines = text.lines.entries
+        lines = text.lines
         assert_equal 5, lines.size
-        expected = "line one\n\nline two\n\nline three".lines.entries
+        expected = "line one\n\nline two\n\nline three".lines
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2

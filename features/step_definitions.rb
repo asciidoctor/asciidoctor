@@ -1,14 +1,10 @@
-# encoding: UTF-8
 ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
+ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
-
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
+require File.join(ASCIIDOCTOR_LIB_DIR, 'asciidoctor')
 
 require 'rspec/expectations'
 require 'tilt'

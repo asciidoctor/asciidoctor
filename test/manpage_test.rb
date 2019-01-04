@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -175,7 +174,7 @@ Does stuff.
 
 (C) & (R) are translated to character references, but not the &.)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.entries.last.chomp
+      assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.last.chomp
     end
 
     test 'should replace em dashes' do
@@ -194,7 +193,7 @@ go--to)
 
 .)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\&.', output.lines.entries.last.chomp
+      assert_equal '\&.', output.lines.last.chomp
     end
 
     test 'should escape raw macro' do
@@ -205,7 +204,7 @@ AAA this line of text should be show
 BBB this line and the one above it should be visible)
 
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\&.if 1 .nx', output.lines.entries[-2].chomp
+      assert_equal '\&.if 1 .nx', output.lines[-2].chomp
     end
 
     test 'should normalize whitespace in a paragraph' do
@@ -261,7 +260,7 @@ Describe this thing.)
 
 "`hello`" '`goodbye`' *strong* _weak_ `even`)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.entries.last.chomp
+      assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.last.chomp
     end
 
     test 'should escape backslashes in content' do
@@ -270,7 +269,7 @@ Describe this thing.)
 \\.foo \\ bar\\
 baz)
       output = Asciidoctor.convert input, :backend => :manpage
-      assert_equal '\(rs.foo \(rs bar\(rs', output.lines.entries[-2].chomp
+      assert_equal '\(rs.foo \(rs bar\(rs', output.lines[-2].chomp
     end
 
     test 'should escape literal escape sequence' do
@@ -289,7 +288,7 @@ After break.)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal 'Before break.
 .br
-After break.', output.lines.entries[-3..-1].join
+After break.', output.lines[-3..-1].join
     end
   end
 
@@ -303,7 +302,7 @@ http://asciidoc.org[AsciiDoc])
       assert_equal '.sp
 First paragraph.
 .sp
-.URL "http://asciidoc.org" "AsciiDoc" ""', output.lines.entries[-4..-1].join
+.URL "http://asciidoc.org" "AsciiDoc" ""', output.lines[-4..-1].join
     end
 
     test 'should not swallow content following URL' do
@@ -312,7 +311,7 @@ First paragraph.
 http://asciidoc.org[AsciiDoc] can be used to create man pages.)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
-can be used to create man pages.', output.lines.entries[-2..-1].join
+can be used to create man pages.', output.lines[-2..-1].join
     end
 
     test 'should pass adjacent character as final argument of URL macro' do
@@ -321,7 +320,7 @@ can be used to create man pages.', output.lines.entries[-2..-1].join
 This is http://asciidoc.org[AsciiDoc].)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal 'This is \c
-.URL "http://asciidoc.org" "AsciiDoc" "."', output.lines.entries[-2..-1].join
+.URL "http://asciidoc.org" "AsciiDoc" "."', output.lines[-2..-1].join
     end
 
     test 'should pass adjacent character as final argument of URL macro and move trailing content to next line' do
@@ -331,7 +330,7 @@ This is http://asciidoc.org[AsciiDoc], which can be used to write content.)
       output = Asciidoctor.convert input, :backend => :manpage
       assert_equal 'This is \c
 .URL "http://asciidoc.org" "AsciiDoc" ","
-which can be used to write content.', output.lines.entries[-3..-1].join
+which can be used to write content.', output.lines[-3..-1].join
     end
 
     test 'should not leave blank lines between URLs on contiguous lines of input' do
@@ -351,7 +350,7 @@ The corresponding implementations are
 .URL "http://cmucl.org" "CMUCL" ","
 .URL "http://ecls.sf.net" "ECL" ","
 and \c
-.URL "http://sbcl.sf.net" "SBCL" "."', output.lines.entries[-8..-1].join
+.URL "http://sbcl.sf.net" "SBCL" "."', output.lines[-8..-1].join
     end
 
     test 'should not leave blank lines between URLs on same line of input' do
@@ -366,7 +365,7 @@ The corresponding implementations are \c
 .URL "http://cmucl.org" "CMUCL" ","
 .URL "http://ecls.sf.net" "ECL" ","
 and
-.URL "http://sbcl.sf.net" "SBCL" "."', output.lines.entries[-8..-1].join
+.URL "http://sbcl.sf.net" "SBCL" "."', output.lines[-8..-1].join
     end
 
     test 'should not insert space between link and non-whitespace characters surrounding it' do
@@ -377,7 +376,7 @@ Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
       assert_equal '.sp
 Please search |\c
 .URL "http://discuss.asciidoctor.org" "the forums" "|"
-before asking.', output.lines.entries[-4..-1].join
+before asking.', output.lines[-4..-1].join
     end
 
     test 'should be able to use monospaced text inside a link' do
@@ -388,7 +387,7 @@ Enter the link:cat[`cat`] command.)
       assert_equal '.sp
 Enter the \c
 .URL "cat" "\f(CRcat\fP" " "
-command.', output.lines.entries[-4..-1].join
+command.', output.lines[-4..-1].join
     end
   end
 
@@ -402,7 +401,7 @@ mailto:doc@example.org[Contact the doc])
       assert_equal '.sp
 First paragraph.
 .sp
-.MTO "doc\\(atexample.org" "Contact the doc" ""', output.lines.entries[-4..-1].join
+.MTO "doc\\(atexample.org" "Contact the doc" ""', output.lines[-4..-1].join
     end
 
     test 'should set text of MTO macro to blank for implicit email' do

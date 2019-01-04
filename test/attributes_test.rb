@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -59,8 +58,7 @@ context 'Attributes' do
         result = convert_string_to_embedded str
         assert_includes result, %(<p>#{value}</p>)
       end
-
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'creates an attribute by fusing a legacy multi-line value' do
       str = <<-EOS
@@ -245,11 +243,7 @@ content
 {imagesdir}
 EOS
       output = convert_inline_string input, :safe => :safe
-      if RUBY_VERSION >= '1.9'
-        assert_equal %(#{Dir.home}/etc/images), output
-      else
-        assert_equal %(#{ENV['HOME']}/etc/images), output
-      end
+      assert_equal %(#{Asciidoctor::USER_HOME}/etc/images), output
     end
 
     test 'user-home attribute resolves to . if safe mode is SERVER or greater' do

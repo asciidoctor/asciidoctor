@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Handles all operations for resolving, cleaning and joining paths.
 # This class includes operations for handling both web paths (request URIs) and

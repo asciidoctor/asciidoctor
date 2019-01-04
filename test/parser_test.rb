@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -298,7 +297,7 @@ context "Parser" do
     assert_equal 'Stéphane', metadata['firstname']
     assert_equal 'Brontë', metadata['lastname']
     assert_equal 'SB', metadata['authorinitials']
-  end if ::RUBY_MIN_VERSION_1_9
+  end
 
   test 'parse ideographic author names' do
     metadata, _ = parse_header_metadata '李 四 <si.li@example.com>'
@@ -310,7 +309,7 @@ context "Parser" do
     assert_equal '四', metadata['lastname']
     assert_equal 'si.li@example.com', metadata['email']
     assert_equal '李四', metadata['authorinitials']
-  end if ::RUBY_MIN_VERSION_1_9
+  end
 
   test "parse author condenses whitespace" do
     metadata, _ = parse_header_metadata '   Stuart       Rackham     <founder@asciidoc.org>'
@@ -710,7 +709,7 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
 
     expected = input
 
-    lines = input.lines.entries
+    lines = input.lines
     Asciidoctor::Parser.adjust_indentation! lines, -1
     assert_equal expected, lines.join
   end

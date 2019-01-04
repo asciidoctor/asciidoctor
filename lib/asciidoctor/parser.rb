@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
@@ -1115,9 +1114,7 @@ class Parser
     found = false
     autonum = 0
     text.scan(CalloutScanRx) {
-      # lead with assignments for Ruby 1.8.7 compat
-      captured, num = $&, $2
-      document.callouts.register num == '.' ? (autonum += 1).to_s : num unless captured.start_with? '\\'
+      document.callouts.register $2 == '.' ? (autonum += 1).to_s : $2 unless $&.start_with? '\\'
       # we have to mark as found even if it's escaped so it can be unescaped
       found = true
     } if text.include? '<'
@@ -1152,8 +1149,6 @@ class Parser
   # Returns nothing
   def self.catalog_inline_anchors text, block, document, reader
     text.scan(InlineAnchorScanRx) do
-      # alias match for Ruby 1.8.7 compat
-      m = $~
       if (id = $1)
         if (reftext = $2)
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
@@ -1167,7 +1162,7 @@ class Parser
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
         location = reader.cursor_at_mark
-        if (offset = (m.pre_match.count LF) + ((m[0].start_with? LF) ? 1 : 0)) > 0
+        if (offset = ($`.count LF) + (($&.start_with? LF) ? 1 : 0)) > 0
           (location = location.dup).advance offset
         end
         logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => location
@@ -1704,7 +1699,7 @@ class Parser
   def self.setext_section_title? line1, line2
     if (level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && SetextSectionTitleRx.match?(line1) &&
-        (line_length(line1) - line2_len).abs < 2
+        (line1.length - line2_len).abs < 2
       level
     end
   end
@@ -1766,7 +1761,7 @@ class Parser
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
-        (line_length(line1) - line2_len).abs < 2
+        (line1.length - line2_len).abs < 2
       atx = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
@@ -1777,21 +1772,6 @@ class Parser
     end
     sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
     [sect_id, sect_reftext, sect_title, sect_level, atx]
-  end
-
-  # Public: Calculate the number of unicode characters in the line, excluding the endline
-  #
-  # line - the String to calculate
-  #
-  # returns the number of unicode characters in the line
-  if FORCE_UNICODE_LINE_LENGTH
-    def self.line_length(line)
-      line.scan(UnicodeCharScanRx).size
-    end
-  else
-    def self.line_length(line)
-      line.length
-    end
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).

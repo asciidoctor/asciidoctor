@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   module Converter; end # required for Opal
 

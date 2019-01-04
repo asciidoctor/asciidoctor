@@ -1,10 +1,9 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods and constants for managing AsciiDoc table content in a document.
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
 class Table < AbstractBlock
-  # multipler / divisor for tuning precision of calculated result
-  DEFAULT_PRECISION_FACTOR = 10000.0
+  # precision of column widths
+  DEFAULT_PRECISION = 4
 
   # Public: A data object that encapsulates the collection of rows (head, foot, body) for a table
   class Rows
@@ -111,7 +110,7 @@ class Table < AbstractBlock
   #
   # returns nothing
   def assign_column_widths width_base = nil, autowidth_cols = nil
-    pf = DEFAULT_PRECISION_FACTOR
+    precision = DEFAULT_PRECISION
     total_width = col_pcwidth = 0
 
     if width_base
@@ -120,32 +119,22 @@ class Table < AbstractBlock
           autowidth = 0
           logger.warn %(total column width must not exceed 100% when using autowidth columns; got #{width_base}%)
         else
-          autowidth = ((100.0 - width_base) / autowidth_cols.size * pf).to_i / pf
+          autowidth = ((100.0 - width_base) / autowidth_cols.size).truncate precision
           autowidth = autowidth.to_i if autowidth.to_i == autowidth
           width_base = 100
         end
         autowidth_attrs = { 'width' => autowidth, 'autowidth-option' => '' }
         autowidth_cols.each {|col| col.update_attributes autowidth_attrs }
       end
-      @columns.each {|col| total_width += (col_pcwidth = col.assign_width nil, width_base, pf) }
+      @columns.each {|col| total_width += (col_pcwidth = col.assign_width nil, width_base, precision) }
     else
-      col_pcwidth = ((100 * pf / @columns.size).to_i) / pf
-      # or...
-      #col_pcwidth = (100.0 / @columns.size).truncate 4
+      col_pcwidth = (100.0 / @columns.size).truncate precision
       col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
-      @columns.each {|col| total_width += col.assign_width col_pcwidth }
+      @columns.each {|col| total_width += col.assign_width col_pcwidth, nil, precision }
     end
 
     # donate balance, if any, to final column (using half up rounding)
-    unless total_width == 100
-      @columns[-1].assign_width(((100 - total_width + col_pcwidth) * pf).round / pf)
-      # or (manual half up rounding)...
-      #numerator = (raw_numerator = (100 - total_width + col_pcwidth) * pf).to_i
-      #numerator += 1 if raw_numerator >= numerator + 0.5
-      #@columns[-1].assign_width numerator / pf
-      # or...
-      #@columns[-1].assign_width((100 - total_width + col_pcwidth).round 4)
-    end
+    @columns[-1].assign_width(((100 - total_width + col_pcwidth).round precision), nil, precision) unless total_width == 100
 
     nil
   end
@@ -201,11 +190,9 @@ class Table::Column < AbstractNode
   # This method assigns the colpcwidth and colabswidth attributes.
   #
   # returns the resolved colpcwidth value
-  def assign_width col_pcwidth, width_base = nil, pf = 10000.0
+  def assign_width col_pcwidth, width_base, precision
     if width_base
-      col_pcwidth = ((@attributes['width'].to_f / width_base) * 100 * pf).to_i / pf
-      # or...
-      #col_pcwidth = (@attributes['width'].to_f * 100.0 / width_base).truncate 4
+      col_pcwidth = (@attributes['width'].to_f * 100.0 / width_base).truncate precision
       col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
     end
     @attributes['colpcwidth'] = col_pcwidth

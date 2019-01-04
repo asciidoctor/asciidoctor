@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -141,30 +140,11 @@ class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
     c = target.to_f
     case units
     when 'C'
-      %(#{round_with_precision c, precision} &#176;C)
+      %(#{c.round precision} &#176;C)
     when 'F'
-      %(#{round_with_precision c * 1.8 + 32, precision} &#176;F)
+      %(#{(c * 1.8 + 32).round precision} &#176;F)
     else
       raise ::ArgumentError, %(Unknown temperature units: #{units})
-    end
-  end
-
-  if (::Numeric.instance_method :round).arity == 0
-    def round_with_precision value, precision = 0
-      if precision == 0
-        value.round
-      else
-        factor = 10 ** precision
-        if precision < 0
-          (value * factor).round.div factor
-        else
-          (value * factor).round.fdiv factor
-        end
-      end
-    end
-  else
-    def round_with_precision value, precision = 0
-      value.round precision
     end
   end
 end

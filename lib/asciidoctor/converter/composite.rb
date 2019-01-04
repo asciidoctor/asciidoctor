@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that delegates to the chain of {Converter}
   # objects passed to the constructor. Selects the first {Converter} that

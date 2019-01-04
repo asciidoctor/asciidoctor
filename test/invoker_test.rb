@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -130,7 +129,7 @@ context 'Invoker' do
     ensure
       FileUtils.rm_f sample_inpath
     end
-  end if RUBY_MIN_VERSION_1_9 && !windows?
+  end unless windows?
 
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = fixturedir

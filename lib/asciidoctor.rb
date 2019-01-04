@@ -1,10 +1,3 @@
-# encoding: UTF-8
-RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
-RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
-RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
-RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
-RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
-
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor
@@ -20,7 +13,7 @@ else
 end
 
 # ideally we should use require_relative instead of modifying the LOAD_PATH
-$:.unshift File.dirname __FILE__
+$:.unshift __dir__
 
 require 'asciidoctor/logging'
 
@@ -54,12 +47,10 @@ require 'asciidoctor/logging'
 #   Asciidoctor.convert_file 'sample.adoc', :template_dir => 'path/to/templates'
 #
 module Asciidoctor
-
-  # alias the RUBY_ENGINE constant inside the Asciidoctor namespace
-  RUBY_ENGINE = ::RUBY_ENGINE
+  # alias the RUBY_ENGINE constant inside the Asciidoctor namespace and define a precomputed alias for runtime
+  RUBY_ENGINE_OPAL = (RUBY_ENGINE = ::RUBY_ENGINE) == 'opal'
 
   module SafeMode
-
     # A safe mode level that disables any of the security features enforced
     # by Asciidoctor (Ruby is still subject to its own restrictions).
     UNSAFE = 0;
@@ -185,7 +176,7 @@ module Asciidoctor
   end
 
   # The absolute root path of the Asciidoctor RubyGem
-  ROOT_PATH = ::File.dirname ::File.dirname ::File.expand_path __FILE__
+  ROOT_PATH = ::File.dirname ::File.absolute_path __dir__
 
   # The absolute lib path of the Asciidoctor RubyGem
   #LIB_PATH = ::File.join ROOT_PATH, 'lib'
@@ -194,29 +185,18 @@ module Asciidoctor
   DATA_PATH = ::File.join ROOT_PATH, 'data'
 
   # The user's home directory, as best we can determine it
-  # NOTE not using infix rescue for performance reasons, see: https://github.com/jruby/jruby/issues/1816
-  begin
-    USER_HOME = ::Dir.home
-  rescue
-    USER_HOME = ::ENV['HOME'] || ::Dir.pwd
-  end
+  USER_HOME = ::Dir.home
 
-  # Flag to indicate whether encoding can be coerced to UTF-8
+  # Flag to indicate whether encoding should be forced to UTF-8
   # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
   # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII"
-  # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  COERCE_ENCODING = !::RUBY_ENGINE_OPAL && ::RUBY_MIN_VERSION_1_9
-
-  # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
-  FORCE_ENCODING = COERCE_ENCODING && ::Encoding.default_external != ::Encoding::UTF_8
+  # Opal doesn't require this since all strings are already encoding internally as UTF-16
+  FORCE_ENCODING = ::Encoding.default_external != ::Encoding::UTF_8
 
   # Byte arrays for UTF-* Byte Order Marks
   BOM_BYTES_UTF_8 = [0xef, 0xbb, 0xbf]
   BOM_BYTES_UTF_16LE = [0xff, 0xfe]
   BOM_BYTES_UTF_16BE = [0xfe, 0xff]
-
-  # Flag to indicate that line length should be calculated using a unicode mode hint
-  FORCE_UNICODE_LINE_LENGTH = !::RUBY_MIN_VERSION_1_9
 
   # The endline character used for output; stored in constant table as an optimization
   LF = EOL = "\n"
@@ -393,29 +373,10 @@ module Asciidoctor
       # CC_ANY is any character except newlines
       CC_ANY = '.'
       CC_EOL = '$'
-      # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
-      if ::RUBY_MIN_VERSION_2
-        CC_ALPHA = CG_ALPHA = '\p{Alpha}'
-        CC_ALNUM = CG_ALNUM = '\p{Alnum}'
-        CG_BLANK = '\p{Blank}'
-        CC_WORD  = CG_WORD = '\p{Word}'
-      # character classes for the Regexp engine in Ruby < 2
-      else
-        CC_ALPHA = '[:alpha:]'
-        CG_ALPHA = '[[:alpha:]]'
-        CC_ALNUM = '[:alnum:]'
-        CG_ALNUM = '[[:alnum:]]'
-        if ::RUBY_MIN_VERSION_1_9
-          CG_BLANK = '[[:blank:]]'
-          CC_WORD = '[:word:]'
-          CG_WORD = '[[:word:]]'
-        else
-          # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
-          CG_BLANK = '[ \t]'
-          CC_WORD = '[:alnum:]_'
-          CG_WORD = '[[:alnum:]_]'
-        end
-      end
+      CC_ALPHA = CG_ALPHA = '\p{Alpha}'
+      CC_ALNUM = CG_ALNUM = '\p{Alnum}'
+      CG_BLANK = '\p{Blank}'
+      CC_WORD  = CG_WORD = '\p{Word}'
     end
 
     ## Document header
@@ -1093,7 +1054,7 @@ module Asciidoctor
     #   one two	 three   four
     #   five	six
     #
-    # TODO change to /(?<!\\)[ \t\n]+/ after dropping support for Ruby 1.8.7
+    # TODO change to /(?<!\\)[ \t\n]+/ once lookbehind assertions are implemented in all modern browsers
     SpaceDelimiterRx = /([^\\])[ \t\n]+/
 
     # Matches a + or - modifier in a subs list
@@ -1108,12 +1069,6 @@ module Asciidoctor
     #   html5
     #
     TrailingDigitsRx = /\d+$/
-
-    # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
-    #
-    unless RUBY_ENGINE == 'opal'
-      UnicodeCharScanRx = /./u if FORCE_UNICODE_LINE_LENGTH
-    end
 
     # Detects strings that resemble URIs.
     #
@@ -1239,9 +1194,7 @@ module Asciidoctor
   quote_subs = nil
   compat_quote_subs = nil
 
-  # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
-  # so we need to match it explicitly
-  # order is significant
+  # NOTE order of replacements is significant
   REPLACEMENTS = [
     # (C)
     [/\\?\(C\)/, '&#169;', :none],
@@ -1249,8 +1202,8 @@ module Asciidoctor
     [/\\?\(R\)/, '&#174;', :none],
     # (TM)
     [/\\?\(TM\)/, '&#8482;', :none],
-    # foo -- bar
-    # FIXME this drops the endline if it appears at end of line
+    # foo -- bar (where either space character can be a newline)
+    # NOTE this necessarily drops the newline if it appears at end of line
     [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
     [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;&#8203;', :leading],
@@ -1300,7 +1253,7 @@ module Asciidoctor
 
     if !(attrs = options[:attributes])
       attrs = {}
-    elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
+    elsif ::Hash === attrs || ((defined? ::Java::JavaUtil::Map) && ::Java::JavaUtil::Map === attrs)
       attrs = attrs.dup
     elsif ::Array === attrs
       attrs, attrs_arr = {}, attrs
@@ -1341,7 +1294,6 @@ module Asciidoctor
         attrs['docyear'] ||= input_mtime.year.to_s
       end
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
-      # Ruby 1.8 doesn't support %:z
       doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
       attrs['docdatetime'] = %(#{docdate} #{doctime})
     elsif input.respond_to? :readlines
@@ -1353,7 +1305,7 @@ module Asciidoctor
       end
       lines = input.readlines
     elsif ::String === input
-      lines = ::RUBY_MIN_VERSION_2 ? input.lines : input.each_line.to_a
+      lines = input.lines
     elsif ::Array === input
       lines = input.drop 0
     else

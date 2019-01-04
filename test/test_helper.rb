@@ -1,12 +1,7 @@
-# encoding: UTF-8
 ASCIIDOCTOR_TEST_DIR = File.expand_path File.dirname __FILE__
 ASCIIDOCTOR_PROJECT_DIR = File.dirname ASCIIDOCTOR_TEST_DIR
 ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
 Dir.chdir ASCIIDOCTOR_PROJECT_DIR
-
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
@@ -182,9 +177,9 @@ class Minitest::Test
   def document_from_string(src, opts = {})
     assign_default_test_options opts
     if opts[:parse]
-      (Asciidoctor::Document.new src.lines.entries, opts).parse
+      (Asciidoctor::Document.new src.lines, opts).parse
     else
-      Asciidoctor::Document.new src.lines.entries, opts
+      Asciidoctor::Document.new src.lines, opts
     end
   end
 
@@ -301,8 +296,7 @@ class Minitest::Test
   end
 
   def resolve_localhost
-    (RUBY_VERSION < '1.9' || RUBY_ENGINE == 'rbx') ? Socket.gethostname :
-        Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
+    Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
   def using_memory_logger

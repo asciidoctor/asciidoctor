@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # A utility class for working with the built-in stylesheets.
 #--

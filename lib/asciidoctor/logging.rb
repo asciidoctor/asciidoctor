@@ -34,8 +34,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  # NOTE Ruby 1.8.7 returns constants as strings instead of symbols
-  SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c.to_sym] }]
+  SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c] }]
 
   attr_reader :messages
 
@@ -95,7 +94,7 @@ module LoggerManager
     def memoize_logger
       class << self
         alias_method :logger, :logger
-        if RUBY_ENGINE == 'opal'
+        if RUBY_ENGINE_OPAL
           define_method :logger do @logger end
         else
           attr_reader :logger

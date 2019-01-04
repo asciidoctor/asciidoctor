@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -24,6 +23,39 @@ context 'API' do
       assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
+    test 'should coerce encoding of file to UTF-8' do
+      old_external = Encoding.default_external
+      old_internal = Encoding.default_internal
+      old_verbose = $VERBOSE
+      begin
+        $VERBOSE = nil # disable warnings since we have to modify constants
+        input_path = fixture_path 'encoding.asciidoc'
+        Encoding.default_external = Encoding.default_internal = Encoding::IBM437
+        output = Asciidoctor.convert_file input_path, :to_file => false, :safe => :safe
+        assert_equal Encoding::UTF_8, output.encoding
+        assert_includes output, 'Romé'
+      ensure
+        Encoding.default_external = old_external
+        Encoding.default_internal = old_internal
+        $VERBOSE = old_verbose
+      end
+    end
+
+    test 'should not load file with unrecognized encoding' do
+      begin
+        tmp_input = Tempfile.new %w(test- .adoc), encoding: Encoding::IBM437
+        # NOTE using a character whose code differs between UTF-8 and IBM437
+        tmp_input.write %(ƒ\n)
+        tmp_input.close
+        exception = assert_raises ArgumentError do
+          Asciidoctor.load_file tmp_input.path, :safe => :safe
+        end
+        assert_match(/Failed to load AsciiDoc document - invalid byte sequence in UTF-8/, exception.message)
+      ensure
+        tmp_input.close!
+      end
+    end
+
     test 'should not load invalid file' do
       sample_input_path = fixture_path('hello-asciidoctor.pdf')
       exception = assert_raises ArgumentError do
@@ -31,8 +63,33 @@ context 'API' do
       end
       assert_match(/Failed to load AsciiDoc document/, exception.message)
       # verify we have the correct backtrace (should be in at least first 5 lines)
-      assert_match((RUBY_ENGINE == 'rbx' ? /parser\.rb/ : /helpers\.rb/), exception.backtrace[0..4].join("\n"))
-    end if RUBY_MIN_VERSION_1_9
+      assert_match(/helpers\.rb/, exception.backtrace[0..4].join("\n"))
+    end
+
+    test 'should convert filename that contains non-ASCII characters independent of default encodings' do
+      old_external = Encoding.default_external
+      old_internal = Encoding.default_internal
+      old_verbose = $VERBOSE
+      begin
+        $VERBOSE = nil # disable warnings since we have to modify constants
+        tmp_input = Tempfile.new %w(test-ＵＴＦ８- .adoc)
+        tmp_input.write %(ＵＴＦ８\n)
+        tmp_input.close
+        tmp_output = tmp_input.path.sub '.adoc', '.html'
+        Asciidoctor.convert_file tmp_input.path, :safe => :safe, :attributes => 'linkcss !copycss'
+        assert File.exist? tmp_output
+        output = File.read tmp_output, mode: 'rb', encoding: 'utf-8:utf-8'
+        assert_equal ::Encoding::UTF_8, output.encoding
+        refute_empty output
+        assert_includes output, 'ＵＴＦ８'
+      ensure
+        tmp_input.close!
+        FileUtils.rm tmp_output
+        Encoding.default_external = old_external
+        Encoding.default_internal = old_internal
+        $VERBOSE = old_verbose
+      end
+    end
 
     test 'should load input IO' do
       input = StringIO.new(<<-EOS)
@@ -67,7 +124,7 @@ Document Title
 
 preamble
       EOS
-      doc = Asciidoctor.load(input.lines.entries, :safe => Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load(input.lines, :safe => Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')

@@ -1,4 +1,3 @@
-# encoding: UTF-8
 begin
   require File.expand_path '../lib/asciidoctor/version', __FILE__
 rescue LoadError

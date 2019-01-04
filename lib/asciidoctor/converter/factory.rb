@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   module Converter
     # A factory for instantiating converters that are used to convert a
@@ -51,9 +50,7 @@ module Asciidoctor
             if initialize_singleton
               # FIXME this assignment itself may not be thread safe; may need to use a helper here
               @__default__ ||= begin
-                unless defined? ::Concurrent::Hash
-                  require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
-                end
+                require 'concurrent/hash' unless defined? ::Concurrent::Hash.new
                 new ::Concurrent::Hash.new
               rescue ::LoadError
                 include Logging unless include? Logging

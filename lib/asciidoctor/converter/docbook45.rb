@@ -1,4 +1,3 @@
-# encoding: UTF-8
 require 'asciidoctor/converter/docbook5'
 
 module Asciidoctor

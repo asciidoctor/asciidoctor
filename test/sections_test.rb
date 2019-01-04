@@ -1,4 +1,3 @@
-# encoding: UTF-8
 unless defined? ASCIIDOCTOR_PROJECT_DIR
   $: << File.dirname(__FILE__); $:.uniq!
   require 'test_helper'
@@ -594,11 +593,7 @@ endif::[]
 == Asciidoctor in 中文
       EOS
       output = convert_string input
-      if ::RUBY_MIN_VERSION_1_9
-        assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
-      else
-        assert_xpath '//h2[@id="_asciidoctor_in"][text()="Asciidoctor in 中文"]', output
-      end
+      assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
     end
 
     test 'with only multibyte characters' do
@@ -607,7 +602,7 @@ endif::[]
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//h2[@id="_视图"][text()="视图"]', output
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'multiline syntax with only multibyte characters' do
       input = <<-EOS
@@ -624,7 +619,7 @@ content
       output = convert_string_to_embedded input
       assert_xpath '//h2[@id="_视图"][text()="视图"]', output
       assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
-    end if ::RUBY_MIN_VERSION_1_9
+    end
   end
 
   context "level 2" do

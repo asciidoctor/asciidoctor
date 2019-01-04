@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods to perform substitutions on lines of AsciiDoc text. This module
 # is intented to be mixed-in to Section and Block to provide operations for performing
@@ -43,24 +42,17 @@ module Substitutors
 
   SUB_HIGHLIGHT = ['coderay', 'pygments']
 
-  if ::RUBY_MIN_VERSION_1_9
-    CAN = %(\u0018)
-    DEL = %(\u007f)
+  CAN = %(\u0018)
+  DEL = %(\u007f)
 
-    # Delimiters and matchers for the passthrough placeholder
-    # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
+  # Delimiters and matchers for the passthrough placeholder
+  # See http://www.aivosto.com/vbtips/control-characters.html#listabout for characters to use
 
-    # SPA, start of guarded protected area (\u0096)
-    PASS_START = %(\u0096)
+  # SPA, start of guarded protected area (\u0096)
+  PASS_START = %(\u0096)
 
-    # EPA, end of guarded protected area (\u0097)
-    PASS_END = %(\u0097)
-  else
-    CAN = 24.chr
-    DEL = 127.chr
-    PASS_START = 150.chr
-    PASS_END = 151.chr
-  end
+  # EPA, end of guarded protected area (\u0097)
+  PASS_END = %(\u0097)
 
   # match passthrough slot
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
@@ -177,28 +169,24 @@ module Substitutors
     compat_mode = @document.compat_mode
     passes = @passthroughs
     text = text.gsub(InlinePassMacroRx) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
       preceding = nil
 
-      if (boundary = m[4]) # $$, ++, or +++
+      if (boundary = $4) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
         if compat_mode && boundary == '++'
-          next m[2] ?
-              %(#{m[1]}[#{m[2]}]#{m[3]}++#{extract_passthroughs m[5]}++) :
-              %(#{m[1]}#{m[3]}++#{extract_passthroughs m[5]}++)
+          next $2 ? %(#{$1}[#{$2}]#{$3}++#{extract_passthroughs $5}++) : %(#{$1}#{$3}++#{extract_passthroughs $5}++)
         end
 
-        attributes = m[2]
-        escape_count = m[3].length
-        content = m[5]
+        attributes = $2
+        escape_count = $3.length
+        content = $5
         old_behavior = false
 
         if attributes
           if escape_count > 0
             # NOTE we don't look for nested unconstrained pass macros
-            next %(#{m[1]}[#{attributes}]#{RS * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
-          elsif m[1] == RS
+            next %(#{$1}[#{attributes}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
+          elsif $1 == RS
             preceding = %([#{attributes}])
             attributes = nil
           else
@@ -210,7 +198,7 @@ module Substitutors
           end
         elsif escape_count > 0
           # NOTE we don't look for nested unconstrained pass macros
-          next %(#{RS * (escape_count - 1)}#{boundary}#{m[5]}#{boundary})
+          next %(#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
@@ -225,12 +213,12 @@ module Substitutors
           passes[pass_key] = {:text => content, :subs => subs}
         end
       else # pass:[]
-        if m[6] == RS
+        if $6 == RS
           # NOTE we don't look for nested pass:[] macros
-          next m[0].slice 1, m[0].length
+          next $&.slice 1, $&.length
         end
 
-        passes[pass_key = passes.size] = {:text => (unescape_brackets m[8]), :subs => (m[7] ? (resolve_pass_subs m[7]) : nil)}
+        passes[pass_key = passes.size] = {:text => (unescape_brackets $8), :subs => ($7 ? (resolve_pass_subs $7) : nil)}
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -238,13 +226,11 @@ module Substitutors
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub(pass_inline_rx) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
-      preceding = m[1]
-      attributes = m[2]
-      escape_mark = RS if (quoted_text = m[3]).start_with? RS
-      format_mark = m[4]
-      content = m[5]
+      preceding = $1
+      attributes = $2
+      escape_mark = RS if (quoted_text = $3).start_with? RS
+      format_mark = $4
+      content = $5
 
       if compat_mode
         old_behavior = true
@@ -297,18 +283,16 @@ module Substitutors
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
     text = text.gsub(InlineStemMacroRx) {
-      # alias match for Ruby 1.8.7 compat
-      m = $~
       # honor the escape
       if $&.start_with? RS
-        next m[0].slice 1, m[0].length
+        next $&.slice 1, $&.length
       end
 
-      if (type = m[1].to_sym) == :stem
+      if (type = $1.to_sym) == :stem
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
       end
-      content = unescape_brackets m[3]
-      subs = m[2] ? (resolve_pass_subs m[2]) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      content = unescape_brackets $3
+      subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passes[pass_key = passes.size] = {:text => content, :subs => subs, :type => type}
       %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
@@ -420,14 +404,8 @@ module Substitutors
   # text - The String text to process.
   #
   # returns The String text with special characters replaced.
-  if ::RUBY_MIN_VERSION_1_9
-    def sub_specialchars text
-      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
-    end
-  else
-    def sub_specialchars text
-      (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub(SpecialCharsRx) { SpecialCharsTr[$&] }) : text
-    end
+  def sub_specialchars text
+    (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
   end
   alias sub_specialcharacters sub_specialchars
 
@@ -573,16 +551,13 @@ module Substitutors
 
       if found_macroish && (text.include? 'menu:')
         text = text.gsub(InlineMenuMacroRx) {
-          # alias match for Ruby 1.8.7 compat
-          m = $~
           # honor the escape
           if $&.start_with? RS
-            next m[0].slice 1, m[0].length
+            next $&.slice 1, $&.length
           end
 
-          menu, items = m[1], m[2]
-
-          if items
+          menu = $1
+          if (items = $2)
             items = items.gsub ESC_R_SB, R_SB if items.include? R_SB
             if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
               submenus = items.split(delim).map {|it| it.strip }
@@ -600,16 +575,12 @@ module Substitutors
 
       if (text.include? '"') && (text.include? '&gt;')
         text = text.gsub(InlineMenuRx) {
-          # alias match for Ruby 1.8.7 compat
-          m = $~
           # honor the escape
           if $&.start_with? RS
-            next m[0].slice 1, m[0].length
+            next $&.slice 1, $&.length
           end
 
-          input = m[1]
-
-          menu, *submenus = input.split('&gt;').map {|it| it.strip }
+          menu, *submenus = $1.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
         }
@@ -621,17 +592,15 @@ module Substitutors
     if (extensions = doc.extensions) && extensions.inline_macros? # && found_macroish
       extensions.inline_macros.each do |extension|
         text = text.gsub(extension.instance.regexp) {
-          # alias match for Ruby 1.8.7 compat
-          m = $~
           # honor the escape
           if $&.start_with? RS
-            next m[0].slice 1, m[0].length
+            next $&.slice 1, $&.length
           end
 
-          if (m.names rescue []).empty?
-            target, content, extconf = m[1], m[2], extension.config
+          if ($~.names rescue []).empty?
+            target, content, extconf = $1, $2, extension.config
           else
-            target, content, extconf = (m[:target] rescue nil), (m[:content] rescue nil), extension.config
+            target, content, extconf = ($~[:target] rescue nil), ($~[:content] rescue nil), extension.config
           end
           attributes = (attributes = extconf[:default_attrs]) ? attributes.dup : {}
           if content.nil_or_empty?
@@ -656,21 +625,19 @@ module Substitutors
     if found_macroish && ((text.include? 'image:') || (text.include? 'icon:'))
       # image:filename.png[Alt Text]
       text = text.gsub(InlineImageMacroRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # honor the escape
-        if (captured = $&).start_with? RS
-          next captured.slice 1, captured.length
-        elsif captured.start_with? 'icon:'
+        if $&.start_with? RS
+          next $&.slice 1, $&.length
+        elsif $&.start_with? 'icon:'
           type, posattrs = 'icon', ['size']
         else
           type, posattrs = 'image', ['alt', 'width', 'height']
         end
-        if (target = m[1]).include? ATTR_REF_HEAD
+        if (target = $1).include? ATTR_REF_HEAD
           # TODO remove this special case once titles use normal substitution order
           target = sub_attributes target
         end
-        attrs = parse_attributes m[2], posattrs, :unescape_input => true
+        attrs = parse_attributes $2, posattrs, :unescape_input => true
         doc.register :images, [target, (attrs['imagesdir'] = doc_attrs['imagesdir'])] unless type == 'icon'
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
@@ -683,13 +650,12 @@ module Substitutors
       # ((Tigers))
       # indexterm2:[Tigers]
       text = text.gsub(InlineIndextermMacroRx) {
-        captured = $&
         case $1
         when 'indexterm'
           text = $2
           # honor the escape
-          if captured.start_with? RS
-            next captured.slice 1, captured.length
+          if $&.start_with? RS
+            next $&.slice 1, $&.length
           end
           # indexterm:[Tigers,Big cats]
           terms = split_simple_csv normalize_string text, true
@@ -698,8 +664,8 @@ module Substitutors
         when 'indexterm2'
           text = $2
           # honor the escape
-          if captured.start_with? RS
-            next captured.slice 1, captured.length
+          if $&.start_with? RS
+            next $&.slice 1, $&.length
           end
           # indexterm2:[Tigers]
           term = normalize_string text, true
@@ -708,13 +674,13 @@ module Substitutors
         else
           text = $3
           # honor the escape
-          if captured.start_with? RS
+          if $&.start_with? RS
             # escape concealed index term, but process nested flow index term
             if (text.start_with? '(') && (text.end_with? ')')
               text = text.slice 1, text.length - 2
               visible, before, after = true, '(', ')'
             else
-              next captured.slice 1, captured.length
+              next $&.slice 1, $&.length
             end
           else
             visible = true
@@ -747,21 +713,19 @@ module Substitutors
     if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       text = text.gsub(InlineLinkRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # honor the escape
         if (target = $2).start_with? RS
-          next %(#{m[1]}#{target.slice 1, target.length}#{m[3]})
+          next %(#{$1}#{target.slice 1, target.length}#{$3})
         end
         # NOTE if text is non-nil, then we've matched a formal macro (i.e., trailing square brackets)
-        prefix, text, suffix = m[1], (macro = m[3]) || '', ''
+        captured, prefix, text, suffix = $&, $1, (macro = $3) || '', ''
         if prefix == 'link:'
           if macro
             prefix = ''
           else
             # invalid macro syntax (link: prefix w/o trailing square brackets)
             # we probably shouldn't even get here...our regex is doing too much
-            next m[0]
+            next captured
           end
         end
         unless macro || UriTerminatorRx !~ target
@@ -794,7 +758,7 @@ module Substitutors
             end
           end
           # NOTE handle case when remaining target is a URI scheme (e.g., http://)
-          return m[0] if target.end_with? '://'
+          return captured if target.end_with? '://'
         end
 
         attrs, link_opts = nil, { :type => :link }
@@ -843,15 +807,18 @@ module Substitutors
     if found_macroish && ((text.include? 'link:') || (text.include? 'mailto:'))
       # inline link macros, link:target[text]
       text = text.gsub(InlineLinkMacroRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # honor the escape
         if $&.start_with? RS
-          next m[0].slice 1, m[0].length
+          next $&.slice 1, $&.length
         end
-        target = (mailto = m[1]) ? %(mailto:#{m[2]}) : m[2]
+        if (mailto = $1)
+          target = %(mailto:#{$2})
+          mailto_text = $2
+        else
+          target = $2
+        end
         attrs, link_opts = nil, { :type => :link }
-        unless (text = m[3]).empty?
+        unless (text = $3).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
             if !doc.compat_mode && (text.include? ',')
@@ -892,7 +859,7 @@ module Substitutors
         if text.empty?
           # mailto is a special case, already processed
           if mailto
-            text = m[2]
+            text = mailto_text
           else
             if doc_attrs.key? 'hide-uri-scheme'
               if (text = target.sub UriSniffRx, '').empty?
@@ -918,31 +885,28 @@ module Substitutors
 
     if text.include? '@'
       text = text.gsub(InlineEmailRx) {
-        address, tip = $&, $1
-        if tip
-          next (tip == RS ? (address.slice 1, address.length) : address)
+        if $1
+          next ($1 == RS ? ($&.slice 1, $&.length) : $&)
         end
 
-        target = %(mailto:#{address})
+        target = %(mailto:#{$&})
         # QUESTION should this be registered as an e-mail address?
         doc.register(:links, target)
 
-        Inline.new(self, :anchor, address, :type => :link, :target => target).convert
+        Inline.new(self, :anchor, $&, :type => :link, :target => target).convert
       }
     end
 
     if found_macroish && (text.include? 'tnote')
       text = text.gsub(InlineFootnoteMacroRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
-        # honor the escape
         if $&.start_with? RS
-          next m[0].slice 1, m[0].length
+          next $&.slice 1, $&.length
         end
-        if m[1] # footnoteref (legacy)
-          id, text = (m[3] || '').split(',', 2)
+        if $1 # footnoteref (legacy)
+          id, text = ($3 || '').split(',', 2)
         else
-          id, text = m[2], m[3]
+          id = $2
+          text = $3
         end
         if id
           if text
@@ -967,7 +931,7 @@ module Substitutors
           doc.register(:footnotes, Document::Footnote.new(index, id, text))
           type = target = nil
         else
-          next m[0]
+          next $&
         end
         Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
       }
@@ -1011,20 +975,18 @@ module Substitutors
   def sub_inline_xrefs(content, found = nil)
     if ((found ? found[:macroish] : (content.include? '[')) && (content.include? 'xref:')) || ((content.include? '&') && (content.include? 'lt;&'))
       content = content.gsub(InlineXrefMacroRx) {
-        # alias match for Ruby 1.8.7 compat
-        m = $~
         # honor the escape
         if $&.start_with? RS
-          next m[0].slice 1, m[0].length
+          next $&.slice 1, $&.length
         end
         attrs, doc = {}, @document
-        if (refid = m[1])
+        if (refid = $1)
           refid, text = refid.split ',', 2
           text = text.lstrip if text
         else
           macro = true
-          refid = m[2]
-          if (text = m[3])
+          refid = $2
+          if (text = $3)
             text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
             # NOTE if an equal sign (=) is present, parse text as attributes
             text = ((AttributeList.new text, self).parse_into attrs)[1] if !doc.compat_mode && (text.include? '=')

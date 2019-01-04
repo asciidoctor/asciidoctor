@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI

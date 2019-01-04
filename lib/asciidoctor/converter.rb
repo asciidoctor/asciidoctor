@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A base module for defining converters that can be used to convert {AbstractNode}
   # objects in a parsed AsciiDoc document to a backend format such as HTML or

@@ -1,7 +1,6 @@
 # NOTE .to_s hides require from Opal
 require 'asciidoctor'.to_s unless defined? Asciidoctor.load
 
-# encoding: UTF-8
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
 # phases of the AsciiDoc processor or extend the AsciiDoc syntax.
@@ -66,14 +65,12 @@ module Extensions
       #
       # Returns nothing
       def use_dsl
-        if self.name.nil_or_empty?
-          # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #include const_get :DSL if constants(false).include? :DSL
-          include const_get :DSL if constants.include? :DSL
-        else
-          # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #extend const_get :DSL if constants(false).include? :DSL
-          extend const_get :DSL if constants.include? :DSL
+        if constants.include? :DSL
+          if self.name.nil_or_empty?
+            include const_get :DSL
+          else
+            extend const_get :DSL
+          end
         end
       end
       alias extend_dsl use_dsl
@@ -1331,7 +1328,6 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
         processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
         processor.instance_exec(&block)
         processor.freeze
@@ -1377,7 +1373,6 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
         processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
         if block.arity == 1
           yield processor
@@ -1548,35 +1543,12 @@ module Extensions
     # Public: Resolves the Class object for the qualified name.
     #
     # Returns Class
-    if ::RUBY_MIN_VERSION_2
-      def class_for_name qualified_name
-        resolved = ::Object.const_get qualified_name, false
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
-    elsif ::RUBY_MIN_VERSION_1_9
-      def class_for_name qualified_name
-        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
-          name.empty? ? current : (current.const_get name, false)
-        end
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
-    else
-      def class_for_name qualified_name
-        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
-          # NOTE on Ruby 1.8, const_defined? only checks for constant in current scope
-          name.empty? ? current : ((current.const_defined? name) ? (current.const_get name) : raise)
-        end
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
+    def class_for_name qualified_name
+      resolved = ::Object.const_get qualified_name, false
+      raise unless ::Class === resolved
+      resolved
+    rescue
+      raise ::NameError, %(Could not resolve class for name: #{qualified_name})
     end
   end
 end
