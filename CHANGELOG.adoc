@@ -24,6 +24,7 @@ Bug Fixes::
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
   * ignore explicit section level style (#1852)
+  * check if type is defined in a way that's compatible with autoload
 
 Build / Infrastructure::
 
