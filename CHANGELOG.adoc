@@ -20,9 +20,15 @@ Enhancements::
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
 
+Improvements::
+
+  * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
+  * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)
+
 Bug Fixes::
 
   * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
+  * do not alter the $LOAD_PATH (#2764)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
   * ignore explicit section level style (#1852)
@@ -32,9 +38,9 @@ Bug Fixes::
 Build / Infrastructure::
 
   * clear SOURCE_DATE_EPOCH env var when testing timezones (PR #2969) (*@aerostitch*)
-  * stop running CI job on unsupported versions of Ruby
   * remove compat folder (removes the AsciiDoc Python config file that provides pseudo-compliance with Asciidoctor and a stylesheet for an old Font Awesome migration)
   * add Ruby 2.6.0 to build matrix
+  * stop running CI job on unsupported versions of Ruby
 
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux

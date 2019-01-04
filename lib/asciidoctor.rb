@@ -6,16 +6,11 @@ if RUBY_ENGINE == 'opal'
   require 'asciidoctor/js'
 else
   autoload :Base64, 'base64'
-  autoload :URI, 'uri'
   autoload :OpenURI, 'open-uri'
   autoload :Pathname, 'pathname'
   autoload :StringScanner, 'strscan'
+  autoload :URI, 'uri'
 end
-
-# ideally we should use require_relative instead of modifying the LOAD_PATH
-$:.unshift __dir__
-
-require 'asciidoctor/logging'
 
 # Public: Methods for parsing AsciiDoc input files and converting documents
 # using eRuby templates.
@@ -175,14 +170,14 @@ module Asciidoctor
     define :markdown_syntax, true
   end
 
-  # The absolute root path of the Asciidoctor RubyGem
-  ROOT_PATH = ::File.dirname ::File.absolute_path __dir__
+  # The absolute root directory of the Asciidoctor RubyGem
+  ROOT_DIR = ::File.dirname ::File.absolute_path __dir__ unless defined? ROOT_DIR
 
-  # The absolute lib path of the Asciidoctor RubyGem
-  #LIB_PATH = ::File.join ROOT_PATH, 'lib'
+  # The absolute lib directory of the Asciidoctor RubyGem
+  LIB_DIR = ::File.join ROOT_DIR, 'lib'
 
-  # The absolute data path of the Asciidoctor RubyGem
-  DATA_PATH = ::File.join ROOT_PATH, 'data'
+  # The absolute data directory of the Asciidoctor RubyGem
+  DATA_DIR = ::File.join ROOT_DIR, 'data'
 
   # The user's home directory, as best we can determine it
   USER_HOME = ::Dir.home
@@ -1564,7 +1559,7 @@ module Asciidoctor
   # Returns the resolved constant, if resolved, otherwise nothing.
   def const_missing name
     if name == :Extensions
-      require 'asciidoctor/extensions'
+      require_relative 'asciidoctor/extensions'
       Extensions
     else
       super
@@ -1574,39 +1569,39 @@ module Asciidoctor
   end
 
   if RUBY_ENGINE == 'opal'
-    require 'asciidoctor/timings'
-    require 'asciidoctor/version'
+    require_relative 'asciidoctor/timings'
   else
-    autoload :Timings, 'asciidoctor/timings'
-    autoload :VERSION, 'asciidoctor/version'
+    autoload :Timings, (::File.absolute_path 'asciidoctor/timings', __dir__)
   end
 end
 
 # core extensions
-require 'asciidoctor/core_ext'
+require_relative 'asciidoctor/core_ext'
 
-# modules
-require 'asciidoctor/helpers'
-require 'asciidoctor/substitutors'
+# modules and helpers
+require_relative 'asciidoctor/helpers'
+require_relative 'asciidoctor/logging'
+require_relative 'asciidoctor/substitutors'
+require_relative 'asciidoctor/version'
 
 # abstract classes
-require 'asciidoctor/abstract_node'
-require 'asciidoctor/abstract_block'
+require_relative 'asciidoctor/abstract_node'
+require_relative 'asciidoctor/abstract_block'
 
 # concrete classes
-require 'asciidoctor/attribute_list'
-require 'asciidoctor/block'
-require 'asciidoctor/callouts'
-require 'asciidoctor/converter'
-require 'asciidoctor/document'
-require 'asciidoctor/inline'
-require 'asciidoctor/list'
-require 'asciidoctor/parser'
-require 'asciidoctor/path_resolver'
-require 'asciidoctor/reader'
-require 'asciidoctor/section'
-require 'asciidoctor/stylesheets'
-require 'asciidoctor/table'
+require_relative 'asciidoctor/attribute_list'
+require_relative 'asciidoctor/block'
+require_relative 'asciidoctor/callouts'
+require_relative 'asciidoctor/converter'
+require_relative 'asciidoctor/document'
+require_relative 'asciidoctor/inline'
+require_relative 'asciidoctor/list'
+require_relative 'asciidoctor/parser'
+require_relative 'asciidoctor/path_resolver'
+require_relative 'asciidoctor/reader'
+require_relative 'asciidoctor/section'
+require_relative 'asciidoctor/stylesheets'
+require_relative 'asciidoctor/table'
 
 # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
 require 'asciidoctor/js/postscript' if RUBY_ENGINE == 'opal'

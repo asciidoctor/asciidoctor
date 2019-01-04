@@ -1,3 +1,3 @@
 require 'optparse'
-require 'asciidoctor/cli/options'
-require 'asciidoctor/cli/invoker'
+require_relative 'cli/options'
+require_relative 'cli/invoker'

@@ -381,7 +381,7 @@ class Document < AbstractBlock
     attrs['last-update-label'] = 'Last updated'
 
     attr_overrides['asciidoctor'] = ''
-    attr_overrides['asciidoctor-version'] = VERSION
+    attr_overrides['asciidoctor-version'] = ::Asciidoctor::VERSION
 
     attr_overrides['safe-mode-name'] = (safe_mode_name = SafeMode.name_for_value @safe)
     attr_overrides["safe-mode-#{safe_mode_name}"] = ''

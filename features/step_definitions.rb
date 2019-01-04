@@ -1,10 +1,10 @@
-ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
-ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
-Dir.chdir ASCIIDOCTOR_PROJECT_DIR
+ASCIIDOCTOR_FEATURES_DIR = File.absolute_path __dir__
+ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_FEATURES_DIR, '../lib')
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_LIB_DIR, 'asciidoctor')
+require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
+Dir.chdir Asciidoctor::ROOT_DIR
 
 require 'rspec/expectations'
 require 'tilt'

@@ -1,8 +1,5 @@
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
-require 'tilt' unless defined? ::Tilt
+require_relative 'test_helper'
+require 'tilt' unless defined? ::Tilt::VERSION
 
 context 'Converter' do
 

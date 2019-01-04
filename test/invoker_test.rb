@@ -1,9 +1,5 @@
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
-require 'asciidoctor/cli/options'
-require 'asciidoctor/cli/invoker'
+require_relative 'test_helper'
+require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 
 context 'Invoker' do
   test 'should parse source and convert to html5 article by default' do
@@ -629,7 +625,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
 
   test 'should force default external encoding to UTF-8' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'encoding.asciidoc'
     old_lang = ENV['LANG']
     ENV['LANG'] = 'US-ASCII'
@@ -665,7 +661,7 @@ Sample *AsciiDoc*
 
   test 'should show timezone as UTC if system TZ is set to UTC' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
@@ -688,7 +684,7 @@ Sample *AsciiDoc*
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']

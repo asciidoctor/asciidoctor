@@ -1,8 +1,5 @@
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
-require 'asciidoctor/cli/options'
+require_relative 'test_helper'
+require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli/options'
 
 context 'Options' do
   test 'should print usage and return error code 0 when help flag is present' do

@@ -227,5 +227,5 @@ module Asciidoctor
   end
 end
 
-require 'asciidoctor/converter/base'
-require 'asciidoctor/converter/factory'
+require_relative 'converter/base'
+require_relative 'converter/factory'

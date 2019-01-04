@@ -1,7 +1,4 @@
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context "Bulleted lists (:ulist)" do
   context "Simple lists" do

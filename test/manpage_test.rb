@@ -1,7 +1,4 @@
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 SAMPLE_MANPAGE_HEADER = <<-EOS.chomp
 = command (1)

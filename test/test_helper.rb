@@ -1,20 +1,19 @@
-ASCIIDOCTOR_TEST_DIR = File.expand_path File.dirname __FILE__
-ASCIIDOCTOR_PROJECT_DIR = File.dirname ASCIIDOCTOR_TEST_DIR
-ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
-Dir.chdir ASCIIDOCTOR_PROJECT_DIR
+ASCIIDOCTOR_TEST_DIR = File.absolute_path __dir__
+ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || (File.join ASCIIDOCTOR_TEST_DIR, '../lib')
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_LIB_DIR, 'asciidoctor')
+require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
+Dir.chdir Asciidoctor::ROOT_DIR
 
-require 'socket'
 require 'nokogiri'
+require 'socket'
 require 'tempfile'
 require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
-autoload :Pathname,  'pathname'
 autoload :Open3, 'open3'
+autoload :Pathname,  'pathname'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
@@ -30,7 +29,7 @@ class Minitest::Test
   end
 
   def disk_root
-    %(#{windows? ? ASCIIDOCTOR_PROJECT_DIR.split('/')[0] : ''}/)
+    %(#{windows? ? Asciidoctor::ROOT_DIR.split('/')[0] : ''}/)
   end
 
   def empty_document options = {}
@@ -57,6 +56,10 @@ class Minitest::Test
       end
     end
     fixture_path(name)
+  end
+
+  def bindir
+    File.join Asciidoctor::ROOT_DIR, 'bin'
   end
 
   def testdir

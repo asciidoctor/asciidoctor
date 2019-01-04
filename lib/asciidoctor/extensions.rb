@@ -1,5 +1,5 @@
 # NOTE .to_s hides require from Opal
-require 'asciidoctor'.to_s unless defined? Asciidoctor.load
+require_relative '../asciidoctor'.to_s unless defined? Asciidoctor.load
 
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
