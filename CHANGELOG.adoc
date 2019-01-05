@@ -21,6 +21,7 @@ Enhancements::
 
 Bug Fixes::
 
+  * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
   * ignore explicit section level style (#1852)

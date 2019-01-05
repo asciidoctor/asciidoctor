@@ -520,6 +520,18 @@ Some more inspiring words.
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
 
+    test 'markdown-style quote block with only attribution' do
+      input = <<-EOS
+> -- Anonymous
+      EOS
+      output = convert_string input
+      assert_css '.quoteblock', output, 1
+      assert_css '.quoteblock > blockquote', output, 1
+      assert_css '.quoteblock > blockquote > *', output, 0
+      assert_css '.quoteblock > .attribution', output, 1
+      assert_xpath %(//*[@class="quoteblock"]//*[@class="attribution"][contains(text(),"Anonymous")]), output, 1
+    end
+
     test 'should parse credit line in markdown-style quote block like positional block attributes' do
       input = <<-EOS
 > I hold it that a little rebellion now and then is a good thing,
