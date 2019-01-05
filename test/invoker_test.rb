@@ -686,8 +686,6 @@ Sample *AsciiDoc*
       end
       if old_source_date_epoch
           ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
-      else
-          ENV.delete 'SOURCE_DATE_EPOCH'
       end
     end
   end
