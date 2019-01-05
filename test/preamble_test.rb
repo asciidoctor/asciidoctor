@@ -31,7 +31,7 @@ Preface content.
 
 Section content.
     EOS
-    result = convert_string input, :backend => :docbook
+    result = convert_string input, backend: :docbook
     assert_xpath '//preface/title', result, 1
     title_node = xmlnodes_at_xpath '//preface/title', result, 1
     assert_equal '', title_node.text
@@ -49,7 +49,7 @@ Preface content.
 
 Section content.
     EOS
-    result = convert_string input, :backend => :docbook
+    result = convert_string input, backend: :docbook
     assert_xpath '//preface/title[text()="Preface"]', result, 1
   end
 

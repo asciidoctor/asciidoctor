@@ -57,7 +57,7 @@ context "Parser" do
   end
 
   test 'store inaccessible attribute on document with value' do
-    doc = empty_document :attributes => { 'foo' => 'baz' }
+    doc = empty_document attributes: { 'foo' => 'baz' }
     attrs = {}
     attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar', doc, attrs
     assert_equal 'foo', attr_name
@@ -83,7 +83,7 @@ context "Parser" do
 
   test 'store inaccessible attribute on document with negated value' do
     { 'foo!' => nil, '!foo' => nil, 'foo' => nil }.each do |name, value|
-      doc = empty_document :attributes => { 'foo' => 'baz' }
+      doc = empty_document attributes: { 'foo' => 'baz' }
       attrs = {}
       attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value, doc, attrs
       assert_equal name.sub('!', ''), attr_name
@@ -93,7 +93,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with id and role' do
-    attributes = {1 => 'style#id.role'}
+    attributes = { 1 => 'style#id.role' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_equal 'style', attributes['style']
@@ -103,7 +103,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with style, role, id and option' do
-    attributes = {1 => 'style.role#id%fragment'}
+    attributes = { 1 => 'style.role#id%fragment' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_equal 'style', attributes['style']
@@ -115,7 +115,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with style, id and multiple roles' do
-    attributes = {1 => 'style#id.role1.role2'}
+    attributes = { 1 => 'style#id.role1.role2' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_equal 'style', attributes['style']
@@ -125,7 +125,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with style, multiple roles and id' do
-    attributes = {1 => 'style.role1.role2#id'}
+    attributes = { 1 => 'style.role1.role2#id' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'style', style
     assert_equal 'style', attributes['style']
@@ -135,7 +135,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with positional and original style' do
-    attributes = {1 => 'new_style', 'style' => 'original_style'}
+    attributes = { 1 => 'new_style', 'style' => 'original_style' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_equal 'new_style', style
     assert_equal 'new_style', attributes['style']
@@ -143,7 +143,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with id and role only' do
-    attributes = {1 => '#id.role'}
+    attributes = { 1 => '#id.role' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_equal 'id', attributes['id']
@@ -152,7 +152,7 @@ context "Parser" do
   end
 
   test 'parse empty style attribute' do
-    attributes = {1 => nil}
+    attributes = { 1 => nil }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_nil attributes['id']
@@ -161,7 +161,7 @@ context "Parser" do
   end
 
   test 'parse style attribute with option should preserve existing options' do
-    attributes = {1 => '%header', 'options' => 'footer', 'footer-option' => ''}
+    attributes = { 1 => '%header', 'options' => 'footer', 'footer-option' => '' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
     assert_equal 'footer,header', attributes['options']
@@ -454,10 +454,10 @@ v{project-version}, {release-date}: {release-summary}
 Author Name
 {project-version}, {release-date}: {release-summary}
     EOS
-    doc = document_from_string input, :attributes => {
+    doc = document_from_string input, attributes: {
       'project-version' => '1.0.1',
       'release-date' => '2018-05-15',
-      'release-summary' => 'The one you can count on!'
+      'release-summary' => 'The one you can count on!',
     }
     assert_equal '1.0.1', (doc.attr 'revnumber')
     assert_equal '2018-05-15', (doc.attr 'revdate')

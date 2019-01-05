@@ -290,7 +290,7 @@ class Table::Cell < AbstractNode
           inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
       end unless inner_document_lines.empty?
-      @inner_document = Document.new(inner_document_lines, :header_footer => false, :parent => @document, :cursor => inner_document_cursor)
+      @inner_document = Document.new(inner_document_lines, header_footer: false, parent: @document, cursor: inner_document_cursor)
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
       @subs = nil
     elsif literal
@@ -336,7 +336,7 @@ class Table::Cell < AbstractNode
       @inner_document.convert
     else
       text.split(BlankLineRx).map do |p|
-        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, :type => @style).convert
+        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, type: @style).convert
       end
     end
   end
@@ -376,7 +376,7 @@ class Table::ParserContext
     'csv' => [',', /,/],
     'dsv' => [':', /:/],
     'tsv' => [%(\t), /\t/],
-    '!sv' => ['!', /!/]
+    '!sv' => ['!', /!/],
   }
 
   # Public: The Table currently being parsed
@@ -414,7 +414,7 @@ class Table::ParserContext
           xsv = '!sv'
         end
       else
-        logger.error message_with_context %(illegal table format: #{xsv}), :source_location => reader.cursor_at_prev_line
+        logger.error message_with_context %(illegal table format: #{xsv}), source_location: reader.cursor_at_prev_line
         @format, xsv = 'psv', (table.document.nested? ? '!sv' : 'psv')
       end
     else
@@ -569,7 +569,7 @@ class Table::ParserContext
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
-        logger.error message_with_context 'table missing leading separator; recovering automatically', :source_location => Reader::Cursor.new(*@start_cursor_data)
+        logger.error message_with_context 'table missing leading separator; recovering automatically', source_location: Reader::Cursor.new(*@start_cursor_data)
         cellspec = {}
         repeat = 1
       end
@@ -586,7 +586,7 @@ class Table::ParserContext
             # trim whitespace and collapse escaped quotes
             cell_text = cell_text.strip.squeeze('"')
           else
-            logger.error message_with_context 'unclosed quote in CSV data; setting cell to empty', :source_location => @reader.cursor_at_prev_line
+            logger.error message_with_context 'unclosed quote in CSV data; setting cell to empty', source_location: @reader.cursor_at_prev_line
             cell_text = ''
           end
         else
@@ -609,12 +609,12 @@ class Table::ParserContext
       else
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
-          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', :source_location => @reader.cursor_before_mark
+          logger.error message_with_context 'dropping cell because it exceeds specified number of columns', source_location: @reader.cursor_before_mark
           return
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, :cursor => @reader.cursor_before_mark)
+      cell = Table::Cell.new(column, cell_text, cellspec, cursor: @reader.cursor_before_mark)
       @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))

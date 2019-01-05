@@ -22,7 +22,7 @@ context 'Manpage' do
   context 'Configuration' do
     test 'should set proper manpage-related attributes' do
       input = SAMPLE_MANPAGE_HEADER
-      doc = Asciidoctor.load input, :backend => :manpage
+      doc = Asciidoctor.load input, backend: :manpage
       assert_equal 'man', doc.attributes['filetype']
       assert_equal '', doc.attributes['filetype-man']
       assert_equal '1', doc.attributes['manvolnum']
@@ -35,7 +35,7 @@ context 'Manpage' do
 
     test 'should output multiple mannames in NAME section' do
       input = SAMPLE_MANPAGE_HEADER.sub(/^command - /, 'command, alt_command - ')
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
@@ -57,7 +57,7 @@ When you need to put some foo on the bar.
       EOS
 
       attrs = { 'manname' => 'foobar', 'manpurpose' => 'puts some foo on the bar' }
-      doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true, :attributes => attrs
+      doc = Asciidoctor.load input, backend: :manpage, header_footer: true, attributes: attrs
       assert_equal 'foobar', (doc.attr 'manname')
       assert_equal ['foobar'], (doc.attr 'mannames')
       assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
@@ -89,14 +89,14 @@ foobar - puts some foo
 When you need to put some foo on the bar.
       EOS
 
-      doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true
+      doc = Asciidoctor.load input, backend: :manpage, header_footer: true
       assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
     end
 
     test 'should parse malformed document with warnings' do
       input = 'garbage in'
       using_memory_logger do |logger|
-        doc = Asciidoctor.load input, :backend => :manpage, :header_footer => true, :attributes => { 'docname' => 'cmd' }
+        doc = Asciidoctor.load input, backend: :manpage, header_footer: true, attributes: { 'docname' => 'cmd' }
         assert_equal 'cmd', doc.attr('manname')
         assert_equal ['cmd'], doc.attr('mannames')
         assert_equal '.1', doc.attr('outfilesuffix')
@@ -117,7 +117,7 @@ command - does stuff
       EOS
 
       using_memory_logger do |logger|
-        document_from_string input, :backend => :manpage
+        document_from_string input, backend: :manpage
         assert_message logger, :ERROR, '<stdin>: line 1: non-conforming manpage title', Hash
       end
     end
@@ -132,7 +132,7 @@ Does stuff.
       EOS
 
       using_memory_logger do |logger|
-        doc = document_from_string input, :backend => :manpage
+        doc = document_from_string input, backend: :manpage
         assert_message logger, :ERROR, '<stdin>: line 3: non-conforming name section body', Hash
         refute_nil doc.sections[0]
         assert_equal 'Synopsis', doc.sections[0].title
@@ -141,26 +141,26 @@ Does stuff.
 
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE blue R < >\n)
     end
 
     test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true,
-          :attributes => { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true,
+          attributes: { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
       assert_includes output.lines, %(.  LINKSTYLE cyan B \\[fo] \\[fc]\n)
     end
 
     test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
       input = %(:man-linkstyle: cyan R < >
 #{SAMPLE_MANPAGE_HEADER})
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R &lt; &gt;\n)
 
       input = %(:man-linkstyle: pass:[cyan R < >]
 #{SAMPLE_MANPAGE_HEADER})
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R < >\n)
     end
   end
@@ -170,7 +170,7 @@ Does stuff.
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 (C) & (R) are translated to character references, but not the &.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.last.chomp
     end
 
@@ -180,7 +180,7 @@ Does stuff.
 go -- to
 
 go--to)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'go \\(em to'
       assert_includes output, 'go\\(emto'
     end
@@ -189,7 +189,7 @@ go--to)
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 .)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&.', output.lines.last.chomp
     end
 
@@ -200,7 +200,7 @@ AAA this line of text should be show
 .if 1 .nx
 BBB this line and the one above it should be visible)
 
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&.if 1 .nx', output.lines[-2].chomp
     end
 
@@ -212,7 +212,7 @@ Oh, here it goes again
     should have known,
 should have known again)
 
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
@@ -224,7 +224,7 @@ should have known again)
   should have known,
 should have known again)
 
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
@@ -233,9 +233,9 @@ should have known again)
 
 Describe this thing.)
 
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true, :attributes => {
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true, attributes: {
         'manmanual' => %(General\nCommands\nManual),
-        'mansource' => %(Control\nAll\nThe\nThings\n5.0)
+        'mansource' => %(Control\nAll\nThe\nThings\n5.0),
       }
       assert_includes output, 'Manual: General Commands Manual'
       assert_includes output, 'Source: Control All The Things 5.0'
@@ -246,7 +246,7 @@ Describe this thing.)
   context 'Backslash' do
     test 'should not escape spaces for empty manual or source fields' do
       input = SAMPLE_MANPAGE_HEADER.lines.select {|l| !l.start_with?(':man ') }
-      output = Asciidoctor.convert input, :backend => :manpage, :header_footer => true
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_match ' Manual: \ \&', output
       assert_match ' Source: \ \&', output
       assert_match(/^\.TH "COMMAND" .* "\\ \\&" "\\ \\&"$/, output)
@@ -256,7 +256,7 @@ Describe this thing.)
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 "`hello`" '`goodbye`' *strong* _weak_ `even`)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.last.chomp
     end
 
@@ -265,7 +265,7 @@ Describe this thing.)
 
 \\.foo \\ bar\\
 baz)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\(rs.foo \(rs bar\(rs', output.lines[-2].chomp
     end
 
@@ -273,7 +273,7 @@ baz)
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
  \\fB makes text bold)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_match '\(rsfB makes text bold', output
     end
 
@@ -282,7 +282,7 @@ baz)
 
 Before break. +
 After break.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal 'Before break.
 .br
 After break.', output.lines[-3..-1].join
@@ -295,7 +295,7 @@ After break.', output.lines[-3..-1].join
 First paragraph.
 
 http://asciidoc.org[AsciiDoc])
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 First paragraph.
 .sp
@@ -306,7 +306,7 @@ First paragraph.
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 http://asciidoc.org[AsciiDoc] can be used to create man pages.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
 can be used to create man pages.', output.lines[-2..-1].join
     end
@@ -315,7 +315,7 @@ can be used to create man pages.', output.lines[-2..-1].join
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 This is http://asciidoc.org[AsciiDoc].)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal 'This is \c
 .URL "http://asciidoc.org" "AsciiDoc" "."', output.lines[-2..-1].join
     end
@@ -324,7 +324,7 @@ This is http://asciidoc.org[AsciiDoc].)
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 This is http://asciidoc.org[AsciiDoc], which can be used to write content.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal 'This is \c
 .URL "http://asciidoc.org" "AsciiDoc" ","
 which can be used to write content.', output.lines[-3..-1].join
@@ -339,7 +339,7 @@ http://ccl.clozure.com[Clozure CL],
 http://cmucl.org[CMUCL],
 http://ecls.sf.net[ECL],
 and http://sbcl.sf.net[SBCL].)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 The corresponding implementations are
 .URL "http://clisp.sf.net" "CLISP" ","
@@ -354,7 +354,7 @@ and \c
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 The corresponding implementations are http://clisp.sf.net[CLISP], http://ccl.clozure.com[Clozure CL], http://cmucl.org[CMUCL], http://ecls.sf.net[ECL], and http://sbcl.sf.net[SBCL].)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 The corresponding implementations are \c
 .URL "http://clisp.sf.net" "CLISP" ","
@@ -369,7 +369,7 @@ and
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 Please search |\c
 .URL "http://discuss.asciidoctor.org" "the forums" "|"
@@ -380,7 +380,7 @@ before asking.', output.lines[-4..-1].join
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 Enter the link:cat[`cat`] command.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 Enter the \c
 .URL "cat" "\f(CRcat\fP" " "
@@ -394,7 +394,7 @@ command.', output.lines[-4..-1].join
 First paragraph.
 
 mailto:doc@example.org[Contact the doc])
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_equal '.sp
 First paragraph.
 .sp
@@ -404,7 +404,7 @@ First paragraph.
     test 'should set text of MTO macro to blank for implicit email' do
       input = %(#{SAMPLE_MANPAGE_HEADER}
 Bugs fixed daily by doc@example.org.)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? 'Bugs fixed daily by \\c
 .MTO "doc\\(atexample.org" "" "."'
     end
@@ -421,7 +421,7 @@ Bugs fixed daily by doc@example.org.)
 |Body 2
 |Footer
 |===)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? 'allbox tab(:);
 lt.
 T{
@@ -453,7 +453,7 @@ T}
 |*bold* |`mono`
 |_italic_ | #mark#
 |===)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       refute_match(/<\/?BOUNDARY>/, output)
     end
 
@@ -468,7 +468,7 @@ T}
 | dimension of the object
 | 3
 |===)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? '.it 1 an-trap
 .nr an-no-space-flag 1
 .nr an-break-flag 1
@@ -509,7 +509,7 @@ T}
 c    _d_
 .
 |===)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? '.TS
 allbox tab(:);
 lt lt.
@@ -536,7 +536,7 @@ T}
 c    _d_
 .
 |===)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? '.TS
 allbox tab(:);
 lt lt.
@@ -561,7 +561,7 @@ T}
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 The Magic 8 Ball says image:signs-point-to-yes.jpg[].)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'The Magic 8 Ball says [signs point to yes].'
     end
 
@@ -569,7 +569,7 @@ The Magic 8 Ball says image:signs-point-to-yes.jpg[].)
       input = %(#{SAMPLE_MANPAGE_HEADER}
 
 The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org/wiki/Magic_8-Ball].)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'The Magic 8 Ball says [signs point to yes] <https://en.wikipedia.org/wiki/Magic_8\-Ball>.'
     end
   end
@@ -583,7 +583,7 @@ ____
 Not everything that is faced can be changed.
 But nothing can be changed until it is faced.
 ____)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? '.RS 3
 .ll -.6i
 .sp
@@ -608,7 +608,7 @@ But nothing can be changed until it is faced.
 $ gem install asciidoctor # <1>
 ----
 <1> Installs the asciidoctor gem from RubyGems.org)
-      output = Asciidoctor.convert input, :backend => :manpage
+      output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? '.TS
 tab(:);
 r lw(\n(.lu*75u/100u).
@@ -624,7 +624,7 @@ T}
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
         ENV['SOURCE_DATE_EPOCH'] = '1234123412'
-        output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+        output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, header_footer: true
         assert_match(/Date: 2009-02-08/, output)
         assert_match(/^\.TH "COMMAND" "1" "2009-02-08" "Command 1.2.3" "Command Manual"$/, output)
       ensure
@@ -640,7 +640,7 @@ T}
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
         ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, :backend => :manpage, :header_footer => true
+        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, header_footer: true
         assert false
       rescue
         assert true

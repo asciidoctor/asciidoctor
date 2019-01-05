@@ -396,7 +396,7 @@ ____
 A famous quote.
 ____
       EOS
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'blockquote', output, 1
       assert_css 'blockquote > simpara', output, 1
       assert_css 'blockquote > attribution', output, 1
@@ -406,7 +406,7 @@ ____
       author = attribution.children.first
       assert_equal 'Famous Person', author.text.strip
     end
- 
+
     test 'epigraph quote block with attribution converted to DocBook' do
       input = <<-EOS
 [.epigraph, Famous Person, Famous Book (1999)]
@@ -414,7 +414,7 @@ ____
 A famous quote.
 ____
       EOS
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'epigraph', output, 1
       assert_css 'epigraph > simpara', output, 1
       assert_css 'epigraph > attribution', output, 1
@@ -613,7 +613,7 @@ ____
 A famous verse.
 ____
       EOS
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'blockquote', output, 1
       assert_css 'blockquote simpara', output, 0
       assert_css 'blockquote > literallayout', output, 1
@@ -624,7 +624,7 @@ ____
       author = attribution.children.first
       assert_equal 'Famous Poet', author.text.strip
     end
- 
+
     test 'single-line epigraph verse block with attribution converted to DocBook' do
       input = <<-EOS
 [verse.epigraph, Famous Poet, Famous Poem]
@@ -632,7 +632,7 @@ ____
 A famous verse.
 ____
       EOS
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'epigraph', output, 1
       assert_css 'epigraph simpara', output, 0
       assert_css 'epigraph > literallayout', output, 1
@@ -919,7 +919,7 @@ line three
 ....
 EOS
       [true, false].each {|header_footer|
-        output = convert_string input, :header_footer => header_footer
+        output = convert_string input, header_footer: header_footer
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
@@ -944,7 +944,7 @@ line three
 ----
 EOS
       [true, false].each {|header_footer|
-        output = convert_string input, header_footer => header_footer
+        output = convert_string input, header_footer: header_footer
         assert_xpath '//pre/code', output, 1
         assert_xpath '//pre/code/text()', output, 1
         text = xmlnodes_at_xpath('//pre/code/text()', output, 1).text
@@ -971,7 +971,7 @@ ____
 --
 EOS
       [true, false].each {|header_footer|
-        output = convert_string input, :header_footer => header_footer
+        output = convert_string input, header_footer: header_footer
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
         text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
@@ -999,7 +999,7 @@ last line
 ....
       EOS
 
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       block = doc.blocks.first
       assert_equal ['', '', '  first line', '', 'last line', '', '{empty}', ''], block.lines
       result = doc.convert
@@ -1270,7 +1270,7 @@ listing block
 ----
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/screen[text()="listing block"]', output, 1
     end
 
@@ -1282,7 +1282,7 @@ listing block
 ----
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/formalpara', output, 1
       assert_xpath '/formalpara/title[text()="title"]', output, 1
       assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
@@ -1296,7 +1296,7 @@ listing block
 ----
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/screen[text()="listing block"]', output, 1
     end
 
@@ -1309,7 +1309,7 @@ listing block
 ----
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/formalpara', output, 1
       assert_xpath '/formalpara/title[text()="title"]', output, 1
       assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
@@ -1362,7 +1362,7 @@ TIP: An open block can have other blocks inside of it.
 Back to our regularly scheduled programming.
       EOS
 
-      output = convert_string input, :backend => :docbook, :keep_namespaces => true
+      output = convert_string input, backend: :docbook, keep_namespaces: true
       assert_css 'article > simpara', output, 2
       assert_css 'article > para', output, 1
       assert_css 'article > para > simpara', output, 1
@@ -1383,7 +1383,7 @@ Back to our regularly scheduled programming.
 This is an open paragraph.
       EOS
 
-      output = convert_string input, :backend => :docbook, :keep_namespaces => true
+      output = convert_string input, backend: :docbook, keep_namespaces: true
       assert_css 'article > simpara', output, 1
       open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara', output, 1
       open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara[text()="This is an open paragraph."]', output, 1
@@ -1404,7 +1404,7 @@ This is an open block with a title.
 --
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'article > formalpara', output, 1
       assert_css 'article > formalpara > *', output, 2
       assert_css 'article > formalpara > title', output, 1
@@ -1419,7 +1419,7 @@ This is an open block with a title.
 This is an open paragraph with a title.
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'article > formalpara', output, 1
       assert_css 'article > formalpara > *', output, 2
       assert_css 'article > formalpara > title', output, 1
@@ -1437,7 +1437,7 @@ It holds stuff.
 --
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'article > para[role=container]', output, 1
       assert_css 'article > para[role=container] > simpara', output, 1
     end
@@ -1449,7 +1449,7 @@ This is an open block.
 It holds stuff.
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_css 'article > simpara[role=container]', output, 1
     end
   end
@@ -1538,7 +1538,7 @@ line below
 ++++
       EOS
 
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       block = doc.blocks[1]
       assert_equal ['', '', '  first line', '', 'last line', '', ''], block.lines
       result = doc.convert
@@ -1590,7 +1590,7 @@ line below
 </informalequation>
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_equal expect.strip, output.strip
     end
 
@@ -1718,7 +1718,7 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
 </informalequation>)
 
       using_memory_logger do |logger|
-        doc = document_from_string input, :backend => :docbook, :header_footer => false
+        doc = document_from_string input, backend: :docbook, header_footer: false
         actual = doc.convert
         if asciimath_available
           assert_equal expect.strip, actual.strip
@@ -1774,11 +1774,11 @@ sqrt(3x-1)+(1+x)^2 < y
 
       [
         {},
-        {'stem' => ''},
-        {'stem' => 'asciimath'},
-        {'stem' => 'bogus'}
+        { 'stem' => '' },
+        { 'stem' => 'asciimath' },
+        { 'stem' => 'bogus' },
       ].each do |attributes|
-        output = convert_string_to_embedded input, :attributes => attributes
+        output = convert_string_to_embedded input, attributes: attributes
         assert_css '.stemblock', output, 1
         nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
         assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
@@ -1794,11 +1794,11 @@ sqrt(3x-1)+(1+x)^2 < y
       EOS
 
       [
-        {'stem' => 'latexmath'},
-        {'stem' => 'latex'},
-        {'stem' => 'tex'}
+        { 'stem' => 'latexmath' },
+        { 'stem' => 'latex' },
+        { 'stem' => 'tex' },
       ].each do |attributes|
-        output = convert_string_to_embedded input, :attributes => attributes
+        output = convert_string_to_embedded input, attributes: attributes
         assert_css '.stemblock', output, 1
         nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
         assert_equal '\[\sqrt{3x-1}+(1+x)^2 &lt; y\]', nodes.first.to_s.strip
@@ -1819,7 +1819,7 @@ sqrt(3x-1)+(1+x)^2 < y
       stemblock = doc.blocks[0]
       assert_equal :stem, stemblock.context
       assert_equal 'asciimath', stemblock.attributes['style']
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
@@ -1915,7 +1915,7 @@ image::images/tiger.png[Tiger]
 image::tiger.svg[Tiger]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//img[@src="tiger.svg"][@alt="Tiger"]', output, 1
     end
 
@@ -1927,7 +1927,7 @@ image::tiger.svg[Tiger]
 image::tiger.svg[Tiger,100]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="images/tiger.svg"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
     end
 
@@ -1949,7 +1949,7 @@ image::images/tiger.svg[Tiger,100]
 image::tiger.svg[Tiger,100,fallback=tiger.png]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="images/tiger.svg"][@width="100"]/img[@src="images/tiger.png"][@width="100"]', output, 1
     end
 
@@ -1961,7 +1961,7 @@ image::tiger.svg[Tiger,100,fallback=tiger.png]
 image::http://example.org/tiger.svg?foo=bar[Tiger,100]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="http://example.org/tiger.svg?foo=bar"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
     end
 
@@ -1973,7 +1973,7 @@ image::http://example.org/tiger.svg?foo=bar[Tiger,100]
 image::http://example.org/tiger-svg[Tiger,100,format=svg]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="http://example.org/tiger-svg"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
     end
 
@@ -1985,7 +1985,7 @@ image::http://example.org/tiger-svg[Tiger,100,format=svg]
 image::circle.svg[Tiger,100]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => testdir }
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
       assert_match(/<svg\s[^>]*width="100px"[^>]*>/, output, 1)
       refute_match(/<svg\s[^>]*width="500px"[^>]*>/, output)
       refute_match(/<svg\s[^>]*height="500px"[^>]*>/, output)
@@ -2001,7 +2001,7 @@ image::circle.svg[Tiger,100]
 image::circle.svg[Tiger,100]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => { 'docdir' => testdir }
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
       assert_match(/<svg\s[^>]*width="100px">/, output, 1)
     end
 
@@ -2011,7 +2011,7 @@ image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=
       EOS
 
       output = using_test_webserver do
-        convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
       end
 
       assert_css 'svg', output, 1
@@ -2027,7 +2027,7 @@ image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=
 image::no-such-image.svg[Alt Text]
       EOS
 
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
       assert_message @logger, :WARN, '~SVG does not exist or cannot be read'
     end
@@ -2136,7 +2136,7 @@ image::images/tiger.png[Tiger]
     test 'should not encode double quotes in alt text when converting to DocBook' do
       input = 'Select "File > Open"'
       expected = 'Select "File &gt; Open"'
-      result = convert_string_to_embedded %(image::images/open.png[#{input}]), :backend => :docbook
+      result = convert_string_to_embedded %(image::images/open.png[#{input}]), backend: :docbook
       assert_includes result, %(<phrase>#{expected}</phrase>)
     end
 
@@ -2231,7 +2231,7 @@ image::images/tiger.png[Tiger]
 image::images/sunset.jpg[Sunset,align=right]
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
@@ -2241,7 +2241,7 @@ image::images/sunset.jpg[Sunset,align=right]
 image::images/sunset.jpg[Sunset,500,332]
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@contentwidth="500"]', output, 1
       assert_xpath '//imagedata[@contentdepth="332"]', output, 1
@@ -2254,7 +2254,7 @@ image::images/sunset.jpg[Sunset,500,332]
 image::images/sunset.jpg[Sunset,500,332,scale=200]
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@scale="200"]', output, 1
       assert_xpath '//imagedata[@width]', output, 0
@@ -2268,7 +2268,7 @@ image::images/sunset.jpg[Sunset,500,332,scale=200]
 image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
       assert_xpath '//imagedata[@depth]', output, 0
@@ -2281,7 +2281,7 @@ image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
 image::images/sunset.jpg[Sunset,scaledwidth=25]
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
     end
@@ -2377,7 +2377,7 @@ image::tiger.png[Tiger]
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -2391,7 +2391,7 @@ image::dot.gif[Dot]
 image::unreadable.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_equal 'fixtures', doc.attributes['imagesdir']
       output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
@@ -2406,7 +2406,7 @@ image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
       EOS
 
       output = using_test_webserver do
-        convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
       end
 
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -2421,7 +2421,7 @@ image::dot.gif[Dot]
       EOS
 
       output = using_test_webserver do
-        convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
       end
 
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
@@ -2436,7 +2436,7 @@ image::#{image_uri}[Missing image]
       EOS
 
       output = using_test_webserver do
-        convert_string_to_embedded input, :safe => :safe, :attributes => {'allow-uri-read' => ''}
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
       end
 
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Missing image"]), output, 1
@@ -2452,7 +2452,7 @@ image::#{image_uri}[Dot]
       EOS
 
       output = using_test_webserver do
-        convert_string_to_embedded input, :safe => :safe
+        convert_string_to_embedded input, safe: :safe
       end
 
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
@@ -2486,7 +2486,7 @@ image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Do
 image::dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => testdir }
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_equal '../..//fixtures/./../../fixtures', doc.attributes['imagesdir']
       output = doc.convert
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
@@ -2503,7 +2503,7 @@ image::dot.gif[Dot]
 image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_equal './', doc.attributes['imagesdir']
       output = doc.convert
       # image target resolves to fixtures/dot.gif relative to docdir (which is explicitly set to the directory of this file)
@@ -2732,7 +2732,7 @@ audio::podcast.mp3[start=1,end=2]
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
     end
 
@@ -2745,7 +2745,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
     end
 
@@ -2758,7 +2758,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 Override the icon of an admonition block using an attribute
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="images/icons/a.png"]', output, 1
     end
 
@@ -2773,7 +2773,7 @@ Override the icon of an admonition block using an attribute
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
@@ -2788,7 +2788,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can set a custom icon using the icon attribute on the block.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
     end
 
@@ -2803,7 +2803,7 @@ You can set a custom icon using the icon attribute on the block.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :attributes => {'icons' => ''}
+      output = convert_string input, attributes: { 'icons' => '' }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="fixtures/tip.gif"][@alt="Tip"]', output, 1
     end
 
@@ -2818,7 +2818,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'docdir' => testdir }
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Tip"]', output, 1
       assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
@@ -2831,7 +2831,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_css %(html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 1
     end
@@ -2845,7 +2845,7 @@ You can use icons for admonitions by setting the 'icons' attribute.
 Override the icon of an admonition block using an attribute
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SERVER
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 0
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="images/icons/a.png"]', output, 1
     end
@@ -2862,7 +2862,7 @@ TIP: You can control the URI scheme used for assets with the asset-uri-scheme at
 puts "AsciiDoc, FTW!"
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
       assert_css %(html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
       assert_css 'html > body > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"]', output, 1
     end
@@ -2879,7 +2879,7 @@ TIP: You can control the URI scheme used for assets with the asset-uri-scheme at
 puts "AsciiDoc, FTW!"
       EOS
 
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
       assert_css %(html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
       assert_css 'html > body > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"]', output, 1
     end
@@ -2891,7 +2891,7 @@ puts "AsciiDoc, FTW!"
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = testdir
-      block = block_from_string input, :attributes => {'docdir' => basedir}
+      block = block_from_string input, attributes: { 'docdir' => basedir }
       doc = block.document
       assert doc.safe >= Asciidoctor::SafeMode::SAFE
 
@@ -2905,7 +2905,7 @@ image::asciidoctor.png[Asciidoctor]
 image::asciidoctor.png[Asciidoctor]
       EOS
       basedir = testdir
-      block = block_from_string input, :safe => Asciidoctor::SafeMode::UNSAFE, :attributes => {'docdir' => basedir}
+      block = block_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => basedir }
       doc = block.document
       assert doc.safe == Asciidoctor::SafeMode::UNSAFE
 
@@ -2988,10 +2988,10 @@ alert("Hello, World!")
 ----
 require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
 ----
       EOS
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay *\{/, output)
     end
@@ -3005,7 +3005,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 puts 'Hello, World!'
 ----
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
@@ -3018,7 +3018,7 @@ puts 'Hello, World!'
 puts 'Hello, World!'
 ----
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
@@ -3032,7 +3032,7 @@ puts 'Hello, World!'
 puts 'Hello, World!'
 ----
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_xpath '//td[@class="line-numbers"]', output, 1
     end
 
@@ -3046,7 +3046,7 @@ puts 'Hello, World!'
 puts 'Hello, World!'
 ----
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_xpath '//span[@class="line-numbers"]', output, 1
       assert_xpath '//span[@class="line-numbers"][text()="10"]', output, 1
     end
@@ -3063,7 +3063,7 @@ public class HelloWorld {
 ----
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, backend: :docbook, safe: Asciidoctor::SafeMode::SAFE
       assert_css 'programlisting[startinglinenumber]', output, 1
       assert_css 'programlisting[startinglinenumber="3"]', output, 1
     end
@@ -3084,7 +3084,7 @@ public class HelloWorld {
 }
 ----
         EOS
-        output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+        output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
         assert_css 'strong.highlighted', output, 4
         assert_xpath '//strong[@class="highlighted"][text()="1"]', output, 1
         assert_xpath '//strong[@class="highlighted"][text()="2"]', output, 0
@@ -3105,10 +3105,10 @@ public class HelloWorld {
 ----
 require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
 ----
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
     end
 
@@ -3119,7 +3119,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 {source-language}
       EOS
 
-      assert_equal 'ruby', (convert_inline_string input, :attributes => {'compat-mode' => ''})
+      assert_equal 'ruby', (convert_inline_string input, attributes: { 'compat-mode' => '' })
 
       input = <<-EOS
 :language: ruby
@@ -3138,7 +3138,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
 require 'coderay' # <1>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <2>
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
 puts html # <3> <4>
 exit 0 # <5><6>
 ----
@@ -3149,7 +3149,7 @@ exit 0 # <5><6>
 <5> Exit program
 <6> Reports success
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
       assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
       assert_match(/puts html.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
@@ -3164,7 +3164,7 @@ exit 0 # <5><6>
 ----
 require 'coderay' # <.><.>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <.>
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <.>
 puts html # <.>
 ----
 <.> Load library
@@ -3172,7 +3172,7 @@ puts html # <.>
 <.> Highlight source
 <.> Print to stdout
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
       assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(3\)<\/b>$/, output)
       assert_match(/puts html.* # <b class="conum">\(4\)<\/b><\/code>/, output)
@@ -3189,7 +3189,7 @@ puts html # <.>
 ----
 require 'coderay' # <1>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table) # <2>
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
 puts html # <3> <4>
 exit 0 # <5><6>
 ----
@@ -3200,7 +3200,7 @@ exit 0 # <5><6>
 <5> Exit program
 <6> Reports success
       EOS
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
       assert_match(/<span class="content">puts 'Hello, world!'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
       assert_match(/puts html.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
@@ -3238,7 +3238,7 @@ print 'value' #<1>
       EOS
 
       inputs.each do |input|
-        output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => { 'source-highlighter' => 'coderay' }
+        output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'source-highlighter' => 'coderay' }
         output = output.gsub(/<\/?span.*?>/, '')
         assert_includes output, '\'value\' #<b class="conum">(1)</b>'
       end
@@ -3258,7 +3258,7 @@ public class Printer {
 }
 ----
       EOS
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
       assert_match(/\.<em>out<\/em>\./, output, 1)
       assert_match(/\*asterisks\*/, output, 1)
       assert_match(/<strong>bold<\/strong>/, output, 1)
@@ -3273,10 +3273,10 @@ public class Printer {
 ----
 require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
 ----
       EOS
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss' => ''}
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss' => '' }
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_css 'link[rel="stylesheet"][href="./coderay-asciidoctor.css"]', output, 1
     end
@@ -3290,10 +3290,10 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 ----
 require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
+html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
 ----
       EOS
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE, :linkcss_default => true
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
       refute_match(/\.CodeRay \{/, output)
     end
@@ -3309,7 +3309,7 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div(:line_numbers => :table)
 <script>hljs.initHighlightingOnLoad();</script>
 ----
       EOS
-      output = convert_string input, :safe => Asciidoctor::SafeMode::SAFE
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
       assert_match(/<link .*highlight\.js/, output)
       assert_match(/<script .*highlight\.js/, output)
       assert_match(/hljs.initHighlightingOnLoad/, output)
@@ -3323,7 +3323,7 @@ puts "foo"
 ----
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'source-highlighter' => 'prettify'}
+      output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'prettify' }
       assert_css 'pre[class="prettyprint highlight"]', output, 1
       assert_css 'pre > code.language-ruby[data-lang="ruby"]', output, 1
     end
@@ -3336,7 +3336,7 @@ puts "foo"
 ----
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'source-highlighter' => 'prettify'}
+      output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'prettify' }
       assert_css 'pre[class="prettyprint highlight linenums:5"]', output, 1
       assert_css 'pre > code.language-ruby[data-lang="ruby"]', output, 1
     end
@@ -3355,7 +3355,7 @@ puts HTML::Pipeline.new(filters, {}).call(input)[:output]
 ----
       EOS
 
-      output = convert_string input, :attributes => {'source-highlighter' => 'html-pipeline'}
+      output = convert_string input, attributes: { 'source-highlighter' => 'html-pipeline' }
       assert_css 'pre[lang="ruby"]', output, 1
       assert_css 'pre[lang="ruby"] > code', output, 1
       assert_css 'pre[class]', output, 0
@@ -3366,7 +3366,7 @@ puts HTML::Pipeline.new(filters, {}).call(input)[:output]
       input = <<-EOS
 :source-highlighter: coderay
       EOS
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SERVER
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SERVER
       assert_nil doc.attributes['source-highlighter']
     end
 
@@ -3475,7 +3475,7 @@ And other stuff.
 --
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 1
       assert_css 'abstract > simpara', output, 2
     end
@@ -3491,7 +3491,7 @@ This article is about stuff.
 --
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 1
       assert_css 'abstract > title', output, 1
       assert_css 'abstract > title + simpara', output, 1
@@ -3506,7 +3506,7 @@ This article is about stuff.
 Abstract for book with title is valid
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 1
     end
 
@@ -3518,7 +3518,7 @@ Abstract for book with title is valid
 Abstract for book is invalid.
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 0
       assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
     end
@@ -3624,7 +3624,7 @@ It can have multiple paragraphs.
 content
       EOS
 
-      output = convert_string input, :backend => 'docbook45'
+      output = convert_string input, backend: 'docbook45'
       assert_css 'partintro', output, 1
       assert_css 'part#_part_1 > partintro', output, 1
       assert_css 'partintro > simpara', output, 2
@@ -3648,7 +3648,7 @@ This is a part intro with a title.
 content
       EOS
 
-      output = convert_string input, :backend => 'docbook45'
+      output = convert_string input, backend: 'docbook45'
       assert_css 'partintro', output, 1
       assert_css 'part#_part_1 > partintro', output, 1
       assert_css 'partintro > title', output, 1
@@ -3664,7 +3664,7 @@ content
 part intro paragraph
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'partintro', output, 0
       assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
@@ -3675,7 +3675,7 @@ part intro paragraph
 part intro paragraph
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'partintro', output, 0
       assert_message @logger, :ERROR, 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
     end
@@ -3746,7 +3746,7 @@ https://{application}.org[{gt}{gt}] <1>
 ....
       EOS
 
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       block = doc.blocks.first
       assert_equal [:attributes, :specialcharacters, :macros], block.subs
       result = doc.convert
@@ -3759,7 +3759,7 @@ https://{application}.org[{gt}{gt}] <1>
 _hey now_ <1>
       EOS
 
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       block = doc.blocks.first
       assert_equal [:specialcharacters], block.subs
       result = doc.convert

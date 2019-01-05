@@ -388,7 +388,7 @@ NOTE: This is a note.
       colist = doc.blocks[0].items[0].blocks[-1]
       assert_equal :colist, colist.context
       refute_equal 'source', colist.style
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_css 'ul', output, 1
       assert_css 'ul > li', output, 1
       assert_css 'ul > li > p', output, 1
@@ -801,7 +801,7 @@ Grays Peak rises to 14,278 feet, making it the highest summit in the Front Range
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
     end
@@ -821,7 +821,7 @@ This is a cross-reference to <<step-4>>.
       refs = doc.catalog[:refs]
       assert refs.key?('step-2')
       assert refs.key?('step-4')
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step 2"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
     end
@@ -978,7 +978,7 @@ List
       EOS
 
       doc = document_from_string input
-      lists = doc.find_by :context => :ulist
+      lists = doc.find_by context: :ulist
       assert_equal 1, lists[0].level
       assert_equal 1, lists[1].level
       assert_equal 1, lists[2].level
@@ -1053,7 +1053,7 @@ List
       EOS
 
       doc = document_from_string input
-      lists = doc.find_by :context => :olist
+      lists = doc.find_by context: :olist
       assert_equal 1, lists[0].level
       assert_equal 1, lists[1].level
       assert_equal 1, lists[2].level
@@ -1965,7 +1965,7 @@ List
 . item 8
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_xpath '//orderedlist', output, 1
       assert_xpath '(//orderedlist)/listitem', output, 2
       assert_xpath '(//orderedlist/listitem)[1][@override = "7"]', output, 1
@@ -1980,7 +1980,7 @@ List
 . item 8
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook5'
+      output = convert_string_to_embedded input, backend: 'docbook5'
       assert_xpath '//orderedlist', output, 1
       assert_xpath '(//orderedlist)/listitem', output, 2
       assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
@@ -2266,7 +2266,7 @@ description
 
 last::
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//varlistentry', output, 2
       assert_xpath '(//varlistentry)[1]/term', output, 2
       assert_xpath '(//varlistentry)[2]/term', output, 1
@@ -2342,7 +2342,7 @@ The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '//dl', output, 1
@@ -2938,7 +2938,7 @@ description
 
 last::
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/glossentry', output, 2
       assert_xpath '(/glossentry)[1]/glossterm', output, 2
       assert_xpath '(/glossentry)[2]/glossterm', output, 1
@@ -2995,7 +2995,7 @@ term:: def
 term:: def
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'informaltable', output, 1
       assert_css 'informaltable > tgroup', output, 1
       assert_css 'informaltable > tgroup > colspec', output, 2
@@ -3041,7 +3041,7 @@ description
 
 last::
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//row', output, 2
       assert_xpath '(//row)[1]/entry', output, 2
       assert_xpath '((//row)[1]/entry)[1]/simpara', output, 2
@@ -3059,7 +3059,7 @@ more detail
 
 second term:: description
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/table', output, 1
       assert_xpath '/table[@tabstyle="horizontal"]', output, 1
       assert_xpath '/table[@tabstyle="horizontal"]/title[text()="Terms"]', output, 1
@@ -3103,7 +3103,7 @@ Question 2::
 +
 NOTE: A note about Answer 2.
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'qandaset', output, 1
       assert_css 'qandaset > qandaentry', output, 2
       (1..2).each do |idx|
@@ -3126,7 +3126,7 @@ response
 
 last question::
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//qandaentry', output, 2
       assert_xpath '(//qandaentry)[1]/question', output, 1
       assert_xpath '(//qandaentry)[1]/question/simpara', output, 2
@@ -3164,7 +3164,7 @@ last question::
   'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
   ISBN 1-56592-580-7.
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'bibliodiv', output, 1
       assert_css 'bibliodiv > bibliomixed', output, 2
       assert_css 'bibliodiv > bibliomixed > bibliomisc', output, 2
@@ -3207,7 +3207,7 @@ Addison-Wesley. 1997.
 * [[[doc-writer]]] Doc Writer. _Documentation As Code_. Static Times, 54. August 2016.
       EOS
       doc = document_from_string input
-      ulists = doc.find_by :context => :ulist
+      ulists = doc.find_by context: :ulist
       assert_equal 2, ulists.size
       assert_equal ulists[0].style, 'bibliography'
       assert_equal ulists[1].style, 'bibliography'
@@ -3266,11 +3266,11 @@ Please read #{'<<'}Fowler_1997>>.
 * [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
       EOS
 
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       ids = doc.catalog[:ids]
       assert ids.key?('Fowler_1997')
       assert_equal '[1]', ids['Fowler_1997']
-      result = doc.convert :header_footer => false
+      result = doc.convert header_footer: false
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
       assert_xpath '//a[@id="Fowler_1997"]', result, 1
@@ -3284,7 +3284,7 @@ Please read #{'<<'}Fowler_1997>>.
 * [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
       EOS
 
-      result = convert_string_to_embedded input, :backend => :docbook
+      result = convert_string_to_embedded input, backend: :docbook
       assert_includes result, '<anchor xml:id="Fowler_1997" xreflabel="[1]"/>'
     end
   end
@@ -4341,7 +4341,7 @@ puts doc.convert # <3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
     assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
@@ -4368,7 +4368,7 @@ Paragraph.
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
     assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
@@ -4392,7 +4392,7 @@ puts doc.convert # <2>
 <1> Import the library
 <2> Where the magic happens
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
     assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
@@ -4415,7 +4415,7 @@ puts doc.convert # <1>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
     assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
@@ -4446,7 +4446,7 @@ puts doc.convert # <3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 2
     assert_xpath '(//programlisting)[1]//co', output, 1
     assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
@@ -4476,7 +4476,7 @@ puts doc.convert # <2>
 <1> Describe the second line
 <2> Describe the third line
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//programlisting', output, 2
     assert_xpath '(//programlisting)[1]//co', output, 1
     assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
@@ -4533,7 +4533,7 @@ as a RubyGem
 +
 You can write this to file rather than printing to stdout.
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//calloutlist', output, 1
     assert_xpath '//calloutlist/callout', output, 3
     assert_xpath '(//calloutlist/callout)[1]/*', output, 1
@@ -4551,8 +4551,8 @@ require 'asciidoctor' # \\<1>
 Asciidoctor.convert 'convert me!' \\<2>
 ----
     EOS
-    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
-      output = convert_string_to_embedded input, :attributes => attributes
+    [{}, { 'source-highlighter' => 'coderay' }].each do |attributes|
+      output = convert_string_to_embedded input, attributes: attributes
       assert_css 'pre b', output, 0
       assert_includes output, ' # &lt;1&gt;'
       assert_includes output, ' &lt;2&gt;'
@@ -4723,8 +4723,8 @@ main = putStrLn "Hello, World!" -- <1>
 ----
 <1> Haskell
     EOS
-    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
-      output = convert_string_to_embedded input, :attributes => attributes
+    [{}, { 'source-highlighter' => 'coderay' }].each do |attributes|
+      output = convert_string_to_embedded input, attributes: attributes
       assert_xpath '//b', output, 4
       nodes = xmlnodes_at_css 'pre', output
       assert_equal %(puts 'Hello, world!' # (1)), nodes[0].text
@@ -4761,8 +4761,8 @@ main = putStrLn "Hello, World!" -- <1>
 ----
 <1> Haskell
     EOS
-    [{}, {'source-highlighter' => 'coderay'}].each do |attributes|
-      output = convert_string_to_embedded input, :attributes => attributes.merge({ 'icons' => 'font' })
+    [{}, { 'source-highlighter' => 'coderay' }].each do |attributes|
+      output = convert_string_to_embedded input, attributes: attributes.merge({ 'icons' => 'font' })
       assert_css 'pre b', output, 4
       assert_css 'pre i.conum', output, 4
       nodes = xmlnodes_at_css 'pre', output
@@ -4798,7 +4798,7 @@ hello_world() -> % <1>
 ----
 <1> Prints a paragraph with the text "Hello"
     EOS
-    output = convert_string_to_embedded input, :attributes => { 'source-highlighter' => 'coderay' }
+    output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'coderay' }
     assert_xpath '//b', output, 1
     nodes = xmlnodes_at_css 'pre', output
     assert_equal %(-# (1)\n%p Hello), nodes[0].text
@@ -4815,7 +4815,7 @@ Violets are blue <2>
 <1> And so is Ruby
 <2> But violet is more like purple
     EOS
-    output = convert_string input, :attributes => {'backend' => 'docbook45'}
+    output = convert_string input, attributes: { 'backend' => 'docbook45' }
     assert_xpath '//literallayout', output, 1
     assert_xpath '//literallayout//co', output, 2
     assert_xpath '(//literallayout//co)[1][@id = "CO1-1"]', output, 1
@@ -4837,7 +4837,7 @@ puts doc.convert # <3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string_to_embedded input, :attributes => {'icons' => ''}
+    output = convert_string_to_embedded input, attributes: { 'icons' => '' }
     assert_css '.listingblock code > img', output, 3
     (1..3).each do |i|
       assert_xpath %((/div[@class="listingblock"]//code/img)[#{i}][@src="./images/icons/callouts/#{i}.png"][@alt="#{i}"]), output, 1
@@ -4860,7 +4860,7 @@ puts doc.convert #<3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string_to_embedded input, :attributes => {'icons' => 'font'}
+    output = convert_string_to_embedded input, attributes: { 'icons' => 'font' }
     assert_css '.listingblock code > i', output, 3
     (1..3).each do |i|
       assert_xpath %((/div[@class="listingblock"]//code/i)[#{i}]), output, 1
@@ -4930,7 +4930,7 @@ context 'Checklists' do
     assert checklist.items[1].attr?('checked')
     refute checklist.items[4].attr?('checkbox')
 
-    output = doc.convert :header_footer => false
+    output = doc.convert header_footer: false
     assert_css '.ulist.checklist', output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{decode_char 10063} todo"]), output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{decode_char 10003} done"]), output, 1
@@ -4946,7 +4946,7 @@ context 'Checklists' do
 - plain
     EOS
 
-    output = convert_string_to_embedded input, :attributes => {'icons' => 'font'}
+    output = convert_string_to_embedded input, attributes: { 'icons' => 'font' }
     assert_css '.ulist.checklist', output, 1
     assert_css '.ulist.checklist li i.fa-check-square-o', output, 1
     assert_css '.ulist.checklist li i.fa-square-o', output, 1
@@ -4967,7 +4967,7 @@ context 'Checklists' do
     assert checklist.option?('checklist')
     assert checklist.option?('interactive')
 
-    output = doc.convert :header_footer => false
+    output = doc.convert header_footer: false
     assert_css '.ulist.checklist', output, 1
     assert_css '.ulist.checklist li input[type="checkbox"]', output, 2
     assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 0
@@ -5095,7 +5095,7 @@ listing block in list item 1
     EOS
 
     doc = document_from_string input
-    list = (doc.find_by :context => :ulist).first
+    list = (doc.find_by context: :ulist).first
     assert_equal 3, list.items.size
     assert_equal 'one', list.items[0].text
     list.items[0].text = 'un'
@@ -5111,7 +5111,7 @@ listing block in list item 1
     EOS
 
     doc = document_from_string input
-    list = (doc.find_by :context => :ulist).first
+    list = (doc.find_by context: :ulist).first
     assert_equal 4, list.items.size
     list.items[0].remove_sub :quotes
     assert_equal '*one*', list.items[0].text
@@ -5132,13 +5132,13 @@ listing block in list item 1
 *** bullet 1.1.1
 * bullet 2
     EOS
-    doc = document_from_string input, :sourcemap => true
-    lists = doc.find_by :context => :ulist
+    doc = document_from_string input, sourcemap: true
+    lists = doc.find_by context: :ulist
     assert_equal 1, lists[0].lineno
     assert_equal 2, lists[1].lineno
     assert_equal 3, lists[2].lineno
 
-    list_items = doc.find_by :context => :list_item
+    list_items = doc.find_by context: :list_item
     assert_equal 1, list_items[0].lineno
     assert_equal 2, list_items[1].lineno
     assert_equal 3, list_items[2].lineno

@@ -12,7 +12,7 @@ context 'Tables' do
 |=======
       EOS
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       table = doc.blocks[0]
       assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
@@ -336,7 +336,7 @@ three
         assert_equal expected_pcwidths[i], table_row0[i].attributes['colpcwidth']
         assert_equal '', table_row0[i].attributes['autowidth-option']
       end
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_css 'table', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 1
@@ -359,7 +359,7 @@ three
         assert_equal 25, table_row0[i].attributes['colpcwidth']
         assert_equal '', table_row0[i].attributes['autowidth-option']
       end
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_css 'table', output, 1
       assert_css 'table[style*="width: 50%;"]', output, 1
       assert_css 'table colgroup col', output, 4
@@ -375,7 +375,7 @@ three
 |1 |2 |3 |4
 |=======
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook5'
+      output = convert_string_to_embedded input, backend: 'docbook5'
       assert_css 'tgroup[cols="4"]', output, 1
       assert_css 'tgroup colspec', output, 4
       assert_css 'tgroup colspec[colwidth]', output, 4
@@ -569,7 +569,7 @@ three
 |Total      |6
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'table', output, 1
       assert_css 'table[frame="topbot"]', output, 1
       assert_css 'table > title', output, 1
@@ -599,7 +599,7 @@ three
 |A |B |C
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'informaltable[frame="topbot"]', output, 1
     end
 
@@ -612,7 +612,7 @@ three
 |===
         EOS
 
-        output = convert_string_to_embedded input, :backend => 'docbook'
+        output = convert_string_to_embedded input, backend: 'docbook'
         assert_css 'informaltable', output, 1
         assert_css 'informaltable[orient="land"]', output, 1
       end
@@ -982,7 +982,7 @@ d|9 2+>|10
 |===
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//colspec', output, 2
       assert_xpath '(//colspec)[1][@colname="col_1"]', output, 1
       assert_xpath '(//colspec)[2][@colname="col_2"]', output, 1
@@ -999,7 +999,7 @@ d|9 2+>|10
 |===
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//colspec', output, 3
       assert_xpath '(//colspec)[1][@colname="col_1"]', output, 1
       assert_xpath '(//colspec)[2][@colname="col_2"]', output, 1
@@ -1021,7 +1021,7 @@ d|9 2+>|10
 |===
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook'
+      output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '//colspec', output, 5
       (1..5).each do |n|
         assert_xpath %((//colspec)[#{n}][@colname="col_#{n}"]), output, 1
@@ -1184,7 +1184,7 @@ doctype={doctype}
 |===
       EOS
 
-      result = convert_string_to_embedded input, :attributes => { 'attribute-missing' => 'skip' }
+      result = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'skip' }
       assert_includes result, 'doctype=article'
       refute_includes result, '{backend-html5-doctype-article}'
       assert_includes result, '{backend-html5-doctype-book}'
@@ -1208,7 +1208,7 @@ doctype={doctype}
 |===
       EOS
 
-      result = convert_string_to_embedded input, :attributes => { 'attribute-missing' => 'skip' }
+      result = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'skip' }
       assert_includes result, 'doctype=book'
       refute_includes result, '{backend-html5-doctype-book}'
       assert_includes result, '{backend-html5-doctype-article}'
@@ -1242,7 +1242,7 @@ DocBook outputs. If the input file is the standard input then the
 output file name is used.
 |===
       EOS
-      doc = document_from_string input, :sourcemap => true
+      doc = document_from_string input, sourcemap: true
       table = doc.blocks.first
       refute_nil table
       tbody = table.rows.body
@@ -1256,9 +1256,9 @@ output file name is used.
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
       assert_equal 5, body_cell_1_3.lineno
       assert_equal 6, body_cell_1_3.inner_document.lineno
-      note = (body_cell_1_3.inner_document.find_by :context => :admonition)[0]
+      note = (body_cell_1_3.inner_document.find_by context: :admonition)[0]
       assert_equal 9, note.lineno
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
 
       assert_css 'table > tbody > tr', output, 2
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3) div.admonitionblock', output, 1
@@ -1273,14 +1273,14 @@ a|
 a| paragraph
 |===
       EOS
-      doc = document_from_string input, :sourcemap => true
+      doc = document_from_string input, sourcemap: true
       table = doc.blocks[0]
       tbody = table.rows.body
       assert_equal 1, table.lineno
       assert_equal 2, tbody[0][0].lineno
       assert_equal 3, tbody[0][0].inner_document.lineno
       assert_equal 4, tbody[1][0].lineno
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_css 'td', output, 2
       assert_xpath '(//td)[1]//*[@class="literalblock"]', output, 1
       assert_xpath '(//td)[2]//*[@class="paragraph"]', output, 1
@@ -1295,7 +1295,7 @@ a|include::fixtures/include-file.asciidoc[]
 |===
       EOS
 
-      output = convert_string_to_embedded input, :safe => :safe, :base_dir => testdir
+      output = convert_string_to_embedded input, safe: :safe, base_dir: testdir
       assert_match(/included content/, output)
     end
 
@@ -1335,7 +1335,7 @@ Grays Peak
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '(//table/tbody/tr)[1]//td//a[@id="mount-evans"]', output, 1
@@ -1388,7 +1388,7 @@ key: value <1>
 <1> Third callout
       EOS
 
-      result = convert_string input, :backend => 'docbook'
+      result = convert_string input, backend: 'docbook'
       conums = xmlnodes_at_xpath '//co', result
       assert_equal 3, conums.size
       ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |conum, idx|
@@ -1679,7 +1679,7 @@ asciidoctor -o - -s test.adoc | view -
 |Item 1     |1
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
@@ -1692,7 +1692,7 @@ asciidoctor -o - -s test.adoc | view -
 |Item 1     |1
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook5'
+      output = convert_string_to_embedded input, backend: 'docbook5'
       assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
@@ -1705,7 +1705,7 @@ asciidoctor -o - -s test.adoc | view -
 |Item 1     |1
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook5'
+      output = convert_string_to_embedded input, backend: 'docbook5'
       assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
@@ -1718,7 +1718,7 @@ asciidoctor -o - -s test.adoc | view -
 |Item 1     |1
 |===
       EOS
-      output = convert_string_to_embedded input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
@@ -1756,7 +1756,7 @@ sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
 nobody:x:99:99:Nobody:/:/sbin/nologin
 |===
       EOS
-      doc = document_from_string input, :header_footer => false
+      doc = document_from_string input, header_footer: false
       table = doc.blocks[0]
       assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert

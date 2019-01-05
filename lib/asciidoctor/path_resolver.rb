@@ -83,7 +83,7 @@ module Asciidoctor
 #     => 'C:/data/docs/css'
 #
 #     begin
-#       resolver.system_path('../../../css', '../../..', '/path/to/docs', :recover => false)
+#       resolver.system_path('../../../css', '../../..', '/path/to/docs', recover: false)
 #     rescue SecurityError => e
 #       puts e.message
 #     end

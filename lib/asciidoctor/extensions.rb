@@ -153,7 +153,7 @@ module Extensions
     end
 
     def create_block parent, context, source, attrs, opts = {}
-      Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
+      Block.new parent, context, { source: source, attributes: attrs }.merge(opts)
     end
 
     # Public: Creates a list node and links it to the specified parent.
@@ -962,7 +962,7 @@ module Extensions
     #   docinfo_processor MetaRobotsDocinfoProcessor
     #
     #   # as an instance of a DocinfoProcessor subclass with an explicit location
-    #   docinfo_processor JQueryDocinfoProcessor.new, :location => :footer
+    #   docinfo_processor JQueryDocinfoProcessor.new, location: :footer
     #
     #   # as a name of a DocinfoProcessor subclass
     #   docinfo_processor 'MetaRobotsDocinfoProcessor'
@@ -1448,7 +1448,7 @@ module Extensions
 
     def create name = nil, &block
       if block_given?
-        Registry.new({ (name || generate_name) => block })
+        Registry.new (name || generate_name) => block
       else
         Registry.new
       end

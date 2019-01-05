@@ -83,7 +83,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.load 'contents', :logger => new_logger
+        Asciidoctor.load 'contents', logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -94,7 +94,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.load_file fixture_path('basic.asciidoc'), :logger => new_logger
+        Asciidoctor.load_file fixture_path('basic.asciidoc'), logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -105,7 +105,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.convert 'contents', :logger => new_logger
+        Asciidoctor.convert 'contents', logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -116,7 +116,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.convert_file fixture_path('basic.asciidoc'), :to_file => false, :logger => new_logger
+        Asciidoctor.convert_file fixture_path('basic.asciidoc'), to_file: false, logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -178,7 +178,7 @@ context 'Logger' do
       class SampleClassE
         include Asciidoctor::Logging
         def create_message cursor
-          message_with_context 'Asciidoctor was here', :source_location => cursor
+          message_with_context 'Asciidoctor was here', source_location: cursor
         end
       end
 

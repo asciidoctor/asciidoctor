@@ -39,7 +39,7 @@ end
 #
 # Use custom (Tilt-supported) templates:
 #
-#   Asciidoctor.convert_file 'sample.adoc', :template_dir => 'path/to/templates'
+#   Asciidoctor.convert_file 'sample.adoc', template_dir: 'path/to/templates'
 #
 module Asciidoctor
   # alias the RUBY_ENGINE constant inside the Asciidoctor namespace and define a precomputed alias for runtime
@@ -331,13 +331,13 @@ module Asciidoctor
   MATHJAX_VERSION = '2.7.4'
 
   BLOCK_MATH_DELIMITERS = {
-    :asciimath => ['\$', '\$'],
-    :latexmath => ['\[', '\]'],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\[', '\]'],
   }
 
   INLINE_MATH_DELIMITERS = {
-    :asciimath => ['\$', '\$'],
-    :latexmath => ['\(', '\)'],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\(', '\)'],
   }
 
   (STEM_TYPE_ALIASES = {
@@ -661,12 +661,12 @@ module Asciidoctor
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
-      :arabic => /\d+\./,
-      :loweralpha => /[a-z]\./,
-      :lowerroman => /[ivx]+\)/,
-      :upperalpha => /[A-Z]\./,
-      :upperroman => /[IVX]+\)/
-      #:lowergreek => /[a-z]\]/
+      arabic: /\d+\./,
+      loweralpha: /[a-z]\./,
+      lowerroman: /[ivx]+\)/,
+      upperalpha: /[A-Z]\./,
+      upperroman: /[IVX]+\)/,
+      #lowergreek: /[a-z]\]/,
     }
 
     # Matches a description list entry.
@@ -738,10 +738,10 @@ module Asciidoctor
 
     # A Hash of regexps for lists used for dynamic access.
     ListRxMap = {
-      :ulist => UnorderedListRx,
-      :olist => OrderedListRx,
-      :dlist => DescriptionListRx,
-      :colist => CalloutListRx
+      ulist: UnorderedListRx,
+      olist: OrderedListRx,
+      dlist: DescriptionListRx,
+      colist: CalloutListRx,
     }
 
     ## Tables
@@ -1438,16 +1438,16 @@ module Asciidoctor
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
-        outdir = doc.normalize_system_path(to_dir, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        outdir = doc.normalize_system_path(to_dir, working_dir, jail, target_name: 'to_dir', recover: false)
         if to_file
-          outfile = doc.normalize_system_path(to_file, outdir, nil, :target_name => 'to_dir', :recover => false)
+          outfile = doc.normalize_system_path(to_file, outdir, nil, target_name: 'to_dir', recover: false)
           # reestablish outdir as the final target directory (in the case to_file had directory segments)
           outdir = ::File.dirname outfile
         else
           outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
         end
       elsif to_file
-        outfile = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        outfile = doc.normalize_system_path(to_file, working_dir, jail, target_name: 'to_dir', recover: false)
         # establish outdir as the final target directory (in the case to_file had directory segments)
         outdir = ::File.dirname outfile
       end
@@ -1510,7 +1510,7 @@ module Asciidoctor
             stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
             # NOTE don't warn if src can't be read and dest already exists (see #2323)
             if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
-                :warn_on_failure => !(::File.file? stylesheet_dest), :label => 'stylesheet')
+                warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
               ::IO.write stylesheet_dest, stylesheet_data
             end
           end

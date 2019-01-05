@@ -276,14 +276,14 @@ class Document < AbstractBlock
     else
       @parent_document = nil
       @catalog = {
-        :ids => {},
-        :refs => {},
-        :footnotes => [],
-        :links => [],
-        :images => [],
-        :indexterms => [],
-        :callouts => Callouts.new,
-        :includes => {},
+        ids: {},
+        refs: {},
+        footnotes: [],
+        links: [],
+        images: [],
+        indexterms: [],
+        callouts: Callouts.new,
+        includes: {},
       }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
@@ -530,7 +530,7 @@ class Document < AbstractBlock
         end
       end
 
-      @reader = PreprocessorReader.new self, data, (Reader::Cursor.new attrs['docfile'], @base_dir), :normalize => true
+      @reader = PreprocessorReader.new self, data, (Reader::Cursor.new attrs['docfile'], @base_dir), normalize: true
       @source_location = @reader.cursor if @sourcemap
     end
   end
@@ -553,7 +553,7 @@ class Document < AbstractBlock
       doc = self
       # create reader if data is provided (used when data is not known at the time the Document object is created)
       if data
-        @reader = PreprocessorReader.new doc, data, (Reader::Cursor.new @attributes['docfile'], @base_dir), :normalize => true
+        @reader = PreprocessorReader.new doc, data, (Reader::Cursor.new @attributes['docfile'], @base_dir), normalize: true
         @source_location = @reader.cursor if @sourcemap
       end
 
@@ -564,7 +564,7 @@ class Document < AbstractBlock
       end
 
       # Now parse the lines in the reader into blocks
-      Parser.parse @reader, doc, :header_only => @options[:parse_header_only]
+      Parser.parse @reader, doc, header_only: @options[:parse_header_only]
 
       # should we call sort of post-parse function?
       restore_attributes
@@ -740,7 +740,7 @@ class Document < AbstractBlock
     end
 
     if (separator = opts[:partition])
-      Title.new val, opts.merge({ :separator => (separator == true ? @attributes['title-separator'] : separator) })
+      Title.new val, opts.merge({ separator: (separator == true ? @attributes['title-separator'] : separator) })
     elsif opts[:sanitize] && val.include?('<')
       val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
     else
@@ -1293,7 +1293,7 @@ class Document < AbstractBlock
         unless (docinfo & ['shared', %(shared-#{location})]).empty?
           docinfo_path = normalize_system_path docinfo_file, docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (shd_content = (read_asset docinfo_path, :normalize => true))
+          if (shd_content = (read_asset docinfo_path, normalize: true))
             content << (apply_subs shd_content, docinfo_subs)
           end
         end
@@ -1301,7 +1301,7 @@ class Document < AbstractBlock
         unless @attributes['docname'].nil_or_empty? || (docinfo & ['private', %(private-#{location})]).empty?
           docinfo_path = normalize_system_path %(#{@attributes['docname']}-#{docinfo_file}), docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (pvt_content = (read_asset docinfo_path, :normalize => true))
+          if (pvt_content = (read_asset docinfo_path, normalize: true))
             content << (apply_subs pvt_content, docinfo_subs)
           end
         end

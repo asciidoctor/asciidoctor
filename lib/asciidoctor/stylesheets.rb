@@ -66,7 +66,7 @@ class Stylesheets
   end
 
   def pygments_background style = nil
-    if load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', :style => style || DEFAULT_PYGMENTS_STYLE)
+    if load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', style: style || DEFAULT_PYGMENTS_STYLE)
       $1
     end
   end
@@ -78,7 +78,7 @@ class Stylesheets
     if load_pygments
       style ||= DEFAULT_PYGMENTS_STYLE
       (@pygments_stylesheet_data ||= {})[style] ||=
-          ((::Pygments.css '.listingblock .pygments', :classprefix => 'tok-', :style => style) || '/* Failed to load Pygments CSS. */').
+          ((::Pygments.css '.listingblock .pygments', classprefix: 'tok-', style: style) || '/* Failed to load Pygments CSS. */').
           sub('.listingblock .pygments  {', '.listingblock .pygments, .listingblock .pygments code {')
     else
       '/* Pygments CSS disabled. Pygments is not available. */'

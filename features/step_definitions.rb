@@ -22,7 +22,7 @@ When /it is converted to html/ do
 end
 
 When /it is converted to docbook/ do
-  @output = Asciidoctor.convert @source, :backend => :docbook
+  @output = Asciidoctor.convert @source, backend: :docbook
 end
 
 Then /the result should (match|contain) the (HTML|XML) source/ do |matcher, format, expected|
@@ -33,9 +33,9 @@ end
 Then /the result should (match|contain) the (HTML|XML) structure/ do |matcher, format, expected|
   result = @output
   if format == 'HTML'
-    options = { :format => :html, :disable_escape => true, :sort_attrs => false }
+    options = { format: :html, disable_escape: true, sort_attrs: false }
   else # format == 'XML'
-    options = { :format => :xhtml, :disable_escape => true, :sort_attrs => false }
+    options = { format: :xhtml, disable_escape: true, sort_attrs: false }
     result = result.gsub '"/>', '" />' if result.include? '"/>'
   end
   result = Slim::Template.new(options) { result.each_line.map {|l| (l.start_with? '<') ? l : %(|#{l}) }.join }.render

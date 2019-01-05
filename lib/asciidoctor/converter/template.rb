@@ -25,18 +25,18 @@ module Asciidoctor
   # will be issued.
   class Converter::TemplateConverter < Converter::Base
     DEFAULT_ENGINE_OPTIONS = {
-      :erb =>  { :trim => '<' },
+      erb: { trim: '<' },
       # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
       # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
-      :haml => { :format => :xhtml, :attr_wrapper => '"', :escape_attrs => false, :ugly => true },
-      :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
+      haml: { format: :xhtml, attr_wrapper: '"', escape_attrs: false, ugly: true },
+      slim: { disable_escape: true, sort_attrs: false, pretty: false }
     }
 
     begin
       require 'concurrent/hash' unless defined? ::Concurrent::Hash
-      @caches = { :scans => ::Concurrent::Hash.new, :templates => ::Concurrent::Hash.new }
+      @caches = { scans: ::Concurrent::Hash.new, templates: ::Concurrent::Hash.new }
     rescue ::LoadError
-      @caches = { :scans => {}, :templates => {} }
+      @caches = { scans: {}, templates: {} }
     end
 
     def self.caches
@@ -253,7 +253,7 @@ module Asciidoctor
             unless @active_engines[extsym]
               # NOTE slim doesn't get automatically loaded by Tilt
               Helpers.require_library 'slim' unless defined? ::Slim::Engine
-              ::Slim::Engine.define_options :asciidoc => {}
+              ::Slim::Engine.define_options asciidoc: {}
               # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
               # NOTE safe mode won't get updated if using template cache and changing safe mode
               (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
@@ -297,7 +297,7 @@ module Asciidoctor
         [::Tilt::ERBTemplate, {}]
       elsif name == 'erubis'
         Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby
-        [::Tilt::ErubisTemplate, { :engine_class => ::Erubis::FastEruby }]
+        [::Tilt::ErubisTemplate, { engine_class: ::Erubis::FastEruby }]
       else
         raise ::ArgumentError, %(Unknown ERB implementation: #{name})
       end

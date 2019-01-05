@@ -18,26 +18,26 @@ module Substitutors
   (VERBATIM_SUBS = [:specialcharacters, :callouts]).freeze
 
   SUB_GROUPS = {
-    :none => NONE_SUBS,
-    :normal => NORMAL_SUBS,
-    :verbatim => VERBATIM_SUBS,
-    :specialchars => BASIC_SUBS
+    none: NONE_SUBS,
+    normal: NORMAL_SUBS,
+    verbatim: VERBATIM_SUBS,
+    specialchars: BASIC_SUBS,
   }
 
   SUB_HINTS = {
-    :a => :attributes,
-    :m => :macros,
-    :n => :normal,
-    :p => :post_replacements,
-    :q => :quotes,
-    :r => :replacements,
-    :c => :specialcharacters,
-    :v => :verbatim
+    a: :attributes,
+    m: :macros,
+    n: :normal,
+    p: :post_replacements,
+    q: :quotes,
+    r: :replacements,
+    c: :specialcharacters,
+    v: :verbatim,
   }
 
   SUB_OPTIONS = {
-    :block  => SUB_GROUPS.keys + NORMAL_SUBS + [:callouts],
-    :inline => SUB_GROUPS.keys + NORMAL_SUBS
+    block:  SUB_GROUPS.keys + NORMAL_SUBS + [:callouts],
+    inline: SUB_GROUPS.keys + NORMAL_SUBS,
   }
 
   SUB_HIGHLIGHT = ['coderay', 'pygments']
@@ -205,12 +205,12 @@ module Substitutors
         pass_key = passes.size
         if attributes
           if old_behavior
-            passes[pass_key] = {:text => content, :subs => NORMAL_SUBS, :type => :monospaced, :attributes => attributes}
+            passes[pass_key] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
           else
-            passes[pass_key] = {:text => content, :subs => subs, :type => :unquoted, :attributes => attributes}
+            passes[pass_key] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
           end
         else
-          passes[pass_key] = {:text => content, :subs => subs}
+          passes[pass_key] = { text: content, subs: subs }
         end
       else # pass:[]
         if $6 == RS
@@ -218,7 +218,7 @@ module Substitutors
           next $&.slice 1, $&.length
         end
 
-        passes[pass_key = passes.size] = {:text => (unescape_brackets $8), :subs => ($7 ? (resolve_pass_subs $7) : nil)}
+        passes[pass_key = passes.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -266,16 +266,16 @@ module Substitutors
 
       pass_key = passes.size
       if compat_mode
-        passes[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :monospaced}
+        passes[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
           subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
-          passes[pass_key] = {:text => content, :subs => subs, :attributes => attributes, :type => :monospaced}
+          passes[pass_key] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
-          passes[pass_key] = {:text => content, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted}
+          passes[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
         end
       else
-        passes[pass_key] = {:text => content, :subs => BASIC_SUBS}
+        passes[pass_key] = { text: content, subs: BASIC_SUBS }
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -293,7 +293,7 @@ module Substitutors
       end
       content = unescape_brackets $3
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      passes[pass_key = passes.size] = {:text => content, :subs => subs, :type => type}
+      passes[pass_key = passes.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{pass_key}#{PASS_END})
     } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
@@ -306,8 +306,8 @@ module Substitutors
         %(#{pre}`+#{$2}+`)
       else
         @passthroughs[pass_key = @passthroughs.size] = attributes ?
-            { :text => $2, :subs => BASIC_SUBS, :attributes => attributes, :type => :unquoted } :
-            { :text => $2, :subs => BASIC_SUBS }
+            { text: $2, subs: BASIC_SUBS, attributes: attributes, type: :unquoted } :
+            { text: $2, subs: BASIC_SUBS }
         %(#{pre}`#{PASS_START}#{pass_key}#{PASS_END}`)
       end
     else
@@ -333,7 +333,7 @@ module Substitutors
       pass = passes[$1.to_i]
       subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
-        subbed_text = Inline.new(self, :quoted, subbed_text, :type => type, :attributes => pass[:attributes]).convert
+        subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
       end
       subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
     }
@@ -542,7 +542,7 @@ module Substitutors
             else
               keys = [keys]
             end
-            (Inline.new self, :kbd, nil, :attributes => { 'keys' => keys }).convert
+            (Inline.new self, :kbd, nil, attributes: { 'keys' => keys }).convert
           else # $2 == 'btn'
             (Inline.new self, :button, (unescape_bracketed_text $3)).convert
           end
@@ -569,7 +569,7 @@ module Substitutors
             submenus, menuitem = [], nil
           end
 
-          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
+          Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
         }
       end
 
@@ -582,7 +582,7 @@ module Substitutors
 
           menu, *submenus = $1.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
-          Inline.new(self, :menu, nil, :attributes => {'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem}).convert
+          Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
         }
       end
     end
@@ -610,7 +610,7 @@ module Substitutors
             if extconf[:content_model] == :attributes
               # QUESTION should we store the text in the _text key?
               # NOTE bracked text has already been escaped
-              parse_attributes content, extconf[:pos_attrs] || [], :into => attributes
+              parse_attributes content, extconf[:pos_attrs] || [], into: attributes
             else
               attributes['text'] = content
             end
@@ -637,10 +637,10 @@ module Substitutors
           # TODO remove this special case once titles use normal substitution order
           target = sub_attributes target
         end
-        attrs = parse_attributes $2, posattrs, :unescape_input => true
+        attrs = parse_attributes $2, posattrs, unescape_input: true
         doc.register :images, [target, (attrs['imagesdir'] = doc_attrs['imagesdir'])] unless type == 'icon'
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
-        Inline.new(self, :image, nil, :type => type, :target => target, :attributes => attrs).convert
+        Inline.new(self, :image, nil, type: type, target: target, attributes: attrs).convert
       }
     end
 
@@ -660,7 +660,7 @@ module Substitutors
           # indexterm:[Tigers,Big cats]
           terms = split_simple_csv normalize_string text, true
           doc.register :indexterms, terms
-          (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
+          (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
         when 'indexterm2'
           text = $2
           # honor the escape
@@ -670,7 +670,7 @@ module Substitutors
           # indexterm2:[Tigers]
           term = normalize_string text, true
           doc.register :indexterms, [term]
-          (Inline.new self, :indexterm, term, :type => :visible).convert
+          (Inline.new self, :indexterm, term, type: :visible).convert
         else
           text = $3
           # honor the escape
@@ -698,12 +698,12 @@ module Substitutors
             # ((Tigers))
             term = normalize_string text
             doc.register :indexterms, [term]
-            subbed_term = (Inline.new self, :indexterm, term, :type => :visible).convert
+            subbed_term = (Inline.new self, :indexterm, term, type: :visible).convert
           else
             # (((Tigers,Big cats)))
             terms = split_simple_csv(normalize_string text)
             doc.register :indexterms, terms
-            subbed_term = (Inline.new self, :indexterm, nil, :attributes => { 'terms' => terms }).convert
+            subbed_term = (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end
@@ -761,7 +761,7 @@ module Substitutors
           return captured if target.end_with? '://'
         end
 
-        attrs, link_opts = nil, { :type => :link }
+        attrs, link_opts = nil, { type: :link }
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if !doc.compat_mode && (text.include? '=')
@@ -817,7 +817,7 @@ module Substitutors
         else
           target = $2
         end
-        attrs, link_opts = nil, { :type => :link }
+        attrs, link_opts = nil, { type: :link }
         unless (text = $3).empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
@@ -893,7 +893,7 @@ module Substitutors
         # QUESTION should this be registered as an e-mail address?
         doc.register(:links, target)
 
-        Inline.new(self, :anchor, $&, :type => :link, :target => target).convert
+        Inline.new(self, :anchor, $&, type: :link, target: target).convert
       }
     end
 
@@ -933,7 +933,7 @@ module Substitutors
         else
           next $&
         end
-        Inline.new(self, :footnote, text, :attributes => {'index' => index}, :id => id, :target => target, :type => type).convert
+        Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
       }
     end
 
@@ -945,7 +945,7 @@ module Substitutors
     if @context == :list_item && @parent.style == 'bibliography'
       text = text.sub(InlineBiblioAnchorRx) {
         # NOTE target property on :bibref is deprecated
-        Inline.new(self, :anchor, %([#{$2 || $1}]), :type => :bibref, :id => $1, :target => $1).convert
+        Inline.new(self, :anchor, %([#{$2 || $1}]), type: :bibref, id: $1, target: $1).convert
       }
     end
 
@@ -964,7 +964,7 @@ module Substitutors
           end
         end
         # NOTE target property on :ref is deprecated
-        Inline.new(self, :anchor, reftext, :type => :ref, :id => id, :target => id).convert
+        Inline.new(self, :anchor, reftext, type: :ref, id: id, target: id).convert
       }
     end
 
@@ -1054,7 +1054,7 @@ module Substitutors
           logger.warn %(invalid reference: #{refid}) if $VERBOSE
         end
         attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
-        Inline.new(self, :anchor, text, :type => :xref, :target => target, :attributes => attrs).convert
+        Inline.new(self, :anchor, text, type: :xref, target: target, attributes: attrs).convert
       }
     end
 
@@ -1075,7 +1075,7 @@ module Substitutors
         # use sub since it might be behind a line comment
         $&.sub(RS, '')
       else
-        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, :id => @document.callouts.read_next_id, :attributes => { 'guard' => $1 }).convert
+        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
       end
     }
   end
@@ -1091,10 +1091,10 @@ module Substitutors
       return text if lines.size < 2
       last = lines.pop
       (lines.map {|line|
-        Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, :type => :line).convert
+        Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, type: :line).convert
       } << last).join LF
     elsif (text.include? PLUS) && (text.include? HARD_LINE_BREAK)
-      text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, :type => :line).convert }
+      text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, type: :line).convert }
     else
       text
     end
@@ -1118,20 +1118,20 @@ module Substitutors
 
     if scope == :constrained
       if unescaped_attrs
-        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], :type => type).convert})
+        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], type: type).convert})
       else
         if (attrlist = match[2])
           id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
           type = :unquoted if type == :mark
         end
-        %(#{match[1]}#{Inline.new(self, :quoted, match[3], :type => type, :id => id, :attributes => attributes).convert})
+        %(#{match[1]}#{Inline.new(self, :quoted, match[3], type: type, id: id, attributes: attributes).convert})
       end
     else
       if (attrlist = match[1])
         id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
         type = :unquoted if type == :mark
       end
-      Inline.new(self, :quoted, match[2], :type => type, :id => id, :attributes => attributes).convert
+      Inline.new(self, :quoted, match[2], type: type, id: id, attributes: attributes).convert
     end
   end
 
@@ -1173,7 +1173,7 @@ module Substitutors
       attrs['role'] = roles.join ' ' unless roles.empty?
       attrs
     else
-      {'role' => str}
+      { 'role' => str }
     end
   end
 
@@ -1445,16 +1445,16 @@ module Substitutors
         end
       end
       result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
-        :css => (@document.attributes['coderay-css'] || :class).to_sym,
-        :line_numbers => linenums_mode,
-        :line_number_start => start,
-        :line_number_anchors => false,
-        :highlight_lines => highlight_lines,
-        :bold_every => false
+        css: (@document.attributes['coderay-css'] || :class).to_sym,
+        line_numbers: linenums_mode,
+        line_number_start: start,
+        line_number_anchors: false,
+        highlight_lines: highlight_lines,
+        bold_every: false,
       }].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
-      opts = { :cssclass => 'pyhl', :classprefix => 'tok-', :nobackground => true, :stripnl => false }
+      opts = { cssclass: 'pyhl', classprefix: 'tok-', nobackground: true, stripnl: false }
       opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
       unless (@document.attributes['pygments-css'] || 'class') == 'class'
         opts[:noclasses] = true
@@ -1470,12 +1470,12 @@ module Substitutors
       if (attr? 'linenums', nil, false) && (opts[:linenostart] = (start = attr 'start', 1, false).to_i < 1 ? 1 : start) &&
           (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
         linenums_mode = :table
-        if (result = lexer.highlight source, :options => opts)
+        if (result = lexer.highlight source, options: opts)
           result = (result.sub PygmentsWrapperDivRx, '\1').gsub PygmentsWrapperPreRx, '\1'
         else
           result = sub_specialchars source
         end
-      elsif (result = lexer.highlight source, :options => opts)
+      elsif (result = lexer.highlight source, options: opts)
         if PygmentsWrapperPreRx =~ result
           result = $1
         end
@@ -1508,9 +1508,9 @@ module Substitutors
           end
           if conums.size == 1
             guard, conum = conums[0]
-            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard }).convert}#{tail})
+            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert}#{tail})
           else
-            conums_markup = conums.map {|guard_it, conum_it| Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, :id => @document.callouts.read_next_id, :attributes => { 'guard' => guard_it }).convert }.join ' '
+            conums_markup = conums.map {|guard_it, conum_it| Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert }.join ' '
             %(#{line}#{conums_markup}#{tail})
           end
         else

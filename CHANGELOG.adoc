@@ -24,6 +24,7 @@ Enhancements::
 
 Improvements::
 
+  * refactor code to use modern Hash syntax
   * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
   * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)
 

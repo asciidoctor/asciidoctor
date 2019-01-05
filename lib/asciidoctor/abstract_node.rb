@@ -370,7 +370,7 @@ class AbstractNode
     # QUESTION what if ext is empty?
     mimetype = (ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length}))
     if asset_dir_key
-      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, :target_name => 'image')
+      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
     else
       image_path = normalize_system_path(target_image)
     end
@@ -427,8 +427,7 @@ class AbstractNode
   # Delegates to normalize_system_path, with the start path set to the value of
   # the base_dir instance variable on the Document object.
   def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
-    normalize_system_path(asset_ref, @document.base_dir, nil,
-        :target_name => asset_name, :recover => autocorrect)
+    normalize_system_path(asset_ref, @document.base_dir, nil, target_name: asset_name, recover: autocorrect)
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths
@@ -502,7 +501,7 @@ class AbstractNode
   # if the file does not exist.
   def read_asset path, opts = {}
     # remap opts for backwards compatibility
-    opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
+    opts = { warn_on_failure: (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
         (Helpers.prepare_source_string ::File.open(path, FILE_READ_MODE) {|f| f.read }).join LF
@@ -553,8 +552,8 @@ class AbstractNode
         return
       end
     else
-      target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
+      target = normalize_system_path target, opts[:start], nil, target_name: (opts[:label] || 'asset')
+      read_asset target, normalize: opts[:normalize], warn_on_failure: (opts.fetch :warn_on_failure, true), label: opts[:label]
     end
   end
 

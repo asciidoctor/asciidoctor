@@ -431,7 +431,7 @@ preamble
     end
 
     test 'document title created from leveloffset shift defined in API' do
-      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string('== Document Title', :attributes => { 'leveloffset' => '-1@' })
+      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string('== Document Title', attributes: { 'leveloffset' => '-1@' })
     end
 
     test 'should assign id on document title to body' do
@@ -705,7 +705,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        convert_string_to_embedded input, :attributes => { 'fragment' => '' }
+        convert_string_to_embedded input, attributes: { 'fragment' => '' }
         assert logger.empty?
       end
     end
@@ -720,7 +720,7 @@ content
       EOS
 
       using_memory_logger do |logger|
-        convert_string_to_embedded input, :attributes => { 'fragment' => '' }
+        convert_string_to_embedded input, attributes: { 'fragment' => '' }
         assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 3, got level 4', Hash
       end
     end
@@ -1040,7 +1040,7 @@ not in section
 not in section
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'sectids' => nil}
+      output = convert_string_to_embedded input, attributes: { 'sectids' => nil }
       assert_xpath '/h3', output, 1
       assert_xpath '/h3[@id="_independent_heading"]', output, 0
       assert_xpath '/h3[@class="float"]', output, 1
@@ -1403,7 +1403,7 @@ text
       using_memory_logger do |logger|
         output = convert_string input
         assert_xpath '//h1[text()="Part"]', output, 1
-        assert_xpath '//h3[text()=".1. Out of Sequence Section"]', output, 1 
+        assert_xpath '//h3[text()=".1. Out of Sequence Section"]', output, 1
       end
     end
 
@@ -1564,7 +1564,7 @@ paragraph
 == Section Three
       EOS
 
-      output = convert_string input, :attributes => {'numbered' => ''}
+      output = convert_string input, attributes: { 'numbered' => '' }
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1598,7 +1598,7 @@ paragraph
 == Section Three
       EOS
 
-      output = convert_string input, :attributes => {'numbered!' => ''}
+      output = convert_string input, attributes: { 'numbered!' => '' }
       assert_xpath '//h1[text()="Document Title"]', output, 1
       assert_xpath '//h2[@id="_colophon_section"][text()="Colophon Section"]', output, 1
       assert_xpath '//h2[@id="_another_colophon_section"][text()="Another Colophon Section"]', output, 1
@@ -1761,12 +1761,12 @@ content
 == The End
       EOS
 
-      doc = document_from_string input, :attributes => { 'sectnums' => '' }
+      doc = document_from_string input, attributes: { 'sectnums' => '' }
       doc.sections.each do |sect|
         sect.number += 1
       end
 
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_xpath '//h2[text()="2. Somewhere in the Middle"]', output, 1
       assert_xpath '//h2[text()="3. The End"]', output, 1
     end
@@ -1784,7 +1784,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'sectanchors' => ''}
+      output = convert_string_to_embedded input, attributes: { 'sectanchors' => '' }
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="anchor"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a/following-sibling::text()="Installation"', output, true
@@ -1804,7 +1804,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'sectanchors' => 'after'}
+      output = convert_string_to_embedded input, attributes: { 'sectanchors' => 'after' }
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="anchor"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a/preceding-sibling::text()="Installation"', output, true
@@ -1824,7 +1824,7 @@ Installation section.
 Linux installation instructions.
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'sectlinks' => ''}
+      output = convert_string_to_embedded input, attributes: { 'sectlinks' => '' }
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[@class="link"][@href="#_installation"]', output, 1
       assert_xpath '/*[@class="sect1"]/h2[@id="_installation"]/a[text()="Installation"]', output, 1
@@ -1850,7 +1850,7 @@ content
 content
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_xpath '//section', output, 2
       assert_xpath '//sect1', output, 0
       assert_xpath '//sect2', output, 0
@@ -2426,7 +2426,7 @@ Colophon content
 = Index Title
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_xpath '/chapter[@id="abstract_title"]', output, 1
       assert_xpath '/chapter[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
       assert_xpath '/chapter/following-sibling::dedication[@id="dedication_title"]', output, 1
@@ -2466,7 +2466,7 @@ Colophon content
 Abstract content
       EOS
 
-      output = convert_string_to_embedded input, :backend => 'docbook45'
+      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_xpath '/abstract[@id="abstract_title"]', output, 1
       assert_xpath '/abstract[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
@@ -2492,7 +2492,7 @@ A second glossary term::
 The corresponding definition.
       EOS
 
-      output = convert_string input, :backend => :docbook
+      output = convert_string input, backend: :docbook
       assert_xpath '//glossary', output, 1
       assert_xpath '//chapter/glossary', output, 1
       assert_xpath '//glossary/title[text()="Glossary A"]', output, 1
@@ -2507,7 +2507,7 @@ The corresponding definition.
 content
       EOS
 
-      output = convert_string_to_embedded input, :backend => :docbook
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '/dedication', output, 1
       assert_xpath '/dedication/title', output, 0
     end
@@ -3242,7 +3242,7 @@ content
 content
       EOS
 
-      output = convert_string_to_embedded input, :safe => :safe
+      output = convert_string_to_embedded input, safe: :safe
       assert_xpath '/*[@id="toc"]', output, 1
       toc_links = xmlnodes_at_xpath '/*[@id="toc"]//li', output
       assert_equal 3, toc_links.size
@@ -3283,7 +3283,7 @@ While they were returning...
 That's all she wrote!
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_xpath '//part', output, 0
       assert_xpath '//chapter', output, 0
       assert_xpath '/article/section', output, 2
@@ -3407,11 +3407,11 @@ content
 
       doc = document_from_string input
       assert_equal 'header', doc.header.sectname
-      assert_equal 'part', (doc.find_by :id => 'part-title')[0].sectname
-      assert_equal 'chapter', (doc.find_by :id => 'chapter-title')[0].sectname
-      assert_equal 'section', (doc.find_by :id => 'section-title')[0].sectname
-      assert_equal 'appendix', (doc.find_by :id => 'appendix-title')[0].sectname
-      assert_equal 'section', (doc.find_by :id => 'appendix-section-title')[0].sectname
+      assert_equal 'part', (doc.find_by id: 'part-title')[0].sectname
+      assert_equal 'chapter', (doc.find_by id: 'chapter-title')[0].sectname
+      assert_equal 'section', (doc.find_by id: 'section-title')[0].sectname
+      assert_equal 'appendix', (doc.find_by id: 'appendix-title')[0].sectname
+      assert_equal 'section', (doc.find_by id: 'appendix-section-title')[0].sectname
     end
 
     test 'should add partintro style to child paragraph of part' do
@@ -3525,7 +3525,7 @@ While they were returning...
 That's all she wrote!
       EOS
 
-      output = convert_string input, :backend => 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_xpath '//chapter/chapter', output, 0
       assert_xpath '/book/part', output, 2
       assert_xpath '/book/part[1]/title[text() = "Part 1"]', output, 1
@@ -3572,7 +3572,7 @@ Appendix subsection content
 
       output = nil
       using_memory_logger do |logger|
-        output = convert_string input, :backend => 'docbook'
+        output = convert_string input, backend: 'docbook'
         assert logger.empty?
       end
       assert_xpath '/book/preface', output, 1

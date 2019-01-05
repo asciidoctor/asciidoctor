@@ -45,7 +45,7 @@ class MemoryLogger < ::Logger
 
   def add severity, message = nil, progname = nil
     message = block_given? ? yield : progname unless message
-    @messages << { :severity => SEVERITY_LABELS[severity || UNKNOWN], :message => message }
+    @messages.push severity: SEVERITY_LABELS[severity || UNKNOWN], message: message
     true
   end
 
@@ -115,7 +115,7 @@ module Logging
   end
 
   def message_with_context text, context = {}
-    ({ :text => text }.merge context).extend Logger::AutoFormattingMessage
+    ({ text: text }.merge context).extend Logger::AutoFormattingMessage
   end
 end
 end

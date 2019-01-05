@@ -10,15 +10,15 @@ module Asciidoctor
 #    attrlist = Asciidoctor::AttributeList.new('astyle')
 #
 #    attrlist.parse
-#    => {0 => 'astyle'}
+#    => { 0 => 'astyle' }
 #
 #    attrlist.rekey(['style'])
-#    => {'style' => 'astyle'}
+#    => { 'style' => 'astyle' }
 #
 #    attrlist = Asciidoctor::AttributeList.new('quote, Famous Person, Famous Book (2001)')
 #
 #    attrlist.parse(['style', 'attribution', 'citetitle'])
-#    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'}
+#    => { 'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)' }
 #
 class AttributeList
   BACKSLASH = '\\'
@@ -43,11 +43,8 @@ class AttributeList
 
   BlankRx = /[ \t]+/
 
-  # Public: Regular expressions for skipping blanks and delimiters
-  SkipRxs = {
-    :blank => BlankRx,
-    ',' => /[ \t]*(,|$)/
-  }
+  # Public: Regular expressions for skipping delimiters
+  SkipRxs = { ',' => /[ \t]*(,|$)/ }
 
   def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source

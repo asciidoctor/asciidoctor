@@ -3,19 +3,19 @@ module Asciidoctor
   # consistent with the html5 backend from AsciiDoc Python.
   class Converter::Html5Converter < Converter::BuiltIn
     (QUOTE_TAGS = {
-      :monospaced  => ['<code>',   '</code>',   true],
-      :emphasis    => ['<em>',     '</em>',     true],
-      :strong      => ['<strong>', '</strong>', true],
-      :double      => ['&#8220;',  '&#8221;',   false],
-      :single      => ['&#8216;',  '&#8217;',   false],
-      :mark        => ['<mark>',   '</mark>',   true],
-      :superscript => ['<sup>',    '</sup>',    true],
-      :subscript   => ['<sub>',    '</sub>',    true],
-      :asciimath   => ['\$',       '\$',        false],
-      :latexmath   => ['\(',       '\)',        false]
+      monospaced:  ['<code>',   '</code>',   true],
+      emphasis:    ['<em>',     '</em>',     true],
+      strong:      ['<strong>', '</strong>', true],
+      double:      ['&#8220;',  '&#8221;',   false],
+      single:      ['&#8216;',  '&#8217;',   false],
+      mark:        ['<mark>',   '</mark>',   true],
+      superscript: ['<sup>',    '</sup>',    true],
+      subscript:   ['<sub>',    '</sub>',    true],
+      asciimath:   ['\$',       '\$',        false],
+      latexmath:   ['\(',       '\)',        false],
       # Opal can't resolve these constants when referenced here
-      #:asciimath   => INLINE_MATH_DELIMITERS[:asciimath] + [false],
-      #:latexmath   => INLINE_MATH_DELIMITERS[:latexmath] + [false]
+      #asciimath:  INLINE_MATH_DELIMITERS[:asciimath] + [false],
+      #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
     }).default = ['', '', false]
 
     DropAnchorRx = /<(?:a[^>+]+|\/a)>/
@@ -59,7 +59,7 @@ module Asciidoctor
         end
         result << %(<link rel="icon" type="#{icon_type}" href="#{icon_href}"#{slash}>)
       end
-      result << %(<title>#{node.doctitle :sanitize => true, :use_fallback => true}</title>)
+      result << %(<title>#{node.doctitle sanitize: true, use_fallback: true}</title>)
 
       if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
         if (webfonts = node.attr 'webfonts')
@@ -75,7 +75,7 @@ module Asciidoctor
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
         else
           result << %(<style>
-#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), :warn_on_failure => true, :label => 'stylesheet'}
+#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), warn_on_failure: true, label: 'stylesheet'}
 </style>)
         end
       end
@@ -309,7 +309,7 @@ MathJax.Hub.Config({
           stitle = section.title
         end
         stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
-        if slevel < toclevels && (child_toc_level = outline section, :toclevels => toclevels, :sectnumlevels => sectnumlevels)
+        if slevel < toclevels && (child_toc_level = outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
           result << %(<li><a href="##{section.id}">#{stitle}</a>)
           result << child_toc_level
           result << '</li>'
@@ -886,7 +886,7 @@ Your browser does not support the audio tag.
 
       %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
-#{outline doc, :toclevels => levels}
+#{outline doc, toclevels: levels}
 </div>)
     end
 
@@ -1117,7 +1117,7 @@ Your browser does not support the video tag.
     def inline_image node
       if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
         class_attr_val = %(fa fa-#{node.target})
-        {'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-'}.each do |key, prefix|
+        { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
           class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
         end
         title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
@@ -1229,7 +1229,7 @@ Your browser does not support the video tag.
     end
 
     def read_svg_contents node, target
-      if (svg = node.read_contents target, :start => (node.document.attr 'imagesdir'), :normalize => true, :label => 'SVG')
+      if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG')
         svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
         old_start_tag = new_start_tag = nil
         # NOTE width, height and style attributes are removed if either width or height is specified

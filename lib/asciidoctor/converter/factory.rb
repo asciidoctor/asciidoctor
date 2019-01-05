@@ -11,7 +11,7 @@ module Asciidoctor
     # backend can be thought of as an intent to convert a document to a
     # specified format. For example:
     #
-    #   converter = Asciidoctor::Converter::Factory.create 'html5', :htmlsyntax => 'xml'
+    #   converter = Asciidoctor::Converter::Factory.create 'html5', htmlsyntax: 'xml'
     #
     # Converter objects are thread safe. They only survive the lifetime of a single conversion.
     #

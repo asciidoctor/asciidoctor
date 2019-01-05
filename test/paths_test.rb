@@ -145,7 +145,7 @@ context 'Path Resolver' do
 
     test 'throws exception for illegal path access if recover is false' do
       begin
-        @resolver.system_path('../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, :recover => false)
+        @resolver.system_path('../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false)
         flunk 'Expecting SecurityError to be raised'
       rescue SecurityError
       end
@@ -244,13 +244,13 @@ context 'Path Resolver' do
 
     test 'raises security error if start is not contained within jail and recover is disabled' do
       begin
-        @resolver.system_path('images/tiger.png', '/etc', JAIL, :recover => false)
+        @resolver.system_path('images/tiger.png', '/etc', JAIL, recover: false)
         flunk 'Expecting SecurityError to be raised'
       rescue SecurityError
       end
 
       begin
-        @resolver.system_path('.', '/etc', JAIL, :recover => false)
+        @resolver.system_path('.', '/etc', JAIL, recover: false)
         flunk 'Expecting SecurityError to be raised'
       rescue SecurityError
       end
@@ -359,7 +359,7 @@ context 'Path Resolver' do
 
     test 'should resolve relative path relative to base dir in unsafe mode' do
       base_dir = fixture_path 'base'
-      doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE
+      doc = empty_document base_dir: base_dir, safe: Asciidoctor::SafeMode::UNSAFE
       expected = ::File.join base_dir, 'images', 'tiger.png'
       actual = doc.normalize_system_path 'tiger.png', 'images'
       assert_equal expected, actual
@@ -367,7 +367,7 @@ context 'Path Resolver' do
 
     test 'should resolve absolute path as absolute in unsafe mode' do
       base_dir = fixture_path 'base'
-      doc = empty_document :base_dir => base_dir, :safe => Asciidoctor::SafeMode::UNSAFE
+      doc = empty_document base_dir: base_dir, safe: Asciidoctor::SafeMode::UNSAFE
       actual = doc.normalize_system_path 'tiger.png', '/etc/images'
       assert_equal '/etc/images/tiger.png', actual
     end

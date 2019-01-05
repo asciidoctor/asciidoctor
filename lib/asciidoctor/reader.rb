@@ -346,7 +346,7 @@ class Reader
       if next_line.start_with? '//'
         if next_line.start_with? '///'
           if (ll = next_line.length) > 3 && next_line == '/' * ll
-            read_lines_until :terminator => next_line, :skip_first_line => true, :read_last_line => true, :skip_processing => true, :context => :comment
+            read_lines_until terminator: next_line, skip_first_line: true, read_last_line: true, skip_processing: true, context: :comment
           else
             break
           end
@@ -391,7 +391,7 @@ class Reader
   end
 
   # Public: Return all the lines from `@lines` until we (1) run out them,
-  #   (2) find a blank line with :break_on_blank_lines => true, or (3) find
+  #   (2) find a blank line with `break_on_blank_lines: true`, or (3) find
   #   a line for which the given block evals to true.
   #
   # options - an optional Hash of processing options:
@@ -424,7 +424,7 @@ class Reader
   #     "\n",
   #     "Third line\n",
   #   ]
-  #   reader = Reader.new data, nil, :normalize => true
+  #   reader = Reader.new data, nil, normalize: true
   #
   #   reader.read_lines_until
   #   => ["First line", "Second line"]
@@ -479,7 +479,7 @@ class Reader
     end
     if terminator && terminator != line && (context = options.fetch :context, terminator)
       start_cursor = cursor_at_mark if start_cursor == :at_mark
-      logger.warn message_with_context %(unterminated #{context} block), :source_location => start_cursor
+      logger.warn message_with_context %(unterminated #{context} block), source_location: start_cursor
       @unterminated = true
     end
     result
@@ -606,7 +606,7 @@ class PreprocessorReader < Reader
     include_depth_default = document.attributes.fetch('max-include-depth', 64).to_i
     include_depth_default = 0 if include_depth_default < 0
     # track both absolute depth for comparing to size of include stack and relative depth for reporting
-    @maxdepth = {:abs => include_depth_default, :rel => include_depth_default}
+    @maxdepth = { abs: include_depth_default, rel: include_depth_default }
     @include_stack = []
     @includes = document.catalog[:includes]
     @skipping = false
@@ -758,12 +758,12 @@ class PreprocessorReader < Reader
 
     if keyword == 'endif'
       if @conditional_stack.empty?
-        logger.error message_with_context %(unmatched macro: endif::#{target}[]), :source_location => cursor
+        logger.error message_with_context %(unmatched macro: endif::#{target}[]), source_location: cursor
       elsif no_target || target == (pair = @conditional_stack[-1])[:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error message_with_context %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), :source_location => cursor
+        logger.error message_with_context %(mismatched macro: endif::#{target}[], expected endif::#{pair[:target]}[]), source_location: cursor
       end
       return true
     end
@@ -817,7 +817,7 @@ class PreprocessorReader < Reader
     # conditional inclusion block
     if keyword == 'ifeval' || !text
       @skipping = true if skip
-      @conditional_stack << {:target => target, :skip => skip, :skipping => @skipping}
+      @conditional_stack << { target: target, skip: skip, skipping: @skipping }
     # single line conditional inclusion
     else
       unless @skipping || skip
@@ -860,7 +860,7 @@ class PreprocessorReader < Reader
   def preprocess_include_directive target, attrlist
     doc = @document
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
-        (expanded_target = doc.sub_attributes target, :attribute_missing => 'drop-line').empty?
+        (expanded_target = doc.sub_attributes target, attribute_missing: 'drop-line').empty?
       shift
       if (doc.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
@@ -869,7 +869,7 @@ class PreprocessorReader < Reader
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
-      ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], :sub_input => true)]
+      ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], sub_input: true)]
       true
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
@@ -878,11 +878,11 @@ class PreprocessorReader < Reader
       replace_next_line %(link:#{expanded_target}[])
     elsif (abs_maxdepth = @maxdepth[:abs]) > 0
       if @include_stack.size >= abs_maxdepth
-        logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), :source_location => cursor
+        logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
         return
       end
 
-      parsed_attrs = doc.parse_attributes attrlist, [], :sub_input => true
+      parsed_attrs = doc.parse_attributes attrlist, [], sub_input: true
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
       if target_type == :file
         reader = ::File.method :open
@@ -948,7 +948,7 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         shift
@@ -985,9 +985,9 @@ class PreprocessorReader < Reader
                     include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
                     if (idx = tag_stack.rindex {|key, _| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
+                      logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
                     else
-                      logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
+                      logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
                     end
                   end
                 elsif inc_tags.key? this_tag
@@ -1006,16 +1006,16 @@ class PreprocessorReader < Reader
             end
           end
         rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
         unless tag_stack.empty?
           tag_stack.each do |tag_name, _, tag_lineno|
-            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => (create_include_cursor inc_path, expanded_target, tag_lineno)
+            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: (create_include_cursor inc_path, expanded_target, tag_lineno)
           end
         end
         unless (missing_tags = inc_tags.keys - tags_used.to_a).empty?
-          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), :source_location => cursor
+          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), source_location: cursor
         end
         shift
         if inc_offset
@@ -1030,7 +1030,7 @@ class PreprocessorReader < Reader
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
       end
@@ -1071,13 +1071,13 @@ class PreprocessorReader < Reader
       [(::URI.parse target), :uri, target]
     else
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
-      inc_path = doc.normalize_system_path target, @dir, nil, :target_name => 'include file'
+      inc_path = doc.normalize_system_path target, @dir, nil, target_name: 'include file'
       unless ::File.file? inc_path
         if attributes.key? 'optional-option'
           shift
           return true
         else
-          logger.error message_with_context %(include file not found: #{inc_path}), :source_location => cursor
+          logger.error message_with_context %(include file not found: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
         end
       end
@@ -1136,11 +1136,11 @@ class PreprocessorReader < Reader
     if attributes.key? 'depth'
       depth = attributes['depth'].to_i
       depth = 1 if depth <= 0
-      @maxdepth = {:abs => (@include_stack.size - 1) + depth, :rel => depth}
+      @maxdepth = { abs: (@include_stack.size - 1) + depth, rel: depth }
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, :normalize => true, :condense => false, :indent => attributes['indent']).empty?
+    if (@lines = prepare_lines data, normalize: true, condense: false, indent: attributes['indent']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
@@ -1284,7 +1284,7 @@ class PreprocessorReader < Reader
 
     # QUESTION should we substitute first?
     # QUESTION should we also require string to be single quoted (like block attribute values?)
-    val = @document.sub_attributes val, :attribute_missing => 'drop' if val.include? ATTR_REF_HEAD
+    val = @document.sub_attributes val, attribute_missing: 'drop' if val.include? ATTR_REF_HEAD
 
     if quoted
       val

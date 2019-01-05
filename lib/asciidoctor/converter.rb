@@ -85,10 +85,10 @@ module Asciidoctor
           syntax = 'html'
         end
         {
-          :basebackend => base,
-          :outfilesuffix => ext,
-          :filetype => type,
-          :htmlsyntax => syntax
+          basebackend: base,
+          outfilesuffix: ext,
+          filetype: type,
+          htmlsyntax: syntax,
         }
       end
 
