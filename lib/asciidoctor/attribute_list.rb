@@ -223,6 +223,5 @@ class AttributeList
   def scan_to_quote quote
     @scanner.scan BoundaryRxs[quote]
   end
-
 end
 end

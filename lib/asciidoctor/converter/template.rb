@@ -81,7 +81,6 @@ module Asciidoctor
         @caches = {} # the empty Hash effectively disables caching
       end
       scan
-      #create_handlers
     end
 
 =begin
@@ -136,34 +135,6 @@ module Asciidoctor
         nil
       end
     end
-
-=begin
-    # Internal: Creates convert methods (e.g., inline_anchor) that delegate to the discovered templates.
-    #
-    # Returns nothing
-    def create_handlers
-      @templates.each do |name, template|
-        create_handler name, template
-      end
-      nil
-    end
-
-    # Internal: Creates a convert method for the specified name that delegates to the specified template.
-    #
-    # Returns nothing
-    def create_handler name, template
-      metaclass = class << self; self; end
-      if name == 'document'
-        metaclass.send :define_method, name do |node|
-          (template.render node).strip
-        end
-      else
-        metaclass.send :define_method, name do |node|
-          (template.render node).rstrip
-        end
-      end
-    end
-=end
 
     # Public: Convert an {AbstractNode} to the backend format using the named template.
     #

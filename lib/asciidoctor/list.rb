@@ -126,6 +126,5 @@ class ListItem < AbstractBlock
   def to_s
     %(#<#{self.class}@#{object_id} {list_context: #{parent.context.inspect}, text: #{@text.inspect}, blocks: #{(@blocks || []).size}}>)
   end
-
 end
 end
