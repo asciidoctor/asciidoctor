@@ -677,7 +677,7 @@ Sample *AsciiDoc*
       doctime, localtime = result.lines.map {|l| l.chomp }
       assert doctime.end_with?(' UTC')
       assert localtime.end_with?(' UTC')
-    rescue
+    ensure
       if old_tz
         ENV['TZ'] = old_tz
       else
