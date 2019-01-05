@@ -83,59 +83,6 @@ module Asciidoctor
       scan
     end
 
-=begin
-    # Public: Called when this converter is added to a composite converter.
-    def composed parent
-      # TODO set the backend info determined during the scan
-    end
-=end
-
-    # Internal: Scans the template directories specified in the constructor for Tilt-supported
-    # templates, loads the templates and stores the in a Hash that is accessible via the
-    # {TemplateConverter#templates} method.
-    #
-    # Returns nothing
-    def scan
-      path_resolver = PathResolver.new
-      backend = @backend
-      engine = @engine
-      @template_dirs.each do |template_dir|
-        # FIXME need to think about safe mode restrictions here
-        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
-
-        if engine
-          file_pattern = %(*.#{engine})
-          # example: templates/haml
-          if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
-            template_dir = engine_dir
-          end
-        else
-          # NOTE last matching template wins for template name if no engine is given
-          file_pattern = '*'
-        end
-
-        # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
-        if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
-          template_dir = backend_dir
-        end
-
-        pattern = %(#{template_dir}/#{file_pattern})
-
-        if (scan_cache = @caches[:scans])
-          template_cache = @caches[:templates]
-          unless (templates = scan_cache[pattern])
-            templates = scan_cache[pattern] = scan_dir template_dir, pattern, template_cache
-          end
-          templates.each do |name, template|
-            @templates[name] = template_cache[template.file] = template
-          end
-        else
-          @templates.update scan_dir(template_dir, pattern, @caches[:templates])
-        end
-        nil
-      end
-    end
-
     # Public: Convert an {AbstractNode} to the backend format using the named template.
     #
     # Looks for a template that matches the value of the
@@ -196,6 +143,61 @@ module Asciidoctor
         template
       end
       #create_handler name, template
+    end
+
+=begin
+    # Internal: Called when this converter is added to a composite converter.
+    def composed parent
+      # TODO set the backend info determined during the scan
+    end
+=end
+
+    private
+
+    # Internal: Scans the template directories specified in the constructor for Tilt-supported
+    # templates, loads the templates and stores the in a Hash that is accessible via the
+    # {TemplateConverter#templates} method.
+    #
+    # Returns nothing
+    def scan
+      path_resolver = PathResolver.new
+      backend = @backend
+      engine = @engine
+      @template_dirs.each do |template_dir|
+        # FIXME need to think about safe mode restrictions here
+        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
+
+        if engine
+          file_pattern = %(*.#{engine})
+          # example: templates/haml
+          if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
+            template_dir = engine_dir
+          end
+        else
+          # NOTE last matching template wins for template name if no engine is given
+          file_pattern = '*'
+        end
+
+        # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
+        if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
+          template_dir = backend_dir
+        end
+
+        pattern = %(#{template_dir}/#{file_pattern})
+
+        if (scan_cache = @caches[:scans])
+          template_cache = @caches[:templates]
+          unless (templates = scan_cache[pattern])
+            templates = scan_cache[pattern] = scan_dir template_dir, pattern, template_cache
+          end
+          templates.each do |name, template|
+            @templates[name] = template_cache[template.file] = template
+          end
+        else
+          @templates.update scan_dir(template_dir, pattern, @caches[:templates])
+        end
+        nil
+      end
     end
 
     # Internal: Scan the specified directory for template files matching pattern and instantiate

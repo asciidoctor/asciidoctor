@@ -557,21 +557,23 @@ class AbstractNode
     end
   end
 
+  # Deprecated: Check whether the specified String is a URI by
+  # matching it against the Asciidoctor::UriSniffRx regex.
+  #
+  # In use by Asciidoctor PDF
+  #
+  # @deprecated Use Helpers.uriish? instead
+  def is_uri? str
+    Helpers.uriish? str
+  end
+
   # Internal: URI encode spaces in a String
   #
   # str - the String to encode
   #
   # Returns the String with all spaces replaced with %20.
-  def uri_encode_spaces str
+  private def uri_encode_spaces str
     (str.include? ' ') ? (str.gsub ' ', '%20') : str
-  end
-
-  # Public: Check whether the specified String is a URI by
-  # matching it against the Asciidoctor::UriSniffRx regex.
-  #
-  # @deprecated Use Helpers.uriish? instead
-  def is_uri? str
-    Helpers.uriish? str
   end
 end
 end

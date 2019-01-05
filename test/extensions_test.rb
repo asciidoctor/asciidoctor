@@ -301,26 +301,26 @@ context 'Extensions' do
     end
 
     test 'should get class for top-level class name' do
-      clazz = Asciidoctor::Extensions.class_for_name 'String'
+      clazz = Asciidoctor::Helpers.class_for_name 'String'
       refute_nil clazz
       assert_equal String, clazz
     end
 
     test 'should get class for class name in module' do
-      clazz = Asciidoctor::Extensions.class_for_name 'Asciidoctor::Document'
+      clazz = Asciidoctor::Helpers.class_for_name 'Asciidoctor::Document'
       refute_nil clazz
       assert_equal Asciidoctor::Document, clazz
     end
 
     test 'should get class for class name resolved from root' do
-      clazz = Asciidoctor::Extensions.class_for_name '::Asciidoctor::Document'
+      clazz = Asciidoctor::Helpers.class_for_name '::Asciidoctor::Document'
       refute_nil clazz
       assert_equal Asciidoctor::Document, clazz
     end
 
     test 'should raise exception if cannot find class for name' do
       begin
-        Asciidoctor::Extensions.class_for_name 'InvalidModule::InvalidClass'
+        Asciidoctor::Helpers.class_for_name 'InvalidModule::InvalidClass'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message
@@ -329,7 +329,7 @@ context 'Extensions' do
 
     test 'should raise exception if constant name is invalid' do
       begin
-        Asciidoctor::Extensions.class_for_name 'foobar'
+        Asciidoctor::Helpers.class_for_name 'foobar'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: foobar', e.message
@@ -338,7 +338,7 @@ context 'Extensions' do
 
     test 'should raise exception if class not found in scope' do
       begin
-        Asciidoctor::Extensions.class_for_name 'Asciidoctor::Extensions::String'
+        Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions::String'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
@@ -347,7 +347,7 @@ context 'Extensions' do
 
     test 'should raise exception if name resolves to module' do
       begin
-        Asciidoctor::Extensions.class_for_name 'Asciidoctor::Extensions'
+        Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: Asciidoctor::Extensions', e.message
@@ -355,20 +355,20 @@ context 'Extensions' do
     end
 
     test 'should resolve class if class is given' do
-      clazz = Asciidoctor::Extensions.resolve_class Asciidoctor::Document
+      clazz = Asciidoctor::Helpers.resolve_class Asciidoctor::Document
       refute_nil clazz
       assert_equal Asciidoctor::Document, clazz
     end
 
     test 'should resolve class if class from string' do
-      clazz = Asciidoctor::Extensions.resolve_class 'Asciidoctor::Document'
+      clazz = Asciidoctor::Helpers.resolve_class 'Asciidoctor::Document'
       refute_nil clazz
       assert_equal Asciidoctor::Document, clazz
     end
 
     test 'should not resolve class if not in scope' do
       begin
-        Asciidoctor::Extensions.resolve_class 'Asciidoctor::Extensions::String'
+        Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
         assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message

@@ -2749,7 +2749,7 @@ class Parser
     nil
   end
 
-  # Public: Convert a string to a legal attribute name.
+  # Internal: Convert a string to a legal attribute name.
   #
   # name  - the String name of the attribute
   #

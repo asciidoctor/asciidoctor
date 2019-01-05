@@ -99,7 +99,7 @@ class ListItem < AbstractBlock
     !simple?
   end
 
-  # Public: Fold the first paragraph block into the text
+  # Internal: Fold the first paragraph block into the text
   #
   # Here are the rules for when a folding occurs:
   #

@@ -1549,7 +1549,7 @@ endif::asciidoctor[]
 
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        assert_nil reader.process_line(reader.lines.first)
+        assert_nil reader.send :process_line, reader.lines.first
       end
 
       test 'peek_line advances cursor to next conditional line of content' do
@@ -1610,7 +1610,7 @@ endif::asciidoctor[]
 
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        refute_nil reader.process_line(reader.lines.first)
+        refute_nil reader.send :process_line, reader.lines.first
       end
 
       test 'peek_line does not advance cursor when on a regular content line' do

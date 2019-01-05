@@ -40,7 +40,7 @@ module Asciidoctor
       @converter_map[transform] ||= (find_converter transform)
     end
 
-    # Internal: Find the converter for the specified transform.
+    # Public: Find the converter for the specified transform.
     # Raise an exception if no converter is found.
     #
     # Returns the matching [Converter] object

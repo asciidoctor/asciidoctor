@@ -91,6 +91,7 @@ module LoggerManager
     end
 
     private
+
     def memoize_logger
       class << self
         alias_method :logger, :logger
@@ -109,7 +110,6 @@ module Logging
     into.extend Logging
   end
 
-  private
   def logger
     LoggerManager.logger
   end

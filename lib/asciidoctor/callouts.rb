@@ -92,6 +92,8 @@ class Callouts
     nil
   end
 
+  private
+
   # Internal: Generate a unique id for the callout based on the internal indexes
   #
   # Returns A unique String id for this callout

@@ -72,7 +72,7 @@ module Asciidoctor
         @backend_info ||= init_backend_info
       end
 
-      def init_backend_info
+      private def init_backend_info
         raise ::ArgumentError, %(Cannot determine backend for converter: #{self.class}) unless @backend
         base = @backend.sub TrailingDigitsRx, ''
         if (ext = DEFAULT_EXTENSIONS[base])

@@ -591,11 +591,11 @@ class Document < AbstractBlock
   def counter name, seed = nil
     return @parent_document.counter name, seed if @parent_document
     if (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
-      @attributes[name] = @counters[name] = nextval attr_val
+      @attributes[name] = @counters[name] = Helpers.nextval attr_val
     elsif seed
       @attributes[name] = @counters[name] = seed == seed.to_i.to_s ? seed.to_i : seed
     else
-      @attributes[name] = @counters[name] = nextval attr_seed ? attr_val : 0
+      @attributes[name] = @counters[name] = Helpers.nextval attr_seed ? attr_val : 0
     end
   end
 
@@ -611,26 +611,7 @@ class Document < AbstractBlock
   # Deprecated: Map old counter_increment method to increment_counter for backwards compatibility
   alias counter_increment increment_and_store_counter
 
-  # Internal: Get the next value in the sequence.
-  #
-  # Handles both integer and character sequences.
-  #
-  # current - the value to increment as a String or Integer
-  #
-  # returns the next value in the sequence according to the current value's type
-  def nextval(current)
-    if ::Integer === current
-      current + 1
-    else
-      intval = current.to_i
-      if intval.to_s != current.to_s
-        (current[0].ord + 1).chr
-      else
-        intval + 1
-      end
-    end
-  end
-
+  # Public: Register a reference in the document catalog
   def register type, value
     case type
     when :ids # deprecated
@@ -817,8 +798,8 @@ class Document < AbstractBlock
     super
   end
 
-  # Internal: called after the header has been parsed and before the content
-  # will be parsed.
+  # Internal: Called by the parser after the header has been parsed and before
+  # the content is parsed.
   #--
   # QUESTION should we invoke the TreeProcessors here, passing in a phase?
   # QUESTION is finalize_header the right name?
@@ -829,96 +810,7 @@ class Document < AbstractBlock
     unrooted_attributes
   end
 
-  # Internal: Branch the attributes so that the original state can be restored
-  # at a future time.
-  def save_attributes
-    # enable toc and sectnums (i.e., numbered) by default in DocBook backend
-    # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
-    if (attrs = @attributes)['basebackend'] == 'docbook'
-      attrs['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
-      attrs['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
-    end
-
-    unless attrs.key?('doctitle') || !(val = doctitle)
-      attrs['doctitle'] = val
-    end
-
-    # css-signature cannot be updated after header attributes are processed
-    @id = attrs['css-signature'] unless @id
-
-    toc_position_val = if (toc_val = attrs.delete('toc2') ? 'left' : attrs['toc'])
-      # toc-placement allows us to separate position from using fitted slot vs macro
-      (toc_placement = attrs.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : attrs['toc-position']
-    else
-      nil
-    end
-
-    if toc_val && (!toc_val.empty? || !toc_position_val.nil_or_empty?)
-      default_toc_position = 'left'
-      # TODO rename toc2 to aside-toc
-      default_toc_class = 'toc2'
-      if !toc_position_val.nil_or_empty?
-        position = toc_position_val
-      elsif !toc_val.empty?
-        position = toc_val
-      else
-        position = default_toc_position
-      end
-      attrs['toc'] = ''
-      attrs['toc-placement'] = 'auto'
-      case position
-      when 'left', '<', '&lt;'
-        attrs['toc-position'] = 'left'
-      when 'right', '>', '&gt;'
-        attrs['toc-position'] = 'right'
-      when 'top', '^'
-        attrs['toc-position'] = 'top'
-      when 'bottom', 'v'
-        attrs['toc-position'] = 'bottom'
-      when 'preamble', 'macro'
-        attrs['toc-position'] = 'content'
-        attrs['toc-placement'] = position
-        default_toc_class = nil
-      else
-        attrs.delete 'toc-position'
-        default_toc_class = nil
-      end
-      attrs['toc-class'] ||= default_toc_class if default_toc_class
-    end
-
-    if (@compat_mode = attrs.key? 'compat-mode')
-      attrs['source-language'] = attrs['language'] if attrs.key? 'language'
-    end
-
-    # NOTE pin the outfilesuffix after the header is parsed
-    @outfilesuffix = attrs['outfilesuffix']
-
-    @header_attributes = attrs.dup
-
-    # unfreeze "flexible" attributes
-    unless @parent_document
-      FLEXIBLE_ATTRIBUTES.each do |name|
-        # turning a flexible attribute off should be permanent
-        # (we may need more config if that's not always the case)
-        if @attribute_overrides.key?(name) && @attribute_overrides[name]
-          @attribute_overrides.delete(name)
-        end
-      end
-    end
-  end
-
-  # Internal: Restore the attributes to the previously saved state (attributes in header)
-  def restore_attributes
-    @catalog[:callouts].rewind unless @parent_document
-    @attributes.replace @header_attributes
-  end
-
-  # Internal: Delete any attributes stored for playback
-  def clear_playback_attributes(attributes)
-    attributes.delete(:attribute_entries)
-  end
-
-  # Internal: Replay attribute assignments at the block level
+  # Public: Replay attribute assignments at the block level
   def playback_attributes(block_attributes)
     if block_attributes.key? :attribute_entries
       block_attributes[:attribute_entries].each do |entry|
@@ -932,6 +824,12 @@ class Document < AbstractBlock
         end
       end
     end
+  end
+
+  # Public: Restore the attributes to the previously saved state (attributes in header)
+  def restore_attributes
+    @catalog[:callouts].rewind unless @parent_document
+    @attributes.replace @header_attributes
   end
 
   # Public: Set the specified attribute on the document if the name is not locked
@@ -1012,151 +910,6 @@ class Document < AbstractBlock
       attrs[name] = value
       true
     end
-  end
-
-  # Internal: Apply substitutions to the attribute value
-  #
-  # If the value is an inline passthrough macro (e.g., pass:<subs>[value]),
-  # apply the substitutions defined in <subs> to the value, or leave the value
-  # unmodified if no substitutions are specified.  If the value is not an
-  # inline passthrough macro, apply header substitutions to the value.
-  #
-  # value - The String attribute value on which to perform substitutions
-  #
-  # Returns The String value with substitutions performed
-  def apply_attribute_value_subs value
-    if AttributeEntryPassMacroRx =~ value
-      $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
-    else
-      apply_header_subs value
-    end
-  end
-
-  # Public: Update the backend attributes to reflect a change in the active backend.
-  #
-  # This method also handles updating the related doctype attributes if the
-  # doctype attribute is assigned at the time this method is called.
-  #
-  # Returns the resolved String backend if updated, nothing otherwise.
-  def update_backend_attributes new_backend, force = nil
-    if force || (new_backend && new_backend != @backend)
-      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
-      if new_backend.start_with? 'xhtml'
-        attrs['htmlsyntax'] = 'xml'
-        new_backend = new_backend.slice 1, new_backend.length
-      elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
-      end
-      if (resolved_backend = BACKEND_ALIASES[new_backend])
-        new_backend = resolved_backend
-      end
-      if current_doctype
-        if current_backend
-          attrs.delete %(backend-#{current_backend})
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-        end
-        attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
-        attrs[%(doctype-#{current_doctype})] = ''
-      elsif current_backend
-        attrs.delete %(backend-#{current_backend})
-      end
-      attrs[%(backend-#{new_backend})] = ''
-      @backend = attrs['backend'] = new_backend
-      # (re)initialize converter
-      if Converter::BackendInfo === (@converter = create_converter)
-        new_basebackend = @converter.basebackend
-        attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
-        new_filetype = @converter.filetype
-      elsif @converter
-        new_basebackend = new_backend.sub TrailingDigitsRx, ''
-        if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
-          new_filetype = new_outfilesuffix.slice 1, new_outfilesuffix.length
-        else
-          new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
-        end
-        attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
-      else
-        # NOTE ideally we shouldn't need the converter before the converter phase, but we do
-        raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
-      end
-      if (current_filetype = attrs['filetype'])
-        attrs.delete %(filetype-#{current_filetype})
-      end
-      attrs['filetype'] = new_filetype
-      attrs[%(filetype-#{new_filetype})] = ''
-      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
-        attrs['pagewidth'] = page_width
-      else
-        attrs.delete 'pagewidth'
-      end
-      if new_basebackend != current_basebackend
-        if current_doctype
-          if current_basebackend
-            attrs.delete %(basebackend-#{current_basebackend})
-            attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          end
-          attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
-        elsif current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend})
-        end
-        attrs[%(basebackend-#{new_basebackend})] = ''
-        attrs['basebackend'] = new_basebackend
-      end
-      return new_backend
-    end
-  end
-
-  # TODO document me
-  #
-  # Returns the String doctype if updated, nothing otherwise.
-  def update_doctype_attributes new_doctype
-    if new_doctype && new_doctype != @doctype
-      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
-      if current_doctype
-        attrs.delete %(doctype-#{current_doctype})
-        if current_backend
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-          attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
-        end
-        if current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
-        end
-      else
-        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
-        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
-      end
-      attrs[%(doctype-#{new_doctype})] = ''
-      return @doctype = attrs['doctype'] = new_doctype
-    end
-  end
-
-  # TODO document me
-  def create_converter
-    converter_opts = {}
-    converter_opts[:htmlsyntax] = @attributes['htmlsyntax']
-    if (template_dir = @options[:template_dir])
-      template_dirs = [template_dir]
-    elsif (template_dirs = @options[:template_dirs])
-      template_dirs = Array template_dirs
-    end
-    if template_dirs
-      converter_opts[:template_dirs] = template_dirs
-      converter_opts[:template_cache] = @options.fetch :template_cache, true
-      converter_opts[:template_engine] = @options[:template_engine]
-      converter_opts[:template_engine_options] = @options[:template_engine_options]
-      converter_opts[:eruby] = @options[:eruby]
-      converter_opts[:safe] = @safe
-    end
-    if (converter = @options[:converter])
-      converter_factory = Converter::Factory.new backend => converter
-    else
-      converter_factory = Converter::Factory.default false
-    end
-    # QUESTION should we honor the convert_opts?
-    # QUESTION should we pass through all options and attributes too?
-    #converter_opts.update opts
-    converter_factory.create backend, converter_opts
   end
 
   # Public: Convert the AsciiDoc document using the templates
@@ -1316,17 +1069,6 @@ class Document < AbstractBlock
     end
   end
 
-  # Internal: Resolve the list of comma-delimited subs to apply to docinfo files.
-  #
-  # Resolve the list of substitutions from the value of the docinfosubs
-  # document attribute, if specified. Otherwise, return an Array containing
-  # the Symbol :attributes.
-  #
-  # Returns an [Array] of substitution [Symbol]s
-  def resolve_docinfo_subs
-    (@attributes.key? 'docinfosubs') ? (resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo') : [:attributes]
-  end
-
   def docinfo_processors?(location = :head)
     if @docinfo_processor_extensions.key?(location)
       # false means we already performed a lookup and didn't find any
@@ -1340,6 +1082,247 @@ class Document < AbstractBlock
 
   def to_s
     %(#<#{self.class}@#{object_id} {doctype: #{doctype.inspect}, doctitle: #{(@header != nil ? @header.title : nil).inspect}, blocks: #{@blocks.size}}>)
+  end
+
+  private
+
+  # Internal: Apply substitutions to the attribute value
+  #
+  # If the value is an inline passthrough macro (e.g., pass:<subs>[value]),
+  # apply the substitutions defined in <subs> to the value, or leave the value
+  # unmodified if no substitutions are specified.  If the value is not an
+  # inline passthrough macro, apply header substitutions to the value.
+  #
+  # value - The String attribute value on which to perform substitutions
+  #
+  # Returns The String value with substitutions performed
+  def apply_attribute_value_subs value
+    if AttributeEntryPassMacroRx =~ value
+      $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
+    else
+      apply_header_subs value
+    end
+  end
+
+  # Internal: Resolve the list of comma-delimited subs to apply to docinfo files.
+  #
+  # Resolve the list of substitutions from the value of the docinfosubs
+  # document attribute, if specified. Otherwise, return an Array containing
+  # the Symbol :attributes.
+  #
+  # Returns an [Array] of substitution [Symbol]s
+  def resolve_docinfo_subs
+    (@attributes.key? 'docinfosubs') ? (resolve_subs @attributes['docinfosubs'], :block, nil, 'docinfo') : [:attributes]
+  end
+
+  # Internal: Create and initialize an instance of the converter for this document
+  def create_converter
+    converter_opts = {}
+    converter_opts[:htmlsyntax] = @attributes['htmlsyntax']
+    if (template_dir = @options[:template_dir])
+      template_dirs = [template_dir]
+    elsif (template_dirs = @options[:template_dirs])
+      template_dirs = Array template_dirs
+    end
+    if template_dirs
+      converter_opts[:template_dirs] = template_dirs
+      converter_opts[:template_cache] = @options.fetch :template_cache, true
+      converter_opts[:template_engine] = @options[:template_engine]
+      converter_opts[:template_engine_options] = @options[:template_engine_options]
+      converter_opts[:eruby] = @options[:eruby]
+      converter_opts[:safe] = @safe
+    end
+    if (converter = @options[:converter])
+      converter_factory = Converter::Factory.new backend => converter
+    else
+      converter_factory = Converter::Factory.default false
+    end
+    # QUESTION should we honor the convert_opts?
+    # QUESTION should we pass through all options and attributes too?
+    #converter_opts.update opts
+    converter_factory.create backend, converter_opts
+  end
+
+  # Internal: Delete any attributes stored for playback
+  def clear_playback_attributes(attributes)
+    attributes.delete(:attribute_entries)
+  end
+
+  # Internal: Branch the attributes so that the original state can be restored
+  # at a future time.
+  def save_attributes
+    # enable toc and sectnums (i.e., numbered) by default in DocBook backend
+    # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
+    if (attrs = @attributes)['basebackend'] == 'docbook'
+      attrs['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
+      attrs['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
+    end
+
+    unless attrs.key?('doctitle') || !(val = doctitle)
+      attrs['doctitle'] = val
+    end
+
+    # css-signature cannot be updated after header attributes are processed
+    @id = attrs['css-signature'] unless @id
+
+    toc_position_val = if (toc_val = attrs.delete('toc2') ? 'left' : attrs['toc'])
+      # toc-placement allows us to separate position from using fitted slot vs macro
+      (toc_placement = attrs.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : attrs['toc-position']
+    else
+      nil
+    end
+
+    if toc_val && (!toc_val.empty? || !toc_position_val.nil_or_empty?)
+      default_toc_position = 'left'
+      # TODO rename toc2 to aside-toc
+      default_toc_class = 'toc2'
+      if !toc_position_val.nil_or_empty?
+        position = toc_position_val
+      elsif !toc_val.empty?
+        position = toc_val
+      else
+        position = default_toc_position
+      end
+      attrs['toc'] = ''
+      attrs['toc-placement'] = 'auto'
+      case position
+      when 'left', '<', '&lt;'
+        attrs['toc-position'] = 'left'
+      when 'right', '>', '&gt;'
+        attrs['toc-position'] = 'right'
+      when 'top', '^'
+        attrs['toc-position'] = 'top'
+      when 'bottom', 'v'
+        attrs['toc-position'] = 'bottom'
+      when 'preamble', 'macro'
+        attrs['toc-position'] = 'content'
+        attrs['toc-placement'] = position
+        default_toc_class = nil
+      else
+        attrs.delete 'toc-position'
+        default_toc_class = nil
+      end
+      attrs['toc-class'] ||= default_toc_class if default_toc_class
+    end
+
+    if (@compat_mode = attrs.key? 'compat-mode')
+      attrs['source-language'] = attrs['language'] if attrs.key? 'language'
+    end
+
+    # NOTE pin the outfilesuffix after the header is parsed
+    @outfilesuffix = attrs['outfilesuffix']
+
+    @header_attributes = attrs.dup
+
+    # unfreeze "flexible" attributes
+    unless @parent_document
+      FLEXIBLE_ATTRIBUTES.each do |name|
+        # turning a flexible attribute off should be permanent
+        # (we may need more config if that's not always the case)
+        if @attribute_overrides.key?(name) && @attribute_overrides[name]
+          @attribute_overrides.delete(name)
+        end
+      end
+    end
+  end
+
+  # Internal: Update the backend attributes to reflect a change in the active backend.
+  #
+  # This method also handles updating the related doctype attributes if the
+  # doctype attribute is assigned at the time this method is called.
+  #
+  # Returns the resolved String backend if updated, nothing otherwise.
+  def update_backend_attributes new_backend, force = nil
+    if force || (new_backend && new_backend != @backend)
+      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
+      if new_backend.start_with? 'xhtml'
+        attrs['htmlsyntax'] = 'xml'
+        new_backend = new_backend.slice 1, new_backend.length
+      elsif new_backend.start_with? 'html'
+        attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
+      end
+      if (resolved_backend = BACKEND_ALIASES[new_backend])
+        new_backend = resolved_backend
+      end
+      if current_doctype
+        if current_backend
+          attrs.delete %(backend-#{current_backend})
+          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+        end
+        attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+        attrs[%(doctype-#{current_doctype})] = ''
+      elsif current_backend
+        attrs.delete %(backend-#{current_backend})
+      end
+      attrs[%(backend-#{new_backend})] = ''
+      @backend = attrs['backend'] = new_backend
+      # (re)initialize converter
+      if Converter::BackendInfo === (@converter = create_converter)
+        new_basebackend = @converter.basebackend
+        attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+        new_filetype = @converter.filetype
+      elsif @converter
+        new_basebackend = new_backend.sub TrailingDigitsRx, ''
+        if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
+          new_filetype = new_outfilesuffix.slice 1, new_outfilesuffix.length
+        else
+          new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
+        end
+        attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
+      else
+        # NOTE ideally we shouldn't need the converter before the converter phase, but we do
+        raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
+      end
+      if (current_filetype = attrs['filetype'])
+        attrs.delete %(filetype-#{current_filetype})
+      end
+      attrs['filetype'] = new_filetype
+      attrs[%(filetype-#{new_filetype})] = ''
+      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
+        attrs['pagewidth'] = page_width
+      else
+        attrs.delete 'pagewidth'
+      end
+      if new_basebackend != current_basebackend
+        if current_doctype
+          if current_basebackend
+            attrs.delete %(basebackend-#{current_basebackend})
+            attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+          end
+          attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
+        elsif current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend})
+        end
+        attrs[%(basebackend-#{new_basebackend})] = ''
+        attrs['basebackend'] = new_basebackend
+      end
+      return new_backend
+    end
+  end
+
+  # Internal: Update the doctype and backend attributes to reflect a change in the active doctype.
+  #
+  # Returns the String doctype if updated, nothing otherwise.
+  def update_doctype_attributes new_doctype
+    if new_doctype && new_doctype != @doctype
+      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
+      if current_doctype
+        attrs.delete %(doctype-#{current_doctype})
+        if current_backend
+          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+          attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
+        end
+        if current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+          attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
+        end
+      else
+        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
+        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
+      end
+      attrs[%(doctype-#{new_doctype})] = ''
+      return @doctype = attrs['doctype'] = new_doctype
+    end
   end
 end
 end

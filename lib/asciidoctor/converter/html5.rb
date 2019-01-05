@@ -1197,6 +1197,8 @@ Your browser does not support the video tag.
       end
     end
 
+    private
+
     def append_boolean_attribute name, xml
       xml ? %( #{name}="#{name}") : %( #{name})
     end

@@ -1338,7 +1338,7 @@ module Extensions
       else
         processor, config = resolve_args args, 2
         # style 2: specified as Class or String class name
-        if (processor_class = Extensions.resolve_class processor)
+        if (processor_class = Helpers.resolve_class processor)
           unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
@@ -1390,7 +1390,7 @@ module Extensions
       else
         processor, name, config = resolve_args args, 3
         # style 2: specified as Class or String class name
-        if (processor_class = Extensions.resolve_class processor)
+        if (processor_class = Helpers.resolve_class processor)
           unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
@@ -1496,7 +1496,7 @@ module Extensions
         resolved_group = block
       elsif (group = args.pop)
         # QUESTION should we instantiate the group class here or defer until activation??
-        resolved_group = (resolve_class group) || group
+        resolved_group = (Helpers.resolve_class group) || group
       else
         raise ::ArgumentError, %(Extension group to register not specified)
       end
@@ -1523,32 +1523,6 @@ module Extensions
     def unregister *names
       names.each {|group| @groups.delete group.to_sym }
       nil
-    end
-
-    # Internal: Resolve the specified object as a Class
-    #
-    # object - The object to resolve as a Class
-    #
-    # Returns a Class if the specified object is a Class (but not a Module) or
-    # a String that resolves to a Class; otherwise, nil
-    def resolve_class object
-      case object
-      when ::Class
-        object
-      when ::String
-        class_for_name object
-      end
-    end
-
-    # Public: Resolves the Class object for the qualified name.
-    #
-    # Returns Class
-    def class_for_name qualified_name
-      resolved = ::Object.const_get qualified_name, false
-      raise unless ::Class === resolved
-      resolved
-    rescue
-      raise ::NameError, %(Could not resolve class for name: #{qualified_name})
     end
   end
 end

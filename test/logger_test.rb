@@ -137,7 +137,7 @@ context 'Logger' do
         include SampleModuleA
       end
       assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.get_logger
-      assert SampleClassA.private_method_defined? :logger
+      assert SampleClassA.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on module access to logging infrastructure' do
@@ -160,7 +160,7 @@ context 'Logger' do
       end
 
       assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.get_logger
-      assert SampleClassC.private_method_defined? :logger
+      assert SampleClassC.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on class access to logging infrastructure' do

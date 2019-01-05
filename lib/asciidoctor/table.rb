@@ -629,7 +629,9 @@ class Table::ParserContext
     nil
   end
 
-  # Public: Close the row by adding it to the Table and resetting the row
+  private
+
+  # Internal: Close the row by adding it to the Table and resetting the row
   # Array and counter variables.
   #
   # returns nothing
@@ -645,7 +647,7 @@ class Table::ParserContext
     nil
   end
 
-  # Public: Activate a rowspan. The rowspan Array is consulted when
+  # Internal: Activate a rowspan. The rowspan Array is consulted when
   # determining the effective number of cells in the current row.
   #
   # returns nothing
@@ -657,12 +659,12 @@ class Table::ParserContext
     nil
   end
 
-  # Public: Check whether we've met the number of effective columns for the current row.
+  # Internal: Check whether we've met the number of effective columns for the current row.
   def end_of_row?
     @colcount == -1 || effective_column_visits == @colcount
   end
 
-  # Public: Calculate the effective column visits, which consists of the number of
+  # Internal: Calculate the effective column visits, which consists of the number of
   # cells plus any active rowspans.
   def effective_column_visits
     @column_visits + @active_rowspans[0]

@@ -169,56 +169,6 @@ class AbstractBlock < AbstractNode
 
   alias query find_by
 
-  # Internal: Performs the work for find_by, but does not handle the StopIteration exception.
-  def find_by_internal selector = {}, result = [], &block
-    if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
-        (!(style_selector = selector[:style]) || style_selector == @style) &&
-        (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
-        (!(id_selector = selector[:id]) || id_selector == @id)
-      if id_selector
-        result.replace block_given? ? ((yield self) ? [self] : []) : [self]
-        raise ::StopIteration
-      elsif block_given?
-        if (verdict = yield self)
-          case verdict
-          when :skip_children
-            result << self
-            return result
-          when :skip
-            return result
-          else
-            result << self
-          end
-        end
-      else
-        result << self
-      end
-    end
-
-    # process document header as a section if present
-    if @context == :document && (any_context || context_selector == :section) && header?
-      @header.find_by_internal selector, result, &block
-    end
-
-    unless context_selector == :document # optimization
-      # yuck, dlist is a special case
-      if @context == :dlist
-        if any_context || context_selector != :section # optimization
-          @blocks.flatten.each do |li|
-            # NOTE the list item of a dlist can be nil, so we have to check
-            li.find_by_internal selector, result, &block if li
-          end
-        end
-      elsif
-        @blocks.each do |b|
-          next if (context_selector == :section && b.context != :section) # optimization
-          b.find_by_internal selector, result, &block
-        end
-      end
-    end
-    result
-  end
-
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
   def next_adjacent_block
@@ -474,6 +424,56 @@ class AbstractBlock < AbstractNode
         block.reindex_sections
       end
     end
+  end
+
+  # Internal: Performs the work for find_by, but does not handle the StopIteration exception.
+  protected def find_by_internal selector = {}, result = [], &block
+    if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
+        (!(style_selector = selector[:style]) || style_selector == @style) &&
+        (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
+        (!(id_selector = selector[:id]) || id_selector == @id)
+      if id_selector
+        result.replace block_given? ? ((yield self) ? [self] : []) : [self]
+        raise ::StopIteration
+      elsif block_given?
+        if (verdict = yield self)
+          case verdict
+          when :skip_children
+            result << self
+            return result
+          when :skip
+            return result
+          else
+            result << self
+          end
+        end
+      else
+        result << self
+      end
+    end
+
+    # process document header as a section if present
+    if @context == :document && (any_context || context_selector == :section) && header?
+      @header.find_by_internal selector, result, &block
+    end
+
+    unless context_selector == :document # optimization
+      # yuck, dlist is a special case
+      if @context == :dlist
+        if any_context || context_selector != :section # optimization
+          @blocks.flatten.each do |li|
+            # NOTE the list item of a dlist can be nil, so we have to check
+            li.find_by_internal selector, result, &block if li
+          end
+        end
+      elsif
+        @blocks.each do |b|
+          next if (context_selector == :section && b.context != :section) # optimization
+          b.find_by_internal selector, result, &block
+        end
+      end
+    end
+    result
   end
 end
 end

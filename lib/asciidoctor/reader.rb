@@ -68,43 +68,6 @@ class Reader
     @saved = nil
   end
 
-  # Internal: Prepare the lines from the provided data
-  #
-  # This method strips whitespace from the end of every line of
-  # the source data and appends a LF (i.e., Unix endline). This
-  # whitespace substitution is very important to how Asciidoctor
-  # works.
-  #
-  # Any leading or trailing blank lines are also removed.
-  #
-  # data - A String Array of input data to be normalized
-  # opts - A Hash of options to control what cleansing is done
-  #
-  # Returns The String lines extracted from the data
-  def prepare_lines data, opts = {}
-    if opts[:normalize]
-      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data)
-    elsif ::String === data
-      data.split LF, -1
-    else
-      data.drop 0
-    end
-  end
-
-  # Internal: Processes a previously unvisited line
-  #
-  # By default, this method marks the line as processed
-  # by incrementing the look_ahead counter and returns
-  # the line unmodified.
-  #
-  # Returns The String line the Reader should make available to the next
-  # invocation of Reader#read_line or nil if the Reader should drop the line,
-  # advance to the next line and process it.
-  def process_line line
-    @look_ahead += 1 if @process_lines
-    line
-  end
-
   # Public: Check whether there are any lines left to read.
   #
   # If a previous call to this method resulted in a value of false,
@@ -565,6 +528,7 @@ class Reader
     @source_lines.join LF
   end
 
+  # Internal: Save the state of the reader at cursor
   def save
     accum = {}
     instance_variables.each do |name|
@@ -574,6 +538,7 @@ class Reader
     nil
   end
 
+  # Internal: Restore the state of the reader at cursor
   def restore_save
     if @saved
       @saved.each do |name, val|
@@ -583,6 +548,7 @@ class Reader
     end
   end
 
+  # Internal: Discard a previous saved state
   def discard_save
     @saved = nil
   end
@@ -592,6 +558,45 @@ class Reader
   #
   # Returns A string summary of this reader, which contains the path and line information
   alias to_s line_info
+
+  private
+
+  # Internal: Prepare the lines from the provided data
+  #
+  # This method strips whitespace from the end of every line of
+  # the source data and appends a LF (i.e., Unix endline). This
+  # whitespace substitution is very important to how Asciidoctor
+  # works.
+  #
+  # Any leading or trailing blank lines are also removed.
+  #
+  # data - A String Array of input data to be normalized
+  # opts - A Hash of options to control what cleansing is done
+  #
+  # Returns The String lines extracted from the data
+  def prepare_lines data, opts = {}
+    if opts[:normalize]
+      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data)
+    elsif ::String === data
+      data.split LF, -1
+    else
+      data.drop 0
+    end
+  end
+
+  # Internal: Processes a previously unvisited line
+  #
+  # By default, this method marks the line as processed
+  # by incrementing the look_ahead counter and returns
+  # the line unmodified.
+  #
+  # Returns The String line the Reader should make available to the next
+  # invocation of Reader#read_line or nil if the Reader should drop the line,
+  # advance to the next line and process it.
+  def process_line line
+    @look_ahead += 1 if @process_lines
+    line
+  end
 end
 
 # Public: Methods for retrieving lines from AsciiDoc source files, evaluating preprocessor
@@ -613,6 +618,166 @@ class PreprocessorReader < Reader
     @conditional_stack = []
     @include_processor_extensions = nil
   end
+
+  # (see Reader#has_more_lines?)
+  def has_more_lines?
+    peek_line ? true : false
+  end
+
+  # (see Reader#empty?)
+  def empty?
+    peek_line ? false : true
+  end
+  alias eof? empty?
+
+  # Public: Override the Reader#peek_line method to pop the include
+  # stack if the last line has been reached and there's at least
+  # one include on the stack.
+  #
+  # Returns the next line of the source data as a String if there are lines remaining
+  # in the current include context or a parent include context.
+  # Returns nothing if there are no more lines remaining and the include stack is empty.
+  def peek_line direct = false
+    if (line = super)
+      line
+    elsif @include_stack.empty?
+      nil
+    else
+      pop_include
+      peek_line direct
+    end
+  end
+
+  # Public: Push source onto the front of the reader and switch the context
+  # based on the file, document-relative path and line information given.
+  #
+  # This method is typically used in an IncludeProcessor to add source
+  # read from the target specified.
+  #
+  # Examples
+  #
+  #    path = 'partial.adoc'
+  #    file = File.expand_path path
+  #    data = IO.read file
+  #    reader.push_include data, file, path
+  #
+  # Returns this Reader object.
+  def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
+    @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
+    if (@file = file)
+      # NOTE if file is not a string, assume it's a URI
+      if ::String === file
+        @dir = ::File.dirname file
+      elsif RUBY_ENGINE_OPAL
+        @dir = ::URI.parse ::File.dirname(file = file.to_s)
+      else
+        # NOTE this intentionally throws an error if URI has no path
+        (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
+        file = file.to_s
+      end
+      path ||= ::File.basename file
+      # only process lines in AsciiDoc files
+      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
+    else
+      @dir = '.'
+      # we don't know what file type we have, so assume AsciiDoc
+      @process_lines = true
+    end
+
+    if path
+      @path = path
+      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
+    else
+      @path = '<stdin>'
+    end
+
+    @lineno = lineno
+
+    if attributes.key? 'depth'
+      depth = attributes['depth'].to_i
+      depth = 1 if depth <= 0
+      @maxdepth = { abs: (@include_stack.size - 1) + depth, rel: depth }
+    end
+
+    # effectively fill the buffer
+    if (@lines = prepare_lines data, normalize: true, condense: false, indent: attributes['indent']).empty?
+      pop_include
+    else
+      # FIXME we eventually want to handle leveloffset without affecting the lines
+      if attributes.key? 'leveloffset'
+        @lines.unshift ''
+        @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
+        @lines << ''
+        if (old_leveloffset = @document.attr 'leveloffset')
+          @lines << %(:leveloffset: #{old_leveloffset})
+        else
+          @lines << ':leveloffset!:'
+        end
+        # compensate for these extra lines
+        @lineno -= 2
+      end
+
+      # FIXME kind of a hack
+      #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
+      #Document::AttributeEntry.new('indir', @dir).save_to_next_block @document
+      @look_ahead = 0
+    end
+    self
+  end
+
+  def include_depth
+    @include_stack.size
+  end
+
+  def exceeded_max_depth?
+    if (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
+      @maxdepth[:rel]
+    else
+      false
+    end
+  end
+
+  # TODO Document this override
+  # also, we now have the field in the super class, so perhaps
+  # just implement the logic there?
+  def shift
+    if @unescape_next_line
+      @unescape_next_line = false
+      (line = super).slice 1, line.length
+    else
+      super
+    end
+  end
+
+  def include_processors?
+    if @include_processor_extensions.nil?
+      if @document.extensions? && @document.extensions.include_processors?
+        !!(@include_processor_extensions = @document.extensions.include_processors)
+      else
+        @include_processor_extensions = false
+      end
+    else
+      @include_processor_extensions != false
+    end
+  end
+
+  def create_include_cursor file, path, lineno
+    if ::String === file
+      dir = ::File.dirname file
+    elsif RUBY_ENGINE_OPAL
+      dir = ::File.dirname(file = file.to_s)
+    else
+      dir = (dir = ::File.dirname file.path) == '' ? '/' : dir
+      file = file.to_s
+    end
+    Cursor.new file, dir, path, lineno
+  end
+
+  def to_s
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
+  end
+
+  private
 
   def prepare_lines data, opts = {}
     result = super
@@ -694,35 +859,6 @@ class PreprocessorReader < Reader
       # NOTE optimization to inline super
       @look_ahead += 1
       line
-    end
-  end
-
-  # (see Reader#has_more_lines?)
-  def has_more_lines?
-    peek_line ? true : false
-  end
-
-  # (see Reader#empty?)
-  def empty?
-    peek_line ? false : true
-  end
-  alias eof? empty?
-
-  # Public: Override the Reader#peek_line method to pop the include
-  # stack if the last line has been reached and there's at least
-  # one include on the stack.
-  #
-  # Returns the next line of the source data as a String if there are lines remaining
-  # in the current include context or a parent include context.
-  # Returns nothing if there are no more lines remaining and the include stack is empty.
-  def peek_line direct = false
-    if (line = super)
-      line
-    elsif @include_stack.empty?
-      nil
-    else
-      pop_include
-      peek_line direct
     end
   end
 
@@ -1088,95 +1224,6 @@ class PreprocessorReader < Reader
     end
   end
 
-  # Public: Push source onto the front of the reader and switch the context
-  # based on the file, document-relative path and line information given.
-  #
-  # This method is typically used in an IncludeProcessor to add source
-  # read from the target specified.
-  #
-  # Examples
-  #
-  #    path = 'partial.adoc'
-  #    file = File.expand_path path
-  #    data = IO.read file
-  #    reader.push_include data, file, path
-  #
-  # Returns this Reader object.
-  def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
-    @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
-    if (@file = file)
-      # NOTE if file is not a string, assume it's a URI
-      if ::String === file
-        @dir = ::File.dirname file
-      elsif RUBY_ENGINE_OPAL
-        @dir = ::URI.parse ::File.dirname(file = file.to_s)
-      else
-        # NOTE this intentionally throws an error if URI has no path
-        (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
-        file = file.to_s
-      end
-      path ||= ::File.basename file
-      # only process lines in AsciiDoc files
-      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
-    else
-      @dir = '.'
-      # we don't know what file type we have, so assume AsciiDoc
-      @process_lines = true
-    end
-
-    if path
-      @path = path
-      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
-    else
-      @path = '<stdin>'
-    end
-
-    @lineno = lineno
-
-    if attributes.key? 'depth'
-      depth = attributes['depth'].to_i
-      depth = 1 if depth <= 0
-      @maxdepth = { abs: (@include_stack.size - 1) + depth, rel: depth }
-    end
-
-    # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: true, condense: false, indent: attributes['indent']).empty?
-      pop_include
-    else
-      # FIXME we eventually want to handle leveloffset without affecting the lines
-      if attributes.key? 'leveloffset'
-        @lines.unshift ''
-        @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
-        @lines << ''
-        if (old_leveloffset = @document.attr 'leveloffset')
-          @lines << %(:leveloffset: #{old_leveloffset})
-        else
-          @lines << ':leveloffset!:'
-        end
-        # compensate for these extra lines
-        @lineno -= 2
-      end
-
-      # FIXME kind of a hack
-      #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-      #Document::AttributeEntry.new('indir', @dir).save_to_next_block @document
-      @look_ahead = 0
-    end
-    self
-  end
-
-  def create_include_cursor file, path, lineno
-    if ::String === file
-      dir = ::File.dirname file
-    elsif RUBY_ENGINE_OPAL
-      dir = ::File.dirname(file = file.to_s)
-    else
-      dir = (dir = ::File.dirname file.path) == '' ? '/' : dir
-      file = file.to_s
-    end
-    Cursor.new file, dir, path, lineno
-  end
-
   def pop_include
     if @include_stack.size > 0
       @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
@@ -1185,30 +1232,6 @@ class PreprocessorReader < Reader
       #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
       @look_ahead = 0
       nil
-    end
-  end
-
-  def include_depth
-    @include_stack.size
-  end
-
-  def exceeded_max_depth?
-    if (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
-      @maxdepth[:rel]
-    else
-      false
-    end
-  end
-
-  # TODO Document this override
-  # also, we now have the field in the super class, so perhaps
-  # just implement the logic there?
-  def shift
-    if @unescape_next_line
-      @unescape_next_line = false
-      (line = super).slice 1, line.length
-    else
-      super
     end
   end
 
@@ -1303,22 +1326,6 @@ class PreprocessorReader < Reader
       # require string values to be explicitly quoted
       val.to_i
     end
-  end
-
-  def include_processors?
-    if @include_processor_extensions.nil?
-      if @document.extensions? && @document.extensions.include_processors?
-        !!(@include_processor_extensions = @document.extensions.include_processors)
-      else
-        @include_processor_extensions = false
-      end
-    else
-      @include_processor_extensions != false
-    end
-  end
-
-  def to_s
-    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
   end
 end
 end

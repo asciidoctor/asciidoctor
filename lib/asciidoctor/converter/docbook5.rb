@@ -638,6 +638,8 @@ module Asciidoctor
       end
     end
 
+    private
+
     def common_attributes id, role = nil, reftext = nil
       attrs = id ? %( xml:id="#{id}") : ''
       attrs = %(#{attrs} role="#{role}") if role

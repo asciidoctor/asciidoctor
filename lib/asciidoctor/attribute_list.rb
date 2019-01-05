@@ -94,6 +94,8 @@ class AttributeList
     attributes
   end
 
+  private
+
   def parse_attribute index = 0, pos_attrs = []
     single_quoted_value = false
     skip_blank

@@ -51,6 +51,8 @@ module Asciidoctor
       end
     end
 
+    private
+
     def author_tag author
       result = []
       result << '<author>'
