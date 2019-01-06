@@ -1706,7 +1706,7 @@ EOS
       test 'should convert contents of asciimath macro to MathML in DocBook output if asciimath gem is available' do
         asciimath_available = !(Asciidoctor::Helpers.require_library 'asciimath', true, :ignore).nil?
         input = 'asciimath:[a < b]'
-        expected = '<inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>a</mml:mi><mml:mo>&#x003C;</mml:mo><mml:mi>b</mml:mi></mml:math></inlineequation>'
+        expected = '<inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>a</mml:mi><mml:mo>&lt;</mml:mo><mml:mi>b</mml:mi></mml:math></inlineequation>'
         using_memory_logger do |logger|
           para = block_from_string input, :backend => :docbook
           actual = para.content
