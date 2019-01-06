@@ -1291,7 +1291,7 @@ a| paragraph
     test 'preprocessor directive on first line of an AsciiDoc table cell should be processed' do
       input = <<-EOS
 |===
-a|include::fixtures/include-file.asciidoc[]
+a|include::fixtures/include-file.adoc[]
 |===
       EOS
 

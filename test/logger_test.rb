@@ -94,7 +94,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.load_file fixture_path('basic.asciidoc'), logger: new_logger
+        Asciidoctor.load_file fixture_path('basic.adoc'), logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -116,7 +116,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.convert_file fixture_path('basic.asciidoc'), to_file: false, logger: new_logger
+        Asciidoctor.convert_file fixture_path('basic.adoc'), to_file: false, logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger

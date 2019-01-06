@@ -48,7 +48,7 @@ class Minitest::Test
   def sample_doc_path(name)
     name = name.to_s
     unless name.include?('.')
-      ['asciidoc', 'txt'].each do |ext|
+      ['adoc', 'asciidoc', 'txt'].each do |ext|
         if File.exist?(fixture_path("#{name}.#{ext}"))
           name = "#{name}.#{ext}"
           break
@@ -267,11 +267,11 @@ class Minitest::Test
     invoker
   end
 
-  def invoke_cli_to_buffer(argv = [], filename = 'sample.asciidoc', &block)
+  def invoke_cli_to_buffer(argv = [], filename = 'sample.adoc', &block)
     invoke_cli(argv, filename, [StringIO.new, StringIO.new], &block)
   end
 
-  def invoke_cli(argv = [], filename = 'sample.asciidoc', buffers = nil, &block)
+  def invoke_cli(argv = [], filename = 'sample.adoc', buffers = nil, &block)
     if filename.nil? || filename == '-' || ::Pathname.new(filename).absolute?
       filepath = filename
     else

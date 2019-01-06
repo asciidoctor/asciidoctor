@@ -600,16 +600,16 @@ preamble
     context 'Include Directive' do
       test 'include directive is disabled by default and becomes a link' do
         input = <<-EOS
-include::include-file.asciidoc[]
+include::include-file.adoc[]
         EOS
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        assert_equal 'link:include-file.asciidoc[]', reader.read_line
+        assert_equal 'link:include-file.adoc[]', reader.read_line
       end
 
       test 'include directive is enabled when safe mode is less than SECURE' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[]
+include::fixtures/include-file.adoc[]
         EOS
 
         doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
@@ -631,11 +631,11 @@ include::fixtures/circle.svg[]
 
       test 'include directive should resolve file with spaces in name' do
         input = <<-EOS
-include::fixtures/include file.asciidoc[]
+include::fixtures/include file.adoc[]
         EOS
 
-        include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
-        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
+        include_file = File.join DIRNAME, 'fixtures', 'include-file.adoc'
+        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.adoc'
         begin
           FileUtils.cp include_file, include_file_with_sp
           doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
@@ -648,11 +648,11 @@ include::fixtures/include file.asciidoc[]
 
       test 'include directive should resolve file with {sp} in name' do
         input = <<-EOS
-include::fixtures/include{sp}file.asciidoc[]
+include::fixtures/include{sp}file.adoc[]
         EOS
 
-        include_file = File.join DIRNAME, 'fixtures', 'include-file.asciidoc'
-        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.asciidoc'
+        include_file = File.join DIRNAME, 'fixtures', 'include-file.adoc'
+        include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.adoc'
         begin
           FileUtils.cp include_file, include_file_with_sp
           doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
@@ -722,6 +722,18 @@ include::fixtures/parent-include.adoc[]
         assert_equal parent_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
+      end
+
+      test 'include directive should process lines when file extension of target is .asciidoc' do
+        input = <<-EOS
+include::fixtures/include-alt-extension.asciidoc[]
+        EOS
+
+        doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+        assert_equal 3, doc.blocks.size
+        assert_equal ['first line'], doc.blocks[0].lines
+        assert_equal ['Asciidoctor!'], doc.blocks[1].lines
+        assert_equal ['last line'], doc.blocks[2].lines
       end
 
       test 'missing file referenced by include directive is skipped when optional option is set' do
@@ -926,7 +938,7 @@ include::#{url}[]
 
       test 'include directive supports selecting lines by line number' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
+include::fixtures/include-file.adoc[lines=1;3..4;6..-1]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -943,7 +955,7 @@ include::fixtures/include-file.asciidoc[lines=1;3..4;6..-1]
 
       test 'include directive supports line ranges specified in quoted attribute value' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
+include::fixtures/include-file.adoc[lines="1, 3..4 , 6 .. -1"]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -960,7 +972,7 @@ include::fixtures/include-file.asciidoc[lines="1, 3..4 , 6 .. -1"]
 
       test 'include directive supports implicit endless range' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[lines=6..]
+include::fixtures/include-file.adoc[lines=6..]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -978,7 +990,7 @@ include::fixtures/include-file.asciidoc[lines=6..]
       test 'include directive ignores empty lines attribute' do
         input = <<-EOS
 ++++
-include::fixtures/include-file.asciidoc[lines=]
+include::fixtures/include-file.adoc[lines=]
 ++++
         EOS
 
@@ -989,7 +1001,7 @@ include::fixtures/include-file.asciidoc[lines=]
 
       test 'include directive supports selecting lines by tag' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tag=snippetA]
+include::fixtures/include-file.adoc[tag=snippetA]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -1001,7 +1013,7 @@ include::fixtures/include-file.asciidoc[tag=snippetA]
 
       test 'include directive supports selecting lines by tags' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tags=snippetA;snippetB]
+include::fixtures/include-file.adoc[tags=snippetA;snippetB]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -1069,7 +1081,7 @@ include::#{tmp_include_path}[tag=include-me]
       test 'include directive does not select lines with tag directives within selected tag region' do
         input = <<-EOS
 ++++
-include::fixtures/include-file.asciidoc[tags=snippet]
+include::fixtures/include-file.adoc[tags=snippet]
 ++++
         EOS
 
@@ -1215,7 +1227,7 @@ end)
 
       test 'should warn if specified tag is not found in include file' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[tag=no-such-tag]
+include::fixtures/include-file.adoc[tag=no-such-tag]
         EOS
 
         using_memory_logger do |logger|
@@ -1227,7 +1239,7 @@ include::fixtures/include-file.asciidoc[tag=no-such-tag]
       test 'should warn if specified tags are not found in include file' do
         input = <<-EOS
 ++++
-include::fixtures/include-file.asciidoc[tags=no-such-tag-b;no-such-tag-a]
+include::fixtures/include-file.adoc[tags=no-such-tag-b;no-such-tag-a]
 ++++
         EOS
 
@@ -1300,7 +1312,7 @@ include::fixtures/include-file.xml[#{attr_name}=]
 
       test 'lines attribute takes precedence over tags attribute in include directive' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[lines=1, tags=snippetA;snippetB]
+include::fixtures/include-file.adoc[lines=1, tags=snippetA;snippetB]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -1325,7 +1337,7 @@ include::fixtures/basic-docinfo.xml[lines=2..3, indent=0]
       test 'should substitute attribute references in attrlist' do
         input = <<-EOS
 :name-of-tag: snippetA
-include::fixtures/include-file.asciidoc[tag={name-of-tag}]
+include::fixtures/include-file.adoc[tag={name-of-tag}]
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
@@ -1337,7 +1349,7 @@ include::fixtures/include-file.asciidoc[tag={name-of-tag}]
 
       test 'should fall back to built-in include directive behavior when not handled by include processor' do
         input = <<-EOS
-include::fixtures/include-file.asciidoc[]
+include::fixtures/include-file.adoc[]
         EOS
 
         include_processor = Class.new {
@@ -1387,7 +1399,7 @@ content
       test 'attributes are substituted in target of include directive' do
         input = <<-EOS
 :fixturesdir: fixtures
-:ext: asciidoc
+:ext: adoc
 
 include::{fixturesdir}/include-file.{ext}[]
         EOS
@@ -1399,21 +1411,21 @@ include::{fixturesdir}/include-file.{ext}[]
 
       test 'line is skipped by default if target of include directive resolves to empty' do
         input = <<-EOS
-include::{foodir}/include-file.asciidoc[]
+include::{foodir}/include-file.adoc[]
         EOS
 
         using_memory_logger do |logger|
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
-          assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.asciidoc[]', line
+          assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.adoc[]', line
           assert_message logger, :WARN, 'dropping line containing reference to missing attribute: foodir'
         end
       end
 
       test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
         input = <<-EOS
-include::{foodir}/include-file.asciidoc[]
+include::{foodir}/include-file.adoc[]
         EOS
 
         using_memory_logger do |logger|
@@ -1427,7 +1439,7 @@ include::{foodir}/include-file.asciidoc[]
 
       test 'line following dropped include is not dropped' do
         input = <<-EOS
-include::{foodir}/include-file.asciidoc[]
+include::{foodir}/include-file.adoc[]
 yo
         EOS
 
@@ -1442,48 +1454,48 @@ yo
 
       test 'escaped include directive is left unprocessed' do
         input = <<-EOS
-\\include::fixtures/include-file.asciidoc[]
+\\include::fixtures/include-file.adoc[]
 \\escape preserved here
         EOS
         doc = empty_safe_document base_dir: DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
         # we should be able to peek it multiple times and still have the backslash preserved
         # this is the test for @unescape_next_line
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.peek_line
-        assert_equal 'include::fixtures/include-file.asciidoc[]', reader.read_line
+        assert_equal 'include::fixtures/include-file.adoc[]', reader.peek_line
+        assert_equal 'include::fixtures/include-file.adoc[]', reader.peek_line
+        assert_equal 'include::fixtures/include-file.adoc[]', reader.read_line
         assert_equal '\\escape preserved here', reader.read_line
       end
 
       test 'include directive not at start of line is ignored' do
         input = <<-EOS
- include::include-file.asciidoc[]
+ include::include-file.adoc[]
         EOS
         para = block_from_string input
         assert_equal 1, para.lines.size
         # NOTE the space gets stripped because the line is treated as an inline literal
         assert_equal :literal, para.context
-        assert_equal 'include::include-file.asciidoc[]', para.source
+        assert_equal 'include::include-file.adoc[]', para.source
       end
 
       test 'include directive is disabled when max-include-depth attribute is 0' do
         input = <<-EOS
-include::include-file.asciidoc[]
+include::include-file.adoc[]
         EOS
         para = block_from_string input, safe: :safe, attributes: { 'max-include-depth' => 0 }
         assert_equal 1, para.lines.size
-        assert_equal 'include::include-file.asciidoc[]', para.source
+        assert_equal 'include::include-file.adoc[]', para.source
       end
 
       test 'max-include-depth cannot be set by document' do
         input = <<-EOS
 :max-include-depth: 1
 
-include::include-file.asciidoc[]
+include::include-file.adoc[]
         EOS
         para = block_from_string input, safe: :safe, attributes: { 'max-include-depth' => 0 }
         assert_equal 1, para.lines.size
-        assert_equal 'include::include-file.asciidoc[]', para.source
+        assert_equal 'include::include-file.adoc[]', para.source
       end
 
       test 'include directive should be disabled if max include depth has been exceeded' do
@@ -1685,7 +1697,7 @@ There was much rejoicing.
 
       test 'ifdef with defined attribute processes include directive in brackets' do
         input = <<-EOS
-ifdef::asciidoctor-version[include::fixtures/include-file.asciidoc[tag=snippetA]]
+ifdef::asciidoctor-version[include::fixtures/include-file.adoc[tag=snippetA]]
         EOS
 
         doc = Asciidoctor::Document.new input, safe: :safe, base_dir: DIRNAME

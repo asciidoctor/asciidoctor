@@ -894,10 +894,10 @@ of the attribute named foo in your document.
       EOS
 
       docdir = Dir.pwd
-      docfile = File.join(docdir, 'sample.asciidoc')
+      docfile = File.join(docdir, 'sample.adoc')
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => docdir, 'docfile' => docfile }
       assert_xpath '//li[1]/p[text()="docdir: "]', output, 1
-      assert_xpath '//li[2]/p[text()="docfile: sample.asciidoc"]', output, 1
+      assert_xpath '//li[2]/p[text()="docfile: sample.adoc"]', output, 1
     end
 
     test 'shows absolute docdir and docfile paths if safe mode is less than SERVER' do
@@ -907,7 +907,7 @@ of the attribute named foo in your document.
       EOS
 
       docdir = Dir.pwd
-      docfile = File.join(docdir, 'sample.asciidoc')
+      docfile = File.join(docdir, 'sample.adoc')
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => docdir, 'docfile' => docfile }
       assert_xpath %(//li[1]/p[text()="docdir: #{docdir}"]), output, 1
       assert_xpath %(//li[2]/p[text()="docfile: #{docfile}"]), output, 1

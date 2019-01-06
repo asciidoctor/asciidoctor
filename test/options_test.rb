@@ -78,80 +78,80 @@ context 'Options' do
   end
 
   test 'basic argument assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-v -s -d book test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-v -s -d book test/fixtures/sample.adoc))
 
     assert_equal 2, options[:verbose]
     assert_equal false, options[:header_footer]
     assert_equal 'book', options[:attributes]['doctype']
     assert_equal 1, options[:input_files].size
-    assert_equal 'test/fixtures/sample.asciidoc', options[:input_files][0]
+    assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]
   end
 
   test 'standard attribute assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-a docinfosubs=attributes,replacements -a icons test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-a docinfosubs=attributes,replacements -a icons test/fixtures/sample.adoc))
 
     assert_equal 'attributes,replacements', options[:attributes]['docinfosubs']
     assert_equal '', options[:attributes]['icons']
   end
 
   test 'multiple attribute arguments' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-a imagesdir=images -a icons test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-a imagesdir=images -a icons test/fixtures/sample.adoc))
 
     assert_equal 'images', options[:attributes]['imagesdir']
     assert_equal '', options[:attributes]['icons']
   end
 
   test 'should only split attribute key/value pairs on first equal sign' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-a name=value=value test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-a name=value=value test/fixtures/sample.adoc))
 
     assert_equal 'value=value', options[:attributes]['name']
   end
 
   test 'should allow safe mode to be specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.adoc))
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
   end
 
   test 'should allow any backend to be specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-b my_custom_backend test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-b my_custom_backend test/fixtures/sample.adoc))
 
     assert_equal 'my_custom_backend', options[:attributes]['backend']
   end
 
   test 'article doctype assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-d article test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-d article test/fixtures/sample.adoc))
     assert_equal 'article', options[:attributes]['doctype']
   end
 
   test 'book doctype assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-d book test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-d book test/fixtures/sample.adoc))
     assert_equal 'book', options[:attributes]['doctype']
   end
 
   test 'inline doctype assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-d inline test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-d inline test/fixtures/sample.adoc))
     assert_equal 'inline', options[:attributes]['doctype']
   end
 
   test 'template engine assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-E haml test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-E haml test/fixtures/sample.adoc))
     assert_equal 'haml', options[:template_engine]
   end
 
   test 'template directory assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend test/fixtures/sample.adoc))
     assert_equal ['custom-backend'], options[:template_dirs]
   end
 
   test 'multiple template directory assignments' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend -T custom-backend-hacks test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend -T custom-backend-hacks test/fixtures/sample.adoc))
     assert_equal ['custom-backend', 'custom-backend-hacks'], options[:template_dirs]
   end
 
   test 'multiple -r flags requires specified libraries' do
     options = Asciidoctor::Cli::Options.new
     redirect_streams do |stdout, stderr|
-      exitval = options.parse! %w(-r foobar -r foobaz test/fixtures/sample.asciidoc)
+      exitval = options.parse! %w(-r foobar -r foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
       assert_equal ['foobar', 'foobaz'], options[:requires]
@@ -161,7 +161,7 @@ context 'Options' do
   test '-r flag with multiple values requires specified libraries' do
     options = Asciidoctor::Cli::Options.new
     redirect_streams do |stdout, stderr|
-      exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.asciidoc)
+      exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
       assert_equal ['foobar', 'foobaz'], options[:requires]
@@ -172,7 +172,7 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.new
     old_load_path = $LOAD_PATH.dup
     begin
-      exitval = options.parse! %w(-I foobar -I foobaz test/fixtures/sample.asciidoc)
+      exitval = options.parse! %w(-I foobar -I foobaz test/fixtures/sample.adoc)
       refute_equal 1, exitval
       assert_equal old_load_path.size + 2, $LOAD_PATH.size
       assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
@@ -187,7 +187,7 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.new
     old_load_path = $LOAD_PATH.dup
     begin
-      exitval = options.parse! %W(-I foobar#{File::PATH_SEPARATOR}foobaz test/fixtures/sample.asciidoc)
+      exitval = options.parse! %W(-I foobar#{File::PATH_SEPARATOR}foobaz test/fixtures/sample.adoc)
       refute_equal 1, exitval
       assert_equal old_load_path.size + 2, $LOAD_PATH.size
       assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
@@ -199,59 +199,59 @@ context 'Options' do
   end
 
   test 'should set failure level to FATAL by default' do
-    options = Asciidoctor::Cli::Options.parse! %W(test/fixtures/sample.asciidoc)
+    options = Asciidoctor::Cli::Options.parse! %W(test/fixtures/sample.adoc)
     assert_equal ::Logger::Severity::FATAL, options[:failure_level]
   end
 
   test 'should allow failure level to be set to WARN' do
     %w(w warn WARN warning WARNING).each do |val|
-      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.asciidoc))
+      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.adoc))
       assert_equal ::Logger::Severity::WARN, options[:failure_level]
     end
   end
 
   test 'should allow failure level to be set to ERROR' do
     %w(e err ERR error ERROR).each do |val|
-      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.asciidoc))
+      options = Asciidoctor::Cli::Options.parse!(%W(--failure-level=#{val} test/fixtures/sample.adoc))
       assert_equal ::Logger::Severity::ERROR, options[:failure_level]
     end
   end
 
   test 'should not allow failure level to be set to unknown value' do
     exit_code, messages = redirect_streams do |_, err|
-      [(Asciidoctor::Cli::Options.parse! %W(--failure-level=foobar test/fixtures/sample.asciidoc)), err.string]
+      [(Asciidoctor::Cli::Options.parse! %W(--failure-level=foobar test/fixtures/sample.adoc)), err.string]
     end
     assert_equal 1, exit_code
     assert_includes messages, 'invalid argument: --failure-level=foobar'
   end
 
   test 'should set verbose to 2 when -v flag is specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-v test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-v test/fixtures/sample.adoc))
     assert_equal 2, options[:verbose]
   end
 
   test 'should set verbose to 0 when -q flag is specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-q test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-q test/fixtures/sample.adoc))
     assert_equal 0, options[:verbose]
   end
 
   test 'should set verbose to 2 when -v flag is specified after -q flag' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-q -v test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-q -v test/fixtures/sample.adoc))
     assert_equal 2, options[:verbose]
   end
 
   test 'should set verbose to 0 when -q flag is specified after -v flag' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-v -q test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-v -q test/fixtures/sample.adoc))
     assert_equal 0, options[:verbose]
   end
 
   test 'should enable timings when -t flag is specified' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-t test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-t test/fixtures/sample.adoc))
     assert_equal true, options[:timings]
   end
 
   test 'timings option is disable by default' do
-    options = Asciidoctor::Cli::Options.parse!(%w(test/fixtures/sample.asciidoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(test/fixtures/sample.adoc))
     assert_equal false, options[:timings]
   end
 

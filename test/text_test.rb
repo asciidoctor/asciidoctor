@@ -38,7 +38,7 @@ context "Text" do
 
   test 'proper encoding to handle utf8 characters from included file' do
     input = <<-EOS
-include::fixtures/encoding.asciidoc[tags=romé]
+include::fixtures/encoding.adoc[tags=romé]
     EOS
     doc = empty_safe_document base_dir: testdir
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true

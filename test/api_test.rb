@@ -3,17 +3,26 @@ require_relative 'test_helper'
 context 'API' do
   context 'Load' do
     test 'should load input file' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       doc = File.open(sample_input_path) {|file| Asciidoctor.load file, safe: Asciidoctor::SafeMode::SAFE }
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
-      assert_equal '.asciidoc', doc.attr('docfilesuffix')
+      assert_equal '.adoc', doc.attr('docfilesuffix')
     end
 
     test 'should load input file from filename' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       doc = Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
+      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.adoc', doc.attr('docfilesuffix')
+    end
+
+    test 'should load input file with alternate file extension' do
+      sample_input_path = fixture_path 'sample-alt-extension.asciidoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: :safe
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
@@ -26,7 +35,7 @@ context 'API' do
       old_verbose = $VERBOSE
       begin
         $VERBOSE = nil # disable warnings since we have to modify constants
-        input_path = fixture_path 'encoding.asciidoc'
+        input_path = fixture_path 'encoding.adoc'
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
         output = Asciidoctor.convert_file input_path, to_file: false, safe: :safe
         assert_equal Encoding::UTF_8, output.encoding
@@ -269,7 +278,7 @@ paragraph text
     test 'should not modify options argument' do
       options = { safe: Asciidoctor::SafeMode::SAFE }
       options.freeze
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.load_file sample_input_path, options
       rescue
@@ -284,7 +293,7 @@ paragraph text
         safe: Asciidoctor::SafeMode::SAFE,
         attributes: attributes,
       }
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.load_file sample_input_path, options
       rescue
@@ -312,59 +321,59 @@ content
     end
 
     test 'should track file and line information with blocks if sourcemap option is set' do
-      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), sourcemap: true
+      doc = Asciidoctor.load_file fixture_path('sample.adoc'), sourcemap: true
 
       refute_nil doc.source_location
-      assert_equal 'sample.asciidoc', doc.file
+      assert_equal 'sample.adoc', doc.file
       assert_equal 1, doc.lineno
 
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
-      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 'sample.adoc', section_1.file
       assert_equal 10, section_1.lineno
 
       section_2 = doc.sections[1]
       assert_equal 'Section B', section_2.title
       refute_nil section_2.source_location
-      assert_equal 'sample.asciidoc', section_2.file
+      assert_equal 'sample.adoc', section_2.file
       assert_equal 18, section_2.lineno
 
       table_block = section_2.blocks[1]
       assert_equal :table, table_block.context
       refute_nil table_block.source_location
-      assert_equal 'sample.asciidoc', table_block.file
+      assert_equal 'sample.adoc', table_block.file
       assert_equal 22, table_block.lineno
       first_cell = table_block.rows.body[0][0]
       refute_nil first_cell.source_location
-      assert_equal 'sample.asciidoc', first_cell.file
+      assert_equal 'sample.adoc', first_cell.file
       assert_equal 23, first_cell.lineno
       second_cell = table_block.rows.body[0][1]
       refute_nil second_cell.source_location
-      assert_equal 'sample.asciidoc', second_cell.file
+      assert_equal 'sample.adoc', second_cell.file
       assert_equal 23, second_cell.lineno
       last_cell = table_block.rows.body[-1][-1]
       refute_nil last_cell.source_location
-      assert_equal 'sample.asciidoc', last_cell.file
+      assert_equal 'sample.adoc', last_cell.file
       assert_equal 24, last_cell.lineno
 
       last_block = section_2.blocks[-1]
       assert_equal :ulist, last_block.context
       refute_nil last_block.source_location
-      assert_equal 'sample.asciidoc', last_block.file
+      assert_equal 'sample.adoc', last_block.file
       assert_equal 28, last_block.lineno
 
       list_items = last_block.blocks
       refute_nil list_items[0].source_location
-      assert_equal 'sample.asciidoc', list_items[0].file
+      assert_equal 'sample.adoc', list_items[0].file
       assert_equal 28, list_items[0].lineno
 
       refute_nil list_items[1].source_location
-      assert_equal 'sample.asciidoc', list_items[1].file
+      assert_equal 'sample.adoc', list_items[1].file
       assert_equal 29, list_items[1].lineno
 
       refute_nil list_items[2].source_location
-      assert_equal 'sample.asciidoc', list_items[2].file
+      assert_equal 'sample.adoc', list_items[2].file
       assert_equal 30, list_items[2].lineno
 
       doc = Asciidoctor.load_file fixture_path('master.adoc'), sourcemap: true, safe: :safe
@@ -504,14 +513,14 @@ content
     end
 
     test 'should allow sourcemap option on document to be modified' do
-      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), parse: false
+      doc = Asciidoctor.load_file fixture_path('sample.adoc'), parse: false
       doc.sourcemap = true
       doc = doc.parse
 
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
-      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 'sample.adoc', section_1.file
       assert_equal 10, section_1.lineno
     end
 
@@ -804,7 +813,7 @@ term without description::
     end
 
     test 'should convert source document to string when to_file is false' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       refute_empty output
@@ -816,7 +825,7 @@ term without description::
     end
 
     test 'lines in output should be separated by line feed' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       refute_empty output
@@ -828,19 +837,19 @@ term without description::
     end
 
     test 'should accept attributes as array' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output = Asciidoctor.convert_file sample_input_path, attributes: %w(sectnums idprefix idseparator=-), to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should accept attributes as string' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output = Asciidoctor.convert_file sample_input_path, attributes: 'sectnums idprefix idseparator=-', to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
@@ -895,7 +904,7 @@ text
     end
 
     test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false,
           safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
       assert_css 'html:root > head > style', output, 1
@@ -944,7 +953,7 @@ text
     end
 
     test 'should resolve custom stylesheet to embed relative to stylesdir' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false,
           attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -954,7 +963,7 @@ text
     end
 
     test 'should convert source file and write result to adjacent file by default' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('sample.html')
       begin
         Asciidoctor.convert_file sample_input_path
@@ -972,7 +981,7 @@ text
     end
 
     test 'should convert source file and write to specified file' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
@@ -990,7 +999,7 @@ text
     end
 
     test 'should convert source file and write to specified file in base_dir' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       fixture_dir = fixture_path('')
       begin
@@ -1011,7 +1020,7 @@ text
     end
 
     test 'in_place option is ignored when to_file is specified' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, in_place: true
@@ -1022,7 +1031,7 @@ text
     end
 
     test 'in_place option is ignored when to_dir is specified' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('sample.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: File.dirname(sample_output_path), in_place: true
@@ -1047,7 +1056,7 @@ text
     end
 
     test 'output should be relative to to_dir option' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
       Dir.mkdir output_dir if !File.exist? output_dir
       sample_output_path = File.join(output_dir, 'sample.html')
@@ -1061,7 +1070,7 @@ text
     end
 
     test 'missing directories should be created if mkdirs is enabled' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.join(File.dirname(sample_input_path), 'test_output'), 'subdir')
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
@@ -1076,15 +1085,15 @@ text
 
     # TODO need similar test for when to_dir is specified
     test 'should raise exception if an attempt is made to overwrite input file' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
       assert_raises IOError do
-        Asciidoctor.convert_file sample_input_path, attributes: { 'outfilesuffix' => '.asciidoc' }
+        Asciidoctor.convert_file sample_input_path, attributes: { 'outfilesuffix' => '.adoc' }
       end
     end
 
     test 'to_file should be relative to to_dir when both given' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       base_dir = File.dirname(sample_input_path)
       sample_rel_output_path = File.join('test_output', 'result.html')
       output_dir = File.dirname(File.join(base_dir, sample_rel_output_path))
@@ -1105,7 +1114,7 @@ text
         to_file: false,
       }
       options.freeze
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.convert_file sample_input_path, options
       rescue
@@ -1114,7 +1123,7 @@ text
     end
 
     test 'should set to_dir option to parent directory of specified output file' do
-      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_input_path = fixture_path 'basic.adoc'
       sample_output_path = fixture_path 'basic.html'
       begin
         doc = Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
@@ -1125,7 +1134,7 @@ text
     end
 
     test 'should set to_dir option to parent directory of specified output directory and file' do
-      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_input_path = fixture_path 'basic.adoc'
       sample_output_path = fixture_path 'basic.html'
       fixture_base_path = File.dirname sample_output_path
       fixture_parent_path = File.dirname fixture_base_path

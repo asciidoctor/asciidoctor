@@ -129,7 +129,7 @@ content
 
   context 'Docinfo files' do
     test 'should include docinfo files for html backend' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       cases = {
         'docinfo'                => { head_script: 1, meta: 0, top_link: 0, footer_script: 1 },
@@ -158,7 +158,7 @@ content
     end
 
     test 'should include docinfo footer even if nofooter attribute is set' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
       refute_empty output
@@ -166,7 +166,7 @@ content
     end
 
     test 'should include docinfo files for html backend with custom docinfodir' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
                                         header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
@@ -194,7 +194,7 @@ content
     end
 
     test 'should include docinfo files for docbook backend' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -222,7 +222,7 @@ content
     end
 
     test 'should include docinfo footer files for html backend' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -244,7 +244,7 @@ content
     end
 
     test 'should include docinfo footer files for docbook backend' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -275,7 +275,7 @@ content
       begin
         $VERBOSE = nil # disable warnings since we have to modify constants
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
-        sample_input_path = fixture_path('basic.asciidoc')
+        sample_input_path = fixture_path('basic.adoc')
         output = Asciidoctor.convert_file sample_input_path, to_file: false, header_footer: true,
             backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private,shared' }
         refute_empty output
@@ -292,7 +292,7 @@ content
     end
 
     test 'should not include docinfo files by default' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, safe: Asciidoctor::SafeMode::SERVER
@@ -308,7 +308,7 @@ content
     end
 
     test 'should not include docinfo files if safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.asciidoc')
+      sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, attributes: { 'docinfo2' => '' }

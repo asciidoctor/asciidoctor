@@ -658,10 +658,10 @@ after
 
     test 'should invoke include processor if it offers to handle include directive' do
       input = <<-EOS
-include::skip-me.asciidoc[]
+include::skip-me.adoc[]
 line after skip
 
-include::include-file.asciidoc[]
+include::include-file.adoc[]
 
 include::fixtures/grandchild-include.adoc[]
 
@@ -671,7 +671,7 @@ last line
       registry = Asciidoctor::Extensions.create do
         include_processor do
           handles? do |target|
-            target == 'skip-me.asciidoc'
+            target == 'skip-me.adoc'
           end
 
           process do |doc, reader, target, attributes|
@@ -680,7 +680,7 @@ last line
 
         include_processor do
           handles? do |target|
-            target == 'include-file.asciidoc'
+            target == 'include-file.adoc'
           end
 
           process do |doc, reader, target, attributes|
@@ -702,13 +702,13 @@ last line
       assert_equal 'line after skip', lines.last
       lines << reader.read_line
       lines << reader.read_line
-      assert_equal 'found include target \'include-file.asciidoc\' at line 4', lines.last
-      assert_equal 'include-file.asciidoc: line 2', reader.line_info
+      assert_equal 'found include target \'include-file.adoc\' at line 4', lines.last
+      assert_equal 'include-file.adoc: line 2', reader.line_info
       while reader.has_more_lines?
         lines << reader.read_line
       end
       source = lines * ::Asciidoctor::LF
-      assert_match(/^found include target 'include-file.asciidoc' at line 4$/, source)
+      assert_match(/^found include target 'include-file.adoc' at line 4$/, source)
       assert_match(/^middle line$/, source)
       assert_match(/^last line of grandchild$/, source)
       assert_match(/^last line$/, source)
@@ -745,9 +745,9 @@ content
           end
         end
 
-        sample_doc = fixture_path 'sample.asciidoc'
+        sample_doc = fixture_path 'sample.adoc'
         doc = Asciidoctor.load_file sample_doc, sourcemap: true
-        assert_includes doc.convert, 'file: sample.asciidoc, lineno: 1'
+        assert_includes doc.convert, 'file: sample.adoc, lineno: 1'
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -1467,7 +1467,7 @@ sample content
         Asciidoctor::Extensions.register do
           docinfo_processor MetaRobotsDocinfoProcessor
         end
-        sample_input_path = fixture_path('basic.asciidoc')
+        sample_input_path = fixture_path('basic.adoc')
 
         output = Asciidoctor.convert_file sample_input_path, to_file: false,
                                           header_footer: true,
