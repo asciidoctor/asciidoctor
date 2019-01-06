@@ -725,7 +725,9 @@ class Parser
           lines.map! {|line| line == '>' ? (line.slice 1, line.length) : ((line.start_with? '> ') ? (line.slice 2, line.length) : line) }
           if lines[-1].start_with? '-- '
             credit_line = (credit_line = lines.pop).slice 3, credit_line.length
-            lines.pop while lines[-1].empty?
+            unless lines.empty?
+              lines.pop while lines[-1].empty?
+            end
           end
           attributes['style'] = 'quote'
           # NOTE will only detect discrete (aka free-floating) headings
