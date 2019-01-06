@@ -586,6 +586,15 @@ preamble
         assert_equal dir_uri, reader.dir
         assert_equal 'index.adoc', reader.path
       end
+
+      test 'PreprocessorReader#push_include method should not fail if data is nil' do
+        lines = %w(a b c)
+        doc = Asciidoctor::Document.new lines
+        reader = doc.reader
+        reader.push_include nil, '', '<stdin>'
+        assert_equal 0, reader.include_stack.size
+        assert_equal 'a', reader.read_line.rstrip
+      end
     end
 
     context 'Include Directive' do

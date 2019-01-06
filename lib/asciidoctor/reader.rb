@@ -58,7 +58,7 @@ class Reader
       end
       @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
     end
-    @lines = data ? (prepare_lines data, opts) : []
+    @lines = prepare_lines data, opts
     @source_lines = @lines.drop 0
     @mark = nil
     @look_ahead = 0
@@ -576,11 +576,11 @@ class Reader
   # Returns The String lines extracted from the data
   def prepare_lines data, opts = {}
     if opts[:normalize]
-      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data)
+      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data || [])
     elsif ::String === data
       data.split LF, -1
     else
-      data.drop 0
+      (data || []).drop 0
     end
   end
 

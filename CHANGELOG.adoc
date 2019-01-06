@@ -40,6 +40,7 @@ Bug Fixes::
   * fix invalid check for DSL in extension class (previously always returned true)
   * scope constant lookups (#2764)
   * use byteslice instead of slice to remove BOM from string (#2764)
+  * Reader#push_include should not fail if data is nil
 
 Build / Infrastructure::
 
