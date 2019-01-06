@@ -927,23 +927,21 @@ class PreprocessorReader < Reader
       if inc_linenos
         inc_lines, inc_offset, inc_lineno = [], nil, 0
         begin
-          open(inc_path, 'rb') do |f|
-            select_remaining = nil
-            f.each_line do |l|
-              inc_lineno += 1
-              if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
+          select_remaining = nil
+          read_include_content(inc_path, target_type).each_line do |l|
+            inc_lineno += 1
+            if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
+              # NOTE record line where we started selecting
+              inc_offset ||= inc_lineno
+              inc_lines << l
+            else
+              if select == inc_lineno
                 # NOTE record line where we started selecting
                 inc_offset ||= inc_lineno
                 inc_lines << l
-              else
-                if select == inc_lineno
-                  # NOTE record line where we started selecting
-                  inc_offset ||= inc_lineno
-                  inc_lines << l
-                  inc_linenos.shift
-                end
-                break if inc_linenos.empty?
+                inc_linenos.shift
               end
+              break if inc_linenos.empty?
             end
           end
         rescue
@@ -970,41 +968,39 @@ class PreprocessorReader < Reader
           wildcard = inc_tags.delete '*'
         end
         begin
-          open(inc_path, 'rb') do |f|
-            dbl_co, dbl_sb = '::', '[]'
-            encoding = ::Encoding::UTF_8 if COERCE_ENCODING
-            f.each_line do |l|
-              inc_lineno += 1
-              # must force encoding since we're performing String operations on line
-              l.force_encoding encoding if encoding
-              if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
-                this_tag = $2
-                if $1 # end tag
-                  if this_tag == active_tag
-                    tag_stack.pop
-                    active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
-                  elsif inc_tags.key? this_tag
-                    include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
-                    if (idx = tag_stack.rindex {|key, _| key == this_tag })
-                      idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
-                    else
-                      logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
-                    end
-                  end
+          dbl_co, dbl_sb = '::', '[]'
+          encoding = ::Encoding::UTF_8 if COERCE_ENCODING
+          read_include_content(inc_path, target_type).each_line do |l|
+            inc_lineno += 1
+            # must force encoding since we're performing String operations on line
+            l.force_encoding encoding if encoding
+            if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
+              this_tag = $2
+              if $1 # end tag
+                if this_tag == active_tag
+                  tag_stack.pop
+                  active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
                 elsif inc_tags.key? this_tag
-                  tags_used << this_tag
-                  # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
-                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
-                elsif !wildcard.nil?
-                  select = active_tag && !select ? false : wildcard
-                  tag_stack << [(active_tag = this_tag), select, inc_lineno]
+                  include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
+                  if (idx = tag_stack.rindex {|key, _| key == this_tag})
+                    idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
+                    logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
+                  else
+                    logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), :source_location => cursor, :include_location => include_cursor
+                  end
                 end
-              elsif select
-                # NOTE record the line where we started selecting
-                inc_offset ||= inc_lineno
-                inc_lines << l
+              elsif inc_tags.key? this_tag
+                tags_used << this_tag
+                # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
+                tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
+              elsif !wildcard.nil?
+                select = active_tag && !select ? false : wildcard
+                tag_stack << [(active_tag = this_tag), select, inc_lineno]
               end
+            elsif select
+              # NOTE record the line where we started selecting
+              inc_offset ||= inc_lineno
+              inc_lines << l
             end
           end
         rescue
@@ -1028,7 +1024,7 @@ class PreprocessorReader < Reader
       else
         begin
           # NOTE read content first so that we only advance cursor if IO operation succeeds
-          inc_content = target_type == :file ? ::File.open(inc_path, 'rb') {|f| f.read } : open(inc_path, 'rb') {|f| f.read }
+          inc_content = read_include_content inc_path, target_type
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
@@ -1038,6 +1034,16 @@ class PreprocessorReader < Reader
       end
       true
     end
+  end
+
+  # Internal: Returns the content of an include directive.
+  #
+  # inc_path     - A String of the resolved (absolute) include path.
+  # target_type  - A Symbol for the target type (:uri or :file).
+  #
+  # Returns A String containing the content of the target.
+  def read_include_content inc_path, target_type
+    target_type == :file ? ::File.open(inc_path, 'rb') {|f| f.read } : open(inc_path, 'rb') {|f| f.read }
   end
 
   # Internal: Resolve the target of an include directive.
