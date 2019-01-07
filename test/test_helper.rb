@@ -325,7 +325,7 @@ class Minitest::Test
   def using_test_webserver host = resolve_localhost, port = 9876
     server = TCPServer.new host, port
     base_dir = testdir
-    t = Thread.new do
+    server_thread = Thread.new do
       while (session = server.accept)
         request = session.gets
         resource = nil
@@ -335,9 +335,8 @@ class Minitest::Test
           session.print %(HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n)
           session.print %(405 - Method not allowed\n)
           session.close
-          break
+          next
         end
-
         if resource == '/name/asciidoctor'
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
@@ -361,16 +360,12 @@ class Minitest::Test
         session.close
       end
     end
+    server_thread.report_on_exception = false if server_thread.respond_to? :report_on_exception=
     begin
       yield
     ensure
-      begin
-        server.shutdown
-      # "Errno::ENOTCONN: Socket is not connected' is reported on some platforms; call #close instead of #shutdown
-      rescue Errno::ENOTCONN
-        server.close
-      end
-      t.exit
+      server.close
+      server_thread.exit
     end
   end
 end
