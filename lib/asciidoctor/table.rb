@@ -652,7 +652,7 @@ class Table::ParserContext
   #
   # returns nothing
   def activate_rowspan(rowspan, colspan)
-    (1...rowspan).each {|i| @active_rowspans[i] = (@active_rowspans[i] || 0) + colspan }
+    1.upto(rowspan - 1) {|i| @active_rowspans[i] = (@active_rowspans[i] || 0) + colspan }
     nil
   end
 
