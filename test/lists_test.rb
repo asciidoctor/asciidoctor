@@ -2960,15 +2960,17 @@ second term:: description
       assert_css '.hdlist table', output, 1
       assert_css '.hdlist table colgroup', output, 0
       assert_css '.hdlist table tr', output, 2
-      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td', output, 2
-      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist1"]', output, 1
-      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]', output, 1
-      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]/p', output, 1
-      assert_xpath '/*[@class="hdlist"]/table/tr[1]/td[@class="hdlist2"]/p/following-sibling::*[@class="paragraph"]', output, 1
+      tbody_path = RUBY_ENGINE == 'jruby' ? 'tbody/' : ''
+      refute_includes output, '<tbody>'
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td), output, 2
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td[@class="hdlist1"]), output, 1
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td[@class="hdlist2"]), output, 1
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td[@class="hdlist2"]/p), output, 1
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td[@class="hdlist2"]/p/following-sibling::*[@class="paragraph"]), output, 1
       assert_xpath '((//tr)[1]/td)[1][normalize-space(text())="first term"]', output, 1
       assert_xpath '((//tr)[1]/td)[2]/p[normalize-space(text())="description"]', output, 1
 
-      assert_xpath '/*[@class="hdlist"]/table/tr[2]/td', output, 2
+      assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[2]/td), output, 2
       assert_xpath '((//tr)[2]/td)[1][normalize-space(text())="second term"]', output, 1
       assert_xpath '((//tr)[2]/td)[2]/p[normalize-space(text())="description"]', output, 1
     end

@@ -3,11 +3,6 @@ source 'https://rubygems.org'
 # Look in asciidoctor.gemspec for runtime and development dependencies
 gemspec
 
-group :development do
-  # pin nokogiri because XPath behavior changed on JRuby starting in 1.8.3 (see sparklemotion/nokogiri#1803)
-  gem 'nokogiri', '1.8.2' if RUBY_ENGINE == 'jruby'
-end
-
 group :doc do
   gem 'yard'
   gem 'yard-tomdoc'
