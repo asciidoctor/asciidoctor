@@ -42,19 +42,16 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'asciimath', '~> 1.0.0'
   # coderay is needed for testing syntax highlighting
   s.add_development_dependency 'coderay', '~> 1.1.0'
-  s.add_development_dependency 'cucumber', '~> 2.4.0'
-  # erubis is needed for testing use of alternative eRuby impls
+  # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
+  s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
+  s.add_development_dependency 'cucumber', '~> 3.1.0'
+  # erubis is needed for testing alternate eRuby impls
   s.add_development_dependency 'erubis', '~> 2.7.0'
-  # haml is needed for testing custom templates
   s.add_development_dependency 'haml', '~> 5.0.0'
-  s.add_development_dependency 'nokogiri', '~> 1.8.5'
-  s.add_development_dependency 'rake', '~> 10.0.0'
-  s.add_development_dependency 'rspec-expectations', '~> 2.14.0'
-  # slim is needed for testing custom templates
+  s.add_development_dependency 'minitest', '~> 5.11.0'
+  s.add_development_dependency 'nokogiri', '~> 1.10.0'
+  s.add_development_dependency 'rake', '~> 12.3.0'
+  s.add_development_dependency 'rspec-expectations', '~> 3.8.0'
   s.add_development_dependency 'slim', '~> 4.0.0'
-  # concurrent-ruby is defined in Gemfile due to enforcement of minimum required Ruby version
-  #s.add_development_dependency 'concurrent-ruby', '~> 1.0.0'
-  # tilt is needed for testing custom templates
   s.add_development_dependency 'tilt', '~> 2.0.0'
-  s.add_development_dependency 'minitest', '~> 5.3.0'
 end

@@ -4,7 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'concurrent-ruby', '~> 1.0.0'
   # pin nokogiri because XPath behavior changed on JRuby starting in 1.8.3 (see sparklemotion/nokogiri#1803)
   gem 'nokogiri', '1.8.2' if RUBY_ENGINE == 'jruby'
 end
@@ -24,5 +23,5 @@ end
 #end
 
 group :ci do
-  gem 'simplecov', '~> 0.14.1'
+  gem 'simplecov', '~> 0.16.0'
 end
