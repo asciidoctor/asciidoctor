@@ -377,7 +377,7 @@ class AbstractNode
 
     if ::File.readable? image_path
       # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.strict_encode64 ::IO.binread image_path})
+      %(data:#{mimetype};base64,#{::Base64.strict_encode64 ::File.binread image_path})
     else
       logger.warn %(image to embed not found or not readable: #{image_path})
       %(data:#{mimetype};base64,)
@@ -503,12 +503,8 @@ class AbstractNode
     # remap opts for backwards compatibility
     opts = { warn_on_failure: (opts != false) } unless ::Hash === opts
     if ::File.readable? path
-      if opts[:normalize]
-        (Helpers.prepare_source_string ::File.open(path, FILE_READ_MODE) {|f| f.read }).join LF
-      else
-        # QUESTION should we chomp or rstrip content?
-        ::IO.read path
-      end
+      # QUESTION should we chomp content if normalize is false?
+      opts[:normalize] ? ((Helpers.prepare_source_string ::File.read path, mode: FILE_READ_MODE).join LF) : (::File.read path, mode: FILE_READ_MODE)
     elsif opts[:warn_on_failure]
       logger.warn %(#{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
       nil

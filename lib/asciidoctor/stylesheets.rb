@@ -23,7 +23,7 @@ class Stylesheets
   #
   # returns the [String] Asciidoctor stylesheet data
   def primary_stylesheet_data
-    @primary_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DIR, 'asciidoctor-default.css')).rstrip
+    @primary_stylesheet_data ||= ::File.read(::File.join(STYLESHEETS_DIR, 'asciidoctor-default.css'), mode: FILE_READ_MODE).rstrip
   end
 
   def embed_primary_stylesheet
@@ -33,7 +33,7 @@ class Stylesheets
   end
 
   def write_primary_stylesheet target_dir = '.'
-    ::IO.write(::File.join(target_dir, primary_stylesheet_name), primary_stylesheet_data)
+    ::File.write (::File.join target_dir, primary_stylesheet_name), primary_stylesheet_data, mode: FILE_WRITE_MODE
   end
 
   def coderay_stylesheet_name
@@ -48,7 +48,7 @@ class Stylesheets
     # unless load_coderay.nil?
     #   ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
     # end
-    @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DIR, coderay_stylesheet_name)).rstrip
+    @coderay_stylesheet_data ||= ::File.read(::File.join(STYLESHEETS_DIR, coderay_stylesheet_name), mode: FILE_READ_MODE).rstrip
   end
 
   def embed_coderay_stylesheet
@@ -58,7 +58,7 @@ class Stylesheets
   end
 
   def write_coderay_stylesheet target_dir = '.'
-    ::IO.write(::File.join(target_dir, coderay_stylesheet_name), coderay_stylesheet_data)
+    ::File.write (::File.join target_dir, coderay_stylesheet_name), coderay_stylesheet_data, mode: FILE_WRITE_MODE
   end
 
   def pygments_stylesheet_name style = nil
@@ -90,7 +90,7 @@ class Stylesheets
   end
 
   def write_pygments_stylesheet target_dir = '.', style = nil
-    ::IO.write(::File.join(target_dir, pygments_stylesheet_name(style)), pygments_stylesheet_data(style))
+    ::File.write (::File.join target_dir, (pygments_stylesheet_name style)), (pygments_stylesheet_data style), mode: FILE_WRITE_MODE
   end
 
   #def load_coderay

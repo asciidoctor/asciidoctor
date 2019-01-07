@@ -35,6 +35,7 @@ Improvements::
   * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
   * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)
   * move custom docinfo content in footer below built-in docinfo content in footer in HTML converter (#3017)
+  * read and write files using File methods instead of IO methods (#2995)
 
 Bug Fixes::
 

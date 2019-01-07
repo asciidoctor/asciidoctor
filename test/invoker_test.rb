@@ -116,7 +116,7 @@ context 'Invoker' do
     begin
       %x(mkfifo #{sample_inpath})
       write_thread = Thread.new do
-        IO.write sample_inpath, 'pipe content'
+        File.write sample_inpath, 'pipe content'
       end
       invoker = invoke_cli_to_buffer %w(-a stylesheet!), sample_inpath
       result = invoker.read_output
@@ -216,7 +216,7 @@ context 'Invoker' do
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
-      output = IO.read(sample_outpath)
+      output = File.read(sample_outpath)
       refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -443,7 +443,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
       invoke_cli(%W(-b manpage -o #{outfile_1}), '-') { input }
       assert File.exist?(outfile_1)
       assert File.exist?(outfile_2)
-      assert_equal '.so eve.1', (IO.read outfile_2).chomp
+      assert_equal '.so eve.1', (File.read outfile_2).chomp
     ensure
       FileUtils.rm_f outfile_1
       FileUtils.rm_f outfile_2

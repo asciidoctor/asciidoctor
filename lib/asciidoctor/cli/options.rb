@@ -143,14 +143,14 @@ Example: asciidoctor -b html5 source.asciidoc
                     require 'zlib' unless defined? ::Zlib::GzipReader
                     $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
                   else
-                    $stdout.puts ::IO.read manpage_path
+                    $stdout.puts ::File.read manpage_path
                   end
                 else
                   $stderr.puts %(asciidoctor: FAILED: manual page not found: #{manpage_path})
                   return 1
                 end
               elsif ::File.exist?(manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
-                $stdout.puts ::IO.read manpage_path
+                $stdout.puts ::File.read manpage_path
               else
                 require 'open3' unless defined? ::Open3.popen3
                 manpage_path = ::Open3.popen3('man -w asciidoctor') {|_, out| out.read }.chop rescue ''
@@ -161,7 +161,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   require 'zlib' unless defined? ::Zlib::GzipReader
                   $stdout.puts ::Zlib::GzipReader.open(manpage_path) {|gz| gz.read }
                 else
-                  $stdout.puts ::IO.read manpage_path
+                  $stdout.puts ::File.read manpage_path
                 end
               end
             else
@@ -287,7 +287,7 @@ Example: asciidoctor -b html5 source.asciidoc
       def print_version os = $stdout
         os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [https://asciidoctor.org])
         encoding_info = { 'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external' }.map do |k, v|
-          %(#{k}:#{v == 'internal' ? (::File.open(__FILE__) {|f| f.getc }).encoding : (::Encoding.find v)})
+          %(#{k}:#{v == 'internal' ? (::File.open(__FILE__) {|f| f.getc.encoding }) : (::Encoding.find v)})
         end
         os.puts %(Runtime Environment (#{::RUBY_DESCRIPTION}) (#{encoding_info.join ' '}))
         0
