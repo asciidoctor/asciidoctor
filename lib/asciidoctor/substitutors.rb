@@ -1535,7 +1535,7 @@ module Substitutors
       if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
         from, to = entry.split delim, 2
         to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
-        line_nums = (::Range.new from.to_i, to).to_a
+        line_nums = (from.to_i..to).to_a
         if negate
           lines -= line_nums
         else
