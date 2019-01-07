@@ -1,6 +1,5 @@
-# encoding: UTF-8
 begin
-  require File.expand_path '../lib/asciidoctor/version', __FILE__
+  require_relative 'lib/asciidoctor/version'
 rescue LoadError
   require 'asciidoctor/version'
 end

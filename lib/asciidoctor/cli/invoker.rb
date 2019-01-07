@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI
@@ -101,16 +100,16 @@ module Asciidoctor
         if stdin
           # allows use of block to supply stdin, particularly useful for tests
           input = block_given? ? yield : STDIN
-          input_opts = opts.merge :to_file => tofile
+          input_opts = opts.merge to_file: tofile
           if show_timings
-            @documents << (::Asciidoctor.convert input, (input_opts.merge :timings => (timings = Timings.new)))
+            @documents << (::Asciidoctor.convert input, (input_opts.merge timings: (timings = Timings.new)))
             timings.print_report err, '-'
           else
             @documents << (::Asciidoctor.convert input, input_opts)
           end
         else
           infiles.each do |infile|
-            input_opts = opts.merge :to_file => tofile
+            input_opts = opts.merge to_file: tofile
             if abs_srcdir_posix && (input_opts.key? :to_dir)
               abs_indir = ::File.dirname ::File.expand_path infile
               if non_posix_env
@@ -123,7 +122,7 @@ module Asciidoctor
               end
             end
             if show_timings
-              @documents << (::Asciidoctor.convert_file infile, (input_opts.merge :timings => (timings = Timings.new)))
+              @documents << (::Asciidoctor.convert_file infile, (input_opts.merge timings: (timings = Timings.new)))
               timings.print_report err, infile
             else
               @documents << (::Asciidoctor.convert_file infile, input_opts)

@@ -1,8 +1,4 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context 'Attributes' do
   default_logger = Asciidoctor::LoggerManager.logger
@@ -59,8 +55,7 @@ context 'Attributes' do
         result = convert_string_to_embedded str
         assert_includes result, %(<p>#{value}</p>)
       end
-
-    end if ::RUBY_MIN_VERSION_1_9
+    end
 
     test 'creates an attribute by fusing a legacy multi-line value' do
       str = <<-EOS
@@ -98,7 +93,7 @@ linus.torvalds@example.com
 {title} + \\
 {email}]
       EOS
-      doc = document_from_string str, :attributes => { 'author' => 'Linus Torvalds', 'title' => 'Linux Hacker', 'email' => 'linus.torvalds@example.com' }
+      doc = document_from_string str, attributes: { 'author' => 'Linus Torvalds', 'title' => 'Linux Hacker', 'email' => 'linus.torvalds@example.com' }
       assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), (doc.attr 'signature')
     end
 
@@ -108,7 +103,7 @@ linus.torvalds@example.com
     end
 
     test 'should delete an attribute that ends with ! set via API' do
-      doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog!' => ''})
+      doc = document_from_string(":frog: Tanglefoot", attributes: { 'frog!' => '' })
       assert_nil doc.attributes['frog']
     end
 
@@ -118,12 +113,12 @@ linus.torvalds@example.com
     end
 
     test 'should delete an attribute that begins with ! set via API' do
-      doc = document_from_string(":frog: Tanglefoot", :attributes => {'!frog' => ''})
+      doc = document_from_string(":frog: Tanglefoot", attributes: { '!frog' => '' })
       assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute set via API to nil value' do
-      doc = document_from_string(":frog: Tanglefoot", :attributes => {'frog' => nil})
+      doc = document_from_string(":frog: Tanglefoot", attributes: { 'frog' => nil })
       assert_nil doc.attributes['frog']
     end
 
@@ -144,7 +139,7 @@ linus.torvalds@example.com
 
     test 'assigns attribute to empty string if substitution fails to resolve attribute' do
       input = ':release: Asciidoctor {version}'
-      document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
+      document_from_string input, attributes: { 'attribute-missing' => 'drop-line' }
       assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
 
@@ -153,7 +148,7 @@ linus.torvalds@example.com
 :release: Asciidoctor +
           {version}
       EOS
-      doc = document_from_string input, :attributes => { 'attribute-missing' => 'drop-line' }
+      doc = document_from_string input, attributes: { 'attribute-missing' => 'drop-line' }
       assert_equal '', doc.attributes['release']
       assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
     end
@@ -207,7 +202,7 @@ content
 {name}
       EOS
 
-      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => 6 }
+      result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 6 }
       assert_equal expected, result
       assert_equal 6, result.bytesize
     end
@@ -220,7 +215,7 @@ content
 {name}
       EOS
 
-      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => 8 }
+      result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 8 }
       assert_equal expected, result
       assert_equal 6, result.bytesize
     end
@@ -233,7 +228,7 @@ content
 {name}
       EOS
 
-      result = convert_inline_string input, :attributes => { 'max-attribute-value-size' => nil }
+      result = convert_inline_string input, attributes: { 'max-attribute-value-size' => nil }
       assert_equal expected, result
       assert_equal 5000, result.bytesize
     end
@@ -244,12 +239,8 @@ content
 
 {imagesdir}
 EOS
-      output = convert_inline_string input, :safe => :safe
-      if RUBY_VERSION >= '1.9'
-        assert_equal %(#{Dir.home}/etc/images), output
-      else
-        assert_equal %(#{ENV['HOME']}/etc/images), output
-      end
+      output = convert_inline_string input, safe: :safe
+      assert_equal %(#{Asciidoctor::USER_HOME}/etc/images), output
     end
 
     test 'user-home attribute resolves to . if safe mode is SERVER or greater' do
@@ -258,7 +249,7 @@ EOS
 
 {imagesdir}
 EOS
-      output = convert_inline_string input, :safe => :server
+      output = convert_inline_string input, safe: :server
       assert_equal './etc/images', output
     end
 
@@ -297,34 +288,34 @@ endif::holygrail[]
     end
 
     test 'attribute set via API overrides attribute set in document' do
-      doc = document_from_string(':cash: money', :attributes => {'cash' => 'heroes'})
+      doc = document_from_string(':cash: money', attributes: { 'cash' => 'heroes' })
       assert_equal 'heroes', doc.attributes['cash']
     end
 
     test 'attribute set via API cannot be unset by document' do
-      doc = document_from_string(':cash!:', :attributes => {'cash' => 'heroes'})
+      doc = document_from_string(':cash!:', attributes: { 'cash' => 'heroes' })
       assert_equal 'heroes', doc.attributes['cash']
     end
 
     test 'attribute soft set via API using modifier on name can be overridden by document' do
-      doc = document_from_string(':cash: money', :attributes => {'cash@' => 'heroes'})
+      doc = document_from_string(':cash: money', attributes: { 'cash@' => 'heroes' })
       assert_equal 'money', doc.attributes['cash']
     end
 
     test 'attribute soft set via API using modifier on value can be overridden by document' do
-      doc = document_from_string(':cash: money', :attributes => {'cash' => 'heroes@'})
+      doc = document_from_string(':cash: money', attributes: { 'cash' => 'heroes@' })
       assert_equal 'money', doc.attributes['cash']
     end
 
     test 'attribute soft set via API using modifier on name can be unset by document' do
-      doc = document_from_string(':cash!:', :attributes => {'cash@' => 'heroes'})
+      doc = document_from_string(':cash!:', attributes: { 'cash@' => 'heroes' })
       assert_nil doc.attributes['cash']
-      doc = document_from_string(':cash!:', :attributes => {'cash@' => true})
+      doc = document_from_string(':cash!:', attributes: { 'cash@' => true })
       assert_nil doc.attributes['cash']
     end
 
     test 'attribute soft set via API using modifier on value can be unset by document' do
-      doc = document_from_string(':cash!:', :attributes => {'cash' => 'heroes@'})
+      doc = document_from_string(':cash!:', attributes: { 'cash' => 'heroes@' })
       assert_nil doc.attributes['cash']
     end
 
@@ -334,7 +325,7 @@ endif::holygrail[]
         { '!cash' => '' },
         { 'cash' => nil },
       ].each do |attributes|
-        doc = document_from_string(':cash: money', :attributes => attributes)
+        doc = document_from_string(':cash: money', attributes: attributes)
         assert_nil doc.attributes['cash']
       end
     end
@@ -347,7 +338,7 @@ endif::holygrail[]
         { '!cash' => '@' },
         { 'cash' => false },
       ].each do |attributes|
-        doc = document_from_string(':cash: money', :attributes => attributes)
+        doc = document_from_string(':cash: money', attributes: attributes)
         assert_equal 'money', doc.attributes['cash']
       end
     end
@@ -360,12 +351,12 @@ endif::holygrail[]
         { '!sectids' => '@' },
         { 'sectids' => false },
       ].each do |attributes|
-        doc = document_from_string '== Heading', :attributes => attributes
+        doc = document_from_string '== Heading', attributes: attributes
         refute doc.attr?('sectids')
-        assert_css '#_heading', (doc.convert :header_footer => false), 0
-        doc = document_from_string %(:sectids:\n\n== Heading), :attributes => attributes
+        assert_css '#_heading', (doc.convert header_footer: false), 0
+        doc = document_from_string %(:sectids:\n\n== Heading), attributes: attributes
         assert doc.attr?('sectids')
-        assert_css '#_heading', (doc.convert :header_footer => false), 1
+        assert_css '#_heading', (doc.convert header_footer: false), 1
       end
     end
 
@@ -389,7 +380,7 @@ content
         'doctype' => 'article',
         'doctype-article' => '',
         'filetype' => 'html',
-        'filetype-html' => ''
+        'filetype-html' => '',
       }
       expect.each do |key, val|
         assert doc.attributes.key? key
@@ -405,7 +396,7 @@ Author Name
 content
       EOS
 
-      doc = document_from_string input, :doctype => 'book', :backend => 'docbook'
+      doc = document_from_string input, doctype: 'book', backend: 'docbook'
       expect = {
         'backend' => 'docbook5',
         'backend-docbook5' => '',
@@ -417,7 +408,7 @@ content
         'doctype' => 'book',
         'doctype-book' => '',
         'filetype' => 'xml',
-        'filetype-xml' => ''
+        'filetype-xml' => '',
       }
       expect.each do |key, val|
         assert doc.attributes.key? key
@@ -435,7 +426,7 @@ Author Name
 content
       EOS
 
-      doc = document_from_string input, :safe => Asciidoctor::SafeMode::SAFE
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE
       expect = {
         'backend' => 'docbook5',
         'backend-docbook5' => '',
@@ -447,7 +438,7 @@ content
         'doctype' => 'book',
         'doctype-book' => '',
         'filetype' => 'xml',
-        'filetype-xml' => ''
+        'filetype-xml' => '',
       }
       expect.each do |key, val|
         assert doc.attributes.key?(key)
@@ -463,7 +454,7 @@ content
     end
 
     test 'backend attributes defined in document options overrides backend attribute in document' do
-      doc = document_from_string(':backend: docbook45', :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'backend' => 'html5'})
+      doc = document_from_string(':backend: docbook45', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'backend' => 'html5' })
       assert_equal 'html5', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-html5'
       assert_equal 'html', doc.attributes['basebackend']
@@ -471,34 +462,34 @@ content
     end
 
     test 'can only access a positional attribute from the attributes hash' do
-      node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 1 => 'position 1' }
+      node = Asciidoctor::Block.new nil, :paragraph, attributes: { 1 => 'position 1' }
       assert_nil node.attr(1)
       refute node.attr?(1)
       assert_equal 'position 1', node.attributes[1]
     end
 
     test 'set_attr should set value to empty string if no value is specified' do
-      node = Asciidoctor::Block.new nil, :paragraph, :attributes => {}
+      node = Asciidoctor::Block.new nil, :paragraph, attributes: {}
       node.set_attr 'foo'
       assert_equal '', (node.attr 'foo')
     end
 
     test 'remove_attr should remove attribute and return previous value' do
       doc = empty_document
-      node = Asciidoctor::Block.new doc, :paragraph, :attributes => { 'foo' => 'bar' }
+      node = Asciidoctor::Block.new doc, :paragraph, attributes: { 'foo' => 'bar' }
       assert_equal 'bar', (node.remove_attr 'foo')
       assert_nil node.attr('foo')
     end
 
     test 'set_attr should not overwrite existing key if overwrite is false' do
-      node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 'foo' => 'bar' }
+      node = Asciidoctor::Block.new nil, :paragraph, attributes: { 'foo' => 'bar' }
       assert_equal 'bar', (node.attr 'foo')
       node.set_attr 'foo', 'baz', false
       assert_equal 'bar', (node.attr 'foo')
     end
 
     test 'set_attr should overwrite existing key by default' do
-      node = Asciidoctor::Block.new nil, :paragraph, :attributes => { 'foo' => 'bar' }
+      node = Asciidoctor::Block.new nil, :paragraph, attributes: { 'foo' => 'bar' }
       assert_equal 'bar', (node.attr 'foo')
       node.set_attr 'foo', 'baz'
       assert_equal 'baz', (node.attr 'foo')
@@ -511,7 +502,7 @@ content
 {uri}
       EOS
 
-      doc = Asciidoctor.load input, :attributes => { 'uri' => 'https://github.com' }
+      doc = Asciidoctor.load input, attributes: { 'uri' => 'https://github.com' }
       doc.set_attr 'uri', 'https://google.com'
       output = doc.convert
       assert_xpath '//a[@href="https://google.com"]', output, 1
@@ -526,7 +517,7 @@ content
     end
 
     test 'set_attribute should not set key if key is locked' do
-      doc = empty_document :attributes => { 'foo' => 'bar' }
+      doc = empty_document attributes: { 'foo' => 'bar' }
       assert_equal 'bar', (doc.attr 'foo')
       res = doc.set_attribute 'foo', 'baz'
       refute res
@@ -534,7 +525,7 @@ content
     end
 
     test 'set_attribute should update backend attributes' do
-      doc = empty_document :attributes => { 'backend' => 'html5@' }
+      doc = empty_document attributes: { 'backend' => 'html5@' }
       assert_equal '', (doc.attr 'backend-html5')
       res = doc.set_attribute 'backend', 'docbook5'
       assert res
@@ -565,7 +556,7 @@ toc toc-placement!                        |   |content     |macro        |nil
       expected.each do |expect|
         raw_attrs, toc, toc_position, toc_placement, toc_class = expect
         attrs = Hash[*raw_attrs.split.map {|e| e.include?('=') ? e.split('=', 2) : [e, ''] }.flatten]
-        doc = document_from_string '', :attributes => attrs
+        doc = document_from_string '', attributes: attrs
         toc ? (assert doc.attr?('toc', toc)) : (refute doc.attr?('toc'))
         toc_position ? (assert doc.attr?('toc-position', toc_position)) : (refute doc.attr?('toc-position'))
         toc_placement ? (assert doc.attr?('toc-placement', toc_placement)) : (refute doc.attr?('toc-placement'))
@@ -590,7 +581,7 @@ He-Man: {He-Man}
 
 She-Ra: {She-Ra}
       EOS
-      result = convert_string_to_embedded input, :attributes => {'She-Ra' => 'The Princess of Power'}
+      result = convert_string_to_embedded input, attributes: { 'She-Ra' => 'The Princess of Power' }
       assert_xpath '//p[text()="He-Man: The most powerful man in the universe"]', result, 1
       assert_xpath '//p[text()="She-Ra: The Princess of Power"]', result, 1
     end
@@ -706,7 +697,7 @@ Line 1
 Line 2
       EOS
 
-      output = convert_string_to_embedded input, :attributes => { 'attribute-missing' => 'drop' }
+      output = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'drop' }
       assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
     end
 
@@ -732,7 +723,7 @@ Author Name
 
 preamble
       EOS
-      doc = document_from_string(input, :parse_header_only => true)
+      doc = document_from_string(input, parse_header_only: true)
       assert_equal 'value', doc.attributes['attribute-b']
     end
 
@@ -744,7 +735,7 @@ Author Name
 
 preamble
       EOS
-      doc = document_from_string(input, :parse_header_only => true)
+      doc = document_from_string(input, parse_header_only: true)
       assert_equal 'Author Name', doc.attributes['name']
     end
 
@@ -757,7 +748,7 @@ Author Name
 
 preamble
       EOS
-      doc = document_from_string(input, :parse_header_only => true)
+      doc = document_from_string(input, parse_header_only: true)
       assert_equal '2013-01-01', doc.attributes['date']
     end
 
@@ -807,7 +798,7 @@ content
 .Require the +{gem_name}+ gem
 To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
-      output = convert_string_to_embedded input, :attributes => {'compat-mode' => ''}
+      output = convert_string_to_embedded input, attributes: { 'compat-mode' => '' }
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
 
       input = <<-EOS
@@ -853,7 +844,7 @@ Belly up to the {foo}.
 `{foo}`
       EOS
 
-      result = convert_string_to_embedded input, :attributes => {'compat-mode' => '@'}
+      result = convert_string_to_embedded input, attributes: { 'compat-mode' => '@' }
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
       assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
@@ -903,10 +894,10 @@ of the attribute named foo in your document.
       EOS
 
       docdir = Dir.pwd
-      docfile = File.join(docdir, 'sample.asciidoc')
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SERVER, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      docfile = File.join(docdir, 'sample.adoc')
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => docdir, 'docfile' => docfile }
       assert_xpath '//li[1]/p[text()="docdir: "]', output, 1
-      assert_xpath '//li[2]/p[text()="docfile: sample.asciidoc"]', output, 1
+      assert_xpath '//li[2]/p[text()="docfile: sample.adoc"]', output, 1
     end
 
     test 'shows absolute docdir and docfile paths if safe mode is less than SERVER' do
@@ -916,8 +907,8 @@ of the attribute named foo in your document.
       EOS
 
       docdir = Dir.pwd
-      docfile = File.join(docdir, 'sample.asciidoc')
-      output = convert_string_to_embedded input, :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'docdir' => docdir, 'docfile' => docfile}
+      docfile = File.join(docdir, 'sample.adoc')
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => docdir, 'docfile' => docfile }
       assert_xpath %(//li[1]/p[text()="docdir: #{docdir}"]), output, 1
       assert_xpath %(//li[2]/p[text()="docfile: #{docfile}"]), output, 1
     end
@@ -1059,7 +1050,7 @@ of the attribute named foo in your document.
       EOS
 
       doc = document_from_string input
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="1"]', output, 2
     end
@@ -1076,7 +1067,7 @@ after: {counter:mycounter}
       EOS
 
       doc = document_from_string input
-      output = doc.convert :header_footer => false
+      output = doc.convert header_footer: false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="before: 1 2 3"]', output, 1
       assert_xpath '//p[text()="after: 1"]', output, 1
@@ -1544,7 +1535,7 @@ Content.
 content
       EOS
 
-      doc = document_from_string input, :backend => 'docbook45'
+      doc = document_from_string input, backend: 'docbook45'
       section = doc.blocks[0]
       refute_nil section
       assert_equal :section, section.context

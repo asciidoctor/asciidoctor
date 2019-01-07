@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
@@ -187,7 +186,7 @@ class Parser
       doc_attrs['manvolnum'] = manvolnum = $2
       doc_attrs['mantitle'] = (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle).downcase
     else
-      logger.error message_with_context 'non-conforming manpage title', :source_location => (reader.cursor_at_line 1)
+      logger.error message_with_context 'non-conforming manpage title', source_location: (reader.cursor_at_line 1)
       # provide sensible fallbacks
       doc_attrs['mantitle'] = doc_attrs['doctitle'] || doc_attrs['docname'] || 'command'
       doc_attrs['manvolnum'] = manvolnum = '1'
@@ -206,7 +205,7 @@ class Parser
       if (name_section_level = is_next_line_section? reader, {})
         if name_section_level == 1
           name_section = initialize_section reader, document, {}
-          name_section_buffer = (reader.read_lines_until :break_on_blank_lines => true, :skip_line_comments => true).map(&:lstrip).join ' '
+          name_section_buffer = (reader.read_lines_until break_on_blank_lines: true, skip_line_comments: true).map(&:lstrip).join ' '
           if ManpageNamePurposeRx =~ name_section_buffer
             doc_attrs['manname-title'] ||= name_section.title
             doc_attrs['manname-id'] = name_section.id if name_section.id
@@ -236,7 +235,7 @@ class Parser
       end
       if error_msg
         reader.restore_save
-        logger.error message_with_context error_msg, :source_location => reader.cursor
+        logger.error message_with_context error_msg, source_location: reader.cursor
         doc_attrs['manname'] = (manname = doc_attrs['docname'] || 'command')
         doc_attrs['mannames'] = [manname]
         if document.backend == 'manpage'
@@ -275,7 +274,7 @@ class Parser
   #   source
   #   # => "= Greetings\n\nThis is my doc.\n\n== Salutations\n\nIt is awesome."
   #
-  #   reader = Reader.new source, nil, :normalize => true
+  #   reader = Reader.new source, nil, normalize: true
   #   # create empty document to parent the section
   #   # and hold attributes extracted from header
   #   doc = Document.new
@@ -297,7 +296,7 @@ class Parser
         (attributes.delete 'invalid-header') || !(is_next_line_section? reader, attributes))
       book = (document = parent).doctype == 'book'
       if has_header || (book && attributes[1] != 'abstract')
-        preamble = intro = (Block.new parent, :preamble, :content_model => :compound)
+        preamble = intro = Block.new parent, :preamble, content_model: :compound
         preamble.title = parent.attr 'preface-title' if book && (parent.attr? 'preface-title')
         parent.blocks << preamble
       end
@@ -346,16 +345,16 @@ class Parser
           if expected_next_level
             unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt) || expected_next_level < 0
               expected_condition = expected_next_level_alt ? %(expected levels #{expected_next_level_alt} or #{expected_next_level}) : %(expected level #{expected_next_level})
-              logger.warn message_with_context %(section title out of sequence: #{expected_condition}, got level #{next_level}), :source_location => reader.cursor
+              logger.warn message_with_context %(section title out of sequence: #{expected_condition}, got level #{next_level}), source_location: reader.cursor
             end
           else
-            logger.error message_with_context %(#{sectname} sections do not support nested sections), :source_location => reader.cursor
+            logger.error message_with_context %(#{sectname} sections do not support nested sections), source_location: reader.cursor
           end
           new_section, attributes = next_section reader, section, attributes
           section.assign_numeral new_section
           section.blocks << new_section
         elsif next_level == 0 && section == document
-          logger.error message_with_context 'level 0 sections can only be used when doctype is book', :source_location => reader.cursor unless book
+          logger.error message_with_context 'level 0 sections can only be used when doctype is book', source_location: reader.cursor unless book
           new_section, attributes = next_section reader, section, attributes
           section.assign_numeral new_section
           section.blocks << new_section
@@ -366,7 +365,7 @@ class Parser
       else
         # just take one block or else we run the risk of overrunning section boundaries
         block_cursor = reader.cursor
-        if (new_block = next_block reader, intro || section, attributes, :parse_metadata => false)
+        if (new_block = next_block reader, intro || section, attributes, parse_metadata: false)
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
@@ -378,7 +377,7 @@ class Parser
                   new_block.style = 'partintro'
                 # emulate [partintro] open block
                 else
-                  new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
+                  new_block.parent = (intro = Block.new section, :open, content_model: :compound)
                   intro.style = 'partintro'
                   section.blocks << intro
                 end
@@ -387,10 +386,10 @@ class Parser
               first_block = section.blocks[0]
               # open the [partintro] open block for appending
               if !intro && first_block.content_model == :compound
-                logger.error message_with_context 'illegal block content outside of partintro block', :source_location => block_cursor
+                logger.error message_with_context 'illegal block content outside of partintro block', source_location: block_cursor
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
-                new_block.parent = (intro = Block.new section, :open, :content_model => :compound)
+                new_block.parent = (intro = Block.new section, :open, content_model: :compound)
                 intro.style = 'partintro'
                 section.blocks.shift
                 if first_block.style == 'partintro'
@@ -416,7 +415,7 @@ class Parser
 
     if part
       unless section.blocks? && section.blocks[-1].context == :section
-        logger.error message_with_context 'invalid part, must have at least one section (e.g., chapter, appendix, etc.)', :source_location => reader.cursor
+        logger.error message_with_context 'invalid part, must have at least one section (e.g., chapter, appendix, etc.)', source_location: reader.cursor
       end
     # NOTE we could try to avoid creating a preamble in the first place, though
     # that would require reworking assumptions in next_section since the preamble
@@ -509,7 +508,7 @@ class Parser
         elsif block_extensions && extensions.registered_for_block?(style, block_context)
           block_context = style.to_sym
         else
-          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), :source_location => reader.cursor_at_mark
+          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark
           style = block_context.to_s
         end
       end
@@ -540,7 +539,7 @@ class Parser
               #!(this_line.start_with? '    ') &&
               (MarkdownThematicBreakRx.match? this_line)
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-            block = Block.new(parent, :thematic_break, :content_model => :empty)
+            block = Block.new(parent, :thematic_break, content_model: :empty)
             break
           end
         elsif this_line.start_with? TAB
@@ -551,14 +550,14 @@ class Parser
           if (layout_break_chars.key? ch0) && (md_syntax ? (ExtLayoutBreakRx.match? this_line) :
               (this_line == ch0 * (ll = this_line.length) && ll > 2))
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
-            block = Block.new(parent, layout_break_chars[ch0], :content_model => :empty)
+            block = Block.new(parent, layout_break_chars[ch0], content_model: :empty)
             break
           # NOTE very rare that a text-only line will end in ] (e.g., inline macro), so check that first
           elsif (this_line.end_with? ']') && (this_line.include? '::')
             #if (this_line.start_with? 'image', 'video', 'audio') && BlockMediaMacroRx =~ this_line
             if (ch0 == 'i' || (this_line.start_with? 'video:', 'audio:')) && BlockMediaMacroRx =~ this_line
               blk_ctx, target, blk_attrs = $1.to_sym, $2, $3
-              block = Block.new parent, blk_ctx, :content_model => :empty
+              block = Block.new parent, blk_ctx, content_model: :empty
               if blk_attrs
                 case blk_ctx
                 when :video
@@ -568,14 +567,14 @@ class Parser
                 else # :image
                   posattrs = ['alt', 'width', 'height']
                 end
-                block.parse_attributes blk_attrs, posattrs, :sub_input => true, :into => attributes
+                block.parse_attributes blk_attrs, posattrs, sub_input: true, into: attributes
               end
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
-              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, :attribute_missing => 'drop-line').empty?
+              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, attribute_missing: 'drop-line').empty?
                 # retain as unparsed if attribute-missing is skip
                 if (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'skip'
-                  return Block.new(parent, :paragraph, :content_model => :simple, :source => [this_line])
+                  return Block.new(parent, :paragraph, content_model: :simple, source: [this_line])
                 # otherwise, drop the line
                 else
                   attributes.clear
@@ -599,8 +598,8 @@ class Parser
               break
 
             elsif ch0 == 't' && (this_line.start_with? 'toc:') && BlockTocMacroRx =~ this_line
-              block = Block.new parent, :toc, :content_model => :empty
-              block.parse_attributes $1, [], :into => attributes if $1
+              block = Block.new parent, :toc, content_model: :empty
+              block.parse_attributes $1, [], into: attributes if $1
               break
 
             elsif block_macro_extensions && CustomBlockMacroRx =~ this_line &&
@@ -612,7 +611,7 @@ class Parser
                 return
               end
               if extension.config[:content_model] == :attributes
-                document.parse_attributes content, extension.config[:pos_attrs] || [], :sub_input => true, :into => attributes if content
+                document.parse_attributes content, extension.config[:pos_attrs] || [], sub_input: true, into: attributes if content
               else
                 attributes['text'] = content || ''
               end
@@ -660,7 +659,7 @@ class Parser
         reader.unshift_line this_line
         float_id, float_reftext, float_title, float_level = parse_section_title reader, document, attributes['id']
         attributes['reftext'] = float_reftext if float_reftext
-        block = Block.new(parent, :floating_title, :content_model => :empty)
+        block = Block.new(parent, :floating_title, content_model: :empty)
         block.title = float_title
         attributes.delete 'title'
         block.id = float_id || ((doc_attrs.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
@@ -689,7 +688,7 @@ class Parser
           # advance to block parsing =>
           break
         else
-          logger.warn message_with_context %(invalid style for paragraph: #{style}), :source_location => reader.cursor_at_mark
+          logger.warn message_with_context %(invalid style for paragraph: #{style}), source_location: reader.cursor_at_mark
           style = nil
           # continue to process paragraph
         end
@@ -700,27 +699,27 @@ class Parser
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, (in_list = ListItem === parent) && skipped == 0, :skip_line_comments => text_only
+        lines = read_paragraph_lines reader, (in_list = ListItem === parent) && skipped == 0, skip_line_comments: text_only
         adjust_indentation! lines
-        block = Block.new(parent, :literal, :content_model => :verbatim, :source => lines, :attributes => attributes)
+        block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
         # a literal gets special meaning inside of a description list
         # TODO this feels hacky, better way to distinguish from explicit literal block?
         block.set_option('listparagraph') if in_list
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
-        lines = read_paragraph_lines reader, skipped == 0 && ListItem === parent, :skip_line_comments => true
+        lines = read_paragraph_lines reader, skipped == 0 && ListItem === parent, skip_line_comments: true
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
         if text_only
           # if [normal] is used over an indented paragraph, shift content to left margin
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
           adjust_indentation! lines if indented && style == 'normal'
-          block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
+          block = Block.new(parent, :paragraph, content_model: :simple, source: lines, attributes: attributes)
         elsif (ADMONITION_STYLE_HEADS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
           lines[0] = $' # string after match
           attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
           attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
-          block = Block.new(parent, :admonition, :content_model => :simple, :source => lines, :attributes => attributes)
+          block = Block.new(parent, :admonition, content_model: :simple, source: lines, attributes: attributes)
         elsif md_syntax && ch0 == '>' && this_line.start_with?('> ')
           lines.map! {|line| line == '>' ? (line.slice 1, line.length) : ((line.start_with? '> ') ? (line.slice 2, line.length) : line) }
           if lines[-1].start_with? '-- '
@@ -745,7 +744,7 @@ class Parser
           lines.pop while lines[-1].empty?
           lines << lines.pop.chop # strip trailing quote
           attributes['style'] = 'quote'
-          block = Block.new(parent, :quote, :content_model => :simple, :source => lines, :attributes => attributes)
+          block = Block.new(parent, :quote, content_model: :simple, source: lines, attributes: attributes)
           attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
           attributes['attribution'] = attribution if attribution
           attributes['citetitle'] = citetitle if citetitle
@@ -753,7 +752,7 @@ class Parser
           # if [normal] is used over an indented paragraph, shift content to left margin
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
           adjust_indentation! lines if indented && style == 'normal'
-          block = Block.new(parent, :paragraph, :content_model => :simple, :source => lines, :attributes => attributes)
+          block = Block.new(parent, :paragraph, content_model: :simple, source: lines, attributes: attributes)
         end
 
         catalog_inline_anchors((lines.join LF), block, document, reader)
@@ -841,7 +840,7 @@ class Parser
 
       when :table
         block_cursor = reader.cursor
-        block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_line_comments => true, :context => :table, :cursor => :at_mark), block_cursor
+        block_reader = Reader.new reader.read_lines_until(terminator: terminator, skip_line_comments: true, context: :table, cursor: :at_mark), block_cursor
         # NOTE it's very rare that format is set when using a format hint char, so short-circuit
         unless terminator.start_with? '|', '!'
           # NOTE infer dsv once all other format hint chars are ruled out
@@ -865,7 +864,7 @@ class Parser
             # QUESTION should we clone the extension for each cloaked context and set in config?
             attributes['cloaked-context'] = cloaked_context
           end
-          block = build_block block_context, content_model, terminator, parent, reader, attributes, :extension => extension
+          block = build_block block_context, content_model, terminator, parent, reader, attributes, extension: extension
           unless block
             attributes.clear
             return
@@ -886,7 +885,7 @@ class Parser
     block.style = attributes['style']
     if (block_id = (block.id ||= attributes['id']))
       unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
-        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), :source_location => reader.cursor_at_mark
+        logger.warn message_with_context %(id assigned to block already in use: #{block_id}), source_location: reader.cursor_at_mark
       end
     end
     # FIXME remove the need for this update!
@@ -1002,16 +1001,16 @@ class Parser
 
     if terminator.nil?
       if parse_as_content_model == :verbatim
-        lines = reader.read_lines_until :break_on_blank_lines => true, :break_on_list_continuation => true
+        lines = reader.read_lines_until break_on_blank_lines: true, break_on_list_continuation: true
       else
         content_model = :simple if content_model == :compound
         # TODO we could also skip processing if we're able to detect reader is a BlockReader
-        lines = read_paragraph_lines reader, false, :skip_line_comments => true, :skip_processing => skip_processing
+        lines = read_paragraph_lines reader, false, skip_line_comments: true, skip_processing: skip_processing
         # QUESTION check for empty lines after grabbing lines for simple content model?
       end
       block_reader = nil
     elsif parse_as_content_model != :compound
-      lines = reader.read_lines_until :terminator => terminator, :skip_processing => skip_processing, :context => block_context, :cursor => :at_mark
+      lines = reader.read_lines_until terminator: terminator, skip_processing: skip_processing, context: block_context, cursor: :at_mark
       block_reader = nil
     # terminator is false when reader has already been prepared
     elsif terminator == false
@@ -1020,7 +1019,7 @@ class Parser
     else
       lines = nil
       block_cursor = reader.cursor
-      block_reader = Reader.new reader.read_lines_until(:terminator => terminator, :skip_processing => skip_processing, :context => block_context, :cursor => :at_mark), block_cursor
+      block_reader = Reader.new reader.read_lines_until(terminator: terminator, skip_processing: skip_processing, context: block_context, cursor: :at_mark), block_cursor
     end
 
     if content_model == :verbatim
@@ -1050,7 +1049,7 @@ class Parser
         return
       end
     else
-      block = Block.new(parent, block_context, :content_model => content_model, :source => lines, :attributes => attributes)
+      block = Block.new(parent, block_context, content_model: content_model, source: lines, attributes: attributes)
     end
 
     # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
@@ -1115,9 +1114,7 @@ class Parser
     found = false
     autonum = 0
     text.scan(CalloutScanRx) {
-      # lead with assignments for Ruby 1.8.7 compat
-      captured, num = $&, $2
-      document.callouts.register num == '.' ? (autonum += 1).to_s : num unless captured.start_with? '\\'
+      document.callouts.register $2 == '.' ? (autonum += 1).to_s : $2 unless $&.start_with? '\\'
       # we have to mark as found even if it's escaped so it can be unescaped
       found = true
     } if text.include? '<'
@@ -1136,9 +1133,9 @@ class Parser
   def self.catalog_inline_anchor id, reftext, node, location, doc = nil
     doc ||= node.document
     reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
-    unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, :type => :ref, :id => id), reftext]
+    unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id), reftext]
       location = location.cursor if Reader === location
-      logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => location
+      logger.warn message_with_context %(id assigned to anchor already in use: #{id}), source_location: location
     end
     nil
   end
@@ -1152,8 +1149,6 @@ class Parser
   # Returns nothing
   def self.catalog_inline_anchors text, block, document, reader
     text.scan(InlineAnchorScanRx) do
-      # alias match for Ruby 1.8.7 compat
-      m = $~
       if (id = $1)
         if (reftext = $2)
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
@@ -1165,12 +1160,12 @@ class Parser
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
         end
       end
-      unless document.register :refs, [id, (Inline.new block, :anchor, reftext, :type => :ref, :id => id), reftext]
+      unless document.register :refs, [id, (Inline.new block, :anchor, reftext, type: :ref, id: id), reftext]
         location = reader.cursor_at_mark
-        if (offset = (m.pre_match.count LF) + ((m[0].start_with? LF) ? 1 : 0)) > 0
+        if (offset = ($`.count LF) + (($&.start_with? LF) ? 1 : 0)) > 0
           (location = location.dup).advance offset
         end
-        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), :source_location => location
+        logger.warn message_with_context %(id assigned to anchor already in use: #{id}), source_location: location
       end
     end if (text.include? '[[') || (text.include? 'or:')
     nil
@@ -1186,8 +1181,8 @@ class Parser
   # Returns nothing
   def self.catalog_inline_biblio_anchor id, reftext, node, reader
     # QUESTION should we sub attributes in reftext (like with regular anchors)?
-    unless node.document.register :refs, [id, (Inline.new node, :anchor, (styled_reftext = %([#{reftext || id}])), :type => :bibref, :id => id), styled_reftext]
-      logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), :source_location => reader.cursor
+    unless node.document.register :refs, [id, (Inline.new node, :anchor, (styled_reftext = %([#{reftext || id}])), type: :bibref, id: id), styled_reftext]
+      logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), source_location: reader.cursor
     end
     nil
   end
@@ -1241,12 +1236,12 @@ class Parser
       end
       # might want to move this check to a validate method
       unless num == next_index.to_s
-        logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{num}), :source_location => reader.cursor_at_mark
+        logger.warn message_with_context %(callout list item index: expected #{next_index}, got #{num}), source_location: reader.cursor_at_mark
       end
       if (list_item = parse_list_item reader, list_block, match, '<1>')
         list_block.items << list_item
         if (coids = callouts.callout_ids list_block.items.size).empty?
-          logger.warn message_with_context %(no callout found for <#{list_block.items.size}>), :source_location => reader.cursor_at_mark
+          logger.warn message_with_context %(no callout found for <#{list_block.items.size}>), source_location: reader.cursor_at_mark
         else
           list_item.attributes['coids'] = coids
         end
@@ -1358,7 +1353,7 @@ class Parser
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
-      if (block = next_block(list_item_reader, list_item, {}, :text => !has_text))
+      if (block = next_block(list_item_reader, list_item, {}, text: !has_text))
         list_item.blocks << block
       end
 
@@ -1445,7 +1440,7 @@ class Parser
           buffer << this_line
           # grab all the lines in the block, leaving the delimiters in place
           # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.read_lines_until(:terminator => match.terminator, :read_last_line => true, :context => nil)
+          buffer.concat reader.read_lines_until(terminator: match.terminator, read_last_line: true, context: nil)
           continuation = :inactive
         else
           break
@@ -1464,9 +1459,9 @@ class Parser
           if LiteralParagraphRx.match? this_line
             reader.unshift_line this_line
             buffer.concat reader.read_lines_until(
-                :preserve_last_line => true,
-                :break_on_blank_lines => true,
-                :break_on_list_continuation => true) {|line|
+                preserve_last_line: true,
+                break_on_blank_lines: true,
+                break_on_list_continuation: true) {|line|
               # we may be in an indented list disguised as a literal paragraph
               # so we need to make sure we don't slurp up a legitimate sibling
               list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
@@ -1518,9 +1513,9 @@ class Parser
               elsif LiteralParagraphRx.match? this_line
                 reader.unshift_line this_line
                 buffer.concat reader.read_lines_until(
-                    :preserve_last_line => true,
-                    :break_on_blank_lines => true,
-                    :break_on_list_continuation => true) {|line|
+                    preserve_last_line: true,
+                    break_on_blank_lines: true,
+                    break_on_list_continuation: true) {|line|
                   # we may be in an indented list disguised as a literal paragraph
                   # so we need to make sure we don't slurp up a legitimate sibling
                   list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
@@ -1629,7 +1624,7 @@ class Parser
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
-        logger.warn message_with_context %(id assigned to section already in use: #{id}), :source_location => (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
+        logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
       end
     end
 
@@ -1704,7 +1699,7 @@ class Parser
   def self.setext_section_title? line1, line2
     if (level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && SetextSectionTitleRx.match?(line1) &&
-        (line_length(line1) - line2_len).abs < 2
+        (line1.length - line2_len).abs < 2
       level
     end
   end
@@ -1766,7 +1761,7 @@ class Parser
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
         line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
-        (line_length(line1) - line2_len).abs < 2
+        (line1.length - line2_len).abs < 2
       atx = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
         sect_title, sect_id, sect_reftext = (sect_title.slice 0, sect_title.length - $&.length), $2, $3
@@ -1777,21 +1772,6 @@ class Parser
     end
     sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
     [sect_id, sect_reftext, sect_title, sect_level, atx]
-  end
-
-  # Public: Calculate the number of unicode characters in the line, excluding the endline
-  #
-  # line - the String to calculate
-  #
-  # returns the number of unicode characters in the line
-  if FORCE_UNICODE_LINE_LENGTH
-    def self.line_length(line)
-      line.scan(UnicodeCharScanRx).size
-    end
-  else
-    def self.line_length(line)
-      line.length
-    end
   end
 
   # Public: Consume and parse the two header lines (line 1 = author info, line 2 = revision info).
@@ -1805,9 +1785,9 @@ class Parser
   # Examples
   #
   #  data = ["Author Name <author@example.org>\n", "v1.0, 2012-12-21: Coincide w/ end of world.\n"]
-  #  parse_header_metadata(Reader.new data, nil, :normalize => true)
-  #  # => {'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
-  #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.'}
+  #  parse_header_metadata(Reader.new data, nil, normalize: true)
+  #  # => { 'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
+  #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.' }
   def self.parse_header_metadata(reader, document = nil)
     doc_attrs = document && document.attributes
     # NOTE this will discard any comment lines, but not skip blank lines
@@ -2073,7 +2053,7 @@ class Parser
         elsif (next_line.end_with? ']') && BlockAttributeListRx =~ next_line
           current_style = attributes[1]
           # extract id, role, and options from first positional attribute and remove, if present
-          if (document.parse_attributes $1, [], :sub_input => true, :sub_result => true, :into => attributes)[1]
+          if (document.parse_attributes $1, [], sub_input: true, sub_result: true, into: attributes)[1]
             attributes[1] = (parse_style_attribute attributes, reader) || current_style
           end
           return true
@@ -2090,7 +2070,7 @@ class Parser
           return true
         elsif normal && '/' * (ll = next_line.length) == next_line
           unless ll == 3
-            reader.read_lines_until :terminator => next_line, :skip_first_line => true, :preserve_last_line => true, :skip_processing => true, :context => :comment
+            reader.read_lines_until terminator: next_line, skip_first_line: true, preserve_last_line: true, skip_processing: true, context: :comment
             return true
           end
         else
@@ -2272,7 +2252,7 @@ class Parser
     end
 
     if validate && expected != actual
-      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), :source_location => reader.cursor
+      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor
     end
 
     [marker, style]
@@ -2600,7 +2580,7 @@ class Parser
         if collector.empty?
           unless type == :style
             if reader
-              logger.warn message_with_context %(invalid empty #{type} detected in style attribute), :source_location => reader.cursor_at_prev_line
+              logger.warn message_with_context %(invalid empty #{type} detected in style attribute), source_location: reader.cursor_at_prev_line
             else
               logger.warn %(invalid empty #{type} detected in style attribute)
             end
@@ -2612,7 +2592,7 @@ class Parser
           when :id
             if parsed.key? :id
               if reader
-                logger.warn message_with_context 'multiple ids detected in style attribute', :source_location => reader.cursor_at_prev_line
+                logger.warn message_with_context 'multiple ids detected in style attribute', source_location: reader.cursor_at_prev_line
               else
                 logger.warn 'multiple ids detected in style attribute'
               end
@@ -2769,7 +2749,7 @@ class Parser
     nil
   end
 
-  # Public: Convert a string to a legal attribute name.
+  # Internal: Convert a string to a legal attribute name.
   #
   # name  - the String name of the attribute
   #

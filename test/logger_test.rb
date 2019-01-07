@@ -1,8 +1,4 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context 'Logger' do
   MyLogger = Class.new Logger
@@ -87,7 +83,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.load 'contents', :logger => new_logger
+        Asciidoctor.load 'contents', logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -98,7 +94,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.load_file fixture_path('basic.asciidoc'), :logger => new_logger
+        Asciidoctor.load_file fixture_path('basic.adoc'), logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -109,7 +105,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.convert 'contents', :logger => new_logger
+        Asciidoctor.convert 'contents', logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -120,7 +116,7 @@ context 'Logger' do
       old_logger = Asciidoctor::LoggerManager.logger
       new_logger = MyLogger.new $stdout
       begin
-        Asciidoctor.convert_file fixture_path('basic.asciidoc'), :to_file => false, :logger => new_logger
+        Asciidoctor.convert_file fixture_path('basic.adoc'), to_file: false, logger: new_logger
         assert_same new_logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
@@ -141,7 +137,7 @@ context 'Logger' do
         include SampleModuleA
       end
       assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.get_logger
-      assert SampleClassA.private_method_defined? :logger
+      assert SampleClassA.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on module access to logging infrastructure' do
@@ -164,7 +160,7 @@ context 'Logger' do
       end
 
       assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.get_logger
-      assert SampleClassC.private_method_defined? :logger
+      assert SampleClassC.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on class access to logging infrastructure' do
@@ -182,7 +178,7 @@ context 'Logger' do
       class SampleClassE
         include Asciidoctor::Logging
         def create_message cursor
-          message_with_context 'Asciidoctor was here', :source_location => cursor
+          message_with_context 'Asciidoctor was here', source_location: cursor
         end
       end
 

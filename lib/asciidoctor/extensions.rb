@@ -1,7 +1,6 @@
 # NOTE .to_s hides require from Opal
-require 'asciidoctor'.to_s unless defined? Asciidoctor.load
+require_relative '../asciidoctor'.to_s unless defined? Asciidoctor.load
 
-# encoding: UTF-8
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
 # phases of the AsciiDoc processor or extend the AsciiDoc syntax.
@@ -66,14 +65,12 @@ module Extensions
       #
       # Returns nothing
       def use_dsl
-        if self.name.nil_or_empty?
-          # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #include const_get :DSL if constants(false).include? :DSL
-          include const_get :DSL if constants.include? :DSL
-        else
-          # NOTE contants(false) doesn't exist in Ruby 1.8.7
-          #extend const_get :DSL if constants(false).include? :DSL
-          extend const_get :DSL if constants.include? :DSL
+        if const_defined? :DSL
+          if self.name.nil_or_empty?
+            include const_get :DSL
+          else
+            extend const_get :DSL
+          end
         end
       end
       alias extend_dsl use_dsl
@@ -156,7 +153,7 @@ module Extensions
     end
 
     def create_block parent, context, source, attrs, opts = {}
-      Block.new parent, context, { :source => source, :attributes => attrs }.merge(opts)
+      Block.new parent, context, { source: source, attributes: attrs }.merge(opts)
     end
 
     # Public: Creates a list node and links it to the specified parent.
@@ -965,7 +962,7 @@ module Extensions
     #   docinfo_processor MetaRobotsDocinfoProcessor
     #
     #   # as an instance of a DocinfoProcessor subclass with an explicit location
-    #   docinfo_processor JQueryDocinfoProcessor.new, :location => :footer
+    #   docinfo_processor JQueryDocinfoProcessor.new, location: :footer
     #
     #   # as a name of a DocinfoProcessor subclass
     #   docinfo_processor 'MetaRobotsDocinfoProcessor'
@@ -1319,8 +1316,8 @@ module Extensions
     def add_document_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
       kind_class_symbol = kind_name.split.map {|it| it.capitalize }.join.to_sym
-      kind_class = Extensions.const_get kind_class_symbol
-      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
+      kind_class = Extensions.const_get kind_class_symbol, false
+      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
       # style 1: specified as block
       extension = if block_given?
@@ -1331,8 +1328,7 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
-        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1342,7 +1338,7 @@ module Extensions
       else
         processor, config = resolve_args args, 2
         # style 2: specified as Class or String class name
-        if (processor_class = Extensions.resolve_class processor)
+        if (processor_class = Helpers.resolve_class processor)
           unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
@@ -1366,8 +1362,8 @@ module Extensions
     def add_syntax_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
       kind_class_symbol = (kind_name.split.map {|it| it.capitalize }.push 'Processor').join.to_sym
-      kind_class = Extensions.const_get kind_class_symbol
-      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol) : nil
+      kind_class = Extensions.const_get kind_class_symbol, false
+      kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, {})
       # style 1: specified as block
       if block_given?
@@ -1377,8 +1373,7 @@ module Extensions
         #class << processor
         #  include_dsl
         #end
-        # NOTE kind_class.contants(false) doesn't exist in Ruby 1.8.7
-        processor.extend kind_class.const_get :DSL if kind_class.constants.include? :DSL
+        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
         if block.arity == 1
           yield processor
         else
@@ -1395,7 +1390,7 @@ module Extensions
       else
         processor, name, config = resolve_args args, 3
         # style 2: specified as Class or String class name
-        if (processor_class = Extensions.resolve_class processor)
+        if (processor_class = Helpers.resolve_class processor)
           unless processor_class < kind_class || (kind_java_class && processor_class < kind_java_class)
             raise ::ArgumentError, %(Class specified for #{kind_name} extension does not inherit from #{kind_class}: #{processor})
           end
@@ -1453,7 +1448,7 @@ module Extensions
 
     def create name = nil, &block
       if block_given?
-        Registry.new({ (name || generate_name) => block })
+        Registry.new (name || generate_name) => block
       else
         Registry.new
       end
@@ -1501,7 +1496,7 @@ module Extensions
         resolved_group = block
       elsif (group = args.pop)
         # QUESTION should we instantiate the group class here or defer until activation??
-        resolved_group = (resolve_class group) || group
+        resolved_group = (Helpers.resolve_class group) || group
       else
         raise ::ArgumentError, %(Extension group to register not specified)
       end
@@ -1528,55 +1523,6 @@ module Extensions
     def unregister *names
       names.each {|group| @groups.delete group.to_sym }
       nil
-    end
-
-    # Internal: Resolve the specified object as a Class
-    #
-    # object - The object to resolve as a Class
-    #
-    # Returns a Class if the specified object is a Class (but not a Module) or
-    # a String that resolves to a Class; otherwise, nil
-    def resolve_class object
-      case object
-      when ::Class
-        object
-      when ::String
-        class_for_name object
-      end
-    end
-
-    # Public: Resolves the Class object for the qualified name.
-    #
-    # Returns Class
-    if ::RUBY_MIN_VERSION_2
-      def class_for_name qualified_name
-        resolved = ::Object.const_get qualified_name, false
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
-    elsif ::RUBY_MIN_VERSION_1_9
-      def class_for_name qualified_name
-        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
-          name.empty? ? current : (current.const_get name, false)
-        end
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
-    else
-      def class_for_name qualified_name
-        resolved = (qualified_name.split '::').reduce ::Object do |current, name|
-          # NOTE on Ruby 1.8, const_defined? only checks for constant in current scope
-          name.empty? ? current : ((current.const_defined? name) ? (current.const_get name) : raise)
-        end
-        raise unless ::Class === resolved
-        resolved
-      rescue
-        raise ::NameError, %(Could not resolve class for name: #{qualified_name})
-      end
     end
   end
 end

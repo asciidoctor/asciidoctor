@@ -6,11 +6,11 @@ module Asciidoctor
   #
   # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
   class Converter::ManPageConverter < Converter::BuiltIn
-    LF = %(\n)
-    TAB = %(\t)
+    LF = ?\n
+    TAB = ?\t
     WHITESPACE = %(#{LF}#{TAB} )
     ET = ' ' * 8
-    ESC = %(\u001b) # troff leader marker
+    ESC = ?\u001b # troff leader marker
     ESC_BS = %(#{ESC}\\) # escaped backslash (indicates troff formatting sequence)
     ESC_FS = %(#{ESC}.)  # escaped full stop (indicates troff macro)
 
@@ -145,7 +145,7 @@ module Asciidoctor
         if node.attr? 'manpurpose'
           mannames = node.attr 'mannames', [manname]
           result << %(.SH "#{(node.attr 'manname-title', 'NAME').upcase}"
-#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), :whitespace => :normalize})
+#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), whitespace: :normalize})
         end
       end
 
@@ -235,7 +235,7 @@ r lw(\n(.lu*75u/100u).'
       num = 0
       node.items.each do |item|
         result << %(\\fB(#{num += 1})\\fP\\h'-2n':T{)
-        result << (manify item.text, :whitespace => :normalize)
+        result << (manify item.text, whitespace: :normalize)
         result << item.content if item.blocks?
         result << 'T}'
       end
@@ -259,11 +259,11 @@ r lw(\n(.lu*75u/100u).'
 .RS 4)
         else
           result << %(.sp
-#{manify [*terms].map {|dt| dt.text }.join(', '), :whitespace => :normalize}
+#{manify [*terms].map {|dt| dt.text }.join(', '), whitespace: :normalize}
 .RS 4)
         end
         if dd
-          result << (manify dd.text, :whitespace => :normalize) if dd.text?
+          result << (manify dd.text, whitespace: :normalize) if dd.text?
           result << dd.content if dd.blocks?
         end
         result << '.RE'
@@ -296,7 +296,7 @@ r lw(\n(.lu*75u/100u).'
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content, :whitespace => :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -310,7 +310,7 @@ r lw(\n(.lu*75u/100u).'
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content, :whitespace => :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -332,7 +332,7 @@ r lw(\n(.lu*75u/100u).'
 .  sp -1
 .  IP " #{idx + 1}." 4.2
 .\\}
-#{manify item.text, :whitespace => :normalize})
+#{manify item.text, whitespace: :normalize})
         result << item.content if item.blocks?
         result << '.RE'
       end
@@ -356,10 +356,10 @@ r lw(\n(.lu*75u/100u).'
         %(.sp
 .B #{manify node.title}
 .br
-#{manify node.content, :whitespace => :normalize})
+#{manify node.content, whitespace: :normalize})
       else
         %(.sp
-#{manify node.content, :whitespace => :normalize})
+#{manify node.content, whitespace: :normalize})
       end
     end
 
@@ -458,7 +458,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text, :whitespace => :normalize}#{LF})
+              row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
             elsif tsec == :body
               if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}t)
@@ -470,11 +470,11 @@ allbox tab(:);'
               when :asciidoc
                 cell_content = cell.content
               when :literal
-                cell_content = %(.nf#{LF}#{manify cell.text, :whitespace => :preserve}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
               when :verse
-                cell_content = %(.nf#{LF}#{manify cell.text, :whitespace => :preserve}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
               else
-                cell_content = manify cell.content.join, :whitespace => :normalize
+                cell_content = manify cell.content.join, whitespace: :normalize
               end
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
@@ -484,7 +484,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text, :whitespace => :normalize}#{LF})
+              row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
@@ -560,7 +560,7 @@ allbox tab(:);'
 .  sp -1
 .  IP \\(bu 2.3
 .\\}
-#{manify item.text, :whitespace => :normalize}]
+#{manify item.text, whitespace: :normalize}]
         result << item.content if item.blocks?
         result << '.RE'
       }
@@ -579,7 +579,7 @@ allbox tab(:);'
       attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
       result << %(.sp
 .nf
-#{manify node.content, :whitespace => :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .br)
       if attribution_line
@@ -701,7 +701,7 @@ allbox tab(:);'
     end
 
     def resolve_content node
-      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, :whitespace => :normalize})
+      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, whitespace: :normalize})
     end
 
     def write_alternate_pages mannames, manvolnum, target
@@ -710,7 +710,7 @@ allbox tab(:);'
         manvolext = %(.#{manvolnum})
         dir, basename = ::File.split target
         mannames.each do |manname|
-          ::IO.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename})
+          ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
         end
       end
     end

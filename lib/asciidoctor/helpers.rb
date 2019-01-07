@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 module Helpers
   # Internal: Require the specified library using Kernel#require.
@@ -43,82 +42,60 @@ module Helpers
     nil
   end
 
-  # Public: Normalize the data to prepare for parsing
+  # Public: Prepare the source data Array for parsing.
   #
-  # Delegates to Helpers#normalize_lines_from_string if data is a String.
-  # Delegates to Helpers#normalize_lines_array if data is a String Array.
+  # Encodes the data to UTF-8, if necessary, and removes any trailing
+  # whitespace from every line.
   #
-  # returns a String Array of normalized lines
-  def self.normalize_lines data
-    ::String === data ? (normalize_lines_from_string data) : (normalize_lines_array data)
-  end
-
-  # Public: Normalize the array of lines to prepare them for parsing
+  # If a BOM is found at the beginning of the data, a best attempt is made to
+  # encode it to UTF-8 from the specified source encoding.
   #
-  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
+  # data - the source data Array to prepare (no nil entries allowed)
   #
-  # If a BOM is present at the beginning of the data, a best attempt
-  # is made to encode from the specified encoding to UTF-8.
-  #
-  # data - a String Array of lines to normalize
-  #
-  # returns a String Array of normalized lines
-  def self.normalize_lines_array data
-    return data if data.empty?
-
-    leading_bytes = (first_line = data[0]).unpack 'C3'
-    if COERCE_ENCODING
-      utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        # HACK Ruby messes up trailing whitespace on UTF-16LE, so reencode whole document first
-        data = data.join
-        return (((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8).each_line.map {|line| line.rstrip }
-      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data[0] = (first_line.force_encoding ::Encoding::UTF_16BE).slice 1, first_line.length
-        return data.map {|line| ((line.force_encoding ::Encoding::UTF_16BE).encode utf8).rstrip }
-      elsif leading_bytes == BOM_BYTES_UTF_8
-        data[0] = (first_line.force_encoding utf8).slice 1, first_line.length
-      end
-
-      data.map {|line| line.encoding == utf8 ? line.rstrip : (line.force_encoding utf8).rstrip }
-    else
-      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      data[0] = first_line.slice 3, first_line.length if leading_bytes == BOM_BYTES_UTF_8
+  # returns a String Array of prepared lines
+  def self.prepare_source_array data
+    return [] if data.empty?
+    if (leading_2_bytes = (leading_bytes = (first = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
+      data[0] = first.byteslice 2, first.bytesize
+      # NOTE you can't split a UTF-16LE string using .lines when encoding is UTF-8; doing so will cause this line to fail
+      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16LE).rstrip }
+    elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+      data[0] = first.byteslice 2, first.bytesize
+      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16BE).rstrip }
+    elsif leading_bytes == BOM_BYTES_UTF_8
+      data[0] = first.byteslice 3, first.bytesize
+    end
+    if first.encoding == UTF_8
       data.map {|line| line.rstrip }
+    else
+      data.map {|line| (line.encode UTF_8).rstrip }
     end
   end
 
-  # Public: Normalize the String and split into lines to prepare them for parsing
+  # Public: Prepare the source data String for parsing.
   #
-  # Force encodes the data to UTF-8 and removes trailing whitespace from each line.
-  # Converts the data to a String Array.
+  # Encodes the data to UTF-8, if necessary, splits it into an array, and
+  # removes any trailing whitespace from every line.
   #
-  # If a BOM is present at the beginning of the data, a best attempt
-  # is made to encode from the specified encoding to UTF-8.
+  # If a BOM is found at the beginning of the data, a best attempt is made to
+  # encode it to UTF-8 from the specified source encoding.
   #
-  # data - a String of lines to normalize
+  # data - the source data String to prepare
   #
-  # returns a String Array of normalized lines
-  def self.normalize_lines_from_string data
+  # returns a String Array of prepared lines
+  def self.prepare_source_string data
     return [] if data.nil_or_empty?
-
-    leading_bytes = data.unpack 'C3'
-    if COERCE_ENCODING
-      utf8 = ::Encoding::UTF_8
-      if (leading_2_bytes = leading_bytes.slice 0, 2) == BOM_BYTES_UTF_16LE
-        data = ((data.force_encoding ::Encoding::UTF_16LE).slice 1, data.length).encode utf8
-      elsif leading_2_bytes == BOM_BYTES_UTF_16BE
-        data = ((data.force_encoding ::Encoding::UTF_16BE).slice 1, data.length).encode utf8
-      elsif leading_bytes == BOM_BYTES_UTF_8
-        data = data.encoding == utf8 ? (data.slice 1, data.length) : ((data.force_encoding utf8).slice 1, data.length)
-      else
-        data = data.force_encoding utf8 unless data.encoding == utf8
-      end
-    else
-      # Ruby 1.8 has no built-in re-encoding, so no point in removing the UTF-16 BOMs
-      data = data.slice 3, data.length if leading_bytes == BOM_BYTES_UTF_8
+    if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
+      data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16LE
+    elsif leading_2_bytes == BOM_BYTES_UTF_16BE
+      data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16BE
+    elsif leading_bytes == BOM_BYTES_UTF_8
+      data = data.byteslice 3, data.bytesize
+      data = data.encode UTF_8 unless data.encoding == UTF_8
+    elsif data.encoding != UTF_8
+      data = data.encode UTF_8
     end
-    data.each_line.map {|line| line.rstrip }
+    data.lines.map {|line| line.rstrip }
   end
 
   # Public: Efficiently checks whether the specified String resembles a URI
@@ -146,7 +123,7 @@ module Helpers
   end
 
   # Matches the characters in a URI to encode
-  REGEXP_ENCODE_URI_CHARS = /[^\w\-.!~*';:@=+$,()\[\]]/
+  UriEncodeCharsRx = /[^\w\-.!~*';:@=+$,()\[\]]/
 
   # Public: Encode a String for inclusion in a URI.
   #
@@ -154,7 +131,7 @@ module Helpers
   #
   # Returns the String with all URI reserved characters encoded.
   def self.uri_encode str
-    str.gsub(REGEXP_ENCODE_URI_CHARS) { $&.each_byte.map {|c| sprintf '%%%02X', c }.join }
+    str.gsub(UriEncodeCharsRx) { $&.each_byte.map {|c| sprintf '%%%02X', c }.join }
   end
 
   # Public: Removes the file extension from filename and returns the result
@@ -222,6 +199,46 @@ module Helpers
       repeat, val = val.divmod i
       l * repeat
     }.join
+  end
+
+  # Public: Get the next value in the sequence.
+  #
+  # Handles both integer and character sequences.
+  #
+  # current - the value to increment as a String or Integer
+  #
+  # returns the next value in the sequence according to the current value's type
+  def self.nextval current
+    if ::Integer === current
+      current + 1
+    else
+      intval = current.to_i
+      if intval.to_s != current.to_s
+        (current[0].ord + 1).chr
+      else
+        intval + 1
+      end
+    end
+  end
+
+  # Public: Resolve the specified object as a Class
+  #
+  # object - The Object to resolve as a Class
+  #
+  # Returns a Class if the specified object is a Class (but not a Module) or
+  # a String that resolves to a Class; otherwise, nil
+  def self.resolve_class object
+    ::Class === object ? object : (::String === object ? (class_for_name object) : nil)
+  end
+
+  # Public: Resolves a Class object (not a Module) for the qualified name.
+  #
+  # Returns Class
+  def self.class_for_name qualified_name
+    raise unless ::Class === (resolved = ::Object.const_get qualified_name, false)
+    resolved
+  rescue
+    raise ::NameError, %(Could not resolve class for name: #{qualified_name})
   end
 end
 end

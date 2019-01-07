@@ -1,38 +1,102 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context 'API' do
   context 'Load' do
     test 'should load input file' do
-      sample_input_path = fixture_path('sample.asciidoc')
-      doc = File.open(sample_input_path) {|file| Asciidoctor.load file, :safe => Asciidoctor::SafeMode::SAFE }
+      sample_input_path = fixture_path('sample.adoc')
+      doc = File.open(sample_input_path) {|file| Asciidoctor.load file, safe: Asciidoctor::SafeMode::SAFE }
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
+      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.adoc', doc.attr('docfilesuffix')
+    end
+
+    test 'should load input file from filename' do
+      sample_input_path = fixture_path('sample.adoc')
+      doc = Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
+      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
+      assert_equal '.adoc', doc.attr('docfilesuffix')
+    end
+
+    test 'should load input file with alternate file extension' do
+      sample_input_path = fixture_path 'sample-alt-extension.asciidoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: :safe
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
       assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
-    test 'should load input file from filename' do
-      sample_input_path = fixture_path('sample.asciidoc')
-      doc = Asciidoctor.load_file(sample_input_path, :safe => Asciidoctor::SafeMode::SAFE)
-      assert_equal 'Document Title', doc.doctitle
-      assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
-      assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
-      assert_equal '.asciidoc', doc.attr('docfilesuffix')
+    test 'should coerce encoding of file to UTF-8' do
+      old_external = Encoding.default_external
+      old_internal = Encoding.default_internal
+      old_verbose = $VERBOSE
+      begin
+        $VERBOSE = nil # disable warnings since we have to modify constants
+        input_path = fixture_path 'encoding.adoc'
+        Encoding.default_external = Encoding.default_internal = Encoding::IBM437
+        output = Asciidoctor.convert_file input_path, to_file: false, safe: :safe
+        assert_equal Encoding::UTF_8, output.encoding
+        assert_includes output, 'Romé'
+      ensure
+        Encoding.default_external = old_external
+        Encoding.default_internal = old_internal
+        $VERBOSE = old_verbose
+      end
+    end
+
+    test 'should not load file with unrecognized encoding' do
+      begin
+        tmp_input = Tempfile.new %w(test- .adoc), encoding: Encoding::IBM437
+        # NOTE using a character whose code differs between UTF-8 and IBM437
+        tmp_input.write %(ƒ\n)
+        tmp_input.close
+        exception = assert_raises ArgumentError do
+          Asciidoctor.load_file tmp_input.path, safe: :safe
+        end
+        assert_match(/Failed to load AsciiDoc document - invalid byte sequence in UTF-8/, exception.message)
+      ensure
+        tmp_input.close!
+      end
     end
 
     test 'should not load invalid file' do
       sample_input_path = fixture_path('hello-asciidoctor.pdf')
       exception = assert_raises ArgumentError do
-        Asciidoctor.load_file(sample_input_path, :safe => Asciidoctor::SafeMode::SAFE)
+        Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
       end
       assert_match(/Failed to load AsciiDoc document/, exception.message)
       # verify we have the correct backtrace (should be in at least first 5 lines)
-      assert_match((RUBY_ENGINE == 'rbx' ? /parser\.rb/ : /helpers\.rb/), exception.backtrace[0..4].join("\n"))
-    end if RUBY_MIN_VERSION_1_9
+      assert_match(/helpers\.rb/, exception.backtrace[0..4].join("\n"))
+    end
+
+    test 'should convert filename that contains non-ASCII characters independent of default encodings' do
+      old_external = Encoding.default_external
+      old_internal = Encoding.default_internal
+      old_verbose = $VERBOSE
+      begin
+        $VERBOSE = nil # disable warnings since we have to modify constants
+        tmp_input = Tempfile.new %w(test-ＵＴＦ８- .adoc)
+        tmp_input.write %(ＵＴＦ８\n)
+        tmp_input.close
+        Encoding.default_external = Encoding.default_internal = Encoding::IBM437
+        tmp_output = tmp_input.path.sub '.adoc', '.html'
+        Asciidoctor.convert_file tmp_input.path, safe: :safe, attributes: 'linkcss !copycss'
+        assert File.exist? tmp_output
+        output = File.read tmp_output, mode: 'rb', encoding: 'utf-8:utf-8'
+        assert_equal ::Encoding::UTF_8, output.encoding
+        refute_empty output
+        assert_includes output, 'ＵＴＦ８'
+      ensure
+        tmp_input.close!
+        FileUtils.rm_f tmp_output
+        Encoding.default_external = old_external
+        Encoding.default_internal = old_internal
+        $VERBOSE = old_verbose
+      end
+    end
 
     test 'should load input IO' do
       input = StringIO.new(<<-EOS)
@@ -41,7 +105,7 @@ Document Title
 
 preamble
       EOS
-      doc = Asciidoctor.load(input, :safe => Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -54,7 +118,7 @@ Document Title
 
 preamble
       EOS
-      doc = Asciidoctor.load(input, :safe => Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -67,7 +131,7 @@ Document Title
 
 preamble
       EOS
-      doc = Asciidoctor.load(input.lines.entries, :safe => Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load(input.lines, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -75,7 +139,7 @@ preamble
 
     test 'should accept attributes as array' do
 	  # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', :attributes => %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
+      doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
@@ -90,12 +154,12 @@ preamble
     end
 
     test 'should accept attributes as empty array' do
-      doc = Asciidoctor.load('text', :attributes => [])
+      doc = Asciidoctor.load('text', attributes: [])
       assert_kind_of Hash, doc.attributes
     end
 
     test 'should accept attributes as string' do
-      doc = Asciidoctor.load('text', :attributes => 'toc sectnums
+      doc = Asciidoctor.load('text', attributes: 'toc sectnums
 source-highlighter=coderay
 idprefix
 idseparator=-')
@@ -113,7 +177,7 @@ idseparator=-')
     end
 
     test 'should accept values containing spaces in attributes string' do
-      doc = Asciidoctor.load('text', :attributes => %(idprefix idseparator=-   note-caption=Note\\ to\\\tself toc))
+      doc = Asciidoctor.load('text', attributes: %(idprefix idseparator=-   note-caption=Note\\ to\\\tself toc))
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('idprefix')
       assert_equal '', doc.attr('idprefix')
@@ -124,19 +188,19 @@ idseparator=-')
     end
 
     test 'should accept attributes as empty string' do
-      doc = Asciidoctor.load('text', :attributes => '')
+      doc = Asciidoctor.load('text', attributes: '')
       assert_kind_of Hash, doc.attributes
     end
 
     test 'should accept attributes as nil' do
-      doc = Asciidoctor.load('text', :attributes => nil)
+      doc = Asciidoctor.load('text', attributes: nil)
       assert_kind_of Hash, doc.attributes
     end
 
     test 'should accept attributes if hash like' do
       class Hashish
         def initialize
-          @table = {'toc' => ''}
+          @table = { 'toc' => '' }
         end
 
         def keys
@@ -148,14 +212,14 @@ idseparator=-')
         end
       end
 
-      doc = Asciidoctor.load('text', :attributes => Hashish.new)
+      doc = Asciidoctor.load('text', attributes: Hashish.new)
       assert_kind_of Hash, doc.attributes
       assert doc.attributes.has_key?('toc')
     end
 
     test 'should not expand value of docdir attribute if specified via API' do
       docdir = 'virtual/directory'
-      doc = document_from_string '', :safe => :safe, :attributes => { 'docdir' => docdir }
+      doc = document_from_string '', safe: :safe, attributes: { 'docdir' => docdir }
       assert_equal docdir, (doc.attr 'docdir')
       assert_equal docdir, doc.base_dir
     end
@@ -183,12 +247,12 @@ paragraph text
       ([doc] + doc.blocks).each do |block|
         assert_equal block.method(:convert), block.method(:render)
       end
-      inline = Asciidoctor::Inline.new doc.blocks[0], :image, nil, :type => 'image', :target => 'tiger.png'
+      inline = Asciidoctor::Inline.new doc.blocks[0], :image, nil, type: 'image', target: 'tiger.png'
       assert_equal inline.method(:convert), inline.method(:render)
     end
 
     test 'should output timestamps by default' do
-      doc = document_from_string 'text', :backend => :html5, :attributes => nil
+      doc = document_from_string 'text', backend: :html5, attributes: nil
       result = doc.convert
       assert doc.attr?('docdate')
       refute doc.attr? 'reproducible'
@@ -196,7 +260,7 @@ paragraph text
     end
 
     test 'should not output timestamps if reproducible attribute is set in HTML 5' do
-      doc = document_from_string 'text', :backend => :html5, :attributes => { 'reproducible' => '' }
+      doc = document_from_string 'text', backend: :html5, attributes: { 'reproducible' => '' }
       result = doc.convert
       assert doc.attr?('docdate')
       assert doc.attr?('reproducible')
@@ -204,7 +268,7 @@ paragraph text
     end
 
     test 'should not output timestamps if reproducible attribute is set in DocBook' do
-      doc = document_from_string 'text', :backend => :docbook, :attributes => { 'reproducible' => '' }
+      doc = document_from_string 'text', backend: :docbook, attributes: { 'reproducible' => '' }
       result = doc.convert
       assert doc.attr?('docdate')
       assert doc.attr?('reproducible')
@@ -212,11 +276,9 @@ paragraph text
     end
 
     test 'should not modify options argument' do
-      options = {
-        :safe => Asciidoctor::SafeMode::SAFE
-      }
+      options = { safe: Asciidoctor::SafeMode::SAFE }
       options.freeze
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.load_file sample_input_path, options
       rescue
@@ -228,10 +290,10 @@ paragraph text
       attributes = {}
       attributes.freeze
       options = {
-        :safe => Asciidoctor::SafeMode::SAFE,
-        :attributes => attributes
+        safe: Asciidoctor::SafeMode::SAFE,
+        attributes: attributes,
       }
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.load_file sample_input_path, options
       rescue
@@ -259,62 +321,62 @@ content
     end
 
     test 'should track file and line information with blocks if sourcemap option is set' do
-      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :sourcemap => true
+      doc = Asciidoctor.load_file fixture_path('sample.adoc'), sourcemap: true
 
       refute_nil doc.source_location
-      assert_equal 'sample.asciidoc', doc.file
+      assert_equal 'sample.adoc', doc.file
       assert_equal 1, doc.lineno
 
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
-      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 'sample.adoc', section_1.file
       assert_equal 10, section_1.lineno
 
       section_2 = doc.sections[1]
       assert_equal 'Section B', section_2.title
       refute_nil section_2.source_location
-      assert_equal 'sample.asciidoc', section_2.file
+      assert_equal 'sample.adoc', section_2.file
       assert_equal 18, section_2.lineno
 
       table_block = section_2.blocks[1]
       assert_equal :table, table_block.context
       refute_nil table_block.source_location
-      assert_equal 'sample.asciidoc', table_block.file
+      assert_equal 'sample.adoc', table_block.file
       assert_equal 22, table_block.lineno
       first_cell = table_block.rows.body[0][0]
       refute_nil first_cell.source_location
-      assert_equal 'sample.asciidoc', first_cell.file
+      assert_equal 'sample.adoc', first_cell.file
       assert_equal 23, first_cell.lineno
       second_cell = table_block.rows.body[0][1]
       refute_nil second_cell.source_location
-      assert_equal 'sample.asciidoc', second_cell.file
+      assert_equal 'sample.adoc', second_cell.file
       assert_equal 23, second_cell.lineno
       last_cell = table_block.rows.body[-1][-1]
       refute_nil last_cell.source_location
-      assert_equal 'sample.asciidoc', last_cell.file
+      assert_equal 'sample.adoc', last_cell.file
       assert_equal 24, last_cell.lineno
 
       last_block = section_2.blocks[-1]
       assert_equal :ulist, last_block.context
       refute_nil last_block.source_location
-      assert_equal 'sample.asciidoc', last_block.file
+      assert_equal 'sample.adoc', last_block.file
       assert_equal 28, last_block.lineno
 
       list_items = last_block.blocks
       refute_nil list_items[0].source_location
-      assert_equal 'sample.asciidoc', list_items[0].file
+      assert_equal 'sample.adoc', list_items[0].file
       assert_equal 28, list_items[0].lineno
 
       refute_nil list_items[1].source_location
-      assert_equal 'sample.asciidoc', list_items[1].file
+      assert_equal 'sample.adoc', list_items[1].file
       assert_equal 29, list_items[1].lineno
 
       refute_nil list_items[2].source_location
-      assert_equal 'sample.asciidoc', list_items[2].file
+      assert_equal 'sample.adoc', list_items[2].file
       assert_equal 30, list_items[2].lineno
 
-      doc = Asciidoctor.load_file fixture_path('master.adoc'), :sourcemap => true, :safe => :safe
+      doc = Asciidoctor.load_file fixture_path('master.adoc'), sourcemap: true, safe: :safe
 
       section_1 = doc.sections[0]
       assert_equal 'Chapter A', section_1.title
@@ -324,21 +386,21 @@ content
     end
 
     test 'should track file and line information on list items if sourcemap option is set' do
-      doc = Asciidoctor.load_file fixture_path('lists.adoc'), :sourcemap => true
+      doc = Asciidoctor.load_file fixture_path('lists.adoc'), sourcemap: true
 
       first_section = doc.blocks[1]
 
       unordered_basic_list = first_section.blocks[0]
       assert_equal 11, unordered_basic_list.lineno
 
-      unordered_basic_list_items = unordered_basic_list.find_by :context => :list_item
+      unordered_basic_list_items = unordered_basic_list.find_by context: :list_item
       assert_equal 11, unordered_basic_list_items[0].lineno
       assert_equal 12, unordered_basic_list_items[1].lineno
       assert_equal 13, unordered_basic_list_items[2].lineno
 
       unordered_max_nesting = first_section.blocks[1]
       assert_equal 16, unordered_max_nesting.lineno
-      unordered_max_nesting_items = unordered_max_nesting.find_by :context => :list_item
+      unordered_max_nesting_items = unordered_max_nesting.find_by context: :list_item
       assert_equal 16, unordered_max_nesting_items[0].lineno
       assert_equal 17, unordered_max_nesting_items[1].lineno
       assert_equal 18, unordered_max_nesting_items[2].lineno
@@ -348,7 +410,7 @@ content
 
       checklist = first_section.blocks[2]
       assert_equal 24, checklist.lineno
-      checklist_list_items = checklist.find_by :context => :list_item
+      checklist_list_items = checklist.find_by context: :list_item
       assert_equal 24, checklist_list_items[0].lineno
       assert_equal 25, checklist_list_items[1].lineno
       assert_equal 26, checklist_list_items[2].lineno
@@ -356,14 +418,14 @@ content
 
       ordered_basic = first_section.blocks[3]
       assert_equal 30, ordered_basic.lineno
-      ordered_basic_list_items = ordered_basic.find_by :context => :list_item
+      ordered_basic_list_items = ordered_basic.find_by context: :list_item
       assert_equal 30, ordered_basic_list_items[0].lineno
       assert_equal 31, ordered_basic_list_items[1].lineno
       assert_equal 32, ordered_basic_list_items[2].lineno
 
       ordered_nested = first_section.blocks[4]
       assert_equal 35, ordered_nested.lineno
-      ordered_nested_list_items = ordered_nested.find_by :context => :list_item
+      ordered_nested_list_items = ordered_nested.find_by context: :list_item
       assert_equal 35, ordered_nested_list_items[0].lineno
       assert_equal 36, ordered_nested_list_items[1].lineno
       assert_equal 37, ordered_nested_list_items[2].lineno
@@ -372,7 +434,7 @@ content
 
       ordered_max_nesting = first_section.blocks[5]
       assert_equal 42, ordered_max_nesting.lineno
-      ordered_max_nesting_items = ordered_max_nesting.find_by :context => :list_item
+      ordered_max_nesting_items = ordered_max_nesting.find_by context: :list_item
       assert_equal 42, ordered_max_nesting_items[0].lineno
       assert_equal 43, ordered_max_nesting_items[1].lineno
       assert_equal 44, ordered_max_nesting_items[2].lineno
@@ -382,7 +444,7 @@ content
 
       labeled_singleline = first_section.blocks[6]
       assert_equal 50, labeled_singleline.lineno
-      labeled_singleline_items = labeled_singleline.find_by :context => :list_item
+      labeled_singleline_items = labeled_singleline.find_by context: :list_item
       assert_equal 50, labeled_singleline_items[0].lineno
       assert_equal 50, labeled_singleline_items[1].lineno
       assert_equal 51, labeled_singleline_items[2].lineno
@@ -390,7 +452,7 @@ content
 
       labeled_multiline = first_section.blocks[7]
       assert_equal 54, labeled_multiline.lineno
-      labeled_multiline_items = labeled_multiline.find_by :context => :list_item
+      labeled_multiline_items = labeled_multiline.find_by context: :list_item
       assert_equal 54, labeled_multiline_items[0].lineno
       assert_equal 55, labeled_multiline_items[1].lineno
       assert_equal 56, labeled_multiline_items[2].lineno
@@ -398,7 +460,7 @@ content
 
       qanda = first_section.blocks[8]
       assert_equal 61, qanda.lineno
-      qanda_items = qanda.find_by :context => :list_item
+      qanda_items = qanda.find_by context: :list_item
       assert_equal 61, qanda_items[0].lineno
       assert_equal 62, qanda_items[1].lineno
       assert_equal 63, qanda_items[2].lineno
@@ -406,7 +468,7 @@ content
 
       mixed = first_section.blocks[9]
       assert_equal 66, mixed.lineno
-      mixed_items = mixed.find_by(:context => :list_item) {|block| block.text? }
+      mixed_items = mixed.find_by(context: :list_item) {|block| block.text? }
       assert_equal 66, mixed_items[0].lineno
       assert_equal 67, mixed_items[1].lineno
       assert_equal 68, mixed_items[2].lineno
@@ -427,7 +489,7 @@ content
 
       unordered_complex_list = first_section.blocks[10]
       assert_equal 86, unordered_complex_list.lineno
-      unordered_complex_items = unordered_complex_list.find_by :context => :list_item
+      unordered_complex_items = unordered_complex_list.find_by context: :list_item
       assert_equal 86, unordered_complex_items[0].lineno
       assert_equal 87, unordered_complex_items[1].lineno
       assert_equal 88, unordered_complex_items[2].lineno
@@ -446,19 +508,19 @@ content
 == Section B
       EOS
 
-      doc = document_from_string input, :sourcemap => true
-      assert_equal [1, 3, 7], (doc.find_by :context => :section).map(&:lineno)
+      doc = document_from_string input, sourcemap: true
+      assert_equal [1, 3, 7], (doc.find_by context: :section).map(&:lineno)
     end
 
     test 'should allow sourcemap option on document to be modified' do
-      doc = Asciidoctor.load_file fixture_path('sample.asciidoc'), :parse => false
+      doc = Asciidoctor.load_file fixture_path('sample.adoc'), parse: false
       doc.sourcemap = true
       doc = doc.parse
 
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
-      assert_equal 'sample.asciidoc', section_1.file
+      assert_equal 'sample.adoc', section_1.file
       assert_equal 10, section_1.lineno
     end
 
@@ -487,7 +549,7 @@ paragraph
       EOS
 
       doc = Asciidoctor.load input
-      result = doc.find_by :context => :image
+      result = doc.find_by context: :image
       assert_equal 2, result.size
       assert_equal :image, result[0].context
       assert_equal 'tiger.png', result[0].attr('target')
@@ -500,7 +562,7 @@ paragraph
 paragraph
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by :context => :section
+      result = doc.find_by context: :section
       refute_nil result
       assert_equal 0, result.size
     end
@@ -520,7 +582,7 @@ paragraph
       EOS
 
       doc = Asciidoctor.load input
-      result = doc.find_by :context => :ulist, :style => 'square'
+      result = doc.find_by context: :ulist, style: 'square'
       assert_equal 1, result.size
       assert_equal :ulist, result[0].context
     end
@@ -534,7 +596,7 @@ image::shoe.png[Shoe]
       EOS
 
       doc = Asciidoctor.load input
-      result = doc.find_by :context => :image, :role => 'animal'
+      result = doc.find_by context: :image, role: 'animal'
       assert_equal 1, result.size
       assert_equal :image, result[0].context
       assert_equal 'tiger.png', result[0].attr('target')
@@ -551,7 +613,7 @@ preamble
 content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by :context => :section
+      result = doc.find_by context: :section
       refute_nil result
       assert_equal 2, result.size
       assert_equal :section, result[0].context
@@ -569,7 +631,7 @@ content
 content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by(:context => :section) {|sect| sect.level == 1 }
+      result = doc.find_by(context: :section) {|sect| sect.level == 1 }
       refute_nil result
       assert_equal 1, result.size
       assert_equal :section, result[0].context
@@ -672,7 +734,7 @@ content
 content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by(:context => :section, :id => 'subsection')
+      result = doc.find_by(context: :section, id: 'subsection')
       refute_nil result
       assert_equal 1, result.size
       assert_equal :section, result[0].context
@@ -693,7 +755,7 @@ content
       EOS
       doc = Asciidoctor.load input
       visited_last = false
-      result = doc.find_by(:id => 'subsection') do |candidate|
+      result = doc.find_by(id: 'subsection') do |candidate|
         visited_last = true if candidate.id == 'last'
         true
       end
@@ -714,7 +776,7 @@ content
 content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by(:context => :section, :id => 'subsection') {|sect| false }
+      result = doc.find_by(context: :section, id: 'subsection') {|sect| false }
       refute_nil result
       assert_equal 0, result.size
     end
@@ -734,7 +796,7 @@ term without description::
 
     test 'timings are recorded for each step when load and convert are called separately' do
       sample_input_path = fixture_path 'asciidoc_index.txt'
-      (Asciidoctor.load_file sample_input_path, :timings => (timings = Asciidoctor::Timings.new)).convert
+      (Asciidoctor.load_file sample_input_path, timings: (timings = Asciidoctor::Timings.new)).convert
       refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
       refute_equal '0.00000', '%05.5f' % timings.convert.to_f
       refute_equal timings.read_parse, timings.total
@@ -751,9 +813,9 @@ term without description::
     end
 
     test 'should convert source document to string when to_file is false' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
-      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false
+      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -763,9 +825,9 @@ term without description::
     end
 
     test 'lines in output should be separated by line feed' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
-      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false
+      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       refute_empty output
       lines = output.split("\n")
       assert_equal lines.size, output.split(/\r\n|\r|\n/).size
@@ -775,20 +837,20 @@ term without description::
     end
 
     test 'should accept attributes as array' do
-      sample_input_path = fixture_path('sample.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :attributes => %w(sectnums idprefix idseparator=-), :to_file => false
+      sample_input_path = fixture_path('sample.adoc')
+      output = Asciidoctor.convert_file sample_input_path, attributes: %w(sectnums idprefix idseparator=-), to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should accept attributes as string' do
-      sample_input_path = fixture_path('sample.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :attributes => 'sectnums idprefix idseparator=-', :to_file => false
+      sample_input_path = fixture_path('sample.adoc')
+      output = Asciidoctor.convert_file sample_input_path, attributes: 'sectnums idprefix idseparator=-', to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false
+      sample_input_path = fixture_path('basic.adoc')
+      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
@@ -800,7 +862,7 @@ term without description::
 text
       EOS
 
-      output = Asciidoctor.convert input, :safe => Asciidoctor::SafeMode::SERVER, :header_footer => true
+      output = Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, header_footer: true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -817,7 +879,7 @@ text
 text
       EOS
 
-      output = Asciidoctor.convert input, :header_footer => true
+      output = Asciidoctor.convert input, header_footer: true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
@@ -831,7 +893,7 @@ text
 
       #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
       [{ 'linkcss!' => '' }, { 'linkcss' => nil }].each do |attrs|
-        output = Asciidoctor.convert input, :header_footer => true, :attributes => attrs
+        output = Asciidoctor.convert input, header_footer: true, attributes: attrs
         assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
         assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
         stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -842,9 +904,9 @@ text
     end
 
     test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
-      sample_input_path = fixture_path('basic.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :to_file => false,
-          :safe => Asciidoctor::SafeMode::SAFE, :attributes => {'linkcss!' => ''}
+      sample_input_path = fixture_path('basic.adoc')
+      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false,
+          safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
       assert_css 'html:root > head > style', output, 1
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.content
@@ -859,7 +921,7 @@ text
 text
       EOS
 
-      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet!' => ''}
+      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet!' => '' }
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"]', output, 0
     end
@@ -871,11 +933,11 @@ text
 text
       EOS
 
-      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => './custom.css'}
+      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => './custom.css' }
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
 
-      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => 'file:///home/username/custom.css'}
+      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => 'file:///home/username/custom.css' }
       assert_css 'html:root > head > link[rel="stylesheet"][href="file:///home/username/custom.css"]', output, 1
     end
 
@@ -886,14 +948,14 @@ text
 text
       EOS
 
-      output = Asciidoctor.convert input, :header_footer => true, :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets'}
+      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets' }
       assert_css 'html:root > head > link[rel="stylesheet"][href="./stylesheets/custom.css"]', output, 1
     end
 
     test 'should resolve custom stylesheet to embed relative to stylesdir' do
-      sample_input_path = fixture_path('basic.asciidoc')
-      output = Asciidoctor.convert_file sample_input_path, :header_footer => true, :safe => Asciidoctor::SafeMode::SAFE, :to_file => false,
-          :attributes => {'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => ''}
+      sample_input_path = fixture_path('basic.adoc')
+      output = Asciidoctor.convert_file sample_input_path, header_footer: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false,
+          attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.content
       refute_nil styles
@@ -901,7 +963,7 @@ text
     end
 
     test 'should convert source file and write result to adjacent file by default' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('sample.html')
       begin
         Asciidoctor.convert_file sample_input_path
@@ -919,10 +981,10 @@ text
     end
 
     test 'should convert source file and write to specified file' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_file => sample_output_path
+        Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert File.exist?(sample_output_path)
         output = IO.read(sample_output_path)
         refute_empty output
@@ -937,11 +999,11 @@ text
     end
 
     test 'should convert source file and write to specified file in base_dir' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       fixture_dir = fixture_path('')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_file => 'result.html', :base_dir => fixture_dir
+        Asciidoctor.convert_file sample_input_path, to_file: 'result.html', base_dir: fixture_dir
         assert File.exist?(sample_output_path)
         output = IO.read(sample_output_path)
         refute_empty output
@@ -953,15 +1015,15 @@ text
       rescue => e
         flunk e.message
       ensure
-        FileUtils.rm(sample_output_path, :force => true)
+        FileUtils.rm(sample_output_path, force: true)
       end
     end
 
     test 'in_place option is ignored when to_file is specified' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_file => sample_output_path, :in_place => true
+        Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, in_place: true
         assert File.exist?(sample_output_path)
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
@@ -969,10 +1031,10 @@ text
     end
 
     test 'in_place option is ignored when to_dir is specified' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('sample.html')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_dir => File.dirname(sample_output_path), :in_place => true
+        Asciidoctor.convert_file sample_input_path, to_dir: File.dirname(sample_output_path), in_place: true
         assert File.exist?(sample_output_path)
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
@@ -983,7 +1045,7 @@ text
       sample_input = '{outfilesuffix}'
       sample_output_path = fixture_path('result.htm')
       begin
-        Asciidoctor.convert sample_input, :to_file => sample_output_path, :header_footer => false
+        Asciidoctor.convert sample_input, to_file: sample_output_path, header_footer: false
         assert File.exist?(sample_output_path)
         output = IO.read(sample_output_path)
         refute_empty output
@@ -994,12 +1056,12 @@ text
     end
 
     test 'output should be relative to to_dir option' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
       Dir.mkdir output_dir if !File.exist? output_dir
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_dir => output_dir
+        Asciidoctor.convert_file sample_input_path, to_dir: output_dir
         assert File.exist? sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
@@ -1008,11 +1070,11 @@ text
     end
 
     test 'missing directories should be created if mkdirs is enabled' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.join(File.dirname(sample_input_path), 'test_output'), 'subdir')
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
-        Asciidoctor.convert_file sample_input_path, :to_dir => output_dir, :mkdirs => true
+        Asciidoctor.convert_file sample_input_path, to_dir: output_dir, mkdirs: true
         assert File.exist? sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
@@ -1023,22 +1085,22 @@ text
 
     # TODO need similar test for when to_dir is specified
     test 'should raise exception if an attempt is made to overwrite input file' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
 
       assert_raises IOError do
-        Asciidoctor.convert_file sample_input_path, :attributes => { 'outfilesuffix' => '.asciidoc' }
+        Asciidoctor.convert_file sample_input_path, attributes: { 'outfilesuffix' => '.adoc' }
       end
     end
 
     test 'to_file should be relative to to_dir when both given' do
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       base_dir = File.dirname(sample_input_path)
       sample_rel_output_path = File.join('test_output', 'result.html')
       output_dir = File.dirname(File.join(base_dir, sample_rel_output_path))
       Dir.mkdir output_dir if !File.exist? output_dir
       sample_output_path = File.join(base_dir, sample_rel_output_path)
       begin
-        Asciidoctor.convert_file sample_input_path, :to_dir => base_dir, :to_file => sample_rel_output_path
+        Asciidoctor.convert_file sample_input_path, to_dir: base_dir, to_file: sample_rel_output_path
         assert File.exist? sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
@@ -1048,11 +1110,11 @@ text
 
     test 'should not modify options argument' do
       options = {
-        :safe => Asciidoctor::SafeMode::SAFE,
-        :to_file => false
+        safe: Asciidoctor::SafeMode::SAFE,
+        to_file: false,
       }
       options.freeze
-      sample_input_path = fixture_path('sample.asciidoc')
+      sample_input_path = fixture_path('sample.adoc')
       begin
         Asciidoctor.convert_file sample_input_path, options
       rescue
@@ -1061,10 +1123,10 @@ text
     end
 
     test 'should set to_dir option to parent directory of specified output file' do
-      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_input_path = fixture_path 'basic.adoc'
       sample_output_path = fixture_path 'basic.html'
       begin
-        doc = Asciidoctor.convert_file sample_input_path, :to_file => sample_output_path
+        doc = Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert_equal File.dirname(sample_output_path), doc.options[:to_dir]
       ensure
         FileUtils.rm(sample_output_path)
@@ -1072,13 +1134,13 @@ text
     end
 
     test 'should set to_dir option to parent directory of specified output directory and file' do
-      sample_input_path = fixture_path 'basic.asciidoc'
+      sample_input_path = fixture_path 'basic.adoc'
       sample_output_path = fixture_path 'basic.html'
       fixture_base_path = File.dirname sample_output_path
       fixture_parent_path = File.dirname fixture_base_path
       sample_output_relpath = File.join 'fixtures', 'basic.html'
       begin
-        doc = Asciidoctor.convert_file sample_input_path, :to_dir => fixture_parent_path, :to_file => sample_output_relpath
+        doc = Asciidoctor.convert_file sample_input_path, to_dir: fixture_parent_path, to_file: sample_output_relpath
         assert_equal fixture_base_path, doc.options[:to_dir]
       ensure
         FileUtils.rm(sample_output_path)
@@ -1087,7 +1149,7 @@ text
 
     test 'timings are recorded for each step' do
       sample_input_path = fixture_path 'asciidoc_index.txt'
-      Asciidoctor.convert_file sample_input_path, :timings => (timings = Asciidoctor::Timings.new), :to_file => false
+      Asciidoctor.convert_file sample_input_path, timings: (timings = Asciidoctor::Timings.new), to_file: false
       refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
       refute_equal '0.00000', '%05.5f' % timings.convert.to_f
       refute_equal timings.read_parse, timings.total

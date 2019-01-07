@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: An abstract base class that provides state and methods for managing a
 # node of AsciiDoc content. The state and methods on this class are common to
@@ -371,7 +370,7 @@ class AbstractNode
     # QUESTION what if ext is empty?
     mimetype = (ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length}))
     if asset_dir_key
-      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, :target_name => 'image')
+      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
     else
       image_path = normalize_system_path(target_image)
     end
@@ -404,17 +403,13 @@ class AbstractNode
       # caching requires the open-uri-cached gem to be installed
       # processing will be automatically aborted if these libraries can't be opened
       Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-    elsif !::RUBY_ENGINE_OPAL
+    elsif !RUBY_ENGINE_OPAL
       # autoload open-uri
       ::OpenURI
     end
 
     begin
-      mimetype = nil
-      bindata = open image_uri, 'rb' do |f|
-        mimetype = f.content_type
-        f.read
-      end
+      mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
       # NOTE base64 is autoloaded by reference to ::Base64
       %(data:#{mimetype};base64,#{::Base64.strict_encode64 bindata})
     rescue
@@ -432,8 +427,7 @@ class AbstractNode
   # Delegates to normalize_system_path, with the start path set to the value of
   # the base_dir instance variable on the Document object.
   def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
-    normalize_system_path(asset_ref, @document.base_dir, nil,
-        :target_name => asset_name, :recover => autocorrect)
+    normalize_system_path(asset_ref, @document.base_dir, nil, target_name: asset_name, recover: autocorrect)
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths
@@ -507,11 +501,10 @@ class AbstractNode
   # if the file does not exist.
   def read_asset path, opts = {}
     # remap opts for backwards compatibility
-    opts = { :warn_on_failure => (opts != false) } unless ::Hash === opts
+    opts = { warn_on_failure: (opts != false) } unless ::Hash === opts
     if ::File.readable? path
       if opts[:normalize]
-        # NOTE Opal does not yet support File#readlines
-        (Helpers.normalize_lines_array ::File.open(path, 'rb') {|f| f.each_line.to_a }).join LF
+        (Helpers.prepare_source_string ::File.open(path, FILE_READ_MODE) {|f| f.read }).join LF
       else
         # QUESTION should we chomp or rstrip content?
         ::IO.read path
@@ -546,10 +539,9 @@ class AbstractNode
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           if opts[:normalize]
-            # NOTE Opal does not yet support File#readlines
-            (Helpers.normalize_lines_array ::OpenURI.open_uri(target) {|f| f.each_line.to_a }).join LF
+            (Helpers.prepare_source_string ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.read }).join LF
           else
-            ::OpenURI.open_uri(target) {|f| f.read }
+            ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.read }
           end
         rescue
           logger.warn %(could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
@@ -560,9 +552,19 @@ class AbstractNode
         return
       end
     else
-      target = normalize_system_path target, opts[:start], nil, :target_name => (opts[:label] || 'asset')
-      read_asset target, :normalize => opts[:normalize], :warn_on_failure => (opts.fetch :warn_on_failure, true), :label => opts[:label]
+      target = normalize_system_path target, opts[:start], nil, target_name: (opts[:label] || 'asset')
+      read_asset target, normalize: opts[:normalize], warn_on_failure: (opts.fetch :warn_on_failure, true), label: opts[:label]
     end
+  end
+
+  # Deprecated: Check whether the specified String is a URI by
+  # matching it against the Asciidoctor::UriSniffRx regex.
+  #
+  # In use by Asciidoctor PDF
+  #
+  # @deprecated Use Helpers.uriish? instead
+  def is_uri? str
+    Helpers.uriish? str
   end
 
   # Internal: URI encode spaces in a String
@@ -570,16 +572,8 @@ class AbstractNode
   # str - the String to encode
   #
   # Returns the String with all spaces replaced with %20.
-  def uri_encode_spaces str
+  private def uri_encode_spaces str
     (str.include? ' ') ? (str.gsub ' ', '%20') : str
-  end
-
-  # Public: Check whether the specified String is a URI by
-  # matching it against the Asciidoctor::UriSniffRx regex.
-  #
-  # @deprecated Use Helpers.uriish? instead
-  def is_uri? str
-    Helpers.uriish? str
   end
 end
 end

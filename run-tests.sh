@@ -4,7 +4,7 @@
 # This script will execute against all supported Ruby versions if "all" is the first argument to the script.
 
 if [ "$1" = "all" ]; then
-  rvm 1.8@asciidoctor-dev,jruby@asciidoctor-dev,rbx@asciidoctor-dev,1.9@asciidoctor-dev,2.0@asciidoctor-dev,2.1@asciidoctor-dev "do" ./run-tests.sh
+  rvm 2.3@asciidoctor-dev,2.4@asciidoctor-dev,2.5@asciidoctor-dev,2.6@asciidoctor-dev,jruby-9.1@asciidoctor-dev,jruby-9.2@asciidoctor-dev "do" ./run-tests.sh
 else
   rake test:all > /tmp/asciidoctor-test-results.txt 2>&1; cat /tmp/asciidoctor-test-results.txt
 fi

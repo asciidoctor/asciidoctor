@@ -1,8 +1,4 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context "Text" do
   test "proper encoding to handle utf8 characters in document using html backend" do
@@ -12,19 +8,19 @@ context "Text" do
   end
 
   test "proper encoding to handle utf8 characters in embedded document using html backend" do
-    output = example_document(:encoding, :header_footer => false).convert
+    output = example_document(:encoding, header_footer: false).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
   test "proper encoding to handle utf8 characters in document using docbook45 backend" do
-    output = example_document(:encoding, :attributes => {'backend' => 'docbook45', 'xmlns' => ''}).convert
+    output = example_document(:encoding, attributes: { 'backend' => 'docbook45', 'xmlns' => '' }).convert
     assert_xpath '//xmlns:simpara', output, 4
     assert_xpath '//xmlns:ulink', output, 1
   end
 
   test "proper encoding to handle utf8 characters in embedded document using docbook45 backend" do
-    output = example_document(:encoding, :header_footer => false, :attributes => {'backend' => 'docbook45'}).convert
+    output = example_document(:encoding, header_footer: false, attributes: { 'backend' => 'docbook45' }).convert
     assert_xpath '//simpara', output, 4
     assert_xpath '//ulink', output, 1
   end
@@ -35,17 +31,17 @@ context "Text" do
     input << "[verse]\n"
     input.concat(File.readlines(sample_doc_path(:encoding)))
     doc = empty_document
-    reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
+    reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
     block = Asciidoctor::Parser.next_block(reader, doc)
     assert_xpath '//pre', block.convert.gsub(/^\s*\n/, ''), 1
   end
 
   test 'proper encoding to handle utf8 characters from included file' do
     input = <<-EOS
-include::fixtures/encoding.asciidoc[tags=romé]
+include::fixtures/encoding.adoc[tags=romé]
     EOS
-    doc = empty_safe_document :base_dir => testdir
-    reader = Asciidoctor::PreprocessorReader.new doc, input, nil, :normalize => true
+    doc = empty_safe_document base_dir: testdir
+    reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
     block = Asciidoctor::Parser.next_block(reader, doc)
     output = block.convert
     assert_css '.paragraph', output, 1
@@ -61,7 +57,7 @@ include::fixtures/encoding.asciidoc[tags=romé]
   end
 
   test 'single- and double-quoted text' do
-    output = convert_string_to_embedded(%q(``Where?,'' she said, flipping through her copy of `The New Yorker.'), :attributes => {'compat-mode' => ''})
+    output = convert_string_to_embedded(%q(``Where?,'' she said, flipping through her copy of `The New Yorker.'), attributes: { 'compat-mode' => '' })
     assert_match(/&#8220;Where\?,&#8221;/, output)
     assert_match(/&#8216;The New Yorker.&#8217;/, output)
 
@@ -72,7 +68,7 @@ include::fixtures/encoding.asciidoc[tags=romé]
 
   test 'multiple double-quoted text on a single line' do
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
-        convert_inline_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), :attributes => {'compat-mode' => ''})
+        convert_inline_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), attributes: { 'compat-mode' => '' })
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
         convert_inline_string(%q("`Our business is constantly changing`" or "`We need faster time to market.`"))
   end
@@ -188,12 +184,12 @@ This line is separated by something that is not a horizontal rule...
 
   test 'emphasized text with single quote using apostrophe characters' do
     rsquo = decode_char 8217
-    assert_xpath %(//em[text()="Johnny#{rsquo}s"]), convert_string(%q(It's 'Johnny's' phone), :attributes => {'compat-mode' => ''})
+    assert_xpath %(//em[text()="Johnny#{rsquo}s"]), convert_string(%q(It's 'Johnny's' phone), attributes: { 'compat-mode' => '' })
     assert_xpath %(//p[text()="It#{rsquo}s 'Johnny#{rsquo}s' phone"]), convert_string(%q(It's 'Johnny's' phone))
   end
 
   test 'emphasized text with escaped single quote using apostrophe characters' do
-    assert_xpath %(//em[text()="Johnny's"]), convert_string(%q(It's 'Johnny\\'s' phone), :attributes => {'compat-mode' => ''})
+    assert_xpath %(//em[text()="Johnny's"]), convert_string(%q(It's 'Johnny\\'s' phone), attributes: { 'compat-mode' => '' })
     assert_xpath %(//p[text()="It's 'Johnny's' phone"]), convert_string(%q(It\\'s 'Johnny\\'s' phone))
   end
 
@@ -202,8 +198,8 @@ This line is separated by something that is not a horizontal rule...
   end
 
   test 'unescape escaped single quote emphasis in compat mode only' do
-    assert_xpath %(//p[text()="A 'single quoted string' example"]), convert_string_to_embedded(%(A \\'single quoted string' example), :attributes => {'compat-mode' => ''})
-    assert_xpath %(//p[text()="'single quoted string'"]), convert_string_to_embedded(%(\\'single quoted string'), :attributes => {'compat-mode' => ''})
+    assert_xpath %(//p[text()="A 'single quoted string' example"]), convert_string_to_embedded(%(A \\'single quoted string' example), attributes: { 'compat-mode' => '' })
+    assert_xpath %(//p[text()="'single quoted string'"]), convert_string_to_embedded(%(\\'single quoted string'), attributes: { 'compat-mode' => '' })
 
     assert_xpath %(//p[text()="A \\'single quoted string' example"]), convert_string_to_embedded(%(A \\'single quoted string' example))
     assert_xpath %(//p[text()="\\'single quoted string'"]), convert_string_to_embedded(%(\\'single quoted string'))
@@ -227,7 +223,7 @@ This line is separated by something that is not a horizontal rule...
 
   test 'backticks and straight quotes in text' do
     backslash = '\\'
-    assert_equal %q(run <code>foo</code> <em>dog</em>), convert_inline_string(%q(run `foo` 'dog'), :attributes => {'compat-mode' => ''})
+    assert_equal %q(run <code>foo</code> <em>dog</em>), convert_inline_string(%q(run `foo` 'dog'), attributes: { 'compat-mode' => '' })
     assert_equal %q(run <code>foo</code> 'dog'), convert_inline_string(%q(run `foo` 'dog'))
     assert_equal %q(run `foo` 'dog'), convert_inline_string(%(run #{backslash}`foo` 'dog'))
     assert_equal %q(run &#8216;foo` 'dog&#8217;), convert_inline_string(%q(run '`foo` 'dog`'))
@@ -271,11 +267,11 @@ This line is separated by something that is not a horizontal rule...
 
     test "passthrough" do
       assert_xpath "//code", convert_string("This is +passed through+."), 0
-      assert_xpath "//code", convert_string("This is +passed through and monospaced+.", :attributes => {'compat-mode' => ''}), 1
+      assert_xpath "//code", convert_string("This is +passed through and monospaced+.", attributes: { 'compat-mode' => '' }), 1
     end
 
     test "nested styles" do
-      output = convert_string("Winning *big _time_* in the +city *boyeeee*+.", :attributes => {'compat-mode' => ''})
+      output = convert_string("Winning *big _time_* in the +city *boyeeee*+.", attributes: { 'compat-mode' => '' })
 
       assert_xpath "//strong/em", output
       assert_xpath "//code/strong", output
@@ -287,7 +283,7 @@ This line is separated by something that is not a horizontal rule...
     end
 
     test 'unconstrained quotes' do
-      output = convert_string('**B**__I__++M++[role]++M++', :attributes => {'compat-mode' => ''})
+      output = convert_string('**B**__I__++M++[role]++M++', attributes: { 'compat-mode' => '' })
       assert_xpath '//strong', output, 1
       assert_xpath '//em', output, 1
       assert_xpath '//code[not(@class)]', output, 1

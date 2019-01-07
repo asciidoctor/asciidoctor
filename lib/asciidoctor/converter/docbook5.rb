@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 5 output
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the
@@ -81,23 +80,23 @@ module Asciidoctor
 
     (DLIST_TAGS = {
       'qanda' => {
-        :list  => 'qandaset',
-        :entry => 'qandaentry',
-        :label => 'question',
-        :term  => 'simpara',
-        :item  => 'answer'
+        list:  'qandaset',
+        entry: 'qandaentry',
+        label: 'question',
+        term:  'simpara',
+        item:  'answer',
       },
       'glossary' => {
-        :list  => nil,
-        :entry => 'glossentry',
-        :term  => 'glossterm',
-        :item  => 'glossdef'
-      }
+        list:  nil,
+        entry: 'glossentry',
+        term:  'glossterm',
+        item:  'glossdef',
+      },
     }).default = { # default is variable
-      :list => 'variablelist',
-      :entry => 'varlistentry',
-      :term => 'term',
-      :item => 'listitem'
+      list:  'variablelist',
+      entry: 'varlistentry',
+      term:  'term',
+      item:  'listitem',
     }
 
     def dlist node
@@ -601,14 +600,14 @@ module Asciidoctor
     end
 
     (QUOTE_TAGS = {
-      :monospaced  => ['<literal>',                '</literal>',     false],
-      :emphasis    => ['<emphasis>',               '</emphasis>',    true],
-      :strong      => ['<emphasis role="strong">', '</emphasis>',    true],
-      :double      => ['<quote>',                  '</quote>',       true],
-      :single      => ['<quote>',                  '</quote>',       true],
-      :mark        => ['<emphasis role="marked">', '</emphasis>',    false],
-      :superscript => ['<superscript>',            '</superscript>', false],
-      :subscript   => ['<subscript>',              '</subscript>',   false]
+      monospaced:  ['<literal>',                '</literal>',     false],
+      emphasis:    ['<emphasis>',               '</emphasis>',    true],
+      strong:      ['<emphasis role="strong">', '</emphasis>',    true],
+      double:      ['<quote>',                  '</quote>',       true],
+      single:      ['<quote>',                  '</quote>',       true],
+      mark:        ['<emphasis role="marked">', '</emphasis>',    false],
+      superscript: ['<superscript>',            '</superscript>', false],
+      subscript:   ['<subscript>',              '</subscript>',   false],
     }).default = ['', '', true]
 
     def inline_quoted node
@@ -638,6 +637,8 @@ module Asciidoctor
         node.id ? %(<anchor#{common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
       end
     end
+
+    private
 
     def common_attributes id, role = nil, reftext = nil
       attrs = id ? %( xml:id="#{id}") : ''
@@ -673,7 +674,7 @@ module Asciidoctor
       info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
-      result << document_title_tags(doc.doctitle :partition => true, :use_fallback => true) unless doc.notitle
+      result << document_title_tags(doc.doctitle partition: true, use_fallback: true) unless doc.notitle
       if (date = (doc.attr? 'revdate') ? (doc.attr 'revdate') : ((doc.attr? 'reproducible') ? nil : (doc.attr 'docdate')))
         result << %(<date>#{date}</date>)
       end

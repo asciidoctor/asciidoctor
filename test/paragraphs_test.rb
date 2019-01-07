@@ -1,8 +1,4 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
+require_relative 'test_helper'
 
 context 'Paragraphs' do
   context 'Normal' do
@@ -154,7 +150,7 @@ Here is an index entry for indexterm2:[Linux].
 Note that multi-entry terms generate separate index entries.
       EOS
 
-      output = convert_string_to_embedded input, :attributes => {'backend' => 'docbook45'}
+      output = convert_string_to_embedded input, attributes: { 'backend' => 'docbook45' }
       assert_xpath '/simpara', output, 1
       term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
       assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
@@ -470,7 +466,7 @@ Wise words from a wise person.
 Make it what you want.
         EOS
 
-        output = convert_string input, :backend => 'docbook'
+        output = convert_string input, backend: 'docbook'
         assert_css 'abstract > simpara', output, 1
         assert_css 'partintro > simpara', output, 1
         assert_css 'sidebar > simpara', output, 1
@@ -523,7 +519,7 @@ As you can see here.
 Wise words from a wise person.
         EOS
 
-        output = convert_string input, :backend => 'docbook'
+        output = convert_string input, backend: 'docbook'
         assert_css 'abstract > title', output, 1
         assert_xpath '//abstract/title[text() = "Abstract title"]', output, 1
         assert_css 'abstract > title + simpara', output, 1
@@ -545,14 +541,14 @@ Wise words from a wise person.
     context 'Inline doctype' do
       test 'should only format and output text in first paragraph when doctype is inline' do
         input = "http://asciidoc.org[AsciiDoc] is a _lightweight_ markup language...\n\nignored"
-        output = convert_string input, :doctype => 'inline'
+        output = convert_string input, doctype: 'inline'
         assert_equal '<a href="http://asciidoc.org">AsciiDoc</a> is a <em>lightweight</em> markup language&#8230;&#8203;', output
       end
 
       test 'should output nil and warn if first block is not a paragraph' do
         input = '* bullet'
         using_memory_logger do |logger|
-          output = convert_string input, :doctype => 'inline'
+          output = convert_string input, doctype: 'inline'
           assert_nil output
           assert_message logger, :WARN, '~no inline candidate'
         end

@@ -1,10 +1,3 @@
-# encoding: UTF-8
-RUBY_ENGINE = 'unknown' unless defined? RUBY_ENGINE
-RUBY_ENGINE_OPAL = (RUBY_ENGINE == 'opal')
-RUBY_ENGINE_JRUBY = (RUBY_ENGINE == 'jruby')
-RUBY_MIN_VERSION_1_9 = (RUBY_VERSION >= '1.9')
-RUBY_MIN_VERSION_2 = (RUBY_VERSION >= '2')
-
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor
@@ -13,16 +6,11 @@ if RUBY_ENGINE == 'opal'
   require 'asciidoctor/js'
 else
   autoload :Base64, 'base64'
-  autoload :URI, 'uri'
   autoload :OpenURI, 'open-uri'
   autoload :Pathname, 'pathname'
   autoload :StringScanner, 'strscan'
+  autoload :URI, 'uri'
 end
-
-# ideally we should use require_relative instead of modifying the LOAD_PATH
-$:.unshift File.dirname __FILE__
-
-require 'asciidoctor/logging'
 
 # Public: Methods for parsing AsciiDoc input files and converting documents
 # using eRuby templates.
@@ -51,15 +39,13 @@ require 'asciidoctor/logging'
 #
 # Use custom (Tilt-supported) templates:
 #
-#   Asciidoctor.convert_file 'sample.adoc', :template_dir => 'path/to/templates'
+#   Asciidoctor.convert_file 'sample.adoc', template_dir: 'path/to/templates'
 #
 module Asciidoctor
-
-  # alias the RUBY_ENGINE constant inside the Asciidoctor namespace
-  RUBY_ENGINE = ::RUBY_ENGINE
+  # alias the RUBY_ENGINE constant inside the Asciidoctor namespace and define a precomputed alias for runtime
+  RUBY_ENGINE_OPAL = (RUBY_ENGINE = ::RUBY_ENGINE) == 'opal'
 
   module SafeMode
-
     # A safe mode level that disables any of the security features enforced
     # by Asciidoctor (Ruby is still subject to its own restrictions).
     UNSAFE = 0;
@@ -97,12 +83,11 @@ module Asciidoctor
     # enforced)!
     #PARANOID = 100;
 
-    rec = {}
-    constants.each {|sym| rec[const_get sym] = sym.to_s.downcase }
-    @names_by_value = rec
+    @names_by_value = accum = {}
+    (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase }
 
     def self.value_for_name name
-      const_get name.upcase
+      const_get name.upcase, false
     end
 
     def self.name_for_value value
@@ -184,51 +169,46 @@ module Asciidoctor
     define :markdown_syntax, true
   end
 
-  # The absolute root path of the Asciidoctor RubyGem
-  ROOT_PATH = ::File.dirname ::File.dirname ::File.expand_path __FILE__
+  # The absolute root directory of the Asciidoctor RubyGem
+  ROOT_DIR = ::File.dirname ::File.absolute_path __dir__ unless defined? ROOT_DIR
 
-  # The absolute lib path of the Asciidoctor RubyGem
-  #LIB_PATH = ::File.join ROOT_PATH, 'lib'
+  # The absolute lib directory of the Asciidoctor RubyGem
+  LIB_DIR = ::File.join ROOT_DIR, 'lib'
 
-  # The absolute data path of the Asciidoctor RubyGem
-  DATA_PATH = ::File.join ROOT_PATH, 'data'
+  # The absolute data directory of the Asciidoctor RubyGem
+  DATA_DIR = ::File.join ROOT_DIR, 'data'
 
   # The user's home directory, as best we can determine it
-  # NOTE not using infix rescue for performance reasons, see: https://github.com/jruby/jruby/issues/1816
-  begin
-    USER_HOME = ::Dir.home
-  rescue
-    USER_HOME = ::ENV['HOME'] || ::Dir.pwd
-  end
+  USER_HOME = ::Dir.home
 
-  # Flag to indicate whether encoding can be coerced to UTF-8
-  # _All_ input data must be force encoded to UTF-8 if Encoding.default_external is *not* UTF-8
-  # Addresses failures performing string operations that are reported as "invalid byte sequence in US-ASCII"
-  # Ruby 1.8 doesn't seem to experience this problem (perhaps because it isn't validating the encodings)
-  COERCE_ENCODING = !::RUBY_ENGINE_OPAL && ::RUBY_MIN_VERSION_1_9
+  # The endline character used for output; stored in constant table as an optimization
+  LF = EOL = ?\n
 
-  # Flag to indicate whether encoding of external strings needs to be forced to UTF-8
-  FORCE_ENCODING = COERCE_ENCODING && ::Encoding.default_external != ::Encoding::UTF_8
+  # The null character to use for splitting attribute values
+  NULL = ?\0
+
+  # String for matching tab character
+  TAB = ?\t
+
+  # Maximum integer value for "boundless" operations; equal to MAX_SAFE_INTEGER in JavaScript
+  MAX_INT = 9007199254740991
+
+  # Alias UTF_8 encoding for convenience / speed
+  UTF_8 = ::Encoding::UTF_8
 
   # Byte arrays for UTF-* Byte Order Marks
   BOM_BYTES_UTF_8 = [0xef, 0xbb, 0xbf]
   BOM_BYTES_UTF_16LE = [0xff, 0xfe]
   BOM_BYTES_UTF_16BE = [0xfe, 0xff]
 
-  # Flag to indicate that line length should be calculated using a unicode mode hint
-  FORCE_UNICODE_LINE_LENGTH = !::RUBY_MIN_VERSION_1_9
+  # The mode to use when opening a file for reading
+  FILE_READ_MODE = RUBY_ENGINE_OPAL ? 'r' : 'rb:utf-8:utf-8'
 
-  # The endline character used for output; stored in constant table as an optimization
-  LF = EOL = "\n"
+  # The mode to use when opening a URI for reading
+  URI_READ_MODE = FILE_READ_MODE
 
-  # The null character to use for splitting attribute values
-  NULL = "\0"
-
-  # String for matching tab character
-  TAB = "\t"
-
-  # Maximum integer value for "boundless" operations; equal to MAX_SAFE_INTEGER in JavaScript
-  MAX_INT = 9007199254740991
+  # The mode to use when opening a file for writing
+  FILE_WRITE_MODE = RUBY_ENGINE_OPAL ? 'w' : 'w:utf-8'
 
   # The default document type
   # Can influence markup generated by the converters
@@ -351,13 +331,13 @@ module Asciidoctor
   MATHJAX_VERSION = '2.7.4'
 
   BLOCK_MATH_DELIMITERS = {
-    :asciimath => ['\$', '\$'],
-    :latexmath => ['\[', '\]'],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\[', '\]'],
   }
 
   INLINE_MATH_DELIMITERS = {
-    :asciimath => ['\$', '\$'],
-    :latexmath => ['\(', '\)'],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\(', '\)'],
   }
 
   (STEM_TYPE_ALIASES = {
@@ -393,29 +373,10 @@ module Asciidoctor
       # CC_ANY is any character except newlines
       CC_ANY = '.'
       CC_EOL = '$'
-      # character classes for the Regexp engine in Ruby >= 2 (Ruby 1.9 supports \p{} but has problems w/ encoding)
-      if ::RUBY_MIN_VERSION_2
-        CC_ALPHA = CG_ALPHA = '\p{Alpha}'
-        CC_ALNUM = CG_ALNUM = '\p{Alnum}'
-        CG_BLANK = '\p{Blank}'
-        CC_WORD  = CG_WORD = '\p{Word}'
-      # character classes for the Regexp engine in Ruby < 2
-      else
-        CC_ALPHA = '[:alpha:]'
-        CG_ALPHA = '[[:alpha:]]'
-        CC_ALNUM = '[:alnum:]'
-        CG_ALNUM = '[[:alnum:]]'
-        if ::RUBY_MIN_VERSION_1_9
-          CG_BLANK = '[[:blank:]]'
-          CC_WORD = '[:word:]'
-          CG_WORD = '[[:word:]]'
-        else
-          # NOTE Ruby 1.8 cannot match word characters beyond the ASCII range; if you need this feature, upgrade!
-          CG_BLANK = '[ \t]'
-          CC_WORD = '[:alnum:]_'
-          CG_WORD = '[[:alnum:]_]'
-        end
-      end
+      CC_ALPHA = CG_ALPHA = '\p{Alpha}'
+      CC_ALNUM = CG_ALNUM = '\p{Alnum}'
+      CG_BLANK = '\p{Blank}'
+      CC_WORD  = CG_WORD = '\p{Word}'
     end
 
     ## Document header
@@ -700,12 +661,12 @@ module Asciidoctor
 
     # Matches the ordinals for each type of ordered list.
     OrderedListMarkerRxMap = {
-      :arabic => /\d+\./,
-      :loweralpha => /[a-z]\./,
-      :lowerroman => /[ivx]+\)/,
-      :upperalpha => /[A-Z]\./,
-      :upperroman => /[IVX]+\)/
-      #:lowergreek => /[a-z]\]/
+      arabic: /\d+\./,
+      loweralpha: /[a-z]\./,
+      lowerroman: /[ivx]+\)/,
+      upperalpha: /[A-Z]\./,
+      upperroman: /[IVX]+\)/,
+      #lowergreek: /[a-z]\]/,
     }
 
     # Matches a description list entry.
@@ -777,10 +738,10 @@ module Asciidoctor
 
     # A Hash of regexps for lists used for dynamic access.
     ListRxMap = {
-      :ulist => UnorderedListRx,
-      :olist => OrderedListRx,
-      :dlist => DescriptionListRx,
-      :colist => CalloutListRx
+      ulist: UnorderedListRx,
+      olist: OrderedListRx,
+      dlist: DescriptionListRx,
+      colist: CalloutListRx,
     }
 
     ## Tables
@@ -1093,7 +1054,7 @@ module Asciidoctor
     #   one two	 three   four
     #   five	six
     #
-    # TODO change to /(?<!\\)[ \t\n]+/ after dropping support for Ruby 1.8.7
+    # TODO change to /(?<!\\)[ \t\n]+/ once lookbehind assertions are implemented in all modern browsers
     SpaceDelimiterRx = /([^\\])[ \t\n]+/
 
     # Matches a + or - modifier in a subs list
@@ -1108,12 +1069,6 @@ module Asciidoctor
     #   html5
     #
     TrailingDigitsRx = /\d+$/
-
-    # Matches any character with multibyte support explicitly enabled (length of multibyte char = 1)
-    #
-    unless RUBY_ENGINE == 'opal'
-      UnicodeCharScanRx = /./u if FORCE_UNICODE_LINE_LENGTH
-    end
 
     # Detects strings that resemble URIs.
     #
@@ -1239,9 +1194,7 @@ module Asciidoctor
   quote_subs = nil
   compat_quote_subs = nil
 
-  # NOTE in Ruby 1.8.7, [^\\] does not match start of line,
-  # so we need to match it explicitly
-  # order is significant
+  # NOTE order of replacements is significant
   REPLACEMENTS = [
     # (C)
     [/\\?\(C\)/, '&#169;', :none],
@@ -1249,8 +1202,8 @@ module Asciidoctor
     [/\\?\(R\)/, '&#174;', :none],
     # (TM)
     [/\\?\(TM\)/, '&#8482;', :none],
-    # foo -- bar
-    # FIXME this drops the endline if it appears at end of line
+    # foo -- bar (where either space character can be a newline)
+    # NOTE this necessarily drops the newline if it appears at end of line
     [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
     [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;&#8203;', :leading],
@@ -1300,7 +1253,7 @@ module Asciidoctor
 
     if !(attrs = options[:attributes])
       attrs = {}
-    elsif ::Hash === attrs || (::RUBY_ENGINE_JRUBY && ::Java::JavaUtil::Map === attrs)
+    elsif ::Hash === attrs || ((defined? ::Java::JavaUtil::Map) && ::Java::JavaUtil::Map === attrs)
       attrs = attrs.dup
     elsif ::Array === attrs
       attrs, attrs_arr = {}, attrs
@@ -1322,14 +1275,13 @@ module Asciidoctor
       raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
     end
 
-    lines = nil
     if ::File === input
       # TODO cli checks if input path can be read and is file, but might want to add check to API
       input_path = ::File.expand_path input.path
       # See https://reproducible-builds.org/specs/source-date-epoch/
       # NOTE Opal can't call key? on ENV
       input_mtime = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
-      lines = input.readlines
+      source = input.read
       # hold off on setting infile and indir until we get a better sense of their purpose
       attrs['docfile'] = input_path
       attrs['docdir'] = ::File.dirname input_path
@@ -1337,25 +1289,21 @@ module Asciidoctor
       if (docdate = attrs['docdate'])
         attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
       else
-        docdate = attrs['docdate'] = (input_mtime.strftime '%F')
+        docdate = attrs['docdate'] = input_mtime.strftime '%F'
         attrs['docyear'] ||= input_mtime.year.to_s
       end
       # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
-      # Ruby 1.8 doesn't support %:z
       doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
       attrs['docdatetime'] = %(#{docdate} #{doctime})
-    elsif input.respond_to? :readlines
+    elsif input.respond_to? :read
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
       # just fail the rewind operation silently to handle all cases
-      begin
-        input.rewind
-      rescue
-      end
-      lines = input.readlines
+      input.rewind rescue nil
+      source = input.read
     elsif ::String === input
-      lines = ::RUBY_MIN_VERSION_2 ? input.lines : input.each_line.to_a
+      source = input
     elsif ::Array === input
-      lines = input.drop 0
+      source = input.drop 0
     else
       raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
@@ -1366,7 +1314,7 @@ module Asciidoctor
     end
 
     options[:attributes] = attrs
-    doc = options[:parse] == false ? (Document.new lines, options) : (Document.new lines, options).parse
+    doc = options[:parse] == false ? (Document.new source, options) : (Document.new source, options).parse
 
     timings.record :parse if timings
     doc
@@ -1398,7 +1346,7 @@ module Asciidoctor
   #
   # Returns the Asciidoctor::Document
   def load_file filename, options = {}
-    ::File.open(filename, 'rb') {|file| self.load file, options }
+    ::File.open(filename, FILE_READ_MODE) {|file| self.load file, options }
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -1490,16 +1438,16 @@ module Asciidoctor
       # QUESTION should the jail be the working_dir or doc.base_dir???
       jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
       if to_dir
-        outdir = doc.normalize_system_path(to_dir, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        outdir = doc.normalize_system_path(to_dir, working_dir, jail, target_name: 'to_dir', recover: false)
         if to_file
-          outfile = doc.normalize_system_path(to_file, outdir, nil, :target_name => 'to_dir', :recover => false)
+          outfile = doc.normalize_system_path(to_file, outdir, nil, target_name: 'to_dir', recover: false)
           # reestablish outdir as the final target directory (in the case to_file had directory segments)
           outdir = ::File.dirname outfile
         else
           outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
         end
       elsif to_file
-        outfile = doc.normalize_system_path(to_file, working_dir, jail, :target_name => 'to_dir', :recover => false)
+        outfile = doc.normalize_system_path(to_file, working_dir, jail, target_name: 'to_dir', recover: false)
         # establish outdir as the final target directory (in the case to_file had directory segments)
         outdir = ::File.dirname outfile
       end
@@ -1562,7 +1510,7 @@ module Asciidoctor
             stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
             # NOTE don't warn if src can't be read and dest already exists (see #2323)
             if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
-                :warn_on_failure => !(::File.file? stylesheet_dest), :label => 'stylesheet')
+                warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
               ::IO.write stylesheet_dest, stylesheet_data
             end
           end
@@ -1594,7 +1542,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    ::File.open(filename, 'rb') {|file| self.convert file, options }
+    ::File.open(filename, FILE_READ_MODE) {|file| self.convert file, options }
   end
 
   # Alias render_file to convert_file to maintain backwards compatibility
@@ -1612,7 +1560,7 @@ module Asciidoctor
   # Returns the resolved constant, if resolved, otherwise nothing.
   def const_missing name
     if name == :Extensions
-      require 'asciidoctor/extensions'
+      require_relative 'asciidoctor/extensions'
       Extensions
     else
       super
@@ -1622,39 +1570,39 @@ module Asciidoctor
   end
 
   if RUBY_ENGINE == 'opal'
-    require 'asciidoctor/timings'
-    require 'asciidoctor/version'
+    require_relative 'asciidoctor/timings'
   else
-    autoload :Timings, 'asciidoctor/timings'
-    autoload :VERSION, 'asciidoctor/version'
+    autoload :Timings, (::File.absolute_path 'asciidoctor/timings', __dir__)
   end
 end
 
 # core extensions
-require 'asciidoctor/core_ext'
+require_relative 'asciidoctor/core_ext'
 
-# modules
-require 'asciidoctor/helpers'
-require 'asciidoctor/substitutors'
+# modules and helpers
+require_relative 'asciidoctor/helpers'
+require_relative 'asciidoctor/logging'
+require_relative 'asciidoctor/substitutors'
+require_relative 'asciidoctor/version'
 
 # abstract classes
-require 'asciidoctor/abstract_node'
-require 'asciidoctor/abstract_block'
+require_relative 'asciidoctor/abstract_node'
+require_relative 'asciidoctor/abstract_block'
 
 # concrete classes
-require 'asciidoctor/attribute_list'
-require 'asciidoctor/block'
-require 'asciidoctor/callouts'
-require 'asciidoctor/converter'
-require 'asciidoctor/document'
-require 'asciidoctor/inline'
-require 'asciidoctor/list'
-require 'asciidoctor/parser'
-require 'asciidoctor/path_resolver'
-require 'asciidoctor/reader'
-require 'asciidoctor/section'
-require 'asciidoctor/stylesheets'
-require 'asciidoctor/table'
+require_relative 'asciidoctor/attribute_list'
+require_relative 'asciidoctor/block'
+require_relative 'asciidoctor/callouts'
+require_relative 'asciidoctor/converter'
+require_relative 'asciidoctor/document'
+require_relative 'asciidoctor/inline'
+require_relative 'asciidoctor/list'
+require_relative 'asciidoctor/parser'
+require_relative 'asciidoctor/path_resolver'
+require_relative 'asciidoctor/reader'
+require_relative 'asciidoctor/section'
+require_relative 'asciidoctor/stylesheets'
+require_relative 'asciidoctor/table'
 
 # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
 require 'asciidoctor/js/postscript' if RUBY_ENGINE == 'opal'

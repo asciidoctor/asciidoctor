@@ -34,8 +34,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  # NOTE Ruby 1.8.7 returns constants as strings instead of symbols
-  SEVERITY_LABELS = ::Hash[Severity.constants.map {|c| [(Severity.const_get c), c.to_sym] }]
+  SEVERITY_LABELS = ::Hash[(Severity.constants false).map {|c| [(Severity.const_get c, false), c] }]
 
   attr_reader :messages
 
@@ -46,7 +45,7 @@ class MemoryLogger < ::Logger
 
   def add severity, message = nil, progname = nil
     message = block_given? ? yield : progname unless message
-    @messages << { :severity => SEVERITY_LABELS[severity || UNKNOWN], :message => message }
+    @messages.push severity: SEVERITY_LABELS[severity || UNKNOWN], message: message
     true
   end
 
@@ -59,7 +58,7 @@ class MemoryLogger < ::Logger
   end
 
   def max_severity
-    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity] }.max
+    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity], false }.max
   end
 end
 
@@ -92,10 +91,11 @@ module LoggerManager
     end
 
     private
+
     def memoize_logger
       class << self
         alias_method :logger, :logger
-        if RUBY_ENGINE == 'opal'
+        if RUBY_ENGINE_OPAL
           define_method :logger do @logger end
         else
           attr_reader :logger
@@ -110,13 +110,12 @@ module Logging
     into.extend Logging
   end
 
-  private
   def logger
     LoggerManager.logger
   end
 
   def message_with_context text, context = {}
-    ({ :text => text }.merge context).extend Logger::AutoFormattingMessage
+    ({ text: text }.merge context).extend Logger::AutoFormattingMessage
   end
 end
 end

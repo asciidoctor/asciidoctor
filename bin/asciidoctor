@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'rubygems' unless defined? Gem
-
-if File.exist?(asciidoctor = (File.expand_path '../../lib/asciidoctor', __FILE__))
+asciidoctor = File.absolute_path '../lib/asciidoctor.rb', __dir__
+if File.exist? asciidoctor
   require asciidoctor
+  require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 else
   require 'asciidoctor'
+  require 'asciidoctor/cli'
 end
-require 'asciidoctor/cli'
 
 invoker = Asciidoctor::Cli::Invoker.new ARGV
 GC.start

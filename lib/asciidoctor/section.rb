@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for managing sections of AsciiDoc content in a document.
 # The section responds as an Array of content blocks by delegating

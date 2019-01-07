@@ -1,5 +1,4 @@
-# encoding: UTF-8
-require 'asciidoctor/converter/docbook5'
+require_relative 'docbook5'
 
 module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 4.5 output
@@ -51,6 +50,8 @@ module Asciidoctor
         %(<anchor#{common_attributes target, nil, "[#{target}]"}/>[#{target}])
       end
     end
+
+    private
 
     def author_tag author
       result = []

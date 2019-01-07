@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A {Converter} implementation that uses templates composed in template
   # languages supported by {https://github.com/rtomayko/tilt Tilt} to convert
@@ -26,20 +25,18 @@ module Asciidoctor
   # will be issued.
   class Converter::TemplateConverter < Converter::Base
     DEFAULT_ENGINE_OPTIONS = {
-      :erb =>  { :trim => '<' },
+      erb: { trim: '<' },
       # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
       # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
-      :haml => { :format => :xhtml, :attr_wrapper => '"', :escape_attrs => false, :ugly => true },
-      :slim => { :disable_escape => true, :sort_attrs => false, :pretty => false }
+      haml: { format: :xhtml, attr_wrapper: '"', escape_attrs: false, ugly: true },
+      slim: { disable_escape: true, sort_attrs: false, pretty: false }
     }
 
     begin
-      unless defined? ::Concurrent::Hash
-        require ::RUBY_MIN_VERSION_1_9 ? 'concurrent/hash' : 'asciidoctor/core_ext/1.8.7/concurrent/hash'
-      end
-      @caches = { :scans => ::Concurrent::Hash.new, :templates => ::Concurrent::Hash.new }
+      require 'concurrent/hash' unless defined? ::Concurrent::Hash
+      @caches = { scans: ::Concurrent::Hash.new, templates: ::Concurrent::Hash.new }
     rescue ::LoadError
-      @caches = { :scans => {}, :templates => {} }
+      @caches = { scans: {}, templates: {} }
     end
 
     def self.caches
@@ -84,89 +81,7 @@ module Asciidoctor
         @caches = {} # the empty Hash effectively disables caching
       end
       scan
-      #create_handlers
     end
-
-=begin
-    # Public: Called when this converter is added to a composite converter.
-    def composed parent
-      # TODO set the backend info determined during the scan
-    end
-=end
-
-    # Internal: Scans the template directories specified in the constructor for Tilt-supported
-    # templates, loads the templates and stores the in a Hash that is accessible via the
-    # {TemplateConverter#templates} method.
-    #
-    # Returns nothing
-    def scan
-      path_resolver = PathResolver.new
-      backend = @backend
-      engine = @engine
-      @template_dirs.each do |template_dir|
-        # FIXME need to think about safe mode restrictions here
-        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
-
-        if engine
-          file_pattern = %(*.#{engine})
-          # example: templates/haml
-          if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
-            template_dir = engine_dir
-          end
-        else
-          # NOTE last matching template wins for template name if no engine is given
-          file_pattern = '*'
-        end
-
-        # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
-        if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
-          template_dir = backend_dir
-        end
-
-        pattern = %(#{template_dir}/#{file_pattern})
-
-        if (scan_cache = @caches[:scans])
-          template_cache = @caches[:templates]
-          unless (templates = scan_cache[pattern])
-            templates = (scan_cache[pattern] = (scan_dir template_dir, pattern, template_cache))
-          end
-          templates.each do |name, template|
-            @templates[name] = template_cache[template.file] = template
-          end
-        else
-          @templates.update scan_dir(template_dir, pattern, @caches[:templates])
-        end
-        nil
-      end
-    end
-
-=begin
-    # Internal: Creates convert methods (e.g., inline_anchor) that delegate to the discovered templates.
-    #
-    # Returns nothing
-    def create_handlers
-      @templates.each do |name, template|
-        create_handler name, template
-      end
-      nil
-    end
-
-    # Internal: Creates a convert method for the specified name that delegates to the specified template.
-    #
-    # Returns nothing
-    def create_handler name, template
-      metaclass = class << self; self; end
-      if name == 'document'
-        metaclass.send :define_method, name do |node|
-          (template.render node).strip
-        end
-      else
-        metaclass.send :define_method, name do |node|
-          (template.render node).rstrip
-        end
-      end
-    end
-=end
 
     # Public: Convert an {AbstractNode} to the backend format using the named template.
     #
@@ -230,6 +145,61 @@ module Asciidoctor
       #create_handler name, template
     end
 
+=begin
+    # Internal: Called when this converter is added to a composite converter.
+    def composed parent
+      # TODO set the backend info determined during the scan
+    end
+=end
+
+    private
+
+    # Internal: Scans the template directories specified in the constructor for Tilt-supported
+    # templates, loads the templates and stores the in a Hash that is accessible via the
+    # {TemplateConverter#templates} method.
+    #
+    # Returns nothing
+    def scan
+      path_resolver = PathResolver.new
+      backend = @backend
+      engine = @engine
+      @template_dirs.each do |template_dir|
+        # FIXME need to think about safe mode restrictions here
+        next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
+
+        if engine
+          file_pattern = %(*.#{engine})
+          # example: templates/haml
+          if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
+            template_dir = engine_dir
+          end
+        else
+          # NOTE last matching template wins for template name if no engine is given
+          file_pattern = '*'
+        end
+
+        # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
+        if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
+          template_dir = backend_dir
+        end
+
+        pattern = %(#{template_dir}/#{file_pattern})
+
+        if (scan_cache = @caches[:scans])
+          template_cache = @caches[:templates]
+          unless (templates = scan_cache[pattern])
+            templates = scan_cache[pattern] = scan_dir template_dir, pattern, template_cache
+          end
+          templates.each do |name, template|
+            @templates[name] = template_cache[template.file] = template
+          end
+        else
+          @templates.update scan_dir(template_dir, pattern, @caches[:templates])
+        end
+        nil
+      end
+    end
+
     # Internal: Scan the specified directory for template files matching pattern and instantiate
     # a Tilt template for each matched file.
     #
@@ -256,7 +226,7 @@ module Asciidoctor
             unless @active_engines[extsym]
               # NOTE slim doesn't get automatically loaded by Tilt
               Helpers.require_library 'slim' unless defined? ::Slim::Engine
-              ::Slim::Engine.define_options :asciidoc => {}
+              ::Slim::Engine.define_options asciidoc: {}
               # align safe mode of AsciiDoc embedded in Slim template with safe mode of current document
               # NOTE safe mode won't get updated if using template cache and changing safe mode
               (@engine_options[extsym][:asciidoc] ||= {})[:safe] ||= @safe if @safe && ::Slim::VERSION >= '3.0'
@@ -300,7 +270,7 @@ module Asciidoctor
         [::Tilt::ERBTemplate, {}]
       elsif name == 'erubis'
         Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby
-        [::Tilt::ErubisTemplate, { :engine_class => ::Erubis::FastEruby }]
+        [::Tilt::ErubisTemplate, { engine_class: ::Erubis::FastEruby }]
       else
         raise ::ArgumentError, %(Unknown ERB implementation: #{name})
       end

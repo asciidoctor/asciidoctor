@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Maintains a catalog of callouts and their associations.
 class Callouts
@@ -28,7 +27,7 @@ class Callouts
   #
   # Returns The unique String id of this callout
   def register li_ordinal
-    current_list << { :ordinal => li_ordinal.to_i, :id => (id = generate_next_callout_id) }
+    current_list.push ordinal: li_ordinal.to_i, id: (id = generate_next_callout_id)
     @co_index += 1
     id
   end
@@ -92,6 +91,8 @@ class Callouts
     @co_index = 1
     nil
   end
+
+  private
 
   # Internal: Generate a unique id for the callout based on the internal indexes
   #

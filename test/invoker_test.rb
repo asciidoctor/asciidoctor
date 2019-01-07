@@ -1,10 +1,5 @@
-# encoding: UTF-8
-unless defined? ASCIIDOCTOR_PROJECT_DIR
-  $: << File.dirname(__FILE__); $:.uniq!
-  require 'test_helper'
-end
-require 'asciidoctor/cli/options'
-require 'asciidoctor/cli/invoker'
+require_relative 'test_helper'
+require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 
 context 'Invoker' do
   test 'should parse source and convert to html5 article by default' do
@@ -33,7 +28,7 @@ context 'Invoker' do
   end
 
   test 'should set implicit doc info attributes' do
-    sample_filepath = fixture_path 'sample.asciidoc'
+    sample_filepath = fixture_path 'sample.adoc'
     sample_filedir = fixturedir
     invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
     doc = invoker.document
@@ -48,7 +43,7 @@ context 'Invoker' do
   end
 
   test 'should allow docdate and doctime to be overridden' do
-    sample_filepath = fixture_path 'sample.asciidoc'
+    sample_filepath = fixture_path 'sample.adoc'
     invoker = invoke_cli_to_buffer %w(-o /dev/null -a docdate=2015-01-01 -a doctime=10:00:00-0700), sample_filepath
     doc = invoker.document
     assert doc.attr?('docdate', '2015-01-01')
@@ -76,8 +71,8 @@ context 'Invoker' do
   test 'should not fail to rewind input if reading document from stdin' do
     io = STDIN.dup
     class << io
-      def readlines
-        ['paragraph']
+      def read
+        'paragraph'
       end
     end
     invoker = invoke_cli_to_buffer(%w(-s), '-') { io }
@@ -106,13 +101,13 @@ context 'Invoker' do
   end
 
   test 'should fail if input file matches resolved output file' do
-    invoker = invoke_cli_to_buffer %W(-a outfilesuffix=.asciidoc), 'sample.asciidoc'
+    invoker = invoke_cli_to_buffer %W(-a outfilesuffix=.adoc), 'sample.adoc'
     assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
   test 'should fail if input file matches specified output file' do
-    sample_outpath = fixture_path 'sample.asciidoc'
-    invoker = invoke_cli_to_buffer %W(-o #{sample_outpath}), 'sample.asciidoc'
+    sample_outpath = fixture_path 'sample.adoc'
+    invoker = invoke_cli_to_buffer %W(-o #{sample_outpath}), 'sample.adoc'
     assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
@@ -130,7 +125,7 @@ context 'Invoker' do
     ensure
       FileUtils.rm_f sample_inpath
     end
-  end if RUBY_MIN_VERSION_1_9 && !windows?
+  end unless windows?
 
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = fixturedir
@@ -200,7 +195,7 @@ context 'Invoker' do
 
   test 'should report error if input file does not exist' do
     redirect_streams do |out, err|
-      invoker = invoke_cli [], 'missing_file.asciidoc'
+      invoker = invoke_cli [], 'missing_file.adoc'
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
     end
@@ -208,7 +203,7 @@ context 'Invoker' do
 
   test 'should treat extra arguments as files' do
     redirect_streams do |out, err|
-      invoker = invoke_cli %w(-o /dev/null extra arguments sample.asciidoc), nil
+      invoker = invoke_cli %w(-o /dev/null extra arguments sample.adoc), nil
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
     end
@@ -366,7 +361,7 @@ context 'Invoker' do
     basic_outpath = fixture_path 'basic.html'
     sample_outpath = fixture_path 'sample.html'
     begin
-      invoke_cli_with_filenames [], %w(basic.asciidoc sample.asciidoc)
+      invoke_cli_with_filenames [], %w(basic.adoc sample.adoc)
       assert File.exist?(basic_outpath)
       assert File.exist?(sample_outpath)
     ensure
@@ -380,7 +375,7 @@ context 'Invoker' do
     basic_outpath = File.join destination_path, 'basic.htm'
     sample_outpath = File.join destination_path, 'sample.htm'
     begin
-      invoke_cli_with_filenames %w(-D test/test_output -a outfilesuffix=.htm), %w(basic.asciidoc sample.asciidoc)
+      invoke_cli_with_filenames %w(-D test/test_output -a outfilesuffix=.htm), %w(basic.adoc sample.adoc)
       assert File.exist?(basic_outpath)
       assert File.exist?(sample_outpath)
     ensure
@@ -393,7 +388,7 @@ context 'Invoker' do
   test 'should convert all files that matches a glob expression' do
     basic_outpath = fixture_path 'basic.html'
     begin
-      invoke_cli_to_buffer [], "ba*.asciidoc"
+      invoke_cli_to_buffer [], "ba*.adoc"
       assert File.exist?(basic_outpath)
     ensure
       FileUtils.rm_f(basic_outpath)
@@ -402,7 +397,7 @@ context 'Invoker' do
 
   test 'should convert all files that matches an absolute path glob expression' do
     basic_outpath = fixture_path 'basic.html'
-    glob = fixture_path 'ba*.asciidoc'
+    glob = fixture_path 'ba*.adoc'
     # test Windows using backslash-style pathname
     if File::ALT_SEPARATOR == '\\'
       glob = glob.tr '/', '\\'
@@ -630,22 +625,26 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
 
   test 'should force default external encoding to UTF-8' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
-    input_path = fixture_path 'encoding.asciidoc'
+    executable = File.join bindir, 'asciidoctor'
+    input_path = fixture_path 'encoding.adoc'
     old_lang = ENV['LANG']
-    ENV['LANG'] = 'US-ASCII'
     begin
+      ENV['LANG'] = 'US-ASCII'
       # using open3 to work around a bug in JRuby process_manager.rb,
       # which tries to run a gsub on stdout prematurely breaking the test
       cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
       # warnings may be issued, so don't assert on stderr
       stdout_lines = Open3.popen3(cmd) {|_, out| out.readlines }
       refute_empty stdout_lines
-      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } if Asciidoctor::FORCE_ENCODING
+      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless stdout_lines[0].encoding == Encoding::UTF_8
       stdout_str = stdout_lines.join
       assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
     ensure
-      ENV['LANG'] = old_lang
+      if old_lang
+        ENV['LANG'] = old_lang
+      else
+        ENV.delete 'LANG'
+      end
     end
   end
 
@@ -666,7 +665,7 @@ Sample *AsciiDoc*
 
   test 'should show timezone as UTC if system TZ is set to UTC' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
@@ -689,7 +688,7 @@ Sample *AsciiDoc*
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join ASCIIDOCTOR_PROJECT_DIR, 'bin', 'asciidoctor'
+    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
     cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
@@ -714,7 +713,7 @@ Sample *AsciiDoc*
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['SOURCE_DATE_EPOCH'] = '1234123412'
-      sample_filepath = fixture_path 'sample.asciidoc'
+      sample_filepath = fixture_path 'sample.adoc'
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
       assert_equal '2009-02-08', (doc.attr 'docdate')
@@ -736,7 +735,7 @@ Sample *AsciiDoc*
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-      sample_filepath = fixture_path 'sample.asciidoc'
+      sample_filepath = fixture_path 'sample.adoc'
       assert_equal 1, (invoke_cli_to_buffer %w(-o /dev/null), sample_filepath).code
     ensure
       if old_source_date_epoch

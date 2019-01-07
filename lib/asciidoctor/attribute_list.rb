@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Handles parsing AsciiDoc attribute lists into a Hash of key/value
 # pairs. By default, attributes must each be separated by a comma and quotes
@@ -11,15 +10,15 @@ module Asciidoctor
 #    attrlist = Asciidoctor::AttributeList.new('astyle')
 #
 #    attrlist.parse
-#    => {0 => 'astyle'}
+#    => { 0 => 'astyle' }
 #
 #    attrlist.rekey(['style'])
-#    => {'style' => 'astyle'}
+#    => { 'style' => 'astyle' }
 #
 #    attrlist = Asciidoctor::AttributeList.new('quote, Famous Person, Famous Book (2001)')
 #
 #    attrlist.parse(['style', 'attribution', 'citetitle'])
-#    => {'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)'}
+#    => { 'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)' }
 #
 class AttributeList
   BACKSLASH = '\\'
@@ -44,11 +43,8 @@ class AttributeList
 
   BlankRx = /[ \t]+/
 
-  # Public: Regular expressions for skipping blanks and delimiters
-  SkipRxs = {
-    :blank => BlankRx,
-    ',' => /[ \t]*(,|$)/
-  }
+  # Public: Regular expressions for skipping delimiters
+  SkipRxs = { ',' => /[ \t]*(,|$)/ }
 
   def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source
@@ -97,6 +93,8 @@ class AttributeList
 
     attributes
   end
+
+  private
 
   def parse_attribute index = 0, pos_attrs = []
     single_quoted_value = false
@@ -227,6 +225,5 @@ class AttributeList
   def scan_to_quote quote
     @scanner.scan BoundaryRxs[quote]
   end
-
 end
 end

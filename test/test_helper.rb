@@ -1,25 +1,19 @@
-# encoding: UTF-8
-ASCIIDOCTOR_TEST_DIR = File.expand_path File.dirname __FILE__
-ASCIIDOCTOR_PROJECT_DIR = File.dirname ASCIIDOCTOR_TEST_DIR
-ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib')
-Dir.chdir ASCIIDOCTOR_PROJECT_DIR
-
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
+ASCIIDOCTOR_TEST_DIR = File.absolute_path __dir__
+ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || (File.join ASCIIDOCTOR_TEST_DIR, '../lib')
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_LIB_DIR, 'asciidoctor')
+require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
+Dir.chdir Asciidoctor::ROOT_DIR
 
-require 'socket'
 require 'nokogiri'
+require 'socket'
 require 'tempfile'
 require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
-autoload :Pathname,  'pathname'
 autoload :Open3, 'open3'
+autoload :Pathname,  'pathname'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
 RE_DOCTYPE = /\s*<!DOCTYPE (.*)/
@@ -35,7 +29,7 @@ class Minitest::Test
   end
 
   def disk_root
-    %(#{windows? ? ASCIIDOCTOR_PROJECT_DIR.split('/')[0] : ''}/)
+    %(#{windows? ? Asciidoctor::ROOT_DIR.split('/')[0] : ''}/)
   end
 
   def empty_document options = {}
@@ -54,7 +48,7 @@ class Minitest::Test
   def sample_doc_path(name)
     name = name.to_s
     unless name.include?('.')
-      ['asciidoc', 'txt'].each do |ext|
+      ['adoc', 'asciidoc', 'txt'].each do |ext|
         if File.exist?(fixture_path("#{name}.#{ext}"))
           name = "#{name}.#{ext}"
           break
@@ -62,6 +56,10 @@ class Minitest::Test
       end
     end
     fixture_path(name)
+  end
+
+  def bindir
+    File.join Asciidoctor::ROOT_DIR, 'bin'
   end
 
   def testdir
@@ -182,9 +180,9 @@ class Minitest::Test
   def document_from_string(src, opts = {})
     assign_default_test_options opts
     if opts[:parse]
-      (Asciidoctor::Document.new src.lines.entries, opts).parse
+      (Asciidoctor::Document.new src.lines, opts).parse
     else
-      Asciidoctor::Document.new src.lines.entries, opts
+      Asciidoctor::Document.new src.lines, opts
     end
   end
 
@@ -269,11 +267,11 @@ class Minitest::Test
     invoker
   end
 
-  def invoke_cli_to_buffer(argv = [], filename = 'sample.asciidoc', &block)
+  def invoke_cli_to_buffer(argv = [], filename = 'sample.adoc', &block)
     invoke_cli(argv, filename, [StringIO.new, StringIO.new], &block)
   end
 
-  def invoke_cli(argv = [], filename = 'sample.asciidoc', buffers = nil, &block)
+  def invoke_cli(argv = [], filename = 'sample.adoc', buffers = nil, &block)
     if filename.nil? || filename == '-' || ::Pathname.new(filename).absolute?
       filepath = filename
     else
@@ -301,8 +299,7 @@ class Minitest::Test
   end
 
   def resolve_localhost
-    (RUBY_VERSION < '1.9' || RUBY_ENGINE == 'rbx') ? Socket.gethostname :
-        Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
+    Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
   def using_memory_logger
@@ -345,13 +342,13 @@ class Minitest::Test
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
         elsif File.file?(resource_file = (File.join base_dir, resource))
-          mimetype = if (ext = ::File.extname(resource_file)[1..-1])
+          mimetype = if (ext = File.extname(resource_file)[1..-1])
             ext == 'adoc' ? 'text/plain' : %(image/#{ext})
           else
             'text/plain'
           end
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: #{mimetype}\r\n\r\n)
-          File.open resource_file, 'rb' do |fd|
+          File.open resource_file, Asciidoctor::FILE_READ_MODE do |fd|
             until fd.eof? do
               buffer = fd.read 256
               session.write buffer

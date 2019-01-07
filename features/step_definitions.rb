@@ -1,14 +1,10 @@
-# encoding: UTF-8
-ASCIIDOCTOR_PROJECT_DIR = File.dirname File.dirname(__FILE__)
-Dir.chdir ASCIIDOCTOR_PROJECT_DIR
-
-if RUBY_VERSION < '1.9'
-  require 'rubygems'
-end
+ASCIIDOCTOR_FEATURES_DIR = File.absolute_path __dir__
+ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_FEATURES_DIR, '../lib')
 
 require 'simplecov' if ENV['COVERAGE'] == 'true'
 
-require File.join(ASCIIDOCTOR_PROJECT_DIR, 'lib', 'asciidoctor')
+require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
+Dir.chdir Asciidoctor::ROOT_DIR
 
 require 'rspec/expectations'
 require 'tilt'
@@ -26,7 +22,7 @@ When /it is converted to html/ do
 end
 
 When /it is converted to docbook/ do
-  @output = Asciidoctor.convert @source, :backend => :docbook
+  @output = Asciidoctor.convert @source, backend: :docbook
 end
 
 Then /the result should (match|contain) the (HTML|XML) source/ do |matcher, format, expected|
@@ -37,9 +33,9 @@ end
 Then /the result should (match|contain) the (HTML|XML) structure/ do |matcher, format, expected|
   result = @output
   if format == 'HTML'
-    options = { :format => :html, :disable_escape => true, :sort_attrs => false }
+    options = { format: :html, disable_escape: true, sort_attrs: false }
   else # format == 'XML'
-    options = { :format => :xhtml, :disable_escape => true, :sort_attrs => false }
+    options = { format: :xhtml, disable_escape: true, sort_attrs: false }
     result = result.gsub '"/>', '" />' if result.include? '"/>'
   end
   result = Slim::Template.new(options) { result.each_line.map {|l| (l.start_with? '<') ? l : %(|#{l}) }.join }.render

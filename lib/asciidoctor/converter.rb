@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   # A base module for defining converters that can be used to convert {AbstractNode}
   # objects in a parsed AsciiDoc document to a backend format such as HTML or
@@ -73,7 +72,7 @@ module Asciidoctor
         @backend_info ||= init_backend_info
       end
 
-      def init_backend_info
+      private def init_backend_info
         raise ::ArgumentError, %(Cannot determine backend for converter: #{self.class}) unless @backend
         base = @backend.sub TrailingDigitsRx, ''
         if (ext = DEFAULT_EXTENSIONS[base])
@@ -86,10 +85,10 @@ module Asciidoctor
           syntax = 'html'
         end
         {
-          :basebackend => base,
-          :outfilesuffix => ext,
-          :filetype => type,
-          :htmlsyntax => syntax
+          basebackend: base,
+          outfilesuffix: ext,
+          filetype: type,
+          htmlsyntax: syntax,
         }
       end
 
@@ -228,5 +227,5 @@ module Asciidoctor
   end
 end
 
-require 'asciidoctor/converter/base'
-require 'asciidoctor/converter/factory'
+require_relative 'converter/base'
+require_relative 'converter/factory'

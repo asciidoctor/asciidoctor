@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and description lists)
 class List < AbstractBlock
@@ -100,7 +99,7 @@ class ListItem < AbstractBlock
     !simple?
   end
 
-  # Public: Fold the first paragraph block into the text
+  # Internal: Fold the first paragraph block into the text
   #
   # Here are the rules for when a folding occurs:
   #
@@ -127,6 +126,5 @@ class ListItem < AbstractBlock
   def to_s
     %(#<#{self.class}@#{object_id} {list_context: #{parent.context.inspect}, text: #{@text.inspect}, blocks: #{(@blocks || []).size}}>)
   end
-
 end
 end

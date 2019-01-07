@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
 # Public: Handles all operations for resolving, cleaning and joining paths.
 # This class includes operations for handling both web paths (request URIs) and
@@ -84,7 +83,7 @@ module Asciidoctor
 #     => 'C:/data/docs/css'
 #
 #     begin
-#       resolver.system_path('../../../css', '../../..', '/path/to/docs', :recover => false)
+#       resolver.system_path('../../../css', '../../..', '/path/to/docs', recover: false)
 #     rescue SecurityError => e
 #       puts e.message
 #     end

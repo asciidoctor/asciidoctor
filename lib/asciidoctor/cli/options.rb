@@ -1,4 +1,3 @@
-# encoding: UTF-8
 module Asciidoctor
   module Cli
     FS = '/'
@@ -82,9 +81,9 @@ Example: asciidoctor -b html5 source.asciidoc
           opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
                   'unless @ is appended to the value, this attributes takes precedence over attributes',
                   'defined in the source document') do |attr|
+            attr = attr.encode UTF_8 unless attr.encoding == UTF_8
             key, val = attr.split '=', 2
-            val = val ? (FORCE_ENCODING ? (val.force_encoding ::Encoding::UTF_8) : val) : ''
-            self[:attributes][key] = val
+            self[:attributes][key] = val || ''
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|
@@ -118,7 +117,7 @@ Example: asciidoctor -b html5 source.asciidoc
           end
           opts.on('--failure-level LEVEL', %w(warning WARNING error ERROR), 'set minimum logging level that triggers a non-zero exit code: [WARN, ERROR] (default: FATAL)') do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
-            self[:failure_level] = ::Logger::Severity.const_get level
+            self[:failure_level] = ::Logger::Severity.const_get level, false
           end
           opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
             self[:verbose] = 0
@@ -149,7 +148,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   $stderr.puts %(asciidoctor: FAILED: manual page not found: #{manpage_path})
                   return 1
                 end
-              elsif ::File.exist?(manpage_path = (::File.join ::Asciidoctor::ROOT_PATH, 'man', 'asciidoctor.1'))
+              elsif ::File.exist?(manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
                 $stdout.puts ::IO.read manpage_path
               else
                 require 'open3' unless defined? ::Open3.popen3
@@ -286,14 +285,10 @@ Example: asciidoctor -b html5 source.asciidoc
 
       def print_version os = $stdout
         os.puts %(Asciidoctor #{::Asciidoctor::VERSION} [https://asciidoctor.org])
-        if ::RUBY_MIN_VERSION_1_9
-          encoding_info = { 'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external' }.map do |k, v|
-            %(#{k}:#{v == 'internal' ? (::File.open(__FILE__) {|f| f.getc }).encoding : (::Encoding.find v)})
-          end
-          os.puts %(Runtime Environment (#{::RUBY_DESCRIPTION}) (#{encoding_info.join ' '}))
-        else
-          os.puts %(Runtime Environment (#{::RUBY_DESCRIPTION}))
+        encoding_info = { 'lc' => 'locale', 'fs' => 'filesystem', 'in' => 'internal', 'ex' => 'external' }.map do |k, v|
+          %(#{k}:#{v == 'internal' ? (::File.open(__FILE__) {|f| f.getc }).encoding : (::Encoding.find v)})
         end
+        os.puts %(Runtime Environment (#{::RUBY_DESCRIPTION}) (#{encoding_info.join ' '}))
         0
       end
     end
