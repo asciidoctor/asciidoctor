@@ -323,14 +323,13 @@ class Minitest::Test
   end
 
   def using_test_webserver host = resolve_localhost, port = 9876
-    server = TCPServer.new host, port
     base_dir = testdir
-    server_thread = Thread.new do
+    server = TCPServer.new host, port
+    server_thread = Thread.start do
       while (session = server.accept)
         request = session.gets
-        resource = nil
-        if (m = /GET (\S+) HTTP\/1\.1$/.match(request.chomp))
-          resource = (resource = m[1]) == '' ? '.' : resource
+        if /^GET (\S+) HTTP\/1\.1$/ =~ request.chomp
+          resource = (resource = $1) == '' ? '.' : resource
         else
           session.print %(HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/plain\r\n\r\n)
           session.print %(405 - Method not allowed\n)
@@ -360,12 +359,12 @@ class Minitest::Test
         session.close
       end
     end
-    server_thread.report_on_exception = false if server_thread.respond_to? :report_on_exception=
     begin
       yield
     ensure
-      server.close
       server_thread.exit
+      server_thread.value
+      server.close
     end
   end
 end
