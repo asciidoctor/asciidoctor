@@ -25,7 +25,7 @@ module Asciidoctor
   # will be issued.
   class Converter::TemplateConverter < Converter::Base
     DEFAULT_ENGINE_OPTIONS = {
-      erb: { trim: '<' },
+      erb: { trim: 0 },
       # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
       # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
       haml: { format: :xhtml, attr_wrapper: '"', escape_attrs: false, ugly: true },
