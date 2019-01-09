@@ -213,10 +213,9 @@ module Substitutors
           passes[pass_key] = { text: content, subs: subs }
         end
       else # pass:[]
-        if $6 == RS
-          # NOTE we don't look for nested pass:[] macros
-          next $&.slice 1, $&.length
-        end
+        # NOTE we don't look for nested pass:[] macros
+        # honor the escape
+        next $&.slice 1, $&.length if $6 == RS
 
         passes[pass_key = passes.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
@@ -244,9 +243,7 @@ module Substitutors
         if format_mark == '`' && !old_behavior
           # extract nested single-plus passthrough; otherwise return unprocessed
           next (extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes)
-        end
-
-        if escape_mark
+        elsif escape_mark
           # honor the escape of the formatting mark
           next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
         elsif preceding == RS
@@ -284,9 +281,7 @@ module Substitutors
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
     text = text.gsub(InlineStemMacroRx) {
       # honor the escape
-      if $&.start_with? RS
-        next $&.slice 1, $&.length
-      end
+      next $&.slice 1, $&.length if $&.start_with? RS
 
       if (type = $1.to_sym) == :stem
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
@@ -552,9 +547,7 @@ module Substitutors
       if found_macroish && (text.include? 'menu:')
         text = text.gsub(InlineMenuMacroRx) {
           # honor the escape
-          if $&.start_with? RS
-            next $&.slice 1, $&.length
-          end
+          next $&.slice 1, $&.length if $&.start_with? RS
 
           menu = $1
           if (items = $2)
@@ -576,9 +569,7 @@ module Substitutors
       if (text.include? '"') && (text.include? '&gt;')
         text = text.gsub(InlineMenuRx) {
           # honor the escape
-          if $&.start_with? RS
-            next $&.slice 1, $&.length
-          end
+          next $&.slice 1, $&.length if $&.start_with? RS
 
           menu, *submenus = $1.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
@@ -593,9 +584,7 @@ module Substitutors
       extensions.inline_macros.each do |extension|
         text = text.gsub(extension.instance.regexp) {
           # honor the escape
-          if $&.start_with? RS
-            next $&.slice 1, $&.length
-          end
+          next $&.slice 1, $&.length if $&.start_with? RS
 
           if ($~.names rescue []).empty?
             target, content, extconf = $1, $2, extension.config
@@ -652,23 +641,19 @@ module Substitutors
       text = text.gsub(InlineIndextermMacroRx) {
         case $1
         when 'indexterm'
-          text = $2
           # honor the escape
-          if $&.start_with? RS
-            next $&.slice 1, $&.length
-          end
+          next $&.slice 1, $&.length if $&.start_with? RS
+
           # indexterm:[Tigers,Big cats]
-          terms = split_simple_csv normalize_string text, true
+          terms = split_simple_csv normalize_string $2, true
           doc.register :indexterms, terms
           (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
         when 'indexterm2'
-          text = $2
           # honor the escape
-          if $&.start_with? RS
-            next $&.slice 1, $&.length
-          end
+          next $&.slice 1, $&.length if $&.start_with? RS
+
           # indexterm2:[Tigers]
-          term = normalize_string text, true
+          term = normalize_string $2, true
           doc.register :indexterms, [term]
           (Inline.new self, :indexterm, term, type: :visible).convert
         else
@@ -713,10 +698,10 @@ module Substitutors
     if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       text = text.gsub(InlineLinkRx) {
+        target = $2
         # honor the escape
-        if (target = $2).start_with? RS
-          next %(#{$1}#{target.slice 1, target.length}#{$3})
-        end
+        next %(#{$1}#{target.slice 1, target.length}#{$3}) if target.start_with? RS
+
         # NOTE if text is non-nil, then we've matched a formal macro (i.e., trailing square brackets)
         captured, prefix, text, suffix = $&, $1, (macro = $3) || '', ''
         if prefix == 'link:'
@@ -810,8 +795,7 @@ module Substitutors
         # honor the escape
         if $&.start_with? RS
           next $&.slice 1, $&.length
-        end
-        if (mailto = $1)
+        elsif (mailto = $1)
           target = %(mailto:#{$2})
           mailto_text = $2
         else
@@ -885,9 +869,8 @@ module Substitutors
 
     if text.include? '@'
       text = text.gsub(InlineEmailRx) {
-        if $1
-          next ($1 == RS ? ($&.slice 1, $&.length) : $&)
-        end
+        # honor the escapes
+        next ($1 == RS ? ($&.slice 1, $&.length) : $&) if $1
 
         target = %(mailto:#{$&})
         # QUESTION should this be registered as an e-mail address?
@@ -899,15 +882,12 @@ module Substitutors
 
     if found_macroish && (text.include? 'tnote')
       text = text.gsub(InlineFootnoteMacroRx) {
-        if $&.start_with? RS
-          next $&.slice 1, $&.length
-        end
-        if $1 # footnoteref (legacy)
-          id, text = ($3 || '').split(',', 2)
-        else
-          id = $2
-          text = $3
-        end
+        # honor the escape
+        next $&.slice 1, $&.length if $&.start_with? RS
+
+        # $1 is footnoteref (legacy)
+        id, text = $1 ? ($3 || '').split(',', 2) : [$2, $3]
+
         if id
           if text
             # REVIEW it's a dirty job, but somebody's gotta do it
@@ -954,6 +934,7 @@ module Substitutors
       text = text.gsub(InlineAnchorRx) {
         # honor the escape
         next $&.slice 1, $&.length if $1
+
         # NOTE reftext is only relevant for DocBook output; used as value of xreflabel attribute
         if (id = $2)
           reftext = $3
@@ -976,9 +957,8 @@ module Substitutors
     if ((found ? found[:macroish] : (content.include? '[')) && (content.include? 'xref:')) || ((content.include? '&') && (content.include? 'lt;&'))
       content = content.gsub(InlineXrefMacroRx) {
         # honor the escape
-        if $&.start_with? RS
-          next $&.slice 1, $&.length
-        end
+        next $&.slice 1, $&.length if $&.start_with? RS
+
         attrs, doc = {}, @document
         if (refid = $1)
           refid, text = refid.split ',', 2
