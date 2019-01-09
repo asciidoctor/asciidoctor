@@ -1,4 +1,5 @@
 module Asciidoctor
+# Internal: Except where noted, a module that contains internal helper functions.
 module Helpers
   # Internal: Require the specified library using Kernel#require.
   #
@@ -42,7 +43,7 @@ module Helpers
     nil
   end
 
-  # Public: Prepare the source data Array for parsing.
+  # Internal: Prepare the source data Array for parsing.
   #
   # Encodes the data to UTF-8, if necessary, and removes any trailing
   # whitespace from every line.
@@ -72,7 +73,7 @@ module Helpers
     end
   end
 
-  # Public: Prepare the source data String for parsing.
+  # Internal: Prepare the source data String for parsing.
   #
   # Encodes the data to UTF-8, if necessary, splits it into an array, and
   # removes any trailing whitespace from every line.
@@ -98,7 +99,7 @@ module Helpers
     data.lines.map {|line| line.rstrip }
   end
 
-  # Public: Efficiently checks whether the specified String resembles a URI
+  # Internal: Efficiently checks whether the specified String resembles a URI
   #
   # Uses the Asciidoctor::UriSniffRx regex to check whether the String begins
   # with a URI prefix (e.g., http://). No validation of the URI is performed.
@@ -110,7 +111,7 @@ module Helpers
     (str.include? ':') && (UriSniffRx.match? str)
   end
 
-  # Public: Efficiently retrieves the URI prefix of the specified String
+  # Internal: Efficiently retrieves the URI prefix of the specified String
   #
   # Uses the Asciidoctor::UriSniffRx regex to match the URI prefix in the
   # specified String (e.g., http://), if present.
@@ -125,7 +126,7 @@ module Helpers
   # Matches the characters in a URI to encode
   UriEncodeCharsRx = /[^\w\-.!~*';:@=+$,()\[\]]/
 
-  # Public: Encode a String for inclusion in a URI.
+  # Internal: Encode a String for inclusion in a URI.
   #
   # str - the String to URI encode
   #
@@ -140,7 +141,7 @@ module Helpers
   #
   # Examples
   #
-  #   Helpers.rootname('part1/chapter1.adoc')
+  #   Helpers.rootname 'part1/chapter1.adoc'
   #   # => "part1/chapter1"
   #
   # Returns the String filename with the file extension removed
@@ -156,14 +157,14 @@ module Helpers
   #
   # Examples
   #
-  #   Helpers.basename('images/tiger.png', true)
+  #   Helpers.basename 'images/tiger.png', true
   #   # => "tiger"
   #
-  #   Helpers.basename('images/tiger.png', '.png')
+  #   Helpers.basename 'images/tiger.png', '.png'
   #   # => "tiger"
   #
   # Returns the String filename with leading directories removed and, if specified, the extension removed
-  def self.basename(filename, drop_ext = nil)
+  def self.basename filename, drop_ext = nil
     if drop_ext
       ::File.basename filename, (drop_ext == true ? (::File.extname filename) : drop_ext)
     else
@@ -171,6 +172,7 @@ module Helpers
     end
   end
 
+  # Internal: Make a directory, ensuring all parent directories exist.
   def self.mkdir_p dir
     unless ::File.directory? dir
       unless (parent_dir = ::File.dirname dir) == '.'
@@ -189,7 +191,7 @@ module Helpers
     'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1
   }
 
-  # Converts an integer to a Roman numeral.
+  # Internal: Converts an integer to a Roman numeral.
   #
   # val - the [Integer] value to convert
   #
@@ -201,7 +203,7 @@ module Helpers
     }.join
   end
 
-  # Public: Get the next value in the sequence.
+  # Internal: Get the next value in the sequence.
   #
   # Handles both integer and character sequences.
   #
@@ -221,7 +223,7 @@ module Helpers
     end
   end
 
-  # Public: Resolve the specified object as a Class
+  # Internal: Resolve the specified object as a Class
   #
   # object - The Object to resolve as a Class
   #
@@ -231,7 +233,7 @@ module Helpers
     ::Class === object ? object : (::String === object ? (class_for_name object) : nil)
   end
 
-  # Public: Resolves a Class object (not a Module) for the qualified name.
+  # Internal: Resolves a Class object (not a Module) for the qualified name.
   #
   # Returns Class
   def self.class_for_name qualified_name
