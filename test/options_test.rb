@@ -107,6 +107,18 @@ context 'Options' do
     assert_equal 'value=value', options[:attributes]['name']
   end
 
+  test 'should not fail if value of attribute option is empty' do
+    options = Asciidoctor::Cli::Options.parse!(['-a', '', 'test/fixtures/sample.adoc'])
+
+    assert_nil options[:attributes]
+  end
+
+  test 'should not fail if value of attribute option is equal sign' do
+    options = Asciidoctor::Cli::Options.parse!(['-a', '=', 'test/fixtures/sample.adoc'])
+
+    assert_nil options[:attributes]
+  end
+
   test 'should allow safe mode to be specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.adoc))
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
