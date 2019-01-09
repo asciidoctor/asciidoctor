@@ -1,5 +1,5 @@
 module Asciidoctor
-# Public: Methods to parse lines of AsciiDoc into an object hierarchy
+# Internal: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and
 # should be invoked from the Parser class. The main entry point is ::next_block.
 # No Parser instances shall be discovered running around. (Any attempt to
