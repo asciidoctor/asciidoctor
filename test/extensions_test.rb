@@ -1427,7 +1427,8 @@ sample content
           docinfo_processor MetaRobotsDocinfoProcessor
         end
 
-        doc = document_from_string input, safe: :server
+        doc = document_from_string input
+        assert_equal Asciidoctor::SafeMode::SECURE, doc.safe
         assert_equal '<meta name="robots" content="index,follow">', doc.docinfo
       ensure
         Asciidoctor::Extensions.unregister_all

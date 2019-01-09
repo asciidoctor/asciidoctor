@@ -1022,10 +1022,7 @@ class Document < AbstractBlock
   # returns The contents of the docinfo file(s) or empty string if no files are
   # found or the safe mode is secure or greater.
   def docinfo location = :head, suffix = nil
-    if safe >= SafeMode::SECURE
-      ''
-    else
-      content = []
+    if safe < SafeMode::SECURE
       qualifier = %(-#{location}) unless location == :head
       suffix = @outfilesuffix unless suffix
 
@@ -1042,6 +1039,7 @@ class Document < AbstractBlock
       end
 
       if docinfo
+        content = []
         docinfo_file, docinfo_dir, docinfo_subs = %(docinfo#{qualifier}#{suffix}), @attributes['docinfodir'], resolve_docinfo_subs
         unless (docinfo & ['shared', %(shared-#{location})]).empty?
           docinfo_path = normalize_system_path docinfo_file, docinfo_dir
@@ -1059,14 +1057,14 @@ class Document < AbstractBlock
           end
         end
       end
-
-      # TODO allow document to control whether extension docinfo is contributed
-      if @extensions && (docinfo_processors? location)
-        content += @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact
-      end
-
-      content.join LF
     end
+
+    # TODO allow document to control whether extension docinfo is contributed
+    if @extensions && (docinfo_processors? location)
+      (content ||= []).concat @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact
+    end
+
+    content ? (content.join LF) : ''
   end
 
   def docinfo_processors?(location = :head)
