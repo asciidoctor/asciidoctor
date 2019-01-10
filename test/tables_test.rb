@@ -1260,9 +1260,10 @@ output file name is used.
       assert_equal 9, note.lineno
       output = doc.convert header_footer: false
 
-      assert_css 'table > tbody > tr', output, 2
-      assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(3) div.admonitionblock', output, 1
-      assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3) div.dlist', output, 1
+      # NOTE JRuby matches the table inside the admonition block if the class is not specified on the table
+      assert_css 'table.tableblock > tbody > tr', output, 2
+      assert_css 'table.tableblock > tbody > tr:nth-child(1) > td:nth-child(3) div.admonitionblock', output, 1
+      assert_css 'table.tableblock > tbody > tr:nth-child(2) > td:nth-child(3) div.dlist', output, 1
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
