@@ -286,6 +286,7 @@ module Asciidoctor
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
     '!===' => [:table, ::Set.new],
+    '~~~~' => [:open, ::Set['abstract', 'partintro']],
     '////' => [:comment, ::Set.new],
     '```' => [:fenced_code, ::Set.new],
   }
