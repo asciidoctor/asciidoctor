@@ -65,11 +65,7 @@ context 'Converter' do
       selected = doc.converter.find_converter('paragraph')
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
       slim_asciidoc_opts = selected.instance_variable_get(:@engine_options)[:slim][:asciidoc]
-      if ::Slim::VERSION >= '3.0'
-        assert_equal({ safe: Asciidoctor::SafeMode::UNSAFE }, slim_asciidoc_opts)
-      else
-        assert_nil slim_asciidoc_opts
-      end
+      assert_equal({ safe: Asciidoctor::SafeMode::UNSAFE }, slim_asciidoc_opts)
     end
 
     test 'should support custom template engine options for known engine' do
