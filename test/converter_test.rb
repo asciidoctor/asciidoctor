@@ -225,7 +225,8 @@ Sidebar content
     end
 
     test 'should load ERB templates using ERBTemplate if eruby is not set' do
-      doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/erb'), template_cache: false
+      input = %([.wrapper]\n--\nfoobar\n--)
+      doc = Asciidoctor::Document.new input, template_dir: (fixture_path 'custom-backends/erb'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       ['paragraph'].each do |node_name|
         selected = doc.converter.find_converter node_name
@@ -236,6 +237,17 @@ Sidebar content
         assert_kind_of ::ERB, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
+      # NOTE verify behavior of trim mode
+      expected_output = <<-EOS.chomp
+<div class="openblock wrapper">
+<div class="content">
+<div class="paragraph">
+<p>foobar</p>
+</div>
+</div>
+</div>
+      EOS
+      assert_equal expected_output, doc.convert
     end
 
     test 'should load ERB templates using ErubisTemplate if eruby is set to erubis' do
