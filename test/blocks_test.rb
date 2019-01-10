@@ -1348,6 +1348,38 @@ ____
       assert_xpath '//*[@class="openblock"]//*[@class="quoteblock"]', output, 1
     end
 
+    test 'can nest open blocks using ~ variant' do
+      input = <<-EOS
+[.tabs]
+~~~~
+[.tab]
+~~~~~~
+tab one
+~~~~~~
+
+[.tab]
+~~~~~~
+tab two
+~~~~~~
+~~~~
+      EOS
+
+      output = convert_string input
+      assert_css '.openblock', output, 3
+      assert_css '.openblock .openblock', output, 2
+    end
+
+    test 'open block ~ variant cannot masquarade as another block context' do
+      input = <<-EOS
+[sidebar]
+~~~~
+This is not a valid block.
+~~~~
+      EOS
+      output = convert_string input
+      assert_message @logger, :WARN, '<stdin>: line 2: invalid style for open block: sidebar', Hash
+    end
+
     test 'should transfer id and reftext on open block to DocBook output' do
       input = <<-EOS
 Check out that <<open>>!
