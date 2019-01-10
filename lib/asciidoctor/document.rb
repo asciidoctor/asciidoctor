@@ -1180,6 +1180,15 @@ class Document < AbstractBlock
       end
     end
 
+    if (icons_val = attrs['icons']) && !(attrs.key? 'icontype')
+      case icons_val
+      when '', 'font'
+      else
+        attrs['icons'] = ''
+        attrs['icontype'] = icons_val
+      end
+    end
+
     if (@compat_mode = attrs.key? 'compat-mode')
       attrs['source-language'] = attrs['language'] if attrs.key? 'language'
     end

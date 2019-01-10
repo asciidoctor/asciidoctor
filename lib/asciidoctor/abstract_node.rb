@@ -272,12 +272,12 @@ class AbstractNode
   # specified icon name.
   #
   # If the 'icon' attribute is set on this block, the name is ignored and the
-  # value of this attribute is used as the  target image path. Otherwise,
+  # value of this attribute is used as the target image path. Otherwise,
   # construct a target image path by concatenating the value of the 'iconsdir'
-  # attribute, the icon name and the value of the 'icontype' attribute
+  # attribute, the icon name, and the value of the 'icontype' attribute
   # (defaulting to 'png').
   #
-  # The target image path is then passed through the #image_uri() method.  If
+  # The target image path is then passed through the #image_uri() method. If
   # the 'data-uri' attribute is set on the document, the image will be
   # safely converted to a data URI.
   #
