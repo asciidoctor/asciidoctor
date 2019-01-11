@@ -1044,16 +1044,16 @@ class Document < AbstractBlock
         unless (docinfo & ['shared', %(shared-#{location})]).empty?
           docinfo_path = normalize_system_path docinfo_file, docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (shd_content = (read_asset docinfo_path, normalize: true))
-            content << (apply_subs shd_content, docinfo_subs)
+          if (shared_docinfo = (read_asset docinfo_path, normalize: true))
+            content << (apply_subs shared_docinfo, docinfo_subs)
           end
         end
 
         unless @attributes['docname'].nil_or_empty? || (docinfo & ['private', %(private-#{location})]).empty?
           docinfo_path = normalize_system_path %(#{@attributes['docname']}-#{docinfo_file}), docinfo_dir
           # NOTE normalizing the lines is essential if we're performing substitutions
-          if (pvt_content = (read_asset docinfo_path, normalize: true))
-            content << (apply_subs pvt_content, docinfo_subs)
+          if (private_docinfo = (read_asset docinfo_path, normalize: true))
+            content << (apply_subs private_docinfo, docinfo_subs)
           end
         end
       end
