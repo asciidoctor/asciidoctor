@@ -598,11 +598,10 @@ Your browser does not support the audio tag.
         when 'coderay'
           pre_attrs = %( class="CodeRay highlight#{nowrap ? ' nowrap' : ''}")
         when 'pygments'
-          if (node.document.attr? 'pygments-css', 'inline')
-            @pygments_bg = @stylesheets.pygments_background(node.document.attr 'pygments-style') unless defined? @pygments_bg
-            pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}" style="background: #{@pygments_bg}")
-          else
-            pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}")
+          pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}")
+          if (node.document.attr? 'pygments-css', 'inline') &&
+              (bg = (defined? @pygments_bg) ? @pygments_bg : (@pygments_bg = @stylesheets.pygments_background node.document.attr 'pygments-style'))
+            pre_attrs = %(#{pre_attrs} style="background: #{bg}")
           end
         when 'highlightjs', 'highlight.js'
           pre_attrs = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")

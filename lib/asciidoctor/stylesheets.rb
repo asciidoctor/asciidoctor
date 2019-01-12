@@ -66,9 +66,7 @@ class Stylesheets
   end
 
   def pygments_background style = nil
-    if load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', style: style || DEFAULT_PYGMENTS_STYLE)
-      $1
-    end
+    load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', style: style || DEFAULT_PYGMENTS_STYLE) ? $1 : nil
   end
 
   # Public: Generate the Pygments stylesheet with the specified style.
