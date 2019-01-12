@@ -127,13 +127,26 @@ module Helpers
   # Matches the characters in a URI to encode
   UriEncodeCharsRx = /[^\w\-.!~*';:@=+$,()\[\]]/
 
-  # Internal: Encode a String for inclusion in a URI.
+  # Internal: Encode a URI component String for safe inclusion in a URI.
   #
-  # str - the String to URI encode
+  # str - the URI component String to encode
   #
-  # Returns the String with all URI reserved characters encoded.
-  def self.uri_encode str
-    str.gsub(UriEncodeCharsRx) { $&.each_byte.map {|c| sprintf '%%%02X', c }.join }
+  # Returns the String with all reserved URI characters encoded (e.g., /, &, =, space, etc).
+  if RUBY_ENGINE == 'opal'
+    def self.encode_uri_component str
+      # patch necessary to adhere with RFC-3986 (and thus CGI.escape)
+      # see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent#Description
+      %x(
+        return encodeURIComponent(str).replace(/%20|[!'()*]/g, function (m) {
+          return m === '%20' ? '+' : '%' + m.charCodeAt(0).toString(16)
+        })
+      )
+    end
+  else
+    CGI = ::CGI
+    def self.encode_uri_component str
+      CGI.escape str
+    end
   end
 
   # Public: Removes the file extension from filename and returns the result

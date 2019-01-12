@@ -609,12 +609,12 @@ context 'Substitutions' do
 
     test 'a mailto macro with text and subject should be interpreted as a mailto link' do
       para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]')
-      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request">Doc Writer</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request">Doc Writer</a>}, para.sub_macros(para.source)
     end
 
     test 'a mailto macro with text, subject and body should be interpreted as a mailto link' do
       para = block_from_string('mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]')
-      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">Doc Writer</a>}, para.sub_macros(para.source)
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">Doc Writer</a>}, para.sub_macros(para.source)
     end
 
     test 'should recognize inline email addresses' do
@@ -2040,21 +2040,6 @@ context 'Substitutions' do
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
       block.lock_in_subs
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
-    end
-  end
-
-  # TODO move to helpers_test.rb
-  context 'Helpers' do
-    test 'should URI encode non-word characters generally' do
-      given = ' /%&?\\'
-      expect = '%20%2F%25%26%3F%5C'
-      assert_equal expect, (Asciidoctor::Helpers.uri_encode given)
-    end
-
-    test 'should not URI select non-word characters' do
-      given = '-.!~*\';:@=+$,()[]'
-      expect = given
-      assert_equal expect, (Asciidoctor::Helpers.uri_encode given)
     end
   end
 end
