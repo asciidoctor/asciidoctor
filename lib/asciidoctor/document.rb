@@ -798,8 +798,8 @@ class Document < AbstractBlock
     super
   end
 
-  # Internal: Called by the parser after the header has been parsed and before
-  # the content is parsed.
+  # Internal: Called by the parser after parsing the header and before parsing
+  # the body, even if no header is found.
   #--
   # QUESTION should we invoke the TreeProcessors here, passing in a phase?
   # QUESTION is finalize_header the right name?
