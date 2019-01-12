@@ -48,7 +48,7 @@ class Stylesheets
     # unless load_coderay.nil?
     #   ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
     # end
-    @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DIR, 'coderay-asciidoctor.css')).rstrip
+    @coderay_stylesheet_data ||= ::IO.read(::File.join(STYLESHEETS_DIR, coderay_stylesheet_name)).rstrip
   end
 
   def embed_coderay_stylesheet
