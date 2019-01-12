@@ -157,7 +157,7 @@ module Asciidoctor
       # Returns the [Converter] class registered to convert the specified backend
       # or nil if no match is found
       def resolve backend
-        @converters && (@converters[backend] || @star_converter)
+        @converters[backend] || @star_converter
       end
 
       # Public: Unregister all Converter classes that are registered with this
