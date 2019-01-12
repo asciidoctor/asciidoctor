@@ -96,11 +96,11 @@ class Stylesheets
   end
 
   #def load_coderay
-  #  (defined? ::CodeRay) ? true : !(Helpers.require_library 'coderay', true, :ignore).nil?
+  #  (defined? ::CodeRay::Duo) ? true : !(Helpers.require_library 'coderay', true, :ignore).nil?
   #end
 
   def load_pygments
-    (defined? ::Pygments) ? true : !(Helpers.require_library 'pygments', 'pygments.rb', :ignore).nil?
+    (defined? ::Pygments::Lexer) ? true : !(Helpers.require_library 'pygments', 'pygments.rb', :ignore).nil?
   end
 end
 end
