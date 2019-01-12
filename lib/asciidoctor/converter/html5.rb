@@ -596,29 +596,29 @@ Your browser does not support the audio tag.
         end
         case node.document.attr 'source-highlighter'
         when 'coderay'
-          pre_class = %( class="CodeRay highlight#{nowrap ? ' nowrap' : ''}")
+          pre_attrs = %( class="CodeRay highlight#{nowrap ? ' nowrap' : ''}")
         when 'pygments'
           if (node.document.attr? 'pygments-css', 'inline')
             @pygments_bg = @stylesheets.pygments_background(node.document.attr 'pygments-style') unless defined? @pygments_bg
-            pre_class = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}" style="background: #{@pygments_bg}")
+            pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}" style="background: #{@pygments_bg}")
           else
-            pre_class = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}")
+            pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}")
           end
         when 'highlightjs', 'highlight.js'
-          pre_class = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")
+          pre_attrs = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")
           code_attrs = %( class="language-#{language} hljs"#{code_attrs}) if language
         when 'prettify'
           linenums = (node.attr? 'linenums', nil, false) ? ((start = node.attr 'start', nil, false) ? %( linenums:#{start}) : ' linenums') : ''
-          pre_class = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{linenums}")
+          pre_attrs = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{linenums}")
           code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         when 'html-pipeline'
-          pre_class = language ? %( lang="#{language}") : ''
+          pre_attrs = language ? %( lang="#{language}") : ''
           code_attrs = ''
         else
-          pre_class = %( class="highlight#{nowrap ? ' nowrap' : ''}")
+          pre_attrs = %( class="highlight#{nowrap ? ' nowrap' : ''}")
           code_attrs = %( class="language-#{language}"#{code_attrs}) if language
         end
-        pre_start = %(<pre#{pre_class}><code#{code_attrs}>)
+        pre_start = %(<pre#{pre_attrs}><code#{code_attrs}>)
         pre_end = '</code></pre>'
       else
         pre_start = %(<pre#{nowrap ? ' class="nowrap"' : ''}>)
