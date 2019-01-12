@@ -134,13 +134,13 @@ module Asciidoctor
     end
 
     class << self
-      # Mixes the {Config Converter::Config} module into any class that includes the {Converter} module.
+      # Private: Mixes the {Config Converter::Config} module into any class that includes the {Converter} module.
       #
-      # converter - The Class that includes the {Converter} module
+      # into - The Class that includes the {Converter} module
       #
       # Returns nothing
-      def included converter
-        converter.extend Config
+      private def included into
+        into.extend Config
       end
     end
 

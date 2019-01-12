@@ -106,8 +106,15 @@ module LoggerManager
 end
 
 module Logging
-  def self.included into
-    into.extend Logging
+  class << self
+    # Private: Additionally mixes the {Logging} module as static methods into any class that includes the {Logging} module.
+    #
+    # into - The Class that includes the {Logging} module
+    #
+    # Returns nothing
+    private def included into
+      into.extend Logging
+    end
   end
 
   def logger
