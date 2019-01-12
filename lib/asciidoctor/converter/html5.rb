@@ -27,7 +27,6 @@ module Asciidoctor
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
       @void_element_slash = @xml_mode ? '/' : nil
-      @stylesheets = Stylesheets.instance
     end
 
     def document node
@@ -68,7 +67,9 @@ module Asciidoctor
         if linkcss
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
         else
-          result << @stylesheets.embed_primary_stylesheet
+          result << %(<style>
+#{Stylesheets.instance.primary_stylesheet_data}
+</style>)
         end
       elsif node.attr? 'stylesheet'
         if linkcss
@@ -89,24 +90,8 @@ module Asciidoctor
         end
       end
 
-      case (highlighter = node.attr 'source-highlighter')
-      when 'coderay'
-        if (node.attr 'coderay-css', 'class') == 'class'
-          if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.coderay_stylesheet_name, (node.attr 'stylesdir', ''), false}"#{slash}>)
-          else
-            result << @stylesheets.embed_coderay_stylesheet
-          end
-        end
-      when 'pygments'
-        if (node.attr 'pygments-css', 'class') == 'class'
-          pygments_style = node.attr 'pygments-style'
-          if linkcss
-            result << %(<link rel="stylesheet" href="#{node.normalize_web_path @stylesheets.pygments_stylesheet_name(pygments_style), (node.attr 'stylesdir', ''), false}"#{slash}>)
-          else
-            result << (@stylesheets.embed_pygments_stylesheet pygments_style)
-          end
-        end
+      if (syntax_hl = node.syntax_highlighter) && (syntax_hl.docinfo? :head)
+        result << (syntax_hl.docinfo :head, node, linkcss: linkcss)
       end
 
       unless (docinfo_content = node.docinfo).empty?
@@ -196,22 +181,11 @@ module Asciidoctor
         result << '</div>'
       end
 
-      # Load Javascript at the end of body for performance
+      # JavaScript (and auxiliary stylesheets) loaded at the end of body for performance reasons
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
-      case highlighter
-      when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base_url}/highlight.js/9.13.1)
-        result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>)
-        result << %(<script src="#{highlightjs_path}/highlight.min.js"></script>
-<script>hljs.initHighlighting()</script>)
-      when 'prettify'
-        prettify_path = node.attr 'prettifydir', %(#{cdn_base_url}/prettify/r298)
-        if (prettify_theme = node.attr 'prettify-theme', 'prettify').start_with? 'http://', 'https://'
-          result << %(<link rel="stylesheet" href="#{prettify_theme}"#{slash}>)
-        else
-          result << %(<link rel="stylesheet" href="#{prettify_path}/#{prettify_theme}.min.css"#{slash}>)
-        end
-        result << %(<script src="#{prettify_path}/run_prettify.min.js"></script>)
+
+      if syntax_hl && (syntax_hl.docinfo? :footer)
+        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
       end
 
       if node.attr? 'stem'
@@ -590,48 +564,28 @@ Your browser does not support the audio tag.
     end
 
     def listing node
-      nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
+      nowrap = (node.option? 'nowrap') || !(node.document.attr? 'prewrap')
       if node.style == 'source'
-        if (language = node.attr 'language', nil, false)
-          code_attrs = %( data-lang="#{language}")
+        lang = node.attr 'language', nil, false
+        if (syntax_hl = node.document.syntax_highlighter)
+          opts = syntax_hl.highlight? ? {
+            css_mode: ((doc_attrs = node.document.attributes)[%(#{syntax_hl.name}-css)] || :class).to_sym,
+            style: doc_attrs[%(#{syntax_hl.name}-style)],
+          } : {}
+          opts[:nowrap] = nowrap
         else
-          code_attrs = ''
+          pre_open = %(<pre class="highlight#{nowrap ? ' nowrap' : ''}"><code#{lang ? %[ class="language-#{lang}" data-lang="#{lang}"] : ''}>)
+          pre_close = '</code></pre>'
         end
-        case node.document.attr 'source-highlighter'
-        when 'coderay'
-          pre_attrs = %( class="CodeRay highlight#{nowrap ? ' nowrap' : ''}")
-        when 'pygments'
-          pre_attrs = %( class="pygments highlight#{nowrap ? ' nowrap' : ''}")
-          if (node.document.attr? 'pygments-css', 'inline') &&
-              (bg = (defined? @pygments_bg) ? @pygments_bg : (@pygments_bg = @stylesheets.pygments_background node.document.attr 'pygments-style'))
-            pre_attrs = %(#{pre_attrs} style="background: #{bg}")
-          end
-        when 'highlightjs', 'highlight.js'
-          pre_attrs = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")
-          code_attrs = %( class="language-#{language || 'none'} hljs"#{language ? code_attrs : ''})
-        when 'prettify'
-          linenums = (node.attr? 'linenums', nil, false) ? ((start = node.attr 'start', nil, false) ? %( linenums:#{start}) : ' linenums') : ''
-          pre_attrs = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{linenums}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
-        when 'html-pipeline'
-          pre_attrs = language ? %( lang="#{language}") : ''
-          code_attrs = ''
-        else
-          pre_attrs = %( class="highlight#{nowrap ? ' nowrap' : ''}")
-          code_attrs = %( class="language-#{language}"#{code_attrs}) if language
-        end
-        pre_start = %(<pre#{pre_attrs}><code#{code_attrs}>)
-        pre_end = '</code></pre>'
       else
-        pre_start = %(<pre#{nowrap ? ' class="nowrap"' : ''}>)
-        pre_end = '</pre>'
+        pre_open = %(<pre#{nowrap ? ' class="nowrap"' : ''}>)
+        pre_close = '</pre>'
       end
-
       id_attribute = node.id ? %( id="#{node.id}") : ''
       title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
       %(<div#{id_attribute} class="listingblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
-#{pre_start}#{node.content}#{pre_end}
+#{syntax_hl ? (syntax_hl.format node, lang, opts) : pre_open + (node.content || '') + pre_close}
 </div>
 </div>)
     end

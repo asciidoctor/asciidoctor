@@ -808,6 +808,47 @@ term without description::
       refute_equal '0.00000', '%05.5f' % timings.convert.to_f
       refute_equal timings.read_parse, timings.total
     end
+
+    test 'can disable syntax highlighter by setting value to nil in :syntax_highlighters option' do
+      doc = Asciidoctor.load '', safe: :safe, syntax_highlighters: { 'coderay' => nil }, attributes: { 'source-highlighter' => 'coderay' }
+      assert_nil doc.syntax_highlighter
+    end
+
+    test 'can substitute a custom syntax highlighter factory instance using the :syntax_highlighter_factory option' do
+      input = <<-EOS
+[source,ruby]
+----
+puts 'Hello, World!'
+----
+      EOS
+      # NOTE this tests both the lazy loading and the custom factory
+      syntax_hl_factory = Asciidoctor::SyntaxHighlighter::CustomFactory.new 'github' => (Asciidoctor::SyntaxHighlighter.for 'html-pipeline')
+      doc = Asciidoctor.load input, safe: :safe, syntax_highlighter_factory: syntax_hl_factory, attributes: { 'source-highlighter' => 'github' }
+      refute_nil doc.syntax_highlighter
+      assert_kind_of Asciidoctor::SyntaxHighlighter::HtmlPipeline, doc.syntax_highlighter
+      assert_includes doc.convert, '<pre lang="ruby"><code>'
+    end
+
+    test 'can substitute an extended syntax highlighter factory implementation using the :syntax_highlighters option' do
+      input = <<-EOS
+[source,ruby]
+----
+puts 'Hello, World!'
+----
+      EOS
+      syntax_hl_factory_class = Class.new do
+        include Asciidoctor::SyntaxHighlighter::DefaultFactory
+
+        def for name
+          super 'highlight.js'
+        end
+      end
+      doc = Asciidoctor.load input, safe: :safe, syntax_highlighter_factory: syntax_hl_factory_class.new, attributes: { 'source-highlighter' => 'coderay' }
+      refute_nil doc.syntax_highlighter
+      output = doc.convert
+      refute_includes output, 'CodeRay'
+      assert_includes output, 'hljs'
+    end
   end
 
   context 'Convert' do
@@ -1160,6 +1201,27 @@ text
       refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
       refute_equal '0.00000', '%05.5f' % timings.convert.to_f
       refute_equal timings.read_parse, timings.total
+    end
+
+    test 'can override syntax highlighter using syntax_highlighters option' do
+      syntax_hl = Class.new Asciidoctor::SyntaxHighlighter::Base do
+        def highlight?
+          true
+        end
+
+        def highlight node, source, lang, opts
+          'highlighted'
+        end
+      end
+      input = <<-EOS
+[source,ruby]
+----
+puts 'Hello, World!'
+----
+      EOS
+      output = Asciidoctor.convert input, safe: :safe, syntax_highlighters: { 'coderay' => syntax_hl }, attributes: { 'source-highlighter' => 'coderay' }
+      assert_css 'pre.highlight > code[data-lang="ruby"]', output, 1
+      assert_xpath '//pre[@class="coderay highlight"]/code[text()="highlighted"]', output, 1
     end
   end
 

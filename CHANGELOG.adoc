@@ -19,6 +19,7 @@ Enhancements::
 
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
   * drop support for Slim < 3 (#2998)
+  * make syntax highlighter pluggable; extract all logic into adapter classes (#2106)
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
   * use String#encode to encode String as UTF-8 instead of using String#force_encoding (#2764)
   * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
@@ -27,21 +28,23 @@ Enhancements::
   * add support for the `muted` option on vimeo videos (allows autoplay to work in Chrome) (#3014)
   * use value of prettify-theme attribute as is if it starts with http:// or https:// (#3020)
   * allow icontype to be set using icons attribute (#2953)
+  * when using a server-side syntax highlighter, highlight content of source block even if source language is not set (#3027)
 
 Improvements::
 
   * propagate document ID to DocBook output (#3011)
-  * highlight contents of source block even if source language is not set (#3027)
   * refactor code to use modern Hash syntax
   * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
   * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)
   * move custom docinfo content in footer below built-in docinfo content in footer in HTML converter (#3017)
   * read and write files using File methods instead of IO methods (#2995)
   * value comparison in AbstractNode#attr? is only performed if expected value is truthy
+  * align default CodeRay style with style for other syntax highlighters (#2106)
 
 Bug Fixes::
 
   * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
+  * don't fail if value of pygments-style attribute is not recognized; gracefully fallback to default style (#2106)
   * do not alter the $LOAD_PATH (#2764)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * fix styling of source blocks with linenums enabled when using prettify as syntax highlighter (#640)
@@ -57,6 +60,7 @@ Bug Fixes::
   * Reader#push_include should not fail if data is nil
   * fix deprecated ERB trim mode that was causing warning (#3006)
   * move time anchor after query string on vimeo video to avoid dropping options
+  * allow color for generic text, line numbers, and line number border to inherit from Pygments style (#2106)
 
 Build / Infrastructure::
 

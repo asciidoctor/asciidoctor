@@ -279,11 +279,26 @@ context 'Invoker' do
     asciidoctor_stylesheet = fixture_path 'asciidoctor.css'
     coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
     begin
-      invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay)
-      invoker.document
+      invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay), 'source-block.adoc'
       assert File.exist?(sample_outpath)
       assert File.exist?(asciidoctor_stylesheet)
       assert File.exist?(coderay_stylesheet)
+    ensure
+      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f(asciidoctor_stylesheet)
+      FileUtils.rm_f(coderay_stylesheet)
+    end
+  end
+
+  test 'should not copy coderay stylesheet to target directory when no source blocks where highlighted' do
+    sample_outpath = fixture_path 'sample-output.html'
+    asciidoctor_stylesheet = fixture_path 'asciidoctor.css'
+    coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
+    begin
+      invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay)
+      assert File.exist?(sample_outpath)
+      assert File.exist?(asciidoctor_stylesheet)
+      refute File.exist?(coderay_stylesheet)
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(asciidoctor_stylesheet)

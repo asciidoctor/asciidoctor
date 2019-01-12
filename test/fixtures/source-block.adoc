@@ -1,0 +1,4 @@
+[source,ruby]
+----
+puts 'Hello, World!'
+----

@@ -40,8 +40,6 @@ module Substitutors
     inline: SUB_GROUPS.keys + NORMAL_SUBS,
   }
 
-  SUB_HIGHLIGHT = ['coderay', 'pygments']
-
   CAN = ?\u0018
   DEL = ?\u007f
 
@@ -67,11 +65,6 @@ module Substitutors
   ESC_R_SB = '\]'
 
   PLUS = '+'
-
-  PygmentsWrapperDivRx = %r(<div class="pyhl">(.*)</div>)m
-  # NOTE handles all permutations of <pre> wrapper
-  # NOTE trailing whitespace appears when pygments-linenums-mode=table; <pre> has style attribute when pygments-css=inline
-  PygmentsWrapperPreRx = %r(<pre\b[^>]*?>(.*?)</pre>\s*)m
 
   # Internal: A String Array of passthough (unprocessed) text captured from this block
   attr_reader :passthroughs
@@ -1345,158 +1338,92 @@ module Substitutors
     resolve_subs subs, :inline, nil, 'passthrough macro'
   end
 
-  # Public: Highlight the source code if a source highlighter is defined
-  # on the document, otherwise return the text unprocessed
+  # Public: Highlight (i.e., colorize) the source code during conversion using a syntax highlighter, if activated by the
+  # source-highlighter document attribute. Otherwise return the text with verbatim substitutions applied.
   #
-  # Callout marks are stripped from the source prior to passing it to the
-  # highlighter, then later restored in converted form, so they are not
-  # incorrectly processed by the source highlighter.
+  # If the process_callouts argument is true, this method will extract the callout marks from the source before passing
+  # it to the syntax highlighter, then subsequently restore those callout marks to the highlighted source so the callout
+  # marks don't confuse the syntax highlighter.
   #
-  # source - the source code String to highlight
-  # process_callouts - a Boolean flag indicating whether callout marks should be substituted
+  # source - the source code String to syntax highlight
+  # process_callouts - a Boolean flag indicating whether callout marks should be located and substituted
   #
-  # returns the highlighted source code, if a source highlighter is defined
-  # on the document, otherwise the source with verbatim substituions applied
-  def highlight_source source, process_callouts, highlighter = nil
-    case (highlighter ||= @document.attributes['source-highlighter'])
-    when 'coderay'
-      unless (highlighter_loaded = defined? ::CodeRay::Duo) ||
-          (defined? @@coderay_unavailable) || @document.attributes['coderay-unavailable']
-        if (Helpers.require_library 'coderay', true, :warn).nil?
-          # prevent further attempts to load CodeRay in this process
-          @@coderay_unavailable = true
-        else
-          highlighter_loaded = true
-        end
-      end
-    when 'pygments'
-      unless (highlighter_loaded = defined? ::Pygments::Lexer) ||
-          (defined? @@pygments_unavailable) || @document.attributes['pygments-unavailable']
-        if (Helpers.require_library 'pygments', 'pygments.rb', :warn).nil?
-          # prevent further attempts to load Pygments in this process
-          @@pygments_unavailable = true
-        else
-          highlighter_loaded = true
-        end
-      end
-    else
-      # unknown highlighting library (something is misconfigured if we arrive here)
-      highlighter_loaded = false
-    end
-
-    return sub_source source, process_callouts unless highlighter_loaded
+  # Returns the highlighted source code, if a syntax highlighter is defined on the document, otherwise the source with
+  # verbatim substituions applied
+  def highlight_source source, process_callouts
+    # NOTE the call to highlight? is a defensive check since, normally, we wouldn't arrive here unless it returns true
+    return sub_source source, process_callouts unless (syntax_hl = @document.syntax_highlighter) && syntax_hl.highlight?
 
     if process_callouts
       callout_marks = {}
-      last = -1
       lineno = 0
+      last_lineno = nil
       callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
       # extract callout marks, indexed by line number
       source = (source.split LF, -1).map do |line|
-        lineno = lineno + 1
+        lineno += 1
         line.gsub callout_rx do
           # honor the escape
           if $2
             # use sub since it might be behind a line comment
-            $&.sub(RS, '')
+            $&.sub RS, ''
           else
             (callout_marks[lineno] ||= []) << [$1, $4]
-            last = lineno
+            last_lineno = lineno
             nil
           end
         end
       end.join LF
-      callout_on_last = true if last == lineno
-      callout_marks = nil if callout_marks.empty?
-    end
-
-    linenums_mode = nil
-    highlight_lines = nil
-
-    case highlighter
-    when 'coderay'
-      if (linenums_mode = (attr? 'linenums', nil, false) ? (@document.attributes['coderay-linenums-mode'] || :table).to_sym : nil)
-        start = 1 if (start = (attr 'start', nil, 1).to_i) < 1
-        if attr? 'highlight', nil, false
-          highlight_lines = resolve_lines_to_highlight source, (attr 'highlight', nil, false)
-        end
-      end
-      result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html,
-        css: (@document.attributes['coderay-css'] || :class).to_sym,
-        line_numbers: linenums_mode,
-        line_number_start: start,
-        line_number_anchors: false,
-        highlight_lines: highlight_lines,
-        bold_every: false,
-      ].highlight source
-    when 'pygments'
-      lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
-      opts = { cssclass: 'pyhl', classprefix: 'tok-', nobackground: true, stripnl: false }
-      opts[:startinline] = !(option? 'mixed') if lexer.name == 'PHP'
-      unless (@document.attributes['pygments-css'] || 'class') == 'class'
-        opts[:noclasses] = true
-        opts[:style] = (@document.attributes['pygments-style'] || Stylesheets::DEFAULT_PYGMENTS_STYLE)
-      end
-      if attr? 'highlight', nil, false
-        unless (highlight_lines = resolve_lines_to_highlight source, (attr 'highlight', nil, false)).empty?
-          opts[:hl_lines] = highlight_lines.join ' '
-        end
-      end
-      # NOTE highlight can return nil if something goes wrong; fallback to source if this happens
-      # TODO we could add the line numbers in ourselves instead of having to strip out the junk
-      if (attr? 'linenums', nil, false) && (opts[:linenostart] = (start = attr 'start', 1, false).to_i < 1 ? 1 : start) &&
-          (opts[:linenos] = @document.attributes['pygments-linenums-mode'] || 'table') == 'table'
-        linenums_mode = :table
-        if (result = lexer.highlight source, options: opts)
-          result = (result.sub PygmentsWrapperDivRx, '\1').gsub PygmentsWrapperPreRx, '\1'
-        else
-          result = sub_specialchars source
-        end
-      elsif (result = lexer.highlight source, options: opts)
-        if PygmentsWrapperPreRx =~ result
-          result = $1
-        end
+      if last_lineno
+        source = %(#{source}#{LF}) if last_lineno == lineno
       else
-        result = sub_specialchars source
+        callout_marks = nil
       end
     end
+
+    doc_attrs = @document.attributes
+    syntax_hl_name = syntax_hl.name
+    if (linenums_mode = (attr? 'linenums', nil, false) ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
+      start_line_number = 1 if (start_line_number = (attr 'start', nil, 1).to_i) < 1
+    end
+    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight', nil, false
+
+    highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language', nil, false),
+      callouts: callout_marks,
+      css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
+      highlight_lines: highlight_lines,
+      line_numbers: linenums_mode,
+      start_line_number: start_line_number,
+      style: doc_attrs[%(#{syntax_hl_name}-style)]
 
     # fix passthrough placeholders that got caught up in syntax highlighting
-    result = result.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
+    highlighted = highlighted.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
 
-    if callout_marks
+    # NOTE highlight method may have depleted callouts
+    if callout_marks.nil_or_empty?
+      highlighted
+    else
+      if source_offset
+        preamble = highlighted.slice 0, source_offset
+        highlighted = highlighted.slice source_offset, highlighted.length
+      else
+        preamble = ''
+      end
       autonum = lineno = 0
-      reached_code = true unless (linenums_mode_table = linenums_mode == :table)
-      (result.split LF, -1).map do |line|
-        unless reached_code
-          next line unless line.include?('<td class="code">')
-          reached_code = true
-        end
-        lineno += 1
-        if (conums = callout_marks.delete lineno)
-          tail = ''
-          if linenums_mode_table && callout_on_last && callout_marks.empty?
-            if highlighter == 'coderay'
-              if (pos = line.index '</pre>')
-                line, tail = (line.slice 0, pos), (line.slice pos, line.length)
-              end
-            elsif highlighter == 'pygments' && (pos = line.start_with? '</td>')
-              line, tail = '', line
-            end
-          end
+      preamble + ((highlighted.split LF, -1).map do |line|
+        if (conums = callout_marks.delete lineno += 1)
           if conums.size == 1
             guard, conum = conums[0]
-            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert}#{tail})
+            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert})
           else
-            conums_markup = conums.map {|guard_it, conum_it| Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert }.join ' '
-            %(#{line}#{conums_markup}#{tail})
+            %(#{line}#{conums.map do |guard_it, conum_it|
+              Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert
+            end.join ' '})
           end
         else
           line
         end
-      end.join LF
-    else
-      result
+      end.join LF)
     end
   end
 
@@ -1577,8 +1504,8 @@ module Substitutors
     end
 
     # QUESION delegate this logic to a method?
-    if @context == :listing && @style == 'source' && (@document.basebackend? 'html') &&
-        (SUB_HIGHLIGHT.include? @document.attributes['source-highlighter']) && (idx = @subs.index :specialcharacters)
+    if @context == :listing && @style == 'source' && (syntax_hl = @document.syntax_highlighter) &&
+        syntax_hl.highlight? && (idx = @subs.index :specialcharacters)
       @subs[idx] = :highlight
     end
 
