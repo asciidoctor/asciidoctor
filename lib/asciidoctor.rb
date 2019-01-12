@@ -1475,9 +1475,8 @@ module Asciidoctor
 
       # NOTE document cannot control this behavior if safe >= SafeMode::SERVER
       # NOTE skip if stylesdir is a URI
-      if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'linkcss') &&
-          (doc.attr? 'copycss') && (doc.attr? 'basebackend-html') &&
-          !((stylesdir = (doc.attr 'stylesdir')) && (Helpers.uriish? stylesdir))
+      if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'linkcss') && (doc.attr? 'copycss') &&
+          (doc.basebackend? 'html') && !((stylesdir = (doc.attr 'stylesdir')) && (Helpers.uriish? stylesdir))
         copy_asciidoctor_stylesheet = false
         copy_user_stylesheet = false
         if (stylesheet = (doc.attr 'stylesheet'))
