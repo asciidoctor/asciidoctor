@@ -1147,6 +1147,8 @@ class Document < AbstractBlock
 
   # Internal: Branch the attributes so that the original state can be restored
   # at a future time.
+  #
+  # Returns the duplicated attributes, which will later be restored
   def save_attributes
     # enable toc and sectnums (i.e., numbered) by default in DocBook backend
     # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
@@ -1209,8 +1211,6 @@ class Document < AbstractBlock
     # NOTE pin the outfilesuffix after the header is parsed
     @outfilesuffix = attrs['outfilesuffix']
 
-    @header_attributes = attrs.dup
-
     # unfreeze "flexible" attributes
     unless @parent_document
       FLEXIBLE_ATTRIBUTES.each do |name|
@@ -1221,6 +1221,8 @@ class Document < AbstractBlock
         end
       end
     end
+
+    @header_attributes = attrs.dup
   end
 
   # Internal: Update the backend attributes to reflect a change in the active backend.
