@@ -326,9 +326,8 @@ class Document < AbstractBlock
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
-      @converter = nil
       initialize_extensions = defined? ::Asciidoctor::Extensions
-      @extensions = nil # initialize furthur down
+      @extensions = nil # initialize furthur down if initialize_extensions is true
     end
 
     @parsed = false
