@@ -1120,7 +1120,7 @@ class Document < AbstractBlock
     if (template_dir = @options[:template_dir])
       template_dirs = [template_dir]
     elsif (template_dirs = @options[:template_dirs])
-      template_dirs = Array template_dirs
+      template_dirs = [*template_dirs]
     end
     if template_dirs
       converter_opts[:template_dirs] = template_dirs

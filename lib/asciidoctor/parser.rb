@@ -1927,7 +1927,7 @@ class Parser
     author_metadata = {}
     author_idx = 0
     keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : Array(author_line)
+    author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : [*author_line]
     author_entries.each do |author_entry|
       next if author_entry.empty?
       author_idx += 1
