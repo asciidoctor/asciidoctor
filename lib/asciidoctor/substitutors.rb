@@ -1386,11 +1386,10 @@ module Substitutors
 
     return sub_source source, process_callouts unless highlighter_loaded
 
-    lineno = 0
-    callout_on_last = false
     if process_callouts
       callout_marks = {}
       last = -1
+      lineno = 0
       callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
       # extract callout marks, indexed by line number
       source = source.split(LF, -1).map {|line|
@@ -1407,10 +1406,8 @@ module Substitutors
           end
         }
       }.join LF
-      callout_on_last = (last == lineno)
+      callout_on_last = true if last == lineno
       callout_marks = nil if callout_marks.empty?
-    else
-      callout_marks = nil
     end
 
     linenums_mode = nil
@@ -1467,21 +1464,22 @@ module Substitutors
     # fix passthrough placeholders that got caught up in syntax highlighting
     result = result.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
 
-    if process_callouts && callout_marks
-      lineno = 0
-      autonum = 0
-      reached_code = linenums_mode != :table
+    if callout_marks
+      autonum = lineno = 0
+      reached_code = true unless (linenums_mode_table = linenums_mode == :table)
       result.split(LF, -1).map {|line|
         unless reached_code
           next line unless line.include?('<td class="code">')
           reached_code = true
         end
         lineno += 1
-        if (conums = callout_marks.delete(lineno))
-          tail = nil
-          if callout_on_last && callout_marks.empty? && linenums_mode == :table
-            if highlighter == 'coderay' && (pos = line.index '</pre>')
-              line, tail = (line.slice 0, pos), (line.slice pos, line.length)
+        if (conums = callout_marks.delete lineno)
+          tail = ''
+          if linenums_mode_table && callout_on_last && callout_marks.empty?
+            if highlighter == 'coderay'
+              if (pos = line.index '</pre>')
+                line, tail = (line.slice 0, pos), (line.slice pos, line.length)
+              end
             elsif highlighter == 'pygments' && (pos = line.start_with? '</td>')
               line, tail = '', line
             end
