@@ -42,6 +42,7 @@ Bug Fixes::
   * fix invalid check for DSL in extension class (previously always returned true)
   * scope constant lookups (#2764)
   * use byteslice instead of slice to remove BOM from string (#2764)
+  * don't fail if value of -a CLI option is empty string or equals sign (#2997)
   * Reader#push_include should not fail if data is nil
   * fix deprecated ERB trim mode that was causing warning (#3006)
 
