@@ -36,7 +36,7 @@ module Asciidoctor
       unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
-      cdn_base = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
+      cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
       linkcss = node.attr? 'linkcss'
       result = ['<!DOCTYPE html>']
       lang_attribute = (node.attr? 'nolang') ? '' : %( lang="#{node.attr 'lang', 'en'}")
@@ -82,7 +82,7 @@ module Asciidoctor
 
       if node.attr? 'icons', 'font'
         if node.attr? 'iconfont-remote'
-          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css]}"#{slash}>)
+          result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css]}"#{slash}>)
         else
           iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
           result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
@@ -204,12 +204,12 @@ module Asciidoctor
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
       case highlighter
       when 'highlightjs', 'highlight.js'
-        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base}/highlight.js/9.13.1)
+        highlightjs_path = node.attr 'highlightjsdir', %(#{cdn_base_url}/highlight.js/9.13.1)
         result << %(<link rel="stylesheet" href="#{highlightjs_path}/styles/#{node.attr 'highlightjs-theme', 'github'}.min.css"#{slash}>)
         result << %(<script src="#{highlightjs_path}/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>)
       when 'prettify'
-        prettify_path = node.attr 'prettifydir', %(#{cdn_base}/prettify/r298)
+        prettify_path = node.attr 'prettifydir', %(#{cdn_base_url}/prettify/r298)
         result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>)
         result << %(<script src="#{prettify_path}/prettify.min.js"></script>
 <script>prettyPrint()</script>)
@@ -235,7 +235,7 @@ MathJax.Hub.Config({
   TeX: {#{eqnums_opt}}
 });
 </script>
-<script src="#{cdn_base}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
       end
 
       result << '</body>'
