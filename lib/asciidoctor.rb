@@ -182,7 +182,7 @@ module Asciidoctor
   USER_HOME = ::Dir.home
 
   # The endline character used for output; stored in constant table as an optimization
-  LF = EOL = ?\n
+  LF = ?\n
 
   # The null character to use for splitting attribute values
   NULL = ?\0

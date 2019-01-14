@@ -6,8 +6,6 @@ module Asciidoctor
   #
   # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
   class Converter::ManPageConverter < Converter::BuiltIn
-    LF = ?\n
-    TAB = ?\t
     WHITESPACE = %(#{LF}#{TAB} )
     ET = ' ' * 8
     ESC = ?\u001b # troff leader marker
