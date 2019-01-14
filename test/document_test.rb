@@ -819,6 +819,10 @@ more info...
       assert_xpath '/article/articleinfo/revhistory/revision/date[text() = "2012-07-12"]', output, 1
       assert_xpath '/article/articleinfo/revhistory/revision/authorinitials[text() = "SR"]', output, 1
       assert_xpath '/article/articleinfo/revhistory/revision/revremark[text() = "See changelog."]', output, 1
+      article = xmlnodes_at_xpath '/article', output, 1
+      # nokogiri can't make up its mind
+      id_attr = article.attribute('id') || article.attribute('xml:id')
+      assert_nil id_attr
     end
 
     test 'with metadata to DocBook5' do
@@ -837,6 +841,40 @@ more info...
       assert_xpath '/article/info/author/personname/firstname[text() = "Stuart"]', output, 1
       assert_xpath '/article/info/author/personname/surname[text() = "Rackham"]', output, 1
       assert_xpath '/article/info/author/email[text() = "founder@asciidoc.org"]', output, 1
+      article = xmlnodes_at_xpath '/article', output, 1
+      # nokogiri can't make up its mind
+      id_attr = article.attribute('id') || article.attribute('xml:id')
+      assert_nil id_attr
+    end
+
+    test 'with document ID to Docbook 4.5' do
+      input = <<-EOS
+[[document-id]]
+= Document Title
+
+more info...
+      EOS
+      output = convert_string input, backend: 'docbook45'
+      article = xmlnodes_at_xpath '/article', output, 1
+      # nokogiri can't make up its mind
+      id_attr = article.attribute('id') || article.attribute('xml:id')
+      refute_nil id_attr
+      assert_equal 'document-id', id_attr.value
+    end
+
+    test 'with document ID to Docbook 5' do
+      input = <<-EOS
+[[document-id]]
+= Document Title
+
+more info...
+      EOS
+      output = convert_string input, backend: 'docbook', keep_namespaces: true
+      article = xmlnodes_at_xpath '/xmlns:article', output, 1
+      # nokogiri can't make up its mind
+      id_attr = article.attribute('id') || article.attribute('xml:id')
+      refute_nil id_attr
+      assert_equal 'document-id', id_attr.value
     end
 
     test 'with author defined using attribute entry to DocBook 4.5' do

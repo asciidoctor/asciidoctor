@@ -30,7 +30,7 @@ module Asciidoctor
         end
       end
       lang_attribute = (node.attr? 'nolang') ? '' : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
-      result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}>)
+      result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}#{common_attributes node.id}>)
       result << (document_info_tag node, root_tag_name) unless node.noheader
       result << node.content if node.blocks?
       unless (footer_docinfo = node.docinfo :footer).empty?
