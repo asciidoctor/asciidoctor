@@ -69,12 +69,10 @@ class Parser
     'a' => :asciidoc
   }
 
-  # Public: Make sure the Parser object doesn't get initialized.
+  # Hide the default constructor to make sure this class doesn't get instantiated.
   #
-  # Raises RuntimeError if this constructor is invoked.
-  def initialize
-    raise 'Au contraire, mon frere. No parser instances will be running around.'
-  end
+  # Raises NoMethodError if an attempt is made to invoke the constructor.
+  private_class_method :new
 
   # Public: Parses AsciiDoc source read from the Reader into the Document
   #
