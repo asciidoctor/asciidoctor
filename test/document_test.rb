@@ -165,6 +165,17 @@ content
       assert_css 'body > a#top', output, 1
     end
 
+    test 'should include user docinfo after built-in docinfo' do
+      sample_input_path = fixture_path 'basic.adoc'
+      attrs = { 'docinfo' => 'shared', 'source-highlighter' => 'highlight.js', 'linkcss' => '', 'copycss' => nil }
+      output = Asciidoctor.convert_file sample_input_path, to_file: false,
+          header_footer: true, safe: :safe, attributes: attrs
+      assert_css 'link[rel=stylesheet] + meta[http-equiv=imagetoolbar]', output, 1
+      assert_css 'meta[http-equiv=imagetoolbar] + *', output, 0
+      assert_css 'script + a#top', output, 1
+      assert_css 'a#top + *', output, 0
+    end
+
     test 'should include docinfo files for html backend with custom docinfodir' do
       sample_input_path = fixture_path('basic.adoc')
 
