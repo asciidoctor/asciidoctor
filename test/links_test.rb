@@ -431,7 +431,7 @@ anchor:foo[b[a\]r]text'
   test 'inter-document xref should not add suffix to path with a non-AsciiDoc extension' do
     {
       'using-.net-web-services' => 'Using .NET web services',
-      '../file.pdf' => 'Download the .pdf file',
+      'asciidoctor.1' => 'Asciidoctor Manual',
     }.each do |path, text|
       result = convert_string_to_embedded %(<<#{path}#,#{text}>>)
       assert_xpath %(//a[@href="#{path}"][text() = "#{text}"]), result, 1
