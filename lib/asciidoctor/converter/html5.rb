@@ -196,10 +196,6 @@ module Asciidoctor
         result << '</div>'
       end
 
-      unless (docinfo_content = node.docinfo :footer).empty?
-        result << docinfo_content
-      end
-
       # Load Javascript at the end of body for performance
       # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
       case highlighter
@@ -236,6 +232,10 @@ MathJax.Hub.Config({
 });
 </script>
 <script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+      end
+
+      unless (docinfo_content = node.docinfo :footer).empty?
+        result << docinfo_content
       end
 
       result << '</body>'
