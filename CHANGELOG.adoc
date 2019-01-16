@@ -15,7 +15,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
-Enhancements::
+Enhancements / Compliance::
 
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
   * drop support for Slim < 3 (#2998)
@@ -48,6 +48,9 @@ Enhancements::
   * use the third argument of AbstractNode#attr / AbstractNode#attr? to set the name of a fallback attribute to look for on the document (#1934)
   * change default value of third argument to Abstractnode#attr / AbstractNode#attr? to nil so attribute doesn't inherit by default (#3059)
   * look for table-frame, table-grid, and table-stripes attributes on document as fallback for frame, grid, and stripes attributes on table (#3059)
+  * always assume the target of a shorthand interdocument xref is a reference to an AsciiDoc document (source-to-source) (#3021)
+  * if the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
+  * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
 
 Improvements::
 
