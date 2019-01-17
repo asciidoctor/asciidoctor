@@ -25,6 +25,7 @@ Enhancements::
   * set visibility of private and protected methods (#2764)
   * always run docinfo processor extensions regardless of safe mode (gives control to extension) (#2966)
   * add support for the `muted` option on vimeo videos (allows autoplay to work in Chrome) (#3014)
+  * use value of prettify-theme attribute as is if it starts with http:// or https:// (#3020)
 
 Improvements::
 
@@ -41,6 +42,8 @@ Bug Fixes::
   * do not alter the $LOAD_PATH (#2764)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * fix styling of source blocks with linenums enabled when using prettify as syntax highlighter (#640)
+  * update default stylesheet to support prettify themes (#3020)
+  * remove hard-coded color values on source blocks in default stylesheet (#3020)
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
   * ignore explicit section level style (#1852)
   * check if type is defined in a way that's compatible with autoload
