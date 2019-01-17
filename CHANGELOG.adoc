@@ -24,6 +24,7 @@ Enhancements::
   * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
   * set visibility of private and protected methods (#2764)
   * always run docinfo processor extensions regardless of safe mode (gives control to extension) (#2966)
+  * add support for the `mute` option on vimeo videos (allows autoplay to work in Chrome) (#3014)
 
 Improvements::
 
