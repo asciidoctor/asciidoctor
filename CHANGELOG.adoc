@@ -24,6 +24,7 @@ Enhancements::
   * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
   * set visibility of private and protected methods (#2764)
   * always run docinfo processor extensions regardless of safe mode (gives control to extension) (#2966)
+  * add support for the `muted` option on vimeo videos (allows autoplay to work in Chrome) (#3014)
 
 Improvements::
 
@@ -48,6 +49,7 @@ Bug Fixes::
   * don't fail if value of -a CLI option is empty string or equals sign (#2997)
   * Reader#push_include should not fail if data is nil
   * fix deprecated ERB trim mode that was causing warning (#3006)
+  * move time anchor after query string on vimeo video to avoid dropping options
 
 Build / Infrastructure::
 

@@ -974,17 +974,13 @@ Your browser does not support the audio tag.
           asset_uri_scheme = %(#{asset_uri_scheme}:)
         end
         start_anchor = (node.attr? 'start', nil, false) ? %(#at=#{node.attr 'start'}) : ''
-        delimiter = '?'
-        if node.option? 'autoplay'
-          autoplay_param = %(#{delimiter}autoplay=1)
-          delimiter = '&amp;'
-        else
-          autoplay_param = ''
-        end
-        loop_param = (node.option? 'loop') ? %(#{delimiter}loop=1) : ''
+        delimiter = ['?']
+        autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoplay=1) : ''
+        loop_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}loop=1) : ''
+        muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
@@ -997,6 +993,7 @@ Your browser does not support the audio tag.
         end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : ''
         autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : ''
         loop_param = (has_loop_param = node.option? 'loop') ? '&amp;loop=1' : ''
+        mute_param = (node.option? 'muted') ? '&amp;mute=1' : ''
         controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : ''
         # cover both ways of controlling fullscreen option
         if node.option? 'nofullscreen'
@@ -1028,7 +1025,7 @@ Your browser does not support the audio tag.
 
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
       else
