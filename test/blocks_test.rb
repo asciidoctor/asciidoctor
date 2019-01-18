@@ -2636,7 +2636,7 @@ video::67480300[vimeo, 400, 300, start=60, options="autoplay,mute"]
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://player.vimeo.com/video/67480300#at=60?autoplay=1&muted=1"]', output, 1
+      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?autoplay=1&muted=1#at=60"]', output, 1
       assert_css 'iframe[width="400"]', output, 1
       assert_css 'iframe[height="300"]', output, 1
     end

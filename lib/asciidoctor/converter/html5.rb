@@ -980,7 +980,7 @@ Your browser does not support the audio tag.
         muted_param = (node.option? 'mute') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{start_anchor}#{autoplay_param}#{loop_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
