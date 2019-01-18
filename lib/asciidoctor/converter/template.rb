@@ -29,7 +29,7 @@ module Asciidoctor
       # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
       # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
       haml: { format: :xhtml, attr_wrapper: '"', escape_attrs: false, ugly: true },
-      slim: { disable_escape: true, sort_attrs: false, pretty: false }
+      slim: { disable_escape: true, sort_attrs: false, pretty: false },
     }
 
     begin
@@ -57,10 +57,7 @@ module Asciidoctor
       @safe = opts[:safe]
       @active_engines = {}
       @engine = opts[:template_engine]
-      @engine_options = DEFAULT_ENGINE_OPTIONS.inject({}) do |accum, (engine, default_opts)|
-        accum[engine] = default_opts.dup
-        accum
-      end
+      @engine_options = {}.tap {|accum| DEFAULT_ENGINE_OPTIONS.each {|engine, engine_opts| accum[engine] = engine_opts.dup } }
       if opts[:htmlsyntax] == 'html'
         @engine_options[:haml][:format] = :html5
         @engine_options[:slim][:format] = :html

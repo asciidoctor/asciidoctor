@@ -34,7 +34,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  SEVERITY_LABELS = ::Hash[(Severity.constants false).map {|c| [(Severity.const_get c, false), c] }]
+  SEVERITY_LABELS = {}.tap {|accum| (Severity.constants false).each {|c| accum[Severity.const_get c, false] = c } }
 
   attr_reader :messages
 

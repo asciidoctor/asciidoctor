@@ -253,10 +253,7 @@ class Document < AbstractBlock
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
-      @catalog = parent_doc.catalog.inject({}) do |accum, (key, table)|
-        accum[key] = (key == :footnotes ? [] : table)
-        accum
-      end
+      @catalog = parent_doc.catalog.dup.tap {|catalog| catalog[:footnotes] = [] }
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
       @attribute_overrides = attr_overrides = parent_doc.attributes.dup

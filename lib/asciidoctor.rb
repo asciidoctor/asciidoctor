@@ -83,8 +83,7 @@ module Asciidoctor
     # enforced)!
     #PARANOID = 100;
 
-    @names_by_value = accum = {}
-    (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase }
+    @names_by_value = {}.tap {|accum| (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase } }
 
     def self.value_for_name name
       const_get name.upcase, false
@@ -1256,21 +1255,23 @@ module Asciidoctor
     elsif ::Hash === attrs || ((defined? ::Java::JavaUtil::Map) && ::Java::JavaUtil::Map === attrs)
       attrs = attrs.dup
     elsif ::Array === attrs
-      attrs, attrs_arr = {}, attrs
-      attrs_arr.each do |entry|
-        k, v = entry.split '=', 2
-        attrs[k] = v || ''
+      attrs = {}.tap do |accum|
+        attrs.each do |entry|
+          k, v = entry.split '=', 2
+          accum[k] = v || ''
+        end
       end
     elsif ::String === attrs
       # condense and convert non-escaped spaces to null, unescape escaped spaces, then split on null
-      attrs, attrs_arr = {}, attrs.gsub(SpaceDelimiterRx, %(\\1#{NULL})).gsub(EscapedSpaceRx, '\1').split(NULL)
-      attrs_arr.each do |entry|
-        k, v = entry.split '=', 2
-        attrs[k] = v || ''
+      attrs = {}.tap do |accum|
+        attrs.gsub(SpaceDelimiterRx, '\1' + NULL).gsub(EscapedSpaceRx, '\1').split(NULL).each do |entry|
+          k, v = entry.split '=', 2
+          accum[k] = v || ''
+        end
       end
     elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])
-      # convert it to a Hash as we know it
-      attrs = ::Hash[attrs.keys.map {|k| [k, attrs[k]] }]
+      # coerce attrs to a real Hash
+      attrs = {}.tap {|accum| attrs.keys.each {|k| accum[k] = attrs[k] } }
     else
       raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
     end
