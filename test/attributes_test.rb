@@ -548,10 +548,10 @@ toc toc-placement=macro toc-position=left |   |content     |macro        |nil
 toc toc-placement!                        |   |content     |macro        |nil
       EOS
 
-      expected = expected_data.strip.lines.map {|l|
+      expected = expected_data.strip.lines.map do |l|
         next if l.start_with? '#'
         l.split('|').map {|e| (e = e.strip) == 'nil' ? nil : e }
-      }.compact
+      end.compact
 
       expected.each do |expect|
         raw_attrs, toc, toc_position, toc_placement, toc_class = expect

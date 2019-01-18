@@ -197,10 +197,10 @@ module Helpers
   #
   # Returns the [String] roman numeral for this integer
   def self.int_to_roman val
-    ROMAN_NUMERALS.map {|l, i|
+    ROMAN_NUMERALS.map do |l, i|
       repeat, val = val.divmod i
       l * repeat
-    }.join
+    end.join
   end
 
   # Internal: Get the next value in the sequence.
