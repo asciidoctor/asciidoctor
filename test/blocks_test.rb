@@ -2631,7 +2631,7 @@ video::http://example.org/videos/cats-vs-dogs.avi[]
 
     test 'video macro should output custom HTML with iframe for vimeo service' do
       input = <<-EOS
-video::67480300[vimeo, 400, 300, start=60, options="autoplay,mute"]
+video::67480300[vimeo, 400, 300, start=60, options="autoplay,muted"]
       EOS
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
@@ -2643,12 +2643,12 @@ video::67480300[vimeo, 400, 300, start=60, options="autoplay,mute"]
 
     test 'video macro should output custom HTML with iframe for youtube service' do
       input = <<-EOS
-video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,modest", theme=light]
+video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]
       EOS
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://www.youtube.com/embed/U8GBXvdmHT4?rel=0&start=60&autoplay=1&list=PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe&modestbranding=1&theme=light"]', output, 1
+      assert_css 'iframe[src="https://www.youtube.com/embed/U8GBXvdmHT4?rel=0&start=60&autoplay=1&mute=1&list=PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe&modestbranding=1&theme=light"]', output, 1
       assert_css 'iframe[width="640"]', output, 1
       assert_css 'iframe[height="360"]', output, 1
     end
