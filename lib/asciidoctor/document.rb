@@ -264,6 +264,7 @@ class Document < AbstractBlock
       attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
       @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
+      @outfilesuffix = parent_doc.outfilesuffix
       @sourcemap = parent_doc.sourcemap
       @timings = nil
       @path_resolver = parent_doc.path_resolver
@@ -1147,15 +1148,8 @@ class Document < AbstractBlock
   #
   # Returns the duplicated attributes, which will later be restored
   def save_attributes
-    # enable toc and sectnums (i.e., numbered) by default in DocBook backend
-    # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
-    if (attrs = @attributes)['basebackend'] == 'docbook'
-      attrs['toc'] = '' unless attribute_locked?('toc') || @attributes_modified.include?('toc')
-      attrs['sectnums'] = '' unless attribute_locked?('sectnums') || @attributes_modified.include?('sectnums')
-    end
-
-    unless attrs.key?('doctitle') || !(val = doctitle)
-      attrs['doctitle'] = val
+    unless ((attrs = @attributes).key? 'doctitle') || !(resolved_doctitle = doctitle)
+      attrs['doctitle'] = resolved_doctitle
     end
 
     # css-signature cannot be updated after header attributes are processed
@@ -1205,11 +1199,17 @@ class Document < AbstractBlock
       attrs['source-language'] = attrs['language'] if attrs.key? 'language'
     end
 
-    # NOTE pin the outfilesuffix after the header is parsed
-    @outfilesuffix = attrs['outfilesuffix']
-
-    # unfreeze "flexible" attributes
     unless @parent_document
+      if attrs['basebackend'] == 'docbook'
+        # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
+        attrs['toc'] = '' unless (attribute_locked? 'toc') || (@attributes_modified.include? 'toc')
+        attrs['sectnums'] = '' unless (attribute_locked? 'sectnums') || (@attributes_modified.include? 'sectnums')
+      end
+
+      # NOTE pin the outfilesuffix after the header is parsed
+      @outfilesuffix = attrs['outfilesuffix']
+
+      # unfreeze "flexible" attributes
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
