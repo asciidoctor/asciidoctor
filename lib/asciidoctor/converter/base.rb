@@ -24,7 +24,7 @@ module Asciidoctor
     # transform and optionally additional options (when not empty).
     #
     # CAUTION: Method that handles the specified transform *may not* accept the
-    # second argument with additional options, in which case an {ArgumentError}
+    # second argument with additional options, in which case an {::ArgumentError}
     # is raised if the given +opts+ Hash is not nil. The additional options are
     # used in template-based backends to access convert helper methods such as
     # outline.

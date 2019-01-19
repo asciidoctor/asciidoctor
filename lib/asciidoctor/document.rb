@@ -152,9 +152,9 @@ class Document < AbstractBlock
   #
   # A value of 10 (SERVER) disallows the document from setting attributes that
   # would affect the conversion of the document, in addition to all the security
-  # features of SafeMode::SAFE. For instance, this value disallows changing the
-  # backend or the source-highlighter using an attribute defined in the source
-  # document. This is the most fundamental level of security for server-side
+  # features of SafeMode::SAFE. For instance, this level forbids changing the
+  # backend or source-highlighter using an attribute defined in the source
+  # document header. This is the most fundamental level of security for server
   # deployments (hence the name).
   #
   # A value of 20 (SECURE) disallows the document from attempting to read files
@@ -166,7 +166,7 @@ class Document < AbstractBlock
   # trusted content into the document).
   #
   # Since Asciidoctor is aiming for wide adoption, 20 (SECURE) is the default
-  # value and is recommended for server-side deployments.
+  # value and is recommended for server deployments.
   #
   # A value of 100 (PARANOID) is planned to disallow the use of passthrough
   # macros and prevents the document from setting any known attributes in

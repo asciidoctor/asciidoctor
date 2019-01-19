@@ -57,10 +57,10 @@ module Asciidoctor
 
     # A safe mode level that disallows the document from setting attributes
     # that would affect the conversion of the document, in addition to all the
-    # security features of SafeMode::SAFE. For instance, this level disallows
-    # changing the backend or the source-highlighter using an attribute defined
-    # in the source document. This is the most fundamental level of security
-    # for server-side deployments (hence the name).
+    # security features of SafeMode::SAFE. For instance, this level forbids
+    # changing the backend or source-highlighter using an attribute defined
+    # in the source document header. This is the most fundamental level of
+    # security for server deployments (hence the name).
     SERVER = 10;
 
     # A safe mode level that disallows the document from attempting to read
@@ -72,7 +72,7 @@ module Asciidoctor
     # be allowed to embed trusted content into the document).
     #
     # Since Asciidoctor is aiming for wide adoption, this level is the default
-    # and is recommended for server-side deployments.
+    # and is recommended for server deployments.
     SECURE = 20;
 
     # A planned safe mode level that disallows the use of passthrough macros and
