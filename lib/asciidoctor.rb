@@ -1323,7 +1323,7 @@ module Asciidoctor
     begin
       context = %(asciidoctor: FAILED: #{attrs['docfile'] || '<stdin>'}: Failed to load AsciiDoc document)
       if ex.respond_to? :exception
-        # The original message must be explicitely preserved when wrapping a Ruby exception
+        # The original message must be explicitly preserved when wrapping a Ruby exception
         wrapped_ex = ex.exception %(#{context} - #{ex.message})
         # JRuby automatically sets backtrace, but not MRI
         wrapped_ex.set_backtrace ex.backtrace
