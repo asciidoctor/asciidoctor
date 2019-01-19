@@ -56,7 +56,9 @@ context 'API' do
         exception = assert_raises ArgumentError do
           Asciidoctor.load_file tmp_input.path, safe: :safe
         end
-        assert_match(/Failed to load AsciiDoc document - invalid byte sequence in UTF-8/, exception.message)
+        expected_message = 'invalid byte sequence in UTF-8'
+        expected_message = %(Failed to load AsciiDoc document - #{expected_message}) unless RUBY_ENGINE == 'truffleruby'
+        assert_includes exception.message, expected_message
       ensure
         tmp_input.close!
       end
@@ -67,7 +69,9 @@ context 'API' do
       exception = assert_raises ArgumentError do
         Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
       end
-      assert_match(/Failed to load AsciiDoc document/, exception.message)
+      # NOTE truffleruby cannot throw wrapped exception from rescue block of method
+      expected_message = RUBY_ENGINE == 'truffleruby' ? 'invalid byte sequence in UTF-8' : 'Failed to load AsciiDoc document'
+      assert_includes exception.message, expected_message
       # verify we have the correct backtrace (should be in at least first 5 lines)
       assert_match(/helpers\.rb/, exception.backtrace[0..4].join("\n"))
     end
