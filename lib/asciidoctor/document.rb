@@ -1144,18 +1144,16 @@ class Document < AbstractBlock
   #
   # Returns the duplicated attributes, which will later be restored
   def save_attributes
-    unless ((attrs = @attributes).key? 'doctitle') || !(resolved_doctitle = doctitle)
-      attrs['doctitle'] = resolved_doctitle
+    unless ((attrs = @attributes).key? 'doctitle') || !(doctitle_val = doctitle)
+      attrs['doctitle'] = doctitle_val
     end
 
     # css-signature cannot be updated after header attributes are processed
     @id = attrs['css-signature'] unless @id
 
-    toc_position_val = if (toc_val = attrs.delete('toc2') ? 'left' : attrs['toc'])
+    if (toc_val = (attrs.delete 'toc2') ? 'left' : attrs['toc'])
       # toc-placement allows us to separate position from using fitted slot vs macro
-      (toc_placement = attrs.fetch('toc-placement', 'macro')) && toc_placement != 'auto' ? toc_placement : attrs['toc-position']
-    else
-      nil
+      toc_position_val = (toc_placement_val = attrs.fetch 'toc-placement', 'macro') && toc_placement_val != 'auto' ? toc_placement_val : attrs['toc-position']
     end
 
     if toc_val && (!toc_val.empty? || !toc_position_val.nil_or_empty?)
