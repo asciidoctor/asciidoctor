@@ -218,31 +218,27 @@ module Asciidoctor
 
     def listing node
       informal = !node.title?
-      listing_attributes = (common_attributes node.id, node.role, node.reftext)
-      if node.style == 'source' && ((attrs = node.attributes).key? 'language')
-        if attrs.key? 'linenums'
-          if attrs.key? 'start'
-            numbering_attributes = %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}")
-          else
-            numbering_attributes = ' linenumbering="numbered"'
-          end
+      common_attrs = common_attributes node.id, node.role, node.reftext
+      if node.style == 'source'
+        if (attrs = node.attributes).key? 'linenums'
+          numbering_attrs = (attrs.key? 'start') ? %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}") : ' linenumbering="numbered"'
         else
-          numbering_attributes = ' linenumbering="unnumbered"'
+          numbering_attrs = ' linenumbering="unnumbered"'
         end
-        listing_content = %(<programlisting#{informal ? listing_attributes : ''} language="#{attrs['language']}"#{numbering_attributes}>#{node.content}</programlisting>)
+        if attrs.key? 'language'
+          wrapped_content = %(<programlisting#{informal ? common_attrs : ''} language="#{attrs['language']}"#{numbering_attrs}>#{node.content}</programlisting>)
+        else
+          wrapped_content = %(<screen#{informal ? common_attrs : ''}#{numbering_attrs}>#{node.content}</screen>)
+        end
       else
-        listing_content = %(<screen#{informal ? listing_attributes : ''}>#{node.content}</screen>)
+        wrapped_content = %(<screen#{informal ? common_attrs : ''}>#{node.content}</screen>)
       end
-      if informal
-        listing_content
-      else
-        %(<formalpara#{listing_attributes}>
+      informal ? wrapped_content : %(<formalpara#{common_attrs}>
 <title>#{node.title}</title>
 <para>
-#{listing_content}
+#{wrapped_content}
 </para>
 </formalpara>)
-      end
     end
 
     def literal node

@@ -605,7 +605,7 @@ Your browser does not support the audio tag.
           end
         when 'highlightjs', 'highlight.js'
           pre_attrs = %( class="highlightjs highlight#{nowrap ? ' nowrap' : ''}")
-          code_attrs = %( class="language-#{language} hljs"#{code_attrs}) if language
+          code_attrs = %( class="language-#{language || 'none'} hljs"#{language ? code_attrs : ''})
         when 'prettify'
           linenums = (node.attr? 'linenums', nil, false) ? ((start = node.attr 'start', nil, false) ? %( linenums:#{start}) : ' linenums') : ''
           pre_attrs = %( class="prettyprint highlight#{nowrap ? ' nowrap' : ''}#{linenums}")
