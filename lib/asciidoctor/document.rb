@@ -1124,14 +1124,14 @@ class Document < AbstractBlock
       converter_opts[:safe] = @safe
     end
     if (converter = @options[:converter])
-      converter_factory = Converter::Factory.new backend => converter
+      converter_factory = Converter::Factory.new @backend => converter
     else
       converter_factory = Converter::Factory.default false
     end
     # QUESTION should we honor the convert_opts?
     # QUESTION should we pass through all options and attributes too?
     #converter_opts.update opts
-    converter_factory.create backend, converter_opts
+    converter_factory.create @backend, converter_opts
   end
 
   # Internal: Delete any attributes stored for playback
