@@ -206,9 +206,12 @@ module Asciidoctor
 <script>hljs.initHighlighting()</script>)
       when 'prettify'
         prettify_path = node.attr 'prettifydir', %(#{cdn_base_url}/prettify/r298)
-        result << %(<link rel="stylesheet" href="#{prettify_path}/#{node.attr 'prettify-theme', 'prettify'}.min.css"#{slash}>)
-        result << %(<script src="#{prettify_path}/prettify.min.js"></script>
-<script>prettyPrint()</script>)
+        if (prettify_theme = node.attr 'prettify-theme', 'prettify').start_with? 'http://', 'https://'
+          result << %(<link rel="stylesheet" href="#{prettify_theme}"#{slash}>)
+        else
+          result << %(<link rel="stylesheet" href="#{prettify_path}/#{prettify_theme}.min.css"#{slash}>)
+        end
+        result << %(<script src="#{prettify_path}/run_prettify.min.js"></script>)
       end
 
       if node.attr? 'stem'
