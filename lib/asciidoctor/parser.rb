@@ -785,7 +785,7 @@ class Parser
       when :source
         AttributeList.rekey attributes, [nil, 'language', 'linenums']
         if doc_attrs.key? 'source-language'
-          attributes['language'] = doc_attrs['source-language'] || 'text'
+          attributes['language'] = doc_attrs['source-language']
         end unless attributes.key? 'language'
         if (attributes.key? 'linenums-option') || (doc_attrs.key? 'source-linenums-option')
           attributes['linenums'] = ''
@@ -797,23 +797,20 @@ class Parser
 
       when :fenced_code
         attributes['style'] = 'source'
-        if (ll = this_line.length) == 3
-          language = nil
-        elsif (comma_idx = (language = this_line.slice 3, ll).index ',')
-          if comma_idx > 0
-            language = (language.slice 0, comma_idx).strip
-            attributes['linenums'] = '' if comma_idx < ll - 4
+        if (ll = this_line.length) > 3
+          if (comma_idx = (language = this_line.slice 3, ll).index ',')
+            if comma_idx > 0
+              language = (language.slice 0, comma_idx).strip
+              attributes['linenums'] = '' if comma_idx < ll - 4
+            else
+              attributes['linenums'] = '' if ll > 4
+            end
           else
-            language = nil
-            attributes['linenums'] = '' if ll > 4
+            language = language.lstrip
           end
-        else
-          language = language.lstrip
         end
         if language.nil_or_empty?
-          if doc_attrs.key? 'source-language'
-            attributes['language'] = doc_attrs['source-language'] || 'text'
-          end
+          attributes['language'] = doc_attrs['source-language'] if doc_attrs.key? 'source-language'
         else
           attributes['language'] = language
         end

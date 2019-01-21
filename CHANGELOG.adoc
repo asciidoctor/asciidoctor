@@ -29,6 +29,7 @@ Enhancements::
 Improvements::
 
   * propagate document ID to DocBook output (#3011)
+  * highlight contents of source block even if source language is not set (#3027)
   * refactor code to use modern Hash syntax
   * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
   * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)

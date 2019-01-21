@@ -1577,7 +1577,7 @@ module Substitutors
     end
 
     # QUESION delegate this logic to a method?
-    if @context == :listing && @style == 'source' && (@attributes.key? 'language') && (@document.basebackend? 'html') &&
+    if @context == :listing && @style == 'source' && (@document.basebackend? 'html') &&
         (SUB_HIGHLIGHT.include? @document.attributes['source-highlighter']) && (idx = @subs.index :specialcharacters)
       @subs[idx] = :highlight
     end
