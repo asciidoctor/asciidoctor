@@ -835,13 +835,11 @@ class Document < AbstractBlock
   # name  - the String attribute name
   # value - the String attribute value; must not be nil (default: '')
   #
-  # Returns the resolved value if the attribute was set or false if it was not because it's locked.
+  # Returns the resolved value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
-    if attribute_locked? name
-      false
-    else
+    unless attribute_locked? name
       if @max_attribute_value_size
-        resolved_value = (apply_attribute_value_subs value).limit_bytesize @max_attribute_value_size
+        resolved_value = Helpers.limit_bytesize (apply_attribute_value_subs value), @max_attribute_value_size
       else
         resolved_value = apply_attribute_value_subs value
       end

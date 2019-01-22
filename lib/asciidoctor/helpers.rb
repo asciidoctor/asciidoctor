@@ -99,6 +99,21 @@ module Helpers
     data.lines.map {|line| line.rstrip }
   end
 
+  # Public: Safely truncates a string to the specified number of bytes.
+  #
+  # If a multibyte char gets split, the dangling fragment is dropped.
+  #
+  # str - The String the truncate.
+  # max - The maximum allowable size of the String, in bytes.
+  #
+  # Returns the String truncated to the specified bytesize.
+  def self.limit_bytesize str, max
+    if str.bytesize > max
+      max -= 1 until (str = str.byteslice 0, max).valid_encoding?
+    end
+    str
+  end
+
   # Internal: Efficiently checks whether the specified String resembles a URI
   #
   # Uses the Asciidoctor::UriSniffRx regex to check whether the String begins
