@@ -586,7 +586,7 @@ module Substitutors
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
-          if ($~.names rescue []).empty?
+          if $~.names.empty?
             target, content, extconf = $1, $2, extension.config
           else
             target, content, extconf = ($~[:target] rescue nil), ($~[:content] rescue nil), extension.config
