@@ -5,5 +5,5 @@ class String
     return self unless size < bytesize
     size -= 1 until (result = byteslice 0, size).valid_encoding?
     result
-  end unless method_defined? :limit_bytesize
-end
+  end
+end unless String.method_defined? :limit_bytesize
