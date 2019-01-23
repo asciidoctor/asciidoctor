@@ -168,7 +168,7 @@ module Substitutors
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
     passes = @passthroughs
-    text = text.gsub(InlinePassMacroRx) {
+    text = text.gsub InlinePassMacroRx do
       preceding = nil
 
       if (boundary = $4) # $$, ++, or +++
@@ -221,10 +221,10 @@ module Substitutors
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
-    } if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
+    end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
-    text = text.gsub(pass_inline_rx) {
+    text = text.gsub pass_inline_rx do
       preceding = $1
       attributes = $2
       escape_mark = RS if (quoted_text = $3).start_with? RS
@@ -276,10 +276,10 @@ module Substitutors
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
-    } if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
+    end if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
-    text = text.gsub(InlineStemMacroRx) {
+    text = text.gsub InlineStemMacroRx do
       # honor the escape
       next $&.slice 1, $&.length if $&.start_with? RS
 
@@ -290,7 +290,7 @@ module Substitutors
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passes[pass_key = passes.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{pass_key}#{PASS_END})
-    } if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
+    end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
   end
@@ -323,7 +323,7 @@ module Substitutors
     #  return text
     #end
 
-    text.gsub(PassSlotRx) {
+    text.gsub PassSlotRx do
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
       pass = passes[$1.to_i]
       subbed_text = apply_subs(pass[:text], pass[:subs])
@@ -331,7 +331,7 @@ module Substitutors
         subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
       end
       subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
-    }
+    end
   ensure
     # free memory if in outer call...we don't need these anymore
     passes.clear if outer
@@ -516,7 +516,7 @@ module Substitutors
 
     if doc_attrs.key? 'experimental'
       if found_macroish_short && ((text.include? 'kbd:') || (text.include? 'btn:'))
-        text = text.gsub(InlineKbdBtnMacroRx) {
+        text = text.gsub InlineKbdBtnMacroRx do
           # honor the escape
           if $1
             $&.slice 1, $&.length
@@ -541,11 +541,11 @@ module Substitutors
           else # $2 == 'btn'
             (Inline.new self, :button, (unescape_bracketed_text $3)).convert
           end
-        }
+        end
       end
 
       if found_macroish && (text.include? 'menu:')
-        text = text.gsub(InlineMenuMacroRx) {
+        text = text.gsub InlineMenuMacroRx do
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
@@ -563,18 +563,18 @@ module Substitutors
           end
 
           Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
-        }
+        end
       end
 
       if (text.include? '"') && (text.include? '&gt;')
-        text = text.gsub(InlineMenuRx) {
+        text = text.gsub InlineMenuRx do
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
           menu, *submenus = $1.split('&gt;').map {|it| it.strip }
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
-        }
+        end
       end
     end
 
@@ -582,7 +582,7 @@ module Substitutors
     # TODO this handling needs some cleanup
     if (extensions = doc.extensions) && extensions.inline_macros? # && found_macroish
       extensions.inline_macros.each do |extension|
-        text = text.gsub(extension.instance.regexp) {
+        text = text.gsub extension.instance.regexp do
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
@@ -607,13 +607,13 @@ module Substitutors
           # NOTE use content if target is not set (short form only); deprecated - remove in 1.6.0
           replacement = extension.process_method[self, target || content, attributes]
           Inline === replacement ? replacement.convert : replacement
-        }
+        end
       end
     end
 
     if found_macroish && ((text.include? 'image:') || (text.include? 'icon:'))
       # image:filename.png[Alt Text]
-      text = text.gsub(InlineImageMacroRx) {
+      text = text.gsub InlineImageMacroRx do
         # honor the escape
         if $&.start_with? RS
           next $&.slice 1, $&.length
@@ -630,7 +630,7 @@ module Substitutors
         doc.register :images, [target, (attrs['imagesdir'] = doc_attrs['imagesdir'])] unless type == 'icon'
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
         Inline.new(self, :image, nil, type: type, target: target, attributes: attrs).convert
-      }
+      end
     end
 
     if ((text.include? '((') && (text.include? '))')) || (found_macroish_short && (text.include? 'dexterm'))
@@ -638,7 +638,7 @@ module Substitutors
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
       # indexterm2:[Tigers]
-      text = text.gsub(InlineIndextermMacroRx) {
+      text = text.gsub InlineIndextermMacroRx do
         case $1
         when 'indexterm'
           # honor the escape
@@ -692,12 +692,12 @@ module Substitutors
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end
-      }
+      end
     end
 
     if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
-      text = text.gsub(InlineLinkRx) {
+      text = text.gsub InlineLinkRx do
         target = $2
         # honor the escape
         next %(#{$1}#{target.slice 1, target.length}#{$3}) if target.start_with? RS
@@ -786,12 +786,12 @@ module Substitutors
         doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         %(#{prefix}#{Inline.new(self, :anchor, text, link_opts).convert}#{suffix})
-      }
+      end
     end
 
     if found_macroish && ((text.include? 'link:') || (text.include? 'mailto:'))
       # inline link macros, link:target[text]
-      text = text.gsub(InlineLinkMacroRx) {
+      text = text.gsub InlineLinkMacroRx do
         # honor the escape
         if $&.start_with? RS
           next $&.slice 1, $&.length
@@ -864,11 +864,11 @@ module Substitutors
         doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
         Inline.new(self, :anchor, text, link_opts).convert
-      }
+      end
     end
 
     if text.include? '@'
-      text = text.gsub(InlineEmailRx) {
+      text = text.gsub InlineEmailRx do
         # honor the escapes
         next ($1 == RS ? ($&.slice 1, $&.length) : $&) if $1
 
@@ -877,11 +877,11 @@ module Substitutors
         doc.register(:links, target)
 
         Inline.new(self, :anchor, $&, type: :link, target: target).convert
-      }
+      end
     end
 
     if found_macroish && (text.include? 'tnote')
-      text = text.gsub(InlineFootnoteMacroRx) {
+      text = text.gsub InlineFootnoteMacroRx do
         # honor the escape
         next $&.slice 1, $&.length if $&.start_with? RS
 
@@ -914,7 +914,7 @@ module Substitutors
           next $&
         end
         Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
-      }
+      end
     end
 
     sub_inline_xrefs(sub_inline_anchors(text, found), found)
@@ -923,15 +923,15 @@ module Substitutors
   # Internal: Substitute normal and bibliographic anchors
   def sub_inline_anchors(text, found = nil)
     if @context == :list_item && @parent.style == 'bibliography'
-      text = text.sub(InlineBiblioAnchorRx) {
+      text = text.sub InlineBiblioAnchorRx do
         # NOTE target property on :bibref is deprecated
         Inline.new(self, :anchor, %([#{$2 || $1}]), type: :bibref, id: $1, target: $1).convert
-      }
+      end
     end
 
     if ((!found || found[:square_bracket]) && text.include?('[[')) ||
         ((!found || found[:macroish]) && text.include?('or:'))
-      text = text.gsub(InlineAnchorRx) {
+      text = text.gsub InlineAnchorRx do
         # honor the escape
         next $&.slice 1, $&.length if $1
 
@@ -946,7 +946,7 @@ module Substitutors
         end
         # NOTE target property on :ref is deprecated
         Inline.new(self, :anchor, reftext, type: :ref, id: id, target: id).convert
-      }
+      end
     end
 
     text
@@ -955,7 +955,7 @@ module Substitutors
   # Internal: Substitute cross reference links
   def sub_inline_xrefs(content, found = nil)
     if ((found ? found[:macroish] : (content.include? '[')) && (content.include? 'xref:')) || ((content.include? '&') && (content.include? 'lt;&'))
-      content = content.gsub(InlineXrefMacroRx) {
+      content = content.gsub InlineXrefMacroRx do
         # honor the escape
         next $&.slice 1, $&.length if $&.start_with? RS
 
@@ -1035,7 +1035,7 @@ module Substitutors
         end
         attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
         Inline.new(self, :anchor, text, type: :xref, target: target, attributes: attrs).convert
-      }
+      end
     end
 
     content
@@ -1049,7 +1049,7 @@ module Substitutors
   def sub_callouts(text)
     callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
     autonum = 0
-    text.gsub(callout_rx) {
+    text.gsub callout_rx do
       # honor the escape
       if $2
         # use sub since it might be behind a line comment
@@ -1057,7 +1057,7 @@ module Substitutors
       else
         Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
       end
-    }
+    end
   end
 
   # Public: Substitute post replacements
@@ -1070,9 +1070,9 @@ module Substitutors
       lines = text.split LF, -1
       return text if lines.size < 2
       last = lines.pop
-      (lines.map {|line|
+      (lines.map do |line|
         Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, type: :line).convert
-      } << last).join LF
+      end.push last).join LF
     elsif (text.include? PLUS) && (text.include? HARD_LINE_BREAK)
       text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, type: :line).convert }
     else
@@ -1392,9 +1392,9 @@ module Substitutors
       lineno = 0
       callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
       # extract callout marks, indexed by line number
-      source = source.split(LF, -1).map {|line|
+      source = (source.split LF, -1).map do |line|
         lineno = lineno + 1
-        line.gsub(callout_rx) {
+        line.gsub callout_rx do
           # honor the escape
           if $2
             # use sub since it might be behind a line comment
@@ -1404,8 +1404,8 @@ module Substitutors
             last = lineno
             nil
           end
-        }
-      }.join LF
+        end
+      end.join LF
       callout_on_last = true if last == lineno
       callout_marks = nil if callout_marks.empty?
     end
@@ -1421,14 +1421,14 @@ module Substitutors
           highlight_lines = resolve_lines_to_highlight source, (attr 'highlight', nil, false)
         end
       end
-      result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html, {
+      result = ::CodeRay::Duo[attr('language', :text, false).to_sym, :html,
         css: (@document.attributes['coderay-css'] || :class).to_sym,
         line_numbers: linenums_mode,
         line_number_start: start,
         line_number_anchors: false,
         highlight_lines: highlight_lines,
         bold_every: false,
-      }].highlight source
+      ].highlight source
     when 'pygments'
       lexer = ::Pygments::Lexer.find_by_alias(attr 'language', 'text', false) || ::Pygments::Lexer.find_by_mimetype('text/plain')
       opts = { cssclass: 'pyhl', classprefix: 'tok-', nobackground: true, stripnl: false }
@@ -1467,7 +1467,7 @@ module Substitutors
     if callout_marks
       autonum = lineno = 0
       reached_code = true unless (linenums_mode_table = linenums_mode == :table)
-      result.split(LF, -1).map {|line|
+      (result.split LF, -1).map do |line|
         unless reached_code
           next line unless line.include?('<td class="code">')
           reached_code = true
@@ -1494,7 +1494,7 @@ module Substitutors
         else
           line
         end
-      }.join LF
+      end.join LF
     else
       result
     end

@@ -548,7 +548,7 @@ allbox tab(:);'
       result << %(.sp
 .B #{manify node.title}
 .br) if node.title?
-      node.items.map {|item|
+      node.items.map do |item|
         result << %[.sp
 .RS 4
 .ie n \\{\\
@@ -561,7 +561,7 @@ allbox tab(:);'
 #{manify item.text, whitespace: :normalize}]
         result << item.content if item.blocks?
         result << '.RE'
-      }
+      end
       result.join LF
     end
 

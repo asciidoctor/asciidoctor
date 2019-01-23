@@ -1108,11 +1108,11 @@ class Parser
   def self.catalog_callouts(text, document)
     found = false
     autonum = 0
-    text.scan(CalloutScanRx) {
+    text.scan CalloutScanRx do
       document.callouts.register $2 == '.' ? (autonum += 1).to_s : $2 unless $&.start_with? '\\'
       # we have to mark as found even if it's escaped so it can be unescaped
       found = true
-    } if text.include? '<'
+    end if text.include? '<'
     found
   end
 
@@ -1143,7 +1143,7 @@ class Parser
   #
   # Returns nothing
   def self.catalog_inline_anchors text, block, document, reader
-    text.scan(InlineAnchorScanRx) do
+    text.scan InlineAnchorScanRx do
       if (id = $1)
         if (reftext = $2)
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
@@ -2469,9 +2469,7 @@ class Parser
         end
 
         if m[1]
-          1.upto(m[1].to_i) {
-            specs << spec.dup
-          }
+          1.upto(m[1].to_i) { specs << spec.dup }
         else
           specs << spec
         end
@@ -2690,7 +2688,7 @@ class Parser
           # keeps track of how many spaces were added to adjust offset in match data
           spaces_added = 0
           # NOTE Opal has to patch this use of gsub!
-          line.gsub!(TabRx) {
+          line.gsub! TabRx do
             # calculate how many spaces this tab represents, then replace tab with spaces
             if (offset = ($~.begin 0) + spaces_added) % tab_size == 0
               spaces_added += (tab_size - 1)
@@ -2701,7 +2699,7 @@ class Parser
               end
               ' ' * spaces
             end
-          }
+          end
         else
           line
         end
