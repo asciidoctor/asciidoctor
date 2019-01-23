@@ -1,0 +1,6 @@
+- if title?
+  %formalpara{'xml:id'=>@id, role: (attr :role), xreflabel: (attr :reftext)}
+    %title=title
+    %para=content
+- else
+  %para{'xml:id'=>@id, role: (attr :role), xreflabel: (attr :reftext)}=content

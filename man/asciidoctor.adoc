@@ -2,7 +2,7 @@
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
 :man manual: Asciidoctor Manual
-:man source: Asciidoctor 1.5.8
+:man source: Asciidoctor 2.0.0.dev
 :page-layout: base
 
 == NAME
@@ -15,7 +15,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, DocBook 4.5, man(ual) page and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, man(ual) page and other custom output formats.
 
 If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 

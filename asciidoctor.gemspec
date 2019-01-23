@@ -9,8 +9,8 @@ require 'open3' unless defined? Open3.popen3
 Gem::Specification.new do |s|
   s.name = 'asciidoctor'
   s.version = Asciidoctor::VERSION
-  s.summary = 'An implementation of the AsciiDoc text processor and publishing toolchain in Ruby'
-  s.description = 'A fast, open source text processor and publishing toolchain, written in Ruby, for converting AsciiDoc content to HTML5, DocBook 5 (or 4.5) and other formats.'
+  s.summary = 'An implementation of the AsciiDoc text processor and publishing toolchain'
+  s.description = 'A fast, open source text processor and publishing toolchain for converting AsciiDoc content to HTML 5, DocBook 5, and other formats.'
   s.authors = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
   s.email = ['dan.j.allen@gmail.com']
   s.homepage = 'http://asciidoctor.org'

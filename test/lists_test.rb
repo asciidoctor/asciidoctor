@@ -1956,21 +1956,6 @@ List
       assert_xpath '(//ol)[2]/li', output, 1
     end
 
-    test 'should use start number in docbook4.5 backend' do
-      input = <<-EOS
-== List
-
-[start=7]
-. item 7
-. item 8
-      EOS
-
-      output = convert_string_to_embedded input, backend: 'docbook45'
-      assert_xpath '//orderedlist', output, 1
-      assert_xpath '(//orderedlist)/listitem', output, 2
-      assert_xpath '(//orderedlist/listitem)[1][@override = "7"]', output, 1
-    end
-
     test 'should use start number in docbook5 backend' do
       input = <<-EOS
 == List
@@ -4343,12 +4328,12 @@ puts doc.convert # <3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
-    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
-    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
-    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '(//programlisting//co)[1][@xml:id="CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@xml:id="CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@xml:id="CO1-3"]', output, 1
     assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2"]', output, 1
@@ -4370,12 +4355,12 @@ Paragraph.
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
-    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
-    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
-    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '(//programlisting//co)[1][@xml:id="CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@xml:id="CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@xml:id="CO1-3"]', output, 1
     assert_xpath '//programlisting/following-sibling::*[1][self::simpara]', output, 1
     assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
@@ -4394,12 +4379,12 @@ puts doc.convert # <2>
 <1> Import the library
 <2> Where the magic happens
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
-    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
-    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
-    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '(//programlisting//co)[1][@xml:id="CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@xml:id="CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@xml:id="CO1-3"]', output, 1
     assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 2
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2 CO1-3"]', output, 1
@@ -4417,12 +4402,12 @@ puts doc.convert # <1>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 1
     assert_xpath '//programlisting//co', output, 3
-    assert_xpath '(//programlisting//co)[1][@id = "CO1-1"]', output, 1
-    assert_xpath '(//programlisting//co)[2][@id = "CO1-2"]', output, 1
-    assert_xpath '(//programlisting//co)[3][@id = "CO1-3"]', output, 1
+    assert_xpath '(//programlisting//co)[1][@xml:id="CO1-1"]', output, 1
+    assert_xpath '(//programlisting//co)[2][@xml:id="CO1-2"]', output, 1
+    assert_xpath '(//programlisting//co)[3][@xml:id="CO1-3"]', output, 1
     assert_xpath '//programlisting/following-sibling::calloutlist/callout', output, 3
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[1][@arearefs = "CO1-3"]', output, 1
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-1"]', output, 1
@@ -4448,13 +4433,13 @@ puts doc.convert # <3>
 <2> Describe the second line
 <3> Describe the third line
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 2
     assert_xpath '(//programlisting)[1]//co', output, 1
-    assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting)[1]//co[@xml:id="CO1-1"]', output, 1
     assert_xpath '(//programlisting)[2]//co', output, 2
-    assert_xpath '((//programlisting)[2]//co)[1][@id = "CO1-2"]', output, 1
-    assert_xpath '((//programlisting)[2]//co)[2][@id = "CO1-3"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[1][@xml:id="CO1-2"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[2][@xml:id="CO1-3"]', output, 1
     assert_xpath '(//calloutlist/callout)[1][@arearefs = "CO1-1"]', output, 1
     assert_xpath '(//calloutlist/callout)[2][@arearefs = "CO1-2"]', output, 1
     assert_xpath '(//calloutlist/callout)[3][@arearefs = "CO1-3"]', output, 1
@@ -4478,13 +4463,13 @@ puts doc.convert # <2>
 <1> Describe the second line
 <2> Describe the third line
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//programlisting', output, 2
     assert_xpath '(//programlisting)[1]//co', output, 1
-    assert_xpath '(//programlisting)[1]//co[@id = "CO1-1"]', output, 1
+    assert_xpath '(//programlisting)[1]//co[@xml:id="CO1-1"]', output, 1
     assert_xpath '(//programlisting)[2]//co', output, 2
-    assert_xpath '((//programlisting)[2]//co)[1][@id = "CO2-1"]', output, 1
-    assert_xpath '((//programlisting)[2]//co)[2][@id = "CO2-2"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[1][@xml:id="CO2-1"]', output, 1
+    assert_xpath '((//programlisting)[2]//co)[2][@xml:id="CO2-2"]', output, 1
     assert_xpath '//calloutlist', output, 2
     assert_xpath '(//calloutlist)[1]/callout', output, 1
     assert_xpath '((//calloutlist)[1]/callout)[1][@arearefs = "CO1-1"]', output, 1
@@ -4535,7 +4520,7 @@ as a RubyGem
 +
 You can write this to file rather than printing to stdout.
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//calloutlist', output, 1
     assert_xpath '//calloutlist/callout', output, 3
     assert_xpath '(//calloutlist/callout)[1]/*', output, 1
@@ -4817,11 +4802,11 @@ Violets are blue <2>
 <1> And so is Ruby
 <2> But violet is more like purple
     EOS
-    output = convert_string input, attributes: { 'backend' => 'docbook45' }
+    output = convert_string input, attributes: { 'backend' => 'docbook' }
     assert_xpath '//literallayout', output, 1
     assert_xpath '//literallayout//co', output, 2
-    assert_xpath '(//literallayout//co)[1][@id = "CO1-1"]', output, 1
-    assert_xpath '(//literallayout//co)[2][@id = "CO1-2"]', output, 1
+    assert_xpath '(//literallayout//co)[1][@xml:id="CO1-1"]', output, 1
+    assert_xpath '(//literallayout//co)[2][@xml:id="CO1-2"]', output, 1
     assert_xpath '//literallayout/following-sibling::*[1][self::calloutlist]/callout', output, 2
     assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[1][@arearefs = "CO1-1"]', output, 1
     assert_xpath '(//literallayout/following-sibling::*[1][self::calloutlist]/callout)[2][@arearefs = "CO1-2"]', output, 1

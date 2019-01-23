@@ -13,7 +13,7 @@ context 'Converter' do
     end
 
     test 'should set Haml format to xhtml for docbook backend' do
-      doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
+      doc = Asciidoctor::Document.new [], backend: 'docbook5', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
@@ -50,7 +50,7 @@ context 'Converter' do
     end
 
     test 'should set Slim format to nil for docbook backend' do
-      doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
+      doc = Asciidoctor::Document.new [], backend: 'docbook5', template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter('paragraph')
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
@@ -119,8 +119,8 @@ context 'Converter' do
       assert_equal '.foo', doc.attributes['outfilesuffix']
     end
 
-    test 'should load Haml templates for docbook45 backend' do
-      doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
+    test 'should load Haml templates for docbook5 backend' do
+      doc = Asciidoctor::Document.new [], backend: 'docbook5', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
@@ -266,8 +266,8 @@ context 'Converter' do
       end
     end
 
-    test 'should load Slim templates for docbook45 backend' do
-      doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
+    test 'should load Slim templates for docbook5 backend' do
+      doc = Asciidoctor::Document.new [], backend: 'docbook5', template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name

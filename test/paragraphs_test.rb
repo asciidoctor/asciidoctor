@@ -151,7 +151,7 @@ context 'Paragraphs' do
       Note that multi-entry terms generate separate index entries.
       EOS
 
-      output = convert_string_to_embedded input, attributes: { 'backend' => 'docbook45' }
+      output = convert_string_to_embedded input, attributes: { 'backend' => 'docbook' }
       assert_xpath '/simpara', output, 1
       term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
       assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s

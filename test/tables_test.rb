@@ -1673,19 +1673,6 @@ context 'Tables' do
       assert_css 'table > tbody > tr:nth-child(1) > td:nth-child(2) .listingblock', output, 1
     end
 
-    test 'table with breakable option docbook 4.5' do
-      input = <<~'EOS'
-      .Table with breakable
-      [%breakable]
-      |===
-      |Item       |Quantity
-      |Item 1     |1
-      |===
-      EOS
-      output = convert_string_to_embedded input, backend: 'docbook45'
-      assert_includes output, '<?dbfo keep-together="auto"?>'
-    end
-
     test 'table with breakable option docbook 5' do
       input = <<~'EOS'
       .Table with breakable
@@ -1709,19 +1696,6 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook5'
-      assert_includes output, '<?dbfo keep-together="always"?>'
-    end
-
-    test 'table with unbreakable option docbook 4.5' do
-      input = <<~'EOS'
-      .Table with unbreakable
-      [%unbreakable]
-      |===
-      |Item       |Quantity
-      |Item 1     |1
-      |===
-      EOS
-      output = convert_string_to_embedded input, backend: 'docbook45'
       assert_includes output, '<?dbfo keep-together="always"?>'
     end
 

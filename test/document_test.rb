@@ -76,7 +76,7 @@ context 'Document' do
       end
     end
 
-    test 'toc and sectnums should be enabled by default for DocBook backend' do
+    test 'toc and sectnums should be enabled by default in DocBook backend' do
       doc = document_from_string 'content', backend: 'docbook', parse: true
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
@@ -94,7 +94,7 @@ context 'Document' do
       assert_match('<?asciidoc-numbered maxdepth="1"?>', result)
     end
 
-    test 'should be able to disable toc and sectnums in document header for DocBook backend' do
+    test 'should be able to disable toc and sectnums in document header in DocBook backend' do
       input = <<-EOS
 = Document Title
 :toc!:
@@ -117,7 +117,7 @@ content
       assert_xpath '/article/info', result, 0
     end
 
-    test 'should be able to disable section numbering using numbered attribute in document header for DocBook backend' do
+    test 'should be able to disable section numbering using numbered attribute in document header in DocBook backend' do
       input = <<-EOS
 = Document Title
 :numbered!:
@@ -204,7 +204,7 @@ content
       assert_css 'meta[name="robots"]', output, 0
     end
 
-    test 'should include docinfo files for docbook backend' do
+    test 'should include docinfo files in docbook backend' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
@@ -254,7 +254,7 @@ content
       assert_css 'a#top', output, 1
     end
 
-    test 'should include docinfo footer files for docbook backend' do
+    test 'should include docinfo footer files in DocBook backend' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
@@ -262,20 +262,20 @@ content
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
-      assert_css 'glossary#_glossary', output, 0
+      assert_css 'glossary', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 0
-      assert_css 'glossary#_glossary', output, 1
+      assert_css 'glossary[xml|id="_glossary"]', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
           header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
-      assert_css 'glossary#_glossary', output, 1
+      assert_css 'glossary[xml|id="_glossary"]', output, 1
     end
 
     # WARNING this test manipulates runtime settings; should probably be run in forked process
@@ -373,7 +373,7 @@ content
   end
 
   context 'Converter' do
-    test 'built-in HTML5 views are registered by default' do
+    test 'convert methos on built-in converter are registered by default' do
       doc = document_from_string ''
       assert_equal 'html5', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-html5'
@@ -386,21 +386,7 @@ content
       end
     end
 
-    test 'built-in DocBook45 views are registered when backend is docbook45' do
-      doc = document_from_string '', attributes: { 'backend' => 'docbook45' }
-      converter = doc.converter
-      assert_equal 'docbook45', doc.attributes['backend']
-      assert doc.attributes.has_key? 'backend-docbook45'
-      assert_equal 'docbook', doc.attributes['basebackend']
-      assert doc.attributes.has_key? 'basebackend-docbook'
-      converter = doc.converter
-      assert_kind_of Asciidoctor::Converter::DocBook45Converter, converter
-      BUILT_IN_ELEMENTS.each do |element|
-        assert_respond_to converter, element
-      end
-    end
-
-    test 'built-in DocBook5 views are registered when backend is docbook5' do
+    test 'convert methods on built-in converter are registered when backend is docbook5' do
       doc = document_from_string '', attributes: { 'backend' => 'docbook5' }
       converter = doc.converter
       assert_equal 'docbook5', doc.attributes['backend']
@@ -738,11 +724,11 @@ more info...
       assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
       assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
       assert_xpath '//meta[@name="copyright"][@content="Stuart Rackham"]', output, 1
-      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="author"][text() = "Stuart Rackham"]', output, 1
-      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text() = "founder@asciidoc.org"]', output, 1
-      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revnumber"][text() = "version 8.6.8,"]', output, 1
-      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revdate"][text() = "2012-07-12"]', output, 1
-      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revremark"][text() = "See changelog."]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="author"][text()="Stuart Rackham"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text()="founder@asciidoc.org"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revnumber"][text()="version 8.6.8,"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revdate"][text()="2012-07-12"]', output, 1
+      assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="revremark"][text()="See changelog."]', output, 1
     end
 
     test 'should parse revision line if date is empty' do
@@ -760,7 +746,7 @@ content
       assert_equal 'remark', doc.attributes['revremark']
     end
 
-    test 'should include revision history if revdate and revnumber is set' do
+    test 'should include revision history in DocBook output if revdate and revnumber is set' do
       input = <<-EOS
 = Document Title
 Author Name
@@ -777,7 +763,7 @@ content
       assert_css 'revhistory > revision > revnumber', output, 1
     end
 
-    test 'should include revision history if revdate and revremark is set' do
+    test 'should include revision history in DocBook output if revdate and revremark is set' do
       input = <<-EOS
 = Document Title
 Author Name
@@ -794,7 +780,7 @@ content
       assert_css 'revhistory > revision > revremark', output, 1
     end
 
-    test 'should not include revision history if revdate is not set' do
+    test 'should not include revision history in DocBook output if revdate is not set' do
       input = <<-EOS
 = Document Title
 Author Name
@@ -807,36 +793,7 @@ content
       assert_css 'revhistory', output, 0
     end
 
-    test 'with metadata to DocBook45' do
-      input = <<-EOS
-= AsciiDoc
-Stuart Rackham <founder@asciidoc.org>
-v8.6.8, 2012-07-12: See changelog.
-
-== Version 8.6.8
-
-more info...
-      EOS
-      output = convert_string input, backend: 'docbook45'
-      assert_xpath '/article/articleinfo', output, 1
-      assert_xpath '/article/articleinfo/title[text() = "AsciiDoc"]', output, 1
-      assert_xpath '/article/articleinfo/date[text() = "2012-07-12"]', output, 1
-      assert_xpath '/article/articleinfo/author/firstname[text() = "Stuart"]', output, 1
-      assert_xpath '/article/articleinfo/author/surname[text() = "Rackham"]', output, 1
-      assert_xpath '/article/articleinfo/author/email[text() = "founder@asciidoc.org"]', output, 1
-      assert_xpath '/article/articleinfo/revhistory', output, 1
-      assert_xpath '/article/articleinfo/revhistory/revision', output, 1
-      assert_xpath '/article/articleinfo/revhistory/revision/revnumber[text() = "8.6.8"]', output, 1
-      assert_xpath '/article/articleinfo/revhistory/revision/date[text() = "2012-07-12"]', output, 1
-      assert_xpath '/article/articleinfo/revhistory/revision/authorinitials[text() = "SR"]', output, 1
-      assert_xpath '/article/articleinfo/revhistory/revision/revremark[text() = "See changelog."]', output, 1
-      article = xmlnodes_at_xpath '/article', output, 1
-      # nokogiri can't make up its mind
-      id_attr = article.attribute('id') || article.attribute('xml:id')
-      assert_nil id_attr
-    end
-
-    test 'with metadata to DocBook5' do
+    test 'with metadata to DocBook 5' do
       input = <<-EOS
 = AsciiDoc
 Stuart Rackham <founder@asciidoc.org>
@@ -847,30 +804,13 @@ more info...
       EOS
       output = convert_string input, backend: 'docbook5'
       assert_xpath '/article/info', output, 1
-      assert_xpath '/article/info/title[text() = "AsciiDoc"]', output, 1
+      assert_xpath '/article/info/title[text()="AsciiDoc"]', output, 1
       assert_xpath '/article/info/author/personname', output, 1
-      assert_xpath '/article/info/author/personname/firstname[text() = "Stuart"]', output, 1
-      assert_xpath '/article/info/author/personname/surname[text() = "Rackham"]', output, 1
-      assert_xpath '/article/info/author/email[text() = "founder@asciidoc.org"]', output, 1
-      article = xmlnodes_at_xpath '/article', output, 1
-      # nokogiri can't make up its mind
-      id_attr = article.attribute('id') || article.attribute('xml:id')
-      assert_nil id_attr
-    end
-
-    test 'with document ID to Docbook 4.5' do
-      input = <<-EOS
-[[document-id]]
-= Document Title
-
-more info...
-      EOS
-      output = convert_string input, backend: 'docbook45'
-      article = xmlnodes_at_xpath '/article', output, 1
-      # nokogiri can't make up its mind
-      id_attr = article.attribute('id') || article.attribute('xml:id')
-      refute_nil id_attr
-      assert_equal 'document-id', id_attr.value
+      assert_xpath '/article/info/author/personname/firstname[text()="Stuart"]', output, 1
+      assert_xpath '/article/info/author/personname/surname[text()="Rackham"]', output, 1
+      assert_xpath '/article/info/author/email[text()="founder@asciidoc.org"]', output, 1
+      assert_css 'article:root:not([xml|id])', output, 1
+      assert_css 'article:root[xml|lang="en"]', output, 1
     end
 
     test 'with document ID to Docbook 5' do
@@ -881,14 +821,10 @@ more info...
 more info...
       EOS
       output = convert_string input, backend: 'docbook', keep_namespaces: true
-      article = xmlnodes_at_xpath '/xmlns:article', output, 1
-      # nokogiri can't make up its mind
-      id_attr = article.attribute('id') || article.attribute('xml:id')
-      refute_nil id_attr
-      assert_equal 'document-id', id_attr.value
+      assert_css 'article:root[xml|id="document-id"]', output, 1
     end
 
-    test 'with author defined using attribute entry to DocBook 4.5' do
+    test 'with author defined using attribute entry to DocBook' do
       input = <<-EOS
 = Document Title
 :author: Doc Writer
@@ -897,12 +833,12 @@ more info...
 content
       EOS
 
-      output = convert_string input, backend: 'docbook45'
-      assert_xpath '//articleinfo/author', output, 1
-      assert_xpath '//articleinfo/author/firstname[text() = "Doc"]', output, 1
-      assert_xpath '//articleinfo/author/surname[text() = "Writer"]', output, 1
-      assert_xpath '//articleinfo/author/email[text() = "thedoctor@asciidoc.org"]', output, 1
-      assert_xpath '//articleinfo/authorinitials[text() = "DW"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/article/info/author', output, 1
+      assert_xpath '/article/info/author/personname/firstname[text()="Doc"]', output, 1
+      assert_xpath '/article/info/author/personname/surname[text()="Writer"]', output, 1
+      assert_xpath '/article/info/author/email[text()="thedoctor@asciidoc.org"]', output, 1
+      assert_xpath '/article/info/authorinitials[text()="DW"]', output, 1
     end
 
     test 'should sanitize content of HTML meta authors tag' do
@@ -958,12 +894,12 @@ Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 content
       EOS
 
-      output = convert_string input, backend: 'docbook45'
-      assert_xpath '//articleinfo/author', output, 0
-      assert_xpath '//articleinfo/authorgroup', output, 1
-      assert_xpath '//articleinfo/authorgroup/author', output, 2
-      assert_xpath '//articleinfo/authorgroup/author[1]/firstname[text() = "Doc"]', output, 1
-      assert_xpath '//articleinfo/authorgroup/author[2]/firstname[text() = "Junior"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/article/info/author', output, 0
+      assert_xpath '/article/info/authorgroup', output, 1
+      assert_xpath '/article/info/authorgroup/author', output, 2
+      assert_xpath '(/article/info/authorgroup/author)[1]/personname/firstname[text()="Doc"]', output, 1
+      assert_xpath '(/article/info/authorgroup/author)[2]/personname/firstname[text()="Junior"]', output, 1
     end
 
     test 'with author defined by indexed attribute name' do
@@ -989,14 +925,14 @@ content
 content
       EOS
 
-      output = convert_string input, backend: 'docbook45'
-      assert_xpath '//articleinfo/author', output, 0
-      assert_xpath '//articleinfo/authorgroup', output, 1
-      assert_xpath '//articleinfo/authorgroup/author', output, 2
-      assert_xpath '(//articleinfo/authorgroup/author)[1]/firstname[text() = "Doc"]', output, 1
-      assert_xpath '(//articleinfo/authorgroup/author)[1]/email[text() = "thedoctor@asciidoc.org"]', output, 1
-      assert_xpath '(//articleinfo/authorgroup/author)[2]/firstname[text() = "Junior"]', output, 1
-      assert_xpath '(//articleinfo/authorgroup/author)[2]/email[text() = "junior@asciidoc.org"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/article/info/author', output, 0
+      assert_xpath '/article/info/authorgroup', output, 1
+      assert_xpath '/article/info/authorgroup/author', output, 2
+      assert_xpath '(/article/info/authorgroup/author)[1]/personname/firstname[text()="Doc"]', output, 1
+      assert_xpath '(/article/info/authorgroup/author)[1]/email[text()="thedoctor@asciidoc.org"]', output, 1
+      assert_xpath '(/article/info/authorgroup/author)[2]/personname/firstname[text()="Junior"]', output, 1
+      assert_xpath '(/article/info/authorgroup/author)[2]/email[text()="junior@asciidoc.org"]', output, 1
     end
 
     test 'should populate copyright element in DocBook output if copyright attribute is defined' do
@@ -1220,16 +1156,16 @@ image::inner.png[]
       result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5' })
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
-      assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
-      assert_xpath '/html//*[@id="content"]//p[text() = "paragraph"]', result, 1
+      assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
+      assert_xpath '/html//*[@id="content"]//p[text()="paragraph"]', result, 1
     end
 
     test 'html5 backend doctype book' do
       result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5', 'doctype' => 'book' })
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
-      assert_xpath '/html//*[@id="header"]/h1[text() = "Title"]', result, 1
-      assert_xpath '/html//*[@id="content"]//p[text() = "paragraph"]', result, 1
+      assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
+      assert_xpath '/html//*[@id="content"]//p[text()="paragraph"]', result, 1
     end
 
     test 'xhtml5 backend should map to html5 and set htmlsyntax to xml' do
@@ -1348,116 +1284,23 @@ two
 content
       EOS
       result = convert_string input, safe: :safe, backend: :xhtml, keep_namespaces: true
-      assert_xpath '//*[not(namespace-uri() = "http://www.w3.org/1999/xhtml")]', result, 0
+      assert_xpath '//*[not(namespace-uri()="http://www.w3.org/1999/xhtml")]', result, 0
     end
 
-    test 'docbook45 backend doctype article' do
-      input = <<-EOS
-= Title
-
-preamble
-
-== First Section
-
-section body
-      EOS
-      result = convert_string(input, attributes: { 'backend' => 'docbook45' })
-      assert_xpath '/article', result, 1
-      assert_xpath '/article/articleinfo/title[text() = "Title"]', result, 1
-      assert_xpath '/article/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/article/section', result, 1
-      assert_xpath '/article/section[@id = "_first_section"]/title[text() = "First Section"]', result, 1
-      assert_xpath '/article/section[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
-    end
-
-    test 'docbook45 backend doctype article no title' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook45' })
-      assert_xpath '/article', result, 1
-      assert_xpath '/article/articleinfo/date', result, 1
-      assert_xpath '/article/simpara[text() = "text"]', result, 1
-    end
-
-    test 'docbook45 backend doctype article no xmlns' do
-      result = convert_string('text', keep_namespaces: true, attributes: { 'backend' => 'docbook45', 'doctype' => 'article' })
-      refute_match(RE_XMLNS_ATTRIBUTE, result)
-    end
-
-    test 'docbook45 backend doctype manpage' do
-      input = <<-EOS
-= asciidoctor(1)
-
-== NAME
-
-asciidoctor - Process text
-
-== SYNOPSIS
-
-some text
-
-== First Section
-
-section body
-      EOS
-      result = convert_string(input, attributes: { 'backend' => 'docbook45', 'doctype' => 'manpage' })
-      assert_xpath '/refentry', result, 1
-      assert_xpath '/refentry/refentryinfo/title[text() = "asciidoctor(1)"]', result, 1
-      assert_xpath '/refentry/refmeta/refentrytitle[text() = "asciidoctor"]', result, 1
-      assert_xpath '/refentry/refmeta/manvolnum[text() = "1"]', result, 1
-      assert_xpath '/refentry/refnamediv/refname[text() = "asciidoctor"]', result, 1
-      assert_xpath '/refentry/refnamediv/refpurpose[text() = "Process text"]', result, 1
-      assert_xpath '/refentry/refsynopsisdiv', result, 1
-      assert_xpath '/refentry/refsynopsisdiv/simpara[text() = "some text"]', result, 1
-      assert_xpath '/refentry/refsection', result, 1
-      assert_xpath '/refentry/refsection[@id = "_first_section"]/title[text() = "First Section"]', result, 1
-      assert_xpath '/refentry/refsection[@id = "_first_section"]/simpara[text() = "section body"]', result, 1
-    end
-
-    test 'docbook45 backend doctype book' do
-      input = <<-EOS
-= Title
-
-preamble
-
-== First Chapter
-
-chapter body
-      EOS
-      result = convert_string(input, attributes: { 'backend' => 'docbook45', 'doctype' => 'book' })
-      assert_xpath '/book', result, 1
-      assert_xpath '/book/bookinfo/title[text() = "Title"]', result, 1
-      assert_xpath '/book/preface/simpara[text() = "preamble"]', result, 1
-      assert_xpath '/book/chapter', result, 1
-      assert_xpath '/book/chapter[@id = "_first_chapter"]/title[text() = "First Chapter"]', result, 1
-      assert_xpath '/book/chapter[@id = "_first_chapter"]/simpara[text() = "chapter body"]', result, 1
-    end
-
-    test 'docbook45 backend doctype book no title' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook45', 'doctype' => 'book' })
-      assert_xpath '/book', result, 1
-      assert_xpath '/book/bookinfo/date', result, 1
-      # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
-      assert_xpath '/book/preface/simpara[text() = "text"]', result, 1
-    end
-
-    test 'docbook45 backend doctype book no xmlns' do
-      result = convert_string('text', keep_namespaces: true, attributes: { 'backend' => 'docbook45', 'doctype' => 'book' })
-      refute_match(RE_XMLNS_ATTRIBUTE, result)
-    end
-
-    test 'docbook45 backend parses out subtitle' do
+    test 'should parse out subtitle when backend is DocBook' do
       input = <<-EOS
 = Document Title: Subtitle
 :doctype: book
 
 text
       EOS
-      result = convert_string input, backend: 'docbook45'
+      result = convert_string input, backend: 'docbook5'
       assert_xpath '/book', result, 1
-      assert_xpath '/book/bookinfo/title[text() = "Document Title"]', result, 1
-      assert_xpath '/book/bookinfo/subtitle[text() = "Subtitle"]', result, 1
+      assert_xpath '/book/info/title[text()="Document Title"]', result, 1
+      assert_xpath '/book/info/subtitle[text()="Subtitle"]', result, 1
     end
 
-    test 'docbook5 backend doctype article' do
+    test 'should be able to set doctype to article when converting to DocBoook' do
       input = <<-EOS
 = Title
 Author Name
@@ -1474,19 +1317,21 @@ section body
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:article[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text() = "Title"]', result, 1
-      assert_xpath '/xmlns:article/xmlns:simpara[text() = "preamble"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text()="Title"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:simpara[text()="preamble"]', result, 1
       assert_xpath '/xmlns:article/xmlns:section', result, 1
-      section = xmlnodes_at_xpath('/xmlns:article/xmlns:section', result, 1)
-      # nokogiri can't make up its mind
-      id_attr = section.attribute('id') || section.attribute('xml:id')
-      refute_nil id_attr
-      refute_nil id_attr.namespace
-      assert_equal 'xml', id_attr.namespace.prefix
-      assert_equal '_first_section', id_attr.value
+      assert_css 'article:root > section[xml|id="_first_section"]', result, 1
     end
 
-    test 'docbook5 backend doctype manpage' do
+    test 'should set doctype to article by default for document with no title when converting to DocBoook' do
+      result = convert_string('text', attributes: { 'backend' => 'docbook' })
+      assert_xpath '/article', result, 1
+      assert_xpath '/article/info/title', result, 1
+      assert_xpath '/article/info/title[text()="Untitled"]', result, 1
+      assert_xpath '/article/info/date', result, 1
+    end
+
+    test 'should be able to convert DocBook manpage output when backend is DocBook and doctype is manpage' do
       input = <<-EOS
 = asciidoctor(1)
 :mansource: Asciidoctor
@@ -1510,26 +1355,20 @@ section body
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text() = "asciidoctor(1)"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text() = "asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text() = "1"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text() = "Asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text() = "Asciidoctor Manual"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text() = "asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text() = "Process text"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text()="asciidoctor(1)"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text()="1"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="Asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="Asciidoctor Manual"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text()="Process text"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text() = "some text"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text()="some text"]', result, 1
       assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
-      section = xmlnodes_at_xpath('/xmlns:refentry/xmlns:refsection', result, 1)
-      # nokogiri can't make up its mind
-      id_attr = section.attribute('id') || section.attribute('xml:id')
-      refute_nil id_attr
-      refute_nil id_attr.namespace
-      assert_equal 'xml', id_attr.namespace.prefix
-      assert_equal '_first_section', id_attr.value
+      assert_css 'refentry:root > refsection[xml|id="_first_section"]', result, 1
     end
 
-    test 'should output non-breaking space for source and manual in docbook5 manpage output if absent from source' do
+    test 'should output non-breaking space for source and manual in docbook manpage output if absent from source' do
       input = <<-EOS
 = asciidoctor(1)
 
@@ -1542,11 +1381,11 @@ asciidoctor - Process text
 some text
       EOS
       result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' })
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text() = "#{decode_char 160}"]), result, 1
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text() = "#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
     end
 
-    test 'docbook5 backend doctype book' do
+    test 'should be able to set doctype to book when converting to DocBoook' do
       input = <<-EOS
 = Title
 Author Name
@@ -1563,16 +1402,18 @@ chapter body
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:book[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:book/xmlns:info/xmlns:title[text() = "Title"]', result, 1
-      assert_xpath '/xmlns:book/xmlns:preface/xmlns:simpara[text() = "preamble"]', result, 1
+      assert_xpath '/xmlns:book/xmlns:info/xmlns:title[text()="Title"]', result, 1
+      assert_xpath '/xmlns:book/xmlns:preface/xmlns:simpara[text()="preamble"]', result, 1
       assert_xpath '/xmlns:book/xmlns:chapter', result, 1
-      chapter = xmlnodes_at_xpath('/xmlns:book/xmlns:chapter', result, 1)
-      # nokogiri can't make up its mind
-      id_attr = chapter.attribute('id') || chapter.attribute('xml:id')
-      refute_nil id_attr
-      refute_nil id_attr.namespace
-      assert_equal 'xml', id_attr.namespace.prefix
-      assert_equal '_first_chapter', id_attr.value
+      assert_css 'book:root > chapter[xml|id="_first_chapter"]', result, 1
+    end
+
+    test 'should be able to set doctype to book for document with no title when converting to DocBoook' do
+      result = convert_string('text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
+      assert_xpath '/book', result, 1
+      assert_xpath '/book/info/date', result, 1
+      # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
+      assert_xpath '/book/preface/simpara[text()="text"]', result, 1
     end
 
     test 'adds refname to DocBook output for each name defined in NAME section of manpage' do
@@ -1627,7 +1468,7 @@ chapter body
     end
 
     test ':backend option should override backend attribute' do
-      doc = empty_document backend: 'html5', attributes: { 'backend' => 'docbook45' }
+      doc = empty_document backend: 'html5', attributes: { 'backend' => 'docbook5' }
       assert_equal 'html5', doc.attributes['backend']
     end
 
@@ -1649,8 +1490,8 @@ Stuart Rackham <founder@asciidoc.org>
 
 more info...
       EOS
-      output = convert_string input, attributes: { 'backend' => 'docbook45' }
-      assert_xpath '/article/articleinfo/authorinitials[text()="SJR"]', output, 1
+      output = convert_string input, attributes: { 'backend' => 'docbook5' }
+      assert_xpath '/article/info/authorinitials[text()="SJR"]', output, 1
     end
 
     test 'attribute entry can appear immediately after document title' do
