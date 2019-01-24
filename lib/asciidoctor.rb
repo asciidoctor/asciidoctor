@@ -1509,7 +1509,7 @@ module Asciidoctor
             # NOTE don't warn if src can't be read and dest already exists (see #2323)
             if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
                 warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
-              ::IO.write stylesheet_dest, stylesheet_data
+              ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
             end
           end
 

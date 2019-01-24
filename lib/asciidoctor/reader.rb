@@ -658,7 +658,7 @@ class PreprocessorReader < Reader
   #
   #    path = 'partial.adoc'
   #    file = File.expand_path path
-  #    data = IO.read file
+  #    data = File.read file
   #    reader.push_include data, file, path
   #
   # Returns this Reader object.

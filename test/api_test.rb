@@ -972,7 +972,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path
         assert File.exist?(sample_output_path)
-        output = IO.read(sample_output_path)
+        output = File.read(sample_output_path)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -990,7 +990,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert File.exist?(sample_output_path)
-        output = IO.read(sample_output_path)
+        output = File.read(sample_output_path)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1009,7 +1009,7 @@ text
       begin
         Asciidoctor.convert_file sample_input_path, to_file: 'result.html', base_dir: fixture_dir
         assert File.exist?(sample_output_path)
-        output = IO.read(sample_output_path)
+        output = File.read(sample_output_path)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1051,7 +1051,7 @@ text
       begin
         Asciidoctor.convert sample_input, to_file: sample_output_path, header_footer: false
         assert File.exist?(sample_output_path)
-        output = IO.read(sample_output_path)
+        output = File.read(sample_output_path)
         refute_empty output
         assert_includes output, '<p>.htm</p>'
       ensure

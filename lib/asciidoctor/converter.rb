@@ -213,7 +213,7 @@ module Asciidoctor
         # ensure there's a trailing endline to be nice to terminals
         target.write LF
       else
-        ::IO.write target, output
+        ::File.write target, output, mode: FILE_WRITE_MODE
       end
       nil
     end
