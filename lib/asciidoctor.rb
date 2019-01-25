@@ -1325,7 +1325,7 @@ module Asciidoctor
       if ex.respond_to? :exception
         # The original message must be explicitly preserved when wrapping a Ruby exception
         wrapped_ex = ex.exception %(#{context} - #{ex.message})
-        # JRuby automatically sets backtrace, but not MRI
+        # JRuby automatically sets backtrace; MRI did not until 2.6
         wrapped_ex.set_backtrace ex.backtrace
       else
         # Likely a Java exception class
