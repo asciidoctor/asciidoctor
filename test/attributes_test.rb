@@ -53,7 +53,9 @@ context 'Attributes' do
 {#{name}}
         EOS
         result = convert_string_to_embedded str
-        # NOTE truffleruby adds \n to the beginning of a paragraph containing RTL text
+        # NOTE truffleruby adds \n to the beginning of a paragraph containing multibyte chars
+        # see https://github.com/oracle/truffleruby/issues/1543
+        #assert_includes result, %(<p>#{value}</p>)
         assert_includes result, value
       end
     end
