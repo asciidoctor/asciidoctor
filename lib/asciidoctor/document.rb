@@ -1152,39 +1152,32 @@ class Document < AbstractBlock
     if (toc_val = (attrs.delete 'toc2') ? 'left' : attrs['toc'])
       # toc-placement allows us to separate position from using fitted slot vs macro
       toc_position_val = (toc_placement_val = attrs.fetch 'toc-placement', 'macro') && toc_placement_val != 'auto' ? toc_placement_val : attrs['toc-position']
-    end
-
-    if toc_val && (!toc_val.empty? || !toc_position_val.nil_or_empty?)
-      default_toc_position = 'left'
-      # TODO rename toc2 to aside-toc
-      default_toc_class = 'toc2'
-      if !toc_position_val.nil_or_empty?
-        position = toc_position_val
-      elsif !toc_val.empty?
-        position = toc_val
-      else
-        position = default_toc_position
+      unless toc_val.empty? && toc_position_val.nil_or_empty?
+        default_toc_position = 'left'
+        # TODO rename toc2 to aside-toc
+        default_toc_class = 'toc2'
+        position = toc_position_val.nil_or_empty? ? (toc_val.empty? ? default_toc_position : toc_val) : toc_position_val
+        attrs['toc'] = ''
+        attrs['toc-placement'] = 'auto'
+        case position
+        when 'left', '<', '&lt;'
+          attrs['toc-position'] = 'left'
+        when 'right', '>', '&gt;'
+          attrs['toc-position'] = 'right'
+        when 'top', '^'
+          attrs['toc-position'] = 'top'
+        when 'bottom', 'v'
+          attrs['toc-position'] = 'bottom'
+        when 'preamble', 'macro'
+          attrs['toc-position'] = 'content'
+          attrs['toc-placement'] = position
+          default_toc_class = nil
+        else
+          attrs.delete 'toc-position'
+          default_toc_class = nil
+        end
+        attrs['toc-class'] ||= default_toc_class if default_toc_class
       end
-      attrs['toc'] = ''
-      attrs['toc-placement'] = 'auto'
-      case position
-      when 'left', '<', '&lt;'
-        attrs['toc-position'] = 'left'
-      when 'right', '>', '&gt;'
-        attrs['toc-position'] = 'right'
-      when 'top', '^'
-        attrs['toc-position'] = 'top'
-      when 'bottom', 'v'
-        attrs['toc-position'] = 'bottom'
-      when 'preamble', 'macro'
-        attrs['toc-position'] = 'content'
-        attrs['toc-placement'] = position
-        default_toc_class = nil
-      else
-        attrs.delete 'toc-position'
-        default_toc_class = nil
-      end
-      attrs['toc-class'] ||= default_toc_class if default_toc_class
     end
 
     if (@compat_mode = attrs.key? 'compat-mode')
