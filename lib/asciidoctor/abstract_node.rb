@@ -100,8 +100,8 @@ class AbstractNode
   #
   # Check if the attribute is defined. First look in the attributes on this
   # node. If not found, and this node is a child of the Document node, look in
-  # the attributes of the Document node. If the attribute is found and a
-  # comparison value is specified (not nil), return whether the two values match.
+  # the attributes of the Document node. If the attribute is found and a truthy
+  # comparison value is specified, return whether the two values match.
   # Otherwise, return whether the attribute was found.
   #
   # name       - the String or Symbol name of the attribute to lookup
@@ -110,15 +110,15 @@ class AbstractNode
   #              AsciiDoctor::Document if not found on this node (default: true)
   #
   # return a Boolean indicating whether the attribute exists and, if a
-  # comparison value is specified, whether the value of the attribute matches
+  # truthy comparison value is specified, whether the value of the attribute matches
   # the comparison value
   def attr? name, expect_val = nil, inherit = true
     name = name.to_s
     # NOTE if @parent is set, it means @document is also set
-    if expect_val.nil?
-      (@attributes.key? name) || (inherit && @parent && (@document.attributes.key? name))
-    else
+    if expect_val
       expect_val == (@attributes[name] || (inherit && @parent ? @document.attributes[name] : nil))
+    else
+      (@attributes.key? name) || (inherit && @parent && (@document.attributes.key? name))
     end
   end
 
