@@ -5,9 +5,7 @@ module Asciidoctor
 # QUESTION create method for user stylesheet?
 class Stylesheets
   DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
-  DEFAULT_PYGMENTS_STYLE = 'default'
   STYLESHEETS_DIR = ::File.join DATA_DIR, 'stylesheets'
-  PygmentsBgColorRx = /^\.pygments +\{ *background: *([^;]+);/
 
   @__instance__ = new
 
@@ -23,9 +21,12 @@ class Stylesheets
   #
   # returns the [String] Asciidoctor stylesheet data
   def primary_stylesheet_data
-    @primary_stylesheet_data ||= ::File.read(::File.join(STYLESHEETS_DIR, 'asciidoctor-default.css'), mode: FILE_READ_MODE).rstrip
+    @primary_stylesheet_data ||= (::File.read (::File.join STYLESHEETS_DIR, 'asciidoctor-default.css'), mode: FILE_READ_MODE).rstrip
   end
 
+  # Deprecated: Generate code to embed the primary stylesheet
+  #
+  # Returns the [String] primary stylesheet data wrapped in a <style> tag
   def embed_primary_stylesheet
     %(<style>
 #{primary_stylesheet_data}
@@ -37,20 +38,19 @@ class Stylesheets
   end
 
   def coderay_stylesheet_name
-    'coderay-asciidoctor.css'
+    (SyntaxHighlighter.for 'coderay').stylesheet_basename
   end
 
   # Public: Read the contents of the default CodeRay stylesheet
   #
   # returns the [String] CodeRay stylesheet data
   def coderay_stylesheet_data
-    # NOTE use the following lines to load a built-in theme instead
-    # unless load_coderay.nil?
-    #   ::CodeRay::Encoders[:html]::CSS.new(:default).stylesheet
-    # end
-    @coderay_stylesheet_data ||= ::File.read(::File.join(STYLESHEETS_DIR, coderay_stylesheet_name), mode: FILE_READ_MODE).rstrip
+    (SyntaxHighlighter.for 'coderay').read_stylesheet
   end
 
+  # Deprecated: Generate code to embed the CodeRay stylesheet
+  #
+  # Returns the [String] CodeRay stylesheet data wrapped in a <style> tag
   def embed_coderay_stylesheet
     %(<style>
 #{coderay_stylesheet_data}
@@ -62,27 +62,19 @@ class Stylesheets
   end
 
   def pygments_stylesheet_name style = nil
-    %(pygments-#{style || DEFAULT_PYGMENTS_STYLE}.css)
-  end
-
-  def pygments_background style = nil
-    load_pygments && PygmentsBgColorRx =~ (::Pygments.css '.pygments', style: style || DEFAULT_PYGMENTS_STYLE) ? $1 : nil
+    (SyntaxHighlighter.for 'pygments').stylesheet_basename style
   end
 
   # Public: Generate the Pygments stylesheet with the specified style.
   #
   # returns the [String] Pygments stylesheet data
   def pygments_stylesheet_data style = nil
-    if load_pygments
-      style ||= DEFAULT_PYGMENTS_STYLE
-      (@pygments_stylesheet_data ||= {})[style] ||=
-          ((::Pygments.css '.listingblock .pygments', classprefix: 'tok-', style: style) || '/* Failed to load Pygments CSS. */').
-          sub('.listingblock .pygments  {', '.listingblock .pygments, .listingblock .pygments code {')
-    else
-      '/* Pygments CSS disabled. Pygments is not available. */'
-    end
+    (SyntaxHighlighter.for 'pygments').read_stylesheet style
   end
 
+  # Deprecated: Generate code to embed the Pygments stylesheet
+  #
+  # Returns the [String] Pygments stylesheet data for the specified style wrapped in a <style> tag
   def embed_pygments_stylesheet style = nil
     %(<style>
 #{pygments_stylesheet_data style}
@@ -91,14 +83,6 @@ class Stylesheets
 
   def write_pygments_stylesheet target_dir = '.', style = nil
     ::File.write (::File.join target_dir, (pygments_stylesheet_name style)), (pygments_stylesheet_data style), mode: FILE_WRITE_MODE
-  end
-
-  #def load_coderay
-  #  (defined? ::CodeRay::Duo) ? true : !(Helpers.require_library 'coderay', true, :ignore).nil?
-  #end
-
-  def load_pygments
-    (defined? ::Pygments::Lexer) ? true : !(Helpers.require_library 'pygments', 'pygments.rb', :ignore).nil?
   end
 end
 end

@@ -230,6 +230,9 @@ class Document < AbstractBlock
   # Public: Get the Converter associated with this document
   attr_reader :converter
 
+  # Public: Get the SyntaxHighlighter associated with this document
+  attr_reader :syntax_highlighter
+
   # Public: Get the activated Extensions::Registry associated with this document.
   attr_reader :extensions
 
@@ -271,6 +274,7 @@ class Document < AbstractBlock
       @converter = parent_doc.converter
       initialize_extensions = false
       @extensions = parent_doc.extensions
+      @syntax_highlighter = parent_doc.syntax_highlighter
     else
       @parent_document = nil
       @catalog = {
@@ -1194,7 +1198,19 @@ class Document < AbstractBlock
     end
 
     unless @parent_document
-      if attrs['basebackend'] == 'docbook'
+      if (basebackend = attrs['basebackend']) == 'html'
+        # QUESTION should we allow source-highlighter to be disabled in AsciiDoc table cell?
+        if (syntax_hl_name = attrs['source-highlighter']) && !attrs[%(#{syntax_hl_name}-unavailable)]
+          if (syntax_hl_factory = @options[:syntax_highlighter_factory])
+            @syntax_highlighter = syntax_hl_factory.create syntax_hl_name, @backend, document: self
+          elsif (syntax_hls = @options[:syntax_highlighters])
+            @syntax_highlighter = (SyntaxHighlighter::DefaultFactoryProxy.new syntax_hls).create syntax_hl_name, @backend, document: self
+          else
+            @syntax_highlighter = SyntaxHighlighter.create syntax_hl_name, @backend, document: self
+          end
+        end
+      # enable toc and sectnums (i.e., numbered) by default in DocBook backend
+      elsif basebackend == 'docbook'
         # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility
         attrs['toc'] = '' unless (attribute_locked? 'toc') || (@attributes_modified.include? 'toc')
         attrs['sectnums'] = '' unless (attribute_locked? 'sectnums') || (@attributes_modified.include? 'sectnums')

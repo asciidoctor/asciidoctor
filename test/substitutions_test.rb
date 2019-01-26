@@ -1959,15 +1959,16 @@ foo&#8201;&#8212;&#8201;'
 
   context 'Resolve subs' do
     test 'should resolve subs for block' do
-      block = Asciidoctor::Block.new(empty_document, :paragraph)
+      doc = empty_document parse: true
+      block = Asciidoctor::Block.new doc, :paragraph
       block.attributes['subs'] = 'quotes,normal'
       block.lock_in_subs
       assert_equal [:quotes, :specialcharacters, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
 
     test 'should resolve specialcharacters sub as highlight for source block when source highlighter is coderay' do
-      doc = empty_document attributes: { 'source-highlighter' => 'coderay' }
-      block = Asciidoctor::Block.new(doc, :listing, content_model: :verbatim)
+      doc = empty_document attributes: { 'source-highlighter' => 'coderay' }, parse: true
+      block = Asciidoctor::Block.new doc, :listing, content_model: :verbatim
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
@@ -1976,18 +1977,18 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should resolve specialcharacters sub as highlight for source block when source highlighter is pygments' do
-      doc = empty_document attributes: { 'source-highlighter' => 'pygments' }
-      block = Asciidoctor::Block.new(doc, :listing, content_model: :verbatim)
+      doc = empty_document attributes: { 'source-highlighter' => 'pygments' }, parse: true
+      block = Asciidoctor::Block.new doc, :listing, content_model: :verbatim
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
       block.lock_in_subs
       assert_equal [:highlight], block.subs
-    end
+    end if ENV['PYGMENTS']
 
-    test 'should not resolve specialcharacters sub as highlight for source block when source highlighter is not set' do
-      doc = empty_document
-      block = Asciidoctor::Block.new(doc, :listing, content_model: :verbatim)
+    test 'should not replace specialcharacters sub with highlight for source block when source highlighter is not set' do
+      doc = empty_document parse: true
+      block = Asciidoctor::Block.new doc, :listing, content_model: :verbatim
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
@@ -1996,7 +1997,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should not use subs if subs option passed to block constructor is nil' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: nil, attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
       block.lock_in_subs
@@ -2004,7 +2005,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should not use subs if subs option passed to block constructor is empty array' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: [], attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
       block.lock_in_subs
@@ -2012,7 +2013,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should use subs from subs option passed to block constructor' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: [:specialcharacters], attributes: { 'subs' => 'quotes' }
       assert_equal [:specialcharacters], block.subs
       block.lock_in_subs
@@ -2020,7 +2021,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should use subs from subs attribute if subs option is not passed to block constructor' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
       # in this case, we have to call lock_in_subs to resolve the subs
@@ -2029,7 +2030,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should use subs from subs attribute if subs option passed to block constructor is :default' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: :default, attributes: { 'subs' => 'quotes' }
       assert_equal [:quotes], block.subs
       block.lock_in_subs
@@ -2037,7 +2038,7 @@ foo&#8201;&#8212;&#8201;'
     end
 
     test 'should use built-in subs if subs option passed to block constructor is :default and subs attribute is absent' do
-      doc = empty_document
+      doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: :default
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
       block.lock_in_subs

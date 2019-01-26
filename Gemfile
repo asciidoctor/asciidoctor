@@ -3,6 +3,10 @@ source 'https://rubygems.org'
 # Look in asciidoctor.gemspec for runtime and development dependencies
 gemspec
 
+group :development do
+  gem 'pygments.rb' if ENV['PYGMENTS']
+end
+
 group :doc do
   gem 'yard'
   gem 'yard-tomdoc'

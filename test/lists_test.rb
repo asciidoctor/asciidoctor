@@ -4405,9 +4405,9 @@ puts doc.convert # <2>
     assert_xpath '(//programlisting/following-sibling::calloutlist/callout)[2][@arearefs = "CO1-2 CO1-3"]', output, 1
   end
 
-  test 'listing block with non-sequential callouts followed by adjacent callout list' do
+  test 'source block with non-sequential callouts followed by adjacent callout list' do
     input = <<-EOS
-[source, ruby]
+[source,ruby]
 ----
 require 'asciidoctor' # <2>
 doc = Asciidoctor::Document.new('Hello, World!') # <3>

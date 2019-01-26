@@ -1485,9 +1485,8 @@ module Asciidoctor
             copy_user_stylesheet = true
           end
         end
-        copy_coderay_stylesheet = (doc.attr? 'source-highlighter', 'coderay') && (doc.attr 'coderay-css', 'class') == 'class'
-        copy_pygments_stylesheet = (doc.attr? 'source-highlighter', 'pygments') && (doc.attr 'pygments-css', 'class') == 'class'
-        if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_coderay_stylesheet || copy_pygments_stylesheet
+        copy_syntax_hl_stylesheet = (syntax_hl = doc.syntax_highlighter) && (syntax_hl.write_stylesheet? doc)
+        if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_syntax_hl_stylesheet
           stylesoutdir = doc.normalize_system_path(stylesdir, outdir, doc.safe >= SafeMode::SAFE ? outdir : nil)
           if mkdirs
             Helpers.mkdir_p stylesoutdir
@@ -1512,12 +1511,7 @@ module Asciidoctor
               ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
             end
           end
-
-          if copy_coderay_stylesheet
-            Stylesheets.instance.write_coderay_stylesheet stylesoutdir
-          elsif copy_pygments_stylesheet
-            Stylesheets.instance.write_pygments_stylesheet stylesoutdir, (doc.attr 'pygments-style')
-          end
+          syntax_hl.write_stylesheet doc, stylesoutdir if copy_syntax_hl_stylesheet
         end
       end
       doc
@@ -1600,6 +1594,7 @@ require_relative 'asciidoctor/path_resolver'
 require_relative 'asciidoctor/reader'
 require_relative 'asciidoctor/section'
 require_relative 'asciidoctor/stylesheets'
+require_relative 'asciidoctor/syntax_highlighter'
 require_relative 'asciidoctor/table'
 
 # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
