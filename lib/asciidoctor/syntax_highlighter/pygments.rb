@@ -74,7 +74,7 @@ module Asciidoctor
     end
 
     def write_stylesheet doc, to_dir
-      ::File.write (::File.join to_dir, (stylesheet_basename @style)), (read_stylesheet @style)
+      ::File.write (::File.join to_dir, (stylesheet_basename @style)), (read_stylesheet @style), mode: FILE_WRITE_MODE
     end
 
     module Loader
@@ -102,12 +102,12 @@ module Asciidoctor
 
       private
 
-      def style_available? style
-        (((@@available_styles ||= ::Pygments.styles.to_set).include? style) rescue nil) && style
-      end
-
       def base_style style
         @@base_style_cache[style || DEFAULT_STYLE]
+      end
+
+      def style_available? style
+        (((@@available_styles ||= ::Pygments.styles.to_set).include? style) rescue nil) && style
       end
 
       (@@base_style_cache = {}).default_proc = proc do |cache, key|
