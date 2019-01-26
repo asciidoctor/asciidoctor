@@ -73,49 +73,43 @@ class AbstractNode
     @parent, @document = parent, parent.document
   end
 
-  # Public: Get the value of the specified attribute.
+  # Public: Get the value of the specified attribute. If the attribute is not found on this node, fallback_name is set,
+  # and this node is not the Document node, get the value of the specified attribute from the Document node.
   #
-  # First look for the attribute in the attributes on this node and return the
-  # value of the attribute if found. Otherwise, if inherit is true, and this
-  # node is a child of the Document node, look in the attributes on the Document
-  # node and return the value of the attribute if found. Otherwise, return the
-  # default_value, which defaults to nil.
+  # Look for the specified attribute in the attributes on this node and return the value of the attribute, if found.
+  # Otherwise, if fallback_name is set (default: same as name) and this node is not the Document node, look for that
+  # attribute on the Document node and return its value, if found. Otherwise, return the default value (default: nil).
   #
-  # name          - the String or Symbol name of the attribute to lookup.
-  # default_value - the Object value to return if the attribute is not found (default: nil).
-  # inherit       - a Boolean indicating whether to check for the attribute on the
-  #                 AsciiDoctor::Document if not found on this node (default: true).
+  # name          - The String or Symbol name of the attribute to resolve.
+  # default_value - The Object value to return if the attribute is not found (default: nil).
+  # fallback_name - The String or Symbol of the attribute to resolve on the Document if the attribute is not found on
+  #                 this node (default: same as name).
   #
-  # Returns the value of the attribute or default_value if the attribute is not found.
-  def attr name, default_value = nil, inherit = true
-    # NOTE if @parent is set, we assume @document is also set
-    @attributes[name = name.to_s] || (@parent && inherit ? @document.attributes[name] || default_value : default_value)
+  # Returns the [Object] value (typically a String) of the attribute or default_value if the attribute is not found.
+  def attr name, default_value = nil, fallback_name = name
+    @attributes[name.to_s] || (@parent && fallback_name && @document.attributes[fallback_name.to_s] || default_value)
   end
 
-  # Public: Check if the attribute is defined, optionally performing a
-  # comparison of its value if expected_value is not falsy.
+  # Public: Check if the specified attribute is defined using the same logic as {#attr}, optionally performing a
+  # comparison with the expected value if specified.
   #
-  # First look for the attribute in the attributes on this node. If not found,
-  # inherit is true, and this node is a child of the Document node, look in the
-  # attributes on the Document node. In either case, if the attribute is found,
-  # and a truthy comparison value is specified, return whether the two values
-  # match. Otherwise, return whether the attribute was found.
+  # Look for the specified attribute in the attributes on this node. If not found, fallback_name is specified (default:
+  # same as name), and this node is not the Document node, look for that attribute on the Document node. In either case,
+  # if the attribute is found, and the comparison value is truthy, return whether the two values match. Otherwise,
+  # return whether the attribute was found.
   #
-  # name           - the String or Symbol name of the attribute to lookup.
-  # expected_value - the expected Object value of the attribute (default: nil).
-  # inherit        - a Boolean indicating whether to check for the attribute on the
-  #                  AsciiDoctor::Document if not found on this node (default: true).
+  # name           - The String or Symbol name of the attribute to resolve.
+  # expected_value - The expected Object value of the attribute (default: nil).
+  # fallback_name  - The String or Symbol of the attribute to resolve on the Document if the attribute is not found on
+  #                  this node (default: same as name).
   #
-  # Returns a Boolean indicating whether the attribute exists and, if a truthy
-  # comparison value is specified, whether the value of the attribute matches
-  # the comparison value.
-  def attr? name, expected_value = nil, inherit = true
-    name = name.to_s
-    # NOTE if @parent is set, @document is also set
+  # Returns a [Boolean] indicating whether the attribute exists and, if a truthy comparison value is specified, whether
+  # the value of the attribute matches the comparison value.
+  def attr? name, expected_value = nil, fallback_name = name
     if expected_value
-      expected_value == (@attributes[name] || (@parent && inherit ? @document.attributes[name] : nil))
+      expected_value == (@attributes[name.to_s] || (@parent && fallback_name ? @document.attributes[fallback_name.to_s] : nil))
     else
-      (@attributes.key? name) || (@parent && inherit && (@document.attributes.key? name))
+      (@attributes.key? name.to_s) || (@parent && fallback_name ? (@document.attributes.key? fallback_name.to_s) : false)
     end
   end
 
