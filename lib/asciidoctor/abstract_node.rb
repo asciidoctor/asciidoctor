@@ -286,7 +286,8 @@ class AbstractNode
   # Returns A String reference or data URI for an icon image
   def icon_uri name
     if attr? 'icon'
-      if (::File.extname (icon = attr 'icon')).empty?
+      # Ruby 2.3 requires the extra brackets around the attr method call
+      if (::File.extname (icon = (attr 'icon'))).empty?
         # QUESTION should we be adding the extension if the icon is an absolute URI?
         icon = %(#{icon}.#{@document.attr 'icontype', 'png'})
       end
