@@ -8,7 +8,7 @@ module Asciidoctor
 # that returns true. The companion docinfo method will then be called to insert markup into the output document. The
 # docinfo functionality is available to both adapter types.
 #
-# Asciidoctor provides several built-in adapters, including coderay, pygments, highlight.js, html-pipeline, and
+# Asciidoctor provides several built-in adapters, including coderay, pygments, rouge, highlight.js, html-pipeline, and
 # prettify. Additional adapters can be registered using SyntaxHighlighter.register or by supplying a custom factory.
 module SyntaxHighlighter
   # Public: Returns the String name of this syntax highlighter for referencing it in messages and option names.
@@ -175,9 +175,8 @@ module SyntaxHighlighter
             @@mutex.synchronize { register syntax_highlighter, *names }
       end
 
-      # In addition to retrieving the syntax highlighter class or object registered for the specified name, this
-      # method will lazy require and register additional built-in implementations (coderay, pygments, and prettify).
-      # Refer to {Factory#for} for parameters and return value.
+      # This method will lazy require and register additional built-in implementations, which include coderay,
+      # pygments, rouge, and prettify. Refer to {Factory#for} for parameters and return value.
       def for name
         @@registry.fetch name do
           @@mutex.synchronize do
@@ -198,6 +197,7 @@ module SyntaxHighlighter
         'coderay' => %(#{__dir__}/syntax_highlighter/coderay),
         'prettify' => %(#{__dir__}/syntax_highlighter/prettify),
         'pygments' => %(#{__dir__}/syntax_highlighter/pygments),
+        'rouge' => %(#{__dir__}/syntax_highlighter/rouge),
       }
 
       private

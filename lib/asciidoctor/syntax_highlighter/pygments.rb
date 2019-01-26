@@ -36,12 +36,8 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
         node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
       end
     elsif (highlighted = lexer.highlight source, options: highlight_opts)
-      if linenos
-        highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs if noclasses
-        highlighted.sub WrapperTagRx, PreTagCs
-      else
-        highlighted.sub WrapperTagRx, '\1'
-      end
+      highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs if linenos && noclasses
+      highlighted.sub WrapperTagRx, '\1'
     else
       node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
     end
@@ -103,7 +99,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     private
 
     def base_style style
-      @@base_style_cache[style || DEFAULT_STYLE]
+      library_available? ? @@base_style_cache[style || DEFAULT_STYLE] : nil
     end
 
     def style_available? style
@@ -141,8 +137,10 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   PreTagCs = '<pre>\1</pre>'
   StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
   StyledLinenoSpanTagRx = %r(<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">( *\d+ )</span>)
-  WRAPPER_CLASS = 'pygments-'
-  # NOTE <pre> has style attribute when pygments-css=style; <div> has trailing newline when pygments-linenums-mode=table; initial <span></span> preserves leading blank lines
+  WRAPPER_CLASS = 'lineno' # doesn't appear in output
+  # NOTE <pre> has style attribute when pygments-css=style
+  # NOTE <div> has trailing newline when pygments-linenums-mode=table
+  # NOTE initial <span></span> preserves leading blank lines
   WrapperTagRx = %r(<div class="#{WRAPPER_CLASS}"><pre\b[^>]*?>(.*)</pre></div>\n*)m
 
   private_constant :CodeCellStartTagCs, :LinenoColumnStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS

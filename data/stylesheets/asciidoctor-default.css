@@ -223,13 +223,12 @@ pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
 pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
 pre.prettyprint li code[data-lang]::before{opacity:1}
 pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
-table.pygments-table{border-collapse:separate;border:0;margin-bottom:0;background:none}
-table.pygments-table td{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
-table.pygments-table td.code{padding-left:.75em}
-pre.pygments .lineno,table.pygments-table td.linenos{border-right:1px solid currentColor;opacity:.35}
-pre.pygments .lineno{display:inline-block;margin-right:.75em}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
 pre.pygments .lineno::before{content:"";margin-right:-.125em}
-table.pygments-table td.linenos{padding-right:.5em}
 .quoteblock{margin:0 1em 1.25em 1.5em;display:table}
 .quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
 .quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
