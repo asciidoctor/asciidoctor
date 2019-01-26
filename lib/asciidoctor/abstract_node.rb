@@ -92,7 +92,7 @@ class AbstractNode
   def attr name, default_val = nil, inherit = true
     name = name.to_s
     # NOTE if @parent is set, it means @document is also set
-    @attributes[name] || (inherit && @parent ? @document.attributes[name] || default_val : default_val)
+    @attributes[name] || (@parent && inherit ? @document.attributes[name] || default_val : default_val)
   end
 
   # Public: Check if the attribute is defined, optionally performing a
@@ -116,9 +116,9 @@ class AbstractNode
     name = name.to_s
     # NOTE if @parent is set, it means @document is also set
     if expect_val
-      expect_val == (@attributes[name] || (inherit && @parent ? @document.attributes[name] : nil))
+      expect_val == (@attributes[name] || (@parent && inherit ? @document.attributes[name] : nil))
     else
-      (@attributes.key? name) || (inherit && @parent && (@document.attributes.key? name))
+      (@attributes.key? name) || (@parent && inherit && (@document.attributes.key? name))
     end
   end
 
