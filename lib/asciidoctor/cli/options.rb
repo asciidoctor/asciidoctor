@@ -149,7 +149,7 @@ Example: asciidoctor -b html5 source.asciidoc
                   $stderr.puts %(asciidoctor: FAILED: manual page not found: #{manpage_path})
                   return 1
                 end
-              elsif ::File.exist?(manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
+              elsif ::File.exist? (manpage_path = ::File.join ROOT_DIR, 'man', 'asciidoctor.1')
                 $stdout.puts ::File.read manpage_path
               else
                 require 'open3' unless defined? ::Open3.popen3

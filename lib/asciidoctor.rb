@@ -1478,7 +1478,7 @@ module Asciidoctor
       # NOTE skip if stylesdir is a URI
       if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'linkcss') && (doc.attr? 'copycss') &&
           (doc.basebackend? 'html') && !((stylesdir = (doc.attr 'stylesdir')) && (Helpers.uriish? stylesdir))
-        if (stylesheet = (doc.attr 'stylesheet'))
+        if (stylesheet = doc.attr 'stylesheet')
           if DEFAULT_STYLESHEET_KEYS.include? stylesheet
             copy_asciidoctor_stylesheet = true
           elsif !(Helpers.uriish? stylesheet)
@@ -1498,7 +1498,7 @@ module Asciidoctor
             Stylesheets.instance.write_primary_stylesheet stylesoutdir
           # FIXME should Stylesheets also handle the user stylesheet?
           elsif copy_user_stylesheet
-            if (stylesheet_src = (doc.attr 'copycss')).empty?
+            if (stylesheet_src = doc.attr 'copycss').empty?
               stylesheet_src = doc.normalize_system_path stylesheet
             else
               # NOTE in this case, copycss is a source location (but cannot be a URI)
