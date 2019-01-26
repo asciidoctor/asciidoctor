@@ -2762,6 +2762,37 @@ Override the icon of an admonition block using an attribute
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="images/icons/a.png"]', output, 1
     end
 
+    test 'should allow icontype to be specified when using built-in admonition icon' do
+      input = <<-EOS
+TIP: Set the icontype using either the icontype attribute on the icons attribute.
+      EOS
+      [
+        { 'icons' => '', 'ext' => 'png' },
+        { 'icons' => '', 'icontype' => 'jpg', 'ext' => 'jpg' },
+        { 'icons' => 'jpg', 'ext' => 'jpg' },
+      ].each do |attributes|
+        expected_src = %(./images/icons/tip.#{attributes.delete 'ext'})
+        output = convert_string input, attributes: attributes
+        assert_xpath %(//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="#{expected_src}"]), output, 1
+      end
+    end
+
+    test 'should allow icontype to be specified when using custom admonition icon' do
+      input = <<-EOS
+[TIP,icon=hint]
+Set the icontype using either the icontype attribute on the icons attribute.
+      EOS
+      [
+        { 'icons' => '', 'ext' => 'png' },
+        { 'icons' => '', 'icontype' => 'jpg', 'ext' => 'jpg' },
+        { 'icons' => 'jpg', 'ext' => 'jpg' },
+      ].each do |attributes|
+        expected_src = %(./images/icons/hint.#{attributes.delete 'ext'})
+        output = convert_string input, attributes: attributes
+        assert_xpath %(//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="#{expected_src}"]), output, 1
+      end
+    end
+
     test 'embeds base64-encoded data uri of icon when data-uri attribute is set and safe mode level is less than SECURE' do
       input = <<-EOS
 :icons:
