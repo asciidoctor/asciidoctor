@@ -563,10 +563,9 @@ class Reader
 
   # Internal: Prepare the lines from the provided data
   #
-  # This method strips whitespace from the end of every line of
-  # the source data and appends a LF (i.e., Unix endline). This
-  # whitespace substitution is very important to how Asciidoctor
-  # works.
+  # This method strips whitespace from the end of every line of the source data
+  # and appends a LF (i.e., line feed, the Unix line ending). This whitespace
+  # substitution is very important to how Asciidoctor works.
   #
   # Any leading or trailing blank lines are also removed.
   #

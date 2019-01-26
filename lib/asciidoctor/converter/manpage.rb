@@ -31,7 +31,7 @@ module Asciidoctor
     #          :preserve - preserve spaces (only expanding tabs); :normalize - normalize whitespace
     #          (remove spaces around newlines); :collapse - collapse adjacent whitespace to a single
     #          space (default: :collapse)
-    #        * :append_newline a Boolean that indicates whether to append an endline to the result (default: false)
+    #        * :append_newline a Boolean that indicates whether to append a newline to the result (default: false)
     def manify str, opts = {}
       case opts.fetch :whitespace, :collapse
       when :preserve

@@ -180,7 +180,7 @@ module Asciidoctor
   # The user's home directory, as best we can determine it
   USER_HOME = ::Dir.home
 
-  # The endline character used for output; stored in constant table as an optimization
+  # The newline character used for output; stored in constant table as an optimization
   LF = ?\n
 
   # The null character to use for splitting attribute values
@@ -846,7 +846,7 @@ module Asciidoctor
     #   image:filename.png[More [Alt\] Text] (alt text becomes "More [Alt] Text")
     #   icon:github[large]
     #
-    # NOTE be as non-greedy as possible by not allowing endline or left square bracket in target
+    # NOTE be as non-greedy as possible by not allowing newline or left square bracket in target
     InlineImageMacroRx = /\\?i(?:mage|con):([^:\s\[](?:[^\n\[]*[^\s\[])?)\[(|#{CC_ALL}*?[^\\])\]/m
 
     # Matches an indexterm inline macro, which may span multiple lines.

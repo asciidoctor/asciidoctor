@@ -133,7 +133,7 @@ module Asciidoctor
       rescue ::Exception => e
         if ::SignalException === e
           @code = e.signo
-          # add extra endline if Ctrl+C is used
+          # add extra newline if Ctrl+C is used
           err.puts if ::Interrupt === e
         else
           @code = (e.respond_to? :status) ? e.status : 1

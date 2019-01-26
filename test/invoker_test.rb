@@ -465,7 +465,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     end
   end
 
-  test 'should output a trailing endline to stdout' do
+  test 'should output a trailing newline to stdout' do
     invoker = nil
     output = nil
     redirect_streams do |out, err|

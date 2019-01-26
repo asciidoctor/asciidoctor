@@ -121,7 +121,7 @@ second paragraph
       assert_xpath '//p', output, 2
     end
 
-    test "can convert with block comment at end of document with trailing endlines" do
+    test "can convert with block comment at end of document with trailing newlines" do
       input = <<-EOS
 paragraph
 
@@ -135,7 +135,7 @@ block comment
       refute_match(/block comment/, output)
     end
 
-    test "trailing endlines after block comment at end of document does not create paragraph" do
+    test "trailing newlines after block comment at end of document does not create paragraph" do
       input = <<-EOS
 paragraph
 
@@ -935,7 +935,7 @@ eof
       assert_css 'pre:empty', output, 1
     end
 
-    test 'should preserve endlines in literal block' do
+    test 'should preserve newlines in literal block' do
       input = <<-EOS
 ....
 line one
@@ -959,7 +959,7 @@ EOS
       }
     end
 
-    test 'should preserve endlines in listing block' do
+    test 'should preserve newlines in listing block' do
       input = <<-EOS
 ----
 line one
@@ -983,7 +983,7 @@ EOS
       }
     end
 
-    test 'should preserve endlines in verse block' do
+    test 'should preserve newlines in verse block' do
       input = <<-EOS
 --
 [verse]
@@ -1032,7 +1032,7 @@ last line
       assert_xpath %(//pre[text()="  first line\n\nlast line"]), result, 1
     end
 
-    test 'should process block with CRLF endlines' do
+    test 'should process block with CRLF line endings' do
       input = <<-EOS
 ----\r
 source line 1\r
@@ -1267,7 +1267,7 @@ AssertionError
       EOS
 
       output2 = convert_string_to_embedded input2
-      # FIXME JRuby is adding extra trailing endlines in the second document,
+      # FIXME JRuby is adding extra trailing newlines in the second document,
       # for now, rstrip is necessary
       assert_equal output.rstrip, output2.rstrip
     end

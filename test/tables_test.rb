@@ -265,7 +265,7 @@ three
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
-    test 'should preserving leading spaces but not leading endlines or trailing spaces in literal table cells' do
+    test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
       input = <<-EOS
 [cols=2*]
 |===
@@ -282,7 +282,7 @@ three
       assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
     end
 
-    test 'should preserving leading spaces but not leading endlines or trailing spaces in verse table cells' do
+    test 'should preserving leading spaces but not leading newlines or trailing spaces in verse table cells' do
       input = <<-EOS
 [cols=2*]
 |===
@@ -1103,7 +1103,7 @@ I wouldn't have it any other way.
       assert_equal 26, literal.text.lines.size
     end
 
-    test 'should strip trailing endline when splitting paragraphs' do
+    test 'should strip trailing newlines when splitting paragraphs' do
       input = <<-EOS
 |===
 |first wrapped

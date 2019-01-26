@@ -781,7 +781,7 @@ Bug Fixes::
 
 Infrastructure::
 
-  * remove trailing endlines in project source code
+  * remove trailing newlines in project source code
   * update contributing guidelines
   * explicitly test ifeval scenario raised in issue #1585
   * remove backreference substitution hack for Opal/Asciidoctor.js
@@ -1075,7 +1075,7 @@ Improvements::
   * print runtime environment in version output, support -v as version flag (#785)
   * unwrap preamble if standalone (#533)
   * drop leading & trailing blank lines in verbatim & raw content (#724)
-  * remove trailing endlines from source data (#727)
+  * remove trailing newlines from source data (#727)
   * add flag to cli to suppress warnings (#557)
   * emit warning if tag(s) not found in include file (#639)
   * use <th> element for vertical table headers instead of header class (#738) (*@davidgamba*)
@@ -1521,7 +1521,7 @@ Compliance::
   * added support for name=value@ attribute syntax passed via cli (#97)
   * attr refs no longer case sensitive (#109)
   * fixed several cases of incorrect list handling
-  * don't allow links to consume endlines or surrounding angled brackets
+  * don't allow links to consume newlines or surrounding angled brackets
   * recognize single quote in author name
   * support horizontal labeled list style
   * added support for the d cell style

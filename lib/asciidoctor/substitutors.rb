@@ -1203,7 +1203,7 @@ module Substitutors
     end
   end
 
-  # Internal: Strip bounding whitespace, fold endlines and unescape closing
+  # Internal: Strip bounding whitespace, fold newlines and unescape closing
   # square brackets from text extracted from brackets
   def unescape_bracketed_text text
     if (text = text.strip.tr LF, ' ').include? R_SB
@@ -1212,7 +1212,7 @@ module Substitutors
     text
   end
 
-  # Internal: Strip bounding whitespace and fold endlines
+  # Internal: Strip bounding whitespace and fold newlines
   def normalize_string str, unescape_brackets = false
     unless str.empty?
       str = str.strip.tr LF, ' '

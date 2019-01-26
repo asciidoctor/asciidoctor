@@ -813,7 +813,7 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
-    test 'should not match an inline image macro if target contains an endline character' do
+    test 'should not match an inline image macro if target contains a newline character' do
       para = block_from_string(%(Fear not. There are no image:big\ncats.png[] around here.))
       result = para.sub_macros(para.source)
       refute_includes result, '<img '
@@ -891,7 +891,7 @@ context 'Substitutions' do
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a multi-line footnote macro should be registered and output as a footnote without endline' do
+    test 'a multi-line footnote macro should be registered and output as a footnote without newline' do
       para = block_from_string("Sentence text footnote:[An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
@@ -1005,7 +1005,7 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'a footnoteref macro with id and multi-line text should be registered and output as a footnote without endlines' do
+    test 'a footnoteref macro with id and multi-line text should be registered and output as a footnote without newlines' do
       para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size

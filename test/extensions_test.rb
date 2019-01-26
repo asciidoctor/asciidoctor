@@ -684,7 +684,7 @@ last line
           end
 
           process do |doc, reader, target, attributes|
-            # demonstrates that push_include normalizes endlines
+            # demonstrates that push_include normalizes newlines
             content = [
               %(found include target '#{target}' at line #{reader.cursor_at_prev_line.lineno}\r\n),
               %(\r\n),

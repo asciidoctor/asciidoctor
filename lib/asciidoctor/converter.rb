@@ -210,7 +210,7 @@ module Asciidoctor
     def write output, target
       if target.respond_to? :write
         target.write output.chomp
-        # ensure there's a trailing endline to be nice to terminals
+        # ensure there's a trailing newline to be nice to terminals
         target.write LF
       else
         ::File.write target, output, mode: FILE_WRITE_MODE

@@ -471,7 +471,7 @@ captured yet again
 source\r
 with\r
 CRLF\r
-endlines\r
+line endings\r
       EOS
 
         [input, input.lines, input.split(::Asciidoctor::LF), input.split(::Asciidoctor::LF).join(::Asciidoctor::LF)].each do |lines|
@@ -1041,7 +1041,7 @@ include::fixtures/#{filename}[tag=snippet,indent=0]
         end
       end
 
-      test 'include directive supports selecting tagged lines in file that has CRLF endlines' do
+      test 'include directive supports selecting tagged lines in file that has CRLF line endings' do
         begin
           tmp_include = Tempfile.new %w(include- .adoc)
           tmp_include_dir, tmp_include_path = File.split tmp_include.path

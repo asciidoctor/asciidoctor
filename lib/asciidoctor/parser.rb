@@ -2647,7 +2647,7 @@ class Parser
   #
   # This method preserves the relative indentation of the lines.
   #
-  # lines  - the Array of String lines to process (no trailing endlines)
+  # lines  - the Array of String lines to process (no trailing newlines)
   # indent - the integer number of spaces to add to the beginning
   #          of each line; if this value is nil, the existing
   #          space is preserved (optional, default: 0)

@@ -181,11 +181,11 @@ context 'Links' do
     assert_xpath '//a', convert_string('\http://asciidoc.org[AsciiDoc] is the key to good docs.'), 0
   end
 
-  test 'inline qualified url followed by an endline should not include endline in link' do
+  test 'inline qualified url followed by a newline should not include newline in link' do
     assert_xpath '//a[@href="https://github.com/asciidoctor"]', convert_string("The source code for Asciidoctor can be found at https://github.com/asciidoctor\nwhich is a GitHub organization."), 1
   end
 
-  test 'qualified url divided by endline using macro syntax should not create link' do
+  test 'qualified url divided by newline using macro syntax should not create link' do
     assert_xpath '//a', convert_string("The source code for Asciidoctor can be found at link:https://github.com/asciidoctor\n[]which is a GitHub organization."), 0
   end
 
