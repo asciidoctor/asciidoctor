@@ -85,7 +85,7 @@ class AbstractNode
   # name        - the String or Symbol name of the attribute to lookup
   # default_val - the Object value to return if the attribute is not found (default: nil)
   # inherit     - a Boolean indicating whether to check for the attribute on the
-  #               AsciiDoctor::Document if not found on this node (default: false)
+  #               AsciiDoctor::Document if not found on this node (default: true)
   #
   # return the value of the attribute or the default value if the attribute
   # is not found in the attributes of this node or the document node
@@ -107,7 +107,7 @@ class AbstractNode
   # name       - the String or Symbol name of the attribute to lookup
   # expect_val - the expected Object value of the attribute (default: nil)
   # inherit    - a Boolean indicating whether to check for the attribute on the
-  #              AsciiDoctor::Document if not found on this node (default: false)
+  #              AsciiDoctor::Document if not found on this node (default: true)
   #
   # return a Boolean indicating whether the attribute exists and, if a
   # comparison value is specified, whether the value of the attribute matches
