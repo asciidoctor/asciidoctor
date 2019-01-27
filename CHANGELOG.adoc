@@ -40,6 +40,7 @@ Improvements::
   * read and write files using File methods instead of IO methods (#2995)
   * value comparison in AbstractNode#attr? is only performed if expected value is truthy
   * align default CodeRay style with style for other syntax highlighters (#2106)
+  * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
 
 Bug Fixes::
 

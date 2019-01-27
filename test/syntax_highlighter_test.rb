@@ -685,12 +685,13 @@ puts 'Hello, World!'
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
+      assert_css 'td.linenos', output, 1
       assert_css 'div.linenodiv:not([style])', output, 1
       assert_includes output, '<div class="linenodiv"><pre>'
       assert_css 'pre:not([style])', output, 2
     end
 
-    test 'should not hardcode styles on lineno spans when linenums are enabled and source-highlighter is pygments' do
+    test 'should not hardcode inline styles on lineno spans when linenums are enabled and source-highlighter is pygments' do
       input = <<-EOS
 :source-highlighter: pygments
 :pygments-css: inline

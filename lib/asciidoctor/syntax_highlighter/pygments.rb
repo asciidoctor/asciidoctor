@@ -29,7 +29,7 @@ module Asciidoctor
       end
       if (linenos = opts[:line_numbers]) && (highlight_opts[:linenostart] = opts[:start_line_number]) && (highlight_opts[:linenos] = linenos) == :table
         if (highlighted = lexer.highlight source, options: highlight_opts)
-          highlighted = highlighted.sub StyledLinenoDivPreStartTagsRx, LinenoDivPreStartTagsCs if noclasses
+          highlighted = highlighted.sub StyledLinenoColumnStartTagsRx, LinenoColumnStartTagsCs if noclasses
           highlighted = highlighted.sub WrapperTagRx, PreTagCs
           opts[:callouts] ? [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil] : highlighted
         else
@@ -136,15 +136,15 @@ module Asciidoctor
     include Loader, Styles # adds methods to instance
 
     CodeCellStartTagCs = '<td class="code">'
-    LinenoDivPreStartTagsCs = '<div class="linenodiv"><pre>'
+    LinenoColumnStartTagsCs = '<td class="linenos"><div class="linenodiv"><pre>'
     LinenoSpanTagCs = '<span class="lineno">\1</span>'
     PreTagCs = '<pre>\1</pre>'
-    StyledLinenoDivPreStartTagsRx = /<div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
+    StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
     StyledLinenoSpanTagRx = %r(<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">( *\d+ )</span>)
     WRAPPER_CLASS = 'pygments-'
     # NOTE <pre> has style attribute when pygments-css=style; <div> has trailing newline when pygments-linenums-mode=table; initial <span></span> preserves leading blank lines
     WrapperTagRx = %r(<div class="#{WRAPPER_CLASS}"><pre\b[^>]*?>(.*)</pre></div>\n*)m
 
-    private_constant :CodeCellStartTagCs, :LinenoDivPreStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoDivPreStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
+    private_constant :CodeCellStartTagCs, :LinenoColumnStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
   end
 end
