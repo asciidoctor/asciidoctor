@@ -38,11 +38,11 @@ module Asciidoctor
 
       def parse!(args)
         opts_parser = ::OptionParser.new do |opts|
-          opts.banner = <<-EOS
-Usage: asciidoctor [OPTION]... FILE...
-Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
-By default, the output is written to a file with the basename of the source file and the appropriate extension.
-Example: asciidoctor -b html5 source.asciidoc
+          opts.banner = <<~EOS
+          Usage: asciidoctor [OPTION]... FILE...
+          Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 4.5, etc.)
+          By default, the output is written to a file with the basename of the source file and the appropriate extension.
+          Example: asciidoctor -b html5 source.asciidoc
 
           EOS
 
