@@ -129,9 +129,9 @@ class Section < AbstractBlock
         case xrefstyle
         when 'full'
           if (type = @sectname) == 'chapter' || type == 'appendix'
-            quoted_title = sprintf sub_quotes('_%s_'), title
+            quoted_title = sub_placeholder (sub_quotes '_%s_'), title
           else
-            quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
+            quoted_title = sub_placeholder (sub_quotes @document.compat_mode ? %q(``%s'') : '"`%s`"'), title
           end
           if (signifier = @document.attributes[%(#{type}-refsig)])
             %(#{signifier} #{sectnum '.', ','} #{quoted_title})
@@ -145,10 +145,10 @@ class Section < AbstractBlock
             sectnum '.', ''
           end
         else # 'basic'
-          (type = @sectname) == 'chapter' || type == 'appendix' ? (sprintf sub_quotes('_%s_'), title) : title
+          (type = @sectname) == 'chapter' || type == 'appendix' ? (sub_placeholder (sub_quotes '_%s_'), title) : title
         end
       else # apply basic styling
-        (type = @sectname) == 'chapter' || type == 'appendix' ? (sprintf sub_quotes('_%s_'), title) : title
+        (type = @sectname) == 'chapter' || type == 'appendix' ? (sub_placeholder (sub_quotes '_%s_'), title) : title
       end
     else
       title
