@@ -607,10 +607,10 @@ class PreprocessorReader < Reader
   def initialize document, data = nil, cursor = nil, opts = {}
     @document = document
     super data, cursor, opts
-    include_depth_default = document.attributes.fetch('max-include-depth', 64).to_i
-    include_depth_default = 0 if include_depth_default < 0
+    default_include_depth = (document.attributes['max-include-depth'] || 64).to_i
+    default_include_depth = 0 if default_include_depth < 0
     # track both absolute depth for comparing to size of include stack and relative depth for reporting
-    @maxdepth = { abs: include_depth_default, rel: include_depth_default }
+    @maxdepth = { abs: default_include_depth, rel: default_include_depth }
     @include_stack = []
     @includes = document.catalog[:includes]
     @skipping = false
