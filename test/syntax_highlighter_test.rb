@@ -2,13 +2,13 @@ require_relative 'test_helper'
 
 context 'Syntax Highlighter' do
   test 'should set syntax_highlighter property on document if source highlighter is set and basebackend is html' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     doc = document_from_string input, safe: :safe, parse: true
     assert doc.basebackend? 'html'
@@ -17,37 +17,37 @@ puts 'Hello, World!'
   end
 
   test 'should not set syntax_highlighter property on document if source highlighter is not set' do
-    input = <<-EOS
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    input = <<~'EOS'
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     doc = document_from_string input, safe: :safe, parse: true
     assert_nil doc.syntax_highlighter
   end
 
   test 'should not set syntax_highlighter property on document if syntax highlighter cannot be found' do
-    input = <<-EOS
-:source-highlighter: unknown
+    input = <<~'EOS'
+    :source-highlighter: unknown
 
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     doc = document_from_string input, safe: :safe, parse: true
     assert_nil doc.syntax_highlighter
   end
 
   test 'should not set syntax_highlighter property on document if basebackend is not html' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     doc = document_from_string input, safe: :safe, backend: 'docbook', parse: true
     refute doc.basebackend? 'html'
@@ -55,20 +55,18 @@ puts 'Hello, World!'
   end
 
   test 'should not allow document to enable syntax highlighter if safe mode is at least SERVER' do
-    input = <<-EOS
-:source-highlighter: coderay
-    EOS
+    input = ':source-highlighter: coderay'
     doc = document_from_string input, safe: Asciidoctor::SafeMode::SERVER, parse: true
     assert_nil doc.attributes['source-highlighter']
     assert_nil doc.syntax_highlighter
   end
 
   test 'should set language on source block output when source-highlighter attribute is not set' do
-    input = <<-EOS
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    input = <<~'EOS'
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
     assert_css 'pre.highlight', output, 1
@@ -77,13 +75,13 @@ puts 'Hello, World!'
   end
 
   test 'should set language on source block output when source-highlighter attribute is not recognized' do
-    input = <<-EOS
-:source-highlighter: unknown
+    input = <<~'EOS'
+    :source-highlighter: unknown
 
-[source, ruby]
-----
-puts 'Hello, World!'
-----
+    [source, ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
     assert_css 'pre.highlight', output, 1
@@ -92,15 +90,15 @@ puts 'Hello, World!'
   end
 
   test 'should highlight source if source-highlighter attribute is coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-require 'coderay'
+    [source, ruby]
+    ----
+    require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
-----
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
     assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
@@ -108,16 +106,16 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
   end
 
   test 'should highlight source if source highlighter is set even if language is not set' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source%linenums]
-----
-[numbers]
-one
-two
-three
-----
+    [source%linenums]
+    ----
+    [numbers]
+    one
+    two
+    three
+    ----
     EOS
     output = convert_string input, safe: :safe
     assert_css 'pre.CodeRay.highlight', output, 1
@@ -126,12 +124,12 @@ three
   end
 
   test 'should not crash if source block has no lines and source highlighter is set' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source,text]
-----
-----
+    [source,text]
+    ----
+    ----
     EOS
     output = convert_string_to_embedded input, safe: :safe
     assert_css 'pre.CodeRay', output, 1
@@ -140,72 +138,72 @@ three
   end
 
   test 'should highlight source inside AsciiDoc table cell if source-highlighter attribute is coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-|===
-a|
-[source, ruby]
-----
-require 'coderay'
+    |===
+    a|
+    [source, ruby]
+    ----
+    require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
-----
-|===
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
+    ----
+    |===
     EOS
     output = convert_string_to_embedded input, safe: :safe
     assert_xpath '/table//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
   end
 
   test 'should number lines if third positional attribute is set' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source,ruby,linenums]
-----
-puts 'Hello, World!'
-----
+    [source,ruby,linenums]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_xpath '//td[@class="line-numbers"]', output, 1
   end
 
   test 'should number lines if linenums option is set on source block' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source%linenums,ruby]
-----
-puts 'Hello, World!'
-----
+    [source%linenums,ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_xpath '//td[@class="line-numbers"]', output, 1
   end
 
   test 'should number lines of source block if source-linenums-option document attribute is set' do
-    input = <<-EOS
-:source-highlighter: coderay
-:source-linenums-option:
+    input = <<~'EOS'
+    :source-highlighter: coderay
+    :source-linenums-option:
 
-[source,ruby]
-----
-puts 'Hello, World!'
-----
+    [source,ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_xpath '//td[@class="line-numbers"]', output, 1
   end
 
   test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
-    input = <<-EOS
-:source-highlighter: coderay
-:coderay-linenums-mode: inline
+    input = <<~'EOS'
+    :source-highlighter: coderay
+    :coderay-linenums-mode: inline
 
-[source%linenums,ruby,start=10]
-----
-puts 'Hello, World!'
-----
+    [source%linenums,ruby,start=10]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_xpath '//span[@class="line-numbers"]', output, 1
@@ -213,15 +211,15 @@ puts 'Hello, World!'
   end
 
   test 'should set starting line number in DocBook output if linenums option is enabled and start attribute is set' do
-    input = <<-EOS
-[source%linenums,java,start=3]
-----
-public class HelloWorld {
-public static void main(String[] args) {
-  out.println("Hello, World!");
-}
-}
-----
+    input = <<~'EOS'
+    [source%linenums,java,start=3]
+    ----
+    public class HelloWorld {
+      public static void main(String[] args) {
+        out.println("Hello, World!");
+      }
+    }
+    ----
     EOS
 
     output = convert_string_to_embedded input, backend: :docbook, safe: Asciidoctor::SafeMode::SAFE
@@ -231,19 +229,19 @@ public static void main(String[] args) {
 
   test 'should highlight lines specified in highlight attribute if linenums is set and source-highlighter is coderay' do
     %w(highlight="1,4-6" highlight=1;4..6 highlight=1;4..;!7).each do |highlight_attr|
-      input = <<-EOS
-:source-highlighter: coderay
+      input = <<~EOS
+      :source-highlighter: coderay
 
-[source%linenums,java,#{highlight_attr}]
-----
-import static java.lang.System.out;
+      [source%linenums,java,#{highlight_attr}]
+      ----
+      import static java.lang.System.out;
 
-public class HelloWorld {
-public static void main(String[] args) {
-  out.println("Hello, World!");
-}
-}
-----
+      public class HelloWorld {
+        public static void main(String[] args) {
+          out.println("Hello, World!");
+        }
+      }
+      ----
       EOS
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       assert_css 'strong.highlighted', output, 4
@@ -258,57 +256,57 @@ public static void main(String[] args) {
   end
 
   test 'should read source language from source-language document attribute if not specified on source block' do
-    input = <<-EOS
-:source-highlighter: coderay
-:source-language: ruby
+    input = <<~'EOS'
+    :source-highlighter: coderay
+    :source-language: ruby
 
-[source]
-----
-require 'coderay'
+    [source]
+    ----
+    require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
-----
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
+    ----
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
     assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
   end
 
   test 'should rename document attribute named language to source-language when compat-mode is enabled' do
-    input = <<-EOS
-:language: ruby
+    input = <<~'EOS'
+    :language: ruby
 
-{source-language}
+    {source-language}
     EOS
 
     assert_equal 'ruby', (convert_inline_string input, attributes: { 'compat-mode' => '' })
 
-    input = <<-EOS
-:language: ruby
+    input = <<~'EOS'
+    :language: ruby
 
-{source-language}
+    {source-language}
     EOS
 
     assert_equal '{source-language}', (convert_inline_string input)
   end
 
   test 'should replace callout marks but not highlight them if source-highlighter attribute is coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-require 'coderay' # <1>
+    [source, ruby]
+    ----
+    require 'coderay' # <1>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
-puts html # <3> <4>
-exit 0 # <5><6>
-----
-<1> Load library
-<2> Highlight source
-<3> Print to stdout
-<4> Redirect to a file to capture output
-<5> Exit program
-<6> Reports success
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
+    puts html # <3> <4>
+    exit 0 # <5><6>
+    ----
+    <1> Load library
+    <2> Highlight source
+    <3> Print to stdout
+    <4> Redirect to a file to capture output
+    <5> Exit program
+    <6> Reports success
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
@@ -318,20 +316,20 @@ exit 0 # <5><6>
   end
 
   test 'should support autonumbered callout marks if source-highlighter attribute is coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-require 'coderay' # <.><.>
+    [source, ruby]
+    ----
+    require 'coderay' # <.><.>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <.>
-puts html # <.>
-----
-<.> Load library
-<.> Gem must be installed
-<.> Highlight source
-<.> Print to stdout
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <.>
+    puts html # <.>
+    ----
+    <.> Load library
+    <.> Gem must be installed
+    <.> Highlight source
+    <.> Print to stdout
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b> <b class="conum">\(2\)<\/b>$/, output)
@@ -342,24 +340,24 @@ puts html # <.>
   end
 
   test 'should restore callout marks to correct lines if source highlighter is coderay and table line numbering is enabled' do
-    input = <<-EOS
-:source-highlighter: coderay
-:coderay-linenums-mode: table
+    input = <<~'EOS'
+    :source-highlighter: coderay
+    :coderay-linenums-mode: table
 
-[source, ruby, numbered]
-----
-require 'coderay' # <1>
+    [source, ruby, numbered]
+    ----
+    require 'coderay' # <1>
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
-puts html # <3> <4>
-exit 0 # <5><6>
-----
-<1> Load library
-<2> Highlight source
-<3> Print to stdout
-<4> Redirect to a file to capture output
-<5> Exit program
-<6> Reports success
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table # <2>
+    puts html # <3> <4>
+    exit 0 # <5><6>
+    ----
+    <1> Load library
+    <2> Highlight source
+    <3> Print to stdout
+    <4> Redirect to a file to capture output
+    <5> Exit program
+    <6> Reports success
     EOS
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
     assert_match(/<span class="content">coderay<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
@@ -370,17 +368,17 @@ exit 0 # <5><6>
   end
 
   test 'should restore isolated callout mark on last line of source when source highlighter is coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source,ruby,linenums]
-----
-require 'app'
+    [source,ruby,linenums]
+    ----
+    require 'app'
 
-launch_app
-# <1>
-----
-<1> Profit.
+    launch_app
+    # <1>
+    ----
+    <1> Profit.
     EOS
 
     output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
@@ -391,31 +389,31 @@ launch_app
   test 'should preserve space before callout on final line' do
     inputs = []
 
-    inputs << <<-EOS
-[source,yaml]
-----
-a: 'a'
-key: 'value' #<1>
-----
-<1> key-value pair
+    inputs << <<~'EOS'
+    [source,yaml]
+    ----
+    a: 'a'
+    key: 'value' #<1>
+    ----
+    <1> key-value pair
     EOS
 
-    inputs << <<-EOS
-[source,ruby]
-----
-puts 'hi'
-puts 'value' #<1>
-----
-<1> print to stdout
+    inputs << <<~'EOS'
+    [source,ruby]
+    ----
+    puts 'hi'
+    puts 'value' #<1>
+    ----
+    <1> print to stdout
     EOS
 
-    inputs << <<-EOS
-[source,python]
-----
-print 'hi'
-print 'value' #<1>
-----
-<1> print to stdout
+    inputs << <<~'EOS'
+    [source,python]
+    ----
+    print 'hi'
+    print 'value' #<1>
+    ----
+    <1> print to stdout
     EOS
 
     inputs.each do |input|
@@ -426,18 +424,18 @@ print 'value' #<1>
   end
 
   test 'should preserve passthrough placeholders when highlighting source using coderay' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source,java]
-[subs="specialcharacters,macros,callouts"]
-----
-public class Printer {
-public static void main(String[] args) {
-  System.pass:quotes[_out_].println("*asterisks* make text pass:quotes[*bold*]");
-}
-}
-----
+    [source,java]
+    [subs="specialcharacters,macros,callouts"]
+    ----
+    public class Printer {
+      public static void main(String[] args) {
+        System.pass:quotes[_out_].println("*asterisks* make text pass:quotes[*bold*]");
+      }
+    }
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
     assert_match(/\.<em>out<\/em>\./, output, 1)
@@ -447,15 +445,15 @@ public static void main(String[] args) {
   end
 
   test 'should link to CodeRay stylesheet if source-highlighter is coderay and linkcss is set' do
-    input = <<-EOS
-:source-highlighter: coderay
+    input = <<~'EOS'
+    :source-highlighter: coderay
 
-[source, ruby]
-----
-require 'coderay'
+    [source, ruby]
+    ----
+    require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
-----
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss' => '' }
     assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
@@ -463,16 +461,16 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
   end
 
   test 'should highlight source inline if source-highlighter attribute is coderay and coderay-css is style' do
-    input = <<-EOS
-:source-highlighter: coderay
-:coderay-css: style
+    input = <<~'EOS'
+    :source-highlighter: coderay
+    :coderay-css: style
 
-[source, ruby]
-----
-require 'coderay'
+    [source, ruby]
+    ----
+    require 'coderay'
 
-html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
-----
+    html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
     assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
@@ -480,15 +478,15 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
   end
 
   test 'should include remote highlight.js assets if source-highlighter attribute is highlight.js' do
-    input = <<-EOS
-:source-highlighter: highlight.js
+    input = <<~'EOS'
+    :source-highlighter: highlight.js
 
-[source, javascript]
-----
-<link rel="stylesheet" href="styles/default.css">
-<script src="highlight.pack.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-----
+    [source, javascript]
+    ----
+    <link rel="stylesheet" href="styles/default.css">
+    <script src="highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    ----
     EOS
     output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
     assert_match(/<link .*highlight\.js/, output)
@@ -497,27 +495,27 @@ html = CodeRay.scan("puts 'Hello, world!'", :ruby).div line_numbers: :table
   end
 
   test 'should add language-none class to source block when source-highlighter is highlight.js and language is not set' do
-    input = <<-EOS
-:source-highlighter: highlight.js
+    input = <<~'EOS'
+    :source-highlighter: highlight.js
 
-[source]
-----
-[numbers]
-one
-two
-three
-----
+    [source]
+    ----
+    [numbers]
+    one
+    two
+    three
+    ----
     EOS
     output = convert_string input, safe: :safe
     assert_css 'code.language-none', output, 1
   end
 
   test 'should add language classes to child code element when source-highlighter is prettify' do
-    input = <<-EOS
-[source,ruby]
-----
-puts "foo"
-----
+    input = <<~'EOS'
+    [source,ruby]
+    ----
+    puts "foo"
+    ----
     EOS
 
     output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'prettify' }
@@ -526,11 +524,11 @@ puts "foo"
   end
 
   test 'should set linenums start if linenums are enabled and start attribute is set when source-highlighter is prettify' do
-    input = <<-EOS
-[source%linenums,ruby,start=5]
-----
-puts "foo"
-----
+    input = <<~'EOS'
+    [source%linenums,ruby,start=5]
+    ----
+    puts "foo"
+    ----
     EOS
 
     output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'prettify' }
@@ -539,17 +537,17 @@ puts "foo"
   end
 
   test 'should set lang attribute on pre when source-highlighter is html-pipeline' do
-    input = <<-EOS
-[source,ruby]
-----
-filters = [
-HTML::Pipeline::AsciiDocFilter,
-HTML::Pipeline::SanitizationFilter,
-HTML::Pipeline::SyntaxHighlightFilter
-]
+    input = <<~'EOS'
+    [source,ruby]
+    ----
+    filters = [
+    HTML::Pipeline::AsciiDocFilter,
+    HTML::Pipeline::SanitizationFilter,
+    HTML::Pipeline::SyntaxHighlightFilter
+    ]
 
-puts HTML::Pipeline.new(filters, {}).call(input)[:output]
-----
+    puts HTML::Pipeline.new(filters, {}).call(input)[:output]
+    ----
     EOS
 
     output = convert_string input, attributes: { 'source-highlighter' => 'html-pipeline' }
@@ -572,11 +570,11 @@ puts HTML::Pipeline.new(filters, {}).call(input)[:output]
       end
     end
 
-    input = <<-EOS
-[source,ruby]
-----
-puts 'Hello, World!'
-----
+    input = <<~'EOS'
+    [source,ruby]
+    ----
+    puts 'Hello, World!'
+    ----
     EOS
 
     doc = document_from_string input, attributes: { 'source-highlighter' => 'unavailable' }
@@ -590,19 +588,19 @@ puts 'Hello, World!'
 
   context 'Pygments' do
     test 'should highlight source if source-highlighter attribute is pygments' do
-      input = <<-EOS
-:source-highlighter: pygments
-:pygments-style: monokai
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-style: monokai
 
-[source,python]
-----
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import HtmlFormatter
+      [source,python]
+      ----
+      from pygments import highlight
+      from pygments.lexers import PythonLexer
+      from pygments.formatters import HtmlFormatter
 
-source = 'print "Hello World"'
-print(highlight(source, PythonLexer(), HtmlFormatter()))
-----
+      source = 'print "Hello World"'
+      print(highlight(source, PythonLexer(), HtmlFormatter()))
+      ----
       EOS
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_xpath '//pre[@class="pygments highlight"]/code[@data-lang="python"]/span[@class="tok-kn"][text()="import"]', output, 3
@@ -610,19 +608,19 @@ print(highlight(source, PythonLexer(), HtmlFormatter()))
     end
 
     test 'should gracefully fallback to default style if specified style not recognized' do
-      input = <<-EOS
-:source-highlighter: pygments
-:pygments-style: unknown
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-style: unknown
 
-[source,python]
-----
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import HtmlFormatter
+      [source,python]
+      ----
+      from pygments import highlight
+      from pygments.lexers import PythonLexer
+      from pygments.formatters import HtmlFormatter
 
-source = 'print "Hello World"'
-print(highlight(source, PythonLexer(), HtmlFormatter()))
-----
+      source = 'print "Hello World"'
+      print(highlight(source, PythonLexer(), HtmlFormatter()))
+      ----
       EOS
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_css 'pre.pygments', output, 1
@@ -631,22 +629,22 @@ print(highlight(source, PythonLexer(), HtmlFormatter()))
     end
 
     test 'should restore callout marks to correct lines if source highlighter is pygments and table line numbering is enabled' do
-      input = <<-EOS
-:source-highlighter: pygments
-:pygments-linenums-mode: table
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-linenums-mode: table
 
-[source%linenums,ruby]
-----
-from pygments import highlight # <1>
-from pygments.lexers import PythonLexer
-from pygments.formatters import HtmlFormatter
+      [source%linenums,ruby]
+      ----
+      from pygments import highlight # <1>
+      from pygments.lexers import PythonLexer
+      from pygments.formatters import HtmlFormatter
 
-code = 'print "Hello World"'
-print(highlight(code, PythonLexer(), HtmlFormatter())) # <2><3>
-----
-<1> Load library
-<2> Highlight source
-<3> Print to stdout
+      code = 'print "Hello World"'
+      print(highlight(code, PythonLexer(), HtmlFormatter())) # <2><3>
+      ----
+      <1> Load library
+      <2> Highlight source
+      <3> Print to stdout
       EOS
       output = convert_string_to_embedded input, safe: :safe
       assert_match(/highlight<\/span> # <b class="conum">\(1\)<\/b>$/, output)
@@ -655,17 +653,17 @@ print(highlight(code, PythonLexer(), HtmlFormatter())) # <2><3>
     end
 
     test 'should restore isolated callout mark on last line of source when source highlighter is pygments' do
-      input = <<-EOS
-:source-highlighter: pygments
+      input = <<~'EOS'
+      :source-highlighter: pygments
 
-[source,ruby,linenums]
-----
-require 'app'
+      [source,ruby,linenums]
+      ----
+      require 'app'
 
-launch_app
-# <1>
-----
-<1> Profit.
+      launch_app
+      # <1>
+      ----
+      <1> Profit.
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -674,14 +672,14 @@ launch_app
     end
 
     test 'should not hardcode inline styles on lineno div and pre elements when linenums are enabled in table mode' do
-      input = <<-EOS
-:source-highlighter: pygments
-:pygments-css: inline
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-css: inline
 
-[source%linenums,ruby]
-----
-puts 'Hello, World!'
-----
+      [source%linenums,ruby]
+      ----
+      puts 'Hello, World!'
+      ----
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -692,24 +690,24 @@ puts 'Hello, World!'
     end
 
     test 'should not hardcode inline styles on lineno spans when linenums are enabled and source-highlighter is pygments' do
-      input = <<-EOS
-:source-highlighter: pygments
-:pygments-css: inline
-:pygments-linenums-mode: inline
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-css: inline
+      :pygments-linenums-mode: inline
 
-[source%linenums,ruby]
-----
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-puts 'Hello, World!'
-exit 0
-----
+      [source%linenums,ruby]
+      ----
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      puts 'Hello, World!'
+      exit 0
+      ----
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
