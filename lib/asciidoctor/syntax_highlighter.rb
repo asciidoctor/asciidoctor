@@ -229,4 +229,4 @@ module Asciidoctor
 end
 
 require_relative 'syntax_highlighter/highlightjs'
-require_relative 'syntax_highlighter/html_pipeline'
+require_relative 'syntax_highlighter/html_pipeline' unless RUBY_ENGINE == 'opal'
