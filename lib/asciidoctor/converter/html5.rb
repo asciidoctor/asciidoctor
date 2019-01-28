@@ -26,7 +26,7 @@ module Asciidoctor
 
     def initialize backend, opts = {}
       @xml_mode = opts[:htmlsyntax] == 'xml'
-      @void_element_slash = @xml_mode ? '/' : nil
+      @void_element_slash = @xml_mode ? '/' : ''
     end
 
     def document node
