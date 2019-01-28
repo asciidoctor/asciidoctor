@@ -21,6 +21,16 @@ Enhancements::
   * drop support for Slim < 3 (#2998)
   * make syntax highlighter pluggable; extract all logic into adapter classes (#2106)
   * add syntax highlighter adapter for Rouge (#1040)
+  * redesign Converter API based on SyntaxHighlighter API; remap deprecated API to new API to ensure compatibility (#2891)
+  * repurpose built-in converters as regular converters (#2891)
+  * make registration and resolution of global converters thread-safe (#2891)
+  * fold the default converter factory into the Converter module (#2891)
+  * add a default implementation for Converter#convert in the Base converter (#2891)
+  * rename Converter::BackendInfo to Converter::BackendTraits; map backend_info to new backend_traits method (#2891)
+  * allow built-in converter classes to be resolved using Converter#for and instantiated using Converter#create (#2891)
+  * allow converter factory to be passed using :converter_factory API option (#2891)
+  * honor htmlsyntax if defined on converter (#2891)
+  * add backend_traits_source keyword argument to CompositeConverter constructor (#2891)
   * add support for start attribute when using prettify to highlight source blocks with line numbering enabled
   * use String#encode to encode String as UTF-8 instead of using String#force_encoding (#2764)
   * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
@@ -43,6 +53,7 @@ Improvements::
   * align default CodeRay style with style for other syntax highlighters (#2106)
   * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
   * rename CSS class of Pygments line numbering table to linenotable (to align with Rouge) (#1040)
+  * remove unused Converter#convert_with_options method (#2891)
 
 Bug Fixes::
 

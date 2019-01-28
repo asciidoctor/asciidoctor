@@ -971,8 +971,8 @@ class Document < AbstractBlock
       else
         ::File.write target, output, mode: FILE_WRITE_MODE
       end
-      if @backend == 'manpage' && ::String === target && (@converter.respond_to? :write_alternate_pages)
-        @converter.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target
+      if @backend == 'manpage' && ::String === target && (@converter.class.respond_to? :write_alternate_pages)
+        @converter.class.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target
       end
     end
     @timings.record :write if @timings
@@ -1111,20 +1111,20 @@ class Document < AbstractBlock
   # Internal: Create and initialize an instance of the converter for this document
   #--
   # QUESTION is there any additional information we should be passing to the converter?
-  def create_converter
-    converter_opts = { htmlsyntax: @attributes['htmlsyntax'] }
-    if (template_dirs = @options[:template_dirs] || @options[:template_dir])
+  def create_converter backend
+    converter_opts = { document: self, htmlsyntax: @attributes['htmlsyntax'] }
+    if (template_dirs = (opts = @options)[:template_dirs] || opts[:template_dir])
       converter_opts[:template_dirs] = [*template_dirs]
-      converter_opts[:template_cache] = @options.fetch :template_cache, true
-      converter_opts[:template_engine] = @options[:template_engine]
-      converter_opts[:template_engine_options] = @options[:template_engine_options]
-      converter_opts[:eruby] = @options[:eruby]
+      converter_opts[:template_cache] = opts.fetch :template_cache, true
+      converter_opts[:template_engine] = opts[:template_engine]
+      converter_opts[:template_engine_options] = opts[:template_engine_options]
+      converter_opts[:eruby] = opts[:eruby]
       converter_opts[:safe] = @safe
     end
-    if (converter = @options[:converter])
-      (Converter::Factory.new @backend => converter).create @backend, converter_opts
+    if (converter = opts[:converter])
+      (Converter::CustomFactory.new backend => converter).create backend, converter_opts
     else
-      (Converter::Factory.default false).create @backend, converter_opts
+      (opts.fetch :converter_factory, Converter).create backend, converter_opts
     end
   end
 
@@ -1231,13 +1231,15 @@ class Document < AbstractBlock
   #
   # Returns the resolved String backend if updated, nothing otherwise.
   def update_backend_attributes new_backend, force = nil
-    if force || (new_backend && new_backend != @backend)
-      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
+    if force || new_backend != @backend
+      current_backend = @backend
+      current_basebackend = (attrs = @attributes)['basebackend']
+      current_doctype = @doctype
       if new_backend.start_with? 'xhtml'
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend.slice 1, new_backend.length
       elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] = 'html' unless attrs['htmlsyntax'] == 'xml'
+        attrs['htmlsyntax'] ||= 'html'
       end
       if (resolved_backend = BACKEND_ALIASES[new_backend])
         new_backend = resolved_backend
@@ -1253,24 +1255,27 @@ class Document < AbstractBlock
         attrs.delete %(backend-#{current_backend})
       end
       attrs[%(backend-#{new_backend})] = ''
+      # QUESTION should we defer the @backend assignment until after the converter is created?
       @backend = attrs['backend'] = new_backend
       # (re)initialize converter
-      if Converter::BackendInfo === (@converter = create_converter)
-        new_basebackend = @converter.basebackend
-        attrs['outfilesuffix'] = @converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
-        new_filetype = @converter.filetype
-      elsif @converter
-        new_basebackend = new_backend.sub TrailingDigitsRx, ''
-        if (new_outfilesuffix = DEFAULT_EXTENSIONS[new_basebackend])
-          new_filetype = new_outfilesuffix.slice 1, new_outfilesuffix.length
-        else
-          new_outfilesuffix, new_basebackend, new_filetype = '.html', 'html', 'html'
+      if Converter::BackendTraits === (converter = create_converter new_backend)
+        new_basebackend = converter.basebackend
+        new_filetype = converter.filetype
+        if (htmlsyntax = converter.htmlsyntax)
+          attrs['htmlsyntax'] = htmlsyntax
         end
-        attrs['outfilesuffix'] = new_outfilesuffix unless attribute_locked? 'outfilesuffix'
+        # QUESTION should we pass outfilesuffix to converter initializer?
+        attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+      elsif converter
+        backend_traits = Converter::BackendTraits.derive_backend_traits new_backend
+        new_basebackend = backend_traits[:basebackend]
+        new_filetype = backend_traits[:filetype]
+        attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
       else
         # NOTE ideally we shouldn't need the converter before the converter phase, but we do
         raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
       end
+      @converter = converter
       if (current_filetype = attrs['filetype'])
         attrs.delete %(filetype-#{current_filetype})
       end
@@ -1294,7 +1299,7 @@ class Document < AbstractBlock
         attrs[%(basebackend-#{new_basebackend})] = ''
         attrs['basebackend'] = new_basebackend
       end
-      return new_backend
+      new_backend
     end
   end
 

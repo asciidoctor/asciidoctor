@@ -1,7 +1,9 @@
 module Asciidoctor
   # A built-in {Converter} implementation that generates HTML 5 output
   # consistent with the html5 backend from AsciiDoc Python.
-  class Converter::Html5Converter < Converter::BuiltIn
+  class Converter::Html5Converter < Converter::Base
+    register_for 'html5'
+
     (QUOTE_TAGS = {
       monospaced:  ['<code>',   '</code>',   true],
       emphasis:    ['<em>',     '</em>',     true],
@@ -25,13 +27,21 @@ module Asciidoctor
     DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
 
     def initialize backend, opts = {}
-      @xml_mode = opts[:htmlsyntax] == 'xml'
-      @void_element_slash = @xml_mode ? '/' : ''
+      @backend = backend
+      if opts[:htmlsyntax] == 'xml'
+        syntax = 'xml'
+        @xml_mode = true
+        @void_element_slash = '/'
+      else
+        syntax = 'html'
+        @xml_mode = nil
+        @void_element_slash = ''
+      end
+      init_backend_traits basebackend: 'html', filetype: 'html', htmlsyntax: syntax, outfilesuffix: '.html', supports_templates: true
     end
 
     def document node
-      slash = @void_element_slash
-      br = %(<br#{slash}>)
+      br = %(<br#{slash = @void_element_slash}>)
       unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
@@ -120,7 +130,7 @@ module Asciidoctor
 #{outline node}
 </div>)
           end
-          result << (generate_manname_section node) if node.attr? 'manpurpose'
+          result << (_generate_manname_section node) if node.attr? 'manpurpose'
         else
           if node.has_header?
             result << %(<h1>#{node.header.title}</h1>) unless node.notitle
@@ -228,7 +238,7 @@ MathJax.Hub.Config({
           id_attr = node.id ? %( id="#{node.id}") : ''
           result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
         end
-        result << (generate_manname_section node) if node.attr? 'manpurpose'
+        result << (_generate_manname_section node) if node.attr? 'manpurpose'
       else
         if node.has_header? && !node.notitle
           id_attr = node.id ? %( id="#{node.id}") : ''
@@ -385,7 +395,7 @@ MathJax.Hub.Config({
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
+<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (_append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (_append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (_append_boolean_attribute 'loop', xml) : ''}>
 Your browser does not support the audio tag.
 </audio>
 </div>
@@ -539,15 +549,15 @@ Your browser does not support the audio tag.
       if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
           ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
-          img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+          img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
         end
       end
-      img ||= %(<img src="#{node.image_uri target}" alt="#{encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img ||= %(<img src="#{node.image_uri target}" alt="#{_encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       if node.attr? 'link', nil, false
-        img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+        img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
       end
       id_attr = node.id ? %( id="#{node.id}") : ''
       classes = ['imageblock']
@@ -601,6 +611,8 @@ Your browser does not support the audio tag.
 </div>)
     end
 
+    alias pass _content_only
+
     def stem node
       id_attribute = node.id ? %( id="#{node.id}") : ''
       title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
@@ -634,7 +646,7 @@ Your browser does not support the audio tag.
 
       type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : ''
       start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : ''
-      reversed_attribute = (node.option? 'reversed') ? (append_boolean_attribute 'reversed', @xml_mode) : ''
+      reversed_attribute = (node.option? 'reversed') ? (_append_boolean_attribute 'reversed', @xml_mode) : ''
       result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}#{reversed_attribute}>)
 
       node.items.each do |item|
@@ -937,7 +949,7 @@ Your browser does not support the audio tag.
         muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (_append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
       when 'youtube'
@@ -958,7 +970,7 @@ Your browser does not support the audio tag.
           fs_attribute = ''
         else
           fs_param = ''
-          fs_attribute = append_boolean_attribute 'allowfullscreen', xml
+          fs_attribute = _append_boolean_attribute 'allowfullscreen', xml
         end
         modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : ''
         theme_param = (node.attr? 'theme', nil, false) ? %(&amp;theme=#{node.attr 'theme'}) : ''
@@ -993,7 +1005,7 @@ Your browser does not support the audio tag.
         time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
         %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (_append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (_append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (_append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
@@ -1005,7 +1017,7 @@ Your browser does not support the video tag.
       case node.type
       when :xref
         if (path = node.attributes['path'])
-          attrs = (append_link_constraint_attrs node, node.role ? [%( class="#{node.role}")] : []).join
+          attrs = (_append_link_constraint_attrs node, node.role ? [%( class="#{node.role}")] : []).join
           text = node.text || path
         else
           attrs = node.role ? %( class="#{node.role}") : ''
@@ -1025,7 +1037,7 @@ Your browser does not support the video tag.
         attrs = node.id ? [%( id="#{node.id}")] : []
         attrs << %( class="#{node.role}") if node.role
         attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
-        %(<a href="#{node.target}"#{(append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
+        %(<a href="#{node.target}"#{(_append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
       when :bibref
         # NOTE technically node.text should be node.reftext, but subs have already been applied to text
         %(<a id="#{node.id}"></a>#{node.text})
@@ -1083,16 +1095,16 @@ Your browser does not support the video tag.
         if type != 'icon' && ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) &&
             node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
           if svg
-            img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+            img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
           elsif obj
-            fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_quotes node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+            fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_quotes node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
             img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
           end
         end
-        img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_quotes node.alt}"#{attrs}#{@void_element_slash}>)
+        img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{_encode_quotes node.alt}"#{attrs}#{@void_element_slash}>)
       end
       if node.attr? 'link', nil, false
-        img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+        img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
       end
       if (role = node.role)
         if node.attr? 'float'
@@ -1152,15 +1164,15 @@ Your browser does not support the video tag.
 
     private
 
-    def append_boolean_attribute name, xml
+    def _append_boolean_attribute name, xml
       xml ? %( #{name}="#{name}") : %( #{name})
     end
 
-    def encode_quotes val
+    def _encode_quotes val
       (val.include? '"') ? (val.gsub '"', '&quot;') : val
     end
 
-    def generate_manname_section node
+    def _generate_manname_section node
       manname_title = node.attr 'manname-title', 'Name'
       if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
         manname_title = manname_title.upcase
@@ -1172,7 +1184,7 @@ Your browser does not support the video tag.
 </div>)
     end
 
-    def append_link_constraint_attrs node, attrs = []
+    def _append_link_constraint_attrs node, attrs = []
       rel = 'nofollow' if node.option? 'nofollow'
       if (window = node.attributes['window'])
         attrs << %( target="#{window}")
@@ -1183,7 +1195,7 @@ Your browser does not support the video tag.
       attrs
     end
 
-    def read_svg_contents node, target
+    def _read_svg_contents node, target
       if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG')
         svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
         old_start_tag = new_start_tag = nil

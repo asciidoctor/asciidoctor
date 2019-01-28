@@ -2,9 +2,16 @@ module Asciidoctor
   # A built-in {Converter} implementation that generates DocBook 5 output
   # similar to the docbook45 backend from AsciiDoc Python, but migrated to the
   # DocBook 5 specification.
-  class Converter::DocBook5Converter < Converter::BuiltIn
+  class Converter::DocBook5Converter < Converter::Base
+    register_for 'docbook5'
+
     CopyrightRx = /^(.+?)(?: ((?:\d{4}\-)?\d{4}))?$/
     ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
+
+    def initialize backend, opts = {}
+      @backend = backend
+      init_backend_traits basebackend: 'docbook', filetype: 'xml', outfilesuffix: '.xml', supports_templates: true
+    end
 
     def document node
       result = []
@@ -12,7 +19,7 @@ module Asciidoctor
         root_tag_name = 'refentry'
       end
       result << '<?xml version="1.0" encoding="UTF-8"?>'
-      if (doctype_line = doctype_declaration root_tag_name)
+      if (doctype_line = _doctype_declaration root_tag_name)
         result << doctype_line
       end
       if node.attr? 'toc'
@@ -29,9 +36,9 @@ module Asciidoctor
           result << '<?asciidoc-numbered?>'
         end
       end
-      lang_attribute = (node.attr? 'nolang') ? '' : %( #{lang_attribute_name}="#{node.attr 'lang', 'en'}")
-      result << %(<#{root_tag_name}#{document_ns_attributes node}#{lang_attribute}#{common_attributes node.id}>)
-      result << (document_info_tag node, root_tag_name) unless node.noheader
+      lang_attribute = (node.attr? 'nolang') ? '' : %( #{_lang_attribute_name}="#{node.attr 'lang', 'en'}")
+      result << %(<#{root_tag_name}#{_document_ns_attributes node}#{lang_attribute}#{_common_attributes node.id}>)
+      result << (_document_info_tag node, root_tag_name) unless node.noheader
       result << node.content if node.blocks?
       unless (footer_docinfo = node.docinfo :footer).empty?
         result << footer_docinfo
@@ -40,7 +47,7 @@ module Asciidoctor
       result.join LF
     end
 
-    alias embedded content
+    alias embedded _content_only
 
     MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
 
@@ -51,22 +58,22 @@ module Asciidoctor
         tag_name = node.sectname
       end
       title_el = node.special && (node.option? 'untitled') ? '' : %(<title>#{node.title}</title>\n)
-      %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
+      %(<#{tag_name}#{_common_attributes node.id, node.role, node.reftext}>
 #{title_el}#{node.content}
 </#{tag_name}>)
     end
 
     def admonition node
-      %(<#{tag_name = node.attr 'name'}#{common_attributes node.id, node.role, node.reftext}>
-#{title_tag node}#{resolve_content node}
+      %(<#{tag_name = node.attr 'name'}#{_common_attributes node.id, node.role, node.reftext}>
+#{_title_tag node}#{_resolve_content node}
 </#{tag_name}>)
     end
 
-    alias audio skip
+    alias audio _skip
 
     def colist node
       result = []
-      result << %(<calloutlist#{common_attributes node.id, node.role, node.reftext}>)
+      result << %(<calloutlist#{_common_attributes node.id, node.role, node.reftext}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         result << %(<callout arearefs="#{item.attr 'coids'}">)
@@ -102,8 +109,8 @@ module Asciidoctor
     def dlist node
       result = []
       if node.style == 'horizontal'
-        result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
-#{title_tag node}<tgroup cols="2">
+        result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
+#{_title_tag node}<tgroup cols="2">
 <colspec colwidth="#{node.attr 'labelwidth', 15}*"/>
 <colspec colwidth="#{node.attr 'itemwidth', 85}*"/>
 <tbody valign="top">)
@@ -133,7 +140,7 @@ module Asciidoctor
         term_tag = tags[:term]
         item_tag = tags[:item]
         if list_tag
-          result << %(<#{list_tag}#{common_attributes node.id, node.role, node.reftext}>)
+          result << %(<#{list_tag}#{_common_attributes node.id, node.role, node.reftext}>)
           result << %(<title>#{node.title}</title>) if node.title?
         end
 
@@ -163,19 +170,19 @@ module Asciidoctor
 
     def example node
       if node.title?
-        %(<example#{common_attributes node.id, node.role, node.reftext}>
+        %(<example#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
-#{resolve_content node}
+#{_resolve_content node}
 </example>)
       else
-        %(<informalexample#{common_attributes node.id, node.role, node.reftext}>
-#{resolve_content node}
+        %(<informalexample#{_common_attributes node.id, node.role, node.reftext}>
+#{_resolve_content node}
 </informalexample>)
       end
     end
 
     def floating_title node
-      %(<bridgehead#{common_attributes node.id, node.role, node.reftext} renderas="sect#{node.level}">#{node.title}</bridgehead>)
+      %(<bridgehead#{_common_attributes node.id, node.role, node.reftext} renderas="sect#{node.level}">#{node.title}</bridgehead>)
     end
 
     def image node
@@ -205,12 +212,12 @@ module Asciidoctor
 </mediaobject>)
 
       if node.title?
-        %(<figure#{common_attributes node.id, node.role, node.reftext}>
+        %(<figure#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 #{mediaobject}
 </figure>)
       else
-        %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
+        %(<informalfigure#{_common_attributes node.id, node.role, node.reftext}>
 #{mediaobject}
 </informalfigure>)
       end
@@ -218,7 +225,7 @@ module Asciidoctor
 
     def listing node
       informal = !node.title?
-      common_attrs = common_attributes node.id, node.role, node.reftext
+      common_attrs = _common_attributes node.id, node.role, node.reftext
       if node.style == 'source'
         if (attrs = node.attributes).key? 'linenums'
           numbering_attrs = (attrs.key? 'start') ? %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}") : ' linenumbering="numbered"'
@@ -243,16 +250,18 @@ module Asciidoctor
 
     def literal node
       if node.title?
-        %(<formalpara#{common_attributes node.id, node.role, node.reftext}>
+        %(<formalpara#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 <para>
 <literallayout class="monospaced">#{node.content}</literallayout>
 </para>
 </formalpara>)
       else
-        %(<literallayout#{common_attributes node.id, node.role, node.reftext} class="monospaced">#{node.content}</literallayout>)
+        %(<literallayout#{_common_attributes node.id, node.role, node.reftext} class="monospaced">#{node.content}</literallayout>)
       end
     end
+
+    alias pass _content_only
 
     def stem node
       if (idx = node.subs.index :specialcharacters)
@@ -275,13 +284,13 @@ module Asciidoctor
 <mathphrase><![CDATA[#{equation}]]></mathphrase>)
       end
       if node.title?
-        %(<equation#{common_attributes node.id, node.role, node.reftext}>
+        %(<equation#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 #{equation_data}
 </equation>)
       else
         # WARNING dblatex displays the <informalequation> element inline instead of block as documented (except w/ mathml)
-        %(<informalequation#{common_attributes node.id, node.role, node.reftext}>
+        %(<informalequation#{_common_attributes node.id, node.role, node.reftext}>
 #{equation_data}
 </informalequation>)
       end
@@ -291,7 +300,7 @@ module Asciidoctor
       result = []
       num_attribute = node.style ? %( numeration="#{node.style}") : ''
       start_attribute = (node.attr? 'start') ? %( startingnumber="#{node.attr 'start'}") : ''
-      result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
+      result << %(<orderedlist#{_common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         result << '<listitem>'
@@ -311,7 +320,7 @@ module Asciidoctor
           ''
         else
           %(<abstract>
-#{title_tag node}#{resolve_content node}
+#{_title_tag node}#{_resolve_content node}
 </abstract>)
         end
       when 'partintro'
@@ -319,28 +328,28 @@ module Asciidoctor
           logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
           ''
         else
-          %(<partintro#{common_attributes node.id, node.role, node.reftext}>
-#{title_tag node}#{resolve_content node}
+          %(<partintro#{_common_attributes node.id, node.role, node.reftext}>
+#{_title_tag node}#{_resolve_content node}
 </partintro>)
         end
       else
         reftext = node.reftext if (id = node.id)
         role = node.role
         if node.title?
-          %(<formalpara#{common_attributes id, role, reftext}>
+          %(<formalpara#{_common_attributes id, role, reftext}>
 <title>#{node.title}</title>
 <para>#{content_spacer = node.content_model == :compound ? LF : ''}#{node.content}#{content_spacer}</para>
 </formalpara>)
         elsif id || role
           if node.content_model == :compound
-            %(<para#{common_attributes id, role, reftext}>
+            %(<para#{_common_attributes id, role, reftext}>
 #{node.content}
 </para>)
           else
-            %(<simpara#{common_attributes id, role, reftext}>#{node.content}</simpara>)
+            %(<simpara#{_common_attributes id, role, reftext}>#{node.content}</simpara>)
           end
         else
-          resolve_content node
+          _resolve_content node
         end
       end
     end
@@ -351,19 +360,19 @@ module Asciidoctor
 
     def paragraph node
       if node.title?
-        %(<formalpara#{common_attributes node.id, node.role, node.reftext}>
+        %(<formalpara#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 <para>#{node.content}</para>
 </formalpara>)
       else
-        %(<simpara#{common_attributes node.id, node.role, node.reftext}>#{node.content}</simpara>)
+        %(<simpara#{_common_attributes node.id, node.role, node.reftext}>#{node.content}</simpara>)
       end
     end
 
     def preamble node
       if node.document.doctype == 'book'
-        %(<preface#{common_attributes node.id, node.role, node.reftext}>
-#{title_tag node, false}#{node.content}
+        %(<preface#{_common_attributes node.id, node.role, node.reftext}>
+#{_title_tag node, false}#{node.content}
 </preface>)
       else
         node.content
@@ -371,7 +380,7 @@ module Asciidoctor
     end
 
     def quote node
-      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { resolve_content node }
+      _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { _resolve_content node }
     end
 
     def thematic_break node
@@ -379,8 +388,8 @@ module Asciidoctor
     end
 
     def sidebar node
-      %(<sidebar#{common_attributes node.id, node.role, node.reftext}>
-#{title_tag node}#{resolve_content node}
+      %(<sidebar#{_common_attributes node.id, node.role, node.reftext}>
+#{_title_tag node}#{_resolve_content node}
 </sidebar>)
     end
 
@@ -393,7 +402,7 @@ module Asciidoctor
       if (frame = node.attr 'frame', 'all') == 'ends'
         frame = 'topbot'
       end
-      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', false) ? ' orient="land"' : ''}>)
+      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', false) ? ' orient="land"' : ''}>)
       if (node.option? 'unbreakable')
         result << '<?dbfo keep-together="always"?>'
       elsif (node.option? 'breakable')
@@ -455,12 +464,12 @@ module Asciidoctor
       result.join LF
     end
 
-    alias toc skip
+    alias toc _skip
 
     def ulist node
       result = []
       if node.style == 'bibliography'
-        result << %(<bibliodiv#{common_attributes node.id, node.role, node.reftext}>)
+        result << %(<bibliodiv#{_common_attributes node.id, node.role, node.reftext}>)
         result << %(<title>#{node.title}</title>) if node.title?
         node.items.each do |item|
           result << '<bibliomixed>'
@@ -472,7 +481,7 @@ module Asciidoctor
       else
         mark_type = (checklist = node.option? 'checklist') ? 'none' : node.style
         mark_attribute = mark_type ? %( mark="#{mark_type}") : ''
-        result << %(<itemizedlist#{common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
+        result << %(<itemizedlist#{_common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
         result << %(<title>#{node.title}</title>) if node.title?
         node.items.each do |item|
           text_marker = if checklist && (item.attr? 'checkbox')
@@ -492,15 +501,15 @@ module Asciidoctor
     end
 
     def verse node
-      blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
+      _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
     end
 
-    alias video skip
+    alias video _skip
 
     def inline_anchor node
       case node.type
       when :ref
-        %(<anchor#{common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
+        %(<anchor#{_common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
       when :xref
         if (path = node.attributes['path'])
           # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
@@ -513,7 +522,7 @@ module Asciidoctor
         %(<link xl:href="#{node.target}">#{node.text}</link>)
       when :bibref
         # NOTE technically node.text should be node.reftext, but subs have already been applied to text
-        %(<anchor#{common_attributes node.id, nil, (text = node.text)}/>#{text})
+        %(<anchor#{_common_attributes node.id, nil, (text = node.text)}/>#{text})
       else
         logger.warn %(unknown anchor type: #{node.type.inspect})
         nil
@@ -529,14 +538,14 @@ module Asciidoctor
     end
 
     def inline_callout node
-      %(<co#{common_attributes node.id}/>)
+      %(<co#{_common_attributes node.id}/>)
     end
 
     def inline_footnote node
       if node.type == :xref
         %(<footnoteref linkend="#{node.target}"/>)
       else
-        %(<footnote#{common_attributes node.id}><simpara>#{node.text}</simpara></footnote>)
+        %(<footnote#{_common_attributes node.id}><simpara>#{node.text}</simpara></footnote>)
       end
     end
 
@@ -630,13 +639,13 @@ module Asciidoctor
           quoted_text = %(#{open}#{text}#{close})
         end
 
-        node.id ? %(<anchor#{common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
+        node.id ? %(<anchor#{_common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
       end
     end
 
     private
 
-    def common_attributes id, role = nil, reftext = nil
+    def _common_attributes id, role = nil, reftext = nil
       attrs = id ? %( xml:id="#{id}") : ''
       attrs = %(#{attrs} role="#{role}") if role
       if reftext
@@ -649,11 +658,9 @@ module Asciidoctor
       attrs
     end
 
-    def doctype_declaration root_tag_name
-      nil
-    end
+    def _doctype_declaration root_tag_name; end
 
-    def author_tag author
+    def _author_tag author
       result = []
       result << '<author>'
       result << '<personname>'
@@ -666,11 +673,11 @@ module Asciidoctor
       result.join LF
     end
 
-    def document_info_tag doc, info_tag_prefix, use_info_tag_prefix = false
+    def _document_info_tag doc, info_tag_prefix, use_info_tag_prefix = false
       info_tag_prefix = '' unless use_info_tag_prefix
       result = []
       result << %(<#{info_tag_prefix}info>)
-      result << document_title_tags(doc.doctitle partition: true, use_fallback: true) unless doc.notitle
+      result << _document_title_tags(doc.doctitle partition: true, use_fallback: true) unless doc.notitle
       if (date = (doc.attr? 'revdate') ? (doc.attr 'revdate') : ((doc.attr? 'reproducible') ? nil : (doc.attr 'docdate')))
         result << %(<date>#{date}</date>)
       end
@@ -685,10 +692,10 @@ module Asciidoctor
         unless (authors = doc.authors).empty?
           if authors.size > 1
             result << '<authorgroup>'
-            authors.each {|author| result << (author_tag author) }
+            authors.each {|author| result << (_author_tag author) }
             result << '</authorgroup>'
           else
-            result << author_tag(author = authors[0])
+            result << _author_tag(author = authors[0])
             result << %(<authorinitials>#{author.initials}</authorinitials>) if author.initials
           end
         end
@@ -704,10 +711,10 @@ module Asciidoctor
         end
         unless use_info_tag_prefix
           if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
-            if (back_cover_tag = cover_tag doc, 'back')
-              result << (cover_tag doc, 'front', true)
+            if (back_cover_tag = _cover_tag doc, 'back')
+              result << (_cover_tag doc, 'front', true)
               result << back_cover_tag
-            elsif (front_cover_tag = cover_tag doc, 'front')
+            elsif (front_cover_tag = _cover_tag doc, 'front')
               result << front_cover_tag
             end
           end
@@ -735,15 +742,15 @@ module Asciidoctor
       result.join LF
     end
 
-    def document_ns_attributes doc
+    def _document_ns_attributes doc
       ' xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"'
     end
 
-    def lang_attribute_name
+    def _lang_attribute_name
       'xml:lang'
     end
 
-    def document_title_tags title
+    def _document_title_tags title
       if title.subtitle?
         %(<title>#{title.main}</title>
 <subtitle>#{title.subtitle}</subtitle>)
@@ -753,15 +760,15 @@ module Asciidoctor
     end
 
     # FIXME this should be handled through a template mechanism
-    def resolve_content node
+    def _resolve_content node
       node.content_model == :compound ? node.content : %(<simpara>#{node.content}</simpara>)
     end
 
-    def title_tag node, optional = true
+    def _title_tag node, optional = true
       !optional || node.title? ? %(<title>#{node.title}</title>\n) : ''
     end
 
-    def cover_tag doc, face, use_placeholder = false
+    def _cover_tag doc, face, use_placeholder = false
       if (cover_image = doc.attr %(#{face}-cover-image))
         width_attr = ''
         depth_attr = ''
@@ -790,13 +797,13 @@ module Asciidoctor
       end
     end
 
-    def blockquote_tag node, tag_name = nil
+    def _blockquote_tag node, tag_name = nil
       if tag_name
         start_tag, end_tag = %(<#{tag_name}), %(</#{tag_name}>)
       else
         start_tag, end_tag = '<blockquote', '</blockquote>'
       end
-      result = [%(#{start_tag}#{common_attributes node.id, node.role, node.reftext}>)]
+      result = [%(#{start_tag}#{_common_attributes node.id, node.role, node.reftext}>)]
       result << %(<title>#{node.title}</title>) if node.title?
       if (node.attr? 'attribution') || (node.attr? 'citetitle')
         result << '<attribution>'
