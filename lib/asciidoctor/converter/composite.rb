@@ -22,10 +22,10 @@ module Asciidoctor
     # node      - the AbstractNode to convert
     # transform - the optional String transform, or the name of the node if no
     #             transform is specified. (default: nil)
-    # opts      - an optional Hash that is passed to the delegate's convert method. (default: {})
+    # opts      - an optional Hash that is passed to the delegate's convert method. (default: nil)
     #
     # Returns the String result returned from the delegate's convert method
-    def convert node, transform = nil, opts = {}
+    def convert node, transform = nil, opts = nil
       transform ||= node.node_name
       (converter_for transform).convert node, transform, opts
     end

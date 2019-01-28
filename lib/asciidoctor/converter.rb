@@ -177,10 +177,10 @@ module Asciidoctor
     #             the transform is typically derived from the value of the
     #             node's node_name property. (optional, default: nil)
     # opts      - An optional Hash of options that provide additional hints about
-    #             how to convert the node. (optional, default: {})
+    #             how to convert the node. (optional, default: nil)
     #
     # Returns the [String] result
-    def convert node, transform = nil, opts = {}
+    def convert node, transform = nil, opts = nil
       raise ::NotImplementedError
     end
 
