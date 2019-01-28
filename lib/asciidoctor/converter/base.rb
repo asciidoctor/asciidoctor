@@ -33,8 +33,7 @@ module Asciidoctor
     #
     # Returns the [String] result of conversion
     def convert node, transform = nil, opts = {}
-      transform ||= node.node_name
-      opts.empty? ? (send transform, node) : (send transform, node, opts)
+      opts.empty? ? (send transform || node.node_name, node) : (send transform || node.node_name, node, opts)
     end
 
     alias handles? respond_to?

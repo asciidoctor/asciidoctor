@@ -94,8 +94,7 @@ module Asciidoctor
     #
     # Returns the [String] result from rendering the template
     def convert node, template_name = nil, opts = {}
-      template_name ||= node.node_name
-      unless (template = @templates[template_name])
+      unless (template = @templates[template_name ||= node.node_name])
         raise %(Could not find a custom template to handle transform: #{template_name})
       end
 
