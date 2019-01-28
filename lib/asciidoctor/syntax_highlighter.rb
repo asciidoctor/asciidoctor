@@ -158,7 +158,7 @@ module Asciidoctor
       unless RUBY_ENGINE == 'opal'
         public
 
-        def register syntax_highlighter, *names
+        def register *args
           @@mutex.owned? ? super : @@mutex.synchronize { super }
         end
 
