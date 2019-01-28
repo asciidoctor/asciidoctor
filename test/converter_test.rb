@@ -349,6 +349,7 @@ content
           end
         end
 
+        assert CustomConverterB.converts? 'foobar'
         converters = Asciidoctor::Converter::Factory.converters
         assert converters.size == 1
         assert converters['foobar'] == CustomConverterB
@@ -462,6 +463,8 @@ content
           end
         end
 
+        assert CustomConverterF.converts? 'all'
+        assert CustomConverterF.converts? 'whatever'
         converters = Asciidoctor::Converter::Factory.converters
         assert converters['*'] == CustomConverterF
         output = convert_string input, backend: 'foobaz'

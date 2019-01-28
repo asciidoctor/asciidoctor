@@ -53,15 +53,10 @@ module Asciidoctor
       # Returns nothing
       def register_for *backends
         Factory.register self, backends
-        metaclass = class << self; self; end
         if backends == ['*']
-          metaclass.send :define_method, :converts? do |name|
-            true
-          end
+          define_singleton_method(:converts?) {|name| true }
         else
-          metaclass.send :define_method, :converts? do |name|
-            backends.include? name
-          end
+          define_singleton_method(:converts?) {|name| backends.include? name }
         end
         nil
       end
