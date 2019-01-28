@@ -328,7 +328,7 @@ class AbstractBlock < AbstractNode
     elsif xrefstyle && @title && @caption
       case xrefstyle
       when 'full'
-        quoted_title = sprintf sub_quotes(@document.compat_mode ? %q(``%s'') : '"`%s`"'), title
+        quoted_title = sub_placeholder (sub_quotes @document.compat_mode ? %q(``%s'') : '"`%s`"'), title
         if @numeral && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
           %(#{prefix} #{@numeral}, #{quoted_title})
         else
