@@ -155,7 +155,6 @@ module Asciidoctor
     # Returns a new instance of [Converter]
     def initialize backend, opts = {}
       @backend = backend
-      init_backend_info
     end
 
 =begin
