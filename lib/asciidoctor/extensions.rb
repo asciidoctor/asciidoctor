@@ -1,5 +1,5 @@
-# NOTE .to_s hides require from Opal
-require_relative '../asciidoctor'.to_s unless defined? Asciidoctor.load
+# allow `require 'asciidoctor/extensions'` to be used to fully load asciidoctor gem
+(require 'asciidoctor' unless defined? Asciidoctor.load) unless RUBY_ENGINE == 'opal'
 
 module Asciidoctor
 # Extensions provide a way to participate in the parsing and converting
