@@ -140,7 +140,15 @@ module Asciidoctor
       end
 
       private def registry
-        @registry ||= {}
+        @registry || (@registry = {})
+      end
+    end
+
+    class CustomFactory
+      include Factory
+
+      def initialize registry = nil
+        @registry = registry
       end
     end
 
@@ -192,14 +200,6 @@ module Asciidoctor
       end
     end
 
-    class CustomFactory
-      include Factory
-
-      def initialize registry = nil
-        @registry = registry
-      end
-    end
-
     class DefaultFactoryProxy < CustomFactory
       include DefaultFactory
 
@@ -207,8 +207,6 @@ module Asciidoctor
         (@registry.key? name) ? @registry[name] : super
       end
     end
-
-    extend DefaultFactory # exports static methods
 
     class Base
       include SyntaxHighlighter
@@ -225,6 +223,8 @@ module Asciidoctor
         end
       end
     end
+
+    extend DefaultFactory # exports static methods
   end
 end
 
