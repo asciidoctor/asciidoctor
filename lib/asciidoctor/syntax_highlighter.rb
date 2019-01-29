@@ -204,7 +204,7 @@ module Asciidoctor
       include DefaultFactory
 
       def for name
-        (@registry.key? name) ? @registry[name] : super
+        @registry.fetch(name) { super }
       end
     end
 
