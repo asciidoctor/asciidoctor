@@ -89,7 +89,7 @@ module Extensions
     end
 
     def process *args
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::Processor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{Processor} subclass #{self.class} must implement the ##{__method__} method)
     end
 
     # QUESTION should attributes be an option instead of a parameter?
@@ -259,7 +259,7 @@ module Extensions
         # TODO need a test for this!
         @process_block.call(*args)
       else
-        # TODO add exception message here
+        # FIXME add exception message here
         raise ::NotImplementedError
       end
     end
@@ -374,7 +374,7 @@ module Extensions
   # Preprocessor implementations must extend the Preprocessor class.
   class Preprocessor < Processor
     def process document, reader
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::Preprocessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{Preprocessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
   Preprocessor::DSL = DocumentProcessorDsl
@@ -391,7 +391,7 @@ module Extensions
   # QUESTION should the tree processor get invoked after parse header too?
   class TreeProcessor < Processor
     def process document
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::TreeProcessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{TreeProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
   TreeProcessor::DSL = DocumentProcessorDsl
@@ -416,7 +416,7 @@ module Extensions
   # Postprocessor implementations must Postprocessor.
   class Postprocessor < Processor
     def process document, output
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::Postprocessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{Postprocessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
   Postprocessor::DSL = DocumentProcessorDsl
@@ -434,7 +434,7 @@ module Extensions
   # TODO add file extension or regexp as shortcut for handles? method
   class IncludeProcessor < Processor
     def process document, reader, target, attributes
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::IncludeProcessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{IncludeProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
 
     def handles? target
@@ -480,7 +480,7 @@ module Extensions
     end
 
     def process document
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::DocinfoProcessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{DocinfoProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
 
@@ -536,7 +536,7 @@ module Extensions
     end
 
     def process parent, reader, attributes
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::BlockProcessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{BlockProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
 
@@ -562,7 +562,7 @@ module Extensions
     end
 
     def process parent, target, attributes
-      raise ::NotImplementedError, %(Asciidoctor::Extensions::MacroProcessor subclass must implement ##{__method__} method)
+      raise ::NotImplementedError, %(#{MacroProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
 
