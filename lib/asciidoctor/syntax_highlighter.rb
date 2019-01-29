@@ -32,7 +32,7 @@ module Asciidoctor
     #
     # Return the String markup to insert.
     def docinfo location
-      raise ::NotImplementedError, %(#{SyntaxHighlighter.name} must implement the docinfo method if the docinfo? method returns true)
+      raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #docinfo? returns true)
     end
 
     # Public: Indicates whether highlighting is handled by this syntax highlighter or by the client.
@@ -59,7 +59,7 @@ module Asciidoctor
     #
     # Returns the highlighted source String or a tuple of the highlighted source String and an Integer line offset.
     def highlight node, source, lang, opts
-      raise ::NotImplementedError, %(#{SyntaxHighlighter.name} must implement the highlight method if the highlight? method returns true)
+      raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #highlight? returns true)
     end
 
     # Public: Format the highlighted source for inclusion in an HTML document.
@@ -71,7 +71,7 @@ module Asciidoctor
     #
     # Returns the highlighted source String wrapped in preformatted tags (e.g., pre and code)
     def format node, lang, opts
-      raise ::NotImplementedError, %(#{SyntaxHighlighter.name} must implement the format method)
+      raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method)
     end
 
     # Public: Indicates whether this syntax highlighter wants to write a stylesheet to disk.
@@ -90,7 +90,7 @@ module Asciidoctor
     #
     # Returns nothing.
     def write_stylesheet doc, to_dir
-      raise ::NotImplementedError, %(#{SyntaxHighlighter.name} must implement the write_stylesheet method if the write_stylesheet? method returns true)
+      raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #write_stylesheet? returns true)
     end
 
     private_class_method def self.included into
@@ -134,7 +134,7 @@ module Asciidoctor
       def create name, backend = 'html5', opts = {}
         if (syntax_hl = self.for name)
           syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
-          raise ::NameError, %(#{syntax_hl.class.name} must specify a value for `name') unless syntax_hl.name
+          raise ::NameError, %(#{syntax_hl.class} must specify a value for `name') unless syntax_hl.name
           syntax_hl
         end
       end
