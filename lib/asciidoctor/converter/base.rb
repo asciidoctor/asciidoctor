@@ -8,8 +8,7 @@ module Asciidoctor
   # Concrete subclasses must implement the {#convert} method and, optionally,
   # the {#convert_with_options} method.
   class Converter::Base
-    include Logging
-    include Converter
+    include Converter, Logging
   end
 
   # An abstract base class for built-in {Converter} classes.
