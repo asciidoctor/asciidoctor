@@ -201,7 +201,7 @@ module Asciidoctor
     end
 
     class DefaultFactoryProxy < CustomFactory
-      include DefaultFactory # Ruby inserts the module into the ancestors chain immediately after the superclass
+      include DefaultFactory # inserts module into ancestors chain immediately after superclass
 
       def for name
         @registry.fetch(name) { super }
