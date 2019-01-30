@@ -170,8 +170,9 @@ module Asciidoctor
       unless RUBY_ENGINE == 'opal'
         public
 
-        def register *args
-          @@mutex.owned? ? super : @@mutex.synchronize { super }
+        def register syntax_highlighter, *names
+          @@mutex.owned? ? names.each {|name| @@registry = @@registry.merge name => syntax_highlighter } :
+              @@mutex.synchronize { register syntax_highlighter, *names }
         end
 
         # In addition to retrieving the syntax highlighter class or object registered for the specified name, this
@@ -185,7 +186,8 @@ module Asciidoctor
                   require_relative script_path
                   @@registry[name]
                 else
-                  @@registry[name] = nil
+                  @@registry = @@registry.merge name => nil
+                  nil
                 end
               end
             end
