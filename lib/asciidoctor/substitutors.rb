@@ -1467,7 +1467,7 @@ module Substitutors
     process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
   end
 
-  alias :sub_placeholder :sprintf
+  alias sub_placeholder sprintf
 
   # Internal: Lock-in the substitutions for this block
   #
