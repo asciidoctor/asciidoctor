@@ -140,15 +140,19 @@ module Asciidoctor
       end
 
       private def registry
-        @registry || (@registry = {})
+        raise ::NotImplementedError, %(#{Factory} subclass #{self.class} must implement the ##{__method__} method)
       end
     end
 
     class CustomFactory
       include Factory
 
-      def initialize registry = nil
-        @registry = registry
+      def initialize seed_registry = nil
+        @registry = seed_registry || {}
+      end
+
+      private def registry
+        @registry
       end
     end
 
@@ -157,11 +161,11 @@ module Asciidoctor
 
       private
 
+      @@registry = {}
+
       def registry
         @@registry
       end
-
-      @@registry = {}
 
       unless RUBY_ENGINE == 'opal'
         public
@@ -201,11 +205,11 @@ module Asciidoctor
     end
 
     class DefaultFactoryProxy < CustomFactory
-      include DefaultFactory # inserts module into ancestors chain immediately after superclass
+      include DefaultFactory # inserts module into ancestors immediately after superclass
 
       def for name
         @registry.fetch(name) { super }
-      end
+      end unless RUBY_ENGINE == 'opal'
     end
 
     class Base
