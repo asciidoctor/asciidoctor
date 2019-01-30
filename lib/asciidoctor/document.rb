@@ -1109,16 +1109,12 @@ class Document < AbstractBlock
   end
 
   # Internal: Create and initialize an instance of the converter for this document
+  #--
+  # QUESTION is there any additional information we should be passing to the converter?
   def create_converter
-    converter_opts = {}
-    converter_opts[:htmlsyntax] = @attributes['htmlsyntax']
-    if (template_dir = @options[:template_dir])
-      template_dirs = [template_dir]
-    elsif (template_dirs = @options[:template_dirs])
-      template_dirs = [*template_dirs]
-    end
-    if template_dirs
-      converter_opts[:template_dirs] = template_dirs
+    converter_opts = { htmlsyntax: @attributes['htmlsyntax'] }
+    if (template_dirs = @options[:template_dirs] || @options[:template_dir])
+      converter_opts[:template_dirs] = [*template_dirs]
       converter_opts[:template_cache] = @options.fetch :template_cache, true
       converter_opts[:template_engine] = @options[:template_engine]
       converter_opts[:template_engine_options] = @options[:template_engine_options]
@@ -1126,14 +1122,10 @@ class Document < AbstractBlock
       converter_opts[:safe] = @safe
     end
     if (converter = @options[:converter])
-      converter_factory = Converter::Factory.new @backend => converter
+      (Converter::Factory.new @backend => converter).create @backend, converter_opts
     else
-      converter_factory = Converter::Factory.default false
+      (Converter::Factory.default false).create @backend, converter_opts
     end
-    # QUESTION should we honor the convert_opts?
-    # QUESTION should we pass through all options and attributes too?
-    #converter_opts.update opts
-    converter_factory.create @backend, converter_opts
   end
 
   # Internal: Delete any attributes stored for playback
