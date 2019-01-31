@@ -23,21 +23,21 @@ module SyntaxHighlighter
   #
   # location - The Symbol representing the location slot (:head or :footer).
   #
-  # Returns a Boolean indicating whether the docinfo method should be called for this location.
+  # Returns a [Boolean] indicating whether the docinfo method should be called for this location.
   def docinfo? location; end
 
   # Public: Generates docinfo markup to insert in the output document at the specified location.
   #
   # location - The Symbol representing the location slot (:head or :footer).
   #
-  # Return the String markup to insert.
+  # Return the [String] markup to insert.
   def docinfo location
     raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #docinfo? returns true)
   end
 
   # Public: Indicates whether highlighting is handled by this syntax highlighter or by the client.
   #
-  # Returns a Boolean indicating whether the highlight method should be used to handle the :specialchars substitution.
+  # Returns a [Boolean] indicating whether the highlight method should be used to handle the :specialchars substitution.
   def highlight?; end
 
   # Public: Highlights the specified source when this source block is being converted.
@@ -69,7 +69,7 @@ module SyntaxHighlighter
   # opts   - A Hash of options that control syntax highlighting:
   #          :nowrap - A Boolean that indicates whether wrapping should be disabled (optional).
   #
-  # Returns the highlighted source String wrapped in preformatted tags (e.g., pre and code)
+  # Returns the highlighted source [String] wrapped in preformatted tags (e.g., pre and code)
   def format node, lang, opts
     raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method)
   end
@@ -80,7 +80,7 @@ module SyntaxHighlighter
   #
   # doc - The Document in which this syntax highlighter is being used.
   #
-  # Returns a Boolean indicating whether the write_stylesheet method should be called.
+  # Returns a [Boolean] indicating whether the write_stylesheet method should be called.
   def write_stylesheet? doc; end
 
   # Public: Writes the stylesheet to support the highlighted source(s) to disk.
@@ -118,7 +118,7 @@ module SyntaxHighlighter
     #
     # name - The String name of the syntax highlighter to retrieve.
     #
-    # Returns the SyntaxHighlighter class or instance registered for this name.
+    # Returns the SyntaxHighlighter Class or Object instance registered for this name.
     def for name
       registry[name]
     end
@@ -130,7 +130,7 @@ module SyntaxHighlighter
     # opts    - A Hash of options providing information about the context in which this syntax highlighter is used:
     #           :doc - The Document for which this syntax highlighter was created.
     #
-    # Returns a SyntaxHighlighter instance for the specified name.
+    # Returns a [SyntaxHighlighter] instance for the specified name.
     def create name, backend = 'html5', opts = {}
       if (syntax_hl = self.for name)
         syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
