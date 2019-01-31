@@ -1,5 +1,5 @@
 module Asciidoctor
-class SyntaxHighlighter::CodeRay < SyntaxHighlighter::Base
+class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
   register_for 'coderay'
 
   def initialize *args

@@ -1,5 +1,5 @@
 module Asciidoctor
-class SyntaxHighlighter::Prettify < SyntaxHighlighter::Base
+class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
   register_for 'prettify'
 
   def initialize *args

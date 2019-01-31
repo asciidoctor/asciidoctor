@@ -825,7 +825,7 @@ puts 'Hello, World!'
       syntax_hl_factory = Asciidoctor::SyntaxHighlighter::CustomFactory.new 'github' => (Asciidoctor::SyntaxHighlighter.for 'html-pipeline')
       doc = Asciidoctor.load input, safe: :safe, syntax_highlighter_factory: syntax_hl_factory, attributes: { 'source-highlighter' => 'github' }
       refute_nil doc.syntax_highlighter
-      assert_kind_of Asciidoctor::SyntaxHighlighter::HtmlPipeline, doc.syntax_highlighter
+      assert_kind_of Asciidoctor::SyntaxHighlighter::HtmlPipelineAdapter, doc.syntax_highlighter
       assert_includes doc.convert, '<pre lang="ruby"><code>'
     end
 

@@ -1,5 +1,5 @@
 module Asciidoctor
-class SyntaxHighlighter::HighlightJs < SyntaxHighlighter::Base
+class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   register_for 'highlightjs', 'highlight.js'
 
   def initialize *args

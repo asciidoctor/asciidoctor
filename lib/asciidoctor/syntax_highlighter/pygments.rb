@@ -1,5 +1,5 @@
 module Asciidoctor
-class SyntaxHighlighter::Pygments < SyntaxHighlighter::Base
+class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   register_for 'pygments'
 
   def initialize *args

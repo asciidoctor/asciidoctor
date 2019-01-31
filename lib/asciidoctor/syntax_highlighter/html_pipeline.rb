@@ -1,5 +1,5 @@
 module Asciidoctor
-class SyntaxHighlighter::HtmlPipeline < SyntaxHighlighter::Base
+class SyntaxHighlighter::HtmlPipelineAdapter < SyntaxHighlighter::Base
   register_for 'html-pipeline'
 
   def format node, lang, opts
