@@ -107,9 +107,7 @@ module Asciidoctor
       # Defines a new compliance key and assigns an initial value.
       def define key, value
         instance_variable_set %(@#{key}), value
-        class << self
-          self
-        end.send :attr_accessor, key
+        singleton_class.send :attr_accessor, key
         @keys << key
         nil
       end
