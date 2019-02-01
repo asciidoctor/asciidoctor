@@ -1046,7 +1046,7 @@ module Asciidoctor
     ReplaceableTextRx = /[&']|--|\.\.\.|\([CRT]M?\)/
 
     # Matches a whitespace delimiter, a sequence of spaces, tabs, and/or newlines.
-	# Matches the parsing rules of %w strings in Ruby.
+    # Matches the parsing rules of %w strings in Ruby.
     #
     # Examples
     #
