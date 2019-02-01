@@ -94,7 +94,7 @@ module LoggerManager
 
     def memoize_logger
       class << self
-        alias logger logger # suppress warning on CRuby
+        alias logger logger # suppresses warning from CRuby
         attr_reader :logger
       end
     end

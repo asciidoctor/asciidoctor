@@ -103,14 +103,16 @@ module Asciidoctor
     @keys = ::Set.new
     class << self
       attr_reader :keys
-    end
 
-    # Defines a new compliance key and assigns an initial value.
-    def self.define key, value
-      instance_variable_set %(@#{key}), value
-      class << self; self; end.send :attr_accessor, key
-      @keys << key
-      nil
+      # Defines a new compliance key and assigns an initial value.
+      def define key, value
+        instance_variable_set %(@#{key}), value
+        class << self
+          self
+        end.send :attr_accessor, key
+        @keys << key
+        nil
+      end
     end
 
     # AsciiDoc terminates paragraphs adjacent to
