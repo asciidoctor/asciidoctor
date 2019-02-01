@@ -94,27 +94,21 @@ module LoggerManager
 
     def memoize_logger
       class << self
-        alias_method :logger, :logger
-        if RUBY_ENGINE_OPAL
-          define_method :logger do @logger end
-        else
-          attr_reader :logger
-        end
+        alias logger logger # suppress warning on CRuby
+        attr_reader :logger
       end
     end
   end
 end
 
 module Logging
-  class << self
-    # Private: Additionally mixes the {Logging} module as static methods into any class that includes the {Logging} module.
-    #
-    # into - The Class that includes the {Logging} module
-    #
-    # Returns nothing
-    private def included into
-      into.extend Logging
-    end
+  # Private: Mixes the {Logging} module as static methods into any class that includes the {Logging} module.
+  #
+  # into - The Class that includes the {Logging} module
+  #
+  # Returns nothing
+  private_class_method def self.included into
+    into.extend Logging
   end
 
   def logger
