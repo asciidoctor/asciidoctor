@@ -1,7 +1,6 @@
 require_relative 'test_helper'
 
 context "Parser" do
-
   test "is_section_title?" do
     assert Asciidoctor::Parser.is_section_title?('AsciiDoc Home Page', '==================')
     assert Asciidoctor::Parser.is_section_title?('=== AsciiDoc Home Page')
@@ -356,9 +355,9 @@ context "Parser" do
   end
 
   test 'use explicit authorinitials if set after implicit author line' do
-    input = <<-EOS.chomp
-Jean-Claude Van Damme
-:authorinitials: JCVD
+    input = <<~'EOS'.chomp
+    Jean-Claude Van Damme
+    :authorinitials: JCVD
     EOS
     doc = empty_document
     parse_header_metadata input, doc
@@ -366,9 +365,9 @@ Jean-Claude Van Damme
   end
 
   test 'use explicit authorinitials if set after author attribute' do
-    input = <<-EOS.chomp
-:author: Jean-Claude Van Damme
-:authorinitials: JCVD
+    input = <<~'EOS'.chomp
+    :author: Jean-Claude Van Damme
+    :authorinitials: JCVD
     EOS
     doc = empty_document
     parse_header_metadata input, doc
@@ -384,9 +383,7 @@ Jean-Claude Van Damme
   end
 
   test 'does not drop name joiner when using multiple authors' do
-    input = <<-EOS
-Kismet Chameleon; Lazarus het_Draeke
-    EOS
+    input = 'Kismet Chameleon; Lazarus het_Draeke'
     doc = empty_document
     parse_header_metadata input, doc
     assert_equal 2, doc.attributes['authorcount']
@@ -397,9 +394,9 @@ Kismet Chameleon; Lazarus het_Draeke
   end
 
   test 'allows authors to be overridden using explicit author attributes' do
-    input = <<-EOS
-Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
-:author_2: Danger Mouse
+    input = <<~'EOS'
+    Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
+    :author_2: Danger Mouse
     EOS
     doc = empty_document
     parse_header_metadata input, doc
@@ -412,9 +409,7 @@ Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
   end
 
   test 'removes formatting before partitioning author defined using author attribute' do
-    input = <<-EOS
-:author: pass:n[http://example.org/community/team.html[Ze_**Project** team]]
-    EOS
+    input = ':author: pass:n[http://example.org/community/team.html[Ze_**Project** team]]'
 
     doc = empty_document
     parse_header_metadata input, doc
@@ -425,9 +420,9 @@ Kismet Chameleon; Johnny Bravo; Lazarus het_Draeke
   end
 
   test "parse rev number date remark" do
-    input = <<-EOS
-Ryan Waldron
-v0.0.7, 2013-12-18: The first release you can stand on
+    input = <<~'EOS'
+    Ryan Waldron
+    v0.0.7, 2013-12-18: The first release you can stand on
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 9, metadata.size
@@ -437,9 +432,9 @@ v0.0.7, 2013-12-18: The first release you can stand on
   end
 
   test 'parse rev number, data, and remark as attribute references' do
-    input = <<-EOS
-Author Name
-v{project-version}, {release-date}: {release-summary}
+    input = <<~'EOS'
+    Author Name
+    v{project-version}, {release-date}: {release-summary}
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 9, metadata.size
@@ -449,10 +444,10 @@ v{project-version}, {release-date}: {release-summary}
   end
 
   test 'should resolve attribute references in rev number, data, and remark' do
-    input = <<-EOS
-= Document Title
-Author Name
-{project-version}, {release-date}: {release-summary}
+    input = <<~'EOS'
+    = Document Title
+    Author Name
+    {project-version}, {release-date}: {release-summary}
     EOS
     doc = document_from_string input, attributes: {
       'project-version' => '1.0.1',
@@ -465,9 +460,9 @@ Author Name
   end
 
   test "parse rev date" do
-    input = <<-EOS
-Ryan Waldron
-2013-12-18
+    input = <<~'EOS'
+    Ryan Waldron
+    2013-12-18
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
@@ -475,9 +470,9 @@ Ryan Waldron
   end
 
   test 'parse rev number with trailing comma' do
-    input = <<-EOS
-Stuart Rackham
-v8.6.8,
+    input = <<~'EOS'
+    Stuart Rackham
+    v8.6.8,
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
@@ -487,9 +482,9 @@ v8.6.8,
 
   # Asciidoctor recognizes a standalone revision without a trailing comma
   test 'parse rev number' do
-    input = <<-EOS
-Stuart Rackham
-v8.6.8
+    input = <<~'EOS'
+    Stuart Rackham
+    v8.6.8
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
@@ -499,9 +494,9 @@ v8.6.8
 
   # while compliant w/ AsciiDoc, this is just sloppy parsing
   test "treats arbitrary text on rev line as revdate" do
-    input = <<-EOS
-Ryan Waldron
-foobar
+    input = <<~'EOS'
+    Ryan Waldron
+    foobar
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
@@ -509,9 +504,9 @@ foobar
   end
 
   test "parse rev date remark" do
-    input = <<-EOS
-Ryan Waldron
-2013-12-18:  The first release you can stand on
+    input = <<~'EOS'
+    Ryan Waldron
+    2013-12-18:  The first release you can stand on
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 8, metadata.size
@@ -520,9 +515,9 @@ Ryan Waldron
   end
 
   test "should not mistake attribute entry as rev remark" do
-    input = <<-EOS
-Joe Cool
-:page-layout: post
+    input = <<~'EOS'
+    Joe Cool
+    :page-layout: post
     EOS
     metadata, _ = parse_header_metadata input
     refute_equal 'page-layout: post', metadata['revremark']
@@ -530,9 +525,9 @@ Joe Cool
   end
 
   test "parse rev remark only" do
-    input = <<-EOS
-Joe Cool
- :Must start revremark-only line with space
+    input = <<~'EOS'
+    Joe Cool
+     :Must start revremark-only line with space
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 'Must start revremark-only line with space', metadata['revremark']
@@ -540,10 +535,10 @@ Joe Cool
   end
 
   test "skip line comments before author" do
-    input = <<-EOS
-// Asciidoctor
-// release artist
-Ryan Waldron
+    input = <<~'EOS'
+    // Asciidoctor
+    // release artist
+    Ryan Waldron
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 6, metadata.size
@@ -555,12 +550,12 @@ Ryan Waldron
   end
 
   test "skip block comment before author" do
-    input = <<-EOS
-////
-Asciidoctor
-release artist
-////
-Ryan Waldron
+    input = <<~'EOS'
+    ////
+    Asciidoctor
+    release artist
+    ////
+    Ryan Waldron
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 6, metadata.size
@@ -572,13 +567,13 @@ Ryan Waldron
   end
 
   test "skip block comment before rev" do
-    input = <<-EOS
-Ryan Waldron
-////
-Asciidoctor
-release info
-////
-v0.0.7, 2013-12-18
+    input = <<~'EOS'
+    Ryan Waldron
+    ////
+    Asciidoctor
+    release info
+    ////
+    v0.0.7, 2013-12-18
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 8, metadata.size
@@ -589,11 +584,11 @@ v0.0.7, 2013-12-18
   end
 
   test 'break header at line with three forward slashes' do
-    input = <<-EOS
-Joe Cool
-v1.0
-///
-stuff
+    input = <<~'EOS'
+    Joe Cool
+    v1.0
+    ///
+    stuff
     EOS
     metadata, _ = parse_header_metadata input
     assert_equal 7, metadata.size
@@ -610,7 +605,7 @@ stuff
   end
 
   test 'adjust indentation to 0' do
-    input = <<-EOS.chomp
+    input = <<-'EOS'.chomp
     def names
 
       @name.split
@@ -618,63 +613,29 @@ stuff
     end
     EOS
 
-    expected = <<-EOS.chomp
-def names
+    expected = <<~'EOS'.chomp
+    def names
 
-  @name.split
+      @name.split
 
-end
+    end
     EOS
 
-    lines = input.split("\n")
+    lines = input.split ?\n
     Asciidoctor::Parser.adjust_indentation! lines
-    assert_equal expected, (lines * "\n")
+    assert_equal expected, (lines * ?\n)
   end
 
   test 'adjust indentation mixed with tabs and spaces to 0' do
-    input = <<-EOS.chomp
-    def names
+    input = <<~EOS.chomp
+        def names
 
-\t  @name.split
+    \t  @name.split
 
-    end
+        end
     EOS
 
-    expected = <<-EOS.chomp
-def names
-
-  @name.split
-
-end
-    EOS
-
-    lines = input.split("\n")
-    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
-    assert_equal expected, (lines * "\n")
-  end
-
-  test 'expands tabs to spaces' do
-    input = <<-EOS.chomp
-Filesystem				Size	Used	Avail	Use%	Mounted on
-Filesystem              Size    Used    Avail   Use%    Mounted on
-devtmpfs				3.9G	   0	 3.9G	  0%	/dev
-/dev/mapper/fedora-root	 48G	 18G	  29G	 39%	/
-    EOS
-
-    expected = <<-EOS.chomp
-Filesystem              Size    Used    Avail   Use%    Mounted on
-Filesystem              Size    Used    Avail   Use%    Mounted on
-devtmpfs                3.9G       0     3.9G     0%    /dev
-/dev/mapper/fedora-root  48G     18G      29G    39%    /
-    EOS
-
-    lines = input.split("\n")
-    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
-    assert_equal expected, (lines * "\n")
-  end
-
-  test 'adjust indentation to non-zero' do
-    input = <<-EOS.chomp
+    expected = <<~EOS.chomp
     def names
 
       @name.split
@@ -682,7 +643,41 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
     end
     EOS
 
-    expected = <<-EOS.chomp
+    lines = input.split ?\n
+    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
+    assert_equal expected, (lines * ?\n)
+  end
+
+  test 'expands tabs to spaces' do
+    input = <<~'EOS'.chomp
+    Filesystem				Size	Used	Avail	Use%	Mounted on
+    Filesystem              Size    Used    Avail   Use%    Mounted on
+    devtmpfs				3.9G	   0	 3.9G	  0%	/dev
+    /dev/mapper/fedora-root	 48G	 18G	  29G	 39%	/
+    EOS
+
+    expected = <<~'EOS'.chomp
+    Filesystem              Size    Used    Avail   Use%    Mounted on
+    Filesystem              Size    Used    Avail   Use%    Mounted on
+    devtmpfs                3.9G       0     3.9G     0%    /dev
+    /dev/mapper/fedora-root  48G     18G      29G    39%    /
+    EOS
+
+    lines = input.split ?\n
+    Asciidoctor::Parser.adjust_indentation! lines, 0, 4
+    assert_equal expected, (lines * ?\n)
+  end
+
+  test 'adjust indentation to non-zero' do
+    input = <<-'EOS'.chomp
+    def names
+
+      @name.split
+
+    end
+    EOS
+
+    expected = <<-'EOS'.chomp
   def names
 
     @name.split
@@ -690,13 +685,13 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
   end
     EOS
 
-    lines = input.split("\n")
+    lines = input.split ?\n
     Asciidoctor::Parser.adjust_indentation! lines, 2
-    assert_equal expected, (lines * "\n")
+    assert_equal expected, (lines * ?\n)
   end
 
   test 'preserve block indent if indent is -1' do
-    input = <<-EOS
+    input = <<-'EOS'
     def names
 
       @name.split
@@ -721,13 +716,13 @@ devtmpfs                3.9G       0     3.9G     0%    /dev
   end
 
   test 'should warn if inline anchor is already in use' do
-    input = <<-EOS
-[#in-use]
-A paragraph with an id.
+    input = <<~'EOS'
+    [#in-use]
+    A paragraph with an id.
 
-Another paragraph
-[[in-use]]that uses an id
-which is already in use.
+    Another paragraph
+    [[in-use]]that uses an id
+    which is already in use.
     EOS
 
     using_memory_logger do |logger|
