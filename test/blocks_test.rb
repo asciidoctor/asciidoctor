@@ -310,6 +310,21 @@ paragraph
     end
   end
 
+  context 'Sidebar Blocks' do
+    test 'should parse sidebar block' do
+      input = <<~'EOS'
+      == Section
+
+      .Sidebar
+      ****
+      Content goes here
+      ****
+      EOS
+      result = convert_string input
+      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+    end
+  end
+
   context 'Quote and Verse Blocks' do
     test 'quote block with no attribution' do
       input = <<-EOS

@@ -3,10 +3,10 @@ require_relative 'test_helper'
 context 'Paragraphs' do
   context 'Normal' do
     test 'should treat plain text separated by blank lines as paragraphs' do
-      input = <<-EOS
-Plain text for the win!
+      input = <<~'EOS'
+      Plain text for the win!
 
-Yep. Text. Plain and simple.
+      Yep. Text. Plain and simple.
       EOS
       output = convert_string_to_embedded input
       assert_css 'p', output, 2
@@ -15,11 +15,11 @@ Yep. Text. Plain and simple.
     end
 
     test 'should associate block title with paragraph' do
-      input = <<-EOS
-.Titled
-Paragraph.
+      input = <<~'EOS'
+      .Titled
+      Paragraph.
 
-Winning.
+      Winning.
       EOS
       output = convert_string_to_embedded input
 
@@ -30,20 +30,20 @@ Winning.
     end
 
     test 'no duplicate block before next section' do
-      input = <<-EOS
-= Title
+      input = <<~'EOS'
+      = Title
 
-Preamble
+      Preamble
 
-== First Section
+      == First Section
 
-Paragraph 1
+      Paragraph 1
 
-Paragraph 2
+      Paragraph 2
 
-== Second Section
+      == Second Section
 
-Last words
+      Last words
       EOS
 
       output = convert_string input
@@ -51,9 +51,9 @@ Last words
     end
 
     test 'does not treat wrapped line as a list item' do
-      input = <<-EOS
-paragraph
-. wrapped line
+      input = <<~'EOS'
+      paragraph
+      . wrapped line
       EOS
 
       output = convert_string_to_embedded input
@@ -62,9 +62,9 @@ paragraph
     end
 
     test 'does not treat wrapped line as a block title' do
-      input = <<-EOS
-paragraph
-.wrapped line
+      input = <<~'EOS'
+      paragraph
+      .wrapped line
       EOS
 
       output = convert_string_to_embedded input
@@ -73,10 +73,10 @@ paragraph
     end
 
     test 'interprets normal paragraph style as normal paragraph' do
-      input = <<-EOS
-[normal]
-Normal paragraph.
-Nothing special.
+      input = <<~'EOS'
+      [normal]
+      Normal paragraph.
+      Nothing special.
       EOS
 
       output = convert_string_to_embedded input
@@ -84,11 +84,11 @@ Nothing special.
     end
 
     test 'removes indentation from literal paragraph marked as normal' do
-      input = <<-EOS
-[normal]
-  Normal paragraph.
-    Nothing special.
-  Last line.
+      input = <<~'EOS'
+      [normal]
+        Normal paragraph.
+          Nothing special.
+        Last line.
       EOS
 
       output = convert_string_to_embedded input
@@ -97,10 +97,10 @@ Nothing special.
     end
 
     test 'normal paragraph terminates at block attribute list' do
-      input = <<-EOS
-normal text
-[literal]
-literal text
+      input = <<~'EOS'
+      normal text
+      [literal]
+      literal text
       EOS
       output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 1
@@ -108,11 +108,11 @@ literal text
     end
 
     test 'normal paragraph terminates at block delimiter' do
-      input = <<-EOS
-normal text
---
-text in open block
---
+      input = <<~'EOS'
+      normal text
+      --
+      text in open block
+      --
       EOS
       output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 1
@@ -120,9 +120,9 @@ text in open block
     end
 
     test 'normal paragraph terminates at list continuation' do
-      input = <<-EOS
-normal text
-+
+      input = <<~'EOS'
+      normal text
+      +
       EOS
       output = convert_string_to_embedded input
       assert_css '.paragraph:root', output, 2
@@ -131,10 +131,10 @@ normal text
     end
 
     test 'normal style turns literal paragraph into normal paragraph' do
-      input = <<-EOS
-[normal]
- normal paragraph,
- despite the leading indent
+      input = <<~'EOS'
+      [normal]
+       normal paragraph,
+       despite the leading indent
       EOS
 
       output = convert_string_to_embedded input
@@ -142,12 +142,12 @@ normal text
     end
 
     test 'expands index term macros in DocBook backend' do
-      input = <<-EOS
-Here is an index entry for ((tigers)).
-indexterm:[Big cats,Tigers,Siberian Tiger]
-Here is an index entry for indexterm2:[Linux].
-(((Operating Systems,Linux,Fedora)))
-Note that multi-entry terms generate separate index entries.
+      input = <<~'EOS'
+      Here is an index entry for ((tigers)).
+      indexterm:[Big cats,Tigers,Siberian Tiger]
+      Here is an index entry for indexterm2:[Linux].
+      (((Operating Systems,Linux,Fedora)))
+      Note that multi-entry terms generate separate index entries.
       EOS
 
       output = convert_string_to_embedded input, attributes: { 'backend' => 'docbook45' }
@@ -184,9 +184,9 @@ Note that multi-entry terms generate separate index entries.
     end
 
     test 'normal paragraph should honor explicit subs list' do
-      input = <<-EOS
-[subs="specialcharacters"]
-*<Hey Jude>*
+      input = <<~'EOS'
+      [subs="specialcharacters"]
+      *<Hey Jude>*
       EOS
 
       output = convert_string_to_embedded input
@@ -194,9 +194,9 @@ Note that multi-entry terms generate separate index entries.
     end
 
     test 'normal paragraph should honor specialchars shorthand' do
-      input = <<-EOS
-[subs="specialchars"]
-*<Hey Jude>*
+      input = <<~'EOS'
+      [subs="specialchars"]
+      *<Hey Jude>*
       EOS
 
       output = convert_string_to_embedded input
@@ -204,11 +204,11 @@ Note that multi-entry terms generate separate index entries.
     end
 
     test 'should add a hardbreak at end of each line when hardbreaks option is set' do
-      input = <<-EOS
-[%hardbreaks]
-read
-my
-lips
+      input = <<~'EOS'
+      [%hardbreaks]
+      read
+      my
+      lips
       EOS
 
       output = convert_string_to_embedded input
@@ -220,25 +220,27 @@ lips
 
   context 'Literal' do
     test 'single-line literal paragraphs' do
-      input = <<-EOS
- LITERALS
+      input = <<~'EOS'
+      you know what?
 
- ARE LITERALLY
+       LITERALS
 
- AWESOME!
+       ARE LITERALLY
+
+       AWESOME!
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//pre', output, 3
     end
 
     test 'multi-line literal paragraph' do
-      input = <<-EOS
-Install instructions:
+      input = <<~'EOS'
+      Install instructions:
 
- yum install ruby rubygems
- gem install asciidoctor
+       yum install ruby rubygems
+       gem install asciidoctor
 
-You're good to go!
+      You're good to go!
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//pre', output, 1
@@ -247,18 +249,18 @@ You're good to go!
     end
 
     test 'literal paragraph' do
-      input = <<-EOS
-[literal]
-this text is literally literal
+      input = <<~'EOS'
+      [literal]
+      this text is literally literal
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]//pre[text()="this text is literally literal"]), output, 1
     end
 
     test 'should read content below literal style verbatim' do
-      input = <<-EOS
-[literal]
-image::not-an-image-block[]
+      input = <<~'EOS'
+      [literal]
+      image::not-an-image-block[]
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]//pre[text()="image::not-an-image-block[]"]), output, 1
@@ -266,37 +268,37 @@ image::not-an-image-block[]
     end
 
     test 'listing paragraph' do
-      input = <<-EOS
-[listing]
-this text is a listing
+      input = <<~'EOS'
+      [listing]
+      this text is a listing
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[text()="this text is a listing"]), output, 1
     end
 
     test 'source paragraph' do
-      input = <<-EOS
-[source]
-use the source, luke!
+      input = <<~'EOS'
+      [source]
+      use the source, luke!
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[text()="use the source, luke!"]), output, 1
     end
 
     test 'source code paragraph with language' do
-      input = <<-EOS
-[source, perl]
-die 'zomg perl sucks';
+      input = <<~'EOS'
+      [source, perl]
+      die 'zomg perl sucks';
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="language-perl"][@data-lang="perl"][text()="die 'zomg perl sucks';"]), output, 1
     end
 
     test 'literal paragraph terminates at block attribute list' do
-      input = <<-EOS
- literal text
-[normal]
-normal text
+      input = <<~'EOS'
+       literal text
+      [normal]
+      normal text
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
@@ -304,11 +306,11 @@ normal text
     end
 
     test 'literal paragraph terminates at block delimiter' do
-      input = <<-EOS
- literal text
---
-normal text
---
+      input = <<~'EOS'
+       literal text
+      --
+      normal text
+      --
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
@@ -316,9 +318,9 @@ normal text
     end
 
     test 'literal paragraph terminates at list continuation' do
-      input = <<-EOS
- literal text
-+
+      input = <<~'EOS'
+       literal text
+      +
       EOS
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="literalblock"]), output, 1
@@ -330,9 +332,9 @@ normal text
 
   context 'Quote' do
     test "single-line quote paragraph" do
-      input = <<-EOS
-[quote]
-Famous quote.
+      input = <<~'EOS'
+      [quote]
+      Famous quote.
       EOS
       output = convert_string input
       assert_xpath '//*[@class = "quoteblock"]', output, 1
@@ -341,10 +343,10 @@ Famous quote.
     end
 
     test 'quote paragraph terminates at list continuation' do
-      input = <<-EOS
-[quote]
-A famouse quote.
-+
+      input = <<~'EOS'
+      [quote]
+      A famouse quote.
+      +
       EOS
       output = convert_string_to_embedded input
       assert_css '.quoteblock:root', output, 1
@@ -361,9 +363,9 @@ A famouse quote.
     end
 
     test 'should perform normal subs on a verse paragraph' do
-      input = <<-EOS
-[verse]
-_GET /groups/link:#group-id[\{group-id\}]_
+      input = <<~'EOS'
+      [verse]
+      _GET /groups/link:#group-id[\{group-id\}]_
       EOS
 
       output = convert_string_to_embedded input
@@ -371,10 +373,10 @@ _GET /groups/link:#group-id[\{group-id\}]_
     end
 
     test 'quote paragraph should honor explicit subs list' do
-      input = <<-EOS
-[subs="specialcharacters"]
-[quote]
-*Hey Jude*
+      input = <<~'EOS'
+      [subs="specialcharacters"]
+      [quote]
+      *Hey Jude*
       EOS
 
       output = convert_string_to_embedded input
@@ -401,69 +403,60 @@ _GET /groups/link:#group-id[\{group-id\}]_
       end
     end
 
-    test "sidebar block" do
-      input = <<-EOS
-== Section
-
-.Sidebar
-****
-Content goes here
-****
+    test 'should process preprocessor conditional in paragraph content' do
+      input = <<~'EOS'
+      ifdef::asciidoctor-version[]
+      [sidebar]
+      First line of sidebar.
+      ifdef::backend[The backend is {backend}.]
+      Last line of sidebar.
+      endif::[]
       EOS
-      result = convert_string(input)
-      assert_xpath "//*[@class='sidebarblock']//p", result, 1
-    end
 
-    test 'should process preprocessor conditional in paragrpah content' do
-      input = <<-EOS
-ifdef::asciidoctor-version[]
-[sidebar]
-First line of sidebar.
-ifdef::backend[The backend is {backend}.]
-Last line of sidebar.
-endif::[]
+      expected = <<~'EOS'.chomp
+      <div class="sidebarblock">
+      <div class="content">
+      First line of sidebar.
+      The backend is html5.
+      Last line of sidebar.
+      </div>
+      </div>
       EOS
 
       result = convert_string_to_embedded input
-      assert_equal %(<div class="sidebarblock">
-<div class="content">
-First line of sidebar.
-The backend is html5.
-Last line of sidebar.
-</div>
-</div>), result
+      assert_equal expected, result
     end
 
     context 'Styled Paragraphs' do
       test 'should wrap text in simpara for styled paragraphs when converted to DocBook' do
-        input = <<-EOS
-= Book
-:doctype: book
+        input = <<~'EOS'
+        = Book
+        :doctype: book
 
-[preface]
-= About this book
+        [preface]
+        = About this book
 
-[abstract]
-An abstract for the book.
+        [abstract]
+        An abstract for the book.
 
-= Part 1
+        = Part 1
 
-[partintro]
-An intro to this part.
+        [partintro]
+        An intro to this part.
 
-== Chapter 1
+        == Chapter 1
 
-[sidebar]
-Just a side note.
+        [sidebar]
+        Just a side note.
 
-[example]
-As you can see here.
+        [example]
+        As you can see here.
 
-[quote]
-Wise words from a wise person.
+        [quote]
+        Wise words from a wise person.
 
-[open]
-Make it what you want.
+        [open]
+        Make it what you want.
         EOS
 
         output = convert_string input, backend: 'docbook'
@@ -476,9 +469,9 @@ Make it what you want.
       end
 
       test 'should convert open paragraph to open block' do
-        input = <<-EOS
-[open]
-Make it what you want.
+        input = <<~'EOS'
+        [open]
+        Make it what you want.
         EOS
 
         output = convert_string_to_embedded input
@@ -487,36 +480,36 @@ Make it what you want.
       end
 
       test 'should wrap text in simpara for styled paragraphs with title when converted to DocBook' do
-        input = <<-EOS
-= Book
-:doctype: book
+        input = <<~'EOS'
+        = Book
+        :doctype: book
 
-[preface]
-= About this book
+        [preface]
+        = About this book
 
-[abstract]
-.Abstract title
-An abstract for the book.
+        [abstract]
+        .Abstract title
+        An abstract for the book.
 
-= Part 1
+        = Part 1
 
-[partintro]
-.Part intro title
-An intro to this part.
+        [partintro]
+        .Part intro title
+        An intro to this part.
 
-== Chapter 1
+        == Chapter 1
 
-[sidebar]
-.Sidebar title
-Just a side note.
+        [sidebar]
+        .Sidebar title
+        Just a side note.
 
-[example]
-.Example title
-As you can see here.
+        [example]
+        .Example title
+        As you can see here.
 
-[quote]
-.Quote title
-Wise words from a wise person.
+        [quote]
+        .Quote title
+        Wise words from a wise person.
         EOS
 
         output = convert_string input, backend: 'docbook'
