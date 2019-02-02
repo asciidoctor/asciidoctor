@@ -84,7 +84,8 @@ context 'Paragraphs' do
     end
 
     test 'removes indentation from literal paragraph marked as normal' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       [normal]
         Normal paragraph.
           Nothing special.
@@ -220,7 +221,8 @@ context 'Paragraphs' do
 
   context 'Literal' do
     test 'single-line literal paragraphs' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       you know what?
 
        LITERALS
@@ -234,7 +236,8 @@ context 'Paragraphs' do
     end
 
     test 'multi-line literal paragraph' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       Install instructions:
 
        yum install ruby rubygems
@@ -295,7 +298,8 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block attribute list' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
        literal text
       [normal]
       normal text
@@ -306,7 +310,8 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block delimiter' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
        literal text
       --
       normal text
@@ -318,7 +323,8 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at list continuation' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
        literal text
       +
       EOS

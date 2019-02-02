@@ -265,7 +265,8 @@ context 'Tables' do
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       [cols=2*]
       |===
       l|
@@ -282,7 +283,8 @@ context 'Tables' do
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in verse table cells' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       [cols=2*]
       |===
       v|
@@ -1266,7 +1268,8 @@ context 'Tables' do
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
-      input = <<~'EOS'
+      # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+      input = <<~EOS
       |===
       a|
        $ command

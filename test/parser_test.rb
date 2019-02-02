@@ -525,7 +525,8 @@ context "Parser" do
   end
 
   test "parse rev remark only" do
-    input = <<~'EOS'
+    # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+    input = <<~EOS
     Joe Cool
      :Must start revremark-only line with space
     EOS
@@ -613,7 +614,8 @@ context "Parser" do
     end
     EOS
 
-    expected = <<~'EOS'.chomp
+    # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+    expected = <<~EOS.chomp
     def names
 
       @name.split
