@@ -1,15 +1,14 @@
 require_relative 'test_helper'
 
 context 'Tables' do
-
   context 'PSV' do
     test 'converts simple psv table' do
-      input = <<-EOS
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
       doc = document_from_string input, header_footer: false
@@ -34,13 +33,13 @@ context 'Tables' do
     end
 
     test 'should add direction CSS class if float attribute is set on table' do
-      input = <<-EOS
-[float=left]
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [float=left]
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
 
       output = convert_string_to_embedded input
@@ -48,13 +47,13 @@ context 'Tables' do
     end
 
     test 'should set stripes class if stripes option is set' do
-      input = <<-EOS
-[stripes=odd]
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [stripes=odd]
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
 
       output = convert_string_to_embedded input
@@ -62,13 +61,13 @@ context 'Tables' do
     end
 
     test 'outputs a caption on simple psv table' do
-      input = <<-EOS
-.Simple psv table
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      .Simple psv table
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/table/caption[@class="title"][text()="Table 1. Simple psv table"]', output, 1
@@ -76,20 +75,20 @@ context 'Tables' do
     end
 
     test 'only increments table counter for tables that have a title' do
-      input = <<-EOS
-.First numbered table
-|=======
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      .First numbered table
+      |=======
+      |1 |2 |3
+      |=======
 
-|=======
-|4 |5 |6
-|=======
+      |=======
+      |4 |5 |6
+      |=======
 
-.Second numbered table
-|=======
-|7 |8 |9
-|=======
+      .Second numbered table
+      |=======
+      |7 |8 |9
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_css 'table:root', output, 3
@@ -101,14 +100,14 @@ context 'Tables' do
     end
 
     test 'uses explicit caption in front of title in place of default caption and number' do
-      input = <<-EOS
-[caption="All the Data. "]
-.Simple psv table
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [caption="All the Data. "]
+      .Simple psv table
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/table/caption[@class="title"][text()="All the Data. Simple psv table"]', output, 1
@@ -116,14 +115,14 @@ context 'Tables' do
     end
 
     test 'disables caption when caption attribute on table is empty' do
-      input = <<-EOS
-[caption=]
-.Simple psv table
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [caption=]
+      .Simple psv table
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
@@ -131,14 +130,14 @@ context 'Tables' do
     end
 
     test 'disables caption when caption attribute on table is empty string' do
-      input = <<-EOS
-[caption=""]
-.Simple psv table
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [caption=""]
+      .Simple psv table
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
@@ -146,15 +145,15 @@ context 'Tables' do
     end
 
     test 'disables caption on table when table-caption document attribute is unset' do
-      input = <<-EOS
-:!table-caption:
+      input = <<~'EOS'
+      :!table-caption:
 
-.Simple psv table
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      .Simple psv table
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/table/caption[@class="title"][text()="Simple psv table"]', output, 1
@@ -162,10 +161,10 @@ context 'Tables' do
     end
 
     test 'ignores escaped separators' do
-      input = <<-EOS
-|===
-|A \\| here| a \\| there
-|===
+      input = <<~'EOS'
+      |===
+      |A \| here| a \| there
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -177,13 +176,13 @@ context 'Tables' do
     end
 
     test 'preserves escaped delimiters at the end of the line' do
-      input = <<-EOS
-[%header,cols="1,1"]
-|===
-|A |B\\|
-|A1 |B1\\|
-|A2 |B2\\|
-|===
+      input = <<~'EOS'
+      [%header,cols="1,1"]
+      |===
+      |A |B\|
+      |A1 |B1\|
+      |A2 |B2\|
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -199,12 +198,12 @@ context 'Tables' do
     end
 
     test 'should treat trailing pipe as an empty cell' do
-      input = <<-EOS
-|===
-|A1 |
-|B1 |B2
-|C1 |C2
-|===
+      input = <<~'EOS'
+      |===
+      |A1 |
+      |B1 |B2
+      |C1 |C2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -217,14 +216,14 @@ context 'Tables' do
     end
 
     test 'should auto recover with warning if missing leading separator on first cell' do
-      input = <<-EOS
-|===
-A | here| a | there
-| x
-| y
-| z
-| end
-|===
+      input = <<~'EOS'
+      |===
+      A | here| a | there
+      | x
+      | y
+      | z
+      | end
+      |===
       EOS
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
@@ -240,11 +239,11 @@ A | here| a | there
     end
 
     test 'performs normal substitutions on cell content' do
-      input = <<-EOS
-:show_title: Cool new show
-|===
-|{show_title} |Coming soon...
-|===
+      input = <<~'EOS'
+      :show_title: Cool new show
+      |===
+      |{show_title} |Coming soon...
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//tbody/tr/td[1]/p[text()="Cool new show"]', output, 1
@@ -252,13 +251,13 @@ A | here| a | there
     end
 
     test 'should only substitute specialchars for literal table cells' do
-      input = <<-EOS
-|===
-l|one
-*two*
-three
-<four>
-|===
+      input = <<~'EOS'
+      |===
+      l|one
+      *two*
+      three
+      <four>
+      |===
       EOS
       output = convert_string_to_embedded input
       result = xmlnodes_at_xpath('/table//pre', output, 1)
@@ -266,16 +265,16 @@ three
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
-      input = <<-EOS
-[cols=2*]
-|===
-l|
-  one
-  two
-three
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      l|
+        one
+        two
+      three
 
-  | normal
-|===
+        | normal
+      |===
       EOS
       output = convert_string_to_embedded input
       result = xmlnodes_at_xpath('/table//pre', output, 1)
@@ -283,16 +282,16 @@ three
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in verse table cells' do
-      input = <<-EOS
-[cols=2*]
-|===
-v|
-  one
-  two
-three
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      v|
+        one
+        two
+      three
 
-  | normal
-|===
+        | normal
+      |===
       EOS
       output = convert_string_to_embedded input
       result = xmlnodes_at_xpath('/table//div[@class="verse"]', output, 1)
@@ -300,13 +299,13 @@ three
     end
 
     test 'table and column width not assigned when autowidth option is specified' do
-      input = <<-EOS
-[options="autowidth"]
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [options="autowidth"]
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -317,13 +316,13 @@ three
     end
 
     test 'does not assign column width for autowidth columns in HTML output' do
-      input = <<-EOS
-[cols="15%,3*~"]
-|=======
-|A |B |C |D
-|a |b |c |d
-|1 |2 |3 |4
-|=======
+      input = <<~'EOS'
+      [cols="15%,3*~"]
+      |=======
+      |A |B |C |D
+      |a |b |c |d
+      |1 |2 |3 |4
+      |=======
       EOS
       doc = document_from_string input
       table_row0 = doc.blocks[0].rows.body[0]
@@ -344,13 +343,13 @@ three
     end
 
     test 'can assign autowidth to all columns even when table has a width' do
-      input = <<-EOS
-[cols="4*~",width=50%]
-|=======
-|A |B |C |D
-|a |b |c |d
-|1 |2 |3 |4
-|=======
+      input = <<~'EOS'
+      [cols="4*~",width=50%]
+      |=======
+      |A |B |C |D
+      |a |b |c |d
+      |1 |2 |3 |4
+      |=======
       EOS
       doc = document_from_string input
       table_row0 = doc.blocks[0].rows.body[0]
@@ -367,13 +366,13 @@ three
     end
 
     test 'equally distributes remaining column width to autowidth columns in DocBook output' do
-      input = <<-EOS
-[cols="15%,3*~"]
-|=======
-|A |B |C |D
-|a |b |c |d
-|1 |2 |3 |4
-|=======
+      input = <<~'EOS'
+      [cols="15%,3*~"]
+      |=======
+      |A |B |C |D
+      |a |b |c |d
+      |1 |2 |3 |4
+      |=======
       EOS
       output = convert_string_to_embedded input, backend: 'docbook5'
       assert_css 'tgroup[cols="4"]', output, 1
@@ -385,13 +384,13 @@ three
     end
 
     test 'explicit table width is used even when autowidth option is specified' do
-      input = <<-EOS
-[%autowidth,width=75%]
-|=======
-|A |B |C
-|a |b |c
-|1 |2 |3
-|=======
+      input = <<~'EOS'
+      [%autowidth,width=75%]
+      |=======
+      |A |B |C
+      |a |b |c
+      |1 |2 |3
+      |=======
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -401,12 +400,12 @@ three
     end
 
     test 'first row sets number of columns when not specified' do
-      input = <<-EOS
-|===
-|first |second |third |fourth
-|1 |2 |3
-|4
-|===
+      input = <<~'EOS'
+      |===
+      |first |second |third |fourth
+      |1 |2 |3
+      |4
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -417,11 +416,11 @@ three
     end
 
     test 'colspec attribute using asterisk syntax sets number of columns' do
-      input = <<-EOS
-[cols="3*"]
-|===
-|A |B |C |a |b |c |1 |2 |3
-|===
+      input = <<~'EOS'
+      [cols="3*"]
+      |===
+      |A |B |C |a |b |c |1 |2 |3
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -429,12 +428,12 @@ three
     end
 
     test 'table with explicit column count can have multiple rows on a single line' do
-      input = <<-EOS
-[cols="3*"]
-|===
-|one |two
-|1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols="3*"]
+      |===
+      |one |two
+      |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -443,12 +442,12 @@ three
     end
 
     test 'table with explicit deprecated colspec syntax can have multiple rows on a single line' do
-      input = <<-EOS
-[cols="3"]
-|===
-|one |two
-|1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols="3"]
+      |===
+      |one |two
+      |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -457,12 +456,12 @@ three
     end
 
     test 'columns are added for empty records in colspec attribute' do
-      input = <<-EOS
-[cols="<,"]
-|===
-|one |two
-|1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols="<,"]
+      |===
+      |one |two
+      |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -471,12 +470,12 @@ three
     end
 
     test 'cols may be separated by semi-colon instead of comma' do
-      input = <<-EOS
-[cols="1s;3m"]
-|===
-| strong
-| mono
-|===
+      input = <<~'EOS'
+      [cols="1s;3m"]
+      |===
+      | strong
+      | mono
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -488,11 +487,11 @@ three
     end
 
     test 'cols attribute may include spaces' do
-      input = <<-EOS
-[cols=" 1, 1 "]
-|===
-|one |two |1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols=" 1, 1 "]
+      |===
+      |one |two |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -502,12 +501,12 @@ three
     end
 
     test 'blank cols attribute should be ignored' do
-      input = <<-EOS
-[cols=" "]
-|===
-|one |two
-|1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols=" "]
+      |===
+      |one |two
+      |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -517,12 +516,12 @@ three
     end
 
     test 'empty cols attribute should be ignored' do
-      input = <<-EOS
-[cols=""]
-|===
-|one |two
-|1 |2 |a |b
-|===
+      input = <<~'EOS'
+      [cols=""]
+      |===
+      |one |two
+      |1 |2 |a |b
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -532,15 +531,15 @@ three
     end
 
     test 'table with header and footer' do
-      input = <<-EOS
-[frame="topbot",options="header,footer"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|Item 2     |2
-|Item 3     |3
-|Total      |6
-|===
+      input = <<~'EOS'
+      [frame="topbot",options="header,footer"]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |Item 2     |2
+      |Item 3     |3
+      |Total      |6
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -558,16 +557,16 @@ three
     end
 
     test 'table with header and footer docbook' do
-      input = <<-EOS
-.Table with header, body and footer
-[frame="topbot",options="header,footer"]
-|===
-|Item       |Quantity
-|Item 1     |1
-|Item 2     |2
-|Item 3     |3
-|Total      |6
-|===
+      input = <<~'EOS'
+      .Table with header, body and footer
+      [frame="topbot",options="header,footer"]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |Item 2     |2
+      |Item 3     |3
+      |Total      |6
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'table', output, 1
@@ -593,11 +592,11 @@ three
     end
 
     test 'should recognize ends as an alias to topbot for frame when converting to DocBook' do
-      input = <<-EOS
-[frame=ends]
-|===
-|A |B |C
-|===
+      input = <<~'EOS'
+      [frame=ends]
+      |===
+      |A |B |C
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'informaltable[frame="topbot"]', output, 1
@@ -605,11 +604,11 @@ three
 
     test 'table with landscape orientation in DocBook' do
       ['orientation=landscape', '%rotate'].each do |attrs|
-        input = <<-EOS
-[#{attrs}]
-|===
-|Column A | Column B | Column C
-|===
+        input = <<~EOS
+        [#{attrs}]
+        |===
+        |Column A | Column B | Column C
+        |===
         EOS
 
         output = convert_string_to_embedded input, backend: 'docbook'
@@ -619,16 +618,16 @@ three
     end
 
     test 'table with implicit header row' do
-      input = <<-EOS
-|===
-|Column 1 |Column 2
+      input = <<~'EOS'
+      |===
+      |Column 1 |Column 2
 
-|Data A1
-|Data B1
+      |Data A1
+      |Data B1
 
-|Data A2
-|Data B2
-|===
+      |Data A2
+      |Data B2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -641,11 +640,11 @@ three
     end
 
     test 'table with implicit header row only' do
-      input = <<-EOS
-|===
-|Column 1 |Column 2
+      input = <<~'EOS'
+      |===
+      |Column 1 |Column 2
 
-|===
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -657,14 +656,14 @@ three
     end
 
     test 'table with implicit header row when other options set' do
-      input = <<-EOS
-[%autowidth]
-|===
-|Column 1 |Column 2
+      input = <<~'EOS'
+      [%autowidth]
+      |===
+      |Column 1 |Column 2
 
-|Data A1
-|Data B1
-|===
+      |Data A1
+      |Data B1
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -678,15 +677,15 @@ three
     end
 
     test 'no implicit header row if second line not blank' do
-      input = <<-EOS
-|===
-|Column 1 |Column 2
-|Data A1
-|Data B1
+      input = <<~'EOS'
+      |===
+      |Column 1 |Column 2
+      |Data A1
+      |Data B1
 
-|Data A2
-|Data B2
-|===
+      |Data A2
+      |Data B2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -697,17 +696,17 @@ three
     end
 
     test 'no implicit header row if cell in first line spans multiple lines' do
-      input = <<-EOS
-[cols=2*]
-|===
-|A1
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      |A1
 
 
-A1 continued|B1
+      A1 continued|B1
 
-|A2
-|B2
-|===
+      |A2
+      |B2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -719,20 +718,20 @@ A1 continued|B1
     end
 
     test 'no implicit header row if AsciiDoc cell in first line spans multiple lines' do
-      input = <<-EOS
-[cols=2*]
-|===
-a|contains AsciiDoc content
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      a|contains AsciiDoc content
 
-* a
-* b
-* c
-a|contains no AsciiDoc content
+      * a
+      * b
+      * c
+      a|contains no AsciiDoc content
 
-just text
-|A2
-|B2
-|===
+      just text
+      |A2
+      |B2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -744,18 +743,18 @@ just text
     end
 
     test 'no implicit header row if first line blank' do
-      input = <<-EOS
-|===
+      input = <<~'EOS'
+      |===
 
-|Column 1 |Column 2
+      |Column 1 |Column 2
 
-|Data A1
-|Data B1
+      |Data A1
+      |Data B1
 
-|Data A2
-|Data B2
+      |Data A2
+      |Data B2
 
-|===
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -766,17 +765,17 @@ just text
     end
 
     test 'no implicit header row if noheader option is specified' do
-      input = <<-EOS
-[%noheader]
-|===
-|Column 1 |Column 2
+      input = <<~'EOS'
+      [%noheader]
+      |===
+      |Column 1 |Column 2
 
-|Data A1
-|Data B1
+      |Data A1
+      |Data B1
 
-|Data A2
-|Data B2
-|===
+      |Data A2
+      |Data B2
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -787,13 +786,13 @@ just text
     end
 
     test 'styles not applied to header cells' do
-      input = <<-EOS
-[cols="1h,1s,1e",options="header,footer"]
-|===
-|Name |Occupation| Website
-|Octocat |Social coding| https://github.com
-|Name |Occupation| Website
-|===
+      input = <<~'EOS'
+      [cols="1h,1s,1e",options="header,footer"]
+      |===
+      |Name |Occupation| Website
+      |Octocat |Social coding| https://github.com
+      |Name |Occupation| Website
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -813,17 +812,17 @@ just text
     end
 
     test 'vertical table headers use th element instead of header class' do
-      input = <<-EOS
-[cols="1h,1s,1e"]
-|===
+      input = <<~'EOS'
+      [cols="1h,1s,1e"]
+      |===
 
-|Name |Occupation| Website
+      |Name |Occupation| Website
 
-|Octocat |Social coding| https://github.com
+      |Octocat |Social coding| https://github.com
 
-|Name |Occupation| Website
+      |Name |Occupation| Website
 
-|===
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -836,26 +835,26 @@ just text
     end
 
     test 'supports horizontal and vertical source data with blank lines and table header' do
-      input = <<-EOS
-.Horizontal and vertical source data
-[width="80%",cols="3,^2,^2,10",options="header"]
-|===
-|Date |Duration |Avg HR |Notes
+      input = <<~'EOS'
+      .Horizontal and vertical source data
+      [width="80%",cols="3,^2,^2,10",options="header"]
+      |===
+      |Date |Duration |Avg HR |Notes
 
-|22-Aug-08 |10:24 | 157 |
-Worked out MSHR (max sustainable heart rate) by going hard
-for this interval.
+      |22-Aug-08 |10:24 | 157 |
+      Worked out MSHR (max sustainable heart rate) by going hard
+      for this interval.
 
-|22-Aug-08 |23:03 | 152 |
-Back-to-back with previous interval.
+      |22-Aug-08 |23:03 | 152 |
+      Back-to-back with previous interval.
 
-|24-Aug-08 |40:00 | 145 |
-Moderately hard interspersed with 3x 3min intervals (2 min
-hard + 1 min really hard taking the HR up to 160).
+      |24-Aug-08 |40:00 | 145 |
+      Moderately hard interspersed with 3x 3min intervals (2 min
+      hard + 1 min really hard taking the HR up to 160).
 
-I am getting in shape!
+      I am getting in shape!
 
-|===
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -879,11 +878,11 @@ I am getting in shape!
     end
 
     test 'percentages as column widths' do
-      input = <<-EOS
-[cols="<.^10%,<90%"]
-|===
-|column A |column B
-|===
+      input = <<~'EOS'
+      [cols="<.^10%,<90%"]
+      |===
+      |column A |column B
+      |===
       EOS
 
       output = convert_string_to_embedded input
@@ -893,14 +892,14 @@ I am getting in shape!
     end
 
     test 'spans, alignments and styles' do
-      input = <<-EOS
-[cols="e,m,^,>s",width="25%"]
-|===
-|1 >s|2 |3 |4
-^|5 2.2+^.^|6 .3+<.>m|7
-^|8
-d|9 2+>|10
-|===
+      input = <<~'EOS'
+      [cols="e,m,^,>s",width="25%"]
+      |===
+      |1 >s|2 |3 |4
+      ^|5 2.2+^.^|6 .3+<.>m|7
+      ^|8
+      d|9 2+>|10
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -930,12 +929,12 @@ d|9 2+>|10
     end
 
     test 'sets up columns correctly if first row has cell that spans columns' do
-      input = <<-EOS
-|===
-2+^|AAA |CCC
-|AAA |BBB |CCC
-|AAA |BBB |CCC
-|===
+      input = <<~'EOS'
+      |===
+      2+^|AAA |CCC
+      |AAA |BBB |CCC
+      |AAA |BBB |CCC
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 2
@@ -946,12 +945,12 @@ d|9 2+>|10
     end
 
     test 'supports repeating cells' do
-      input = <<-EOS
-|===
-3*|A
-|1 3*|2
-|b |c
-|===
+      input = <<~'EOS'
+      |===
+      3*|A
+      |1 3*|2
+      |b |c
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -975,11 +974,11 @@ d|9 2+>|10
     end
 
     test 'calculates colnames correctly when using implicit column count and single cell with colspan' do
-      input = <<-EOS
-|===
-2+|Two Columns
-|One Column |One Column
-|===
+      input = <<~'EOS'
+      |===
+      2+|Two Columns
+      |One Column |One Column
+      |===
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -992,11 +991,11 @@ d|9 2+>|10
     end
 
     test 'calculates colnames correctly when using implicit column count and cells with mixed colspans' do
-      input = <<-EOS
-|===
-2+|Two Columns | One Column
-|One Column |One Column |One Column
-|===
+      input = <<~'EOS'
+      |===
+      2+|Two Columns | One Column
+      |One Column |One Column |One Column
+      |===
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1012,13 +1011,13 @@ d|9 2+>|10
     end
 
     test 'assigns unique column names for table with implicit column count and colspans in first row' do
-      input = <<-EOS
-|===
-|                 2+| Node 0          2+| Node 1
+      input = <<~'EOS'
+      |===
+      |                 2+| Node 0          2+| Node 1
 
-| Host processes    | Core 0 | Core 1   | Core 4 | Core 5
-| Guest processes   | Core 2 | Core 3   | Core 6 | Core 7
-|===
+      | Host processes    | Core 0 | Core 1   | Core 4 | Core 5
+      | Guest processes   | Core 2 | Core 3   | Core 6 | Core 7
+      |===
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1034,15 +1033,15 @@ d|9 2+>|10
     end
 
     test 'ignores cell with colspan that exceeds colspec' do
-      input = <<-EOS
-[cols=2*]
-|===
-3+|A
-|B
-a|C
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      3+|A
+      |B
+      a|C
 
-more C
-|===
+      more C
+      |===
       EOS
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
@@ -1053,37 +1052,37 @@ more C
     end
 
     test 'paragraph, verse and literal content' do
-      input = <<-EOS
-[cols=",^v,^l",options="header"]
-|===
-|Paragraphs |Verse |Literal
-3*|The discussion about what is good,
-what is beautiful, what is noble,
-what is pure, and what is true
-could always go on.
+      input = <<~'EOS'
+      [cols=",^v,^l",options="header"]
+      |===
+      |Paragraphs |Verse |Literal
+      3*|The discussion about what is good,
+      what is beautiful, what is noble,
+      what is pure, and what is true
+      could always go on.
 
-Why is that important?
-Why would I like to do that?
+      Why is that important?
+      Why would I like to do that?
 
-Because that's the only conversation worth having.
+      Because that's the only conversation worth having.
 
-And whether it goes on or not after I die, I don't know.
-But, I do know that it is the conversation I want to have while I am still alive.
+      And whether it goes on or not after I die, I don't know.
+      But, I do know that it is the conversation I want to have while I am still alive.
 
-Which means that to me the offer of certainty,
-the offer of complete security,
-the offer of an impermeable faith that can't give way
-is an offer of something not worth having.
+      Which means that to me the offer of certainty,
+      the offer of complete security,
+      the offer of an impermeable faith that can't give way
+      is an offer of something not worth having.
 
-I want to live my life taking the risk all the time
-that I don't know anything like enough yet...
-that I haven't understood enough...
-that I can't know enough...
-that I am always hungrily operating on the margins
-of a potentially great harvest of future knowledge and wisdom.
+      I want to live my life taking the risk all the time
+      that I don't know anything like enough yet...
+      that I haven't understood enough...
+      that I can't know enough...
+      that I am always hungrily operating on the margins
+      of a potentially great harvest of future knowledge and wisdom.
 
-I wouldn't have it any other way.
-|===
+      I wouldn't have it any other way.
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1104,15 +1103,15 @@ I wouldn't have it any other way.
     end
 
     test 'should strip trailing newlines when splitting paragraphs' do
-      input = <<-EOS
-|===
-|first wrapped
-paragraph
+      input = <<~'EOS'
+      |===
+      |first wrapped
+      paragraph
 
-second paragraph
+      second paragraph
 
-third paragraph
-|===
+      third paragraph
+      |===
       EOS
 
       result = convert_string_to_embedded input
@@ -1122,14 +1121,14 @@ third paragraph
     end
 
     test 'basic AsciiDoc cell' do
-      input = <<-EOS
-|===
-a|--
-NOTE: content
+      input = <<~'EOS'
+      |===
+      a|--
+      NOTE: content
 
-content
---
-|===
+      content
+      --
+      |===
       EOS
 
       result = convert_string_to_embedded input
@@ -1141,10 +1140,10 @@ content
     end
 
     test 'AsciiDoc table cell should be wrapped in div with class "content"' do
-      input = <<-EOS
-|===
-a|AsciiDoc table cell
-|===
+      input = <<~'EOS'
+      |===
+      a|AsciiDoc table cell
+      |===
       EOS
 
       result = convert_string_to_embedded input
@@ -1153,13 +1152,13 @@ a|AsciiDoc table cell
     end
 
     test 'doctype can be set in AsciiDoc table cell' do
-      input = <<-EOS
-|===
-a|
-:doctype: inline
+      input = <<~'EOS'
+      |===
+      a|
+      :doctype: inline
 
-content
-|===
+      content
+      |===
       EOS
 
       result = convert_string_to_embedded input
@@ -1168,20 +1167,20 @@ content
     end
 
     test 'should reset doctype to default in AsciiDoc table cell' do
-      input = <<-EOS
-= Book Title
-:doctype: book
+      input = <<~'EOS'
+      = Book Title
+      :doctype: book
 
-== Chapter 1
+      == Chapter 1
 
-|===
-a|
-= AsciiDoc Table Cell
+      |===
+      a|
+      = AsciiDoc Table Cell
 
-doctype={doctype}
-{backend-html5-doctype-article}
-{backend-html5-doctype-book}
-|===
+      doctype={doctype}
+      {backend-html5-doctype-article}
+      {backend-html5-doctype-book}
+      |===
       EOS
 
       result = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'skip' }
@@ -1191,21 +1190,21 @@ doctype={doctype}
     end
 
     test 'should update doctype-related attributes in AsciiDoc table cell when doctype is set' do
-      input = <<-EOS
-= Document Title
-:doctype: article
+      input = <<~'EOS'
+      = Document Title
+      :doctype: article
 
-== Chapter 1
+      == Chapter 1
 
-|===
-a|
-= AsciiDoc Table Cell
-:doctype: book
+      |===
+      a|
+      = AsciiDoc Table Cell
+      :doctype: book
 
-doctype={doctype}
-{backend-html5-doctype-book}
-{backend-html5-doctype-article}
-|===
+      doctype={doctype}
+      {backend-html5-doctype-book}
+      {backend-html5-doctype-article}
+      |===
       EOS
 
       result = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'skip' }
@@ -1215,32 +1214,32 @@ doctype={doctype}
     end
 
     test 'AsciiDoc content' do
-      input = <<-EOS
-[cols="1e,1,5a",frame="topbot",options="header"]
-|===
-|Name |Backends |Description
+      input = <<~'EOS'
+      [cols="1e,1,5a",frame="topbot",options="header"]
+      |===
+      |Name |Backends |Description
 
-|badges |xhtml11, html5 |
-Link badges ('XHTML 1.1' and 'CSS') in document footers.
+      |badges |xhtml11, html5 |
+      Link badges ('XHTML 1.1' and 'CSS') in document footers.
 
-[NOTE]
-====
-The path names of images, icons and scripts are relative path
-names to the output document not the source document.
-====
-|[[X97]] docinfo, docinfo1, docinfo2 |All backends |
-These three attributes control which document information
-files will be included in the the header of the output file:
+      [NOTE]
+      ====
+      The path names of images, icons and scripts are relative path
+      names to the output document not the source document.
+      ====
+      |[[X97]] docinfo, docinfo1, docinfo2 |All backends |
+      These three attributes control which document information
+      files will be included in the the header of the output file:
 
-docinfo:: Include `<filename>-docinfo.<ext>`
-docinfo1:: Include `docinfo.<ext>`
-docinfo2:: Include `docinfo.<ext>` and `<filename>-docinfo.<ext>`
+      docinfo:: Include `<filename>-docinfo.<ext>`
+      docinfo1:: Include `docinfo.<ext>`
+      docinfo2:: Include `docinfo.<ext>` and `<filename>-docinfo.<ext>`
 
-Where `<filename>` is the file name (sans extension) of the AsciiDoc
-input file and `<ext>` is `.html` for HTML outputs or `.xml` for
-DocBook outputs. If the input file is the standard input then the
-output file name is used.
-|===
+      Where `<filename>` is the file name (sans extension) of the AsciiDoc
+      input file and `<ext>` is `.html` for HTML outputs or `.xml` for
+      DocBook outputs. If the input file is the standard input then the
+      output file name is used.
+      |===
       EOS
       doc = document_from_string input, sourcemap: true
       table = doc.blocks.first
@@ -1267,12 +1266,12 @@ output file name is used.
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
-      input = <<-EOS
-|===
-a|
- $ command
-a| paragraph
-|===
+      input = <<~'EOS'
+      |===
+      a|
+       $ command
+      a| paragraph
+      |===
       EOS
       doc = document_from_string input, sourcemap: true
       table = doc.blocks[0]
@@ -1290,10 +1289,10 @@ a| paragraph
     end
 
     test 'preprocessor directive on first line of an AsciiDoc table cell should be processed' do
-      input = <<-EOS
-|===
-a|include::fixtures/include-file.adoc[]
-|===
+      input = <<~'EOS'
+      |===
+      a|include::fixtures/include-file.adoc[]
+      |===
       EOS
 
       output = convert_string_to_embedded input, safe: :safe, base_dir: testdir
@@ -1301,16 +1300,16 @@ a|include::fixtures/include-file.adoc[]
     end
 
     test 'cross reference link in an AsciiDoc table cell should resolve to reference in main document' do
-      input = <<-EOS
-== Some
+      input = <<~'EOS'
+      == Some
 
-|===
-a|See <<_more>>
-|===
+      |===
+      a|See <<_more>>
+      |===
 
-== More
+      == More
 
-content
+      content
       EOS
 
       result = convert_string input
@@ -1319,18 +1318,18 @@ content
     end
 
     test 'should discover anchor at start of cell and register it as a reference' do
-      input = <<-EOS
-The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
+      input = <<~'EOS'
+      The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
 
-[cols="1s,1"]
-|===
-|[[mount-evans,Mount Evans]]Mount Evans
-|14,271 feet
+      [cols="1s,1"]
+      |===
+      |[[mount-evans,Mount Evans]]Mount Evans
+      |14,271 feet
 
-h|[[grays-peak,Grays Peak]]
-Grays Peak
-|14,278 feet
-|===
+      h|[[grays-peak,Grays Peak]]
+      Grays Peak
+      |14,278 feet
+      |===
       EOS
       doc = document_from_string input
       refs = doc.catalog[:refs]
@@ -1344,10 +1343,10 @@ Grays Peak
     end
 
     test 'footnotes should not be shared between an AsciiDoc table cell and the main document' do
-      input = <<-EOS
-|===
-a|AsciiDoc footnote:[A lightweight markup language.]
-|===
+      input = <<~'EOS'
+      |===
+      a|AsciiDoc footnote:[A lightweight markup language.]
+      |===
       EOS
 
       result = convert_string input
@@ -1355,38 +1354,38 @@ a|AsciiDoc footnote:[A lightweight markup language.]
     end
 
     test 'callout numbers should be globally unique, including AsciiDoc table cells' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-== Section 1
+      == Section 1
 
-|===
-a|
-[source, yaml]
-----
-key: value <1>
-----
-<1> First callout
-|===
+      |===
+      a|
+      [source, yaml]
+      ----
+      key: value <1>
+      ----
+      <1> First callout
+      |===
 
-== Section 2
+      == Section 2
 
-|===
-a|
-[source, yaml]
-----
-key: value <1>
-----
-<1> Second callout
-|===
+      |===
+      a|
+      [source, yaml]
+      ----
+      key: value <1>
+      ----
+      <1> Second callout
+      |===
 
-== Section 3
+      == Section 3
 
-[source, yaml]
-----
-key: value <1>
-----
-<1> Third callout
+      [source, yaml]
+      ----
+      key: value <1>
+      ----
+      <1> Third callout
       EOS
 
       result = convert_string input, backend: 'docbook'
@@ -1403,13 +1402,13 @@ key: value <1>
     end
 
     test 'compat mode can be activated in AsciiDoc table cell' do
-      input = <<-EOS
-|===
-a|
-:compat-mode:
+      input = <<~'EOS'
+      |===
+      a|
+      :compat-mode:
 
-The word 'italic' is emphasized.
-|===
+      The word 'italic' is emphasized.
+      |===
       EOS
 
       result = convert_string_to_embedded input
@@ -1417,19 +1416,19 @@ The word 'italic' is emphasized.
     end
 
     test 'compat mode in AsciiDoc table cell inherits from parent document' do
-      input = <<-EOS
-:compat-mode:
+      input = <<~'EOS'
+      :compat-mode:
 
-The word 'italic' is emphasized.
+      The word 'italic' is emphasized.
 
-[cols=1*]
-|===
-|The word 'oblique' is emphasized.
-a|
-The word 'slanted' is emphasized.
-|===
+      [cols=1*]
+      |===
+      |The word 'oblique' is emphasized.
+      a|
+      The word 'slanted' is emphasized.
+      |===
 
-The word 'askew' is emphasized.
+      The word 'askew' is emphasized.
       EOS
 
       result = convert_string_to_embedded input
@@ -1440,21 +1439,21 @@ The word 'askew' is emphasized.
     end
 
     test 'compat mode in AsciiDoc table cell can be unset if set in parent document' do
-      input = <<-EOS
-:compat-mode:
+      input = <<~'EOS'
+      :compat-mode:
 
-The word 'italic' is emphasized.
+      The word 'italic' is emphasized.
 
-[cols=1*]
-|===
-|The word 'oblique' is emphasized.
-a|
-:!compat-mode:
+      [cols=1*]
+      |===
+      |The word 'oblique' is emphasized.
+      a|
+      :!compat-mode:
 
-The word 'slanted' is not emphasized.
-|===
+      The word 'slanted' is not emphasized.
+      |===
 
-The word 'askew' is emphasized.
+      The word 'askew' is emphasized.
       EOS
 
       result = convert_string_to_embedded input
@@ -1465,16 +1464,16 @@ The word 'askew' is emphasized.
     end
 
     test 'nested table' do
-      input = <<-EOS
-[cols="1,2a"]
-|===
-|Normal cell
-|Cell with nested table
-[cols="2,1"]
-!===
-!Nested table cell 1 !Nested table cell 2
-!===
-|===
+      input = <<~'EOS'
+      [cols="1,2a"]
+      |===
+      |Normal cell
+      |Cell with nested table
+      [cols="2,1"]
+      !===
+      !Nested table cell 1 !Nested table cell 2
+      !===
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 2
@@ -1484,16 +1483,16 @@ The word 'askew' is emphasized.
     end
 
     test 'can set format of nested table to psv' do
-      input = <<-EOS
-[cols="2*"]
-|===
-|normal cell
-a|
-[format=psv]
-!===
-!nested cell
-!===
-|===
+      input = <<~'EOS'
+      [cols="2*"]
+      |===
+      |normal cell
+      a|
+      [format=psv]
+      !===
+      !nested cell
+      !===
+      |===
       EOS
 
       output = convert_string_to_embedded input
@@ -1504,15 +1503,15 @@ a|
     end
 
     test 'toc from parent document should not be included in an AsciiDoc table cell' do
-      input = <<-EOS
-= Document Title
-:toc:
+      input = <<~'EOS'
+      = Document Title
+      :toc:
 
-== Section A
+      == Section A
 
-|===
-a|AsciiDoc content
-|===
+      |===
+      a|AsciiDoc content
+      |===
       EOS
 
       output = convert_string input
@@ -1521,20 +1520,20 @@ a|AsciiDoc content
     end
 
     test 'should be able to enable toc in an AsciiDoc table cell' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-== Section A
+      == Section A
 
-|===
-a|
-= Subdocument Title
-:toc:
+      |===
+      a|
+      = Subdocument Title
+      :toc:
 
-== Subdocument Section A
+      == Subdocument Section A
 
-content
-|===
+      content
+      |===
       EOS
 
       output = convert_string input
@@ -1543,24 +1542,24 @@ content
     end
 
     test 'should be able to enable toc in both outer document and in an AsciiDoc table cell' do
-      input = <<-EOS
-= Document Title
-:toc:
+      input = <<~'EOS'
+      = Document Title
+      :toc:
 
-== Section A
+      == Section A
 
-|===
-a|
-= Subdocument Title
-:toc: macro
+      |===
+      a|
+      = Subdocument Title
+      :toc: macro
 
-[#table-cell-toc]
-toc::[]
+      [#table-cell-toc]
+      toc::[]
 
-== Subdocument Section A
+      == Subdocument Section A
 
-content
-|===
+      content
+      |===
       EOS
 
       output = convert_string input
@@ -1571,13 +1570,13 @@ content
     end
 
     test 'document in an AsciiDoc table cell should not see doctitle of parent' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-[cols="1a"]
-|===
-|AsciiDoc content
-|===
+      [cols="1a"]
+      |===
+      |AsciiDoc content
+      |===
       EOS
 
       output = convert_string input
@@ -1588,16 +1587,16 @@ content
     end
 
     test 'cell background color' do
-      input = <<-EOS
-[cols="1e,1", options="header"]
-|===
-|{set:cellbgcolor:green}green
-|{set:cellbgcolor!}
-plain
-|{set:cellbgcolor:red}red
-|{set:cellbgcolor!}
-plain
-|===
+      input = <<~'EOS'
+      [cols="1e,1", options="header"]
+      |===
+      |{set:cellbgcolor:green}green
+      |{set:cellbgcolor!}
+      plain
+      |{set:cellbgcolor:red}red
+      |{set:cellbgcolor!}
+      plain
+      |===
       EOS
 
       output = convert_string_to_embedded input
@@ -1608,16 +1607,16 @@ plain
     end
 
     test 'should warn if table block is not terminated' do
-      input = <<-EOS
-outside
+      input = <<~'EOS'
+      outside
 
-|===
-|
-inside
+      |===
+      |
+      inside
 
-still inside
+      still inside
 
-eof
+      eof
       EOS
 
       using_memory_logger do |logger|
@@ -1628,20 +1627,20 @@ eof
     end
 
     test 'should show correct line number in warning about unterminated block inside AsciiDoc table cell' do
-      input = <<-EOS
-outside
+      input = <<~'EOS'
+      outside
 
-* list item
-+
-|===
-|cell
-a|inside
+      * list item
+      +
+      |===
+      |cell
+      a|inside
 
-====
-unterminated example block
-|===
+      ====
+      unterminated example block
+      |===
 
-eof
+      eof
       EOS
 
       using_memory_logger do |logger|
@@ -1652,15 +1651,15 @@ eof
     end
 
     test 'custom separator for an AsciiDoc table cell' do
-      input = <<-EOS
-[cols=2,separator=!]
-|===
-!Pipe output to vim
-a!
-----
-asciidoctor -o - -s test.adoc | view -
-----
-|===
+      input = <<~'EOS'
+      [cols=2,separator=!]
+      |===
+      !Pipe output to vim
+      a!
+      ----
+      asciidoctor -o - -s test.adoc | view -
+      ----
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1672,66 +1671,66 @@ asciidoctor -o - -s test.adoc | view -
     end
 
     test 'table with breakable option docbook 4.5' do
-      input = <<-EOS
-.Table with breakable
-[%breakable]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
+      input = <<~'EOS'
+      .Table with breakable
+      [%breakable]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook45'
       assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
     test 'table with breakable option docbook 5' do
-      input = <<-EOS
-.Table with breakable
-[%breakable]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
+      input = <<~'EOS'
+      .Table with breakable
+      [%breakable]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook5'
       assert_includes output, '<?dbfo keep-together="auto"?>'
     end
 
     test 'table with unbreakable option docbook 5' do
-      input = <<-EOS
-.Table with unbreakable
-[%unbreakable]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
+      input = <<~'EOS'
+      .Table with unbreakable
+      [%unbreakable]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook5'
       assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
     test 'table with unbreakable option docbook 4.5' do
-      input = <<-EOS
-.Table with unbreakable
-[%unbreakable]
-|===
-|Item       |Quantity
-|Item 1     |1
-|===
+      input = <<~'EOS'
+      .Table with unbreakable
+      [%unbreakable]
+      |===
+      |Item       |Quantity
+      |Item 1     |1
+      |===
       EOS
       output = convert_string_to_embedded input, backend: 'docbook45'
       assert_includes output, '<?dbfo keep-together="always"?>'
     end
 
     test 'no implicit header row if cell in first line is quoted and spans multiple lines' do
-      input = <<-EOS
-[cols=2*l]
-,===
-"A1
+      input = <<~'EOS'
+      [cols=2*l]
+      ,===
+      "A1
 
-A1 continued",B1
-A2,B2
-,===
+      A1 continued",B1
+      A2,B2
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1744,18 +1743,17 @@ A2,B2
   end
 
   context 'DSV' do
-
     test 'converts simple dsv table' do
-      input = <<-EOS
-[width="75%",format="dsv"]
-|===
-root:x:0:0:root:/root:/bin/bash
-bin:x:1:1:bin:/bin:/sbin/nologin
-mysql:x:27:27:MySQL\\:Server:/var/lib/mysql:/bin/bash
-gdm:x:42:42::/var/lib/gdm:/sbin/nologin
-sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
-nobody:x:99:99:Nobody:/:/sbin/nologin
-|===
+      input = <<~'EOS'
+      [width="75%",format="dsv"]
+      |===
+      root:x:0:0:root:/root:/bin/bash
+      bin:x:1:1:bin:/bin:/sbin/nologin
+      mysql:x:27:27:MySQL\:Server:/var/lib/mysql:/bin/bash
+      gdm:x:42:42::/var/lib/gdm:/sbin/nologin
+      sshd:x:74:74:Privilege-separated SSH:/var/empty/sshd:/sbin/nologin
+      nobody:x:99:99:Nobody:/:/sbin/nologin
+      |===
       EOS
       doc = document_from_string input, header_footer: false
       table = doc.blocks[0]
@@ -1770,11 +1768,11 @@ nobody:x:99:99:Nobody:/:/sbin/nologin
     end
 
     test 'dsv format shorthand' do
-      input = <<-EOS
-:===
-a:b:c
-1:2:3
-:===
+      input = <<~'EOS'
+      :===
+      a:b:c
+      1:2:3
+      :===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1785,10 +1783,10 @@ a:b:c
     end
 
     test 'single cell in DSV table should only produce single row' do
-      input = <<-EOS
-:===
-single cell
-:===
+      input = <<~'EOS'
+      :===
+      single cell
+      :===
       EOS
 
       output = convert_string_to_embedded input
@@ -1796,12 +1794,12 @@ single cell
     end
 
     test 'should treat trailing colon as an empty cell' do
-      input = <<-EOS
-:===
-A1:
-B1:B2
-C1:C2
-:===
+      input = <<~'EOS'
+      :===
+      A1:
+      B1:B2
+      C1:C2
+      :===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1815,14 +1813,13 @@ C1:C2
   end
 
   context 'CSV' do
-
     test 'should treat trailing comma as an empty cell' do
-      input = <<-EOS
-,===
-A1,
-B1,B2
-C1,C2
-,===
+      input = <<~'EOS'
+      ,===
+      A1,
+      B1,B2
+      C1,C2
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1835,11 +1832,11 @@ C1,C2
     end
 
     test 'should log error but not crash if cell data has unclosed quote' do
-      input = <<-EOS
-,===
-a,b
-c,"
-,===
+      input = <<~'EOS'
+      ,===
+      a,b
+      c,"
+      ,===
       EOS
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
@@ -1851,21 +1848,21 @@ c,"
     end
 
     test 'should preserve newlines in quoted CSV values' do
-      input = <<-EOS
-[cols="1,1,1l"]
-,===
-"A
-B
-C","one
+      input = <<~'EOS'
+      [cols="1,1,1l"]
+      ,===
+      "A
+      B
+      C","one
 
-two
+      two
 
-three","do
+      three","do
 
-re
+      re
 
-me"
-,===
+      me"
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1881,18 +1878,18 @@ me"
     end
 
     test 'mixed unquoted records and quoted records with escaped quotes, commas, and wrapped lines' do
-      input = <<-EOS
-[format="csv",options="header"]
-|===
-Year,Make,Model,Description,Price
-1997,Ford,E350,"ac, abs, moon",3000.00
-1999,Chevy,"Venture ""Extended Edition""","",4900.00
-1999,Chevy,"Venture ""Extended Edition, Very Large""",,5000.00
-1996,Jeep,Grand Cherokee,"MUST SELL!
-air, moon roof, loaded",4799.00
-2000,Toyota,Tundra,"""This one's gonna to blow you're socks off,"" per the sticker",10000.00
-2000,Toyota,Tundra,"Check it, ""this one's gonna to blow you're socks off"", per the sticker",10000.00
-|===
+      input = <<~'EOS'
+      [format="csv",options="header"]
+      |===
+      Year,Make,Model,Description,Price
+      1997,Ford,E350,"ac, abs, moon",3000.00
+      1999,Chevy,"Venture ""Extended Edition""","",4900.00
+      1999,Chevy,"Venture ""Extended Edition, Very Large""",,5000.00
+      1996,Jeep,Grand Cherokee,"MUST SELL!
+      air, moon roof, loaded",4799.00
+      2000,Toyota,Tundra,"""This one's gonna to blow you're socks off,"" per the sticker",10000.00
+      2000,Toyota,Tundra,"Check it, ""this one's gonna to blow you're socks off"", per the sticker",10000.00
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1907,15 +1904,15 @@ air, moon roof, loaded",4799.00
     end
 
     test 'should allow quotes around a CSV value to be on their own lines' do
-      input = <<-EOS
-[cols=2*]
-,===
-"
-A
-","
-B
-"
-,===
+      input = <<~'EOS'
+      [cols=2*]
+      ,===
+      "
+      A
+      ","
+      B
+      "
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1927,11 +1924,11 @@ B
     end
 
     test 'csv format shorthand' do
-      input = <<-EOS
-,===
-a,b,c
-1,2,3
-,===
+      input = <<~'EOS'
+      ,===
+      a,b,c
+      1,2,3
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1942,12 +1939,12 @@ a,b,c
     end
 
     test 'tsv as format' do
-      input = <<-EOS
-[format=tsv]
-,===
-a\tb\tc
-1\t2\t3
-,===
+      input = <<~EOS
+      [format=tsv]
+      ,===
+      a\tb\tc
+      1\t2\t3
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1958,12 +1955,12 @@ a\tb\tc
     end
 
     test 'custom csv separator' do
-      input = <<-EOS
-[format=csv,separator=;]
-|===
-a;b;c
-1;2;3
-|===
+      input = <<~'EOS'
+      [format=csv,separator=;]
+      |===
+      a;b;c
+      1;2;3
+      |===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1974,12 +1971,12 @@ a;b;c
     end
 
     test 'tab as separator' do
-      input = <<-EOS
-[separator=\\t]
-,===
-a\tb\tc
-1\t2\t3
-,===
+      input = <<~EOS
+      [separator=\\t]
+      ,===
+      a\tb\tc
+      1\t2\t3
+      ,===
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
@@ -1990,10 +1987,10 @@ a\tb\tc
     end
 
     test 'single cell in CSV table should only produce single row' do
-      input = <<-EOS
-,===
-single cell
-,===
+      input = <<~'EOS'
+      ,===
+      single cell
+      ,===
       EOS
 
       output = convert_string_to_embedded input
@@ -2001,13 +1998,13 @@ single cell
     end
 
     test 'cell formatted with AsciiDoc style' do
-      input = <<-EOS
-[cols="1,1,1a",separator=;]
-,===
-element;description;example
+      input = <<~'EOS'
+      [cols="1,1,1a",separator=;]
+      ,===
+      element;description;example
 
-thematic break,a visible break; also known as a horizontal rule;---
-,===
+      thematic break,a visible break; also known as a horizontal rule;---
+      ,===
       EOS
 
       output = convert_string_to_embedded input
@@ -2015,15 +2012,15 @@ thematic break,a visible break; also known as a horizontal rule;---
     end
 
     test 'should strip whitespace around contents of AsciiDoc cell' do
-      input = <<-EOS
-[cols="1,1,1a",separator=;]
-,===
-element;description;example
+      input = <<~'EOS'
+      [cols="1,1,1a",separator=;]
+      ,===
+      element;description;example
 
-paragraph;contiguous lines of words and phrases;"
-  one sentence, one line
-  "
-,===
+      paragraph;contiguous lines of words and phrases;"
+        one sentence, one line
+        "
+      ,===
       EOS
 
       output = convert_string_to_embedded input
