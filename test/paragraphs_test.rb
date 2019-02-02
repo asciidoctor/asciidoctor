@@ -288,10 +288,10 @@ context 'Paragraphs' do
     test 'source code paragraph with language' do
       input = <<~'EOS'
       [source, perl]
-      die 'zomg perl sucks';
+      die 'zomg perl is tough';
       EOS
       output = convert_string_to_embedded input
-      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="language-perl"][@data-lang="perl"][text()="die 'zomg perl sucks';"]), output, 1
+      assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="language-perl"][@data-lang="perl"][text()="die 'zomg perl is tough';"]), output, 1
     end
 
     test 'literal paragraph terminates at block attribute list' do

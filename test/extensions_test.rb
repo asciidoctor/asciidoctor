@@ -608,12 +608,12 @@ context 'Extensions' do
     end
 
     test 'should invoke preprocessors before parsing document' do
-      input = <<-EOS
-junk line
+      input = <<~'EOS'
+      junk line
 
-= Document Title
+      = Document Title
 
-sample content
+      sample content
       EOS
 
       begin
@@ -632,12 +632,12 @@ sample content
     end
 
     test 'should invoke include processor to process include directive' do
-      input = <<-EOS
-before
+      input = <<~'EOS'
+      before
 
-include::lorem-ipsum.txt[]
+      include::lorem-ipsum.txt[]
 
-after
+      after
       EOS
 
       begin
@@ -657,15 +657,15 @@ after
     end
 
     test 'should invoke include processor if it offers to handle include directive' do
-      input = <<-EOS
-include::skip-me.adoc[]
-line after skip
+      input = <<~'EOS'
+      include::skip-me.adoc[]
+      line after skip
 
-include::include-file.adoc[]
+      include::include-file.adoc[]
 
-include::fixtures/grandchild-include.adoc[]
+      include::fixtures/grandchild-include.adoc[]
 
-last line
+      last line
       EOS
 
       registry = Asciidoctor::Extensions.create do
@@ -715,11 +715,11 @@ last line
     end
 
     test 'should invoke tree processors after parsing document' do
-      input = <<-EOS
-= Document Title
-Doc Writer
+      input = <<~'EOS'
+      = Document Title
+      Doc Writer
 
-content
+      content
       EOS
 
       begin
@@ -754,11 +754,11 @@ content
     end
 
     test 'should allow tree processor to replace tree' do
-      input = <<-EOS
-= Original Document
-Doc Writer
+      input = <<~'EOS'
+      = Original Document
+      Doc Writer
 
-content
+      content
       EOS
 
       begin
@@ -774,14 +774,14 @@ content
     end
 
     test 'should honor block title assigned in tree processor' do
-      input = <<-EOS
-= Document Title
-:!example-caption:
+      input = <<~'EOS'
+      = Document Title
+      :!example-caption:
 
-.Old block title
-====
-example block content
-====
+      .Old block title
+      ====
+      example block content
+      ====
       EOS
 
       old_title = nil
@@ -847,10 +847,10 @@ example block content
     end
 
     test 'should invoke postprocessors after converting document' do
-      input = <<-EOS
-* one
-* two
-* three
+      input = <<~'EOS'
+      * one
+      * two
+      * three
       EOS
 
       begin
@@ -866,9 +866,9 @@ example block content
     end
 
     test 'should invoke processor for custom block' do
-      input = <<-EOS
-[yell]
-Hi there!
+      input = <<~'EOS'
+      [yell]
+      Hi there!
       EOS
 
       begin
@@ -885,12 +885,12 @@ Hi there!
     end
 
     test 'should invoke processor for custom block in an AsciiDoc table cell' do
-      input = <<-EOS
-|===
-a|
-[yell]
-Hi there!
-|===
+      input = <<~'EOS'
+      |===
+      a|
+      [yell]
+      Hi there!
+      |===
       EOS
 
       begin
@@ -907,11 +907,11 @@ Hi there!
     end
 
     test 'should pass cloaked context in attributes passed to process method of custom block' do
-      input = <<-EOS
-[custom]
-****
-sidebar
-****
+      input = <<~'EOS'
+      [custom]
+      ****
+      sidebar
+      ****
       EOS
 
       cloaked_context = nil
@@ -934,9 +934,7 @@ sidebar
     end
 
     test 'should invoke processor for custom block macro' do
-      input = <<-EOS
-snippet::12345[mode=edit]
-      EOS
+      input = 'snippet::12345[mode=edit]'
 
       begin
         Asciidoctor::Extensions.register do
@@ -951,9 +949,7 @@ snippet::12345[mode=edit]
     end
 
     test 'should substitute attributes in target of custom block macro' do
-      input = <<-EOS
-snippet::{gist-id}[mode=edit]
-      EOS
+      input = 'snippet::{gist-id}[mode=edit]'
 
       begin
         Asciidoctor::Extensions.register do
@@ -968,11 +964,11 @@ snippet::{gist-id}[mode=edit]
     end
 
     test 'should drop block macro line if target references missing attribute and attribute-missing is drop-line' do
-      input = <<-EOS
-[.rolename]
-snippet::{gist-ns}12345[mode=edit]
+      input = <<~EOS
+      [.rolename]
+      snippet::{gist-ns}12345[mode=edit]
 
-following paragraph
+      following paragraph
       EOS
 
       begin
@@ -996,10 +992,10 @@ following paragraph
     end
 
     test 'should invoke processor for custom block macro in an AsciiDoc table cell' do
-      input = <<-EOS
-|===
-a|message::hi[]
-|===
+      input = <<~'EOS'
+      |===
+      a|message::hi[]
+      |===
       EOS
 
       begin
@@ -1019,9 +1015,7 @@ a|message::hi[]
     end
 
     test 'should match short form of block macro' do
-      input = <<-EOS
-custom-toc::[]
-      EOS
+      input = 'custom-toc::[]'
 
       resolved_target = nil
 
@@ -1085,10 +1079,10 @@ custom-toc::[]
             end
           end
         end
-        input = <<-EOS
-attribute::yin[yang]
+        input = <<~'EOS'
+        attribute::yin[yang]
 
-header_attribute::foo[bar]
+        header_attribute::foo[bar]
         EOS
         doc = document_from_string input
         assert_nil doc.attr 'yin'
@@ -1181,30 +1175,30 @@ header_attribute::foo[bar]
           end
         end
 
-        input = <<-EOS
-[subs=normal]
-++++
-short_attributes:[]
-short_attributes:[value,key=val]
-short_text:[]
-short_text:[[text\\]]
-full-attributes:target[]
-full-attributes:target[value,key=val]
-full-text:target[]
-full-text:target[[text\\]]
-@target
-++++
+        input = <<~'EOS'
+        [subs=normal]
+        ++++
+        short_attributes:[]
+        short_attributes:[value,key=val]
+        short_text:[]
+        short_text:[[text\]]
+        full-attributes:target[]
+        full-attributes:target[value,key=val]
+        full-text:target[]
+        full-text:target[[text\]]
+        @target
+        ++++
         EOS
-        expected = <<-EOS.chomp
-target="", attributes=[]
-target="value,key=val", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
-target="", attributes=[["text", ""]]
-target="[text]", attributes=[["text", "[text]"]]
-target="target", attributes=[]
-target="target", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
-target="target", attributes=[["text", ""]]
-target="target", attributes=[["text", "[text]"]]
-target="target", attributes=[]
+        expected = <<~'EOS'.chomp
+        target="", attributes=[]
+        target="value,key=val", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
+        target="", attributes=[["text", ""]]
+        target="[text]", attributes=[["text", "[text]"]]
+        target="target", attributes=[]
+        target="target", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
+        target="target", attributes=[["text", ""]]
+        target="target", attributes=[["text", "[text]"]]
+        target="target", attributes=[]
         EOS
         output = convert_string_to_embedded input
         assert_equal expected, output
@@ -1247,14 +1241,14 @@ target="target", attributes=[]
             end
           end
         end
-        input = <<-EOS
-.unused title
-[skip-me]
-not shown
+        input = <<~'EOS'
+        .unused title
+        [skip-me]
+        not shown
 
---
-shown
---
+        --
+        shown
+        --
         EOS
         doc = document_from_string input
         assert_equal 1, doc.blocks.size
@@ -1278,14 +1272,14 @@ shown
             end
           end
         end
-        input = <<-EOS
-.unused title
-[ignore]
-not shown
+        input = <<~'EOS'
+        .unused title
+        [ignore]
+        not shown
 
---
-shown
---
+        --
+        shown
+        --
         EOS
         doc = document_from_string input
         refute process_method_called
@@ -1310,10 +1304,10 @@ shown
             end
           end
         end
-        input = <<-EOS
-.title
-[foo]
-content
+        input = <<~'EOS'
+        .title
+        [foo]
+        content
         EOS
         doc = document_from_string input
         assert_equal 1, doc.blocks.size
@@ -1336,19 +1330,19 @@ content
             end
           end
         end
-        input = <<-EOS
-[wrap]
---
-[foo=bar]
-====
-content
-====
+        input = <<~'EOS'
+        [wrap]
+        --
+        [foo=bar]
+        ====
+        content
+        ====
 
-[baz=qux]
-====
-content
-====
---
+        [baz=qux]
+        ====
+        content
+        ====
+        --
         EOS
         doc = document_from_string input
         assert_equal 1, doc.blocks.size
@@ -1378,12 +1372,12 @@ content
           end
         end
 
-        input_tpl = <<-EOS
-= Document Title
-:doctype: book
-:sectnums:
+        input_tpl = <<~'EOS'
+        = Document Title
+        :doctype: book
+        :sectnums:
 
-sect::[%s]
+        sect::[%s]
         EOS
 
         {
@@ -1416,10 +1410,10 @@ sect::[%s]
     end
 
     test 'should add docinfo to document' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-sample content
+      sample content
       EOS
 
       begin
@@ -1436,10 +1430,10 @@ sample content
     end
 
     test 'should add multiple docinfo to document' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-sample content
+      sample content
       EOS
 
       begin
@@ -1455,8 +1449,7 @@ sample content
         end
 
         doc = document_from_string input, safe: :server
-        assert_equal '<meta name="robots" content="index,follow">
-<meta name="application-name" content="Asciidoctor App">', doc.docinfo
+        assert_equal %(<meta name="robots" content="index,follow">\n<meta name="application-name" content="Asciidoctor App">), doc.docinfo
         assert_equal '<script><!-- analytics code --></script>', doc.docinfo(:footer)
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1503,9 +1496,7 @@ sample content
     end
 
     test 'should raise an exception if mandatory target attribute is not provided for image block' do
-      input = <<-EOS
-cat_in_sink::[]
-      EOS
+      input = 'cat_in_sink::[]'
       exception = assert_raises ArgumentError do
         convert_string_to_embedded input, extension_registry: create_cat_in_sink_block_macro
       end
@@ -1513,9 +1504,7 @@ cat_in_sink::[]
     end
 
     test 'should assign alt attribute to image block if alt is not provided' do
-      input = <<-EOS
-cat_in_sink::25[]
-      EOS
+      input = 'cat_in_sink::25[]'
       doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
       image = doc.blocks[0]
       assert_equal 'cat in sink day 25', (image.attr 'alt')
@@ -1525,9 +1514,7 @@ cat_in_sink::25[]
     end
 
     test 'should create an image block if mandatory attributes are provided' do
-      input = <<-EOS
-cat_in_sink::30[cat in sink (yes)]
-      EOS
+      input = 'cat_in_sink::30[cat in sink (yes)]'
       doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
       image = doc.blocks[0]
       assert_equal 'cat in sink (yes)', (image.attr 'alt')
@@ -1537,18 +1524,16 @@ cat_in_sink::30[cat in sink (yes)]
     end
 
     test 'should not assign caption on image block if title is not set on custom block macro' do
-      input = <<-EOS
-cat_in_sink::30[]
-      EOS
+      input = 'cat_in_sink::30[]'
       doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
       output = doc.convert
       assert_xpath '/*[@class="imageblock"]/*[@class="title"]', output, 0
     end
 
     test 'should assign caption on image block if title is set on custom block macro' do
-      input = <<-EOS
-.Cat in Sink?
-cat_in_sink::30[]
+      input = <<~'EOS'
+      .Cat in Sink?
+      cat_in_sink::30[]
       EOS
       doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
       output = doc.convert
