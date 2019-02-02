@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-SAMPLE_MANPAGE_HEADER = <<-EOS.chomp
+SAMPLE_MANPAGE_HEADER = <<'EOS'.chomp
 = command (1)
 Author Name
 :doctype: manpage
@@ -40,20 +40,20 @@ context 'Manpage' do
     end
 
     test 'should not parse NAME section if manname and manpurpose attributes are set' do
-      input = <<-EOS
-= foobar (1)
-Author Name
-:doctype: manpage
-:man manual: Foo Bar Manual
-:man source: Foo Bar 1.0
+      input = <<~'EOS'
+      = foobar (1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*foobar* [_OPTIONS_]...
+      *foobar* [_OPTIONS_]...
 
-== DESCRIPTION
+      == DESCRIPTION
 
-When you need to put some foo on the bar.
+      When you need to put some foo on the bar.
       EOS
 
       attrs = { 'manname' => 'foobar', 'manpurpose' => 'puts some foo on the bar' }
@@ -65,28 +65,28 @@ When you need to put some foo on the bar.
     end
 
     test 'should normalize whitespace and skip line comments before and inside NAME section' do
-      input = <<-EOS
-= foobar (1)
-Author Name
-:doctype: manpage
-:man manual: Foo Bar Manual
-:man source: Foo Bar 1.0
+      input = <<~'EOS'
+      = foobar (1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
 
-// this is the name section
-== NAME
+      // this is the name section
+      == NAME
 
-// it follows the form `name - description`
-foobar - puts some foo
- on the bar
-// a little bit of this, a little bit of that
+      // it follows the form `name - description`
+      foobar - puts some foo
+       on the bar
+      // a little bit of this, a little bit of that
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*foobar* [_OPTIONS_]...
+      *foobar* [_OPTIONS_]...
 
-== DESCRIPTION
+      == DESCRIPTION
 
-When you need to put some foo on the bar.
+      When you need to put some foo on the bar.
       EOS
 
       doc = Asciidoctor.load input, backend: :manpage, header_footer: true
@@ -108,12 +108,12 @@ When you need to put some foo on the bar.
     end
 
     test 'should warn if document title is non-conforming' do
-      input = <<-EOS
-= command
+      input = <<~'EOS'
+      = command
 
-== Name
+      == Name
 
-command - does stuff
+      command - does stuff
       EOS
 
       using_memory_logger do |logger|
@@ -123,12 +123,12 @@ command - does stuff
     end
 
     test 'should warn if first section is not name section' do
-      input = <<-EOS
-= command(1)
+      input = <<~'EOS'
+      = command(1)
 
-== Synopsis
+      == Synopsis
 
-Does stuff.
+      Does stuff.
       EOS
 
       using_memory_logger do |logger|
@@ -147,19 +147,22 @@ Does stuff.
 
     test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true,
-          attributes: { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
+      output = Asciidoctor.convert input, backend: :manpage, header_footer: true, attributes: { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
       assert_includes output.lines, %(.  LINKSTYLE cyan B \\[fo] \\[fc]\n)
     end
 
     test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
-      input = %(:man-linkstyle: cyan R < >
-#{SAMPLE_MANPAGE_HEADER})
+      input = <<~EOS.chomp
+      :man-linkstyle: cyan R < >
+      #{SAMPLE_MANPAGE_HEADER}
+      EOS
       output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R &lt; &gt;\n)
 
-      input = %(:man-linkstyle: pass:[cyan R < >]
-#{SAMPLE_MANPAGE_HEADER})
+      input = <<~EOS.chomp
+      :man-linkstyle: pass:[cyan R < >]
+      #{SAMPLE_MANPAGE_HEADER}
+      EOS
       output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R < >\n)
     end
@@ -167,71 +170,85 @@ Does stuff.
 
   context 'Manify' do
     test 'should unescape literal ampersand' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-(C) & (R) are translated to character references, but not the &.)
+      (C) & (R) are translated to character references, but not the &.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.last.chomp
     end
 
     test 'should replace em dashes' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-go -- to
+      go -- to
 
-go--to)
+      go--to
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'go \\(em to'
       assert_includes output, 'go\\(emto'
     end
 
     test 'should escape lone period' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-.)
+      .
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&.', output.lines.last.chomp
     end
 
     test 'should escape raw macro' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-AAA this line of text should be show
-.if 1 .nx
-BBB this line and the one above it should be visible)
+      AAA this line of text should be show
+      .if 1 .nx
+      BBB this line and the one above it should be visible
+      EOS
 
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&.if 1 .nx', output.lines[-2].chomp
     end
 
     test 'should normalize whitespace in a paragraph' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-Oh, here it goes again
-  I should have known,
-    should have known,
-should have known again)
+      Oh, here it goes again
+        I should have known,
+          should have known,
+      should have known again
+      EOS
 
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
     test 'should normalize whitespace in a list item' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-* Oh, here it goes again
-    I should have known,
-  should have known,
-should have known again)
+      * Oh, here it goes again
+          I should have known,
+        should have known,
+      should have known again
+      EOS
 
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
     test 'should collapse whitespace in the man manual and man source' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-Describe this thing.)
+      Describe this thing.
+      EOS
 
       output = Asciidoctor.convert input, backend: :manpage, header_footer: true, attributes: {
         'manmanual' => %(General\nCommands\nManual),
@@ -253,322 +270,409 @@ Describe this thing.)
     end
 
     test 'should preserve backslashes in escape sequences' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-"`hello`" '`goodbye`' *strong* _weak_ `even`)
+      "`hello`" '`goodbye`' *strong* _weak_ `even`
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.last.chomp
     end
 
     test 'should escape backslashes in content' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-\\.foo \\ bar\\
-baz)
+      \\.foo \\ bar\\
+      baz
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\(rs.foo \(rs bar\(rs', output.lines[-2].chomp
     end
 
     test 'should escape literal escape sequence' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
- \\fB makes text bold)
+       \\fB makes text bold
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_match '\(rsfB makes text bold', output
     end
 
     test 'should preserve inline breaks' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-Before break. +
-After break.)
+      Before break. +
+      After break.
+      EOS
+      expected = <<~EOS.chomp
+      Before break.
+      .br
+      After break.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal 'Before break.
-.br
-After break.', output.lines[-3..-1].join
+      assert_equal expected, output.lines[-3..-1].join
     end
   end
 
   context 'URL macro' do
     test 'should not leave blank line before URL macro' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
-First paragraph.
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
+      First paragraph.
 
-http://asciidoc.org[AsciiDoc])
+      http://asciidoc.org[AsciiDoc]
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      First paragraph.
+      .sp
+      .URL "http://asciidoc.org" "AsciiDoc" ""
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-First paragraph.
-.sp
-.URL "http://asciidoc.org" "AsciiDoc" ""', output.lines[-4..-1].join
+      assert_equal expected, output.lines[-4..-1].join
     end
 
     test 'should not swallow content following URL' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-http://asciidoc.org[AsciiDoc] can be used to create man pages.)
+      http://asciidoc.org[AsciiDoc] can be used to create man pages.
+      EOS
+      expected = <<~'EOS'.chomp
+      .URL "http://asciidoc.org" "AsciiDoc" " "
+      can be used to create man pages.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.URL "http://asciidoc.org" "AsciiDoc" " "
-can be used to create man pages.', output.lines[-2..-1].join
+      assert_equal expected, output.lines[-2..-1].join
     end
 
     test 'should pass adjacent character as final argument of URL macro' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-This is http://asciidoc.org[AsciiDoc].)
+      This is http://asciidoc.org[AsciiDoc].
+      EOS
+      expected = <<~'EOS'.chomp
+      This is \c
+      .URL "http://asciidoc.org" "AsciiDoc" "."
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal 'This is \c
-.URL "http://asciidoc.org" "AsciiDoc" "."', output.lines[-2..-1].join
+      assert_equal expected, output.lines[-2..-1].join
     end
 
     test 'should pass adjacent character as final argument of URL macro and move trailing content to next line' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-This is http://asciidoc.org[AsciiDoc], which can be used to write content.)
+      This is http://asciidoc.org[AsciiDoc], which can be used to write content.
+      EOS
+      expected = <<~'EOS'.chomp
+      This is \c
+      .URL "http://asciidoc.org" "AsciiDoc" ","
+      which can be used to write content.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal 'This is \c
-.URL "http://asciidoc.org" "AsciiDoc" ","
-which can be used to write content.', output.lines[-3..-1].join
+      assert_equal expected, output.lines[-3..-1].join
     end
 
     test 'should not leave blank lines between URLs on contiguous lines of input' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-The corresponding implementations are
-http://clisp.sf.net[CLISP],
-http://ccl.clozure.com[Clozure CL],
-http://cmucl.org[CMUCL],
-http://ecls.sf.net[ECL],
-and http://sbcl.sf.net[SBCL].)
+      The corresponding implementations are
+      http://clisp.sf.net[CLISP],
+      http://ccl.clozure.com[Clozure CL],
+      http://cmucl.org[CMUCL],
+      http://ecls.sf.net[ECL],
+      and http://sbcl.sf.net[SBCL].
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      The corresponding implementations are
+      .URL "http://clisp.sf.net" "CLISP" ","
+      .URL "http://ccl.clozure.com" "Clozure CL" ","
+      .URL "http://cmucl.org" "CMUCL" ","
+      .URL "http://ecls.sf.net" "ECL" ","
+      and \c
+      .URL "http://sbcl.sf.net" "SBCL" "."
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-The corresponding implementations are
-.URL "http://clisp.sf.net" "CLISP" ","
-.URL "http://ccl.clozure.com" "Clozure CL" ","
-.URL "http://cmucl.org" "CMUCL" ","
-.URL "http://ecls.sf.net" "ECL" ","
-and \c
-.URL "http://sbcl.sf.net" "SBCL" "."', output.lines[-8..-1].join
+      assert_equal expected, output.lines[-8..-1].join
     end
 
     test 'should not leave blank lines between URLs on same line of input' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-The corresponding implementations are http://clisp.sf.net[CLISP], http://ccl.clozure.com[Clozure CL], http://cmucl.org[CMUCL], http://ecls.sf.net[ECL], and http://sbcl.sf.net[SBCL].)
+      The corresponding implementations are http://clisp.sf.net[CLISP], http://ccl.clozure.com[Clozure CL], http://cmucl.org[CMUCL], http://ecls.sf.net[ECL], and http://sbcl.sf.net[SBCL].
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      The corresponding implementations are \c
+      .URL "http://clisp.sf.net" "CLISP" ","
+      .URL "http://ccl.clozure.com" "Clozure CL" ","
+      .URL "http://cmucl.org" "CMUCL" ","
+      .URL "http://ecls.sf.net" "ECL" ","
+      and
+      .URL "http://sbcl.sf.net" "SBCL" "."
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-The corresponding implementations are \c
-.URL "http://clisp.sf.net" "CLISP" ","
-.URL "http://ccl.clozure.com" "Clozure CL" ","
-.URL "http://cmucl.org" "CMUCL" ","
-.URL "http://ecls.sf.net" "ECL" ","
-and
-.URL "http://sbcl.sf.net" "SBCL" "."', output.lines[-8..-1].join
+      assert_equal expected, output.lines[-8..-1].join
     end
 
     test 'should not insert space between link and non-whitespace characters surrounding it' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.)
+      Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      Please search |\c
+      .URL "http://discuss.asciidoctor.org" "the forums" "|"
+      before asking.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-Please search |\c
-.URL "http://discuss.asciidoctor.org" "the forums" "|"
-before asking.', output.lines[-4..-1].join
+      assert_equal expected, output.lines[-4..-1].join
     end
 
     test 'should be able to use monospaced text inside a link' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-Enter the link:cat[`cat`] command.)
+      Enter the link:cat[`cat`] command.
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      Enter the \c
+      .URL "cat" "\f(CRcat\fP" " "
+      command.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-Enter the \c
-.URL "cat" "\f(CRcat\fP" " "
-command.', output.lines[-4..-1].join
+      assert_equal expected, output.lines[-4..-1].join
     end
   end
 
   context 'MTO macro' do
     test 'should convert inline email macro into MTO macro' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
-First paragraph.
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
+      First paragraph.
 
-mailto:doc@example.org[Contact the doc])
+      mailto:doc@example.org[Contact the doc]
+      EOS
+      expected = <<~'EOS'.chomp
+      .sp
+      First paragraph.
+      .sp
+      .MTO "doc\(atexample.org" "Contact the doc" ""
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '.sp
-First paragraph.
-.sp
-.MTO "doc\\(atexample.org" "Contact the doc" ""', output.lines[-4..-1].join
+      assert_equal expected, output.lines[-4..-1].join
     end
 
     test 'should set text of MTO macro to blank for implicit email' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
-Bugs fixed daily by doc@example.org.)
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
+      Bugs fixed daily by doc@example.org.
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      Bugs fixed daily by \c
+      .MTO "doc\(atexample.org" "" "."
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? 'Bugs fixed daily by \\c
-.MTO "doc\\(atexample.org" "" "."'
+      assert output.end_with? expected_coda
     end
   end
 
   context 'Table' do
     test 'should create header, body, and footer rows in correct order' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-[%header%footer]
-|===
-|Header
-|Body 1
-|Body 2
-|Footer
-|===)
+      [%header%footer]
+      |===
+      |Header
+      |Body 1
+      |Body 2
+      |Footer
+      |===
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      allbox tab(:);
+      lt.
+      T{
+      .sp
+      Header
+      T}
+      T{
+      .sp
+      Body 1
+      T}
+      T{
+      .sp
+      Body 2
+      T}
+      T{
+      .sp
+      Footer
+      T}
+      .TE
+      .sp
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? 'allbox tab(:);
-lt.
-T{
-.sp
-Header
-T}
-T{
-.sp
-Body 1
-T}
-T{
-.sp
-Body 2
-T}
-T{
-.sp
-Footer
-T}
-.TE
-.sp'
+      assert output.end_with? expected_coda
     end
 
     test 'should manify normal table cell content' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-|===
-|*Col A* |_Col B_
+      |===
+      |*Col A* |_Col B_
 
-|*bold* |`mono`
-|_italic_ | #mark#
-|===)
+      |*bold* |`mono`
+      |_italic_ | #mark#
+      |===
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       refute_match(/<\/?BOUNDARY>/, output)
     end
 
     test 'should manify table title' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-.Table of options
-|===
-| Name | Description | Default
+      .Table of options
+      |===
+      | Name | Description | Default
 
-| dim
-| dimension of the object
-| 3
-|===)
+      | dim
+      | dimension of the object
+      | 3
+      |===
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      .it 1 an-trap
+      .nr an-no-space-flag 1
+      .nr an-break-flag 1
+      .br
+      .B Table 1. Table of options
+      .TS
+      allbox tab(:);
+      lt lt lt.
+      T{
+      .sp
+      Name
+      T}:T{
+      .sp
+      Description
+      T}:T{
+      .sp
+      Default
+      T}
+      T{
+      .sp
+      dim
+      T}:T{
+      .sp
+      dimension of the object
+      T}:T{
+      .sp
+      3
+      T}
+      .TE
+      .sp
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? '.it 1 an-trap
-.nr an-no-space-flag 1
-.nr an-break-flag 1
-.br
-.B Table 1. Table of options
-.TS
-allbox tab(:);
-lt lt lt.
-T{
-.sp
-Name
-T}:T{
-.sp
-Description
-T}:T{
-.sp
-Default
-T}
-T{
-.sp
-dim
-T}:T{
-.sp
-dimension of the object
-T}:T{
-.sp
-3
-T}
-.TE
-.sp'
+      assert output.end_with? expected_coda
     end
 
     test 'should manify and preserve whitespace in literal table cell' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-|===
-|a l|b
-c    _d_
-.
-|===)
+      |===
+      |a l|b
+      c    _d_
+      .
+      |===
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      .TS
+      allbox tab(:);
+      lt lt.
+      T{
+      .sp
+      a
+      T}:T{
+      .sp
+      .nf
+      b
+      c    _d_
+      \&.
+      .fi
+      T}
+      .TE
+      .sp
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? '.TS
-allbox tab(:);
-lt lt.
-T{
-.sp
-a
-T}:T{
-.sp
-.nf
-b
-c    _d_
-\\&.
-.fi
-T}
-.TE
-.sp'
+      assert output.end_with? expected_coda
     end
 
     test 'should manify and preserve whitespace in verse table cell' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-|===
-|a v|b
-c    _d_
-.
-|===)
+      |===
+      |a v|b
+      c    _d_
+      .
+      |===
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      .TS
+      allbox tab(:);
+      lt lt.
+      T{
+      .sp
+      a
+      T}:T{
+      .sp
+      .nf
+      b
+      c    \fId\fP
+      \&.
+      .fi
+      T}
+      .TE
+      .sp
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? '.TS
-allbox tab(:);
-lt lt.
-T{
-.sp
-a
-T}:T{
-.sp
-.nf
-b
-c    \\fId\\fP
-\\&.
-.fi
-T}
-.TE
-.sp'
+      assert output.end_with? expected_coda
     end
   end
 
   context 'Images' do
     test 'should replace inline image with alt text' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-The Magic 8 Ball says image:signs-point-to-yes.jpg[].)
+      The Magic 8 Ball says image:signs-point-to-yes.jpg[].
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'The Magic 8 Ball says [signs point to yes].'
     end
 
     test 'should place link after alt text for inline image if link is defined' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org/wiki/Magic_8-Ball].)
+      The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org/wiki/Magic_8-Ball].
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'The Magic 8 Ball says [signs point to yes] <https://en.wikipedia.org/wiki/Magic_8\-Ball>.'
     end
@@ -576,46 +680,56 @@ The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org
 
   context 'Quote Block' do
     test 'should indent quote block' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-[,James Baldwin]
-____
-Not everything that is faced can be changed.
-But nothing can be changed until it is faced.
-____)
+      [,James Baldwin]
+      ____
+      Not everything that is faced can be changed.
+      But nothing can be changed until it is faced.
+      ____
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      .RS 3
+      .ll -.6i
+      .sp
+      Not everything that is faced can be changed.
+      But nothing can be changed until it is faced.
+      .br
+      .RE
+      .ll
+      .RS 5
+      .ll -.10i
+      \(em James Baldwin
+      .RE
+      .ll
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? '.RS 3
-.ll -.6i
-.sp
-Not everything that is faced can be changed.
-But nothing can be changed until it is faced.
-.br
-.RE
-.ll
-.RS 5
-.ll -.10i
-\(em James Baldwin
-.RE
-.ll'
+      assert output.end_with? expected_coda
     end
   end
 
   context 'Callout List' do
     test 'should generate callout list using proper formatting commands' do
-      input = %(#{SAMPLE_MANPAGE_HEADER}
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
 
-----
-$ gem install asciidoctor # <1>
-----
-<1> Installs the asciidoctor gem from RubyGems.org)
+      ----
+      $ gem install asciidoctor # <1>
+      ----
+      <1> Installs the asciidoctor gem from RubyGems.org
+      EOS
+      expected_coda = <<~'EOS'.chomp
+      .TS
+      tab(:);
+      r lw(\n(.lu*75u/100u).
+      \fB(1)\fP\h'-2n':T{
+      Installs the asciidoctor gem from RubyGems.org
+      T}
+      .TE
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? '.TS
-tab(:);
-r lw(\n(.lu*75u/100u).
-\fB(1)\fP\h\'-2n\':T{
-Installs the asciidoctor gem from RubyGems.org
-T}
-.TE'
+      assert output.end_with? expected_coda
     end
   end
 

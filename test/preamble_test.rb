@@ -1,16 +1,15 @@
 require_relative 'test_helper'
 
 context 'Preamble' do
-
   test 'title and single paragraph preamble before section' do
-    input = <<-EOS
-= Title
+    input = <<~'EOS'
+    = Title
 
-Preamble paragraph 1.
+    Preamble paragraph 1.
 
-== First Section
+    == First Section
 
-Section paragraph 1.
+    Section paragraph 1.
     EOS
     result = convert_string(input)
     assert_xpath '//p', result, 2
@@ -21,15 +20,15 @@ Section paragraph 1.
   end
 
   test 'title of preface is blank by default in DocBook output' do
-    input = <<-EOS
-= Document Title
-:doctype: book
+    input = <<~'EOS'
+    = Document Title
+    :doctype: book
 
-Preface content.
+    Preface content.
 
-== First Section
+    == First Section
 
-Section content.
+    Section content.
     EOS
     result = convert_string input, backend: :docbook
     assert_xpath '//preface/title', result, 1
@@ -38,32 +37,32 @@ Section content.
   end
 
   test 'preface-title attribute is assigned as title of preface in DocBook output' do
-    input = <<-EOS
-= Document Title
-:doctype: book
-:preface-title: Preface
+    input = <<~'EOS'
+    = Document Title
+    :doctype: book
+    :preface-title: Preface
 
-Preface content.
+    Preface content.
 
-== First Section
+    == First Section
 
-Section content.
+    Section content.
     EOS
     result = convert_string input, backend: :docbook
     assert_xpath '//preface/title[text()="Preface"]', result, 1
   end
 
   test 'title and multi-paragraph preamble before section' do
-    input = <<-EOS
-= Title
+    input = <<~'EOS'
+    = Title
 
-Preamble paragraph 1.
+    Preamble paragraph 1.
 
-Preamble paragraph 2.
+    Preamble paragraph 2.
 
-== First Section
+    == First Section
 
-Section paragraph 1.
+    Section paragraph 1.
     EOS
     result = convert_string(input)
     assert_xpath '//p', result, 3
@@ -74,10 +73,10 @@ Section paragraph 1.
   end
 
   test 'should not wrap content in preamble if document has title but no sections' do
-    input = <<-EOS
-= Title
+    input = <<~'EOS'
+    = Title
 
-paragraph
+    paragraph
     EOS
     result = convert_string(input)
     assert_xpath '//p', result, 1
@@ -86,12 +85,12 @@ paragraph
   end
 
   test 'title and section without preamble' do
-    input = <<-EOS
-= Title
+    input = <<~'EOS'
+    = Title
 
-== First Section
+    == First Section
 
-Section paragraph 1.
+    Section paragraph 1.
     EOS
     result = convert_string(input)
     assert_xpath '//p', result, 1
@@ -100,12 +99,12 @@ Section paragraph 1.
   end
 
   test 'no title with preamble and section' do
-    input = <<-EOS
-Preamble paragraph 1.
+    input = <<~'EOS'
+    Preamble paragraph 1.
 
-== First Section
+    == First Section
 
-Section paragraph 1.
+    Section paragraph 1.
     EOS
     result = convert_string(input)
     assert_xpath '//p', result, 2
@@ -114,29 +113,29 @@ Section paragraph 1.
   end
 
   test 'preamble in book doctype' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-Back then...
+      Back then...
 
-= Chapter One
+      = Chapter One
 
-[partintro]
-It was a dark and stormy night...
+      [partintro]
+      It was a dark and stormy night...
 
-== Scene One
+      == Scene One
 
-Someone's gonna get axed.
+      Someone's gonna get axed.
 
-= Chapter Two
+      = Chapter Two
 
-[partintro]
-They couldn't believe their eyes when...
+      [partintro]
+      They couldn't believe their eyes when...
 
-== Scene One
+      == Scene One
 
-The axe came swinging.
+      The axe came swinging.
       EOS
 
       d = document_from_string(input)
@@ -147,21 +146,21 @@ The axe came swinging.
   end
 
   test 'should output table of contents in preamble if toc-placement attribute value is preamble' do
-    input = <<-EOS
-= Article
-:toc:
-:toc-placement: preamble
+    input = <<~'EOS'
+    = Article
+    :toc:
+    :toc-placement: preamble
 
-Once upon a time...
+    Once upon a time...
 
-== Section One
+    == Section One
 
-It was a dark and stormy night...
+    It was a dark and stormy night...
 
-== Section Two
+    == Section Two
 
-They couldn't believe their eyes when...
-      EOS
+    They couldn't believe their eyes when...
+    EOS
 
     output = convert_string input
     assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
