@@ -106,7 +106,7 @@ context 'API' do
     end
 
     test 'should load input IO' do
-      input = StringIO.new <<~EOS
+      input = StringIO.new <<~'EOS'
       Document Title
       ==============
 
@@ -119,7 +119,7 @@ context 'API' do
     end
 
     test 'should load input string' do
-      input = <<~EOS
+      input = <<~'EOS'
       Document Title
       ==============
 
@@ -132,7 +132,7 @@ context 'API' do
     end
 
     test 'should load input string array' do
-      input = <<~EOS
+      input = <<~'EOS'
       Document Title
       ==============
 
@@ -230,7 +230,7 @@ context 'API' do
 
     test 'converts block to output format when convert is called' do
       doc = Asciidoctor.load 'paragraph text'
-      expected = <<~EOS
+      expected = <<~'EOS'
       <div class="paragraph">
       <p>paragraph text</p>
       </div>
@@ -241,7 +241,7 @@ context 'API' do
     end
 
     test 'render method on node is aliased to convert method' do
-      input = <<~EOS
+      input = <<~'EOS'
       paragraph text
 
       * list item
@@ -306,7 +306,7 @@ context 'API' do
     end
 
     test 'should be able to restore header attributes after call to convert' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
       :foo: bar
 
@@ -502,7 +502,7 @@ context 'API' do
     end
 
     test 'should assign correct source location if section occurs on last line of input' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       == Section A
@@ -529,7 +529,7 @@ context 'API' do
     end
 
     test 'find_by should return Array of blocks anywhere in document tree that match criteria' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       preamble
@@ -570,7 +570,7 @@ context 'API' do
     end
 
     test 'find_by should return Array of blocks that match style criteria' do
-      input = <<~EOS
+      input = <<~'EOS'
       [square]
       * one
       * two
@@ -590,7 +590,7 @@ context 'API' do
     end
 
     test 'find_by should return Array of blocks that match role criteria' do
-      input = <<~EOS
+      input = <<~'EOS'
       [#tiger.animal]
       image::tiger.png[Tiger]
 
@@ -605,7 +605,7 @@ context 'API' do
     end
 
     test 'find_by should return the document title section if context selector is :section' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       preamble
@@ -623,7 +623,7 @@ context 'API' do
     end
 
     test 'find_by should only return results for which the block argument yields true' do
-      input = <<~EOS
+      input = <<~'EOS'
       == Section
 
       content
@@ -641,7 +641,7 @@ context 'API' do
     end
 
     test 'find_by should skip node and its children if block returns :skip' do
-      input = <<~EOS
+      input = <<~'EOS'
       paragraph 1
 
       ====
@@ -670,7 +670,7 @@ context 'API' do
     end
 
     test 'find_by should accept node but skip its children if block returns :skip_children' do
-      input = <<~EOS
+      input = <<~'EOS'
       ====
       paragraph 2
 
@@ -691,7 +691,7 @@ context 'API' do
     end
 
     test 'find_by should stop looking for blocks when StopIteration is raised' do
-      input = <<~EOS
+      input = <<~'EOS'
       paragraph 1
 
       ====
@@ -725,7 +725,7 @@ context 'API' do
     end
 
     test 'find_by should only return one result when matching by id' do
-      input = <<~EOS
+      input = <<~'EOS'
       == Section
 
       content
@@ -744,7 +744,7 @@ context 'API' do
     end
 
     test 'find_by should stop seeking once match is found' do
-      input = <<~EOS
+      input = <<~'EOS'
       == Section
 
       content
@@ -767,7 +767,7 @@ context 'API' do
     end
 
     test 'find_by should return an empty Array if the id criteria matches but the block argument yields false' do
-      input = <<~EOS
+      input = <<~'EOS'
       == Section
 
       content
@@ -808,7 +808,7 @@ context 'API' do
     end
 
     test 'can substitute a custom syntax highlighter factory instance using the :syntax_highlighter_factory option' do
-      input = <<~EOS
+      input = <<~'EOS'
       [source,ruby]
       ----
       puts 'Hello, World!'
@@ -823,7 +823,7 @@ context 'API' do
     end
 
     test 'can substitute an extended syntax highlighter factory implementation using the :syntax_highlighters option' do
-      input = <<~EOS
+      input = <<~'EOS'
       [source,ruby]
       ----
       puts 'Hello, World!'
@@ -897,7 +897,7 @@ context 'API' do
     end
 
     test 'should embed default stylesheet by default if SafeMode is less than SECURE' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       text
@@ -913,7 +913,7 @@ context 'API' do
     end
 
     test 'should not allow linkcss be unset from document if SafeMode is SECURE or greater' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
       :linkcss!:
 
@@ -926,7 +926,7 @@ context 'API' do
     end
 
     test 'should embed default stylesheet if linkcss is unset from API and SafeMode is SECURE or greater' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       text
@@ -956,7 +956,7 @@ context 'API' do
     end
 
     test 'should not link to stylesheet if stylesheet is unset' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       text
@@ -968,7 +968,7 @@ context 'API' do
     end
 
     test 'should link to custom stylesheet if specified in stylesheet attribute' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       text
@@ -983,7 +983,7 @@ context 'API' do
     end
 
     test 'should resolve custom stylesheet relative to stylesdir' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Document Title
 
       text
@@ -1206,7 +1206,7 @@ context 'API' do
           'highlighted'
         end
       end
-      input = <<~EOS
+      input = <<~'EOS'
       [source,ruby]
       ----
       puts 'Hello, World!'
@@ -1220,7 +1220,7 @@ context 'API' do
 
   context 'AST' do
     test 'with no author' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
 
       Getting Real details the business, design, programming, and marketing principles of 37signals.
@@ -1231,7 +1231,7 @@ context 'API' do
     end
 
     test 'with one author' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
       David Heinemeier Hansson <david@37signals.com>
 
@@ -1251,7 +1251,7 @@ context 'API' do
     end
 
     test 'with two authors' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
       David Heinemeier Hansson <david@37signals.com>; Jason Fried <jason@37signals.com>
 
@@ -1278,7 +1278,7 @@ context 'API' do
     end
 
     test 'with authors as attributes' do
-      input = <<~EOS
+      input = <<~'EOS'
       = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
       :author_1: David Heinemeier Hansson
       :email_1: david@37signals.com
@@ -1308,7 +1308,7 @@ context 'API' do
     end
 
     test 'should not crash if nil cell text is passed to Cell constructor' do
-      input = <<~EOS
+      input = <<~'EOS'
       |===
       |a
       |===
@@ -1321,7 +1321,7 @@ context 'API' do
     end
 
     test 'should set option on node when set_option is called' do
-      input = <<~EOS
+      input = <<~'EOS'
       . three
       . two
       . one
@@ -1336,7 +1336,7 @@ context 'API' do
     end
 
     test 'should append option to existing options' do
-      input = <<~EOS
+      input = <<~'EOS'
       [%fancy]
       . three
       . two
@@ -1349,7 +1349,7 @@ context 'API' do
     end
 
     test 'should not append option if option is already set' do
-      input = <<~EOS
+      input = <<~'EOS'
       [%reversed]
       . three
       . two
