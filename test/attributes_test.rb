@@ -195,7 +195,8 @@ context 'Attributes' do
 
     test 'should handle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      input = <<~'EOS'
+      # NOTE this test breaks on truffleruby if defined using 'EOS'
+      input = <<~EOS
       :name: 日本語
 
       {name}
@@ -208,7 +209,8 @@ context 'Attributes' do
 
     test 'should not mangle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      input = <<~'EOS'
+      # NOTE this test breaks on truffleruby if defined using 'EOS'
+      input = <<~EOS
       :name: 日本語
 
       {name}
