@@ -106,11 +106,11 @@ context 'API' do
     end
 
     test 'should load input IO' do
-      input = StringIO.new(<<-EOS)
-Document Title
-==============
+      input = StringIO.new <<~EOS
+      Document Title
+      ==============
 
-preamble
+      preamble
       EOS
       doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
@@ -119,11 +119,11 @@ preamble
     end
 
     test 'should load input string' do
-      input = <<-EOS
-Document Title
-==============
+      input = <<~EOS
+      Document Title
+      ==============
 
-preamble
+      preamble
       EOS
       doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
@@ -132,11 +132,11 @@ preamble
     end
 
     test 'should load input string array' do
-      input = <<-EOS
-Document Title
-==============
+      input = <<~EOS
+      Document Title
+      ==============
 
-preamble
+      preamble
       EOS
       doc = Asciidoctor.load(input.lines, safe: Asciidoctor::SafeMode::SAFE)
       assert_equal 'Document Title', doc.doctitle
@@ -166,10 +166,7 @@ preamble
     end
 
     test 'should accept attributes as string' do
-      doc = Asciidoctor.load('text', attributes: 'toc sectnums
-source-highlighter=coderay
-idprefix
-idseparator=-')
+      doc = Asciidoctor.load 'text', attributes: %(toc sectnums\nsource-highlighter=coderay\nidprefix\nidseparator=-)
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
@@ -233,10 +230,10 @@ idseparator=-')
 
     test 'converts block to output format when convert is called' do
       doc = Asciidoctor.load 'paragraph text'
-      expected = <<-EOS
-<div class="paragraph">
-<p>paragraph text</p>
-</div>
+      expected = <<~EOS
+      <div class="paragraph">
+      <p>paragraph text</p>
+      </div>
       EOS
       assert_equal 1, doc.blocks.length
       assert_equal :paragraph, doc.blocks[0].context
@@ -244,10 +241,10 @@ idseparator=-')
     end
 
     test 'render method on node is aliased to convert method' do
-      input = <<-EOS
-paragraph text
+      input = <<~EOS
+      paragraph text
 
-* list item
+      * list item
       EOS
       doc = Asciidoctor.load input
       assert_equal 2, doc.blocks.length
@@ -309,15 +306,15 @@ paragraph text
     end
 
     test 'should be able to restore header attributes after call to convert' do
-      input = <<-EOS
-= Document Title
-:foo: bar
+      input = <<~EOS
+      = Document Title
+      :foo: bar
 
-content
+      content
 
-:foo: baz
+      :foo: baz
 
-content
+      content
       EOS
       doc = Asciidoctor.load input
       assert_equal 'bar', (doc.attr 'foo')
@@ -505,14 +502,14 @@ content
     end
 
     test 'should assign correct source location if section occurs on last line of input' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-== Section A
+      == Section A
 
-content
+      content
 
-== Section B
+      == Section B
       EOS
 
       doc = document_from_string input, sourcemap: true
@@ -532,27 +529,27 @@ content
     end
 
     test 'find_by should return Array of blocks anywhere in document tree that match criteria' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-preamble
+      preamble
 
-== Section A
+      == Section A
 
-paragraph
+      paragraph
 
---
-Exhibit A::
-+
-[#tiger.animal]
-image::tiger.png[Tiger]
---
+      --
+      Exhibit A::
+      +
+      [#tiger.animal]
+      image::tiger.png[Tiger]
+      --
 
-image::shoe.png[Shoe]
+      image::shoe.png[Shoe]
 
-== Section B
+      == Section B
 
-paragraph
+      paragraph
       EOS
 
       doc = Asciidoctor.load input
@@ -565,9 +562,7 @@ paragraph
     end
 
     test 'find_by should return an empty Array if no matches are found' do
-      input = <<-EOS
-paragraph
-      EOS
+      input = 'paragraph'
       doc = Asciidoctor.load input
       result = doc.find_by context: :section
       refute_nil result
@@ -575,17 +570,17 @@ paragraph
     end
 
     test 'find_by should return Array of blocks that match style criteria' do
-      input = <<-EOS
-[square]
-* one
-* two
-* three
+      input = <<~EOS
+      [square]
+      * one
+      * two
+      * three
 
----
+      ---
 
-* apples
-* bananas
-* pears
+      * apples
+      * bananas
+      * pears
       EOS
 
       doc = Asciidoctor.load input
@@ -595,11 +590,11 @@ paragraph
     end
 
     test 'find_by should return Array of blocks that match role criteria' do
-      input = <<-EOS
-[#tiger.animal]
-image::tiger.png[Tiger]
+      input = <<~EOS
+      [#tiger.animal]
+      image::tiger.png[Tiger]
 
-image::shoe.png[Shoe]
+      image::shoe.png[Shoe]
       EOS
 
       doc = Asciidoctor.load input
@@ -610,14 +605,14 @@ image::shoe.png[Shoe]
     end
 
     test 'find_by should return the document title section if context selector is :section' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-preamble
+      preamble
 
-== Section One
+      == Section One
 
-content
+      content
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by context: :section
@@ -628,14 +623,14 @@ content
     end
 
     test 'find_by should only return results for which the block argument yields true' do
-      input = <<-EOS
-== Section
+      input = <<~EOS
+      == Section
 
-content
+      content
 
-=== Subsection
+      === Subsection
 
-content
+      content
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by(context: :section) {|sect| sect.level == 1 }
@@ -646,18 +641,18 @@ content
     end
 
     test 'find_by should skip node and its children if block returns :skip' do
-      input = <<-EOS
-paragraph 1
+      input = <<~EOS
+      paragraph 1
 
-====
-paragraph 2
+      ====
+      paragraph 2
 
-term::
-+
-paragraph 3
-====
+      term::
+      +
+      paragraph 3
+      ====
 
-paragraph 4
+      paragraph 4
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by do |candidate|
@@ -675,14 +670,14 @@ paragraph 4
     end
 
     test 'find_by should accept node but skip its children if block returns :skip_children' do
-      input = <<-EOS
-====
-paragraph 2
+      input = <<~EOS
+      ====
+      paragraph 2
 
-term::
-+
-paragraph 3
-====
+      term::
+      +
+      paragraph 3
+      ====
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by do |candidate|
@@ -696,22 +691,22 @@ paragraph 3
     end
 
     test 'find_by should stop looking for blocks when StopIteration is raised' do
-      input = <<-EOS
-paragraph 1
+      input = <<~EOS
+      paragraph 1
 
-====
-paragraph 2
+      ====
+      paragraph 2
 
-****
-paragraph 3
-****
-====
+      ****
+      paragraph 3
+      ****
+      ====
 
-paragraph 4
+      paragraph 4
 
-* item
-+
-paragraph 5
+      * item
+      +
+      paragraph 5
       EOS
       doc = Asciidoctor.load input
 
@@ -730,15 +725,15 @@ paragraph 5
     end
 
     test 'find_by should only return one result when matching by id' do
-      input = <<-EOS
-== Section
+      input = <<~EOS
+      == Section
 
-content
+      content
 
-[#subsection]
-=== Subsection
+      [#subsection]
+      === Subsection
 
-content
+      content
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by(context: :section, id: 'subsection')
@@ -749,16 +744,16 @@ content
     end
 
     test 'find_by should stop seeking once match is found' do
-      input = <<-EOS
-== Section
+      input = <<~EOS
+      == Section
 
-content
+      content
 
-[#subsection]
-=== Subsection
+      [#subsection]
+      === Subsection
 
-[#last]
-content
+      [#last]
+      content
       EOS
       doc = Asciidoctor.load input
       visited_last = false
@@ -772,15 +767,15 @@ content
     end
 
     test 'find_by should return an empty Array if the id criteria matches but the block argument yields false' do
-      input = <<-EOS
-== Section
+      input = <<~EOS
+      == Section
 
-content
+      content
 
-[#subsection]
-=== Subsection
+      [#subsection]
+      === Subsection
 
-content
+      content
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by(context: :section, id: 'subsection') {|sect| false }
@@ -789,9 +784,7 @@ content
     end
 
     test 'find_by should not crash if dlist entry does not have description' do
-      input = <<-EOS
-term without description::
-      EOS
+      input = 'term without description::'
       doc = Asciidoctor.load input
       result = doc.find_by
       refute_nil result
@@ -815,11 +808,11 @@ term without description::
     end
 
     test 'can substitute a custom syntax highlighter factory instance using the :syntax_highlighter_factory option' do
-      input = <<-EOS
-[source,ruby]
-----
-puts 'Hello, World!'
-----
+      input = <<~EOS
+      [source,ruby]
+      ----
+      puts 'Hello, World!'
+      ----
       EOS
       # NOTE this tests both the lazy loading and the custom factory
       syntax_hl_factory = Asciidoctor::SyntaxHighlighter::CustomFactory.new 'github' => (Asciidoctor::SyntaxHighlighter.for 'html-pipeline')
@@ -830,11 +823,11 @@ puts 'Hello, World!'
     end
 
     test 'can substitute an extended syntax highlighter factory implementation using the :syntax_highlighters option' do
-      input = <<-EOS
-[source,ruby]
-----
-puts 'Hello, World!'
-----
+      input = <<~EOS
+      [source,ruby]
+      ----
+      puts 'Hello, World!'
+      ----
       EOS
       syntax_hl_factory_class = Class.new do
         include Asciidoctor::SyntaxHighlighter::DefaultFactory
@@ -904,10 +897,10 @@ puts 'Hello, World!'
     end
 
     test 'should embed default stylesheet by default if SafeMode is less than SECURE' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-text
+      text
       EOS
 
       output = Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, header_footer: true
@@ -920,11 +913,11 @@ text
     end
 
     test 'should not allow linkcss be unset from document if SafeMode is SECURE or greater' do
-      input = <<-EOS
-= Document Title
-:linkcss!:
+      input = <<~EOS
+      = Document Title
+      :linkcss!:
 
-text
+      text
       EOS
 
       output = Asciidoctor.convert input, header_footer: true
@@ -933,10 +926,10 @@ text
     end
 
     test 'should embed default stylesheet if linkcss is unset from API and SafeMode is SECURE or greater' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-text
+      text
       EOS
 
       #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
@@ -963,10 +956,10 @@ text
     end
 
     test 'should not link to stylesheet if stylesheet is unset' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-text
+      text
       EOS
 
       output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet!' => '' }
@@ -975,10 +968,10 @@ text
     end
 
     test 'should link to custom stylesheet if specified in stylesheet attribute' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-text
+      text
       EOS
 
       output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => './custom.css' }
@@ -990,10 +983,10 @@ text
     end
 
     test 'should resolve custom stylesheet relative to stylesdir' do
-      input = <<-EOS
-= Document Title
+      input = <<~EOS
+      = Document Title
 
-text
+      text
       EOS
 
       output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets' }
@@ -1213,11 +1206,11 @@ text
           'highlighted'
         end
       end
-      input = <<-EOS
-[source,ruby]
-----
-puts 'Hello, World!'
-----
+      input = <<~EOS
+      [source,ruby]
+      ----
+      puts 'Hello, World!'
+      ----
       EOS
       output = Asciidoctor.convert input, safe: :safe, syntax_highlighters: { 'coderay' => syntax_hl }, attributes: { 'source-highlighter' => 'coderay' }
       assert_css 'pre.highlight > code[data-lang="ruby"]', output, 1
@@ -1227,10 +1220,10 @@ puts 'Hello, World!'
 
   context 'AST' do
     test 'with no author' do
-      input = <<-EOS
-= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+      input = <<~EOS
+      = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
 
-Getting Real details the business, design, programming, and marketing principles of 37signals.
+      Getting Real details the business, design, programming, and marketing principles of 37signals.
       EOS
 
       doc = document_from_string input
@@ -1238,11 +1231,11 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'with one author' do
-      input = <<-EOS
-= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
-David Heinemeier Hansson <david@37signals.com>
+      input = <<~EOS
+      = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+      David Heinemeier Hansson <david@37signals.com>
 
-Getting Real details the business, design, programming, and marketing principles of 37signals.
+      Getting Real details the business, design, programming, and marketing principles of 37signals.
       EOS
 
       doc = document_from_string input
@@ -1258,11 +1251,11 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'with two authors' do
-      input = <<-EOS
-= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
-David Heinemeier Hansson <david@37signals.com>; Jason Fried <jason@37signals.com>
+      input = <<~EOS
+      = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+      David Heinemeier Hansson <david@37signals.com>; Jason Fried <jason@37signals.com>
 
-Getting Real details the business, design, programming, and marketing principles of 37signals.
+      Getting Real details the business, design, programming, and marketing principles of 37signals.
       EOS
 
       doc = document_from_string input
@@ -1285,14 +1278,14 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'with authors as attributes' do
-      input = <<-EOS
-= Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
-:author_1: David Heinemeier Hansson
-:email_1: david@37signals.com
-:author_2: Jason Fried
-:email_2: jason@37signals.com
+      input = <<~EOS
+      = Getting Real: The Smarter, Faster, Easier Way to Build a Successful Web Application
+      :author_1: David Heinemeier Hansson
+      :email_1: david@37signals.com
+      :author_2: Jason Fried
+      :email_2: jason@37signals.com
 
-Getting Real details the business, design, programming, and marketing principles of 37signals.
+      Getting Real details the business, design, programming, and marketing principles of 37signals.
       EOS
 
       doc = document_from_string input
@@ -1315,10 +1308,10 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'should not crash if nil cell text is passed to Cell constructor' do
-      input = <<-EOS
-|===
-|a
-|===
+      input = <<~EOS
+      |===
+      |a
+      |===
       EOS
       table = (document_from_string input).blocks[0]
       cell = Asciidoctor::Table::Cell.new table.rows.body[0][0].column, nil, {}
@@ -1328,10 +1321,10 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'should set option on node when set_option is called' do
-      input = <<-EOS
-. three
-. two
-. one
+      input = <<~EOS
+      . three
+      . two
+      . one
       EOS
 
       block = (document_from_string input).blocks[0]
@@ -1343,11 +1336,11 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'should append option to existing options' do
-      input = <<-EOS
-[%fancy]
-. three
-. two
-. one
+      input = <<~EOS
+      [%fancy]
+      . three
+      . two
+      . one
       EOS
 
       block = (document_from_string input).blocks[0]
@@ -1356,11 +1349,11 @@ Getting Real details the business, design, programming, and marketing principles
     end
 
     test 'should not append option if option is already set' do
-      input = <<-EOS
-[%reversed]
-. three
-. two
-. one
+      input = <<~EOS
+      [%reversed]
+      . three
+      . two
+      . one
       EOS
 
       block = (document_from_string input).blocks[0]
