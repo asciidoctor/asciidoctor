@@ -24,9 +24,7 @@ context 'Attributes' do
 
     # NOTE AsciiDoc Python recognizes this entry
     test 'does not recognize attribute entry if name contains colon' do
-      input = <<-EOS.chomp
-:foo:bar: baz
-      EOS
+      input = ':foo:bar: baz'
       doc = document_from_string input
       refute doc.attr?('foo:bar')
       assert_equal 1, doc.blocks.size
@@ -35,9 +33,7 @@ context 'Attributes' do
 
     # NOTE AsciiDoc Python recognizes this entry
     test 'does not recognize attribute entry if name ends with colon' do
-      input = <<-EOS.chomp
-:foo:: bar
-      EOS
+      input = ':foo:: bar'
       doc = document_from_string input
       refute doc.attr?('foo:')
       assert_equal 1, doc.blocks.size
@@ -47,10 +43,10 @@ context 'Attributes' do
     # NOTE AsciiDoc Python does not recognize this entry
     test 'allows any word character defined by Unicode in an attribute name' do
       [['café', 'a coffee shop'], ['سمن', %(سازمان مردمنهاد)]].each do |(name, value)|
-        str = <<-EOS
-:#{name}: #{value}
+        str = <<~EOS
+        :#{name}: #{value}
 
-{#{name}}
+        {#{name}}
         EOS
         result = convert_string_to_embedded str
         # NOTE truffleruby adds \n to the beginning of a paragraph containing multibyte chars
@@ -61,40 +57,40 @@ context 'Attributes' do
     end
 
     test 'creates an attribute by fusing a legacy multi-line value' do
-      str = <<-EOS
-:description: This is the first      +
-              Ruby implementation of +
-              AsciiDoc.
+      str = <<~'EOS'
+      :description: This is the first      +
+                    Ruby implementation of +
+                    AsciiDoc.
       EOS
       doc = document_from_string(str)
       assert_equal 'This is the first Ruby implementation of AsciiDoc.', doc.attributes['description']
     end
 
     test 'creates an attribute by fusing a multi-line value' do
-      str = <<-EOS
-:description: This is the first \\
-              Ruby implementation of \\
-              AsciiDoc.
+      str = <<~'EOS'
+      :description: This is the first \
+                    Ruby implementation of \
+                    AsciiDoc.
       EOS
       doc = document_from_string(str)
       assert_equal 'This is the first Ruby implementation of AsciiDoc.', doc.attributes['description']
     end
 
     test 'honors line break characters in multi-line values' do
-      str = <<-EOS
-:signature: Linus Torvalds + \\
-Linux Hacker + \\
-linus.torvalds@example.com
+      str = <<~'EOS'
+      :signature: Linus Torvalds + \
+      Linux Hacker + \
+      linus.torvalds@example.com
       EOS
       doc = document_from_string(str)
       assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), doc.attributes['signature']
     end
 
     test 'should allow pass macro to surround a multi-line value that contains line breaks' do
-      str = <<-EOS
-:signature: pass:a[{author} + \\
-{title} + \\
-{email}]
+      str = <<~'EOS'
+      :signature: pass:a[{author} + \
+      {title} + \
+      {email}]
       EOS
       doc = document_from_string str, attributes: { 'author' => 'Linus Torvalds', 'title' => 'Linux Hacker', 'email' => 'linus.torvalds@example.com' }
       assert_equal %(Linus Torvalds +\nLinux Hacker +\nlinus.torvalds@example.com), (doc.attr 'signature')
@@ -147,9 +143,9 @@ linus.torvalds@example.com
     end
 
     test 'assigns multi-line attribute to empty string if substitution fails to resolve attribute' do
-      input = <<-EOS
-:release: Asciidoctor +
-          {version}
+      input = <<~'EOS'
+      :release: Asciidoctor +
+                {version}
       EOS
       doc = document_from_string input, attributes: { 'attribute-missing' => 'drop-line' }
       assert_equal '', doc.attributes['release']
@@ -157,12 +153,12 @@ linus.torvalds@example.com
     end
 
     test 'resolves attributes inside attribute value within header' do
-      input = <<-EOS
-= Document Title
-:big: big
-:bigfoot: {big}foot
+      input = <<~'EOS'
+      = Document Title
+      :big: big
+      :bigfoot: {big}foot
 
-{bigfoot}
+      {bigfoot}
       EOS
 
       result = convert_string_to_embedded input
@@ -170,14 +166,14 @@ linus.torvalds@example.com
     end
 
     test 'resolves attributes and pass macro inside attribute value outside header' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-content
+      content
 
-:big: pass:a,q[_big_]
-:bigfoot: {big}foot
-{bigfoot}
+      :big: pass:a,q[_big_]
+      :bigfoot: {big}foot
+      {bigfoot}
       EOS
 
       result = convert_string_to_embedded input
@@ -186,10 +182,10 @@ content
 
     test 'should limit maximum size of attribute value if safe mode is SECURE' do
       expected = 'a' * 4096
-      input = <<-EOS
-:name: #{'a' * 5000}
+      input = <<~EOS
+      :name: #{'a' * 5000}
 
-{name}
+      {name}
       EOS
 
       result = convert_inline_string input
@@ -199,10 +195,10 @@ content
 
     test 'should handle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      input = <<-EOS
-:name: 日本語
+      input = <<~'EOS'
+      :name: 日本語
 
-{name}
+      {name}
       EOS
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 6 }
@@ -212,10 +208,10 @@ content
 
     test 'should not mangle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      input = <<-EOS
-:name: 日本語
+      input = <<~'EOS'
+      :name: 日本語
 
-{name}
+      {name}
       EOS
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 8 }
@@ -225,10 +221,10 @@ content
 
     test 'should allow maximize size of attribute value to be disabled' do
       expected = 'a' * 5000
-      input = <<-EOS
-:name: #{'a' * 5000}
+      input = <<~EOS
+      :name: #{'a' * 5000}
 
-{name}
+      {name}
       EOS
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => nil }
@@ -237,21 +233,21 @@ content
     end
 
     test 'resolves user-home attribute if safe mode is less than SERVER' do
-      input = <<-EOS
-:imagesdir: {user-home}/etc/images
+      input = <<~'EOS'
+      :imagesdir: {user-home}/etc/images
 
-{imagesdir}
-EOS
+      {imagesdir}
+      EOS
       output = convert_inline_string input, safe: :safe
       assert_equal %(#{Asciidoctor::USER_HOME}/etc/images), output
     end
 
     test 'user-home attribute resolves to . if safe mode is SERVER or greater' do
-      input = <<-EOS
-:imagesdir: {user-home}/etc/images
+      input = <<~'EOS'
+      :imagesdir: {user-home}/etc/images
 
-{imagesdir}
-EOS
+      {imagesdir}
+      EOS
       output = convert_inline_string input, safe: :server
       assert_equal './etc/images', output
     end
@@ -273,16 +269,16 @@ EOS
     end
 
     test "attribute is treated as defined until it's not" do
-      input = <<-EOS
-:holygrail:
-ifdef::holygrail[]
-The holy grail has been found!
-endif::holygrail[]
+      input = <<~'EOS'
+      :holygrail:
+      ifdef::holygrail[]
+      The holy grail has been found!
+      endif::holygrail[]
 
-:holygrail!:
-ifndef::holygrail[]
-Buggers! What happened to the grail?
-endif::holygrail[]
+      :holygrail!:
+      ifndef::holygrail[]
+      Buggers! What happened to the grail?
+      endif::holygrail[]
       EOS
       output = convert_string input
       assert_xpath '//p', output, 2
@@ -364,11 +360,11 @@ endif::holygrail[]
     end
 
     test 'backend and doctype attributes are set by default in default configuration' do
-      input = <<-EOS
-= Document Title
-Author Name
+      input = <<~'EOS'
+      = Document Title
+      Author Name
 
-content
+      content
       EOS
 
       doc = document_from_string input
@@ -392,11 +388,11 @@ content
     end
 
     test 'backend and doctype attributes are set by default in custom configuration' do
-      input = <<-EOS
-= Document Title
-Author Name
+      input = <<~'EOS'
+      = Document Title
+      Author Name
 
-content
+      content
       EOS
 
       doc = document_from_string input, doctype: 'book', backend: 'docbook'
@@ -420,13 +416,13 @@ content
     end
 
     test 'backend attributes are updated if backend attribute is defined in document and safe mode is less than SERVER' do
-      input = <<-EOS
-= Document Title
-Author Name
-:backend: docbook
-:doctype: book
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      :backend: docbook
+      :doctype: book
 
-content
+      content
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE
@@ -499,10 +495,10 @@ content
     end
 
     test 'set_attr should set header attribute in loaded document' do
-      input = <<-EOS
-:uri: http://example.org
+      input = <<~'EOS'
+      :uri: http://example.org
 
-{uri}
+      {uri}
       EOS
 
       doc = Asciidoctor.load input, attributes: { 'uri' => 'https://github.com' }
@@ -537,21 +533,21 @@ content
     end
 
     test 'verify toc attribute matrix' do
-      expected_data = <<-EOS
-#attributes                               |toc|toc-position|toc-placement|toc-class
-toc                                       |   |nil         |auto         |nil
-toc=header                                |   |nil         |auto         |nil
-toc=beeboo                                |   |nil         |auto         |nil
-toc=left                                  |   |left        |auto         |toc2
-toc2                                      |   |left        |auto         |toc2
-toc=right                                 |   |right       |auto         |toc2
-toc=preamble                              |   |content     |preamble     |nil
-toc=macro                                 |   |content     |macro        |nil
-toc toc-placement=macro toc-position=left |   |content     |macro        |nil
-toc toc-placement!                        |   |content     |macro        |nil
+      expected_data = <<~'EOS'
+      #attributes                               |toc|toc-position|toc-placement|toc-class
+      toc                                       |   |nil         |auto         |nil
+      toc=header                                |   |nil         |auto         |nil
+      toc=beeboo                                |   |nil         |auto         |nil
+      toc=left                                  |   |left        |auto         |toc2
+      toc2                                      |   |left        |auto         |toc2
+      toc=right                                 |   |right       |auto         |toc2
+      toc=preamble                              |   |content     |preamble     |nil
+      toc=macro                                 |   |content     |macro        |nil
+      toc toc-placement=macro toc-position=left |   |content     |macro        |nil
+      toc toc-placement!                        |   |content     |macro        |nil
       EOS
 
-      expected = expected_data.strip.lines.map do |l|
+      expected = expected_data.lines.map do |l|
         next if l.start_with? '#'
         l.split('|').map {|e| (e = e.strip) == 'nil' ? nil : e }
       end.compact
@@ -577,12 +573,12 @@ toc toc-placement!                        |   |content     |macro        |nil
     end
 
     test 'attribute lookup is not case sensitive' do
-      input = <<-EOS
-:He-Man: The most powerful man in the universe
+      input = <<~'EOS'
+      :He-Man: The most powerful man in the universe
 
-He-Man: {He-Man}
+      He-Man: {He-Man}
 
-She-Ra: {She-Ra}
+      She-Ra: {She-Ra}
       EOS
       result = convert_string_to_embedded input, attributes: { 'She-Ra' => 'The Princess of Power' }
       assert_xpath '//p[text()="He-Man: The most powerful man in the universe"]', result, 1
@@ -596,24 +592,24 @@ She-Ra: {She-Ra}
     end
 
     test "collapses spaces in attribute names" do
-      input = <<-EOS
-Main Header
-===========
-:My frog: Tanglefoot
+      input = <<~'EOS'
+      Main Header
+      ===========
+      :My frog: Tanglefoot
 
-Yo, {myfrog}!
+      Yo, {myfrog}!
       EOS
       output = convert_string input
       assert_xpath '(//p)[1][text()="Yo, Tanglefoot!"]', output, 1
     end
 
     test 'ignores lines with bad attributes if attribute-missing is drop-line' do
-      input = <<-EOS
-:attribute-missing: drop-line
+      input = <<~'EOS'
+      :attribute-missing: drop-line
 
-This is
-blah blah {foobarbaz}
-all there is.
+      This is
+      blah blah {foobarbaz}
+      all there is.
       EOS
       output = convert_string_to_embedded input
       para = xmlnodes_at_css 'p', output, 1
@@ -629,11 +625,11 @@ all there is.
     end
 
     test 'should drop line with reference to missing attribute if attribute-missing attribute is drop-line' do
-      input = <<-EOS
-:attribute-missing: drop-line
+      input = <<~'EOS'
+      :attribute-missing: drop-line
 
-Line 1: This line should appear in the output.
-Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
+      Line 1: This line should appear in the output.
+      Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
       EOS
 
       output = convert_string_to_embedded input
@@ -643,9 +639,9 @@ Line 2: Oh no, a {bogus-attribute}! This line should not appear in the output.
     end
 
     test 'should not drop line with reference to missing attribute by default' do
-      input = <<-EOS
-Line 1: This line should appear in the output.
-Line 2: A {bogus-attribute}! This time, this line should appear in the output.
+      input = <<~'EOS'
+      Line 1: This line should appear in the output.
+      Line 2: A {bogus-attribute}! This time, this line should appear in the output.
       EOS
 
       output = convert_string_to_embedded input
@@ -655,11 +651,11 @@ Line 2: A {bogus-attribute}! This time, this line should appear in the output.
     end
 
     test 'should drop line with attribute unassignment by default' do
-      input = <<-EOS
-:a:
+      input = <<~'EOS'
+      :a:
 
-Line 1: This line should appear in the output.
-Line 2: {set:a!}This line should not appear in the output.
+      Line 1: This line should appear in the output.
+      Line 2: {set:a!}This line should not appear in the output.
       EOS
 
       output = convert_string_to_embedded input
@@ -668,12 +664,12 @@ Line 2: {set:a!}This line should not appear in the output.
     end
 
     test 'should not drop line with attribute unassignment if attribute-undefined is drop' do
-      input = <<-EOS
-:attribute-undefined: drop
-:a:
+      input = <<~'EOS'
+      :attribute-undefined: drop
+      :a:
 
-Line 1: This line should appear in the output.
-Line 2: {set:a!}This line should appear in the output.
+      Line 1: This line should appear in the output.
+      Line 2: {set:a!}This line should appear in the output.
       EOS
 
       output = convert_string_to_embedded input
@@ -683,10 +679,10 @@ Line 2: {set:a!}This line should appear in the output.
     end
 
     test 'should drop line that only contains attribute assignment' do
-      input = <<-EOS
-Line 1
-{set:a}
-Line 2
+      input = <<~'EOS'
+      Line 1
+      {set:a}
+      Line 2
       EOS
 
       output = convert_string_to_embedded input
@@ -694,10 +690,10 @@ Line 2
     end
 
     test 'should drop line that only contains unresolved attribute when attribute-missing is drop' do
-      input = <<-EOS
-Line 1
-{unresolved}
-Line 2
+      input = <<~'EOS'
+      Line 1
+      {unresolved}
+      Line 2
       EOS
 
       output = convert_string_to_embedded input, attributes: { 'attribute-missing' => 'drop' }
@@ -718,55 +714,55 @@ Line 2
     end
 
     test 'interpolates attribute defined in header inside attribute entry in header' do
-      input = <<-EOS
-= Title
-Author Name
-:attribute-a: value
-:attribute-b: {attribute-a}
+      input = <<~'EOS'
+      = Title
+      Author Name
+      :attribute-a: value
+      :attribute-b: {attribute-a}
 
-preamble
+      preamble
       EOS
       doc = document_from_string(input, parse_header_only: true)
       assert_equal 'value', doc.attributes['attribute-b']
     end
 
     test 'interpolates author attribute inside attribute entry in header' do
-      input = <<-EOS
-= Title
-Author Name
-:name: {author}
+      input = <<~'EOS'
+      = Title
+      Author Name
+      :name: {author}
 
-preamble
+      preamble
       EOS
       doc = document_from_string(input, parse_header_only: true)
       assert_equal 'Author Name', doc.attributes['name']
     end
 
     test 'interpolates revinfo attribute inside attribute entry in header' do
-      input = <<-EOS
-= Title
-Author Name
-2013-01-01
-:date: {revdate}
+      input = <<~'EOS'
+      = Title
+      Author Name
+      2013-01-01
+      :date: {revdate}
 
-preamble
+      preamble
       EOS
       doc = document_from_string(input, parse_header_only: true)
       assert_equal '2013-01-01', doc.attributes['date']
     end
 
     test 'attribute entries can resolve previously defined attributes' do
-      input = <<-EOS
-= Title
-Author Name
-v1.0, 2010-01-01: First release!
-:a: value
-:a2: {a}
-:revdate2: {revdate}
+      input = <<~'EOS'
+      = Title
+      Author Name
+      v1.0, 2010-01-01: First release!
+      :a: value
+      :a2: {a}
+      :revdate2: {revdate}
 
-{a} == {a2}
+      {a} == {a2}
 
-{revdate} == {revdate2}
+      {revdate} == {revdate2}
       EOS
 
       doc = document_from_string input
@@ -781,13 +777,13 @@ v1.0, 2010-01-01: First release!
     end
 
     test 'should warn if unterminated block comment is detected in document header' do
-      input = <<-EOS
-= Document Title
-:foo: bar
-////
-:hey: there
+      input = <<~'EOS'
+      = Document Title
+      :foo: bar
+      ////
+      :hey: there
 
-content
+      content
       EOS
       doc = document_from_string input
       assert_nil doc.attr('hey')
@@ -795,34 +791,34 @@ content
     end
 
     test 'substitutes inside block title' do
-      input = <<-EOS
-:gem_name: asciidoctor
+      input = <<~'EOS'
+      :gem_name: asciidoctor
 
-.Require the +{gem_name}+ gem
-To use {gem_name}, the first thing to do is to import it in your Ruby source file.
+      .Require the +{gem_name}+ gem
+      To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
       output = convert_string_to_embedded input, attributes: { 'compat-mode' => '' }
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
 
-      input = <<-EOS
-:gem_name: asciidoctor
+      input = <<~'EOS'
+      :gem_name: asciidoctor
 
-.Require the `{gem_name}` gem
-To use {gem_name}, the first thing to do is to import it in your Ruby source file.
+      .Require the `{gem_name}` gem
+      To use {gem_name}, the first thing to do is to import it in your Ruby source file.
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//*[@class="title"]/code[text()="asciidoctor"]', output, 1
     end
 
     test 'sets attribute until it is deleted' do
-      input = <<-EOS
-:foo: bar
+      input = <<~'EOS'
+      :foo: bar
 
-Crossing the {foo}.
+      Crossing the {foo}.
 
-:foo!:
+      :foo!:
 
-Belly up to the {foo}.
+      Belly up to the {foo}.
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//p[text()="Crossing the bar."]', output, 1
@@ -830,21 +826,21 @@ Belly up to the {foo}.
     end
 
     test 'should allow compat-mode to be set and unset in middle of document' do
-      input = <<-EOS
-:foo: bar
+      input = <<~'EOS'
+      :foo: bar
 
-[[paragraph-a]]
-`{foo}`
+      [[paragraph-a]]
+      `{foo}`
 
-:compat-mode!:
+      :compat-mode!:
 
-[[paragraph-b]]
-`{foo}`
+      [[paragraph-b]]
+      `{foo}`
 
-:compat-mode:
+      :compat-mode:
 
-[[paragraph-c]]
-`{foo}`
+      [[paragraph-c]]
+      `{foo}`
       EOS
 
       result = convert_string_to_embedded input, attributes: { 'compat-mode' => '@' }
@@ -866,34 +862,34 @@ Belly up to the {foo}.
     end
 
     test 'does not substitute attributes inside listing blocks' do
-      input = <<-EOS
-:forecast: snow
+      input = <<~'EOS'
+      :forecast: snow
 
-----
-puts 'The forecast for today is {forecast}'
-----
+      ----
+      puts 'The forecast for today is {forecast}'
+      ----
       EOS
       output = convert_string(input)
       assert_match(/\{forecast\}/, output)
     end
 
     test 'does not substitute attributes inside literal blocks' do
-      input = <<-EOS
-:foo: bar
+      input = <<~'EOS'
+      :foo: bar
 
-....
-You insert the text {foo} to expand the value
-of the attribute named foo in your document.
-....
+      ....
+      You insert the text {foo} to expand the value
+      of the attribute named foo in your document.
+      ....
       EOS
       output = convert_string(input)
       assert_match(/\{foo\}/, output)
     end
 
     test 'does not show docdir and shows relative docfile if safe mode is SERVER or greater' do
-      input = <<-EOS
-* docdir: {docdir}
-* docfile: {docfile}
+      input = <<~'EOS'
+      * docdir: {docdir}
+      * docfile: {docfile}
       EOS
 
       docdir = Dir.pwd
@@ -904,9 +900,9 @@ of the attribute named foo in your document.
     end
 
     test 'shows absolute docdir and docfile paths if safe mode is less than SERVER' do
-      input = <<-EOS
-* docdir: {docdir}
-* docfile: {docfile}
+      input = <<~'EOS'
+      * docdir: {docdir}
+      * docfile: {docfile}
       EOS
 
       docdir = Dir.pwd
@@ -938,12 +934,12 @@ of the attribute named foo in your document.
     end
 
     test 'unassigns attribute defined in attribute reference with set prefix' do
-      input = <<-EOS
-:attribute-missing: drop-line
-:foo:
+      input = <<~'EOS'
+      :attribute-missing: drop-line
+      :foo:
 
-{set:foo!}
-{foo}yes
+      {set:foo!}
+      {foo}yes
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
@@ -972,9 +968,7 @@ of the attribute named foo in your document.
     end
 
     test 'creates counter' do
-      input = <<-EOS
-{counter:mycounter}
-      EOS
+      input = '{counter:mycounter}'
 
       doc = document_from_string input
       output = doc.convert
@@ -983,9 +977,7 @@ of the attribute named foo in your document.
     end
 
     test 'creates counter silently' do
-      input = <<-EOS
-{counter2:mycounter}
-      EOS
+      input = '{counter2:mycounter}'
 
       doc = document_from_string input
       output = doc.convert
@@ -994,9 +986,7 @@ of the attribute named foo in your document.
     end
 
     test 'creates counter with numeric seed value' do
-      input = <<-EOS
-{counter2:mycounter:10}
-      EOS
+      input = '{counter2:mycounter:10}'
 
       doc = document_from_string input
       doc.convert
@@ -1004,9 +994,7 @@ of the attribute named foo in your document.
     end
 
     test 'creates counter with character seed value' do
-      input = <<-EOS
-{counter2:mycounter:A}
-      EOS
+      input = '{counter2:mycounter:A}'
 
       doc = document_from_string input
       doc.convert
@@ -1014,12 +1002,12 @@ of the attribute named foo in your document.
     end
 
     test 'increments counter with numeric value' do
-      input = <<-EOS
-:mycounter: 1
+      input = <<~'EOS'
+      :mycounter: 1
 
-{counter:mycounter}
+      {counter:mycounter}
 
-{mycounter}
+      {mycounter}
       EOS
 
       doc = document_from_string input
@@ -1029,12 +1017,12 @@ of the attribute named foo in your document.
     end
 
     test 'increments counter with character value' do
-      input = <<-EOS
-:mycounter: @
+      input = <<~'EOS'
+      :mycounter: @
 
-{counter:mycounter}
+      {counter:mycounter}
 
-{mycounter}
+      {mycounter}
       EOS
 
       doc = document_from_string input
@@ -1044,12 +1032,12 @@ of the attribute named foo in your document.
     end
 
     test 'counter uses 0 as seed value if seed attribute is nil' do
-      input = <<-EOS
-:mycounter:
+      input = <<~'EOS'
+      :mycounter:
 
-{counter:mycounter}
+      {counter:mycounter}
 
-{mycounter}
+      {mycounter}
       EOS
 
       doc = document_from_string input
@@ -1059,14 +1047,14 @@ of the attribute named foo in your document.
     end
 
     test 'counter value can be reset by attribute entry' do
-      input = <<-EOS
-:mycounter:
+      input = <<~'EOS'
+      :mycounter:
 
-before: {counter:mycounter} {counter:mycounter} {counter:mycounter}
+      before: {counter:mycounter} {counter:mycounter} {counter:mycounter}
 
-:mycounter!:
+      :mycounter!:
 
-after: {counter:mycounter}
+      after: {counter:mycounter}
       EOS
 
       doc = document_from_string input
@@ -1077,23 +1065,23 @@ after: {counter:mycounter}
     end
 
     test 'nested document should use counter from parent document' do
-      input = <<-EOS
-.Title for Foo
-image::foo.jpg[]
+      input = <<~'EOS'
+      .Title for Foo
+      image::foo.jpg[]
 
-[cols="2*a"]
-|===
-|
-.Title for Bar
-image::bar.jpg[]
+      [cols="2*a"]
+      |===
+      |
+      .Title for Bar
+      image::bar.jpg[]
 
-|
-.Title for Baz
-image::baz.jpg[]
-|===
+      |
+      .Title for Baz
+      image::baz.jpg[]
+      |===
 
-.Title for Qux
-image::qux.jpg[]
+      .Title for Qux
+      image::qux.jpg[]
       EOS
 
       output = convert_string_to_embedded input
@@ -1107,9 +1095,9 @@ image::qux.jpg[]
 
   context 'Block attributes' do
     test 'parses attribute names as name token' do
-      input = <<-EOS
-[normal,foo="bar",_foo="_bar",foo1="bar1",foo-foo="bar-bar",foo.foo="bar.bar"]
-content
+      input = <<~'EOS'
+      [normal,foo="bar",_foo="_bar",foo1="bar1",foo-foo="bar-bar",foo.foo="bar.bar"]
+      content
       EOS
 
       block = block_from_string input
@@ -1121,11 +1109,11 @@ content
     end
 
     test 'positional attributes assigned to block' do
-      input = <<-EOS
-[quote, author, source]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [quote, author, source]
+      ____
+      A famous quote.
+      ____
       EOS
       doc = document_from_string(input)
       qb = doc.blocks.first
@@ -1137,11 +1125,11 @@ ____
     end
 
     test 'normal substitutions are performed on single-quoted positional attribute' do
-      input = <<-EOS
-[quote, author, 'http://wikipedia.org[source]']
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [quote, author, 'http://wikipedia.org[source]']
+      ____
+      A famous quote.
+      ____
       EOS
       doc = document_from_string(input)
       qb = doc.blocks.first
@@ -1153,11 +1141,11 @@ ____
     end
 
     test 'normal substitutions are performed on single-quoted named attribute' do
-      input = <<-EOS
-[quote, author, citetitle='http://wikipedia.org[source]']
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [quote, author, citetitle='http://wikipedia.org[source]']
+      ____
+      A famous quote.
+      ____
       EOS
       doc = document_from_string(input)
       qb = doc.blocks.first
@@ -1169,20 +1157,20 @@ ____
     end
 
     test 'normal substitutions are performed once on single-quoted named title attribute' do
-      input = <<-EOS
-[title='*title*']
-content
+      input = <<~'EOS'
+      [title='*title*']
+      content
       EOS
       output = convert_string_to_embedded input
       assert_xpath '//*[@class="title"]/strong[text()="title"]', output, 1
     end
 
     test 'attribute list may not begin with space' do
-      input = <<-EOS
-[ quote]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [ quote]
+      ____
+      A famous quote.
+      ____
       EOS
 
       doc = document_from_string input
@@ -1191,11 +1179,11 @@ ____
     end
 
     test 'attribute list may begin with comma' do
-      input = <<-EOS
-[, author, source]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [, author, source]
+      ____
+      A famous quote.
+      ____
       EOS
 
       doc = document_from_string input
@@ -1206,11 +1194,11 @@ ____
     end
 
     test 'first attribute in list may be double quoted' do
-      input = <<-EOS
-["quote", "author", "source", role="famous"]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      ["quote", "author", "source", role="famous"]
+      ____
+      A famous quote.
+      ____
       EOS
 
       doc = document_from_string input
@@ -1222,11 +1210,11 @@ ____
     end
 
     test 'first attribute in list may be single quoted' do
-      input = <<-EOS
-['quote', 'author', 'source', role='famous']
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      ['quote', 'author', 'source', role='famous']
+      ____
+      A famous quote.
+      ____
       EOS
 
       doc = document_from_string input
@@ -1238,9 +1226,9 @@ ____
     end
 
     test 'attribute with value None without quotes is ignored' do
-      input = <<-EOS
-[id=None]
-paragraph
+      input = <<~'EOS'
+      [id=None]
+      paragraph
       EOS
 
       doc = document_from_string input
@@ -1249,9 +1237,9 @@ paragraph
     end
 
     test 'role? returns true if role is assigned' do
-      input = <<-EOS
-[role="lead"]
-A paragraph
+      input = <<~'EOS'
+      [role="lead"]
+      A paragraph
       EOS
 
       doc = document_from_string input
@@ -1260,9 +1248,9 @@ A paragraph
     end
 
     test 'role? can check for exact role name match' do
-      input = <<-EOS
-[role="lead"]
-A paragraph
+      input = <<~'EOS'
+      [role="lead"]
+      A paragraph
       EOS
 
       doc = document_from_string input
@@ -1273,9 +1261,9 @@ A paragraph
     end
 
     test 'has_role? can check for precense of role name' do
-      input = <<-EOS
-[role="lead abstract"]
-A paragraph
+      input = <<~'EOS'
+      [role="lead abstract"]
+      A paragraph
       EOS
 
       doc = document_from_string input
@@ -1285,9 +1273,9 @@ A paragraph
     end
 
     test 'roles returns array of role names' do
-      input = <<-EOS
-[role="story lead"]
-A paragraph
+      input = <<~'EOS'
+      [role="story lead"]
+      A paragraph
       EOS
 
       doc = document_from_string input
@@ -1296,9 +1284,7 @@ A paragraph
     end
 
     test 'roles returns empty array if role attribute is not set' do
-      input = <<-EOS
-A paragraph
-      EOS
+      input = 'a paragraph'
 
       doc = document_from_string input
       p = doc.blocks.first
@@ -1306,11 +1292,11 @@ A paragraph
     end
 
     test "Attribute substitutions are performed on attribute list before parsing attributes" do
-      input = <<-EOS
-:lead: role="lead"
+      input = <<~'EOS'
+      :lead: role="lead"
 
-[{lead}]
-A paragraph
+      [{lead}]
+      A paragraph
       EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1318,9 +1304,9 @@ A paragraph
     end
 
     test 'id, role and options attributes can be specified on block style using shorthand syntax' do
-      input = <<-EOS
-[literal#first.lead%step]
-A literal paragraph.
+      input = <<~'EOS'
+      [literal#first.lead%step]
+      A literal paragraph.
       EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1332,12 +1318,12 @@ A literal paragraph.
     end
 
     test 'id, role and options attributes can be specified using shorthand syntax on block style using multiple block attribute lines' do
-      input = <<-EOS
-[literal]
-[#first]
-[.lead]
-[%step]
-A literal paragraph.
+      input = <<~'EOS'
+      [literal]
+      [#first]
+      [.lead]
+      [%step]
+      A literal paragraph.
       EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1349,9 +1335,9 @@ A literal paragraph.
     end
 
     test 'multiple roles and options can be specified in block style using shorthand syntax' do
-      input = <<-EOS
-[.role1%option1.role2%option2]
-Text
+      input = <<~'EOS'
+      [.role1%option1.role2%option2]
+      Text
       EOS
 
       doc = document_from_string input
@@ -1363,10 +1349,10 @@ Text
     end
 
     test 'options specified using shorthand syntax on block style across multiple lines should be additive' do
-      input = <<-EOS
-[%option1]
-[%option2]
-Text
+      input = <<~'EOS'
+      [%option1]
+      [%option2]
+      Text
       EOS
 
       doc = document_from_string input
@@ -1377,10 +1363,10 @@ Text
     end
 
     test 'roles specified using shorthand syntax on block style across multiple lines should be additive' do
-      input = <<-EOS
-[.role1]
-[.role2.role3]
-Text
+      input = <<~'EOS'
+      [.role1]
+      [.role2.role3]
+      Text
       EOS
 
       doc = document_from_string input
@@ -1389,11 +1375,11 @@ Text
     end
 
     test 'setting a role using the role attribute replaces any existing roles' do
-      input = <<-EOS
-[.role1]
-[role=role2]
-[.role3]
-Text
+      input = <<~'EOS'
+      [.role1]
+      [role=role2]
+      [.role3]
+      Text
       EOS
 
       doc = document_from_string input
@@ -1402,10 +1388,10 @@ Text
     end
 
     test 'setting a role using the shorthand syntax on block style should not clear the ID' do
-      input = <<-EOS
-[#id]
-[.role]
-Text
+      input = <<~'EOS'
+      [#id]
+      [.role]
+      Text
       EOS
 
       doc = document_from_string input
@@ -1415,9 +1401,7 @@ Text
     end
 
     test 'a role can be added using add_role when the node has no roles' do
-        input = <<-EOS
-A normal paragraph
-        EOS
+      input = 'A normal paragraph'
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.add_role 'role1'
@@ -1427,10 +1411,10 @@ A normal paragraph
     end
 
     test 'a role can be added using add_role when the node already has a role' do
-        input = <<-EOS
-[.role1]
-A normal paragraph
-        EOS
+      input = <<~'EOS'
+      [.role1]
+      A normal paragraph
+      EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.add_role 'role2'
@@ -1441,10 +1425,10 @@ A normal paragraph
     end
 
     test 'a role is not added using add_role if the node already has that role' do
-        input = <<-EOS
-[.role1]
-A normal paragraph
-        EOS
+      input = <<~'EOS'
+      [.role1]
+      A normal paragraph
+      EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.add_role 'role1'
@@ -1454,10 +1438,10 @@ A normal paragraph
     end
 
     test 'an existing role can be removed using remove_role' do
-        input = <<-EOS
-[.role1.role2]
-A normal paragraph
-        EOS
+      input = <<~'EOS'
+      [.role1.role2]
+      A normal paragraph
+      EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.remove_role 'role1'
@@ -1468,10 +1452,10 @@ A normal paragraph
     end
 
     test 'roles are removed when last role is removed using remove_role' do
-        input = <<-EOS
-[.role1]
-A normal paragraph
-        EOS
+      input = <<~'EOS'
+      [.role1]
+      A normal paragraph
+      EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.remove_role 'role1'
@@ -1482,10 +1466,10 @@ A normal paragraph
     end
 
     test 'roles are not changed when a non-existent role is removed using remove_role' do
-        input = <<-EOS
-[.role1]
-A normal paragraph
-        EOS
+      input = <<~'EOS'
+      [.role1]
+      A normal paragraph
+      EOS
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.remove_role 'role2'
@@ -1496,9 +1480,7 @@ A normal paragraph
     end
 
     test 'roles are not changed when using remove_role if the node has no roles' do
-        input = <<-EOS
-A normal paragraph
-        EOS
+      input = 'A normal paragraph'
       doc = document_from_string(input)
       para = doc.blocks.first
       res = para.remove_role 'role1'
@@ -1508,9 +1490,9 @@ A normal paragraph
     end
 
     test 'option can be specified in first position of block style using shorthand syntax' do
-      input = <<-EOS
-[%interactive]
-- [x] checked
+      input = <<~'EOS'
+      [%interactive]
+      - [x] checked
       EOS
 
       doc = document_from_string input
@@ -1520,10 +1502,10 @@ A normal paragraph
     end
 
     test 'id and role attributes can be specified on section style using shorthand syntax' do
-      input = <<-EOS
-[dedication#dedication.small]
-== Section
-Content.
+      input = <<~'EOS'
+      [dedication#dedication.small]
+      == Section
+      Content.
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/div[@class="sect1 small"]', output, 1
@@ -1531,11 +1513,11 @@ Content.
     end
 
     test 'id attribute specified using shorthand syntax should not create a special section' do
-      input = <<-EOS
-[#idname]
-== Section
+      input = <<~'EOS'
+      [#idname]
+      == Section
 
-content
+      content
       EOS
 
       doc = document_from_string input, backend: 'docbook45'
@@ -1549,10 +1531,10 @@ content
     end
 
     test "Block attributes are additive" do
-      input = <<-EOS
-[id='foo']
-[role='lead']
-A paragraph.
+      input = <<~'EOS'
+      [id='foo']
+      [role='lead']
+      A paragraph.
       EOS
       doc = document_from_string(input)
       para = doc.blocks.first
@@ -1561,16 +1543,16 @@ A paragraph.
     end
 
     test "Last wins for id attribute" do
-      input = <<-EOS
-[[bar]]
-[[foo]]
-== Section
+      input = <<~'EOS'
+      [[bar]]
+      [[foo]]
+      == Section
 
-paragraph
+      paragraph
 
-[[baz]]
-[id='coolio']
-=== Section
+      [[baz]]
+      [id='coolio']
+      === Section
       EOS
       doc = document_from_string(input)
       sec = doc.first_section
@@ -1580,29 +1562,29 @@ paragraph
     end
 
     test "trailing block attributes transfer to the following section" do
-      input = <<-EOS
-[[one]]
+      input = <<~'EOS'
+      [[one]]
 
-== Section One
+      == Section One
 
-paragraph
+      paragraph
 
-[[sub]]
-// try to mess this up!
+      [[sub]]
+      // try to mess this up!
 
-=== Sub-section
+      === Sub-section
 
-paragraph
+      paragraph
 
-[role='classy']
+      [role='classy']
 
-////
-block comment
-////
+      ////
+      block comment
+      ////
 
-== Section Two
+      == Section Two
 
-content
+      content
       EOS
       doc = document_from_string(input)
       section_one = doc.blocks.first
