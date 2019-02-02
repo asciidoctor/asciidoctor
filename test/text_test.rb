@@ -37,9 +37,7 @@ context "Text" do
   end
 
   test 'proper encoding to handle utf8 characters from included file' do
-    input = <<-EOS
-include::fixtures/encoding.adoc[tags=romé]
-    EOS
+    input = 'include::fixtures/encoding.adoc[tags=romé]'
     doc = empty_safe_document base_dir: testdir
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
     block = Asciidoctor::Parser.next_block(reader, doc)
@@ -74,12 +72,12 @@ include::fixtures/encoding.adoc[tags=romé]
   end
 
   test 'horizontal rule' do
-    input = <<-EOS
-This line is separated by a horizontal rule...
+    input = <<~'EOS'
+    This line is separated by a horizontal rule...
 
-'''
+    '''
 
-...from this line.
+    ...from this line.
     EOS
     output = convert_string_to_embedded input
     assert_xpath "//hr", output, 1
@@ -107,12 +105,12 @@ This line is separated by a horizontal rule...
 
     variants.each do |variant|
       offsets.each do |offset|
-        input = <<-EOS
-This line is separated by a horizontal rule...
+        input = <<~EOS
+        This line is separated by a horizontal rule...
 
-#{offset}#{variant}
+        #{offset}#{variant}
 
-...from this line.
+        ...from this line.
         EOS
         output = convert_string_to_embedded input
         assert_xpath "//hr", output, 1
@@ -140,12 +138,12 @@ This line is separated by a horizontal rule...
 
     bad_variants.each do |variant|
       good_offsets.each do |offset|
-        input = <<-EOS
-This line is separated by something that is not a horizontal rule...
+        input = <<~EOS
+        This line is separated by something that is not a horizontal rule...
 
-#{offset}#{variant}
+        #{offset}#{variant}
 
-...from this line.
+        ...from this line.
         EOS
         output = convert_string_to_embedded input
         assert_xpath '//hr', output, 0
@@ -165,12 +163,12 @@ This line is separated by something that is not a horizontal rule...
 
     good_variants.each do |variant|
       bad_offsets.each do |offset|
-        input = <<-EOS
-This line is separated by something that is not a horizontal rule...
+        input = <<~EOS
+        This line is separated by something that is not a horizontal rule...
 
-#{offset}#{variant}
+        #{offset}#{variant}
 
-...from this line.
+        ...from this line.
         EOS
         output = convert_string_to_embedded input
         assert_xpath '//hr', output, 0
