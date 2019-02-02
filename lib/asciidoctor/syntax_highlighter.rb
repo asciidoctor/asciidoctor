@@ -182,8 +182,8 @@ module SyntaxHighlighter
         @@registry.fetch name do
           @@mutex.synchronize do
             @@registry.fetch name do
-              if (script_path = PROVIDED[name])
-                require_relative script_path
+              if (require_path = PROVIDED[name])
+                require require_path
                 @@registry[name]
               else
                 @@registry = @@registry.merge name => nil
@@ -194,15 +194,15 @@ module SyntaxHighlighter
         end
       end
 
+      PROVIDED = {
+        'coderay' => %(#{__dir__}/syntax_highlighter/coderay),
+        'prettify' => %(#{__dir__}/syntax_highlighter/prettify),
+        'pygments' => %(#{__dir__}/syntax_highlighter/pygments),
+      }
+
       private
 
       @@mutex = ::Mutex.new
-
-      PROVIDED = {
-        'coderay' => 'syntax_highlighter/coderay',
-        'prettify' => 'syntax_highlighter/prettify',
-        'pygments' => 'syntax_highlighter/pygments',
-      }
     end
   end
 
