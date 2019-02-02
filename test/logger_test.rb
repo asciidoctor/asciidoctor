@@ -190,12 +190,12 @@ context 'Logger' do
     end
 
     test 'writes message prefixed with program name and source location to stderr' do
-      input = <<-EOS
-[#first]
-first paragraph
+      input = <<~'EOS'
+      [#first]
+      first paragraph
 
-[#first]
-another first paragraph
+      [#first]
+      another first paragraph
       EOS
       messages = redirect_streams do |_, err|
         convert_string_to_embedded input

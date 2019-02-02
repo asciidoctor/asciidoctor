@@ -149,9 +149,9 @@ context 'Invoker' do
   end
 
   test 'should print warnings to stderr by default' do
-    input = <<-EOS
-2. second
-3. third
+    input = <<~'EOS'
+    2. second
+    3. third
     EOS
     warnings = nil
     redirect_streams do |out, err|
@@ -162,9 +162,9 @@ context 'Invoker' do
   end
 
   test 'should silence warnings if -q flag is specified' do
-    input = <<-EOS
-2. second
-3. third
+    input = <<~'EOS'
+    2. second
+    3. third
     EOS
     warnings = nil
     redirect_streams do |out, err|
@@ -175,9 +175,9 @@ context 'Invoker' do
   end
 
   test 'should return non-zero exit code if failure level is reached' do
-    input = <<-EOS
-2. second
-3. third
+    input = <<~'EOS'
+    2. second
+    3. third
     EOS
     exit_code, messages = redirect_streams do |_, err|
       [invoke_cli(%w(-q --failure-level=WARN -o /dev/null), '-') { input }.code, err.string]
@@ -437,21 +437,21 @@ context 'Invoker' do
     outdir = fixturedir
     outfile_1 = File.join outdir, 'eve.1'
     outfile_2 = File.join outdir, 'islifeform.1'
-    input = <<-EOS
-= eve(1)
-Andrew Stanton
-v1.0.0
-:doctype: manpage
-:manmanual: EVE
-:mansource: EVE
+    input = <<~'EOS'
+    = eve(1)
+    Andrew Stanton
+    v1.0.0
+    :doctype: manpage
+    :manmanual: EVE
+    :mansource: EVE
 
-== NAME
+    == NAME
 
-eve, islifeform - analyzes an image to determine if it's a picture of a life form
+    eve, islifeform - analyzes an image to determine if it's a picture of a life form
 
-== SYNOPSIS
+    == SYNOPSIS
 
-*eve* ['OPTION']... 'FILE'...
+    *eve* ['OPTION']... 'FILE'...
     EOS
 
     begin
@@ -664,9 +664,7 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
   end
 
   test 'should print timings when -t flag is specified' do
-    input = <<-EOS
-Sample *AsciiDoc*
-    EOS
+    input = 'Sample *AsciiDoc*'
     invoker = nil
     error = nil
     redirect_streams do |_, err|
