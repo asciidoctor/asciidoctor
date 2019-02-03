@@ -2,6 +2,7 @@ module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI
     class Invoker
+      include Logging
 
       attr_reader :options
       attr_reader :documents
@@ -65,12 +66,12 @@ module Asciidoctor
             case val
             when 0
               $VERBOSE = nil
-              old_logger, LoggerManager.logger = LoggerManager.logger, NullLogger.new
+              old_logger, LoggerManager.logger = logger, NullLogger.new
             when 1
               $VERBOSE = false
             when 2
               $VERBOSE = true
-              old_logger_level, LoggerManager.logger.level = LoggerManager.logger.level, ::Logger::Severity::DEBUG
+              old_logger_level, logger.level = logger.level, ::Logger::Severity::DEBUG
             end
           else
             opts[key] = val unless val.nil?
@@ -128,7 +129,7 @@ module Asciidoctor
             end
           end
         end
-        @code = 1 if ((logger = LoggerManager.logger).respond_to? :max_severity) && logger.max_severity && logger.max_severity >= opts[:failure_level]
+        @code = 1 if (logger.respond_to? :max_severity) && logger.max_severity && logger.max_severity >= opts[:failure_level]
       rescue ::Exception => e
         if ::SignalException === e
           @code = e.signo
@@ -153,7 +154,7 @@ module Asciidoctor
         if old_logger
           LoggerManager.logger = old_logger
         elsif old_logger_level
-          LoggerManager.logger.level = old_logger_level
+          logger.level = old_logger_level
         end
       end
 
