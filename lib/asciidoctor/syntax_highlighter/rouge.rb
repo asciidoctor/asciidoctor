@@ -74,7 +74,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     end
 
     def load_library
-      (defined? ::Rouge::Lexer) ? :loaded : (Helpers.require_library %(#{::File.dirname __dir__}/rouge_ext), 'rouge', :warn).nil? ? :unavailable : :loaded
+      (defined? RougeExt) ? :loaded : (Helpers.require_library %(#{::File.dirname __dir__}/rouge_ext), 'rouge', :warn).nil? ? :unavailable : :loaded
     end
   end
 

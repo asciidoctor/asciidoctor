@@ -1,4 +1,4 @@
-require 'rouge'
+require 'rouge' unless defined? Rouge.version
 
 module Asciidoctor; module RougeExt; module Formatters
   class HTMLTable < ::Rouge::Formatter
