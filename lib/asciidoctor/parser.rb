@@ -32,11 +32,11 @@ class Parser
   # Regexp for leading tab indentation
   TabIndentRx = /^\t+/
 
-  StartOfBlockProc = lambda {|l| ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (is_delimited_block? l) }
+  StartOfBlockProc = proc {|l| ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (is_delimited_block? l) }
 
-  StartOfListProc = lambda {|l| AnyListRx.match? l }
+  StartOfListProc = proc {|l| AnyListRx.match? l }
 
-  StartOfBlockOrListProc = lambda {|l| (is_delimited_block? l) || ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (AnyListRx.match? l) }
+  StartOfBlockOrListProc = proc {|l| (is_delimited_block? l) || ((l.start_with? '[') && (BlockAttributeLineRx.match? l)) || (AnyListRx.match? l) }
 
   NoOp = nil
 
@@ -2569,7 +2569,7 @@ class Parser
     if (raw_style = attributes[1]) && !raw_style.include?(' ') && Compliance.shorthand_property_syntax
       type, collector, parsed = :style, [], {}
       # QUESTION should this be a private method? (though, it's never called if shorthand isn't used)
-      save_current = lambda {
+      save_current = proc {
         if collector.empty?
           unless type == :style
             if reader
