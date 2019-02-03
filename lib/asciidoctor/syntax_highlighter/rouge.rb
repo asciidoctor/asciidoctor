@@ -39,7 +39,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     lang = (lang.split '?', 2)[0] if lang.include? '?'
     if opts[:css_mode] != :class && (@style = (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE) &&
         (pre_style_attr_val = base_style @style)
-      opts[:transform] = -> pre, _ { pre['style'] = pre_style_attr_val }
+      opts[:transform] = proc {|pre| pre['style'] = pre_style_attr_val }
     end
     super
   end

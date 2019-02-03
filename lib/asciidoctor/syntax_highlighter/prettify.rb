@@ -9,7 +9,7 @@ class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
 
   def format node, lang, opts
     if node.attr? 'linenums', nil, false
-      opts[:transform] = -> pre, _ { pre['class'] += %( #{(start = node.attr 'start', nil, false) ? %[linenums:#{start}] : 'linenums'}) }
+      opts[:transform] = proc {|pre| pre['class'] += %( #{(start = node.attr 'start', nil, false) ? %[linenums:#{start}] : 'linenums'}) }
     end
     super
   end
