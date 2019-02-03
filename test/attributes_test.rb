@@ -195,12 +195,13 @@ context 'Attributes' do
 
     test 'should handle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      # NOTE this test breaks on truffleruby if defined using 'EOS'
-      input = <<~EOS
+      input = <<~'EOS'
       :name: 日本語
 
       {name}
       EOS
+      # see https://github.com/oracle/truffleruby/issues/1563
+      input = input.force_encoding ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 6 }
       assert_equal expected, result
@@ -209,12 +210,13 @@ context 'Attributes' do
 
     test 'should not mangle multibyte characters when limiting attribute value size' do
       expected = '日本'
-      # NOTE this test breaks on truffleruby if defined using 'EOS'
-      input = <<~EOS
+      input = <<~'EOS'
       :name: 日本語
 
       {name}
       EOS
+      # see https://github.com/oracle/truffleruby/issues/1563
+      input = input.force_encoding ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 8 }
       assert_equal expected, result
