@@ -86,8 +86,8 @@ module LoggerManager
       @logger ||= (@logger_class.new pipe)
     end
 
-    def logger= logger
-      @logger = logger || (@logger_class.new $stderr)
+    def logger= new_logger
+      @logger = new_logger || (@logger_class.new $stderr)
     end
 
     private

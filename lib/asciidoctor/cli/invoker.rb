@@ -65,8 +65,7 @@ module Asciidoctor
             case val
             when 0
               $VERBOSE = nil
-              old_logger = LoggerManager.logger
-              LoggerManager.logger = NullLogger.new
+              old_logger, LoggerManager.logger = LoggerManager.logger, NullLogger.new
             when 1
               $VERBOSE = false
             when 2
