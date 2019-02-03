@@ -525,7 +525,7 @@ context "Parser" do
   end
 
   test "parse rev remark only" do
-    # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+    # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
     input = <<~EOS
     Joe Cool
      :Must start revremark-only line with space
@@ -614,7 +614,7 @@ context "Parser" do
     end
     EOS
 
-    # NOTE JRuby does not parse this heredoc correctly when defined using 'EOS'
+    # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
     expected = <<~EOS.chomp
     def names
 
