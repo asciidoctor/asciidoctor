@@ -7,6 +7,12 @@ require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
 Dir.chdir Asciidoctor::ROOT_DIR
 
 require 'nokogiri'
+proc do
+  old_verbose, $VERBOSE = $VERBOSE, nil
+  require 'rouge'
+  Rouge::Lexer.disable_debug!
+  $VERBOSE = old_verbose
+end.call
 require 'socket'
 require 'tempfile'
 require 'tmpdir'
