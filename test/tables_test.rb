@@ -1391,7 +1391,7 @@ context 'Tables' do
       <1> Third callout
       EOS
 
-      result = convert_string input, backend: 'docbook'
+      result = convert_string_to_embedded input, backend: 'docbook'
       conums = xmlnodes_at_xpath '//co', result
       assert_equal 3, conums.size
       ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |conum, idx|

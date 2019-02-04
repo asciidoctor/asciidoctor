@@ -172,7 +172,7 @@ class Minitest::Test
   end
 
   def xmldoc_from_string(content)
-    if content.match(RE_XMLNS_ATTRIBUTE)
+    if content.start_with?('<?xml ') || content.match(RE_XMLNS_ATTRIBUTE)
       Nokogiri::XML::Document.parse(content)
     elsif !(doctype_match = content.match(RE_DOCTYPE))
       Nokogiri::HTML::DocumentFragment.parse(content)
