@@ -1708,10 +1708,10 @@ EOS
           actual = para.content
           if asciimath_available
             assert_equal expected, actual
-            assert_equal :loaded, para.document.converter.instance_variable_get(:@asciimath)
+            assert_equal :loaded, para.document.converter.instance_variable_get(:@asciimath_status)
           else
             assert_message logger, :WARN, 'optional gem \'asciimath\' is not installed. Functionality disabled.'
-            assert_equal :unavailable, para.document.converter.instance_variable_get(:@asciimath)
+            assert_equal :unavailable, para.document.converter.instance_variable_get(:@asciimath_status)
           end
         end
       end
@@ -1720,7 +1720,7 @@ EOS
         asciimath_available = !(Asciidoctor::Helpers.require_library 'asciimath', true, :ignore).nil?
         input = 'asciimath:[a < b]'
         para = block_from_string input, backend: :docbook
-        para.document.converter.instance_variable_set :@asciimath, :unavailable
+        para.document.converter.instance_variable_set :@asciimath_status, :unavailable
         if asciimath_available
           old_asciimath = ::AsciiMath
           Object.send :remove_const, 'AsciiMath'

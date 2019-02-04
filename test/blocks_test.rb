@@ -1760,10 +1760,10 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
         actual = doc.convert
         if asciimath_available
           assert_equal expect, actual.strip
-          assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath)
+          assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath_status)
         else
           assert_message logger, :WARN, 'optional gem \'asciimath\' is not installed. Functionality disabled.'
-          assert_equal :unavailable, doc.converter.instance_variable_get(:@asciimath)
+          assert_equal :unavailable, doc.converter.instance_variable_get(:@asciimath_status)
         end
       end
     end

@@ -272,12 +272,8 @@ class Converter::DocBook5Converter < Converter::Base
       equation = node.content
     end
     if node.style == 'asciimath'
-      if (@asciimath ||= ((defined? ::AsciiMath::VERSION) || (Helpers.require_library 'asciimath', true, :warn)).nil? ? :unavailable : :loaded) == :loaded
-        # NOTE fop requires jeuclid to process raw mathml
-        equation_data = (::AsciiMath.parse equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'
-      else
-        equation_data = %(<mathphrase><![CDATA[#{equation}]]></mathphrase>)
-      end
+      # NOTE fop requires jeuclid to process mathml markup
+      equation_data = _asciimath_available? ? ((::AsciiMath.parse equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML') : %(<mathphrase><![CDATA[#{equation}]]></mathphrase>)
     else
       # unhandled math; pass source to alt and required mathphrase element; dblatex will process alt as LaTeX math
       equation_data = %(<alt><![CDATA[#{equation}]]></alt>
@@ -617,12 +613,8 @@ class Converter::DocBook5Converter < Converter::Base
 
   def inline_quoted node
     if (type = node.type) == :asciimath
-      if (@asciimath ||= ((defined? ::AsciiMath::VERSION) || (Helpers.require_library 'asciimath', true, :warn)).nil? ? :unavailable : :loaded) == :loaded
-        # NOTE fop requires jeuclid to process raw mathml
-        %(<inlineequation>#{(::AsciiMath.parse node.text).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'}</inlineequation>)
-      else
-        %(<inlineequation><mathphrase><![CDATA[#{node.text}]]></mathphrase></inlineequation>)
-      end
+      # NOTE fop requires jeuclid to process mathml markup
+      _asciimath_available? ? %(<inlineequation>#{(::AsciiMath.parse node.text).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'}</inlineequation>) : %(<inlineequation><mathphrase><![CDATA[#{node.text}]]></mathphrase></inlineequation>)
     elsif type == :latexmath
       # unhandled math; pass source to alt and required mathphrase element; dblatex will process alt as LaTeX math
       %(<inlineequation><alt><![CDATA[#{equation = node.text}]]></alt><mathphrase><![CDATA[#{equation}]]></mathphrase></inlineequation>)
@@ -814,6 +806,14 @@ class Converter::DocBook5Converter < Converter::Base
     result << yield
     result << end_tag
     result.join LF
+  end
+
+  def _asciimath_available?
+    (@asciimath_status ||= _load_asciimath) == :loaded
+  end
+
+  def _load_asciimath
+    (defined? ::AsciiMath.parse) ? :loaded : (Helpers.require_library 'asciimath', true, :warn).nil? ? :unavailable : :loaded
   end
 end
 end
