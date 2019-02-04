@@ -58,7 +58,7 @@ module Asciidoctor
       @active_engines = {}
       @engine = opts[:template_engine]
       @engine_options = {}.tap {|accum| DEFAULT_ENGINE_OPTIONS.each {|engine, engine_opts| accum[engine] = engine_opts.dup } }
-      if opts[:htmlsyntax] == 'html'
+      if opts[:htmlsyntax] == 'html' # if not set, assume xml since this converter is also used for DocBook (which doesn't specify htmlsyntax)
         @engine_options[:haml][:format] = :html5
         @engine_options[:slim][:format] = :html
       end
@@ -82,15 +82,15 @@ module Asciidoctor
 
     # Public: Convert an {AbstractNode} to the backend format using the named template.
     #
-    # Looks for a template that matches the value of the
-    # {AbstractNode#node_name} property if a template name is not specified.
+    # Looks for a template that matches the value of the template name or, if the template name is not specified, the
+    # value of the {AbstractNode#node_name} property.
     #
     # node          - the AbstractNode to convert
     # template_name - the String name of the template to use, or the value of
     #                 the node_name property on the node if a template name is
     #                 not specified. (optional, default: nil)
     # opts          - an optional Hash that is passed as local variables to the
-    #                 template. (optional, default: {})
+    #                 template. (optional, default: nil)
     #
     # Returns the [String] result from rendering the template
     def convert node, template_name = nil, opts = nil
@@ -140,13 +140,6 @@ module Asciidoctor
       end
       #create_handler name, template
     end
-
-=begin
-    # Internal: Called when this converter is added to a composite converter.
-    def composed parent
-      # TODO set the backend info determined during the scan
-    end
-=end
 
     private
 

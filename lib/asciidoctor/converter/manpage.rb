@@ -5,7 +5,9 @@ module Asciidoctor
   # consistent with the output produced by the a2x tool from AsciiDoc Python.
   #
   # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
-  class Converter::ManPageConverter < Converter::BuiltIn
+  class Converter::ManPageConverter < Converter::Base
+    register_for 'manpage'
+
     WHITESPACE = %(#{LF}#{TAB} )
     ET = ' ' * 8
     ESC = ?\u001b # troff leader marker
@@ -20,64 +22,9 @@ module Asciidoctor
     EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
     WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
 
-    # Converts HTML entity references back to their original form, escapes
-    # special man characters and strips trailing whitespace.
-    #
-    # It's crucial that text only ever pass through manify once.
-    #
-    # str  - the String to convert
-    # opts - an Hash of options to control processing (default: {})
-    #        * :whitespace an enum that indicates how to handle whitespace; supported options are:
-    #          :preserve - preserve spaces (only expanding tabs); :normalize - normalize whitespace
-    #          (remove spaces around newlines); :collapse - collapse adjacent whitespace to a single
-    #          space (default: :collapse)
-    #        * :append_newline a Boolean that indicates whether to append a newline to the result (default: false)
-    def manify str, opts = {}
-      case opts.fetch :whitespace, :collapse
-      when :preserve
-        str = str.gsub TAB, ET
-      when :normalize
-        str = str.gsub WrappedIndentRx, LF
-      else
-        str = str.tr_s WHITESPACE, ' '
-      end
-      str = str.
-        gsub(LiteralBackslashRx, '\&(rs'). # literal backslash (not a troff escape sequence)
-        gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
-        # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-        gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.
-        gsub('-', '\-').
-        gsub('&lt;', '<').
-        gsub('&gt;', '>').
-        gsub('&#160;', '\~').     # non-breaking space
-        gsub('&#169;', '\(co').   # copyright sign
-        gsub('&#174;', '\(rg').   # registered sign
-        gsub('&#8482;', '\(tm').  # trademark sign
-        gsub('&#8201;', ' ').     # thin space
-        gsub('&#8211;', '\(en').  # en dash
-        gsub(EmDashCharRefRx, '\(em'). # em dash
-        gsub('&#8216;', '\(oq').  # left single quotation mark
-        gsub('&#8217;', '\(cq').  # right single quotation mark
-        gsub('&#8220;', '\(lq').  # left double quotation mark
-        gsub('&#8221;', '\(rq').  # right double quotation mark
-        gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
-        gsub('&#8592;', '\(<-').  # leftwards arrow
-        gsub('&#8594;', '\(->').  # rightwards arrow
-        gsub('&#8656;', '\(lA').  # leftwards double arrow
-        gsub('&#8658;', '\(rA').  # rightwards double arrow
-        gsub('&#8203;', '\:').    # zero width space
-        gsub('&amp;','&').        # literal ampersand (NOTE must take place after any other replacement that includes &)
-        gsub('\'', '\(aq').       # apostrophe-quote
-        gsub(MockBoundaryRx, ''). # mock boundary
-        gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
-        gsub(ESC_FS, '.').        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
-        rstrip                    # strip trailing space
-      opts[:append_newline] ? %(#{str}#{LF}) : str
-    end
-
-    def skip_with_warning node, name = nil
-      logger.warn %(converter missing for #{name || node.node_name} node in manpage backend)
-      nil
+    def initialize backend, opts = {}
+      @backend = backend
+      init_backend_traits basebackend: 'manpage', filetype: 'man', outfilesuffix: '.man', supports_templates: true
     end
 
     def document node
@@ -101,7 +48,7 @@ module Asciidoctor
 .\\"  Language: English
 .\\")
       # TODO add document-level setting to disable capitalization of manname
-      result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{mansource ? (manify mansource) : '\ \&'}" "#{manmanual ? (manify manmanual) : '\ \&'}")
+      result << %(.TH "#{_manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{mansource ? (_manify mansource) : '\ \&'}" "#{manmanual ? (_manify manmanual) : '\ \&'}")
       # define portability settings
       # see http://bugs.debian.org/507673
       # see http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
@@ -143,7 +90,7 @@ module Asciidoctor
         if node.attr? 'manpurpose'
           mannames = node.attr 'mannames', [manname]
           result << %(.SH "#{(node.attr 'manname-title', 'NAME').upcase}"
-#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), whitespace: :normalize})
+#{mannames.map {|n| _manify n }.join ', '} \\- #{_manify node.attr('manpurpose'), whitespace: :normalize})
         end
       end
 
@@ -196,7 +143,7 @@ module Asciidoctor
         macro = 'SH'
         stitle = node.title.upcase
       end
-      result << %(.#{macro} "#{manify stitle}"
+      result << %(.#{macro} "#{_manify stitle}"
 #{node.content})
       result.join LF
     end
@@ -210,21 +157,19 @@ module Asciidoctor
 .nr an-break-flag 1
 .br
 .ps +1
-.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{manify node.title}" : ''}
+.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{_manify node.title}" : ''}
 .ps -1
 .br
-#{resolve_content node}
+#{_resolve_content node}
 .sp .5v
 .RE)
       result.join LF
     end
 
-    alias audio skip_with_warning
-
     def colist node
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
       result << '.TS
 tab(:);
@@ -233,7 +178,7 @@ r lw(\n(.lu*75u/100u).'
       num = 0
       node.items.each do |item|
         result << %(\\fB(#{num += 1})\\fP\\h'-2n':T{)
-        result << (manify item.text, whitespace: :normalize)
+        result << (_manify item.text, whitespace: :normalize)
         result << item.content if item.blocks?
         result << 'T}'
       end
@@ -245,7 +190,7 @@ r lw(\n(.lu*75u/100u).'
     def dlist node
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
       counter = 0
       node.items.each do |terms, dd|
@@ -253,15 +198,15 @@ r lw(\n(.lu*75u/100u).'
         case node.style
         when 'qanda'
           result << %(.sp
-#{counter}. #{manify [*terms].map {|dt| dt.text }.join ' '}
+#{counter}. #{_manify [*terms].map {|dt| dt.text }.join ' '}
 .RS 4)
         else
           result << %(.sp
-#{manify [*terms].map {|dt| dt.text }.join(', '), whitespace: :normalize}
+#{_manify [*terms].map {|dt| dt.text }.join(', '), whitespace: :normalize}
 .RS 4)
         end
         if dd
-          result << (manify dd.text, whitespace: :normalize) if dd.text?
+          result << (_manify dd.text, whitespace: :normalize) if dd.text?
           result << dd.content if dd.blocks?
         end
         result << '.RE'
@@ -272,29 +217,27 @@ r lw(\n(.lu*75u/100u).'
     def example node
       result = []
       result << %(.sp
-.B #{manify node.captioned_title}
+.B #{_manify node.captioned_title}
 .br) if node.title?
       result << %(.RS 4
-#{resolve_content node}
+#{_resolve_content node}
 .RE)
       result.join LF
     end
 
     def floating_title node
-      %(.SS "#{manify node.title}")
+      %(.SS "#{_manify node.title}")
     end
-
-    alias image skip_with_warning
 
     def listing node
       result = []
       result << %(.sp
-.B #{manify node.captioned_title}
+.B #{_manify node.captioned_title}
 .br) if node.title?
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content, whitespace: :preserve}
+#{_manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -303,12 +246,12 @@ r lw(\n(.lu*75u/100u).'
     def literal node
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
       result << %(.sp
 .if n .RS 4
 .nf
-#{manify node.content, whitespace: :preserve}
+#{_manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
       result.join LF
@@ -317,7 +260,7 @@ r lw(\n(.lu*75u/100u).'
     def olist node
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
 
       node.items.each_with_index do |item, idx|
@@ -330,7 +273,7 @@ r lw(\n(.lu*75u/100u).'
 .  sp -1
 .  IP " #{idx + 1}." 4.2
 .\\}
-#{manify item.text, whitespace: :normalize})
+#{_manify item.text, whitespace: :normalize})
         result << item.content if item.blocks?
         result << '.RE'
       end
@@ -340,35 +283,36 @@ r lw(\n(.lu*75u/100u).'
     def open node
       case node.style
       when 'abstract', 'partintro'
-        resolve_content node
+        _resolve_content node
       else
         node.content
       end
     end
 
     # TODO use Page Control https://www.gnu.org/software/groff/manual/html_node/Page-Control.html#Page-Control
-    alias page_break skip
+    alias page_break _skip
 
     def paragraph node
       if node.title?
         %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br
-#{manify node.content, whitespace: :normalize})
+#{_manify node.content, whitespace: :normalize})
       else
         %(.sp
-#{manify node.content, whitespace: :normalize})
+#{_manify node.content, whitespace: :normalize})
       end
     end
 
-    alias preamble content
+    alias pass _content_only
+    alias preamble _content_only
 
     def quote node
       result = []
       if node.title?
         result << %(.sp
 .RS 3
-.B #{manify node.title}
+.B #{_manify node.title}
 .br
 .RE)
       end
@@ -376,7 +320,7 @@ r lw(\n(.lu*75u/100u).'
       attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
       result << %(.RS 3
 .ll -.6i
-#{resolve_content node}
+#{_resolve_content node}
 .br
 .RE
 .ll)
@@ -390,11 +334,9 @@ r lw(\n(.lu*75u/100u).'
       result.join LF
     end
 
-    alias sidebar skip_with_warning
-
     def stem node
       title_element = node.title? ? %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) : ''
       open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
 
@@ -419,7 +361,7 @@ r lw(\n(.lu*75u/100u).'
 .nr an-no-space-flag 1
 .nr an-break-flag 1
 .br
-.B #{manify node.captioned_title}
+.B #{_manify node.captioned_title}
 )
       end
       result << '.TS
@@ -456,7 +398,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
+              row_text[row_index] << %(#{_manify cell.text, whitespace: :normalize}#{LF})
             elsif tsec == :body
               if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
                 row_header[row_index][cell_index] << %(#{cell_halign}t)
@@ -468,11 +410,11 @@ allbox tab(:);'
               when :asciidoc
                 cell_content = cell.content
               when :literal
-                cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{_manify cell.text, whitespace: :preserve}#{LF}.fi)
               when :verse
-                cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
+                cell_content = %(.nf#{LF}#{_manify cell.text, whitespace: :preserve}#{LF}.fi)
               else
-                cell_content = manify cell.content.join, whitespace: :normalize
+                cell_content = _manify cell.content.join, whitespace: :normalize
               end
               row_text[row_index] << %(#{cell_content}#{LF})
             elsif tsec == :foot
@@ -482,7 +424,7 @@ allbox tab(:);'
                 row_header[row_index][cell_index + 1] ||= []
                 row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
               end
-              row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
+              row_text[row_index] << %(#{_manify cell.text, whitespace: :normalize}#{LF})
             end
             if cell.colspan && cell.colspan > 1
               (cell.colspan - 1).times do |i|
@@ -541,12 +483,12 @@ allbox tab(:);'
 \l\'\n(.lu*25u/100u\(ap\''
     end
 
-    alias toc skip
+    alias toc _skip
 
     def ulist node
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
       node.items.map do |item|
         result << %[.sp
@@ -558,7 +500,7 @@ allbox tab(:);'
 .  sp -1
 .  IP \\(bu 2.3
 .\\}
-#{manify item.text, whitespace: :normalize}]
+#{_manify item.text, whitespace: :normalize}]
         result << item.content if item.blocks?
         result << '.RE'
       end
@@ -570,14 +512,14 @@ allbox tab(:);'
       result = []
       if node.title?
         result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br)
       end
       attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
       attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
       result << %(.sp
 .nf
-#{manify node.content, whitespace: :preserve}
+#{_manify node.content, whitespace: :preserve}
 .fi
 .br)
       if attribution_line
@@ -595,7 +537,7 @@ allbox tab(:);'
       end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : ''
       result = []
       result << %(.sp
-.B #{manify node.title}
+.B #{_manify node.title}
 .br) if node.title?
       result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
       result.join LF
@@ -698,11 +640,7 @@ allbox tab(:);'
       end
     end
 
-    def resolve_content node
-      node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, whitespace: :normalize})
-    end
-
-    def write_alternate_pages mannames, manvolnum, target
+    def self.write_alternate_pages mannames, manvolnum, target
       if mannames && mannames.size > 1
         mannames.shift
         manvolext = %(.#{manvolnum})
@@ -711,6 +649,67 @@ allbox tab(:);'
           ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
         end
       end
+    end
+
+    private
+
+    # Converts HTML entity references back to their original form, escapes
+    # special man characters and strips trailing whitespace.
+    #
+    # It's crucial that text only ever pass through _manify once.
+    #
+    # str  - the String to convert
+    # opts - an Hash of options to control processing (default: {})
+    #        * :whitespace an enum that indicates how to handle whitespace; supported options are:
+    #          :preserve - preserve spaces (only expanding tabs); :normalize - normalize whitespace
+    #          (remove spaces around newlines); :collapse - collapse adjacent whitespace to a single
+    #          space (default: :collapse)
+    #        * :append_newline a Boolean that indicates whether to append a newline to the result (default: false)
+    def _manify str, opts = {}
+      case opts.fetch :whitespace, :collapse
+      when :preserve
+        str = str.gsub TAB, ET
+      when :normalize
+        str = str.gsub WrappedIndentRx, LF
+      else
+        str = str.tr_s WHITESPACE, ' '
+      end
+      str = str.
+        gsub(LiteralBackslashRx, '\&(rs'). # literal backslash (not a troff escape sequence)
+        gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
+        # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
+        gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.
+        gsub('-', '\-').
+        gsub('&lt;', '<').
+        gsub('&gt;', '>').
+        gsub('&#160;', '\~').     # non-breaking space
+        gsub('&#169;', '\(co').   # copyright sign
+        gsub('&#174;', '\(rg').   # registered sign
+        gsub('&#8482;', '\(tm').  # trademark sign
+        gsub('&#8201;', ' ').     # thin space
+        gsub('&#8211;', '\(en').  # en dash
+        gsub(EmDashCharRefRx, '\(em'). # em dash
+        gsub('&#8216;', '\(oq').  # left single quotation mark
+        gsub('&#8217;', '\(cq').  # right single quotation mark
+        gsub('&#8220;', '\(lq').  # left double quotation mark
+        gsub('&#8221;', '\(rq').  # right double quotation mark
+        gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
+        gsub('&#8592;', '\(<-').  # leftwards arrow
+        gsub('&#8594;', '\(->').  # rightwards arrow
+        gsub('&#8656;', '\(lA').  # leftwards double arrow
+        gsub('&#8658;', '\(rA').  # rightwards double arrow
+        gsub('&#8203;', '\:').    # zero width space
+        gsub('&amp;','&').        # literal ampersand (NOTE must take place after any other replacement that includes &)
+        gsub('\'', '\(aq').       # apostrophe-quote
+        gsub(MockBoundaryRx, ''). # mock boundary
+        gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
+        gsub(ESC_FS, '.').        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
+        rstrip                    # strip trailing space
+      opts[:append_newline] ? %(#{str}#{LF}) : str
+    end
+
+    def _resolve_content node
+      node.content_model == :compound ? node.content : %(.sp#{LF}#{_manify node.content, whitespace: :normalize})
     end
   end
 end

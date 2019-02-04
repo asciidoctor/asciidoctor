@@ -3,16 +3,16 @@ module Asciidoctor
   # objects passed to the constructor. Selects the first {Converter} that
   # identifies itself as the handler for a given transform.
   class Converter::CompositeConverter < Converter::Base
-
     # Get the Array of Converter objects in the chain
     attr_reader :converters
 
-    def initialize backend, *converters
+    def initialize backend, *converters, backend_traits_source: nil
       @backend = backend
-      (@converters = converters.flatten.compact).each do |converter|
+      (@converters = converters).each do |converter|
         converter.composed self if converter.respond_to? :composed
       end
-      @converter_map = {}
+      init_backend_traits backend_traits_source.backend_traits if backend_traits_source
+      @converter_cache = {}
     end
 
     # Public: Delegates to the first converter that identifies itself as the
@@ -30,14 +30,11 @@ module Asciidoctor
       (converter_for transform).convert node, transform, opts
     end
 
-    # Alias for backward compatibility.
-    alias convert_with_options convert
-
     # Public: Retrieve the converter for the specified transform.
     #
     # Returns the matching [Converter] object
     def converter_for transform
-      @converter_map[transform] ||= (find_converter transform)
+      @converter_cache[transform] ||= (find_converter transform)
     end
 
     # Public: Find the converter for the specified transform.

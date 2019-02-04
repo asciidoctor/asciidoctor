@@ -2,7 +2,6 @@ require_relative 'test_helper'
 require 'tilt' unless defined? ::Tilt::VERSION
 
 context 'Converter' do
-
   context 'View options' do
     test 'should set Haml format to html5 for html5 backend' do
       doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
@@ -92,7 +91,7 @@ context 'Converter' do
     test 'should load Haml templates for default backend' do
       doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph', 'sidebar'].each do |node_name|
+      %w(paragraph sidebar).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
@@ -123,7 +122,7 @@ context 'Converter' do
     test 'should load Haml templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph'].each do |node_name|
+      %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
@@ -132,18 +131,18 @@ context 'Converter' do
     end
 
     test 'should use Haml templates in place of built-in templates' do
-      input = <<-EOS
-= Document Title
-Author Name
+      input = <<~'EOS'
+      = Document Title
+      Author Name
 
-== Section One
+      == Section One
 
-Sample paragraph
+      Sample paragraph
 
-.Related
-****
-Sidebar content
-****
+      .Related
+      ****
+      Sidebar content
+      ****
       EOS
 
       output = convert_string_to_embedded input, template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
@@ -156,9 +155,7 @@ Sidebar content
 
     test 'should use built-in global cache to cache templates' do
       begin
-        # clear out any cache, just to be sure
         Asciidoctor::Converter::TemplateConverter.clear_caches if defined? Asciidoctor::Converter::TemplateConverter
-
         template_dir = fixture_path 'custom-backends/haml'
         doc = Asciidoctor::Document.new [], template_dir: template_dir
         doc.converter
@@ -206,9 +203,7 @@ Sidebar content
 
     test 'should be able to disable template cache' do
       begin
-        # clear out any cache, just to be sure
         Asciidoctor::Converter::TemplateConverter.clear_caches if defined? Asciidoctor::Converter::TemplateConverter
-
         doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
         doc.converter
         caches = Asciidoctor::Converter::TemplateConverter.caches
@@ -224,7 +219,7 @@ Sidebar content
       input = %([.wrapper]\n--\nfoobar\n--)
       doc = Asciidoctor::Document.new input, template_dir: (fixture_path 'custom-backends/erb'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph'].each do |node_name|
+      %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
@@ -234,14 +229,14 @@ Sidebar content
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
       # NOTE verify behavior of trim mode
-      expected_output = <<-EOS.chomp
-<div class="openblock wrapper">
-<div class="content">
-<div class="paragraph">
-<p>foobar</p>
-</div>
-</div>
-</div>
+      expected_output = <<~'EOS'.chomp
+      <div class="openblock wrapper">
+      <div class="content">
+      <div class="paragraph">
+      <p>foobar</p>
+      </div>
+      </div>
+      </div>
       EOS
       assert_equal expected_output, doc.convert
     end
@@ -249,7 +244,7 @@ Sidebar content
     test 'should load ERB templates using ErubisTemplate if eruby is set to erubis' do
       doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/erb'), template_cache: false, eruby: 'erubis'
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph'].each do |node_name|
+      %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
@@ -263,7 +258,7 @@ Sidebar content
     test 'should load Slim templates for default backend' do
       doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph', 'sidebar'].each do |node_name|
+      %w(paragraph sidebar).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         assert_kind_of Slim::Template, selected.templates[node_name]
@@ -274,7 +269,7 @@ Sidebar content
     test 'should load Slim templates for docbook45 backend' do
       doc = Asciidoctor::Document.new [], backend: 'docbook45', template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
-      ['paragraph'].each do |node_name|
+      %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         assert_kind_of Slim::Template, selected.templates[node_name]
@@ -283,18 +278,18 @@ Sidebar content
     end
 
     test 'should use Slim templates in place of built-in templates' do
-      input = <<-EOS
-= Document Title
-Author Name
+      input = <<~'EOS'
+      = Document Title
+      Author Name
 
-== Section One
+      == Section One
 
-Sample paragraph
+      Sample paragraph
 
-.Related
-****
-Sidebar content
-****
+      .Related
+      ****
+      Sidebar content
+      ****
       EOS
 
       output = convert_string_to_embedded input, template_dir: (fixture_path 'custom-backends/slim'), template_cache: false
@@ -304,59 +299,122 @@ Sidebar content
       assert_xpath '//aside/header/h1[text()="Related"]', output, 1
       assert_xpath '//aside/header/following-sibling::p[text()="Sidebar content"]', output, 1
     end
+  end
 
-    test 'should use custom converter if specified' do
-      input = <<-EOS
-= Document Title
+  context 'Custom converters' do
+    test 'should use specified converter for current backend' do
+      input = <<~'EOS'
+      = Document Title
 
-preamble
+      preamble
 
-== Section
+      == Section
 
-content
+      content
       EOS
 
-      class CustomConverterA
-        def initialize backend, opts = {}
-        end
+      class CustomHtmlConverterA
+        def initialize *args; end
 
         def convert node, name = nil
           'document'
         end
+      end
 
-        def self.converts? backend
-          true
+      doc = document_from_string input, converter: CustomHtmlConverterA
+      assert_kind_of CustomHtmlConverterA, doc.converter
+      assert_equal 'html', doc.attributes['filetype']
+      assert 'document', doc.convert
+    end
+
+    test 'should use specified converter for specified backend' do
+      input = <<~'EOS'
+      = Document Title
+
+      preamble
+
+      == Section
+
+      content
+      EOS
+
+      class CustomTextConverterA
+        def initialize *args; end
+
+        def convert node, name = nil
+          'document'
         end
       end
 
-      output = convert_string input, converter: CustomConverterA
-      assert 'document', output
+      doc = document_from_string input, backend: 'text', converter: CustomTextConverterA
+      assert_kind_of CustomTextConverterA, doc.converter
+      assert_equal 'text', doc.attributes['filetype']
+      assert 'document', doc.convert
+    end
+
+    test 'should get converter from specified converter factory' do
+      input = <<~'EOS'
+      = Document Title
+
+      preamble
+
+      == Section
+
+      content
+      EOS
+
+      my_converter_class = Class.new Asciidoctor::Converter::Base do
+        def document node
+          'document'
+        end
+      end
+
+      converter_factory = Asciidoctor::Converter::CustomFactory.new 'html5' => my_converter_class
+
+      doc = document_from_string input, converter_factory: converter_factory
+      assert_kind_of my_converter_class, doc.converter
+      assert_equal 'html', doc.attributes['filetype']
+      assert 'document', doc.convert
+    end
+
+    test 'should allow converter to set htmlsyntax when basebackend is html' do
+      input = 'image::sunset.jpg[]'
+      converter = Asciidoctor::Converter.create 'html5', htmlsyntax: 'xml'
+      doc = document_from_string input, converter: converter
+      assert_equal converter, doc.converter
+      assert_equal 'xml', (doc.attr 'htmlsyntax')
+      output = doc.convert header_footer: false
+      assert_includes output, '<img src="sunset.jpg" alt="sunset"/>'
     end
 
     test 'should use converter registered for backend' do
-      input = <<-EOS
-content
-      EOS
-
       begin
-        Asciidoctor::Converter::Factory.unregister_all
+        converters_before = Asciidoctor::Converter.converters
 
         class CustomConverterB
           include Asciidoctor::Converter
           register_for 'foobar'
+          def initialize *args
+            super
+            basebackend 'text'
+            filetype 'text'
+            outfilesuffix '.fb'
+          end
+
           def convert node, name = nil
             'foobar content'
           end
         end
 
-        assert CustomConverterB.converts? 'foobar'
-        converters = Asciidoctor::Converter::Factory.converters
-        assert converters.size == 1
+        input = 'content'
+        assert_equal CustomConverterB, (Asciidoctor::Converter.for 'foobar')
+        converters = Asciidoctor::Converter.converters
+        assert converters.size == converters_before.size + 1
         assert converters['foobar'] == CustomConverterB
         output = convert_string input, backend: 'foobar'
         assert 'foobar content', output
       ensure
-        Asciidoctor::Converter::Factory.unregister_all
+        Asciidoctor::Converter.unregister_all
       end
     end
 
@@ -374,16 +432,12 @@ content
     end
 
     test 'should not configure converter to support templates by default' do
-      input = <<-EOS
-paragraph
-      EOS
-
       begin
-        Asciidoctor::Converter::Factory.unregister_all
         class CustomConverterD
           include Asciidoctor::Converter
           register_for 'myhtml'
-          def convert node, transform = nil, opts = {}
+
+          def convert node, transform = nil, opts = nil
             transform ||= node.node_name
             send transform, node
           end
@@ -397,25 +451,20 @@ paragraph
           end
         end
 
+        input = 'paragraph'
         doc = document_from_string input, backend: 'myhtml', template_dir: (fixture_path 'custom-backends/slim/html5'), template_cache: false
         assert_kind_of CustomConverterD, doc.converter
         refute doc.converter.supports_templates?
         output = doc.convert
         assert_xpath '//*[@class="paragraph"]/p[text()="paragraph"]', output, 1
       ensure
-        Asciidoctor::Converter::Factory.unregister_all
+        Asciidoctor::Converter.unregister_all
       end
     end
 
     test 'should wrap converter in composite converter with template converter if it declares that it supports templates' do
-      input = <<-EOS
-paragraph
-      EOS
-
       begin
-        Asciidoctor::Converter::Factory.unregister_all
-        class CustomConverterE
-          include Asciidoctor::Converter
+        class CustomConverterE < Asciidoctor::Converter::Base
           register_for 'myhtml'
 
           def initialize *args
@@ -423,7 +472,7 @@ paragraph
             supports_templates
           end
 
-          def convert node, transform = nil, opts = {}
+          def convert node, transform = nil, opts = nil
             transform ||= node.node_name
             send transform, node
           end
@@ -437,24 +486,19 @@ paragraph
           end
         end
 
+        input = 'paragraph'
         doc = document_from_string input, backend: 'myhtml', template_dir: (fixture_path 'custom-backends/slim/html5'), template_cache: false
         assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
         output = doc.convert
         assert_xpath '//*[@class="paragraph"]/p[text()="paragraph"]', output, 0
         assert_xpath '//body/p[text()="paragraph"]', output, 1
       ensure
-        Asciidoctor::Converter::Factory.unregister_all
+        Asciidoctor::Converter.unregister_all
       end
     end
 
-    test 'should fall back to catch all converter' do
-      input = <<-EOS
-content
-      EOS
-
+    test 'should default to catch all converter' do
       begin
-        Asciidoctor::Converter::Factory.unregister_all
-
         class CustomConverterF
           include Asciidoctor::Converter
           register_for '*'
@@ -463,15 +507,63 @@ content
           end
         end
 
-        assert CustomConverterF.converts? 'all'
-        assert CustomConverterF.converts? 'whatever'
-        converters = Asciidoctor::Converter::Factory.converters
-        assert converters['*'] == CustomConverterF
+        input = 'content'
+        assert_equal CustomConverterF, (Asciidoctor::Converter.for 'all')
+        assert_equal CustomConverterF, (Asciidoctor::Converter.for 'whatever')
+        refute_equal CustomConverterF, (Asciidoctor::Converter.for 'html5')
+        converters = Asciidoctor::Converter.converters
+        assert_nil converters['*']
+        assert_equal CustomConverterF, (Asciidoctor::Converter.send :catch_all)
         output = convert_string input, backend: 'foobaz'
         assert 'foobaz content', output
       ensure
-        Asciidoctor::Converter::Factory.unregister_all
+        Asciidoctor::Converter.unregister_all
       end
+    end
+
+    test 'should use catch all converter from custom factory only if no other converter matches' do
+      class FooConverter < Asciidoctor::Converter::Base; end
+      class CatchAllConverter < Asciidoctor::Converter::Base; end
+
+      factory = Asciidoctor::Converter::CustomFactory.new 'foo' => FooConverter, '*' => CatchAllConverter
+      assert_equal FooConverter, (factory.for 'foo')
+      assert_equal CatchAllConverter, (factory.for 'nada')
+      assert_equal CatchAllConverter, (factory.for 'html5')
+    end
+
+    test 'should prefer catch all converter from proxy over statically registered catch all converter' do
+      begin
+        class StaticCatchAllConverter < Asciidoctor::Converter::Base
+          register_for '*'
+        end
+
+        class LocalCatchAllConverter < Asciidoctor::Converter::Base; end
+
+        factory = Asciidoctor::Converter::DefaultFactoryProxy.new '*' => LocalCatchAllConverter
+        assert_equal LocalCatchAllConverter, (factory.for 'foobar')
+        refute_equal LocalCatchAllConverter, (factory.for 'html5')
+        refute_equal StaticCatchAllConverter, (factory.for 'html5')
+      ensure
+        Asciidoctor::Converter.unregister_all
+      end
+    end
+
+    test 'should prefer converter in proxy with same name as provided converter' do
+      class MyHtml5Converter < Asciidoctor::Converter::Base; end
+      factory = Asciidoctor::Converter::DefaultFactoryProxy.new 'html5' => MyHtml5Converter
+      assert_equal MyHtml5Converter, (factory.for 'html5')
+    end
+
+    test 'should allow nil to be registered as converter' do
+      factory = Asciidoctor::Converter::DefaultFactoryProxy.new 'html5' => nil
+      assert_nil factory.for 'html5'
+    end
+
+    test 'should create a new custom factory when Converter::Factory.new is invoked' do
+      class MyConverter < Asciidoctor::Converter::Base; end
+      factory = Asciidoctor::Converter::Factory.new 'mine' => MyConverter
+      assert_kind_of Asciidoctor::Converter::CustomFactory, factory
+      assert_equal MyConverter, (factory.for 'mine')
     end
   end
 end
