@@ -8,9 +8,7 @@ module Asciidoctor
 
     def initialize backend, *converters, backend_traits_source: nil
       @backend = backend
-      (@converters = converters).each do |converter|
-        converter.composed self if converter.respond_to? :composed
-      end
+      (@converters = converters).each {|converter| converter.composed self if converter.respond_to? :composed }
       init_backend_traits backend_traits_source.backend_traits if backend_traits_source
       @converter_cache = {}
     end
@@ -26,15 +24,14 @@ module Asciidoctor
     #
     # Returns the String result returned from the delegate's convert method
     def convert node, transform = nil, opts = nil
-      transform ||= node.node_name
-      (converter_for transform).convert node, transform, opts
+      (converter_for transform ||= node.node_name).convert node, transform, opts
     end
 
     # Public: Retrieve the converter for the specified transform.
     #
     # Returns the matching [Converter] object
     def converter_for transform
-      @converter_cache[transform] ||= (find_converter transform)
+      @converter_cache[transform] ||= find_converter transform
     end
 
     # Public: Find the converter for the specified transform.
@@ -42,9 +39,7 @@ module Asciidoctor
     #
     # Returns the matching [Converter] object
     def find_converter transform
-      @converters.each do |candidate|
-        return candidate if candidate.handles? transform
-      end
+      @converters.each {|candidate| return candidate if candidate.handles? transform }
       raise %(Could not find a converter to handle transform: #{transform})
     end
   end
