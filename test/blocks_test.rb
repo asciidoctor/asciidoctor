@@ -960,7 +960,7 @@ line two
 line three
 ....
 EOS
-      [true, false].each {|header_footer|
+      [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
@@ -971,7 +971,7 @@ EOS
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2
-      }
+      end
     end
 
     test 'should preserve newlines in listing block' do
@@ -984,7 +984,7 @@ line two
 line three
 ----
 EOS
-      [true, false].each {|header_footer|
+      [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
@@ -995,7 +995,7 @@ EOS
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2
-      }
+      end
     end
 
     test 'should preserve newlines in verse block' do
@@ -1011,7 +1011,7 @@ line three
 ____
 --
 EOS
-      [true, false].each {|header_footer|
+      [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
@@ -1022,7 +1022,7 @@ EOS
         assert_equal expected, lines
         blank_lines = output.scan(/\n[ \t]*\n/).size
         assert blank_lines >= 2
-      }
+      end
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do

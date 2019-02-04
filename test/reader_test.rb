@@ -1352,7 +1352,7 @@ include::fixtures/include-file.adoc[tag={name-of-tag}]
 include::fixtures/include-file.adoc[]
         EOS
 
-        include_processor = Class.new {
+        include_processor = Class.new do
           def initialize document
           end
 
@@ -1363,7 +1363,7 @@ include::fixtures/include-file.adoc[]
           def process reader, target, attributes
             raise 'TestIncludeHandler should not have been invoked'
           end
-        }
+        end
 
         document = empty_safe_document base_dir: DIRNAME
         reader = Asciidoctor::PreprocessorReader.new document, input, nil, normalize: true

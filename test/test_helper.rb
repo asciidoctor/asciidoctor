@@ -259,13 +259,13 @@ class Minitest::Test
   def invoke_cli_with_filenames(argv = [], filenames = [], &block)
     filepaths = Array.new
 
-    filenames.each {|filename|
+    filenames.each do |filename|
       if filenames.nil? || ::Pathname.new(filename).absolute?
         filepaths << filename
       else
         filepaths << (fixture_path filename)
       end
-    }
+    end
 
     invoker = Asciidoctor::Cli::Invoker.new(argv + filepaths)
 

@@ -23,13 +23,13 @@ context 'Tables' do
       assert_css 'table > tbody > tr', output, 3
       assert_css 'table td', output, 9
       assert_css 'table > tbody > tr > td.tableblock.halign-left.valign-top > p.tableblock', output, 9
-      cells.each_with_index {|row, rowi|
+      cells.each_with_index do |row, rowi|
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td", output, row.size
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td > p", output, row.size
-        row.each_with_index {|cell, celli|
+        row.each_with_index do |cell, celli|
           assert_xpath "(//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']", output, 1
-        }
-      }
+        end
+      end
     end
 
     test 'should add direction CSS class if float attribute is set on table' do

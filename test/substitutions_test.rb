@@ -1924,10 +1924,10 @@ foo&#8201;&#8212;&#8201;'
         %(he is 6' tall),
         %(`')
       ]
-      given.size.times {|i|
+      given.size.times do |i|
         para = block_from_string given[i]
         assert_equal expected[i], para.sub_replacements(para.source)
-      }
+      end
     end
   end
 

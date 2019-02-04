@@ -419,12 +419,12 @@ content
         '' => %w(favicon.ico image/x-icon),
         '/favicon.ico' => %w(/favicon.ico image/x-icon),
         '/img/favicon.png' => %w(/img/favicon.png image/png),
-      }.each {|val, (href, type)|
+      }.each do |val, (href, type)|
         result = convert_string '= Untitled', attributes: { 'favicon' => val }
         assert_css 'link[rel="icon"]', result, 1
         assert_css %(link[rel="icon"][href="#{href}"]), result, 1
         assert_css %(link[rel="icon"][type="#{type}"]), result, 1
-      }
+      end
     end
   end
 
@@ -1335,9 +1335,9 @@ two
       EOS
       result = convert_string input, safe: :safe, backend: :xhtml
       begin
-        Nokogiri::XML::Document.parse(result) {|config|
+        Nokogiri::XML::Document.parse(result) do |config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
-        }
+        end
       rescue => e
         flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
       end

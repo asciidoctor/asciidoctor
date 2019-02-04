@@ -597,9 +597,7 @@ context 'Extensions' do
     end
 
     test 'can provide extensions proc as option' do
-      doc = document_from_string %(= Document Title\n\ncontent), extensions: proc {
-        tree_processor SampleTreeProcessor
-      }
+      doc = document_from_string %(= Document Title\n\ncontent), extensions: proc { tree_processor SampleTreeProcessor }
       refute_nil doc.extensions
       assert_equal 1, doc.extensions.groups.size
       assert doc.extensions.tree_processors?
@@ -829,12 +827,12 @@ context 'Extensions' do
             end
           end
 
-          prefer tree_processor {
+          prefer (tree_processor do
             process do |doc|
               doc << (create_paragraph doc, 'a', {})
               nil
             end
-          }
+          end)
 
           prefer :tree_processor, SelfSigningTreeProcessor
         end
