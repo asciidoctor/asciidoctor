@@ -505,6 +505,12 @@ context 'Syntax Highlighter' do
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@style = "color:#036;font-weight:bold"][text() = "CodeRay"]', output, 1
       refute_match(/\.CodeRay \{/, output)
     end
+
+    test 'should read stylesheet' do
+      css = (Asciidoctor::SyntaxHighlighter.for 'coderay').read_stylesheet
+      refute_nil css
+      assert_includes css, 'pre.CodeRay{background:#f7f7f8}'
+    end
   end
 
   context 'Highlight.js' do
@@ -805,6 +811,13 @@ context 'Syntax Highlighter' do
       assert_xpath %(//pre[@class="lineno"][text()="5\n6\n7\n8\n"]), output, 1
       # NOTE notice there's a newline before the closing </pre> tag, but not before the closing </td> tag
       assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
+    end
+
+    test 'should read stylesheet for specified style' do
+      css = (Asciidoctor::SyntaxHighlighter.for 'rouge').read_stylesheet 'monokai'
+      refute_nil css
+      assert_includes css, 'pre.rouge {'
+      assert_includes css, 'background-color: #49483e;'
     end
   end
 

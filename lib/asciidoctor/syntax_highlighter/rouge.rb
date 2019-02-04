@@ -28,8 +28,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     if opts[:line_numbers]
       formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
       if opts[:callouts]
-        highlighted = formatter.format lexer.lex source, lexer_opts
-        return [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
+        return [(highlighted = formatter.format lexer.lex source, lexer_opts), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
       end
     end
     formatter.format lexer.lex source, lexer_opts
@@ -117,6 +116,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     private_constant :BASE_SELECTOR
   end
 
+  extend Styles # exports static methods
   include Loader, Styles # adds methods to instance
 
   CodeCellStartTagCs = '<td class="code">'
