@@ -10,7 +10,7 @@ class Converter::CompositeConverter < Converter::Base
     @backend = backend
     (@converters = converters).each {|converter| converter.composed self if converter.respond_to? :composed }
     init_backend_traits backend_traits_source.backend_traits if backend_traits_source
-    @converter_cache = {}
+    @converter_cache = ::Hash.new {|hash, key| hash[key] = find_converter key }
   end
 
   # Public: Delegates to the first converter that identifies itself as the
@@ -31,7 +31,7 @@ class Converter::CompositeConverter < Converter::Base
   #
   # Returns the matching [Converter] object
   def converter_for transform
-    @converter_cache[transform] ||= find_converter transform
+    @converter_cache[transform]
   end
 
   # Public: Find the converter for the specified transform.
