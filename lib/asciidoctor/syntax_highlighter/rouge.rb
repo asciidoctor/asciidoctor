@@ -98,14 +98,14 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
       (::Rouge::Theme.find style) && style
     end
 
-    (@@base_style_cache = {}).default_proc = proc do |cache, key|
+    @@base_style_cache = ::Hash.new do |cache, key|
       base_style = (theme = ::Rouge::Theme.find key).base_style
       (val = base_style[:fg]) && ((style ||= []) << %(color: #{theme.palette val}))
       (val = base_style[:bg]) && ((style ||= []) << %(background-color: #{theme.palette val}))
       @@base_style_cache = cache.merge key => (resolved_base_style = style && (style.join ';'))
       resolved_base_style
     end
-    (@@stylesheet_cache = {}).default_proc = proc do |cache, key|
+    @@stylesheet_cache = ::Hash.new do |cache, key|
       @@stylesheet_cache = cache.merge key => (stylesheet = ((::Rouge::Theme.find key).render scope: BASE_SELECTOR))
       stylesheet
     end

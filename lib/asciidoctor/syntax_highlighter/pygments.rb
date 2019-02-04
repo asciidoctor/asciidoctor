@@ -106,13 +106,13 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
       (((@@available_styles ||= ::Pygments.styles.to_set).include? style) rescue nil) && style
     end
 
-    (@@base_style_cache = {}).default_proc = proc do |cache, key|
+    @@base_style_cache = ::Hash.new do |cache, key|
       if BaseStyleRx =~ @@stylesheet_cache[key]
         @@base_style_cache = cache.merge key => (style = $1.strip)
         style
       end
     end
-    (@@stylesheet_cache = {}).default_proc = proc do |cache, key|
+    @@stylesheet_cache = ::Hash.new do |cache, key|
       if (stylesheet = ::Pygments.css BASE_SELECTOR, classprefix: TOKEN_CLASS_PREFIX, style: key)
         @@stylesheet_cache = cache.merge key => stylesheet
         stylesheet
