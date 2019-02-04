@@ -209,7 +209,6 @@ table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font
 @media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
 .literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
 .listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
-.sidebarblock .listingblock>.content>pre:not(.highlight),.sidebarblock .listingblock>.content>pre[class="highlight"],.sidebarblock .listingblock>.content>pre[class^="highlight "]{background:#f2f1f1}
 .listingblock>.content{position:relative}
 .listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
 .listingblock:hover code[data-lang]::before{display:block}
