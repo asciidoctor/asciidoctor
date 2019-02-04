@@ -497,6 +497,14 @@ context 'Converter' do
       end
     end
 
+    test 'should map Factory.new to DefaultFactoryProxy constructor by default' do
+      assert_equal (Asciidoctor::Converter.for 'html5'), (Asciidoctor::Converter::Factory.new.for 'html5')
+    end
+
+    test 'should map Factory.new to CustomFactory constructor if proxy keyword arg is false' do
+      assert_nil (Asciidoctor::Converter::Factory.new proxy_default: false).for 'html5'
+    end
+
     test 'should default to catch all converter' do
       begin
         class CustomConverterF
