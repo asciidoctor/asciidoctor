@@ -161,6 +161,21 @@ context 'Invoker' do
     assert_match(/WARNING/, warnings)
   end
 
+  test 'should enable script warnings if -w flag is specified' do
+    old_verbose, $VERBOSE = $VERBOSE, false
+    begin
+      warnings = nil
+      redirect_streams do |out, err|
+        invoke_cli_to_buffer(%w(-w -o /dev/null), '-') { $NO_SUCH_VARIABLE || 'text' }
+        warnings = err.string
+      end
+      assert_equal false, $VERBOSE
+      refute_empty warnings
+    rescue
+      $VERBOSE = old_verbose
+    end
+  end
+
   test 'should silence warnings if -q flag is specified' do
     input = <<~'EOS'
     2. second

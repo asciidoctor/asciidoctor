@@ -78,7 +78,7 @@ context 'Options' do
   end
 
   test 'basic argument assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-v -s -d book test/fixtures/sample.adoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-w -v -s -d book test/fixtures/sample.adoc))
 
     assert_equal 2, options[:verbose]
     assert_equal false, options[:header_footer]
@@ -255,6 +255,11 @@ context 'Options' do
   test 'should set verbose to 0 when -q flag is specified after -v flag' do
     options = Asciidoctor::Cli::Options.parse!(%w(-v -q test/fixtures/sample.adoc))
     assert_equal 0, options[:verbose]
+  end
+
+  test 'should enable warnings when -w flag is specified' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-w test/fixtures/sample.adoc))
+    assert options[:warnings]
   end
 
   test 'should enable timings when -t flag is specified' do

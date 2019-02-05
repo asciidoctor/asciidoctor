@@ -514,7 +514,7 @@ anchor:foo[b[a\]r]text'
         doc.catalog[:includes]['tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-        assert_message logger, :WARN, 'invalid reference: about'
+        assert_message logger, :DEBUG, 'possible invalid reference: about'
       end
     end
   end
@@ -526,7 +526,7 @@ anchor:foo[b[a\]r]text'
         doc.catalog[:includes]['part1/tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-        assert_message logger, :WARN, 'invalid reference: about'
+        assert_message logger, :DEBUG, 'possible invalid reference: about'
       end
     end
   end
@@ -688,7 +688,7 @@ See <<foobaz>>.
       in_verbose_mode do
         output = convert_string_to_embedded input
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :WARN, 'invalid reference: foobaz'
+        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
       end
     end
   end
@@ -706,7 +706,7 @@ See <<#foobaz>>.
       in_verbose_mode do
         output = convert_string_to_embedded input
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :WARN, 'invalid reference: foobaz'
+        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
       end
     end
   end
@@ -787,7 +787,7 @@ See <<test.adoc#foobaz>>.
       in_verbose_mode do
         output = convert_string_to_embedded input, attributes: { 'docname' => 'test' }
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :WARN, 'invalid reference: foobaz'
+        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
       end
     end
   end
