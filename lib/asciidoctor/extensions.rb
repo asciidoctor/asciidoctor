@@ -288,8 +288,6 @@ module Extensions
         option :name, value
       end
     end
-    # NOTE match_name may get deprecated
-    alias match_name named
 
     def content_model value
       option :content_model, value
@@ -1453,8 +1451,6 @@ module Extensions
         Registry.new
       end
     end
-    # Deprecated: Use create instead of build_registry
-    alias build_registry create
 
     # Public: Registers an extension Group that subsequently registers a
     # collection of extensions.
