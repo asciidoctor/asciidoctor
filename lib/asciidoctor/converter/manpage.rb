@@ -229,6 +229,15 @@ r lw(\n(.lu*75u/100u).'
     %(.SS "#{_manify node.title}")
   end
 
+  def image node
+    result = []
+    result << (node.title? ? %(.sp
+.B #{_manify node.title}
+.br) : '.sp')
+    result << %([#{node.alt}])
+    result.join LF
+  end
+
   def listing node
     result = []
     result << %(.sp

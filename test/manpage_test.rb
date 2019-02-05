@@ -657,7 +657,20 @@ context 'Manpage' do
   end
 
   context 'Images' do
-    test 'should replace inline image with alt text' do
+    test 'should replace block image with alt text enclosed in square brackets' do
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
+
+      Behold the wisdom of the Magic 8 Ball!
+
+      image::signs-point-to-yes.jpg[]
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? %(\n.sp\n[signs point to yes])
+    end
+
+    test 'should replace inline image with alt text enclosed in square brackets' do
       input = <<~EOS.chomp
       #{SAMPLE_MANPAGE_HEADER}
 
