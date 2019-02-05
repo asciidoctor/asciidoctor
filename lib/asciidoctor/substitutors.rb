@@ -992,14 +992,14 @@ module Substitutors
         # handles: #id
         if target
           refid = fragment
-          logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
+          logger.debug %(possible invalid reference: #{refid}) if logger.debug? && !(doc.catalog[:ids].key? refid)
         elsif path
           # handles: path#, path#id, path.adoc#, path.adoc#id, or path.adoc (xref macro only)
           # the referenced path is the current document, or its contents have been included in the current document
           if src2src && (doc.attributes['docname'] == path || doc.catalog[:includes][path])
             if fragment
               refid, path, target = fragment, nil, %(##{fragment})
-              logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
+              logger.debug %(possible invalid reference: #{refid}) if logger.debug? && !(doc.catalog[:ids].key? refid)
             else
               refid, path, target = nil, nil, '#'
             end
@@ -1014,7 +1014,7 @@ module Substitutors
         # handles: id (in compat mode or when natural xrefs are disabled)
         elsif doc.compat_mode || !Compliance.natural_xrefs
           refid, target = fragment, %(##{fragment})
-          logger.warn %(invalid reference: #{refid}) if $VERBOSE && !(doc.catalog[:ids].key? refid)
+          logger.debug %(possible invalid reference: #{refid}) if logger.debug? && !(doc.catalog[:ids].key? refid)
         # handles: id
         elsif doc.catalog[:ids].key? fragment
           refid, target = fragment, %(##{fragment})
@@ -1024,7 +1024,7 @@ module Substitutors
           fragment, target = refid, %(##{refid})
         else
           refid, target = fragment, %(##{fragment})
-          logger.warn %(invalid reference: #{refid}) if $VERBOSE
+          logger.debug %(possible invalid reference: #{refid}) if logger.debug?
         end
         attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
         Inline.new(self, :anchor, text, type: :xref, target: target, attributes: attrs).convert
