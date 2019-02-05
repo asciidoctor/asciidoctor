@@ -159,12 +159,20 @@ module Converter
   #
   #   converter = Asciidoctor::Converter.create 'html5', htmlsyntax: 'xml'
   module Factory
-    # NOTE map deprecated initializer to initializer of CustomFactory
-    def self.new seed_registry = nil
-      CustomFactory.new seed_registry
+    # Public: Create an instance of DefaultProxyFactory or CustomFactory, depending on whether the proxy_default keyword
+    # arg is set (true by default), and optionally seed it with the specified converters map. If proxy_default is set,
+    # entries in the proxy registry are preferred over matching entries from the default registry.
+    #
+    # converters    - An optional Hash of converters to use in place of ones in the default registry. The keys are
+    #                 backend names and the values are converter classes or instances.
+    # proxy_default - A Boolean keyword arg indicating whether to proxy the default registry (optional, default: true).
+    #
+    # Returns a Factory instance (DefaultFactoryProxy or CustomFactory) seeded with the optional converters map.
+    def self.new converters = nil, proxy_default: true
+      proxy_default ? (DefaultFactoryProxy.new converters) : (CustomFactory.new converters)
     end
 
-    # NOTE map deprecated default instance holder accessor to Converter class
+    # Deprecated: Maps the old default factory instance holder to the Converter module.
     def self.default *args
       Converter
     end
