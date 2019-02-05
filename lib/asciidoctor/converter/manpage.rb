@@ -344,16 +344,16 @@ r lw(\n(.lu*75u/100u).'
   end
 
   def stem node
-    title_element = node.title? ? %(.sp
+    result = []
+    result << (node.title? ? %(.sp
 .B #{_manify node.title}
-.br) : ''
+.br) : '.sp')
     open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
-
-    unless ((equation = node.content).start_with? open) && (equation.end_with? close)
-      equation = %(#{open}#{equation}#{close})
+    if ((equation = node.content).start_with? open) && (equation.end_with? close)
+      equation = equation.slice open.length, equation.length - open.length - close.length
     end
-
-    %(#{title_element}#{equation})
+    result << %(#{_manify equation, whitespace: :preserve} (#{node.style}))
+    result.join LF
   end
 
   # FIXME: The reason this method is so complicated is because we are not
