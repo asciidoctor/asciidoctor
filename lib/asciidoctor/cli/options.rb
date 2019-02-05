@@ -132,7 +132,6 @@ module Asciidoctor
           opts.on('-t', '--timings', 'enable timings mode (default: false)') do |timing|
             self[:timings] = true
           end
-
           opts.on_tail('-h', '--help [TOPIC]', 'print the help message',
               'show the command usage if TOPIC is not specified (or not recognized)',
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
@@ -170,14 +169,11 @@ module Asciidoctor
             end
             return 0
           end
-
           opts.on_tail('-V', '--version', 'display the version and runtime environment (or -v if no other flags or arguments)') do
             return print_version $stdout
           end
-
         end
 
-        infiles = []
         opts_parser.parse! args
 
         if args.empty?
@@ -189,29 +185,28 @@ module Asciidoctor
           end
         end
 
+        infiles = []
         # shave off the file to process so that options errors appear correctly
         if args.size == 1 && args[0] == '-'
           infiles << args.pop
         elsif
           args.each do |file|
-            if file == '-' || (file.start_with? '-')
+            if file.start_with? '-'
               # warn, but don't panic; we may have enough to proceed, so we won't force a failure
               $stderr.puts %(asciidoctor: WARNING: extra arguments detected (unparsed arguments: '#{args.join "', '"}') or incorrect usage of stdin)
+            elsif ::File.file? file
+              infiles << file
+            # NOTE only attempt to glob if file is not found
             else
-              if ::File.file? file
+              # Tilt backslashes in Windows paths the Ruby-friendly way
+              if ::File::ALT_SEPARATOR == RS && (file.include? RS)
+                file = file.tr RS, FS
+              end
+              if (matches = ::Dir.glob file).empty?
+                # NOTE if no matches, assume it's just a missing file and proceed
                 infiles << file
-              # NOTE only attempt to glob if file is not found
               else
-                # Tilt backslashes in Windows paths the Ruby-friendly way
-                if ::File::ALT_SEPARATOR == RS && (file.include? RS)
-                  file = file.tr RS, FS
-                end
-                if (matches = ::Dir.glob file).empty?
-                  # NOTE if no matches, assume it's just a missing file and proceed
-                  infiles << file
-                else
-                  infiles.concat matches
-                end
+                infiles.concat matches
               end
             end
           end
@@ -237,7 +232,7 @@ module Asciidoctor
 
         self[:input_files] = infiles
 
-        self.delete(:attributes) if self[:attributes].empty?
+        self.delete :attributes if self[:attributes].empty?
 
         if self[:template_dirs]
           begin
@@ -254,13 +249,13 @@ module Asciidoctor
         end
 
         if (load_paths = self[:load_paths])
-          (self[:load_paths] = load_paths.uniq).reverse_each do |path|
-            $:.unshift ::File.expand_path(path)
-          end
+          load_paths.uniq!
+          load_paths.reverse_each {|path| $:.unshift ::File.expand_path path }
         end
 
         if (requires = self[:requires])
-          (self[:requires] = requires.uniq).each do |path|
+          requires.uniq!
+          requires.each do |path|
             begin
               require path
             rescue ::LoadError

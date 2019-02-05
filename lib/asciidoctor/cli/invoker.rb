@@ -32,8 +32,8 @@ module Asciidoctor
       def invoke!
         return unless @options
 
-        old_verbose = $VERBOSE
         old_logger = old_logger_level = nil
+        old_verbose, $VERBOSE = $VERBOSE, false
         opts = {}
         infiles = []
         outfile = nil
@@ -67,8 +67,6 @@ module Asciidoctor
             when 0
               $VERBOSE = nil
               old_logger, LoggerManager.logger = logger, NullLogger.new
-            when 1
-              $VERBOSE = false
             when 2
               $VERBOSE = true
               old_logger_level, logger.level = logger.level, ::Logger::Severity::DEBUG
@@ -140,11 +138,7 @@ module Asciidoctor
           if @options[:trace]
             raise e
           else
-            if ::RuntimeError === e
-              err.puts %(#{e.message} (#{e.class}))
-            else
-              err.puts e.message
-            end
+            err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
             err.puts '  Use --trace for backtrace'
           end
         end
