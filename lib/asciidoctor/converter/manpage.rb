@@ -266,6 +266,17 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
+  def sidebar node
+    result = []
+    result << (node.title? ? %(.sp
+.B #{_manify node.title}
+.br) : '.sp')
+    result << %(.RS 4
+#{_enclose_content node}
+.RE)
+    result.join LF
+  end
+
   def olist node
     result = []
     result << %(.sp
