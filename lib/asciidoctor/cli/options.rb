@@ -136,6 +136,7 @@ module Asciidoctor
           opts.on_tail('-h', '--help [TOPIC]', 'print the help message',
               'show the command usage if TOPIC is not specified (or not recognized)',
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
+            # use `asciidoctor -h manpage | man -l -` to view with man pager
             if topic == 'manpage'
               if (manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH'])
                 if ::File.exist? manpage_path
@@ -153,8 +154,7 @@ module Asciidoctor
               elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
                 $stdout.puts ::File.read manpage_path
               else
-                require 'open3' unless defined? ::Open3.popen3
-                manpage_path = ::Open3.popen3('man -w asciidoctor') {|_, out| out.read }.chop rescue ''
+                manpage_path = `man -w asciidoctor`.chop rescue ''
                 if manpage_path.empty?
                   $stderr.puts 'asciidoctor: FAILED: manual page not found; try `man asciidoctor`'
                   return 1

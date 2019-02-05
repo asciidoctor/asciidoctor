@@ -4,8 +4,6 @@ rescue LoadError
   require 'asciidoctor/version'
 end
 
-require 'open3' unless defined? Open3.popen3
-
 Gem::Specification.new do |s|
   s.name = 'asciidoctor'
   s.version = Asciidoctor::VERSION
@@ -26,8 +24,7 @@ Gem::Specification.new do |s|
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
   files = begin
-    # NOTE popen3 is used instead of backticks to fail properly when used with JRuby
-    (result = Open3.popen3('git ls-files -z') {|_, out| out.read }.split %(\0)).empty? ? Dir['**/*'] : result
+    (result = `got ls-files -z`.split ?\0).empty? ? Dir['**/*'] : result
   rescue
     Dir['**/*']
   end

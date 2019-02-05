@@ -647,9 +647,8 @@ context 'Invoker' do
       ENV['LANG'] = 'US-ASCII'
       # using open3 to work around a bug in JRuby process_manager.rb,
       # which tries to run a gsub on stdout prematurely breaking the test
-      cmd = %(#{ruby} #{executable} -o - --trace #{input_path})
       # warnings may be issued, so don't assert on stderr
-      stdout_lines = Open3.popen3(cmd) {|_, out| out.readlines }
+      stdout_lines = Open3.popen3(%(#{ruby} #{executable} -o - --trace #{input_path})) {|_, out| out.readlines }
       refute_empty stdout_lines
       stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless stdout_lines[0].encoding == Encoding::UTF_8
       stdout_str = stdout_lines.join
@@ -680,12 +679,11 @@ context 'Invoker' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
     executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
-    cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['TZ'] = 'UTC'
-      result = Open3.popen3(cmd) {|_, out| out.read }
+      result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
       doctime, localtime = result.lines.map {|l| l.chomp }
       assert doctime.end_with?(' UTC')
       assert localtime.end_with?(' UTC')
@@ -703,12 +701,11 @@ context 'Invoker' do
     ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
     executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
-    cmd = %(#{ruby} #{executable} -d inline -o - -s #{input_path})
     old_tz = ENV['TZ']
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
       ENV['TZ'] = 'EST+5'
-      result = Open3.popen3(cmd) {|_, out| out.read }
+      result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
       doctime, localtime = result.lines.map {|l| l.chomp }
       assert doctime.end_with?(' -0500')
       assert localtime.end_with?(' -0500')
