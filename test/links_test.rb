@@ -61,8 +61,6 @@ context 'Links' do
     assert_match '<a href="http://example.com">[bracket1]</a>', doc.convert, 1
     doc = document_from_string str, header_footer: false, backend: 'docbook', doctype: 'inline'
     assert_match '<link xl:href="http://example.com">[bracket1]</link>', doc.convert, 1
-    doc = document_from_string str, header_footer: false, backend: 'docbook45', doctype: 'inline'
-    assert_match '<ulink url="http://example.com">[bracket1]</ulink>', doc.convert, 1
   end
 
   test 'link macro with empty target' do
@@ -337,12 +335,12 @@ context 'Links' do
 
   test 'inline ref with reftext converted to DocBook' do
     %w([[tigers,<Tigers>]] anchor:tigers[<Tigers>]).each do |anchor|
-      doc = document_from_string %(Here you can read about tigers.#{anchor}), backend: :docbook45
+      doc = document_from_string %(Here you can read about tigers.#{anchor}), backend: :docbook
       output = doc.convert header_footer: false
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal '<Tigers>', doc.catalog[:refs]['tigers'].text
       assert_equal '<Tigers>', doc.references[:ids]['tigers']
-      assert_includes output, '<anchor id="tigers" xreflabel="&lt;Tigers&gt;"/>'
+      assert_includes output, '<anchor xml:id="tigers" xreflabel="&lt;Tigers&gt;"/>'
     end
   end
 
@@ -446,8 +444,6 @@ anchor:foo[b[a\]r]text'
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
     doc = document_from_string '<<tigers#>>', header_footer: false, backend: 'docbook'
     assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.convert, 1
-    doc = document_from_string '<<tigers#>>', header_footer: false, backend: 'docbook45'
-    assert_match '<ulink url="tigers.xml">tigers.xml</ulink>', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with ancestor path sans extension' do

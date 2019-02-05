@@ -59,7 +59,7 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}/[Asciidoctor] 是一个 _快速_ 文本处理器和发布工具链，它可以将 {uri-what-is-asciidoc}[AsciiDoc] 文档转化成 HTML5、 DocBook 5 (或 4.5) 以及其他格式。
+{uri-project}/[Asciidoctor] 是一个 _快速_ 文本处理器和发布工具链，它可以将 {uri-what-is-asciidoc}[AsciiDoc] 文档转化成 HTML 5、 DocBook 5 以及其他格式。
 Asciidoctor 由 Ruby 编写，打包成 RubyGem，然后发布到 {uri-rubygem}[RubyGems.org] 上。
 这个 gem 还被包含道几个 Linux 发行版中，其中包括 Fedora、Debian 和 Ubuntu。
 Asciidoctor 是开源的，{uri-repo}[代码]托管在 GitHub，遵从 {uri-license}[MIT] 协议。
@@ -100,22 +100,22 @@ endif::[]
 [#the-big-picture]
 == 整体概况
 
-Asciidoctor 以纯文本格式读取内容，见下图左边的面板，并将它转换成 HTML5 呈现在右侧面板中。
-Asciidoctor 将默认的样式表应用到 HTML5 文档上，提供一个愉快的开箱即用的体验。
+Asciidoctor 以纯文本格式读取内容，见下图左边的面板，并将它转换成 HTML 5 呈现在右侧面板中。
+Asciidoctor 将默认的样式表应用到 HTML 5 文档上，提供一个愉快的开箱即用的体验。
 
 image::{image-uri-screenshot}[AsciiDoc 源文预览和相应的 HTML 渲染]
 
 [#asciidoc-processing]
 == AsciiDoc Processing
 
-Asciidoctor 会读取并处理用 AsciiDoc 语法写的文件，然后将解析出来的解析树参数交给内置的转化器去生成 HTML5，DocBook 5 (或 4.5) 或帮助手册页面输出。
+Asciidoctor 会读取并处理用 AsciiDoc 语法写的文件，然后将解析出来的解析树参数交给内置的转化器去生成 HTML 5，DocBook 5 或帮助手册页面输出。
 你可以选择使用你自己的转化器或者加载 {uri-tilt}[Tilt] - 支持通过模板来自定义输出或产生附加的格式。
 
 NOTE: Asciidoctor是为了直接替换原 AsciiDoc Python 处理器（`asciidoc.py`）。
 Asciidoctor 测试套件含有 {uri-tests}[> 1,600 测试示例] 来确保和 AsciiDoc 语法的兼容性。
 
 除了传统的 AsciiDoc 语法，Asciidoctor 还添加额外的标记和格式设置选项，例如 font-based 图标（例如： `+icon:fire[]+`）和 UI 元素（例如： `+button:[Save]+`）。
-Asciidoctor 还提供了一个基于 {uri-foundation}[Foundation] 的现代化的、响应式主题来美化 HTML5 输出。
+Asciidoctor 还提供了一个基于 {uri-foundation}[Foundation] 的现代化的、响应式主题来美化 HTML 5 输出。
 
 [#requirements]
 == 要求

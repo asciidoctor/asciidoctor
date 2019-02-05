@@ -457,7 +457,7 @@ context 'Attributes' do
     end
 
     test 'backend attributes defined in document options overrides backend attribute in document' do
-      doc = document_from_string(':backend: docbook45', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'backend' => 'html5' })
+      doc = document_from_string(':backend: docbook5', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'backend' => 'html5' })
       assert_equal 'html5', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-html5'
       assert_equal 'html', doc.attributes['basebackend']
@@ -572,8 +572,7 @@ context 'Attributes' do
 
     test "convert properly with simple names" do
       html = convert_string(":frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!")
-      result = Nokogiri::HTML(html)
-      assert_equal "Yo, Tanglefoot!\nBeat Spiderman!", result.css("p").first.content.strip
+      assert_xpath %(//p[text()="Yo, Tanglefoot!\nBeat Spiderman!"]), html, 1
     end
 
     test 'attribute lookup is not case sensitive' do
@@ -591,8 +590,7 @@ context 'Attributes' do
 
     test "convert properly with single character name" do
       html = convert_string(":r: Ruby\n\nR is for {r}!")
-      result = Nokogiri::HTML(html)
-      assert_equal 'R is for Ruby!', result.css("p").first.content.strip
+      assert_xpath %(//p[text()="R is for Ruby!"]), html, 1
     end
 
     test "collapses spaces in attribute names" do
@@ -706,15 +704,13 @@ context 'Attributes' do
 
     test "substitutes inside unordered list items" do
       html = convert_string(":foo: bar\n* snort at the {foo}\n* yawn")
-      result = Nokogiri::HTML(html)
-      assert_match(/snort at the bar/, result.css("li").first.content.strip)
+      assert_xpath %(//li/p[text()="snort at the bar"]), html, 1
     end
 
     test 'substitutes inside section title' do
       output = convert_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
-      result = Nokogiri::HTML(output)
-      assert_match(/Cool Title/, result.css('h2').first.content)
-      assert_match(/_cool_title/, result.css('h2').first.attr('id'))
+      assert_xpath '//h2[text()="Cool Title"]', output, 1
+      assert_css 'h2#_cool_title', output, 1
     end
 
     test 'interpolates attribute defined in header inside attribute entry in header' do
@@ -855,14 +851,12 @@ context 'Attributes' do
 
     test 'does not disturb attribute-looking things escaped with backslash' do
       html = convert_string(":foo: bar\nThis is a \\{foo} day.")
-      result = Nokogiri::HTML(html)
-      assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
+      assert_xpath '//p[text()="This is a {foo} day."]', html, 1
     end
 
     test 'does not disturb attribute-looking things escaped with literals' do
       html = convert_string(":foo: bar\nThis is a +++{foo}+++ day.")
-      result = Nokogiri::HTML(html)
-      assert_equal 'This is a {foo} day.', result.css('p').first.content.strip
+      assert_xpath '//p[text()="This is a {foo} day."]', html, 1
     end
 
     test 'does not substitute attributes inside listing blocks' do
@@ -1524,14 +1518,14 @@ context 'Attributes' do
       content
       EOS
 
-      doc = document_from_string input, backend: 'docbook45'
+      doc = document_from_string input, backend: 'docbook'
       section = doc.blocks[0]
       refute_nil section
       assert_equal :section, section.context
       refute section.special
       output = doc.convert
-      assert_css 'section', output, 1
-      assert_css 'section#idname', output, 1
+      assert_css 'article:root > section', output, 1
+      assert_css 'article:root > section[xml|id="idname"]', output, 1
     end
 
     test "Block attributes are additive" do

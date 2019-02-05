@@ -8,7 +8,7 @@ ifndef::icons[]
 :star: &#9733;
 endif::[]
 
-{uri-asciidoctor}[Asciidoctor] is a _fast_, open source text processor and publishing toolchain for converting {uri-asciidoc}[AsciiDoc] content into HTML5, DocBook 5 (or 4.5) and other formats.
+{uri-asciidoctor}[Asciidoctor] is a _fast_, open source text processor and publishing toolchain for converting {uri-asciidoc}[AsciiDoc] content into HTML 5, DocBook 5, and other formats.
 
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
@@ -19,6 +19,7 @@ Enhancements::
 
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
   * drop support for Slim < 3 (#2998)
+  * drop the converter for the docbook45 backend (#3005)
   * make syntax highlighter pluggable; extract all logic into adapter classes (#2106)
   * add syntax highlighter adapter for Rouge (#1040)
   * redesign Converter API based on SyntaxHighlighter API; remap deprecated API to new API to ensure compatibility (#2891)

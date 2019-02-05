@@ -254,7 +254,7 @@ module Converter
   # Mixed into the {Converter} module to provide the global registry of converters that are registered statically.
   #
   # This registry includes built-in converters for {Html5Converter HTML 5}, {DocBook5Converter DocBook 5} and
-  # {DocBook45Converter DocBook 4.5}, as well as any custom converters that have been discovered or explicitly
+  # {ManPageConverter man(ual) page}, as well as any custom converters that have been discovered or explicitly
   # registered. Converter registration is synchronized (where applicable) and is thus guaranteed to be thread safe.
   module DefaultFactory
     include Factory
@@ -296,7 +296,6 @@ module Converter
       end
 
       PROVIDED = {
-        'docbook45' => %(#{__dir__}/converter/docbook45),
         'docbook5' => %(#{__dir__}/converter/docbook5),
         'html5' => %(#{__dir__}/converter/html5),
         'manpage' => %(#{__dir__}/converter/manpage),

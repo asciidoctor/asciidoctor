@@ -59,7 +59,7 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}[Asciidoctor] ist ein _schneller_, {uri-license}[Open Source] Textverarbeitungs- und Publishing-Toolchain für die Konvertierung von {uri-what-is-asciidoc}[AsciiDoc]-Inhalten in HTML5, DocBook, PDF und andere Formate.
+{uri-project}[Asciidoctor] ist ein _schneller_, {uri-license}[Open Source] Textverarbeitungs- und Publishing-Toolchain für die Konvertierung von {uri-what-is-asciidoc}[AsciiDoc]-Inhalten in HTML 5, DocBook 5, PDF und andere Formate.
 Asciidoctor ist in Ruby geschrieben und läuft auf allen gängigen Betriebsystemen.
 Um die Installation zu vereinfachen wird Asciidoctor als Gem auf {uri-rubygem}[RubyGems.org] verpackt und ist als Paket für gängige Linux-Distributionen und MacOS erhältlich.
 Asciidoctor kann auch in einer JVM mit {uri-asciidoctorj}[AsciidoctorJ] oder einer beliebigen Javascript-Umgebung mit {uri-asciidoctorjs}[Asciidoctor.js] ausgeführt werden.
@@ -108,21 +108,21 @@ Sie können dieses Projekt unterstützen, indem Sie Sponsor bei https://opencoll
 
 == Das große Ganze
 
-Asciidoctor liest Inhalte, die im Klartext geschrieben wurden, wie im Feld links im Bild unten gezeigt, und wandelt Sie in HTML5 um, wie im rechten Feld dargestellt.
-Asciidoctor wendet ein Standard-Stylesheet auf das HTML5-Dokument an, um ein angenehmes Out-of-the-Box-Erlebnis zu bieten.
+Asciidoctor liest Inhalte, die im Klartext geschrieben wurden, wie im Feld links im Bild unten gezeigt, und wandelt Sie in HTML 5 um, wie im rechten Feld dargestellt.
+Asciidoctor wendet ein Standard-Stylesheet auf das HTML 5-Dokument an, um ein angenehmes Out-of-the-Box-Erlebnis zu bieten.
 
 image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
 == AsciiDoc Verarbeitung
 
-Asciidoctor liest und analysiert Text, der in der AsciiDoc-Syntax geschrieben wurde, und leitet dann den Parse-Tree durch eine Reihe von eingebauten Konvertern, um HTML5, DocBook 5 und man-pages zu erzeugen.
+Asciidoctor liest und analysiert Text, der in der AsciiDoc-Syntax geschrieben wurde, und leitet dann den Parse-Tree durch eine Reihe von eingebauten Konvertern, um HTML 5, DocBook 5 und man-pages zu erzeugen.
 Sie haben die Möglichkeit, eigene Konverter zu verwenden oder {uri-tilt}[Tilt]-gestützte Vorlagen zu laden, um die generierte Ausgabe anzupassen oder zusätzliche Formate zu erzeugen.
 
 Asciidoctor ist ein Ersatz für den Original AsciiDoc Python Prozessor (`asciidoc.py`).
 Die Asciidoctor-Testsuite verfügt über {uri-tests}[mehr als 2,000 Tests], um die Kompatibilität mit der AsciiDoc-Syntax sicherzustellen.
 
 Neben der klassischen AsciiDoc-Syntax erkennt Asciidoctor zusätzliche Markup- und Formatierungsoptionen, wie z.B. fontbasierte Icons (z.B. `+icon:fire[]+`) und UI-Elemente (z.B. `+button:[Save]+`).
-Asciidoctor bietet auch ein modernes, __responsive Theme__, das auf {uri-foundation}[Foundation] basiert, um die HTML5-Ausgabe zu gestalten.
+Asciidoctor bietet auch ein modernes, __responsive Theme__, das auf {uri-foundation}[Foundation] basiert, um die HTML 5-Ausgabe zu gestalten.
 
 == Wo Ruby hingeht, folgt Asciidoctor
 

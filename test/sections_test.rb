@@ -2426,33 +2426,33 @@ Colophon content
 = Index Title
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook45'
-      assert_xpath '/chapter[@id="abstract_title"]', output, 1
-      assert_xpath '/chapter[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
-      assert_xpath '/chapter/following-sibling::dedication[@id="dedication_title"]', output, 1
-      assert_xpath '/chapter/following-sibling::dedication[@id="dedication_title"]/title[text()="Dedication Title"]', output, 1
-      assert_xpath '/dedication/following-sibling::preface[@id="preface_title"]', output, 1
-      assert_xpath '/dedication/following-sibling::preface[@id="preface_title"]/title[text()="Preface Title"]', output, 1
-      assert_xpath '/preface/section[@id="preface_sub_section"]', output, 1
-      assert_xpath '/preface/section[@id="preface_sub_section"]/title[text()="Preface sub-section"]', output, 1
-      assert_xpath '/preface/following-sibling::part[@id="part_1"]', output, 1
-      assert_xpath '/preface/following-sibling::part[@id="part_1"]/title[text()="Part 1"]', output, 1
-      assert_xpath '/part[@id="part_1"]/partintro', output, 1
-      assert_xpath '/part[@id="part_1"]/partintro/title[text()="Part intro title"]', output, 1
-      assert_xpath '/part[@id="part_1"]/partintro/following-sibling::chapter[@id="chapter_1"]', output, 1
-      assert_xpath '/part[@id="part_1"]/partintro/following-sibling::chapter[@id="chapter_1"]/title[text()="Chapter 1"]', output, 1
-      assert_xpath '(/part)[2]/following-sibling::appendix[@id="appendix_title"]', output, 1
-      assert_xpath '(/part)[2]/following-sibling::appendix[@id="appendix_title"]/title[text()="Appendix Title"]', output, 1
-      assert_xpath '/appendix/section[@id="appendix_sub_section"]', output, 1
-      assert_xpath '/appendix/section[@id="appendix_sub_section"]/title[text()="Appendix sub-section"]', output, 1
-      assert_xpath '/appendix/following-sibling::bibliography[@id="bibliography_title"]', output, 1
-      assert_xpath '/appendix/following-sibling::bibliography[@id="bibliography_title"]/title[text()="Bibliography Title"]', output, 1
-      assert_xpath '/bibliography/following-sibling::glossary[@id="glossary_title"]', output, 1
-      assert_xpath '/bibliography/following-sibling::glossary[@id="glossary_title"]/title[text()="Glossary Title"]', output, 1
-      assert_xpath '/glossary/following-sibling::colophon[@id="colophon_title"]', output, 1
-      assert_xpath '/glossary/following-sibling::colophon[@id="colophon_title"]/title[text()="Colophon Title"]', output, 1
-      assert_xpath '/colophon/following-sibling::index[@id="index_title"]', output, 1
-      assert_xpath '/colophon/following-sibling::index[@id="index_title"]/title[text()="Index Title"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/book/chapter[@xml:id="abstract_title"]', output, 1
+      assert_xpath '/book/chapter[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
+      assert_xpath '/book/chapter/following-sibling::dedication[@xml:id="dedication_title"]', output, 1
+      assert_xpath '/book/chapter/following-sibling::dedication[@xml:id="dedication_title"]/title[text()="Dedication Title"]', output, 1
+      assert_xpath '/book/dedication/following-sibling::preface[@xml:id="preface_title"]', output, 1
+      assert_xpath '/book/dedication/following-sibling::preface[@xml:id="preface_title"]/title[text()="Preface Title"]', output, 1
+      assert_xpath '/book/preface/section[@xml:id="preface_sub_section"]', output, 1
+      assert_xpath '/book/preface/section[@xml:id="preface_sub_section"]/title[text()="Preface sub-section"]', output, 1
+      assert_xpath '/book/preface/following-sibling::part[@xml:id="part_1"]', output, 1
+      assert_xpath '/book/preface/following-sibling::part[@xml:id="part_1"]/title[text()="Part 1"]', output, 1
+      assert_xpath '/book/part[@xml:id="part_1"]/partintro', output, 1
+      assert_xpath '/book/part[@xml:id="part_1"]/partintro/title[text()="Part intro title"]', output, 1
+      assert_xpath '/book/part[@xml:id="part_1"]/partintro/following-sibling::chapter[@xml:id="chapter_1"]', output, 1
+      assert_xpath '/book/part[@xml:id="part_1"]/partintro/following-sibling::chapter[@xml:id="chapter_1"]/title[text()="Chapter 1"]', output, 1
+      assert_xpath '(/book/part)[2]/following-sibling::appendix[@xml:id="appendix_title"]', output, 1
+      assert_xpath '(/book/part)[2]/following-sibling::appendix[@xml:id="appendix_title"]/title[text()="Appendix Title"]', output, 1
+      assert_xpath '/book/appendix/section[@xml:id="appendix_sub_section"]', output, 1
+      assert_xpath '/book/appendix/section[@xml:id="appendix_sub_section"]/title[text()="Appendix sub-section"]', output, 1
+      assert_xpath '/book/appendix/following-sibling::bibliography[@xml:id="bibliography_title"]', output, 1
+      assert_xpath '/book/appendix/following-sibling::bibliography[@xml:id="bibliography_title"]/title[text()="Bibliography Title"]', output, 1
+      assert_xpath '/book/bibliography/following-sibling::glossary[@xml:id="glossary_title"]', output, 1
+      assert_xpath '/book/bibliography/following-sibling::glossary[@xml:id="glossary_title"]/title[text()="Glossary Title"]', output, 1
+      assert_xpath '/book/glossary/following-sibling::colophon[@xml:id="colophon_title"]', output, 1
+      assert_xpath '/book/glossary/following-sibling::colophon[@xml:id="colophon_title"]/title[text()="Colophon Title"]', output, 1
+      assert_xpath '/book/colophon/following-sibling::index[@xml:id="index_title"]', output, 1
+      assert_xpath '/book/colophon/following-sibling::index[@xml:id="index_title"]/title[text()="Index Title"]', output, 1
     end
 
     test 'abstract section maps to abstract element in docbook for article doctype' do
@@ -2466,9 +2466,9 @@ Colophon content
 Abstract content
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook45'
-      assert_xpath '/abstract[@id="abstract_title"]', output, 1
-      assert_xpath '/abstract[@id="abstract_title"]/title[text()="Abstract Title"]', output, 1
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '/abstract[@xml:id="abstract_title"]', output, 1
+      assert_xpath '/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
 
     test 'should allow a special section to be nested at arbitrary depth in DocBook output' do

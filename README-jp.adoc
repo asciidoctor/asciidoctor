@@ -59,7 +59,7 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}/[Asciidoctor]は _高速な_ テキストプロセッサで {uri-what-is-asciidoc}[AsciiDoc] をHTML5, DocBook 5(4.5)や他のフォーマットに変換するツールチェインを配布しています.
+{uri-project}/[Asciidoctor]は _高速な_ テキストプロセッサで {uri-what-is-asciidoc}[AsciiDoc] をHTML 5, DocBook 5や他のフォーマットに変換するツールチェインを配布しています.
 AsciidoctorはRubyで書かれており, RubyGemとしてパッケージされ,  {uri-rubygem}[RubyGems.org] で配布されています.
 gemはいくつかのLinuxディストリビューション, Fedora, Debian, Ubuntuにも含まれています.
 Asciidoctorはオープンソース {uri-repo}[hosted on GitHub] で {uri-license}[the MIT licence]のもとに配布されます.
@@ -101,20 +101,20 @@ endif::[]
 
 == The Big Picture
 
-Asciidoctorは下図の左側のパネルに示されるように, 平文で書かれた内容を読み, 右のパネルに描かれるようにHTML5に変換します.
-Asciidoctorは枠にとらわれない快適なエクスペリエンスのためにデフォルトスタイルシートをHTML5ドキュメントに適用します.
+Asciidoctorは下図の左側のパネルに示されるように, 平文で書かれた内容を読み, 右のパネルに描かれるようにHTML 5に変換します.
+Asciidoctorは枠にとらわれない快適なエクスペリエンスのためにデフォルトスタイルシートをHTML 5ドキュメントに適用します.
 
 image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
 == AsciiDoc Processing
-AsciidoctorはAsciiDoc文法で書かれたテキストを読み込み解釈し, それからHTML5, DocBook5(4.5)やman(ual)を出力するために内蔵コンバータセットにパースツリーを渡します.
+AsciidoctorはAsciiDoc文法で書かれたテキストを読み込み解釈し, それからHTML 5, DocBook 5やman(ual)を出力するために内蔵コンバータセットにパースツリーを渡します.
 生成された出力をカスタマイズ, あるいは追加のフォーマットをつくるためにあなた自身のコンバータを使うことや {uri-tilt}[Tilt]-supported テンプレートを読み込むオプションがあります.
 
 NOTE: AsciidoctorはオリジナルのAsciiDoc Pythonプロセッサ(`asciidoc.py`)の完全互換です.
 Asciidoctorテストスイートは {uri-tests}[> 1,600 tests] をAsciiDoc文法との互換性を保証するために有しています.
 
 クラシックなAsciiDoc文法に加えて, Asciidoctorは追加のマークアップとフォントベースのicons(例えば, `+icon:fire[]+`)などのフォーマッティングオプションとUIエレメント(`+button:[Save]+`)を  受け付けます.
-AsciidoctorはHTML5出力をスタイルするため, モダンで,  {uri-foundation}[Foundation] に基づいたレスポンシブテーマをも提供します.
+AsciidoctorはHTML 5出力をスタイルするため, モダンで,  {uri-foundation}[Foundation] に基づいたレスポンシブテーマをも提供します.
 
 == Requirements
 

@@ -169,7 +169,7 @@ line should be shown
       EOS
 
       output = convert_string_to_embedded input
-      assert_xpath '//p[text() = "line should be shown"]', output, 1
+      assert_xpath '//p[text()="line should be shown"]', output, 1
     end
 
     test 'preprocessor directives should not be processed within comment block' do
@@ -184,7 +184,7 @@ line should be shown
       EOS
 
       output = convert_string_to_embedded input
-      assert_xpath '//p[text() = "line should be shown"]', output, 1
+      assert_xpath '//p[text()="line should be shown"]', output, 1
     end
 
     test 'should warn if unterminated comment block is detected in body' do
@@ -246,7 +246,7 @@ this line should be shown
       EOS
 
       output = convert_string_to_embedded input
-      assert_xpath '//p[text() = "this line should be shown"]', output, 1
+      assert_xpath '//p[text()="this line should be shown"]', output, 1
     end
 
     test 'comment style on open block should only skip block' do
@@ -337,7 +337,7 @@ ____
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath '//*[@class = "quoteblock"]//p[text() = "A famous quote."]', output, 1
+      assert_xpath '//*[@class="quoteblock"]//p[text()="A famous quote."]', output, 1
     end
 
     test 'quote block with attribution' do
@@ -354,8 +354,8 @@ ____
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
       assert_css '.quoteblock > .attribution > br + cite', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Book (1999)"]', output, 1
-      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      assert_xpath '//*[@class="quoteblock"]/*[@class="attribution"]/cite[text()="Famous Book (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class="quoteblock"]/*[@class="attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
@@ -416,7 +416,7 @@ ____
       assert_css 'blockquote > simpara', output, 1
       assert_css 'blockquote > attribution', output, 1
       assert_css 'blockquote > attribution > citetitle', output, 1
-      assert_xpath '//blockquote/attribution/citetitle[text() = "Famous Book (1999)"]', output, 1
+      assert_xpath '//blockquote/attribution/citetitle[text()="Famous Book (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//blockquote/attribution', output, 1
       author = attribution.children.first
       assert_equal 'Famous Person', author.text.strip
@@ -434,7 +434,7 @@ ____
       assert_css 'epigraph > simpara', output, 1
       assert_css 'epigraph > attribution', output, 1
       assert_css 'epigraph > attribution > citetitle', output, 1
-      assert_xpath '//epigraph/attribution/citetitle[text() = "Famous Book (1999)"]', output, 1
+      assert_xpath '//epigraph/attribution/citetitle[text()="Famous Book (1999)"]', output, 1
       attribution = xmlnodes_at_xpath '//epigraph/attribution', output, 1
       author = attribution.children.first
       assert_equal 'Famous Person', author.text.strip
@@ -451,7 +451,7 @@ A famous quote.
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath '//*[@class = "quoteblock"]//p[text() = "A famous quote."]', output, 1
+      assert_xpath '//*[@class="quoteblock"]//p[text()="A famous quote."]', output, 1
     end
 
     test 'markdown-style quote block with single paragraph and no attribution' do
@@ -464,7 +464,7 @@ A famous quote.
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      assert_xpath %(//*[@class="quoteblock"]//p[text()="A famous quote.\nSome more inspiring words."]), output, 1
     end
 
     test 'lazy markdown-style quote block with single paragraph and no attribution' do
@@ -477,7 +477,7 @@ Some more inspiring words.
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      assert_xpath %(//*[@class="quoteblock"]//p[text()="A famous quote.\nSome more inspiring words."]), output, 1
     end
 
     test 'markdown-style quote block with multiple paragraphs and no attribution' do
@@ -491,8 +491,8 @@ Some more inspiring words.
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 2
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
-      assert_xpath %((//*[@class = "quoteblock"]//p)[2][text() = "Some more inspiring words."]), output, 1
+      assert_xpath %((//*[@class="quoteblock"]//p)[1][text()="A famous quote."]), output, 1
+      assert_xpath %((//*[@class="quoteblock"]//p)[2][text()="Some more inspiring words."]), output, 1
     end
 
     test 'markdown-style quote block with multiple blocks and no attribution' do
@@ -507,8 +507,8 @@ Some more inspiring words.
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
       assert_css '.quoteblock > blockquote > .admonitionblock', output, 1
       assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath %((//*[@class = "quoteblock"]//p)[1][text() = "A famous quote."]), output, 1
-      assert_xpath %((//*[@class = "quoteblock"]//*[@class = "admonitionblock note"]//*[@class="content"])[1][normalize-space(text()) = "Some more inspiring words."]), output, 1
+      assert_xpath %((//*[@class="quoteblock"]//p)[1][text()="A famous quote."]), output, 1
+      assert_xpath %((//*[@class="quoteblock"]//*[@class="admonitionblock note"]//*[@class="content"])[1][normalize-space(text())="Some more inspiring words."]), output, 1
     end
 
     test 'markdown-style quote block with single paragraph and attribution' do
@@ -521,12 +521,12 @@ Some more inspiring words.
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
       assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
-      assert_xpath %(//*[@class = "quoteblock"]//p[text() = "A famous quote.\nSome more inspiring words."]), output, 1
+      assert_xpath %(//*[@class="quoteblock"]//p[text()="A famous quote.\nSome more inspiring words."]), output, 1
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
       assert_css '.quoteblock > .attribution > br + cite', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
-      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      assert_xpath '//*[@class="quoteblock"]/*[@class="attribution"]/cite[text()="Famous Source, Volume 1 (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class="quoteblock"]/*[@class="attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
@@ -564,12 +564,12 @@ Some more inspiring words."
       output = convert_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
-      assert_xpath %(//*[@class = "quoteblock"]/blockquote[normalize-space(text()) = "A famous quote. Some more inspiring words."]), output, 1
+      assert_xpath %(//*[@class="quoteblock"]/blockquote[normalize-space(text())="A famous quote. Some more inspiring words."]), output, 1
       assert_css '.quoteblock > .attribution', output, 1
       assert_css '.quoteblock > .attribution > cite', output, 1
       assert_css '.quoteblock > .attribution > br + cite', output, 1
-      assert_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]/cite[text() = "Famous Source, Volume 1 (1999)"]', output, 1
-      attribution = xmlnodes_at_xpath '//*[@class = "quoteblock"]/*[@class = "attribution"]', output, 1
+      assert_xpath '//*[@class="quoteblock"]/*[@class="attribution"]/cite[text()="Famous Source, Volume 1 (1999)"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class="quoteblock"]/*[@class="attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Person", author.text.strip
     end
@@ -598,7 +598,7 @@ ____
       assert_css '.verseblock > pre', output, 1
       assert_css '.verseblock > .attribution', output, 0
       assert_css '.verseblock p', output, 0
-      assert_xpath '//*[@class = "verseblock"]/pre[normalize-space(text()) = "A famous verse."]', output, 1
+      assert_xpath '//*[@class="verseblock"]/pre[normalize-space(text())="A famous verse."]', output, 1
     end
 
     test 'single-line verse block with attribution' do
@@ -615,8 +615,8 @@ ____
       assert_css '.verseblock > .attribution', output, 1
       assert_css '.verseblock > .attribution > cite', output, 1
       assert_css '.verseblock > .attribution > br + cite', output, 1
-      assert_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]/cite[text() = "Famous Poem"]', output, 1
-      attribution = xmlnodes_at_xpath '//*[@class = "verseblock"]/*[@class = "attribution"]', output, 1
+      assert_xpath '//*[@class="verseblock"]/*[@class="attribution"]/cite[text()="Famous Poem"]', output, 1
+      attribution = xmlnodes_at_xpath '//*[@class="verseblock"]/*[@class="attribution"]', output, 1
       author = attribution.children.first
       assert_equal "#{decode_char 8212} Famous Poet", author.text.strip
     end
@@ -634,7 +634,7 @@ ____
       assert_css 'blockquote > literallayout', output, 1
       assert_css 'blockquote > attribution', output, 1
       assert_css 'blockquote > attribution > citetitle', output, 1
-      assert_xpath '//blockquote/attribution/citetitle[text() = "Famous Poem"]', output, 1
+      assert_xpath '//blockquote/attribution/citetitle[text()="Famous Poem"]', output, 1
       attribution = xmlnodes_at_xpath '//blockquote/attribution', output, 1
       author = attribution.children.first
       assert_equal 'Famous Poet', author.text.strip
@@ -653,7 +653,7 @@ ____
       assert_css 'epigraph > literallayout', output, 1
       assert_css 'epigraph > attribution', output, 1
       assert_css 'epigraph > attribution > citetitle', output, 1
-      assert_xpath '//epigraph/attribution/citetitle[text() = "Famous Poem"]', output, 1
+      assert_xpath '//epigraph/attribution/citetitle[text()="Famous Poem"]', output, 1
       attribution = xmlnodes_at_xpath '//epigraph/attribution', output, 1
       author = attribution.children.first
       assert_equal 'Famous Poet', author.text.strip
@@ -669,11 +669,11 @@ Stanza two.
 ____
       EOS
       output = convert_string input
-      assert_xpath '//*[@class = "verseblock"]', output, 1
-      assert_xpath '//*[@class = "verseblock"]/pre', output, 1
-      assert_xpath '//*[@class = "verseblock"]//p', output, 0
-      assert_xpath '//*[@class = "verseblock"]/pre[contains(text(), "A famous verse.")]', output, 1
-      assert_xpath '//*[@class = "verseblock"]/pre[contains(text(), "Stanza two.")]', output, 1
+      assert_xpath '//*[@class="verseblock"]', output, 1
+      assert_xpath '//*[@class="verseblock"]/pre', output, 1
+      assert_xpath '//*[@class="verseblock"]//p', output, 0
+      assert_xpath '//*[@class="verseblock"]/pre[contains(text(), "A famous verse.")]', output, 1
+      assert_xpath '//*[@class="verseblock"]/pre[contains(text(), "Stanza two.")]', output, 1
     end
 
     test 'verse block does not contain block elements' do
@@ -1401,18 +1401,12 @@ Back to our regularly scheduled programming.
       EOS
 
       output = convert_string input, backend: :docbook, keep_namespaces: true
-      assert_css 'article > simpara', output, 2
-      assert_css 'article > para', output, 1
-      assert_css 'article > para > simpara', output, 1
-      assert_css 'article > para > tip', output, 1
-      open = xmlnodes_at_xpath '/xmlns:article/xmlns:para', output, 1
-      # nokogiri can't make up its mind
-      id = open.attribute('id') || open.attribute('xml:id')
-      refute_nil id
-      assert_equal 'open', id.value
-      xreflabel = open.attribute('xreflabel')
-      refute_nil xreflabel
-      assert_equal 'Open Block', xreflabel.value
+      assert_css 'article:root > para[xml|id="open"]', output, 1
+      assert_css 'article:root > para[xreflabel="Open Block"]', output, 1
+      assert_css 'article:root > simpara', output, 2
+      assert_css 'article:root > para', output, 1
+      assert_css 'article:root > para > simpara', output, 1
+      assert_css 'article:root > para > tip', output, 1
     end
 
     test 'should transfer id and reftext on open paragraph to DocBook output' do
@@ -1422,16 +1416,9 @@ This is an open paragraph.
       EOS
 
       output = convert_string input, backend: :docbook, keep_namespaces: true
-      assert_css 'article > simpara', output, 1
-      open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara', output, 1
-      open = xmlnodes_at_xpath '/xmlns:article/xmlns:simpara[text()="This is an open paragraph."]', output, 1
-      # nokogiri can't make up its mind
-      id = open.attribute('id') || open.attribute('xml:id')
-      refute_nil id
-      assert_equal 'openpara', id.value
-      xreflabel = open.attribute('xreflabel')
-      refute_nil xreflabel
-      assert_equal 'Open Paragraph', xreflabel.value
+      assert_css 'article:root > simpara', output, 1
+      assert_css 'article:root > simpara[xml|id="openpara"]', output, 1
+      assert_css 'article:root > simpara[xreflabel="Open Paragraph"]', output, 1
     end
 
     test 'should transfer title on open block to DocBook output' do
@@ -1874,8 +1861,8 @@ paragraph
       EOS
       output = convert_string input
       assert_xpath '//*[@class="paragraph"]', output, 1
-      assert_xpath '//*[@class="paragraph"]/*[@class="title"][text() = "Title"]', output, 1
-      assert_xpath '//*[@class="paragraph"]/p[text() = "paragraph"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/*[@class="title"][text()="Title"]', output, 1
+      assert_xpath '//*[@class="paragraph"]/p[text()="paragraph"]', output, 1
     end
 
     test 'block title above document title demotes document title to a section title' do
@@ -1908,7 +1895,7 @@ paragraph
       # NOTE block title demotes document title to level-0 section
       refute doc.header?
       output = doc.convert
-      assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text() = "Block title"]', output, 1
+      assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
     end
 
     test 'empty attribute list should not appear in output' do
@@ -2245,7 +2232,7 @@ image::images/tiger.png[Tiger]
       assert_equal 1, doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Figure 1. The AsciiDoc Tiger"]', output, 1
+      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text()="Figure 1. The AsciiDoc Tiger"]', output, 1
       assert_equal 1, doc.attributes['figure-number']
     end
 
@@ -2260,7 +2247,7 @@ image::images/tiger.png[Tiger]
       assert_nil doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text() = "Voila! The AsciiDoc Tiger"]', output, 1
+      assert_xpath '//*[@class="imageblock"]/*[@class="title"][text()="Voila! The AsciiDoc Tiger"]', output, 1
       refute doc.attributes.has_key?('figure-number')
     end
 
@@ -3238,7 +3225,7 @@ content
       assert_css '.openblock .title', output, 1
       assert_css '.openblock .content', output, 1
       assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text() = "Intro title"]), output, 1
+      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text()="Intro title"]), output, 1
       assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 1
     end
 
@@ -3286,9 +3273,9 @@ It can have multiple paragraphs.
 content
       EOS
 
-      output = convert_string input, backend: 'docbook45'
+      output = convert_string input, backend: 'docbook'
       assert_css 'partintro', output, 1
-      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'part[xml|id="_part_1"] > partintro', output, 1
       assert_css 'partintro > simpara', output, 2
     end
 
@@ -3310,9 +3297,9 @@ This is a part intro with a title.
 content
       EOS
 
-      output = convert_string input, backend: 'docbook45'
+      output = convert_string input, backend: 'docbook'
       assert_css 'partintro', output, 1
-      assert_css 'part#_part_1 > partintro', output, 1
+      assert_css 'part[xml|id="_part_1"] > partintro', output, 1
       assert_css 'partintro > title', output, 1
       assert_css 'partintro > title + simpara', output, 1
     end
@@ -3455,7 +3442,7 @@ see how they run
 
       output = convert_string_to_embedded input
       assert_includes output, '[[3-blind-mice]]'
-      assert_xpath '/*[@id = ":3-blind-mice"]', output, 0
+      assert_xpath '/*[@id=":3-blind-mice"]', output, 0
     end
 
     test 'should recognize block anchor that starts with colon' do
@@ -3467,7 +3454,7 @@ content
       EOS
 
       output = convert_string_to_embedded input
-      assert_xpath '/*[@id = ":idname"]', output, 1
+      assert_xpath '/*[@id=":idname"]', output, 1
     end
 
     test 'should use specified id and reftext when registering block reference' do

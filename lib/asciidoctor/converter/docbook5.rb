@@ -1,7 +1,6 @@
 module Asciidoctor
-# A built-in {Converter} implementation that generates DocBook 5 output
-# similar to the docbook45 backend from AsciiDoc Python, but migrated to the
-# DocBook 5 specification.
+# A built-in {Converter} implementation that generates DocBook 5 output. The output is inspired by the output produced
+# by the docbook45 backend from AsciiDoc Python, except it has been migrated to the DocBook 5 specification.
 class Converter::DocBook5Converter < Converter::Base
   register_for 'docbook5'
 
@@ -19,9 +18,6 @@ class Converter::DocBook5Converter < Converter::Base
       root_tag_name = 'refentry'
     end
     result << '<?xml version="1.0" encoding="UTF-8"?>'
-    if (doctype_line = _doctype_declaration root_tag_name)
-      result << doctype_line
-    end
     if node.attr? 'toc'
       if node.attr? 'toclevels'
         result << %(<?asciidoc-toc maxdepth="#{node.attr 'toclevels'}"?>)
@@ -36,9 +32,9 @@ class Converter::DocBook5Converter < Converter::Base
         result << '<?asciidoc-numbered?>'
       end
     end
-    lang_attribute = (node.attr? 'nolang') ? '' : %( #{_lang_attribute_name}="#{node.attr 'lang', 'en'}")
-    result << %(<#{root_tag_name}#{_document_ns_attributes node}#{lang_attribute}#{_common_attributes node.id}>)
-    result << (_document_info_tag node, root_tag_name) unless node.noheader
+    lang_attribute = (node.attr? 'nolang') ? '' : %( xml:lang="#{node.attr 'lang', 'en'}")
+    result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{_common_attributes node.id}>)
+    result << (_document_info_tag node) unless node.noheader
     result << node.content if node.blocks?
     unless (footer_docinfo = node.docinfo :footer).empty?
       result << footer_docinfo
@@ -65,7 +61,7 @@ class Converter::DocBook5Converter < Converter::Base
 
   def admonition node
     %(<#{tag_name = node.attr 'name'}#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_resolve_content node}
+#{_title_tag node}#{_enclose_content node}
 </#{tag_name}>)
   end
 
@@ -172,11 +168,11 @@ class Converter::DocBook5Converter < Converter::Base
     if node.title?
       %(<example#{_common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
-#{_resolve_content node}
+#{_enclose_content node}
 </example>)
     else
       %(<informalexample#{_common_attributes node.id, node.role, node.reftext}>
-#{_resolve_content node}
+#{_enclose_content node}
 </informalexample>)
     end
   end
@@ -316,7 +312,7 @@ class Converter::DocBook5Converter < Converter::Base
         ''
       else
         %(<abstract>
-#{_title_tag node}#{_resolve_content node}
+#{_title_tag node}#{_enclose_content node}
 </abstract>)
       end
     when 'partintro'
@@ -325,7 +321,7 @@ class Converter::DocBook5Converter < Converter::Base
         ''
       else
         %(<partintro#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_resolve_content node}
+#{_title_tag node}#{_enclose_content node}
 </partintro>)
       end
     else
@@ -345,7 +341,7 @@ class Converter::DocBook5Converter < Converter::Base
           %(<simpara#{_common_attributes id, role, reftext}>#{node.content}</simpara>)
         end
       else
-        _resolve_content node
+        _enclose_content node
       end
     end
   end
@@ -376,7 +372,7 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def quote node
-    _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { _resolve_content node }
+    _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { _enclose_content node }
   end
 
   def thematic_break node
@@ -385,7 +381,7 @@ class Converter::DocBook5Converter < Converter::Base
 
   def sidebar node
     %(<sidebar#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_resolve_content node}
+#{_title_tag node}#{_enclose_content node}
 </sidebar>)
   end
 
@@ -492,7 +488,6 @@ class Converter::DocBook5Converter < Converter::Base
       end
       result << '</itemizedlist>'
     end
-
     result.join LF
   end
 
@@ -650,8 +645,6 @@ class Converter::DocBook5Converter < Converter::Base
     attrs
   end
 
-  def _doctype_declaration root_tag_name; end
-
   def _author_tag author
     result = []
     result << '<author>'
@@ -665,11 +658,16 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def _document_info_tag doc, info_tag_prefix, use_info_tag_prefix = false
-    info_tag_prefix = '' unless use_info_tag_prefix
-    result = []
-    result << %(<#{info_tag_prefix}info>)
-    result << _document_title_tags(doc.doctitle partition: true, use_fallback: true) unless doc.notitle
+  def _document_info_tag doc
+    result = ['<info>']
+    unless doc.notitle
+      if (title = doc.doctitle partition: true, use_fallback: true).subtitle?
+        result << %(<title>#{title.main}</title>
+<subtitle>#{title.subtitle}</subtitle>)
+      else
+        result << %(<title>#{title}</title>)
+      end
+    end
     if (date = (doc.attr? 'revdate') ? (doc.attr 'revdate') : ((doc.attr? 'reproducible') ? nil : (doc.attr 'docdate')))
       result << %(<date>#{date}</date>)
     end
@@ -701,14 +699,12 @@ class Converter::DocBook5Converter < Converter::Base
         result << %(</revision>
 </revhistory>)
       end
-      unless use_info_tag_prefix
-        if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
-          if (back_cover_tag = _cover_tag doc, 'back')
-            result << (_cover_tag doc, 'front', true)
-            result << back_cover_tag
-          elsif (front_cover_tag = _cover_tag doc, 'front')
-            result << front_cover_tag
-          end
+      if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
+        if (back_cover_tag = _cover_tag doc, 'back')
+          result << (_cover_tag doc, 'front', true)
+          result << back_cover_tag
+        elsif (front_cover_tag = _cover_tag doc, 'front')
+          result << front_cover_tag
         end
       end
       unless (head_docinfo = doc.docinfo).empty?
@@ -716,7 +712,7 @@ class Converter::DocBook5Converter < Converter::Base
       end
       result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
     end
-    result << %(</#{info_tag_prefix}info>)
+    result << '</info>'
 
     if doc.doctype == 'manpage'
       result << '<refmeta>'
@@ -734,25 +730,8 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def _document_ns_attributes doc
-    ' xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"'
-  end
-
-  def _lang_attribute_name
-    'xml:lang'
-  end
-
-  def _document_title_tags title
-    if title.subtitle?
-      %(<title>#{title.main}</title>
-<subtitle>#{title.subtitle}</subtitle>)
-    else
-      %(<title>#{title}</title>)
-    end
-  end
-
   # FIXME this should be handled through a template mechanism
-  def _resolve_content node
+  def _enclose_content node
     node.content_model == :compound ? node.content : %(<simpara>#{node.content}</simpara>)
   end
 

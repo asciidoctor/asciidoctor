@@ -1064,7 +1064,7 @@ module Asciidoctor
     #
     # Examples
     #
-    #   docbook45
+    #   docbook5
     #   html5
     #
     TrailingDigitsRx = /\d+$/

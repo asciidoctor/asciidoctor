@@ -555,8 +555,8 @@ context 'Substitutions' do
     end
 
     test 'quoted text with id and role shorthand using docbook backend' do
-      para = block_from_string(%q{[#bond.white.red-background]#007#}, backend: 'docbook45')
-      assert_equal '<anchor id="bond" xreflabel="007"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.source)
+      para = block_from_string(%q{[#bond.white.red-background]#007#}, backend: 'docbook')
+      assert_equal '<anchor xml:id="bond" xreflabel="007"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.source)
     end
 
     test 'should ignore attributes after comma' do

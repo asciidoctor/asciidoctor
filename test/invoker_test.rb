@@ -486,10 +486,10 @@ context 'Invoker' do
     assert_xpath '/html', output, 1
   end
 
-  test 'should set backend to docbook45 if specified' do
-    invoker = invoke_cli_to_buffer %w(-b docbook45 -a xmlns -o -)
+  test 'should set backend to docbook5 if specified' do
+    invoker = invoke_cli_to_buffer %w(-b docbook5 -a xmlns -o -)
     doc = invoker.document
-    assert_equal 'docbook45', doc.attr('backend')
+    assert_equal 'docbook5', doc.attr('backend')
     assert_equal '.xml', doc.attr('outfilesuffix')
     output = invoker.read_output
     assert_xpath '/xmlns:article', output, 1
