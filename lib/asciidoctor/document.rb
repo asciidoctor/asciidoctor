@@ -490,8 +490,7 @@ class Document < AbstractBlock
       # dynamic intrinstic attribute values
 
       # See https://reproducible-builds.org/specs/source-date-epoch/
-      # NOTE Opal can't call key? on ENV
-      now = ::ENV['SOURCE_DATE_EPOCH'] ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
+      now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
       if (localdate = attrs['localdate'])
         localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
       else
