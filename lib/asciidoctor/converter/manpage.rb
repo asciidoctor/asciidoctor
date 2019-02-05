@@ -216,9 +216,9 @@ r lw(\n(.lu*75u/100u).'
 
   def example node
     result = []
-    result << %(.sp
+    result << (node.title? ? %(.sp
 .B #{_manify node.captioned_title}
-.br) if node.title?
+.br) : '.sp')
     result << %(.RS 4
 #{_enclose_content node}
 .RE)
@@ -519,11 +519,9 @@ allbox tab(:);'
   # FIXME git uses [verse] for the synopsis; detect this special case
   def verse node
     result = []
-    if node.title?
-      result << %(.sp
+    result << (node.title? ? %(.sp
 .B #{_manify node.title}
-.br)
-    end
+.br) : '.sp')
     attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
     attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
     result << %(.sp
@@ -545,9 +543,9 @@ allbox tab(:);'
     start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : ''
     end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : ''
     result = []
-    result << %(.sp
+    result << (node.title? ? %(.sp
 .B #{_manify node.title}
-.br) if node.title?
+.br) : '.sp')
     result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
     result.join LF
   end
