@@ -160,7 +160,7 @@ class Converter::ManPageConverter < Converter::Base
 .B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{_manify node.title}" : ''}
 .ps -1
 .br
-#{_resolve_content node}
+#{_enclose_content node}
 .sp .5v
 .RE)
     result.join LF
@@ -220,7 +220,7 @@ r lw(\n(.lu*75u/100u).'
 .B #{_manify node.captioned_title}
 .br) if node.title?
     result << %(.RS 4
-#{_resolve_content node}
+#{_enclose_content node}
 .RE)
     result.join LF
   end
@@ -292,7 +292,7 @@ r lw(\n(.lu*75u/100u).'
   def open node
     case node.style
     when 'abstract', 'partintro'
-      _resolve_content node
+      _enclose_content node
     else
       node.content
     end
@@ -329,7 +329,7 @@ r lw(\n(.lu*75u/100u).'
     attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
     result << %(.RS 3
 .ll -.6i
-#{_resolve_content node}
+#{_enclose_content node}
 .br
 .RE
 .ll)
@@ -717,7 +717,7 @@ allbox tab(:);'
     opts[:append_newline] ? %(#{str}#{LF}) : str
   end
 
-  def _resolve_content node
+  def _enclose_content node
     node.content_model == :compound ? node.content : %(.sp#{LF}#{_manify node.content, whitespace: :normalize})
   end
 end
