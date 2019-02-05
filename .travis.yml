@@ -10,7 +10,8 @@ rvm:
 - 2.3.8
 - jruby-9.2.6.0
 - jruby-9.1.17.0
-#- truffleruby-rc10
+# the test suite currently crashes on truffleruby
+#- truffleruby-rc13
 env:
   global:
   # use system libraries to speed up installation of nokogiri

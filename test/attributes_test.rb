@@ -50,10 +50,7 @@ context 'Attributes' do
         {#{name}}
         EOS
         result = convert_string_to_embedded str
-        # NOTE truffleruby adds \n to the beginning of a paragraph containing multibyte chars
-        # see https://github.com/oracle/truffleruby/issues/1543
-        #assert_includes result, %(<p>#{value}</p>)
-        assert_includes result, value
+        assert_includes result, %(<p>#{value}</p>)
       end
     end
 
@@ -201,8 +198,6 @@ context 'Attributes' do
 
       {name}
       EOS
-      # see https://github.com/oracle/truffleruby/issues/1563
-      input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 6 }
       assert_equal expected, result
@@ -216,8 +211,6 @@ context 'Attributes' do
 
       {name}
       EOS
-      # see https://github.com/oracle/truffleruby/issues/1563
-      input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 8 }
       assert_equal expected, result
