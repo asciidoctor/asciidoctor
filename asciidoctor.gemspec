@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
   files = begin
-    (result = `got ls-files -z`.split ?\0).empty? ? Dir['**/*'] : result
+    (result = `git ls-files -z`.split ?\0).empty? ? Dir['**/*'] : result
   rescue
     Dir['**/*']
   end
