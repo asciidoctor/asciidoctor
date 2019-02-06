@@ -14,13 +14,13 @@ class AbstractNode
   # Public: Get the Asciidoctor::Document to which this node belongs
   attr_reader :document
 
-  # Public: Get/Set the id of this node
+  # Public: Get/Set the String id of this node
   attr_accessor :id
 
   # Public: Get the String name of this node
   attr_reader :node_name
 
-  # Public: Get the element which is the parent of this node
+  # Public: Get the AbstractBlock parent element of this node
   attr_reader :parent
 
   def initialize parent, context, opts = {}
