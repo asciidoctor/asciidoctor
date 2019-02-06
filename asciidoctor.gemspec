@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.description = 'A fast, open source text processor and publishing toolchain for converting AsciiDoc content to HTML 5, DocBook 5, and other formats.'
   s.authors = ['Dan Allen', 'Sarah White', 'Ryan Waldron', 'Jason Porter', 'Nick Hengeveld', 'Jeremy McAnally']
   s.email = ['dan.j.allen@gmail.com']
-  s.homepage = 'http://asciidoctor.org'
+  s.homepage = 'https://asciidoctor.org'
   s.license = 'MIT'
   # NOTE the required ruby version is informational only; we don't enforce it because it can't be overridden and can cause builds to break
   #s.required_ruby_version = '>= 2.3.0'
