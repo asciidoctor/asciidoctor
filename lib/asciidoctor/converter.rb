@@ -177,6 +177,11 @@ module Converter
       Converter
     end
 
+    # Deprecated: Maps the create method on the old default factory instance holder to the Converter module.
+    def self.create backend, opts = {}
+      default.create backend, opts
+    end
+
     # Public: Register a custom converter with this factory to handle conversion to the specified backends. If the
     # backend value is an asterisk (i.e., +*+), the converter is used as a catch all to handle any backend for which a
     # converter is not registered.
