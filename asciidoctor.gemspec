@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.email = ['dan.j.allen@gmail.com']
   s.homepage = 'https://asciidoctor.org'
   s.license = 'MIT'
-  # NOTE the required ruby version is informational only; we don't enforce it because it can't be overridden and can cause builds to break
+  # NOTE required ruby version is informational only; it's not enforced since it can't be overridden and can cause builds to break
   #s.required_ruby_version = '>= 2.3.0'
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
@@ -28,12 +28,10 @@ Gem::Specification.new do |s|
   rescue
     Dir['**/*']
   end
-  s.files = files.grep %r/^(?:(?:data|lib|man)\/.+|Gemfile|Rakefile|LICENSE|(?:CHANGELOG|CONTRIBUTING|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/
+  s.files = files.grep %r/^(?:(?:data|lib|man)\/.+|LICENSE|(?:CHANGELOG|README(?:-\w+)?)\.adoc|#{s.name}\.gemspec)$/
   s.executables = (files.grep %r/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
-  s.test_files = files.grep %r/^(?:(?:features|test)\/.+)$/
-  s.rdoc_options = ['--charset=UTF-8']
-  s.extra_rdoc_files = ['CHANGELOG.adoc', 'CONTRIBUTING.adoc', 'LICENSE']
+  #s.test_files = files.grep %r/^(?:(?:features|test)\/.+)$/
 
   # asciimath is needed for testing AsciiMath in DocBook backend
   s.add_development_dependency 'asciimath', '~> 1.0.0'
