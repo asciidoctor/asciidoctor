@@ -193,59 +193,66 @@ class AbstractNode
     nil
   end
 
-  # Public: A convenience method that returns the value of the role attribute
+  # Public: Retrieves the space-separated String role for this node.
+  #
+  # Returns the role as a space-separated [String].
   def role
-    @attributes['role'] || @document.attributes['role']
+    @attributes['role']
   end
 
-  # Public: A convenience method that returns the role names as an Array
+  # Public: Retrieves the String role names for this node as an Array.
   #
-  # Returns the role names as an Array or an empty Array if the role attribute is absent.
+  # Returns the role names as a String [Array], which is empty if the role attribute is absent on this node.
   def roles
-    (val = @attributes['role'] || @document.attributes['role']).nil_or_empty? ? [] : val.split
+    (val = @attributes['role']) ? val.split : []
   end
 
-  # Public: A convenience method that checks if the role attribute is specified
-  def role? expected_value = nil
-    if expected_value
-      expected_value == (@attributes['role'] || @document.attributes['role'])
-    else
-      @attributes.key?('role') || @document.attributes.key?('role')
-    end
-  end
-
-  # Public: A convenience method that checks if the specified role is present
-  # in the list of roles on this node
-  def has_role?(name)
-    # NOTE center + include? is faster than split + include?
-    (val = @attributes['role'] || @document.attributes['role']) ? %( #{val} ).include?(%( #{name} )) : false
-  end
-
-  # Public: A convenience method that adds the given role directly to this node
+  # Public: Checks if the role attribute is set on this node and, if an expected value is given, whether the
+  # space-separated role matches that value.
   #
-  # Returns a Boolean indicating whether the role was added.
-  def add_role(name)
-    if (val = @attributes['role']).nil_or_empty?
+  # expected_value - The expected String value of the role (optional, default: nil)
+  #
+  # Returns a [Boolean] indicating whether the role attribute is set on this node and, if an expected value is given,
+  # whether the space-separated role matches that value.
+  def role? expected_value = nil
+    expected_value ? expected_value == @attributes['role'] : (@attributes.key? 'role')
+  end
+
+  # Public: Checks if the specified role is present in the list of roles for this node.
+  #
+  # name - The String name of the role to find.
+  #
+  # Returns a [Boolean] indicating whether this node has the specified role.
+  def has_role? name
+    # NOTE center + include? is faster than split + include?
+    (val = @attributes['role']) ? (%( #{val} ).include? %( #{name} )) : false
+  end
+
+  # Public: Adds the given role directly to this node.
+  #
+  # Returns a [Boolean] indicating whether the role was added.
+  def add_role name
+    if (val = @attributes['role'])
+      # NOTE center + include? is faster than split + include?
+      if %( #{val} ).include? %( #{name} )
+        false
+      else
+        @attributes['role'] = %(#{val} #{name})
+        true
+      end
+    else
       @attributes['role'] = name
       true
-    # NOTE center + include? is faster than split + include?
-    elsif %( #{val} ).include?(%( #{name} ))
-      false
-    else
-      @attributes['role'] = %(#{val} #{name})
-      true
     end
   end
 
-  # Public: A convenience method that removes the given role directly from this node
+  # Public: Removes the given role directly from this node.
   #
-  # Returns a Boolean indicating whether the role was removed.
-  def remove_role(name)
-    if (val = @attributes['role']).nil_or_empty?
-      false
-    elsif (val = val.split).delete name
+  # Returns a [Boolean] indicating whether the role was removed.
+  def remove_role name
+    if (val = @attributes['role']) && ((val = val.split).delete name)
       if val.empty?
-        @attributes.delete('role')
+        @attributes.delete 'role'
       else
         @attributes['role'] = val.join ' '
       end

@@ -42,6 +42,7 @@ Enhancements::
   * allow icontype to be set using icons attribute (#2953)
   * when using a server-side syntax highlighter, highlight content of source block even if source language is not set (#3027)
   * remove the 2-character (i.e., `""`) quote block syntax
+  * don't allow block role to inherit from document attribute; only look for role in block attributes (#1944)
 
 Improvements::
 
