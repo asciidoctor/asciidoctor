@@ -139,9 +139,11 @@ module Asciidoctor
           end
           opts.on_tail('-h', '--help [TOPIC]', 'print a help message',
               'show this usage if TOPIC is not specified or recognized',
+              'show an overview of the AsciiDoc syntax if TOPIC is syntax',
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
+            case topic
             # use `asciidoctor -h manpage | man -l -` to view with man pager
-            if topic == 'manpage'
+            when 'manpage'
               if (manpage_path = ::ENV['ASCIIDOCTOR_MANPAGE_PATH'])
                 if ::File.exist? manpage_path
                   if manpage_path.end_with? '.gz'
@@ -168,6 +170,14 @@ module Asciidoctor
                 else
                   $stdout.puts ::File.read manpage_path
                 end
+              end
+            when 'syntax'
+              # Ruby 2.3 requires the extra brackets around the ::File.join method call
+              if ::File.exist? (syntax_path = (::File.join ROOT_DIR, 'data', 'reference', 'syntax.adoc'))
+                $stdout.puts ::File.read syntax_path
+              else
+                $stderr.puts 'asciidoctor: FAILED: syntax page not found; visit https://asciidoctor.org/docs'
+                return 1
               end
             else
               $stdout.puts opts

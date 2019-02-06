@@ -1,0 +1,274 @@
+= AsciiDoc Syntax
+
+== Paragraphs
+
+A normal paragraph.
+
+  An indented literal
+  paragraph.
+
+== Formatted Text
+
+*bold text*.
+_emphasized text_.
+`monospaced text`.
+
+=== Unconstrained
+
+In short, unconstrained means anywhere, including within a word:
+
+bold ** text with spaces **.
+emphasized le__tt__ers.
+m``o``n``o``spaced letters.
+
+== Document Links
+
+// define link target
+[[id]]
+// link to target id
+<<id,caption>>
+// link to an external file
+link:file#id[caption]
+// cross references between documents
+xref:sibling-document.adoc[caption]
+
+=== URLs
+
+Use normal URL and email address syntax or:
+
+mailto:hello@domain.org[Say hello!]
+link:https://domain.org/page[Go to page]
+link:../path/to/file.txt[Read file]
+link:\\path\to\file.pdf[Download file.pdf]
+
+== Lists
+
+=== Unordered
+
+* level 1
+** level 2
+*** level 3
+**** level 4
+***** level 5
+* level 1
+
+- Edgar Allen Poe
+- Sheri S. Tepper
+- Bill Bryson
+
+=== Ordered
+
+. Step 1
+. Step 2
+.. Step 2a
+.. Step 2b
+. Step 3
+
+=== Checklist
+
+* [*] checked
+* [x] also checked
+* [ ] not checked
+*     normal list item
+
+=== Description
+
+first term:: definition of first term
+second term:: definition of second term
+
+== Document Structure
+
+=== Document Header
+
+// document header must begin at left margin.
+ = My Document's Title
+ Doc Writer <doc.writer@domain.org>
+ v1.0, 2019-01-01
+
+=== Section titles
+
+// section titles must begin at left margin.
+ = Document Title (Level 0)
+ == Level 1 Section Title
+ === Level 2 Section Title
+ ==== Level 3 Section Title
+ ===== Level 4 Section Title
+ ====== Level 5 Section Title
+ == Another Level 1 Section Title
+
+=== Include files
+
+include::basics.adoc[]
+// allow content to be read from a URI using the :allow-uri-read: attribute.
+include::https://domain.org/installation.adoc[]
+
+== Delimited Blocks
+
+////
+Comment
+////
+
+// other types recognized: TIP, WARNING, IMPORTANT, CAUTION.
+[NOTE]
+====
+admonition
+====
+
+[example]
+====
+example
+====
+
+```language
+fenced
+```
+
+[listing]
+----
+listing
+----
+
+[literal]
+....
+literal
+....
+
+--
+open
+--
+
+[pass]
+++++
+passthrough
+++++
+
+[quote,attribution,citation title and information]
+____
+quote
+____
+
+[sidebar]
+****
+sidebar
+****
+
+[source,language,options]
+----
+source
+----
+
+// activate stem support using :stem: attribute.
+[stem]
+++++
+x = y^2
+++++
+
+
+[verse]
+____
+verse
+____
+
+== Tables
+
+.An example table
+[%header,cols=^;2m,width=40%,frame=topbot]
+|===
+|Column 1 |Column 2
+|1        |Item 1
+|2        |Item 2
+|3        |Item 3
+|6        |Three items
+|===
+
+////
+Common attributes:
+
+grid:    none, cols, rows, all
+frame:   topbot, none, sides, all
+options: header, footer
+format:  psv, csv, dsv
+valign:  top, bottom, middle
+width:   1%..100%
+cols:    colspec[,colspec,...]
+
+colspec:    [multiplier*][align][width][style]
+multiplier: 1...
+width:      1... or 1%...100%
+align:      [horiz][.vert]
+            horiz: < (left), ^ (center), > (right)
+            vert:  < (top),  ^ (middle), > (bottom)
+style:      d[efault], e[mphasis], m[onospaced], a[sciidoc],
+            s[trong], l[iteral], v[erse], h[eader]
+cell:       [cellspec]|data
+cellspec:   [span*|+][align][style]
+span:       [colspan][.rowspan]
+            colspan: 1...
+            rowspan: 1...
+////
+
+== Admonition
+
+NOTE: Please note that...
+
+TIP: Pro tip...
+
+IMPORTANT: Don't forget...
+
+WARNING: Watch out for...
+
+CAUTION: Ensure that...
+
+== Images
+
+image::path/to/file.jpg[caption,width,height]
+
+inline image:path/to/file.png[caption,title="title"].
+
+== Videos
+
+video::path/to/file.mp4[width=640,start=60,end=140,options=autoplay]
+
+video::rPQoq7ThGAU[youtube]
+
+video::67480300[vimeo]
+
+== Stem
+
+inline stem:[sqrt(4) = 2]
+
+== Source Code
+
+=== Code block with title, syntax highlighting and callouts
+
+.app.rb
+[source,ruby]
+----
+require 'sinatra' // <1>
+
+get '/hi' do // <2>
+  "Hello World!" // <3>
+end
+----
+<1> Library import
+<2> URL mapping
+<3> HTTP response body
+
+=== Code block sourced from file
+
+[source,ruby]
+----
+include::app.rb[]
+----
+
+== Breaks
+
+// thematic break (aka horizontal rule).
+---
+
+// page break.
+<<<
+
+== Footnotes
+
+footnote:[footnote text]

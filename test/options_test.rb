@@ -28,6 +28,15 @@ context 'Options' do
     assert_includes output, '.TH "ASCIIDOCTOR"'
   end
 
+  test 'should an overview of the AsciiDoc syntax and return error code 0 when help topic is syntax' do
+    exitval, output = redirect_streams do |out, _|
+      [Asciidoctor::Cli::Options.parse!(%w(-h syntax)), out.string]
+    end
+    assert_equal 0, exitval
+    assert_includes output, '= AsciiDoc Syntax'
+    assert_includes output, '== Text Formatting'
+  end
+
   test 'should print message and return error code 1 when manpage is not found' do
     old_manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH']
     begin
