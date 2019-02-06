@@ -1484,7 +1484,7 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        if @context == :listing || (@context == :literal && !(option? 'listparagraph'))
+        if @context == :listing || (@context == :literal && !(@attributes.key? 'listparagraph-option'))
           default_subs = VERBATIM_SUBS
         elsif @context == :verse
           default_subs = NORMAL_SUBS

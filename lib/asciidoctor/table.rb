@@ -158,7 +158,7 @@ class Table < AbstractBlock
       @rows.head = [head]
     end
 
-    if num_body_rows > 0 && attrs.key?('footer-option')
+    if num_body_rows > 0 && (attrs.key? 'footer-option')
       @rows.foot = [@rows.body.pop]
     end
 

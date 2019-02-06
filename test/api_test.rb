@@ -1328,11 +1328,9 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      assert block.set_option('reversed')
-      refute block.set_option('reversed')
-      assert block.option?('reversed')
+      block.set_option('reversed')
+      assert block.option? 'reversed'
       assert_equal '', block.attributes['reversed-option']
-      assert_equal 'reversed', block.attributes['options']
     end
 
     test 'should append option to existing options' do
@@ -1344,8 +1342,9 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      assert block.set_option('reversed')
-      assert_equal 'fancy,reversed', block.attributes['options']
+      block.set_option('reversed')
+      assert block.option? 'fancy'
+      assert block.option? 'reversed'
     end
 
     test 'should not append option if option is already set' do
@@ -1358,7 +1357,19 @@ context 'API' do
 
       block = (document_from_string input).blocks[0]
       refute block.set_option('reversed')
-      assert_equal 'reversed', block.attributes['options']
+      assert_equal '', block.attributes['reversed-option']
+    end
+
+    test 'should return set of option names' do
+      input = <<~'EOS'
+      [%compact%reversed]
+      . three
+      . two
+      . one
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert_equal %w(compact reversed).to_set, block.options
     end
   end
 end

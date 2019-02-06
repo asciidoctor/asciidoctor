@@ -4910,7 +4910,6 @@ context 'Checklists' do
     doc = document_from_string input
     checklist = doc.blocks[0]
     assert checklist.option?('checklist')
-    #assert_equal 'checklist', checklist.attributes['options']
     assert checklist.items[0].attr?('checkbox')
     refute checklist.items[0].attr?('checked')
     assert checklist.items[1].attr?('checkbox')

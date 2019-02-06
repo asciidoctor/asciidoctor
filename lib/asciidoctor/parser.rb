@@ -702,7 +702,7 @@ class Parser
         block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
         # a literal gets special meaning inside of a description list
         # TODO this feels hacky, better way to distinguish from explicit literal block?
-        block.set_option('listparagraph') if in_list
+        block.set_option 'listparagraph' if in_list
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
         lines = read_paragraph_lines reader, skipped == 0 && ListItem === parent, skip_line_comments: true
@@ -1300,9 +1300,7 @@ class Parser
               catalog_inline_anchor $1, $2, list_item, reader
             end
           elsif item_text.start_with?('[ ] ', '[x] ', '[*] ')
-            # FIXME next_block wipes out update to options attribute
-            #list_block.set_option 'checklist' unless list_block.attributes['checklist-option']
-            list_block.attributes['checklist-option'] = ''
+            list_block.set_option 'checklist'
             list_item.attributes['checkbox'] = ''
             list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
             list_item.text = item_text.slice(4, item_text.length)
@@ -2411,7 +2409,6 @@ class Parser
     if implicit_header
       table.has_header_option = true
       attributes['header-option'] = ''
-      attributes['options'] = (attributes.key? 'options') ? %(#{attributes['options']},header) : 'header'
     end
 
     table.partition_header_footer attributes
@@ -2606,7 +2603,6 @@ class Parser
 
         if parsed_attrs.key? :option
           (opts = parsed_attrs[:option]).each {|opt| attributes[%(#{opt}-option)] = '' }
-          attributes['options'] = (existing_opts = attributes['options']).nil_or_empty? ? (opts.join ',') : %(#{existing_opts},#{opts.join ','})
         end
 
         parsed_style

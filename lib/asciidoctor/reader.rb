@@ -687,7 +687,7 @@ class PreprocessorReader < Reader
 
     if path
       @path = path
-      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
+      @includes[Helpers.rootname path] = (attributes.key? 'partial-option') ? nil : true if @process_lines
     else
       @path = '<stdin>'
     end
@@ -1089,7 +1089,7 @@ class PreprocessorReader < Reader
         shift
         # FIXME not accounting for skipped lines in reader line numbering
         if inc_offset
-          parsed_attrs['partial-option'] = true
+          parsed_attrs['partial-option'] = ''
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       elsif inc_tags
@@ -1154,7 +1154,7 @@ class PreprocessorReader < Reader
         end
         shift
         if inc_offset
-          parsed_attrs['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
+          parsed_attrs['partial-option'] = '' unless base_select && wildcard && inc_tags.empty?
           # FIXME not accounting for skipped lines in reader line numbering
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end

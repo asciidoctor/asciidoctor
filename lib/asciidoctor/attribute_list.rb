@@ -158,9 +158,8 @@ class AttributeList
           value = value.delete ' ' if value.include? ' '
           (value.split ',').each {|opt| @attributes[%(#{opt}-option)] = '' unless opt.empty? }
         else
-          @attributes[%(#{value = value.strip}-option)] = ''
+          @attributes[%(#{value}-option)] = '' unless value.empty?
         end
-        @attributes['options'] = value
       else
         if single_quoted_value && @block
           case name

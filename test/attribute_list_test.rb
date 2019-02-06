@@ -207,16 +207,24 @@ context 'AttributeList' do
 
   test 'collect options attribute' do
     attributes = {}
-    line = %(quote, options='opt1,opt2 , opt3')
-    expected = { 1 => 'quote', 'options' => 'opt1,opt2,opt3', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
+    line = %(quote, options='opt1,,opt2 , opt3')
+    expected = { 1 => 'quote', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end
 
   test 'collect opts attribute as options' do
     attributes = {}
-    line = %(quote, opts='opt1,opt2 , opt3')
-    expected = { 1 => 'quote', 'options' => 'opt1,opt2,opt3', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
+    line = %(quote, opts='opt1,,opt2 , opt3')
+    expected = { 1 => 'quote', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'should ignore options attribute if empty' do
+    attributes = {}
+    line = %(quote, opts=)
+    expected = { 1 => 'quote' }
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end

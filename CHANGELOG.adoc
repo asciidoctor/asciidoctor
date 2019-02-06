@@ -57,6 +57,8 @@ Improvements::
   * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
   * rename CSS class of Pygments line numbering table to linenotable (to align with Rouge) (#1040)
   * remove unused Converter#convert_with_options method (#2891)
+  * don't store the options attribute on the block once the options are parsed (#3051)
+  * add an options method on AbstractNode to retrieve the set of option names (#3051)
 
 Bug Fixes::
 

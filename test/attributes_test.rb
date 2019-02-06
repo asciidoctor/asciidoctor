@@ -459,9 +459,9 @@ context 'Attributes' do
     test 'backend attributes defined in document options overrides backend attribute in document' do
       doc = document_from_string(':backend: docbook5', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'backend' => 'html5' })
       assert_equal 'html5', doc.attributes['backend']
-      assert doc.attributes.has_key? 'backend-html5'
+      assert doc.attributes.key? 'backend-html5'
       assert_equal 'html', doc.attributes['basebackend']
-      assert doc.attributes.has_key? 'basebackend-html'
+      assert doc.attributes.key? 'basebackend-html'
     end
 
     test 'can only access a positional attribute from the attributes hash' do
@@ -1231,7 +1231,7 @@ context 'Attributes' do
 
       doc = document_from_string input
       para = doc.blocks.first
-      refute para.attributes.has_key?('id')
+      refute para.attributes.key?('id')
     end
 
     test 'role? returns true if role is assigned' do
@@ -1347,8 +1347,8 @@ context 'Attributes' do
       assert_equal :literal, para.context
       assert_equal 'first', para.attributes['id']
       assert_equal 'lead', para.attributes['role']
-      assert_equal 'step', para.attributes['options']
-      assert para.attributes.has_key?('step-option')
+      assert para.attributes.key?('step-option')
+      refute para.attributes.key?('options')
     end
 
     test 'id, role and options attributes can be specified using shorthand syntax on block style using multiple block attribute lines' do
@@ -1364,8 +1364,8 @@ context 'Attributes' do
       assert_equal :literal, para.context
       assert_equal 'first', para.attributes['id']
       assert_equal 'lead', para.attributes['role']
-      assert_equal 'step', para.attributes['options']
-      assert para.attributes.has_key?('step-option')
+      assert para.attributes.key?('step-option')
+      refute para.attributes.key?('options')
     end
 
     test 'multiple roles and options can be specified in block style using shorthand syntax' do
@@ -1377,9 +1377,9 @@ context 'Attributes' do
       doc = document_from_string input
       para = doc.blocks.first
       assert_equal 'role1 role2', para.attributes['role']
-      assert_equal 'option1,option2', para.attributes['options']
-      assert para.attributes.has_key?('option1-option')
-      assert para.attributes.has_key?('option2-option')
+      assert para.attributes.key?('option1-option')
+      assert para.attributes.key?('option2-option')
+      refute para.attributes.key?('options')
     end
 
     test 'options specified using shorthand syntax on block style across multiple lines should be additive' do
@@ -1391,9 +1391,9 @@ context 'Attributes' do
 
       doc = document_from_string input
       para = doc.blocks.first
-      assert_equal 'option1,option2', para.attributes['options']
-      assert para.attributes.has_key?('option1-option')
-      assert para.attributes.has_key?('option2-option')
+      assert para.attributes.key?('option1-option')
+      assert para.attributes.key?('option2-option')
+      refute para.attributes.key?('options')
     end
 
     test 'roles specified using shorthand syntax on block style across multiple lines should be additive' do
@@ -1531,8 +1531,8 @@ context 'Attributes' do
 
       doc = document_from_string input
       list = doc.blocks.first
-      assert_equal 'interactive', list.attributes['options']
-      assert list.attributes.has_key?('interactive-option')
+      assert list.attributes.key? 'interactive-option'
+      refute list.attributes.key? 'options'
     end
 
     test 'id and role attributes can be specified on section style using shorthand syntax' do
