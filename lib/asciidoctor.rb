@@ -1560,9 +1560,8 @@ module Asciidoctor
 
   end
 
-  if RUBY_ENGINE == 'opal'
-    require_relative 'asciidoctor/timings'
-  else
+  unless RUBY_ENGINE == 'opal'
+    autoload :SyntaxHighlighter, %(#{LIB_DIR}/asciidoctor/syntax_highlighter)
     autoload :Timings, %(#{LIB_DIR}/asciidoctor/timings)
   end
 end
@@ -1593,9 +1592,12 @@ require_relative 'asciidoctor/path_resolver'
 require_relative 'asciidoctor/reader'
 require_relative 'asciidoctor/section'
 require_relative 'asciidoctor/stylesheets'
-require_relative 'asciidoctor/syntax_highlighter'
 require_relative 'asciidoctor/table'
 require_relative 'asciidoctor/writer'
 
-# this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
-require 'asciidoctor/js/postscript' if RUBY_ENGINE == 'opal'
+if RUBY_ENGINE == 'opal'
+  require_relative 'asciidoctor/syntax_highlighter'
+  require_relative 'asciidoctor/timings'
+  # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
+  require 'asciidoctor/js/postscript'
+end
