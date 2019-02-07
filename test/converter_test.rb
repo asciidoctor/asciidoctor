@@ -1,5 +1,5 @@
 require_relative 'test_helper'
-require 'tilt' unless defined? ::Tilt::VERSION
+require 'tilt' unless defined? ::Tilt.new
 
 context 'Converter' do
   context 'View options' do
