@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'test_helper'
 
 class ReaderTest < Minitest::Test
@@ -23,7 +24,7 @@ third line
 
       test 'should remove UTF-8 BOM from first line of String data' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = "\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}".force_encoding start_encoding
+          data = String.new %(\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -34,7 +35,7 @@ third line
       test 'should remove UTF-8 BOM from first line of Array data' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
           data = SAMPLE_DATA.dup
-          data[0] = "\xef\xbb\xbf#{data.first}".force_encoding start_encoding
+          data[0] = String.new %(\xef\xbb\xbf#{data.first}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 asciidoctor = File.absolute_path '../lib/asciidoctor.rb', __dir__
 if File.exist? asciidoctor

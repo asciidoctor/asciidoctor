@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'test_helper'
 
 context 'Attributes' do
@@ -201,7 +202,7 @@ context 'Attributes' do
       {name}
       EOS
       # see https://github.com/oracle/truffleruby/issues/1563
-      input = input.force_encoding ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
+      input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 6 }
       assert_equal expected, result
@@ -216,7 +217,7 @@ context 'Attributes' do
       {name}
       EOS
       # see https://github.com/oracle/truffleruby/issues/1563
-      input = input.force_encoding ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
+      input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
 
       result = convert_inline_string input, attributes: { 'max-attribute-value-size' => 8 }
       assert_equal expected, result

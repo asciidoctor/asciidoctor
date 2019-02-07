@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # Public: A pluggable adapter for integrating a syntax (aka code) highlighter into AsciiDoc processing.
 #
@@ -49,7 +50,7 @@ module SyntaxHighlighter
   # node   - The source Block to syntax highlight.
   # source - The raw source text String of this source block (after preprocessing).
   # lang   - The source language String specified on this block (e.g., ruby).
-  # opts   - A Hash of options that control syntax highlighting:
+  # opts   - A Hash of options that configure the syntax highlighting:
   #          :callouts - A Hash of callouts extracted from the source, indexed by line number (1-based) (optional).
   #          :css_mode - The Symbol CSS mode (:class or :inline).
   #          :highlight_lines - A 1-based Array of Integer line numbers to highlight (aka emphasize) (optional).
@@ -74,9 +75,8 @@ module SyntaxHighlighter
     raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method)
   end
 
-  # Public: Indicates whether this syntax highlighter wants to write a stylesheet to disk.
-  #
-  # Only called if both the linkcss and copycss attributes are set on the document.
+  # Public: Indicates whether this syntax highlighter wants to write a stylesheet to disk. Only called if both the
+  # linkcss and copycss attributes are set on the document.
   #
   # doc - The Document in which this syntax highlighter is being used.
   #

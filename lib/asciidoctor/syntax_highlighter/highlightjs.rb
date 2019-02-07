@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   register_for 'highlightjs', 'highlight.js'

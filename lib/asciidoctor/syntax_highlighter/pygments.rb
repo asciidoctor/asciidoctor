@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   register_for 'pygments'

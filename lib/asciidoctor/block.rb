@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # Public: Methods for managing blocks of Asciidoc content in a section.
 #

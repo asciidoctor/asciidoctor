@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative 'test_helper'
 
 SAMPLE_MANPAGE_HEADER = <<'EOS'.chomp

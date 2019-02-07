@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 def prepare_test_env
   # rather than hardcoding gc settings in test task,
   # could use https://gist.github.com/benders/788695
