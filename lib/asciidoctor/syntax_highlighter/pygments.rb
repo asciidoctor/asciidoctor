@@ -27,7 +27,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     if (highlight_lines = opts[:highlight_lines])
       highlight_opts[:hl_lines] = highlight_lines.join ' '
     end
-    if (linenos = opts[:line_numbers]) && (highlight_opts[:linenostart] = opts[:start_line_number]) && (highlight_opts[:linenos] = linenos) == :table
+    if (linenos = opts[:number_lines]) && (highlight_opts[:linenostart] = opts[:start_line_number]) && (highlight_opts[:linenos] = linenos) == :table
       if (highlighted = lexer.highlight source, options: highlight_opts)
         highlighted = highlighted.sub StyledLinenoColumnStartTagsRx, LinenoColumnStartTagsCs if noclasses
         highlighted = highlighted.sub WrapperTagRx, PreTagCs

@@ -52,9 +52,9 @@ module SyntaxHighlighter
   # opts   - A Hash of options that control syntax highlighting:
   #          :callouts - A Hash of callouts extracted from the source, indexed by line number (1-based) (optional).
   #          :css_mode - The Symbol CSS mode (:class or :inline).
-  #          :highlight_lines - A 1-based Array of Integer line numbers to highlight (i.e., tint) (optional).
-  #          :line_numbers - A Symbol indicating whether line numbers are enabled (:table or :inline) (optional).
-  #          :start_line_number - The Integer line number (1-based) to start with when numbering lines (default: 1).
+  #          :highlight_lines - A 1-based Array of Integer line numbers to highlight (aka emphasize) (optional).
+  #          :number_lines - A Symbol indicating whether lines should be numbered (:table or :inline) (optional).
+  #          :start_line_number - The starting Integer (1-based) line number (optional, default: 1).
   #          :style - The String style (aka theme) to use for colorizing the code (optional).
   #
   # Returns the highlighted source String or a tuple of the highlighted source String and an Integer line offset.

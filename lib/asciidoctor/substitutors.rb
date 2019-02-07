@@ -1392,7 +1392,7 @@ module Substitutors
       callouts: callout_marks,
       css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
       highlight_lines: highlight_lines,
-      line_numbers: linenums_mode,
+      number_lines: linenums_mode,
       start_line_number: start_line_number,
       style: doc_attrs[%(#{syntax_hl_name}-style)]
 

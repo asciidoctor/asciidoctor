@@ -17,7 +17,7 @@ class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
     # NOTE CodeRay::Duo gracefully falls back to no highlighting if lang isn't recognized
     highlighted = ::CodeRay::Duo[lang ? lang.to_sym : :text, :html,
       css: css_mode,
-      line_numbers: (line_numbers = opts[:line_numbers]),
+      line_numbers: (line_numbers = opts[:number_lines]),
       line_number_start: opts[:start_line_number],
       line_number_anchors: false,
       highlight_lines: opts[:highlight_lines],

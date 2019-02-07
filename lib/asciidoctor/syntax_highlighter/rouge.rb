@@ -25,7 +25,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     if (highlight_lines = opts[:highlight_lines])
       formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
     end
-    if opts[:line_numbers]
+    if opts[:number_lines]
       formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
       if opts[:callouts]
         return [(highlighted = formatter.format lexer.lex source, lexer_opts), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
