@@ -203,7 +203,7 @@ class Parser
       if (name_section_level = is_next_line_section? reader, {})
         if name_section_level == 1
           name_section = initialize_section reader, document, {}
-          name_section_buffer = (reader.read_lines_until break_on_blank_lines: true, skip_line_comments: true).map(&:lstrip).join ' '
+          name_section_buffer = (reader.read_lines_until break_on_blank_lines: true, skip_line_comments: true).map {|l| l.lstrip }.join ' '
           if ManpageNamePurposeRx =~ name_section_buffer
             doc_attrs['manname-title'] ||= name_section.title
             doc_attrs['manname-id'] = name_section.id if name_section.id
