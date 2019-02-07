@@ -274,7 +274,6 @@ module Asciidoctor
     '====' => [:example, ['admonition'].to_set],
     '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
-    '""'   => [:quote, ['verse'].to_set],
     '++++' => [:pass, ['stem', 'latexmath', 'asciimath'].to_set],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],

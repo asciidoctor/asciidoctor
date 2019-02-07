@@ -41,6 +41,7 @@ Enhancements::
   * use value of prettify-theme attribute as is if it starts with http:// or https:// (#3020)
   * allow icontype to be set using icons attribute (#2953)
   * when using a server-side syntax highlighter, highlight content of source block even if source language is not set (#3027)
+  * remove the 2-character (i.e., `""`) quote block syntax
 
 Improvements::
 

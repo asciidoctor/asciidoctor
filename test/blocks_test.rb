@@ -440,20 +440,6 @@ ____
       assert_equal 'Famous Person', author.text.strip
     end
 
-    test 'quote block using air quotes with no attribution' do
-      input = <<-EOS
-""
-A famous quote.
-""
-      EOS
-      output = convert_string input
-      assert_css '.quoteblock', output, 1
-      assert_css '.quoteblock > blockquote', output, 1
-      assert_css '.quoteblock > blockquote > .paragraph > p', output, 1
-      assert_css '.quoteblock > .attribution', output, 0
-      assert_xpath '//*[@class="quoteblock"]//p[text()="A famous quote."]', output, 1
-    end
-
     test 'markdown-style quote block with single paragraph and no attribution' do
       input = <<-EOS
 > A famous quote.

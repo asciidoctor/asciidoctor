@@ -923,12 +923,11 @@ class Parser
       tl = 2
     else
       # catches all other delimited blocks, including fenced code
-      if line_len <= 4
+      if line_len < 5
         tip = line
         tl = line_len
       else
-        tip = line.slice 0, 4
-        tl = 4
+        tip = line.slice 0, (tl = 4)
       end
 
       # special case for fenced code blocks
