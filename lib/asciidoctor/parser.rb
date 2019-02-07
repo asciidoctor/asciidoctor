@@ -26,8 +26,8 @@ class Parser
 
   BlockMatchData = Struct.new :context, :masq, :tip, :terminator
 
-  # Regexp for replacing tab character
-  TabRx = /\t/
+  # String for matching tab character
+  TAB = ?\t
 
   # Regexp for leading tab indentation
   TabIndentRx = /^\t+/
@@ -2684,19 +2684,26 @@ class Parser
           end
           # keeps track of how many spaces were added to adjust offset in match data
           spaces_added = 0
-          # NOTE Opal has to patch this use of gsub!
-          line.gsub! TabRx do
-            # calculate how many spaces this tab represents, then replace tab with spaces
-            if (offset = $`.length + spaces_added) % tab_size == 0
-              spaces_added += (tab_size - 1)
-              full_tab_space
-            else
-              unless (spaces = tab_size - offset % tab_size) == 1
-                spaces_added += (spaces - 1)
+          idx = -1
+          result = ''
+          line.each_char do |c|
+            idx += 1
+            if c == TAB
+              # calculate how many spaces this tab represents, then replace tab with spaces
+              if (offset = idx + spaces_added) % tab_size == 0
+                spaces_added += (tab_size - 1)
+                result = result + full_tab_space
+              else
+                unless (spaces = tab_size - offset % tab_size) == 1
+                  spaces_added += (spaces - 1)
+                end
+                result = result + (' ' * spaces)
               end
-              ' ' * spaces
+            else
+              result = result + c
             end
           end
+          result
         else
           line
         end
