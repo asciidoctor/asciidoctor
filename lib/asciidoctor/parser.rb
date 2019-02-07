@@ -1017,10 +1017,11 @@ class Parser
     end
 
     if content_model == :verbatim
+      tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i
       if (indent = attributes['indent'])
-        adjust_indentation! lines, indent, (attributes['tabsize'] || parent.document.attributes['tabsize'])
-      elsif (tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i) > 0
-        adjust_indentation! lines, nil, tab_size
+        adjust_indentation! lines, indent.to_i, tab_size
+      elsif tab_size > 0
+        adjust_indentation! lines, -1, tab_size
       end
     elsif content_model == :skip
       # QUESTION should we still invoke process method if extension is specified?
@@ -2639,17 +2640,16 @@ class Parser
     end
   end
 
-  # Remove the block indentation (the leading whitespace equal to the amount of
-  # leading whitespace of the least indented line), then replace tabs with
-  # spaces (using proper tab expansion logic) and, finally, indent the lines by
-  # the amount specified.
+  # Remove the block indentation (the amount of whitespace of the least indented line), replace tabs with spaces (using
+  # proper tab expansion logic) and, finally, indent the lines by the margin width. Modifies the input Array directly.
   #
-  # This method preserves the relative indentation of the lines.
+  # This method preserves the significant indentation (that exceeding the block indent) on each line.
   #
-  # lines  - the Array of String lines to process (no trailing newlines)
-  # indent - the integer number of spaces to add to the beginning
-  #          of each line; if this value is nil, the existing
-  #          space is preserved (optional, default: 0)
+  # lines       - The Array of String lines to process (no trailing newlines)
+  # indent_size - The Integer number of spaces to readd to the start of non-empty lines after removing the indentation.
+  #               If this value is < 0, the existing indentation is preserved (optional, default: 0)
+  # tab_size    - the Integer number of spaces to use in place of a tab. A value of <= 0 disables the replacement
+  #               (optional, default: 0)
   #
   # Examples
   #
@@ -2659,37 +2659,35 @@ class Parser
   #       end
   #   EOS
   #
-  #   source.split "\n"
+  #   source.split ?\n
   #   # => ["    def names", "      @names.split", "    end"]
   #
-  #   puts Parser.adjust_indentation!(source.split "\n").join "\n"
+  #   puts (Parser.adjust_indentation! source.split ?\n).join ?\n
   #   # => def names
   #   # =>   @names.split
   #   # => end
   #
   # returns Nothing
-  #--
-  # QUESTION should indent be called margin?
-  def self.adjust_indentation! lines, indent = 0, tab_size = 0
+  def self.adjust_indentation! lines, indent_size = 0, tab_size = 0
     return if lines.empty?
 
-    # expand tabs if a tab is detected unless tab_size is nil
-    if (tab_size = tab_size.to_i) > 0 && (lines.join.include? TAB)
-    #if (tab_size = tab_size.to_i) > 0 && (lines.index {|line| line.include? TAB })
+    # expand tabs if a tab character is detected and tab_size > 0
+    if tab_size > 0 && lines.any? {|line| line.include? TAB }
       full_tab_space = ' ' * tab_size
       lines.map! do |line|
-        next line if line.empty?
-
-        # NOTE Opal has to patch this use of sub!
-        line.sub!(TabIndentRx) { full_tab_space * $&.length } if line.start_with? TAB
-
-        if line.include? TAB
+        if line.empty?
+          line
+        elsif (tab_idx = line.index TAB)
+          if tab_idx == 0
+            line = line.sub(TabIndentRx) { full_tab_space * $&.length }
+            next line unless line.include? TAB
+          end
           # keeps track of how many spaces were added to adjust offset in match data
           spaces_added = 0
           # NOTE Opal has to patch this use of gsub!
           line.gsub! TabRx do
             # calculate how many spaces this tab represents, then replace tab with spaces
-            if (offset = ($~.begin 0) + spaces_added) % tab_size == 0
+            if (offset = $`.length + spaces_added) % tab_size == 0
               spaces_added += (tab_size - 1)
               full_tab_space
             else
@@ -2705,36 +2703,30 @@ class Parser
       end
     end
 
-    # skip adjustment of gutter if indent is -1
-    return unless indent && (indent = indent.to_i) > -1
+    # skip block indent adjustment if indent_size is < 0
+    return if indent_size < 0
 
-    # determine width of gutter
-    gutter_width = nil
+    # determine block indent (assumes no whitespace-only lines are present)
+    block_indent = nil
     lines.each do |line|
       next if line.empty?
-      # NOTE this logic assumes no whitespace-only lines
       if (line_indent = line.length - line.lstrip.length) == 0
-        gutter_width = nil
+        block_indent = nil
         break
-      else
-        unless gutter_width && line_indent > gutter_width
-          gutter_width = line_indent
-        end
       end
+      block_indent = line_indent unless block_indent && block_indent < line_indent
     end
 
-    # remove gutter then apply new indent if specified
-    # NOTE gutter_width is > 0 if not nil
-    if indent == 0
-      if gutter_width
-        lines.map! {|line| line.empty? ? line : (line.slice gutter_width, line.length) }
-      end
+    # remove block indent then apply indent_size if specified
+    # NOTE block_indent is > 0 if not nil
+    if indent_size == 0
+      lines.map! {|line| line.empty? ? line : (line.slice block_indent, line.length) } if block_indent
     else
-      padding = ' ' * indent
-      if gutter_width
-        lines.map! {|line| line.empty? ? line : padding + (line.slice gutter_width, line.length) }
+      new_block_indent = ' ' * indent_size
+      if block_indent
+        lines.map! {|line| line.empty? ? line : new_block_indent + (line.slice block_indent, line.length) }
       else
-        lines.map! {|line| line.empty? ? line : padding + line }
+        lines.map! {|line| line.empty? ? line : new_block_indent + line }
       end
     end
 

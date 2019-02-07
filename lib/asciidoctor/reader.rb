@@ -793,9 +793,7 @@ class PreprocessorReader < Reader
       result.pop while (last = result[-1]) && last.empty?
     end
 
-    if opts[:indent]
-      Parser.adjust_indentation! result, opts[:indent], (@document.attr 'tabsize')
-    end
+    Parser.adjust_indentation! result, opts[:indent].to_i, (@document.attr 'tabsize').to_i if opts[:indent]
 
     result
   end
