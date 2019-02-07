@@ -203,9 +203,8 @@ module Converter
       registry[backend]
     end
 
-    # Public: Create a new Converter object that can be used to convert the {AbstractNode} (typically a {Document}) to
-    # the format suggested by the backend. This method accepts an optional Hash of options that are passed on to the
-    # converter's constructor.
+    # Public: Create a new Converter object that can be used to convert {AbstractNode}s to the format associated with
+    # the backend. This method accepts an optional Hash of options that are passed to the converter's constructor.
     #
     # If a custom Converter is found to convert the specified backend, it's instantiated (if necessary) and returned
     # immediately. If a custom Converter is not found, an attempt is made to find a built-in converter. If the
@@ -220,13 +219,16 @@ module Converter
     #
     # Returns the [Converter] instance.
     def create backend, opts = {}
+      template_dirs = opts[:template_dirs]
       if (converter = self.for backend)
         converter = converter.new backend, opts if ::Class === converter
-        if opts[:template_dirs] && BackendTraits === converter && converter.supports_templates?
-          CompositeConverter.new backend, (TemplateConverter.new backend, opts[:template_dirs], opts), converter, backend_traits_source: converter
+        if template_dirs && BackendTraits === converter && converter.supports_templates?
+          CompositeConverter.new backend, (TemplateConverter.new backend, template_dirs, opts), converter, backend_traits_source: converter
         else
           converter
         end
+      elsif template_dirs
+        TemplateConverter.new backend, template_dirs, opts
       end
     end
 
