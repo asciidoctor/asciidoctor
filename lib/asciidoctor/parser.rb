@@ -2680,15 +2680,19 @@ class Parser
           line
         elsif (tab_idx = line.index TAB)
           if tab_idx == 0
-            line = line.sub(TabIndentRx) { full_tab_space * $&.length }
+            leading_tabs = 0
+            line.each_byte do |b|
+              break unless b == 9
+              leading_tabs += 1
+            end
+            line = %(#{full_tab_space * leading_tabs}#{line.slice leading_tabs, line.length})
             next line unless line.include? TAB
           end
           # keeps track of how many spaces were added to adjust offset in match data
           spaces_added = 0
-          idx = -1
+          idx = 0
           result = ''
           line.each_char do |c|
-            idx += 1
             if c == TAB
               # calculate how many spaces this tab represents, then replace tab with spaces
               if (offset = idx + spaces_added) % tab_size == 0
@@ -2703,6 +2707,7 @@ class Parser
             else
               result = result + c
             end
+            idx += 1
           end
           result
         else

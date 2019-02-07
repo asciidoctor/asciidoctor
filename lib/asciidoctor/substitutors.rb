@@ -330,58 +330,32 @@ module Substitutors
     passes.clear if outer
   end
 
-  if RUBY_ENGINE == 'opal'
-    def sub_quotes text
-      if QuotedTextSniffRx[compat = @document.compat_mode].match? text
-        QUOTE_SUBS[compat].each do |type, scope, pattern|
-          text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
-        end
+  # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
+  #
+  # text - The String text to process
+  #
+  # returns The converted [String] text
+  def sub_quotes text
+    if QuotedTextSniffRx[compat = @document.compat_mode].match? text
+      QUOTE_SUBS[compat].each do |type, scope, pattern|
+        text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
       end
-      text
     end
+    text
+  end
 
-    def sub_replacements text
-      if ReplaceableTextRx.match? text
-        REPLACEMENTS.each do |pattern, replacement, restore|
-          text = text.gsub(pattern) { do_replacement $~, replacement, restore }
-        end
+  # Public: Substitute replacement characters (e.g., copyright, trademark, etc.)
+  #
+  # text - The String text to process
+  #
+  # returns The [String] text with the replacement characters substituted
+  def sub_replacements text
+    if ReplaceableTextRx.match? text
+      REPLACEMENTS.each do |pattern, replacement, restore|
+        text = text.gsub(pattern) { do_replacement $~, replacement, restore }
       end
-      text
     end
-  else
-    # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc)
-    #
-    # text - The String text to process
-    #
-    # returns The converted String text
-    def sub_quotes text
-      if QuotedTextSniffRx[compat = @document.compat_mode].match? text
-        # NOTE interpolation is faster than String#dup
-        text = %(#{text})
-        QUOTE_SUBS[compat].each do |type, scope, pattern|
-          # NOTE using gsub! here as an MRI Ruby optimization
-          text.gsub!(pattern) { convert_quoted_text $~, type, scope }
-        end
-      end
-      text
-    end
-
-    # Public: Substitute replacement characters (e.g., copyright, trademark, etc)
-    #
-    # text - The String text to process
-    #
-    # returns The String text with the replacement characters substituted
-    def sub_replacements text
-      if ReplaceableTextRx.match? text
-        # NOTE interpolation is faster than String#dup
-        text = %(#{text})
-        REPLACEMENTS.each do |pattern, replacement, restore|
-          # NOTE Using gsub! as optimization
-          text.gsub!(pattern) { do_replacement $~, replacement, restore }
-        end
-      end
-      text
-    end
+    text
   end
 
   # Public: Substitute special characters (i.e., encode XML)
