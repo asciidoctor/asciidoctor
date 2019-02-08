@@ -530,11 +530,13 @@ class Reader
 
   # Internal: Save the state of the reader at cursor
   def save
-    accum = {}
-    instance_variables.each do |name|
-      accum[name] = ::Array === (val = instance_variable_get name) ? val.dup : val unless name == :@saved || name == :@source_lines
+    @saved = {}.tap do |accum|
+      instance_variables.each do |name|
+        unless name == :@saved || name == :@source_lines
+          accum[name] = ::Array === (val = instance_variable_get name) ? val.dup : val 
+        end
+      end
     end
-    @saved = accum
     nil
   end
 
