@@ -295,8 +295,8 @@ module Converter
 
       def unregister_all
         @@mutex.synchronize do
-          @@catch_all = nil
           @@registry = @@registry.select {|backend| PROVIDED[backend] }
+          @@catch_all = nil
         end
       end
 
