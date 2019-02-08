@@ -2599,16 +2599,16 @@ class Parser
       }
 
       raw_style.each_char do |c|
-        if c == '.' || c == '#' || c == '%'
+        case c
+        when '.'
           save_current.call
-          case c
-          when '.'
-            type = :role
-          when '#'
-            type = :id
-          when '%'
-            type = :option
-          end
+          type = :role
+        when '#'
+          save_current.call
+          type = :id
+        when '%'
+          save_current.call
+          type = :option
         else
           collector << c
         end
