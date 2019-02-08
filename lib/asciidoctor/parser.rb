@@ -2564,80 +2564,85 @@ class Parser
   #         "role" => "lead", "options" => "fragment", "fragment-option" => '' }
   #
   # Returns the String style parsed from the first positional attribute
-  def self.parse_style_attribute(attributes, reader = nil)
+  def self.parse_style_attribute attributes, reader = nil
     # NOTE spaces are not allowed in shorthand, so if we detect one, this ain't no shorthand
     if (raw_style = attributes[1]) && !raw_style.include?(' ') && Compliance.shorthand_property_syntax
-      type, collector, parsed = :style, [], {}
-      # QUESTION should this be a private method? (though, it's never called if shorthand isn't used)
-      save_current = proc {
-        if collector.empty?
-          unless type == :style
-            if reader
-              logger.warn message_with_context %(invalid empty #{type} detected in style attribute), source_location: reader.cursor_at_prev_line
-            else
-              logger.warn %(invalid empty #{type} detected in style attribute)
-            end
-          end
-        else
-          case type
-          when :role, :option
-            (parsed[type] ||= []) << collector.join
-          when :id
-            if parsed.key? :id
-              if reader
-                logger.warn message_with_context 'multiple ids detected in style attribute', source_location: reader.cursor_at_prev_line
-              else
-                logger.warn 'multiple ids detected in style attribute'
-              end
-            end
-            parsed[type] = collector.join
-          else
-            parsed[type] = collector.join
-          end
-          collector = []
-        end
-      }
+      name = nil
+      accum = ''
+      parsed_attrs = {}
 
       raw_style.each_char do |c|
         case c
         when '.'
-          save_current.call
-          type = :role
+          save_buffered_attribute parsed_attrs, name, accum, reader
+          accum = ''
+          name = :role
         when '#'
-          save_current.call
-          type = :id
+          save_buffered_attribute parsed_attrs, name, accum, reader
+          accum = ''
+          name = :id
         when '%'
-          save_current.call
-          type = :option
+          save_buffered_attribute parsed_attrs, name, accum, reader
+          accum = ''
+          name = :option
         else
-          collector << c
+          accum = accum + c
         end
       end
 
       # small optimization if no shorthand is found
-      if type == :style
-        attributes['style'] = raw_style
-      else
-        save_current.call
+      if name
+        save_buffered_attribute parsed_attrs, name, accum, reader
 
-        parsed_style = attributes['style'] = parsed[:style] if parsed.key? :style
-
-        attributes['id'] = parsed[:id] if parsed.key? :id
-
-        if parsed.key? :role
-          attributes['role'] = (existing_role = attributes['role']).nil_or_empty? ? (parsed[:role].join ' ') : %(#{existing_role} #{parsed[:role].join ' '})
+        if (parsed_style = parsed_attrs[:style])
+          attributes['style'] = parsed_style
         end
 
-        if parsed.key? :option
-          (opts = parsed[:option]).each {|opt| attributes[%(#{opt}-option)] = '' }
+        attributes['id'] = parsed_attrs[:id] if parsed_attrs.key? :id
+
+        if parsed_attrs.key? :role
+          attributes['role'] = (existing_role = attributes['role']).nil_or_empty? ? (parsed_attrs[:role].join ' ') : %(#{existing_role} #{parsed_attrs[:role].join ' '})
+        end
+
+        if parsed_attrs.key? :option
+          (opts = parsed_attrs[:option]).each {|opt| attributes[%(#{opt}-option)] = '' }
           attributes['options'] = (existing_opts = attributes['options']).nil_or_empty? ? (opts.join ',') : %(#{existing_opts},#{opts.join ','})
         end
 
         parsed_style
+      else
+        attributes['style'] = raw_style
       end
     else
       attributes['style'] = raw_style
     end
+  end
+
+  # Internal: Save the collected attribute (:id, :option, :role, or nil for :style) in the attribute Hash.
+  def self.save_buffered_attribute attrs, name, value, reader
+    if name
+      if value.empty?
+        if reader
+          logger.warn message_with_context %(invalid empty #{name} detected in style attribute), source_location: reader.cursor_at_prev_line
+        else
+          logger.warn %(invalid empty #{name} detected in style attribute)
+        end
+      elsif name == :id
+        if attrs.key? :id
+          if reader
+            logger.warn message_with_context 'multiple ids detected in style attribute', source_location: reader.cursor_at_prev_line
+          else
+            logger.warn 'multiple ids detected in style attribute'
+          end
+        end
+        attrs[name] = value
+      else
+        (attrs[name] ||= []) << value
+      end
+    else
+      attrs[:style] = value unless value.empty?
+    end
+    nil
   end
 
   # Remove the block indentation (the amount of whitespace of the least indented line), replace tabs with spaces (using
