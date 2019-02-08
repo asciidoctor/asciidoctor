@@ -153,6 +153,12 @@ context 'Converter' do
       assert_xpath '//aside/header/following-sibling::p[text()="Sidebar content"]', output, 1
     end
 
+    test 'should create template converter even when a converter is not registered for the specified backend' do
+      input = 'paragraph content'
+      output = convert_string_to_embedded input, backend: :unknown, template_dir: (fixture_path 'custom-backends/haml/html5-tweaks'), template_cache: false
+      assert_equal '<p>paragraph content</p>', output
+    end
+
     test 'should use built-in global cache to cache templates' do
       begin
         Asciidoctor::Converter::TemplateConverter.clear_caches if defined? Asciidoctor::Converter::TemplateConverter
