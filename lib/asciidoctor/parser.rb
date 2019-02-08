@@ -151,7 +151,7 @@ class Parser
         doc_id = document.id
       end
       if (doc_role = block_attrs['role'])
-        doc_attrs['docrole'] = doc_role
+        doc_attrs['role'] = doc_role
       end
       if (doc_reftext = block_attrs['reftext'])
         doc_attrs['reftext'] = doc_reftext

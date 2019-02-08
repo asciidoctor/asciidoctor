@@ -1245,6 +1245,18 @@ context 'Attributes' do
       assert p.role?
     end
 
+    test 'role? does not return true if role attribute is set on document' do
+      input = <<~'EOS'
+      :role: lead
+
+      A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      refute p.role?
+    end
+
     test 'role? can check for exact role name match' do
       input = <<~'EOS'
       [role="lead"]
@@ -1270,6 +1282,18 @@ context 'Attributes' do
       assert p.has_role?('lead')
     end
 
+    test 'has_role? does not look for role defined as document attribute' do
+      input = <<~'EOS'
+      :role: lead abstract
+
+      A paragraph
+      EOS
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      refute p.has_role?('lead')
+    end
+
     test 'roles returns array of role names' do
       input = <<~'EOS'
       [role="story lead"]
@@ -1283,6 +1307,18 @@ context 'Attributes' do
 
     test 'roles returns empty array if role attribute is not set' do
       input = 'a paragraph'
+
+      doc = document_from_string input
+      p = doc.blocks.first
+      assert_equal [], p.roles
+    end
+
+    test 'roles does not return value of roles document attribute' do
+      input = <<~'EOS'
+      :role: story lead
+
+      A paragraph
+      EOS
 
       doc = document_from_string input
       p = doc.blocks.first

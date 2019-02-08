@@ -115,7 +115,7 @@ class Converter::Html5Converter < Converter::Base
     else
       classes = [node.doctype]
     end
-    classes << (node.attr 'docrole') if node.attr? 'docrole'
+    classes << node.role if node.role?
     body_attrs << %(class="#{classes.join ' '}")
     body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
     result << %(<body #{body_attrs.join ' '}>)
