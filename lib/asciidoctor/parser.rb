@@ -156,7 +156,7 @@ class Parser
       if (doc_reftext = block_attrs['reftext'])
         doc_attrs['reftext'] = doc_reftext
       end
-      block_attrs = {}
+      block_attrs.clear
       parse_header_metadata reader, document
       document.register :refs, [doc_id, document] if doc_id
     end
@@ -401,7 +401,7 @@ class Parser
           end
 
           (intro || section).blocks << new_block
-          attributes = {}
+          attributes.clear
         #else
         #  # don't clear attributes if we don't find a block because they may
         #  # be trailing attributes that didn't get associated with a block
