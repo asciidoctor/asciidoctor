@@ -44,6 +44,7 @@ Enhancements::
   * remove the 2-character (i.e., `""`) quote block syntax
   * don't allow block role to inherit from document attribute; only look for role in block attributes (#1944)
   * split out functionality of -w CLI flag (script warnings) from -v CLI flag (verbose logging) (#3030)
+  * log possible invalid references at debug level (#3030)
 
 Improvements::
 
@@ -58,12 +59,8 @@ Improvements::
   * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
   * rename CSS class of Pygments line numbering table to linenotable (to align with Rouge) (#1040)
   * remove unused Converter#convert_with_options method (#2891)
-<<<<<<< HEAD
   * don't store the options attribute on the block once the options are parsed (#3051)
   * add an options method on AbstractNode to retrieve the set of option names (#3051)
-=======
-  * log possible invalid references at debug level (#3030)
->>>>>>> d2a3e87d... resolves #3030 separate the -v and -w CLI flags
 
 Bug Fixes::
 
