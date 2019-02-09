@@ -320,6 +320,7 @@ class Document < AbstractBlock
       else
         @safe = (SafeMode.value_for_name safe_mode) rescue SafeMode::SECURE
       end
+      input_mtime = options.delete :input_mtime
       @compat_mode = attr_overrides.key? 'compat-mode'
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
@@ -493,7 +494,7 @@ class Document < AbstractBlock
       attrs['stylesdir'] ||= '.'
       attrs['iconsdir'] ||= %(#{attrs.fetch 'imagesdir', './images'}/icons)
 
-      assign_date_attributes attrs
+      fill_datetime_attributes attrs, input_mtime
 
       if initialize_extensions
         if (ext_registry = options[:extension_registry])
@@ -1206,11 +1207,11 @@ class Document < AbstractBlock
     @header_attributes = attrs.dup
   end
 
-  # Internal: Assign the document time and date attributes, namely: localdate, localyear, localtime, localdatetime,
-  # docdate, docyear, doctime and docdatetime.
-  def assign_date_attributes attrs
+  # Internal: Assign the local and document datetime attributes, which includes localdate, localyear, localtime,
+  # localdatetime, docdate, docyear, doctime, and docdatetime. Honor the SOURCE_DATE_EPOCH environment variable, if set.
+  def fill_datetime_attributes attrs, input_mtime
     # See https://reproducible-builds.org/specs/source-date-epoch/
-    now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : ::Time.now
+    now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc) : ::Time.now
     if (localdate = attrs['localdate'])
       localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
     else
@@ -1220,13 +1221,25 @@ class Document < AbstractBlock
     # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
     localtime = (attrs['localtime'] ||= now.strftime %(%T #{now.utc_offset == 0 ? 'UTC' : '%z'}))
     attrs['localdatetime'] ||= %(#{localdate} #{localtime})
-
-    # docdate, doctime and docdatetime should default to
-    # localdate, localtime and localdatetime if not otherwise set
-    attrs['docdate'] ||= localdate
-    attrs['docyear'] ||= localyear
-    attrs['doctime'] ||= localtime
-    attrs['docdatetime'] ||= %(#{localdate} #{localtime})
+    if input_mtime
+      input_mtime = source_date_epoch if source_date_epoch
+      if (docdate = attrs['docdate'])
+        attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
+      else
+        docdate = attrs['docdate'] = input_mtime.strftime '%F'
+        attrs['docyear'] ||= input_mtime.year.to_s
+      end
+      # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
+      doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
+      attrs['docdatetime'] ||= %(#{docdate} #{doctime})
+    else
+      # docdate, doctime and docdatetime should default to
+      # localdate, localtime and localdatetime if not otherwise set
+      attrs['docdate'] ||= localdate
+      attrs['docyear'] ||= localyear
+      attrs['doctime'] ||= localtime
+      attrs['docdatetime'] ||= %(#{localdate} #{localtime})
+    end
     nil
   end
 
