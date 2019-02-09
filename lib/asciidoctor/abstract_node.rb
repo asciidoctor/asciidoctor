@@ -155,7 +155,7 @@ class AbstractNode
   #
   # return a Boolean indicating whether the option has been specified
   def option? name
-    @attributes.key? %(#{name}-option)
+    @attributes[%(#{name}-option)] ? true : false
   end
 
   # Public: Set the specified option on this node.

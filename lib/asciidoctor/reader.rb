@@ -687,7 +687,7 @@ class PreprocessorReader < Reader
 
     if path
       @path = path
-      @includes[Helpers.rootname path] = (attributes.key? 'partial-option') ? nil : true if @process_lines
+      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
     else
       @path = '<stdin>'
     end
@@ -1208,7 +1208,7 @@ class PreprocessorReader < Reader
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
       inc_path = doc.normalize_system_path target, @dir, nil, target_name: 'include file'
       unless ::File.file? inc_path
-        if attributes.key? 'optional-option'
+        if attributes['optional-option']
           shift
           return true
         else

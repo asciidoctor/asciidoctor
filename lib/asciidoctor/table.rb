@@ -47,7 +47,7 @@ class Table < AbstractBlock
     @rows = Rows.new
     @columns = []
 
-    @has_header_option = attributes.key? 'header-option'
+    @has_header_option = attributes['header-option'] ? true : false
 
     # smells like we need a utility method here
     # to resolve an integer width from potential bogus input
@@ -66,7 +66,7 @@ class Table < AbstractBlock
           ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
     end
 
-    attributes['orientation'] = 'landscape' if attributes.key? 'rotate-option'
+    attributes['orientation'] = 'landscape' if attributes['rotate-option']
   end
 
   # Internal: Returns whether the current row being processed is
@@ -158,7 +158,7 @@ class Table < AbstractBlock
       @rows.head = [head]
     end
 
-    if num_body_rows > 0 && (attrs.key? 'footer-option')
+    if num_body_rows > 0 && attrs['footer-option']
       @rows.foot = [@rows.body.pop]
     end
 

@@ -1059,7 +1059,7 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_post_replacements(text)
-    if (@document.attributes.key? 'hardbreaks') || (@attributes.key? 'hardbreaks-option')
+    if @document.attributes['hardbreaks'] || @attributes['hardbreaks-option']
       lines = text.split LF, -1
       return text if lines.size < 2
       last = lines.pop
@@ -1484,7 +1484,7 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        if @context == :listing || (@context == :literal && !(@attributes.key? 'listparagraph-option'))
+        if @context == :listing || (@context == :literal && !@attributes['listparagraph-option'])
           default_subs = VERBATIM_SUBS
         elsif @context == :verse
           default_subs = NORMAL_SUBS

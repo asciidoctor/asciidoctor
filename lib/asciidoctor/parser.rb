@@ -787,7 +787,7 @@ class Parser
         if doc_attrs.key? 'source-language'
           attributes['language'] = doc_attrs['source-language']
         end unless attributes.key? 'language'
-        if (attributes.key? 'linenums-option') || (doc_attrs.key? 'source-linenums-option')
+        if attributes['linenums-option'] || doc_attrs['source-linenums-option']
           attributes['linenums'] = ''
         end unless attributes.key? 'linenums'
         if doc_attrs.key? 'source-indent'
@@ -814,7 +814,7 @@ class Parser
         else
           attributes['language'] = language
         end
-        if (attributes.key? 'linenums-option') || (doc_attrs.key? 'source-linenums-option')
+        if attributes['linenums-option'] || doc_attrs['source-linenums-option']
           attributes['linenums'] = ''
         end unless attributes.key? 'linenums'
         if doc_attrs.key? 'source-indent'
@@ -2297,7 +2297,7 @@ class Parser
     skipped = table_reader.skip_blank_lines || 0
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
-    implicit_header = true unless skipped > 0 || (attributes.key? 'header-option') || (attributes.key? 'noheader-option')
+    implicit_header = true unless skipped > 0 || attributes['header-option'] || attributes['noheader-option']
 
     while (line = table_reader.read_line)
       if (beyond_first = (loop_idx += 1) > 0) && line.empty?

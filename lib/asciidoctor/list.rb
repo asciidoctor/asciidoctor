@@ -114,8 +114,7 @@ class ListItem < AbstractBlock
     if (first_block = @blocks[0]) && Block === first_block &&
         ((first_block.context == :paragraph && !continuation_connects_first_block) ||
         ((content_adjacent || !continuation_connects_first_block) && first_block.context == :literal &&
-            first_block.attributes.key?('listparagraph-option')))
-
+            first_block.attributes['listparagraph-option']))
       block = blocks.shift
       block.lines.unshift @text unless @text.nil_or_empty?
       @text = block.source
