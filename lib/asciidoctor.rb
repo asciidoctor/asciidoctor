@@ -1277,7 +1277,7 @@ module Asciidoctor
 
     if ::File === input
       # TODO cli checks if input path can be read and is file, but might want to add check to API
-      input_path = ::File.expand_path input.path
+      input_path = ::File.absolute_path input.path
       # See https://reproducible-builds.org/specs/source-date-epoch/
       input_mtime = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
       source = input.read
@@ -1409,7 +1409,7 @@ module Asciidoctor
 
     # NOTE outfile may be controlled by document attributes, so resolve outfile after loading
     if write_to_same_dir
-      input_path = ::File.expand_path input.path
+      input_path = ::File.absolute_path input.path
       options[:to_dir] = (outdir = ::File.dirname input_path)
     elsif write_to_target
       if to_dir
@@ -1451,7 +1451,7 @@ module Asciidoctor
         outdir = ::File.dirname outfile
       end
 
-      if ::File === input && outfile == (::File.expand_path input.path)
+      if ::File === input && outfile == (::File.absolute_path input.path)
         raise ::IOError, %(input file and output file cannot be the same: #{outfile})
       end
 
