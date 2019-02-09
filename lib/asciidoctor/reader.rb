@@ -1089,7 +1089,7 @@ class PreprocessorReader < Reader
         shift
         # FIXME not accounting for skipped lines in reader line numbering
         if inc_offset
-          parsed_attrs['partial-option'] = true
+          parsed_attrs['partial-option'] = ''
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       elsif inc_tags
@@ -1154,7 +1154,7 @@ class PreprocessorReader < Reader
         end
         shift
         if inc_offset
-          parsed_attrs['partial-option'] = true unless base_select && wildcard && inc_tags.empty?
+          parsed_attrs['partial-option'] = '' unless base_select && wildcard && inc_tags.empty?
           # FIXME not accounting for skipped lines in reader line numbering
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
@@ -1208,7 +1208,7 @@ class PreprocessorReader < Reader
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
       inc_path = doc.normalize_system_path target, @dir, nil, target_name: 'include file'
       unless ::File.file? inc_path
-        if attributes.key? 'optional-option'
+        if attributes['optional-option']
           shift
           return true
         else

@@ -109,8 +109,8 @@ context "Parser" do
     assert_equal 'id', attributes['id']
     assert_equal 'role', attributes['role']
     assert_equal '', attributes['fragment-option']
-    assert_equal 'fragment', attributes['options']
     assert_equal 'style.role#id%fragment', attributes[1]
+    refute attributes.key? 'options'
   end
 
   test 'parse style attribute with style, id and multiple roles' do
@@ -160,10 +160,9 @@ context "Parser" do
   end
 
   test 'parse style attribute with option should preserve existing options' do
-    attributes = { 1 => '%header', 'options' => 'footer', 'footer-option' => '' }
+    attributes = { 1 => '%header', 'footer-option' => '' }
     style = Asciidoctor::Parser.parse_style_attribute(attributes)
     assert_nil style
-    assert_equal 'footer,header', attributes['options']
     assert_equal '', attributes['header-option']
     assert_equal '', attributes['footer-option']
   end

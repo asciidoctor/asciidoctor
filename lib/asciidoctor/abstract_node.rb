@@ -149,34 +149,32 @@ class AbstractNode
   # enabled on the current node.
   #
   # Check if the option is enabled. This method simply checks to see if the
-  # %name%-option attribute is defined on the current node.
+  # <name>-option attribute is defined on the current node.
   #
   # name    - the String or Symbol name of the option
   #
   # return a Boolean indicating whether the option has been specified
-  def option?(name)
-    @attributes.key? %(#{name}-option)
+  def option? name
+    @attributes[%(#{name}-option)] ? true : false
   end
 
   # Public: Set the specified option on this node.
   #
-  # This method sets the specified option on this node if not already set.
-  # It will add the name to the options attribute and set the <name>-option
-  # attribute.
+  # This method sets the specified option on this node by setting the <name>-option attribute.
   #
   # name - the String name of the option
   #
-  # returns truthy if the option was set or falsey if the option was already set
-  def set_option(name)
-    if (attrs = @attributes)['options']
-      unless attrs[key = %(#{name}-option)]
-        attrs['options'] += %(,#{name})
-        attrs[key] = ''
-      end
-    else
-      attrs['options'] = name
-      attrs[%(#{name}-option)] = ''
-    end
+  # Returns Nothing
+  def set_option name
+    @attributes[%(#{name}-option)] = ''
+    nil
+  end
+
+  # Public: Retrieve the Set of option names that are set on this node
+  #
+  # Returns a [Set] of option names
+  def options
+    ::Set.new.tap {|accum| @attributes.keys.each {|k| accum << (k.slice 0, k.length - 7) if k.to_s.end_with? '-option' } }
   end
 
   # Public: Update the attributes of this node with the new values in
