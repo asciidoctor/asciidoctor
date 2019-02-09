@@ -477,12 +477,12 @@ class Document < AbstractBlock
     else
       # setup default backend and doctype
       @backend = nil
-      if (attrs['backend'] ||= DEFAULT_BACKEND) == 'manpage'
+      if (desired_backend = attrs['backend'] || DEFAULT_BACKEND) == 'manpage'
         @doctype = attrs['doctype'] = attr_overrides['doctype'] = 'manpage'
       else
         @doctype = (attrs['doctype'] ||= DEFAULT_DOCTYPE)
       end
-      update_backend_attributes attrs['backend'], true
+      update_backend_attributes desired_backend, true
 
       #attrs['indir'] = attrs['docdir']
       #attrs['infile'] = attrs['docfile']
