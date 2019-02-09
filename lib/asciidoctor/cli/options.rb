@@ -137,7 +137,7 @@ module Asciidoctor
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
             # use `asciidoctor -h manpage | man -l -` to view with man pager
             if topic == 'manpage'
-              if (manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH'])
+              if (manpage_path = ::ENV['ASCIIDOCTOR_MANPAGE_PATH'])
                 if ::File.exist? manpage_path
                   if manpage_path.end_with? '.gz'
                     require 'zlib' unless defined? ::Zlib::GzipReader
