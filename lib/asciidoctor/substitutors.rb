@@ -393,7 +393,7 @@ module Substitutors
   #
   # returns The String text with special characters replaced.
   def sub_specialchars text
-    (text.include? '<') || (text.include? '&') || (text.include? '>') ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
+    (text.include? ?<) || (text.include? ?&) || (text.include? ?>) ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
   end
   alias sub_specialcharacters sub_specialchars
 
