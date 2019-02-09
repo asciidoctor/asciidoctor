@@ -1276,24 +1276,14 @@ module Asciidoctor
     end
 
     if ::File === input
-      # TODO cli checks if input path can be read and is file, but might want to add check to API
+      options[:input_mtime] = input.mtime
+      # TODO cli checks if input path can be read and is file, but might want to add check to API too
       input_path = ::File.absolute_path input.path
-      # See https://reproducible-builds.org/specs/source-date-epoch/
-      input_mtime = (::ENV.key? 'SOURCE_DATE_EPOCH') ? ::Time.at(Integer ::ENV['SOURCE_DATE_EPOCH']).utc : input.mtime
-      source = input.read
-      # hold off on setting infile and indir until we get a better sense of their purpose
-      attrs['docfile'] = input_path
+      # NOTE defer setting infile and indir until we get a better sense of their purpose
+      attrs['docfile'] = input_path = ::File.absolute_path input.path
       attrs['docdir'] = ::File.dirname input_path
       attrs['docname'] = Helpers.basename input_path, (attrs['docfilesuffix'] = ::File.extname input_path)
-      if (docdate = attrs['docdate'])
-        attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
-      else
-        docdate = attrs['docdate'] = input_mtime.strftime '%F'
-        attrs['docyear'] ||= input_mtime.year.to_s
-      end
-      # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
-      doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
-      attrs['docdatetime'] = %(#{docdate} #{doctime})
+      source = input.read
     elsif input.respond_to? :read
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either
       # just fail the rewind operation silently to handle all cases
