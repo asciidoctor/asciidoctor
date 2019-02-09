@@ -7,6 +7,7 @@ if RUBY_ENGINE == 'opal'
   require 'asciidoctor/js'
 else
   autoload :Base64, 'base64'
+  require 'cgi/util'
   autoload :OpenURI, 'open-uri'
   autoload :Pathname, 'pathname'
   autoload :StringScanner, 'strscan'
