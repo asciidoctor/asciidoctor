@@ -33,7 +33,7 @@ module Asciidoctor
         return unless @options
 
         old_logger = old_logger_level = nil
-        old_verbose, $VERBOSE = $VERBOSE, false
+        old_verbose, $VERBOSE = $VERBOSE, @options[:warnings]
         opts = {}
         infiles = []
         outfile = nil
@@ -61,14 +61,13 @@ module Asciidoctor
           when :timings
             show_timings = val
           when :trace
-            # currently does nothing
+            # no assignment
           when :verbose
             case val
             when 0
               $VERBOSE = nil
               old_logger, LoggerManager.logger = logger, NullLogger.new
             when 2
-              $VERBOSE = true
               old_logger_level, logger.level = logger.level, ::Logger::Severity::DEBUG
             end
           else

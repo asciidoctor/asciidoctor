@@ -126,32 +126,34 @@ Matching templates found in subsequent directories override ones previously disc
 
 *--failure-level*=_LEVEL_::
   The minimum logging level that triggers a non-zero exit code (failure).
-  If this option is not set (default: FATAL), the program exits with a status code zero even if warnings or errors have been logged.
+  If this option is not set (default: FATAL), the program exits with exit code zero even if warnings or errors have been logged.
 
 *-q, --quiet*::
-  Silence warnings.
+  Silence application log messages and script warnings.
 
 *--trace*::
-  Include backtrace information on errors.
-  Not enabled by default.
+  Include backtrace information when reporting errors.
 
 *-v, --verbose*::
-  Verbosely print processing information and configuration file checks to stderr.
+  Verbosely print processing information to stderr, including debug-level log messages.
+
+*-w, --warnings*::
+  Turn on script warnings (applies to executed code).
 
 *-t, --timings*::
-  Display timings information (time to read, parse and convert).
+  Print timings report to stderr (time to read, parse and convert).
 
 === Program Information
 
 *-h, --help* [_TOPIC_]::
-  Print the help message.
-  Show the command usage if _TOPIC_ is not specified (or not recognized).
+  Print a help message.
+  Show the command usage if _TOPIC_ is not specified or recognized.
   Dump the Asciidoctor man page (in troff/groff format) if _TOPIC_ is _manpage_.
 
 *-V, --version*::
   Print program version number.
 +
-`-v` can also be used if no other flags or arguments are present.
+*-v* can also be used if no source files are specified.
 
 == ENVIRONMENT
 

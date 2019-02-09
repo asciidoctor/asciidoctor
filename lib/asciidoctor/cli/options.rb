@@ -22,6 +22,7 @@ module Asciidoctor
         end
         self[:eruby] = options[:eruby] || nil
         self[:verbose] = options[:verbose] || 1
+        self[:warnings] = options[:warnings] || false
         self[:load_paths] = options[:load_paths] || nil
         self[:requires] = options[:requires] || nil
         self[:base_dir] = options[:base_dir]
@@ -120,20 +121,23 @@ module Asciidoctor
             level = 'WARN' if (level = level.upcase) == 'WARNING'
             self[:failure_level] = ::Logger::Severity.const_get level, false
           end
-          opts.on('-q', '--quiet', 'suppress warnings (default: false)') do |verbose|
+          opts.on('-q', '--quiet', 'silence application log messages and script warnings (default: false)') do |verbose|
             self[:verbose] = 0
           end
-          opts.on('--trace', 'include backtrace information on errors (default: false)') do |trace|
+          opts.on('--trace', 'include backtrace information when reporting errors (default: false)') do |trace|
             self[:trace] = true
           end
           opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
             self[:verbose] = 2
           end
-          opts.on('-t', '--timings', 'enable timings mode (default: false)') do |timing|
+          opts.on('-w', '--warnings', 'turn on script warnings (default: false)') do |warnings|
+            self[:warnings] = true
+          end
+          opts.on('-t', '--timings', 'print timings report (default: false)') do |timing|
             self[:timings] = true
           end
-          opts.on_tail('-h', '--help [TOPIC]', 'print the help message',
-              'show the command usage if TOPIC is not specified (or not recognized)',
+          opts.on_tail('-h', '--help [TOPIC]', 'print a help message',
+              'show this usage if TOPIC is not specified or recognized',
               'dump the Asciidoctor man page (in troff/groff format) if TOPIC is manpage') do |topic|
             # use `asciidoctor -h manpage | man -l -` to view with man pager
             if topic == 'manpage'
@@ -174,10 +178,11 @@ module Asciidoctor
           end
         end
 
+        old_verbose, $VERBOSE = $VERBOSE, (args.include? '-w')
         opts_parser.parse! args
 
         if args.empty?
-          if self[:verbose] == 2
+          if self[:verbose] == 2 # -v flag was specified
             return print_version $stdout
           else
             $stderr.puts opts_parser
@@ -278,6 +283,8 @@ module Asciidoctor
         $stderr.puts %(asciidoctor: #{$!.message})
         $stdout.puts opts_parser
         return 1
+      ensure
+        $VERBOSE = old_verbose
       end
 
       def print_version os = $stdout

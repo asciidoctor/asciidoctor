@@ -321,10 +321,10 @@ class Minitest::Test
 
   def in_verbose_mode
     begin
-      old_verbose, $VERBOSE = $VERBOSE, true
+      old_logger_level, Asciidoctor::LoggerManager.logger.level = Asciidoctor::LoggerManager.logger.level, Logger::Severity::DEBUG
       yield
     ensure
-      $VERBOSE = old_verbose
+      Asciidoctor::LoggerManager.logger.level = old_logger_level
     end
   end
 

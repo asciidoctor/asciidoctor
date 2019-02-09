@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
 .\" Generator: Asciidoctor 2.0.0.dev
-.\"      Date: 2019-02-04
+.\"      Date: 2019-02-09
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 2.0.0.dev
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2019-02-04" "Asciidoctor 2.0.0.dev" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2019-02-09" "Asciidoctor 2.0.0.dev" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -173,35 +173,39 @@ Matching templates found in subsequent directories override ones previously disc
 \fB\-\-failure\-level\fP=\fILEVEL\fP
 .RS 4
 The minimum logging level that triggers a non\-zero exit code (failure).
-If this option is not set (default: FATAL), the program exits with a status code zero even if warnings or errors have been logged.
+If this option is not set (default: FATAL), the program exits with exit code zero even if warnings or errors have been logged.
 .RE
 .sp
 \fB\-q, \-\-quiet\fP
 .RS 4
-Silence warnings.
+Silence application log messages and script warnings.
 .RE
 .sp
 \fB\-\-trace\fP
 .RS 4
-Include backtrace information on errors.
-Not enabled by default.
+Include backtrace information when reporting errors.
 .RE
 .sp
 \fB\-v, \-\-verbose\fP
 .RS 4
-Verbosely print processing information and configuration file checks to stderr.
+Verbosely print processing information to stderr, including debug\-level log messages.
+.RE
+.sp
+\fB\-w, \-\-warnings\fP
+.RS 4
+Turn on script warnings (applies to executed code).
 .RE
 .sp
 \fB\-t, \-\-timings\fP
 .RS 4
-Display timings information (time to read, parse and convert).
+Print timings report to stderr (time to read, parse and convert).
 .RE
 .SS "Program Information"
 .sp
 \fB\-h, \-\-help\fP [\fITOPIC\fP]
 .RS 4
-Print the help message.
-Show the command usage if \fITOPIC\fP is not specified (or not recognized).
+Print a help message.
+Show the command usage if \fITOPIC\fP is not specified or recognized.
 Dump the Asciidoctor man page (in troff/groff format) if \fITOPIC\fP is \fImanpage\fP.
 .RE
 .sp
@@ -209,7 +213,7 @@ Dump the Asciidoctor man page (in troff/groff format) if \fITOPIC\fP is \fImanpa
 .RS 4
 Print program version number.
 .sp
-\f(CR\-v\fP can also be used if no other flags or arguments are present.
+\fB\-v\fP can also be used if no source files are specified.
 .RE
 .SH "ENVIRONMENT"
 .sp
