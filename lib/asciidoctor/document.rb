@@ -1214,10 +1214,10 @@ class Document < AbstractBlock
     # See https://reproducible-builds.org/specs/source-date-epoch/
     now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc) : ::Time.now
     if (localdate = attrs['localdate'])
-      localyear = (attrs['localyear'] ||= ((localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil))
+      attrs['localyear'] ||= (localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil
     else
       localdate = attrs['localdate'] = now.strftime '%F'
-      localyear = (attrs['localyear'] ||= now.year.to_s)
+      attrs['localyear'] ||= now.year.to_s
     end
     # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
     localtime = (attrs['localtime'] ||= now.strftime %(%T #{now.utc_offset == 0 ? 'UTC' : '%z'}))
