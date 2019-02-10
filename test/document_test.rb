@@ -96,10 +96,10 @@ context 'Document' do
     end
 
     test 'should be able to disable toc and sectnums in document header in DocBook backend' do
-      input = <<-EOS
-= Document Title
-:toc!:
-:sectnums!:
+      input = <<~'EOS'
+      = Document Title
+      :toc!:
+      :sectnums!:
       EOS
       doc = document_from_string input, backend: 'docbook'
       refute doc.attr?('toc')
@@ -107,11 +107,11 @@ context 'Document' do
     end
 
     test 'noheader attribute should suppress info element when converting to DocBook' do
-      input = <<-EOS
-= Document Title
-:noheader:
+      input = <<~'EOS'
+      = Document Title
+      :noheader:
 
-content
+      content
       EOS
       result = convert_string input, backend: 'docbook'
       assert_xpath '/article', result, 1
@@ -119,9 +119,9 @@ content
     end
 
     test 'should be able to disable section numbering using numbered attribute in document header in DocBook backend' do
-      input = <<-EOS
-= Document Title
-:numbered!:
+      input = <<~'EOS'
+      = Document Title
+      :numbered!:
       EOS
       doc = document_from_string input, backend: 'docbook'
       refute doc.attr?('sectnums')
@@ -425,11 +425,11 @@ content
     end
 
     test 'should enable compat mode for document with legacy doctitle' do
-      input = <<-EOS
-Document Title
-==============
+      input = <<~'EOS'
+      Document Title
+      ==============
 
-+content+
+      +content+
       EOS
 
       doc = document_from_string input
@@ -439,12 +439,12 @@ Document Title
     end
 
     test 'should not enable compat mode for document with legacy doctitle if compat mode disable by header' do
-      input = <<-EOS
-Document Title
-==============
-:compat-mode!:
+      input = <<~'EOS'
+      Document Title
+      ==============
+      :compat-mode!:
 
-+content+
+      +content+
       EOS
 
       doc = document_from_string input
@@ -454,11 +454,11 @@ Document Title
     end
 
     test 'should not enable compat mode for document with legacy doctitle if compat mode is locked by API' do
-      input = <<-EOS
-Document Title
-==============
+      input = <<~'EOS'
+      Document Title
+      ==============
 
-+content+
+      +content+
       EOS
 
       doc = document_from_string input, attributes: { 'compat-mode' => nil }
@@ -481,11 +481,11 @@ Document Title
     end
 
     test 'document with subtitle' do
-      input = <<-EOS
-= Main Title: *Subtitle*
-Author Name
+      input = <<~'EOS'
+      = Main Title: *Subtitle*
+      Author Name
 
-content
+      content
       EOS
 
       doc = document_from_string input
@@ -497,12 +497,12 @@ content
     end
 
     test 'document with subtitle and custom separator' do
-      input = <<-EOS
-[separator=::]
-= Main Title:: *Subtitle*
-Author Name
+      input = <<~'EOS'
+      [separator=::]
+      = Main Title:: *Subtitle*
+      Author Name
 
-content
+      content
       EOS
 
       doc = document_from_string input
@@ -514,12 +514,12 @@ content
     end
 
     test 'should not honor custom separator for doctitle if attribute is locked by API' do
-      input = <<-EOS
-[separator=::]
-= Main Title - *Subtitle*
-Author Name
+      input = <<~'EOS'
+      [separator=::]
+      = Main Title - *Subtitle*
+      Author Name
 
-content
+      content
       EOS
 
       doc = document_from_string input, attributes: { 'title-separator' => ' -' }
@@ -531,26 +531,26 @@ content
     end
 
     test 'document with doctitle defined as attribute entry' do
-     input = <<-EOS
-:doctitle: Document Title
+      input = <<~'EOS'
+      :doctitle: Document Title
 
-preamble
+      preamble
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal 'Document Title', doc.doctitle
-     assert doc.has_header?
-     assert_equal 'Document Title', doc.header.title
-     assert_equal 'Document Title', doc.first_section.title
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal 'Document Title', doc.doctitle
+      assert doc.has_header?
+      assert_equal 'Document Title', doc.header.title
+      assert_equal 'Document Title', doc.first_section.title
     end
 
     test 'document with doctitle defined as attribute entry followed by block with title' do
-      input = <<-EOS
-:doctitle: Document Title
+      input = <<~'EOS'
+      :doctitle: Document Title
 
-.Block title
-Block content
+      .Block title
+      Block content
       EOS
 
       doc = document_from_string input
@@ -562,109 +562,109 @@ Block content
     end
 
     test 'document with title attribute entry overrides doctitle' do
-     input = <<-EOS
-= Document Title
-:title: Override
+      input = <<~'EOS'
+      = Document Title
+      :title: Override
 
-{doctitle}
+      {doctitle}
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal 'Override', doc.doctitle
-     assert_equal 'Override', doc.title
-     assert doc.has_header?
-     assert_equal 'Document Title', doc.header.title
-     assert_equal 'Document Title', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal 'Override', doc.doctitle
+      assert_equal 'Override', doc.title
+      assert doc.has_header?
+      assert_equal 'Document Title', doc.header.title
+      assert_equal 'Document Title', doc.first_section.title
+      assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
     end
 
     test 'document with blank title attribute entry overrides doctitle' do
-     input = <<-EOS
-= Document Title
-:title:
+      input = <<~'EOS'
+      = Document Title
+      :title:
 
-{doctitle}
+      {doctitle}
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal '', doc.doctitle
-     assert_equal '', doc.title
-     assert doc.has_header?
-     assert_equal 'Document Title', doc.header.title
-     assert_equal 'Document Title', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal '', doc.doctitle
+      assert_equal '', doc.title
+      assert doc.has_header?
+      assert_equal 'Document Title', doc.header.title
+      assert_equal 'Document Title', doc.first_section.title
+      assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
     end
 
     test 'document with title attribute entry overrides doctitle attribute entry' do
-     input = <<-EOS
-= Document Title
-:snapshot: {doctitle}
-:doctitle: doctitle
-:title: Override
+      input = <<~'EOS'
+      = Document Title
+      :snapshot: {doctitle}
+      :doctitle: doctitle
+      :title: Override
 
-{snapshot}, {doctitle}
+      {snapshot}, {doctitle}
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal 'Override', doc.doctitle
-     assert_equal 'Override', doc.title
-     assert doc.has_header?
-     assert_equal 'doctitle', doc.header.title
-     assert_equal 'doctitle', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.convert, 1
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal 'Override', doc.doctitle
+      assert_equal 'Override', doc.title
+      assert doc.has_header?
+      assert_equal 'doctitle', doc.header.title
+      assert_equal 'doctitle', doc.first_section.title
+      assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.convert, 1
     end
 
     test 'document with doctitle attribute entry overrides header title and doctitle' do
-     input = <<-EOS
-= Document Title
-:snapshot: {doctitle}
-:doctitle: Override
+      input = <<~'EOS'
+      = Document Title
+      :snapshot: {doctitle}
+      :doctitle: Override
 
-{snapshot}, {doctitle}
+      {snapshot}, {doctitle}
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal 'Override', doc.doctitle
-     assert_nil doc.attributes['title']
-     assert doc.has_header?
-     assert_equal 'Override', doc.header.title
-     assert_equal 'Override', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.convert, 1
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal 'Override', doc.doctitle
+      assert_nil doc.attributes['title']
+      assert doc.has_header?
+      assert_equal 'Override', doc.header.title
+      assert_equal 'Override', doc.first_section.title
+      assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.convert, 1
     end
 
     test 'doctitle attribute entry above header overrides header title and doctitle' do
-     input = <<-EOS
-:doctitle: Override
-= Document Title
+      input = <<~'EOS'
+      :doctitle: Override
+      = Document Title
 
-{doctitle}
+      {doctitle}
 
-== First Section
-     EOS
-     doc = document_from_string input
-     assert_equal 'Override', doc.doctitle
-     assert_nil doc.attributes['title']
-     assert doc.has_header?
-     assert_equal 'Override', doc.header.title
-     assert_equal 'Override', doc.first_section.title
-     assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.convert, 1
+      == First Section
+      EOS
+      doc = document_from_string input
+      assert_equal 'Override', doc.doctitle
+      assert_nil doc.attributes['title']
+      assert doc.has_header?
+      assert_equal 'Override', doc.header.title
+      assert_equal 'Override', doc.first_section.title
+      assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.convert, 1
     end
 
     test 'should recognize document title when preceded by blank lines' do
-      input = <<-EOS
-:doctype: book
+      input = <<~'EOS'
+      :doctype: book
 
-= Title
+      = Title
 
-preamble
+      preamble
 
-== Section 1
+      == Section 1
 
-text
+      text
       EOS
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
       assert_css '#header h1', output, 1
@@ -678,10 +678,10 @@ text
     end
 
     test 'should sanitize contents of HTML title element' do
-      input = <<-EOS
-= *Document* image:logo.png[] _Title_ image:another-logo.png[another logo]
+      input = <<~'EOS'
+      = *Document* image:logo.png[] _Title_ image:another-logo.png[another logo]
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -708,17 +708,17 @@ content
     end
 
     test 'with metadata' do
-      input = <<-EOS
-= AsciiDoc
-Stuart Rackham <founder@asciidoc.org>
-v8.6.8, 2012-07-12: See changelog.
-:description: AsciiDoc user guide
-:keywords: asciidoc,documentation
-:copyright: Stuart Rackham
+      input = <<~'EOS'
+      = AsciiDoc
+      Stuart Rackham <founder@asciidoc.org>
+      v8.6.8, 2012-07-12: See changelog.
+      :description: AsciiDoc user guide
+      :keywords: asciidoc,documentation
+      :copyright: Stuart Rackham
 
-== Version 8.6.8
+      == Version 8.6.8
 
-more info...
+      more info...
       EOS
       output = convert_string input
       assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
@@ -733,12 +733,12 @@ more info...
     end
 
     test 'should parse revision line if date is empty' do
-      input = <<-EOS
-= Document Title
-Author Name
-v1.0.0,:remark
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      v1.0.0,:remark
 
-content
+      content
       EOS
 
       doc = document_from_string input
@@ -748,13 +748,13 @@ content
     end
 
     test 'should include revision history in DocBook output if revdate and revnumber is set' do
-      input = <<-EOS
-= Document Title
-Author Name
-:revdate: 2011-11-11
-:revnumber: 1.0
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      :revdate: 2011-11-11
+      :revnumber: 1.0
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -765,13 +765,13 @@ content
     end
 
     test 'should include revision history in DocBook output if revdate and revremark is set' do
-      input = <<-EOS
-= Document Title
-Author Name
-:revdate: 2011-11-11
-:revremark: features!
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      :revdate: 2011-11-11
+      :revremark: features!
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -782,12 +782,12 @@ content
     end
 
     test 'should not include revision history in DocBook output if revdate is not set' do
-      input = <<-EOS
-= Document Title
-Author Name
-:revnumber: 1.0
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      :revnumber: 1.0
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -795,13 +795,13 @@ content
     end
 
     test 'with metadata to DocBook 5' do
-      input = <<-EOS
-= AsciiDoc
-Stuart Rackham <founder@asciidoc.org>
+      input = <<~'EOS'
+      = AsciiDoc
+      Stuart Rackham <founder@asciidoc.org>
 
-== Version 8.6.8
+      == Version 8.6.8
 
-more info...
+      more info...
       EOS
       output = convert_string input, backend: 'docbook5'
       assert_xpath '/article/info', output, 1
@@ -815,23 +815,23 @@ more info...
     end
 
     test 'with document ID to Docbook 5' do
-      input = <<-EOS
-[[document-id]]
-= Document Title
+      input = <<~'EOS'
+      [[document-id]]
+      = Document Title
 
-more info...
+      more info...
       EOS
       output = convert_string input, backend: 'docbook', keep_namespaces: true
       assert_css 'article:root[xml|id="document-id"]', output, 1
     end
 
     test 'with author defined using attribute entry to DocBook' do
-      input = <<-EOS
-= Document Title
-:author: Doc Writer
-:email: thedoctor@asciidoc.org
+      input = <<~'EOS'
+      = Document Title
+      :author: Doc Writer
+      :email: thedoctor@asciidoc.org
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -843,11 +843,11 @@ content
     end
 
     test 'should sanitize content of HTML meta authors tag' do
-      input = <<-EOS
-= Document Title
-:author: pass:n[http://example.org/community/team.html[Ze *Product* team]]
+      input = <<~'EOS'
+      = Document Title
+      :author: pass:n[http://example.org/community/team.html[Ze *Product* team]]
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -855,11 +855,11 @@ content
     end
 
     test 'should not double escape ampersand in author attribute' do
-      input = <<-EOS
-= Document Title
-R&D Lab
+      input = <<~'EOS'
+      = Document Title
+      R&D Lab
 
-{author}
+      {author}
       EOS
 
       output = convert_string input
@@ -867,11 +867,11 @@ R&D Lab
     end
 
     test 'should include multiple authors in HTML output' do
-      input = <<-EOS
-= Document Title
-Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
+      input = <<~'EOS'
+      = Document Title
+      Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -888,11 +888,11 @@ content
     end
 
     test 'should create authorgroup in DocBook when multiple authors' do
-      input = <<-EOS
-= Document Title
-Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
+      input = <<~'EOS'
+      = Document Title
+      Doc Writer <thedoctor@asciidoc.org>; Junior Writer <junior@asciidoctor.org>
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -904,11 +904,11 @@ content
     end
 
     test 'with author defined by indexed attribute name' do
-      input = <<-EOS
-= Document Title
-:author_1: Doc Writer
+      input = <<~'EOS'
+      = Document Title
+      :author_1: Doc Writer
 
-{author}
+      {author}
       EOS
 
       doc = document_from_string input
@@ -917,13 +917,13 @@ content
     end
 
     test 'with authors defined using attribute entry to DocBook' do
-      input = <<-EOS
-= Document Title
-:authors: Doc Writer; Junior Writer
-:email_1: thedoctor@asciidoc.org
-:email_2: junior@asciidoc.org
+      input = <<~'EOS'
+      = Document Title
+      :authors: Doc Writer; Junior Writer
+      :email_1: thedoctor@asciidoc.org
+      :email_2: junior@asciidoc.org
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -937,11 +937,11 @@ content
     end
 
     test 'should populate copyright element in DocBook output if copyright attribute is defined' do
-      input = <<-EOS
-= Jet Bike
-:copyright: ACME, Inc.
+      input = <<~'EOS'
+      = Jet Bike
+      :copyright: ACME, Inc.
 
-Essential for catching road runners.
+      Essential for catching road runners.
       EOS
       output = convert_string input, backend: 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
@@ -949,11 +949,11 @@ Essential for catching road runners.
     end
 
     test 'should populate copyright element in DocBook output if copyright attribute is defined with year' do
-      input = <<-EOS
-= Jet Bike
-:copyright: ACME, Inc. 1956
+      input = <<~'EOS'
+      = Jet Bike
+      :copyright: ACME, Inc. 1956
 
-Essential for catching road runners.
+      Essential for catching road runners.
       EOS
       output = convert_string input, backend: 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
@@ -963,11 +963,11 @@ Essential for catching road runners.
     end
 
     test 'should populate copyright element in DocBook output if copyright attribute is defined with year range' do
-      input = <<-EOS
-= Jet Bike
-:copyright: ACME, Inc. 1956-2018
+      input = <<~'EOS'
+      = Jet Bike
+      :copyright: ACME, Inc. 1956-2018
 
-Essential for catching road runners.
+      Essential for catching road runners.
       EOS
       output = convert_string input, backend: 'docbook5'
       assert_xpath '/article/info/copyright', output, 1
@@ -988,10 +988,10 @@ Essential for catching road runners.
     end
 
     test 'does not output footer if nofooter is set' do
-      input = <<-EOS
-:nofooter:
+      input = <<~'EOS'
+      :nofooter:
 
-content
+      content
       EOS
 
       result = convert_string input
@@ -1017,10 +1017,10 @@ content
     end
 
     test 'enable title in embedded document by unassigning notitle attribute' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-content
+      content
       EOS
 
       result = convert_string_to_embedded input, attributes: { 'notitle!' => '' }
@@ -1034,10 +1034,10 @@ content
     end
 
     test 'enable title in embedded document by assigning showtitle attribute' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-content
+      content
       EOS
 
       result = convert_string_to_embedded input, attributes: { 'showtitle' => '' }
@@ -1051,12 +1051,12 @@ content
     end
 
     test 'parse header only' do
-      input = <<-EOS
-= Document Title
-Author Name
-:foo: bar
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      :foo: bar
 
-preamble
+      preamble
       EOS
 
       doc = document_from_string input, parse_header_only: true
@@ -1068,10 +1068,10 @@ preamble
     end
 
     test 'outputs footnotes in footer' do
-      input = <<-EOS
-A footnote footnote:[An example footnote.];
-a second footnote with a reference ID footnoteref:[note2,Second footnote.];
-finally a reference to the second footnote footnoteref:[note2].
+      input = <<~'EOS'
+      A footnote footnote:[An example footnote.];
+      a second footnote with a reference ID footnoteref:[note2,Second footnote.];
+      finally a reference to the second footnote footnoteref:[note2].
       EOS
 
       output = convert_string input
@@ -1088,9 +1088,7 @@ finally a reference to the second footnote footnoteref:[note2].
     end
 
     test 'outputs footnotes block in embedded document by default' do
-      input = <<-EOS
-Text that has supporting information{empty}footnote:[An example footnote.].
-      EOS
+      input = 'Text that has supporting information{empty}footnote:[An example footnote.].'
 
       output = convert_string_to_embedded input
       assert_css '#footnotes', output, 1
@@ -1102,9 +1100,7 @@ Text that has supporting information{empty}footnote:[An example footnote.].
     end
 
     test 'does not output footnotes block in embedded document if nofootnotes attribute is set' do
-      input = <<-EOS
-Text that has supporting information{empty}footnote:[An example footnote.].
-      EOS
+      input = 'Text that has supporting information{empty}footnote:[An example footnote.].'
 
       output = convert_string_to_embedded input, attributes: { 'nofootnotes' => '' }
       assert_css '#footnotes', output, 0
@@ -1113,16 +1109,16 @@ Text that has supporting information{empty}footnote:[An example footnote.].
 
   context 'Catalog' do
     test 'document catalog is aliased as references' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-== Section A
+      == Section A
 
-content
+      content
 
-== Section B
+      == Section B
 
-content{blank}footnote:[commentary]
+      content{blank}footnote:[commentary]
       EOS
 
       doc = document_from_string input
@@ -1135,13 +1131,13 @@ content{blank}footnote:[commentary]
     end
 
     test 'should catalog assets inside nested document' do
-      input = <<-EOS
-image::outer.png[]
+      input = <<~'EOS'
+      image::outer.png[]
 
-|===
-a|
-image::inner.png[]
-|===
+      |===
+      a|
+      image::inner.png[]
+      |===
       EOS
 
       doc = document_from_string input, catalog_assets: true
@@ -1170,27 +1166,21 @@ image::inner.png[]
     end
 
     test 'xhtml5 backend should map to html5 and set htmlsyntax to xml' do
-      input = <<-EOS
-content
-      EOS
+      input = 'content'
       doc = document_from_string input, backend: :xhtml5
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
     end
 
     test 'xhtml backend should map to html5 and set htmlsyntax to xml' do
-      input = <<-EOS
-content
-      EOS
+      input = 'content'
       doc = document_from_string input, backend: :xhtml
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
     end
 
     test 'honor htmlsyntax attribute passed via API if backend is html' do
-      input = <<-EOS
----
-      EOS
+      input = '---'
       doc = document_from_string input, safe: :safe, attributes: { 'htmlsyntax' => 'xml' }
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
@@ -1199,11 +1189,11 @@ content
     end
 
     test 'honor htmlsyntax attribute in document header if followed by backend attribute' do
-      input = <<-EOS
-:htmlsyntax: xml
-:backend: html5
+      input = <<~'EOS'
+      :htmlsyntax: xml
+      :backend: html5
 
----
+      ---
       EOS
       doc = document_from_string input, safe: :safe
       assert_equal 'html5', doc.backend
@@ -1213,62 +1203,62 @@ content
     end
 
     test 'does not honor htmlsyntax attribute in document header if not followed by backend attribute' do
-      input = <<-EOS
-:backend: html5
-:htmlsyntax: xml
+      input = <<~'EOS'
+      :backend: html5
+      :htmlsyntax: xml
 
----
+      ---
       EOS
       result = convert_string_to_embedded input, safe: :safe
       assert_equal '<hr>', result
     end
 
     test 'should close all short tags when htmlsyntax is xml' do
-      input = <<-EOS
-= Document Title
-Author Name
-v1.0, 2001-01-01
-:icons:
-:favicon:
+      input = <<~'EOS'
+      = Document Title
+      Author Name
+      v1.0, 2001-01-01
+      :icons:
+      :favicon:
 
-image:tiger.png[]
+      image:tiger.png[]
 
-image::tiger.png[]
+      image::tiger.png[]
 
-* [x] one
-* [ ] two
+      * [x] one
+      * [ ] two
 
-|===
-|A |B
-|===
+      |===
+      |A |B
+      |===
 
-[horizontal, labelwidth="25%", itemwidth="75%"]
-term:: description
+      [horizontal, labelwidth="25%", itemwidth="75%"]
+      term:: description
 
-NOTE: note
+      NOTE: note
 
-[quote,Author,Source]
-____
-Quote me.
-____
+      [quote,Author,Source]
+      ____
+      Quote me.
+      ____
 
-[verse,Author,Source]
-____
-A tall tale.
-____
+      [verse,Author,Source]
+      ____
+      A tall tale.
+      ____
 
-[options="autoplay,loop"]
-video::screencast.ogg[]
+      [options="autoplay,loop"]
+      video::screencast.ogg[]
 
-video::12345[vimeo]
+      video::12345[vimeo]
 
-[options="autoplay,loop"]
-audio::podcast.ogg[]
+      [options="autoplay,loop"]
+      audio::podcast.ogg[]
 
-one +
-two
+      one +
+      two
 
-'''
+      '''
       EOS
       result = convert_string input, safe: :safe, backend: :xhtml
       begin
@@ -1281,19 +1271,17 @@ two
     end
 
     test 'xhtml backend should emit elements in proper namespace' do
-      input = <<-EOS
-content
-      EOS
+      input = 'content'
       result = convert_string input, safe: :safe, backend: :xhtml, keep_namespaces: true
       assert_xpath '//*[not(namespace-uri()="http://www.w3.org/1999/xhtml")]', result, 0
     end
 
     test 'should parse out subtitle when backend is DocBook' do
-      input = <<-EOS
-= Document Title: Subtitle
-:doctype: book
+      input = <<~'EOS'
+      = Document Title: Subtitle
+      :doctype: book
 
-text
+      text
       EOS
       result = convert_string input, backend: 'docbook5'
       assert_xpath '/book', result, 1
@@ -1302,15 +1290,15 @@ text
     end
 
     test 'should be able to set doctype to article when converting to DocBoook' do
-      input = <<-EOS
-= Title
-Author Name
+      input = <<~'EOS'
+      = Title
+      Author Name
 
-preamble
+      preamble
 
-== First Section
+      == First Section
 
-section body
+      section body
       EOS
       result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5' })
       assert_xpath '/xmlns:article', result, 1
@@ -1333,22 +1321,22 @@ section body
     end
 
     test 'should be able to convert DocBook manpage output when backend is DocBook and doctype is manpage' do
-      input = <<-EOS
-= asciidoctor(1)
-:mansource: Asciidoctor
-:manmanual: Asciidoctor Manual
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :mansource: Asciidoctor
+      :manmanual: Asciidoctor Manual
 
-== NAME
+      == NAME
 
-asciidoctor - Process text
+      asciidoctor - Process text
 
-== SYNOPSIS
+      == SYNOPSIS
 
-some text
+      some text
 
-== First Section
+      == First Section
 
-section body
+      section body
       EOS
       result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' })
       assert_xpath '/xmlns:refentry', result, 1
@@ -1370,16 +1358,16 @@ section body
     end
 
     test 'should output non-breaking space for source and manual in docbook manpage output if absent from source' do
-      input = <<-EOS
-= asciidoctor(1)
+      input = <<~'EOS'
+      = asciidoctor(1)
 
-== NAME
+      == NAME
 
-asciidoctor - Process text
+      asciidoctor - Process text
 
-== SYNOPSIS
+      == SYNOPSIS
 
-some text
+      some text
       EOS
       result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' })
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
@@ -1387,15 +1375,15 @@ some text
     end
 
     test 'should be able to set doctype to book when converting to DocBoook' do
-      input = <<-EOS
-= Title
-Author Name
+      input = <<~'EOS'
+      = Title
+      Author Name
 
-preamble
+      preamble
 
-== First Chapter
+      == First Chapter
 
-chapter body
+      chapter body
       EOS
       result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
       assert_xpath '/xmlns:book', result, 1
@@ -1418,21 +1406,21 @@ chapter body
     end
 
     test 'adds refname to DocBook output for each name defined in NAME section of manpage' do
-      input = <<-EOS
-= eve(1)
-Andrew Stanton
-v1.0.0
-:doctype: manpage
-:manmanual: EVE
-:mansource: EVE
+      input = <<~'EOS'
+      = eve(1)
+      Andrew Stanton
+      v1.0.0
+      :doctype: manpage
+      :manmanual: EVE
+      :mansource: EVE
 
-== NAME
+      == NAME
 
-eve, islifeform - analyzes an image to determine if it's a picture of a life form
+      eve, islifeform - analyzes an image to determine if it's a picture of a life form
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*eve* ['OPTION']... 'FILE'...
+      *eve* ['OPTION']... 'FILE'...
       EOS
 
       result = convert_string input, backend: 'docbook5'
@@ -1442,18 +1430,18 @@ eve, islifeform - analyzes an image to determine if it's a picture of a life for
     end
 
     test 'adds a front and back cover image to DocBook 5 when doctype is book' do
-      input = <<-EOS
-= Title
-:doctype: book
-:imagesdir: images
-:front-cover-image: image:front-cover.jpg[scaledwidth=210mm]
-:back-cover-image: image:back-cover.jpg[scaledwidth=210mm]
+      input = <<~'EOS'
+      = Title
+      :doctype: book
+      :imagesdir: images
+      :front-cover-image: image:front-cover.jpg[scaledwidth=210mm]
+      :back-cover-image: image:back-cover.jpg[scaledwidth=210mm]
 
-preamble
+      preamble
 
-== First Chapter
+      == First Chapter
 
-chapter body
+      chapter body
       EOS
 
       result = convert_string input, attributes: { 'backend' => 'docbook5' }
@@ -1484,24 +1472,24 @@ chapter body
     end
 
     test 'do not override explicit author initials' do
-      input = <<-EOS
-= AsciiDoc
-Stuart Rackham <founder@asciidoc.org>
-:Author Initials: SJR
+      input = <<~'EOS'
+      = AsciiDoc
+      Stuart Rackham <founder@asciidoc.org>
+      :Author Initials: SJR
 
-more info...
+      more info...
       EOS
       output = convert_string input, attributes: { 'backend' => 'docbook5' }
       assert_xpath '/article/info/authorinitials[text()="SJR"]', output, 1
     end
 
     test 'attribute entry can appear immediately after document title' do
-      input = <<-EOS
-Reference Guide
-===============
-:toc:
+      input = <<~'EOS'
+      Reference Guide
+      ===============
+      :toc:
 
-preamble
+      preamble
       EOS
       doc = document_from_string input
       assert doc.attr?('toc')
@@ -1509,13 +1497,13 @@ preamble
     end
 
     test 'attribute entry can appear before author line under document title' do
-      input = <<-EOS
-Reference Guide
-===============
-:toc:
-Dan Allen
+      input = <<~'EOS'
+      Reference Guide
+      ===============
+      :toc:
+      Dan Allen
 
-preamble
+      preamble
       EOS
       doc = document_from_string input
       assert doc.attr?('toc')
@@ -1524,13 +1512,13 @@ preamble
     end
 
     test 'should parse mantitle and manvolnum from document title for manpage doctype' do
-      input = <<-EOS
-= asciidoctor ( 1 )
-:doctype: manpage
+      input = <<~'EOS'
+      = asciidoctor ( 1 )
+      :doctype: manpage
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
       doc = document_from_string input
@@ -1539,14 +1527,14 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should perform attribute substitution on mantitle in manpage doctype' do
-      input = <<-EOS
-= {app}(1)
-:doctype: manpage
-:app: Asciidoctor
+      input = <<~'EOS'
+      = {app}(1)
+      :doctype: manpage
+      :app: Asciidoctor
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
       doc = document_from_string input
@@ -1554,13 +1542,13 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should consume name section as manname and manpurpose for manpage doctype' do
-      input = <<-EOS
-= asciidoctor(1)
-:doctype: manpage
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :doctype: manpage
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
       doc = document_from_string input
@@ -1571,13 +1559,13 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should set docname and outfilesuffix from manname and manvolnum for manpage backend and doctype' do
-      input = <<-EOS
-= asciidoctor(1)
-:doctype: manpage
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :doctype: manpage
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
       EOS
 
       doc = document_from_string input, backend: 'manpage'
@@ -1586,17 +1574,17 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should mark synopsis as special section in manpage doctype' do
-      input = <<-EOS
-= asciidoctor(1)
-:doctype: manpage
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :doctype: manpage
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*asciidoctor* ['OPTION']... 'FILE'..
+      *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
       doc = document_from_string input
@@ -1608,17 +1596,17 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should output special header block in HTML for manpage doctype' do
-      input = <<-EOS
-= asciidoctor(1)
-:doctype: manpage
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :doctype: manpage
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*asciidoctor* ['OPTION']... 'FILE'..
+      *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
       output = convert_string input
@@ -1632,18 +1620,18 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should output special header block in embeddable HTML for manpage doctype' do
-      input = <<-EOS
-= asciidoctor(1)
-:doctype: manpage
-:showtitle:
+      input = <<~'EOS'
+      = asciidoctor(1)
+      :doctype: manpage
+      :showtitle:
 
-== NAME
+      == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+      asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
-== SYNOPSIS
+      == SYNOPSIS
 
-*asciidoctor* ['OPTION']... 'FILE'..
+      *asciidoctor* ['OPTION']... 'FILE'..
       EOS
 
       output = convert_string_to_embedded input
@@ -1684,10 +1672,10 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
     end
 
     test 'should raise an exception when a converter cannot be resolved before conversion' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-text
+      text
       EOS
       exception = assert_raises NotImplementedError do
         Asciidoctor.convert input, backend: 'unknownBackend'
@@ -1696,12 +1684,12 @@ text
     end
 
     test 'should raise an exception when a converter cannot be resolved while parsing' do
-      input = <<-EOS
-= Document Title
+      input = <<~'EOS'
+      = Document Title
 
-== A _Big_ Section
+      == A _Big_ Section
 
-text
+      text
       EOS
       exception = assert_raises NotImplementedError do
         Asciidoctor.convert input, backend: 'unknownBackend'
