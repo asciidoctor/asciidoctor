@@ -1222,26 +1222,17 @@ class Document < AbstractBlock
     # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
     localtime = (attrs['localtime'] ||= now.strftime %(%T #{now.utc_offset == 0 ? 'UTC' : '%z'}))
     attrs['localdatetime'] ||= %(#{localdate} #{localtime})
+    # docdate, doctime and docdatetime should default to localdate, localtime and localdatetime if not otherwise set
+    input_mtime = source_date_epoch || input_mtime || now
     if (docdate = attrs['docdate'])
       attrs['docyear'] ||= ((docdate.index '-') == 4 ? (docdate.slice 0, 4) : nil)
-    end
-    if input_mtime
-      input_mtime = source_date_epoch if source_date_epoch
-      docdate = (attrs['docdate'] ||= input_mtime.strftime '%F')
-      attrs['docyear'] ||= input_mtime.year.to_s
-      # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
-      doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
-      attrs['docdatetime'] ||= %(#{docdate} #{doctime})
     else
-      # docdate, doctime and docdatetime should default to
-      # localdate, localtime and localdatetime if not otherwise set
-      doctime = (attrs['doctime'] ||= localtime)
-      docdate ||= localdate
-      attrs['docdate'] ||= docdate
-      attrs['docyear'] ||= localyear
-      attrs['doctime'] ||= doctime
-      attrs['docdatetime'] ||= %(#{docdate} #{doctime})
+      docdate = attrs['docdate'] = input_mtime.strftime '%F'
+      attrs['docyear'] ||= input_mtime.year.to_s
     end
+    # %Z is OS dependent and may contain characters that aren't UTF-8 encoded (see asciidoctor#2770 and asciidoctor.js#23)
+    doctime = (attrs['doctime'] ||= input_mtime.strftime %(%T #{input_mtime.utc_offset == 0 ? 'UTC' : '%z'}))
+    attrs['docdatetime'] ||= %(#{docdate} #{doctime})
     nil
   end
 
