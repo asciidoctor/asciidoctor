@@ -528,6 +528,30 @@ context 'Sections' do
       assert_includes result, '----^^----'
     end
 
+    test 'should not recognize section title that does not contain alphanumeric character' do
+      input = <<~'EOS'
+      !@#$
+      ----
+      EOS
+
+      using_memory_logger do |logger|
+        result = convert_string_to_embedded input
+        assert_css 'h2', result, 0
+      end
+    end
+
+    test 'should not recognize section title that consists of only underscores' do
+      input = <<~'EOS'
+      ____
+      ----
+      EOS
+
+      using_memory_logger do |logger|
+        result = convert_string_to_embedded input
+        assert_css 'h2', result, 0
+      end
+    end
+
     test 'should preprocess second line of setext section title' do
       input = <<~'EOS'
       Section Title

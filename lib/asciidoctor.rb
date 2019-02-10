@@ -603,7 +603,7 @@ module Asciidoctor
 
     # Matches the title only (first line) of an Setext (two-line) section title.
     # The title cannot begin with a dot and must have at least one alphanumeric character.
-    SetextSectionTitleRx = /^((?!\.)#{CC_ANY}*?#{CG_WORD}#{CC_ANY}*)$/
+    SetextSectionTitleRx = /^((?!\.)#{CC_ANY}*?#{CG_ALNUM}#{CC_ANY}*)$/
 
     # Matches an anchor (i.e., id + optional reference text) inside a section title.
     #

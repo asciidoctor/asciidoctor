@@ -66,6 +66,7 @@ Improvements::
 Bug Fixes::
 
   * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
+  * enforce rule that Setext section title must have at least one alphanumeric character; fixes problem w/ block nested inside quote block (#3060)
   * don't fail if value of pygments-style attribute is not recognized; gracefully fallback to default style (#2106)
   * do not alter the $LOAD_PATH (#2764)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
