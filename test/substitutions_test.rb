@@ -839,9 +839,7 @@ context 'Substitutions' do
 
     # NOTE this test verifies attributes get substituted eagerly in target of image in title
     test 'should substitute attributes in target of inline image in section title' do
-      input = <<-EOS
-== image:{iconsdir}/dot.gif[dot] Title
-      EOS
+      input = '== image:{iconsdir}/dot.gif[dot] Title'
 
       using_memory_logger do |logger|
         sect = block_from_string input, attributes: { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, safe: :server, catalog_assets: true
@@ -974,9 +972,7 @@ context 'Substitutions' do
     end
 
     test 'subsequent footnote macros with escaped URLs should be restored in DocBook' do
-      input = <<-EOS
-foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
-      EOS
+      input = 'foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz'
 
       result = convert_string_to_embedded input, doctype: 'inline', backend: 'docbook'
       assert_equal 'foo<footnote><simpara>http://example.com</simpara></footnote>bar<footnote><simpara>http://acme.com</simpara></footnote>baz', result
@@ -1036,12 +1032,12 @@ foofootnote:[+http://example.com+]barfootnote:[+http://acme.com+]baz
     end
 
     test 'inline footnote macro can be used to define and reference a footnote reference' do
-      input = <<-EOS
-You can download the software from the product page.footnote:sub[Option only available if you have an active subscription.]
+      input = <<~'EOS'
+      You can download the software from the product page.footnote:sub[Option only available if you have an active subscription.]
 
-You can also file a support request.footnote:sub[]
+      You can also file a support request.footnote:sub[]
 
-If all else fails, you can give us a call.footnoteref:[sub]
+      If all else fails, you can give us a call.footnoteref:[sub]
       EOS
 
       output = convert_string_to_embedded input
@@ -1051,10 +1047,7 @@ If all else fails, you can give us a call.footnoteref:[sub]
     end
 
     test 'should parse multiple footnote references in a single line' do
-      input = <<-'EOS'
-notable text.footnote:id[about this [text\]], footnote:id[], footnote:id[]
-      EOS
-
+      input = 'notable text.footnote:id[about this [text\]], footnote:id[], footnote:id[]'
       output = convert_string_to_embedded input
       assert_xpath '(//p)[1]/sup[starts-with(@class,"footnote")]', output, 3
       assert_xpath '(//p)[1]/sup[@class="footnote"]', output, 1
@@ -1064,10 +1057,10 @@ notable text.footnote:id[about this [text\]], footnote:id[], footnote:id[]
     end
 
     test 'should not resolve an inline footnote macro missing both id and text' do
-      input = <<-EOS
-The footnote:[] macro can be used for defining and referencing footnotes.
+      input = <<~'EOS'
+      The footnote:[] macro can be used for defining and referencing footnotes.
 
-The footnoteref:[] macro is now deprecated.
+      The footnoteref:[] macro is now deprecated.
       EOS
 
       output = convert_string_to_embedded input
@@ -1076,9 +1069,7 @@ The footnoteref:[] macro is now deprecated.
     end
 
     test 'inline footnote macro can define a numeric id without conflicting with auto-generated ID' do
-      input = <<-EOS
-You can download the software from the product page.footnote:1[Option only available if you have an active subscription.]
-      EOS
+      input = 'You can download the software from the product page.footnote:1[Option only available if you have an active subscription.]'
 
       output = convert_string_to_embedded input
       assert_css '#_footnote_1', output, 1
@@ -1156,16 +1147,16 @@ You can download the software from the product page.footnote:1[Option only avail
 
     test 'should not split index terms on commas inside of quoted terms' do
       inputs = []
-      inputs.push <<-EOS
-Tigers are big, scary cats.
-indexterm:[Tigers, "[Big\\],
-scary cats"]
-EOS
-      inputs.push <<-EOS
-Tigers are big, scary cats.
-(((Tigers, "[Big],
-scary cats")))
-EOS
+      inputs.push <<~'EOS'
+      Tigers are big, scary cats.
+      indexterm:[Tigers, "[Big\],
+      scary cats"]
+      EOS
+      inputs.push <<~'EOS'
+      Tigers are big, scary cats.
+      (((Tigers, "[Big],
+      scary cats")))
+      EOS
 
       inputs.each do |input|
         para = block_from_string input
@@ -1857,18 +1848,23 @@ EOS
     end
 
     test 'replaces dashes' do
-      para = block_from_string %(-- foo foo--bar foo\\--bar foo -- bar foo \\-- bar
-stuff in between
--- foo
-stuff in between
-foo --
-stuff in between
-foo --)
-      expected = '&#8201;&#8212;&#8201;foo foo&#8212;&#8203;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
-stuff in between&#8201;&#8212;&#8201;foo
-stuff in between
-foo&#8201;&#8212;&#8201;stuff in between
-foo&#8201;&#8212;&#8201;'
+      input = <<~'EOS'
+      -- foo foo--bar foo\--bar foo -- bar foo \-- bar
+      stuff in between
+      -- foo
+      stuff in between
+      foo --
+      stuff in between
+      foo --
+      EOS
+      expected = <<~'EOS'.chomp
+      &#8201;&#8212;&#8201;foo foo&#8212;&#8203;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
+      stuff in between&#8201;&#8212;&#8201;foo
+      stuff in between
+      foo&#8201;&#8212;&#8201;stuff in between
+      foo&#8201;&#8212;&#8201;
+      EOS
+      para = block_from_string input
       assert_equal expected, para.sub_replacements(para.source)
     end
 
