@@ -64,6 +64,7 @@ Improvements::
   * add an options method on AbstractNode to retrieve the set of option names (#3051)
   * pass :input_mtime option to Document constructor; let Document constructor assign docdate/time/year attributes (#3029)
   * never mutate strings; add a `frozen_string_literal: true` magic comment to top of all Ruby source files (#3054)
+  * always use docdate and doctime to compute docyear and docdatetime (#3064)
 
 Bug Fixes::
 
