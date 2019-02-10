@@ -648,6 +648,23 @@ context 'Syntax Highlighter' do
       assert_css 'code span.gp', output, 1
     end
 
+    test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
+      input = <<~'EOS'
+      [source%linenums,ruby]
+      ----
+      puts 'Hello, World!'
+      puts 'Goodbye, World!'
+      ----
+      EOS
+      output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'table.linenotable', output, 1
+      assert_css 'table.linenotable td.linenos', output, 1
+      assert_css 'table.linenotable td.linenos pre.lineno', output, 1
+      assert_css 'table.linenotable td.code', output, 1
+      assert_css 'table.linenotable td.code pre:not([class])', output, 1
+      assert_xpath %(//pre[@class="lineno"][text()="1\n2\n"]), output, 1
+    end
+
     test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
       input = <<~'EOS'
       [source%linenums,ruby,start=9]
