@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 class AbstractBlock < AbstractNode
   # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block

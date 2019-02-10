@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
 class Inline < AbstractNode

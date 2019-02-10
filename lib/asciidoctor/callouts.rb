@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # Public: Maintains a catalog of callouts and their associations.
 class Callouts

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # A built-in {Converter} implementation that generates the man page (troff) format.
 #

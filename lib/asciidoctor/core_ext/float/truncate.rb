@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # NOTE remove once minimum required Ruby version is at least 2.4
 Float.prepend(Module.new do
   def truncate *args

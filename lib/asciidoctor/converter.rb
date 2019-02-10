@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
 # A module for defining converters that are used to convert {AbstractNode} objects in a parsed AsciiDoc document to an
 # output (aka backend) format such as HTML or DocBook.
@@ -182,9 +183,8 @@ module Converter
       default.create backend, opts
     end
 
-    # Public: Register a custom converter with this factory to handle conversion to the specified backends. If the
-    # backend value is an asterisk (i.e., +*+), the converter is used as a catch all to handle any backend for which a
-    # converter is not registered.
+    # Public: Register a custom converter with this factory to handle conversion for the specified backends. If the
+    # backend is an asterisk (i.e., +*+), the converter will handle any backend for which a converter is not registered.
     #
     # converter - The Converter class to register.
     # backends  - One or more String backend names that this converter should be registered to handle.
