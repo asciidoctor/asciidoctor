@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 require_relative 'test_helper'
 
-SAMPLE_MANPAGE_HEADER = <<'EOS'.chomp
-= command (1)
-Author Name
-:doctype: manpage
-:man manual: Command Manual
-:man source: Command 1.2.3
-
-== NAME
-
-command - does stuff
-
-== SYNOPSIS
-
-*command* [_OPTION_]... _FILE_...
-
-== DESCRIPTION
-EOS
-
 context 'Manpage' do
+  SAMPLE_MANPAGE_HEADER = <<~'EOS'.chomp
+  = command (1)
+  Author Name
+  :doctype: manpage
+  :man manual: Command Manual
+  :man source: Command 1.2.3
+  
+  == NAME
+  
+  command - does stuff
+  
+  == SYNOPSIS
+  
+  *command* [_OPTION_]... _FILE_...
+  
+  == DESCRIPTION
+  EOS
+
   context 'Configuration' do
     test 'should set proper manpage-related attributes' do
       input = SAMPLE_MANPAGE_HEADER

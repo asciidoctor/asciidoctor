@@ -146,7 +146,7 @@ context 'API' do
     end
 
     test 'should accept attributes as array' do
-	  # NOTE there's a tab character before idseparator
+      # NOTE there's a tab character before idseparator
       doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('toc')
