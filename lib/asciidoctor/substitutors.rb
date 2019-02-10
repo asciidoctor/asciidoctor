@@ -1359,12 +1359,12 @@ module Substitutors
 
     doc_attrs = @document.attributes
     syntax_hl_name = syntax_hl.name
-    if (linenums_mode = (attr? 'linenums', nil, false) ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
-      start_line_number = 1 if (start_line_number = (attr 'start', nil, 1).to_i) < 1
+    if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
+      start_line_number = 1 if (start_line_number = (attr 'start', 1).to_i) < 1
     end
-    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight', nil, false
+    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight'
 
-    highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language', nil, false),
+    highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language'),
       callouts: callout_marks,
       css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
       highlight_lines: highlight_lines,

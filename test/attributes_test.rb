@@ -472,25 +472,37 @@ context 'Attributes' do
       assert_equal 'position 1', node.attributes[1]
     end
 
-    test 'attr should retrieve attribute from document if not set on block' do
+    test 'attr should not retrieve attribute from document if not set on block' do
       doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
       para = doc.blocks[0]
-      assert_equal 'value', (para.attr 'name')
+      assert_nil para.attr 'name'
     end
 
-    test 'attr uses alternate name when looking for attribute on document' do
+    test 'attr looks for attribute on document if fallback name is true' do
+      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      para = doc.blocks[0]
+      assert_equal 'value', (para.attr 'name', nil, true)
+    end
+
+    test 'attr uses fallback name when looking for attribute on document' do
       doc = document_from_string 'paragraph', :attributes => { 'alt-name' => 'value' }
       para = doc.blocks[0]
       assert_equal 'value', (para.attr 'name', nil, 'alt-name')
     end
 
-    test 'attr? should check for attribute on document if not set on block' do
+    test 'attr? should not check for attribute on document if not set on block' do
       doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
       para = doc.blocks[0]
-      assert para.attr? 'name'
+      refute para.attr? 'name'
     end
 
-    test 'attr? uses alternate name when looking for attribute on document' do
+    test 'attr? checks for attribute on document if fallback name is true' do
+      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      para = doc.blocks[0]
+      assert para.attr? 'name', nil, true
+    end
+
+    test 'attr? checks for fallback name when looking for attribute on document' do
       doc = document_from_string 'paragraph', :attributes => { 'alt-name' => 'value' }
       para = doc.blocks[0]
       assert para.attr? 'name', nil, 'alt-name'

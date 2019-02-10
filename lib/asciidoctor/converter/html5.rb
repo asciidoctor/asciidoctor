@@ -391,8 +391,8 @@ TeX: {#{eqnums_opt}}
     classes = ['audioblock', node.role].compact
     class_attribute = %( class="#{classes.join ' '}")
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    start_t = node.attr 'start', nil, false
-    end_t = node.attr 'end', nil, false
+    start_t = node.attr 'start'
+    end_t = node.attr 'end'
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
@@ -547,7 +547,7 @@ Your browser does not support the audio tag.
     target = node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    if ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
+    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
         ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
       if svg
         img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
@@ -557,7 +557,7 @@ Your browser does not support the audio tag.
       end
     end
     img ||= %(<img src="#{node.image_uri target}" alt="#{_encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
-    if node.attr? 'link', nil, false
+    if node.attr? 'link'
       img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
     end
     id_attr = node.id ? %( id="#{node.id}") : ''
@@ -577,7 +577,7 @@ Your browser does not support the audio tag.
   def listing node
     nowrap = (node.option? 'nowrap') || !(node.document.attr? 'prewrap')
     if node.style == 'source'
-      lang = node.attr 'language', nil, false
+      lang = node.attr 'language'
       if (syntax_hl = node.document.syntax_highlighter)
         opts = syntax_hl.highlight? ? {
           css_mode: ((doc_attrs = node.document.attributes)[%(#{syntax_hl.name}-css)] || :class).to_sym,
@@ -767,12 +767,12 @@ Your browser does not support the audio tag.
   def table node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
-    classes = ['tableblock', %(frame-#{node.attr 'frame', 'all'}), %(grid-#{node.attr 'grid', 'all'})]
-    if (stripes = node.attr 'stripes')
+    classes = ['tableblock', %(frame-#{node.attr 'frame', 'all', 'table-frame'}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
+    if (stripes = node.attr 'stripes', nil, 'table-stripes')
       classes << %(stripes-#{stripes})
     end
     styles = []
-    if (autowidth = node.option? 'autowidth') && !(node.attr? 'width', nil, false)
+    if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
       classes << 'fit-content'
     elsif (tablewidth = node.attr 'tablepcwidth') == 100
       classes << 'stretch'
@@ -943,7 +943,7 @@ Your browser does not support the audio tag.
       unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
-      start_anchor = (node.attr? 'start', nil, false) ? %(#at=#{node.attr 'start'}) : ''
+      start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
       delimiter = ['?']
       autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoplay=1) : ''
       loop_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}loop=1) : ''
@@ -959,8 +959,8 @@ Your browser does not support the audio tag.
       end
       rel_param_val = (node.option? 'related') ? 1 : 0
       # NOTE start and end must be seconds (t parameter allows XmYs where X is minutes and Y is seconds)
-      start_param = (node.attr? 'start', nil, false) ? %(&amp;start=#{node.attr 'start'}) : ''
-      end_param = (node.attr? 'end', nil, false) ? %(&amp;end=#{node.attr 'end'}) : ''
+      start_param = (node.attr? 'start') ? %(&amp;start=#{node.attr 'start'}) : ''
+      end_param = (node.attr? 'end') ? %(&amp;end=#{node.attr 'end'}) : ''
       autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : ''
       loop_param = (has_loop_param = node.option? 'loop') ? '&amp;loop=1' : ''
       mute_param = (node.option? 'muted') ? '&amp;mute=1' : ''
@@ -974,17 +974,17 @@ Your browser does not support the audio tag.
         fs_attribute = _append_boolean_attribute 'allowfullscreen', xml
       end
       modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : ''
-      theme_param = (node.attr? 'theme', nil, false) ? %(&amp;theme=#{node.attr 'theme'}) : ''
+      theme_param = (node.attr? 'theme') ? %(&amp;theme=#{node.attr 'theme'}) : ''
       hl_param = (node.attr? 'lang') ? %(&amp;hl=#{node.attr 'lang'}) : ''
 
       # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
       target, list = (node.attr 'target').split '/', 2
-      if (list ||= (node.attr 'list', nil, false))
+      if (list ||= (node.attr 'list'))
         list_param = %(&amp;list=#{list})
       else
         # parse dynamic playlist syntax: video_id1,video_id2,...
         target, playlist = target.split ',', 2
-        if (playlist ||= (node.attr 'playlist', nil, false))
+        if (playlist ||= (node.attr 'playlist'))
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
           list_param = %(&amp;playlist=#{playlist})
         else
@@ -999,10 +999,10 @@ Your browser does not support the audio tag.
 </div>
 </div>)
     else
-      poster_attribute = (val = node.attr 'poster', nil, false).nil_or_empty? ? '' : %( poster="#{node.media_uri val}")
-      preload_attribute = (val = node.attr 'preload', nil, false).nil_or_empty? ? '' : %( preload="#{val}")
-      start_t = node.attr 'start', nil, false
-      end_t = node.attr 'end', nil, false
+      poster_attribute = (val = node.attr 'poster').nil_or_empty? ? '' : %( poster="#{node.media_uri val}")
+      preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
+      start_t = node.attr 'start'
+      end_t = node.attr 'end'
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
@@ -1025,7 +1025,7 @@ Your browser does not support the video tag.
         unless (text = node.text)
           refid = node.attributes['refid']
           if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid])
-            text = (ref.xreftext node.attr('xrefstyle')) || %([#{refid}])
+            text = (ref.xreftext node.attr('xrefstyle', nil, true)) || %([#{refid}])
           else
             text = %([#{refid}])
           end
@@ -1037,7 +1037,7 @@ Your browser does not support the video tag.
     when :link
       attrs = node.id ? [%( id="#{node.id}")] : []
       attrs << %( class="#{node.role}") if node.role
-      attrs << %( title="#{node.attr 'title'}") if node.attr? 'title', nil, false
+      attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
       %(<a href="#{node.target}"#{(_append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
     when :bibref
       # NOTE technically node.text should be node.reftext, but subs have already been applied to text
@@ -1068,7 +1068,7 @@ Your browser does not support the video tag.
   end
 
   def inline_footnote node
-    if (index = node.attr 'index', nil, false)
+    if (index = node.attr 'index')
       if node.type == :xref
         %(<sup class="footnoteref">[<a class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
       else
@@ -1093,7 +1093,7 @@ Your browser does not support the video tag.
     else
       target = node.target
       attrs = ['width', 'height', 'title'].map {|name| (node.attr? name) ? %( #{name}="#{node.attr name}") : '' }.join
-      if type != 'icon' && ((node.attr? 'format', 'svg', false) || (target.include? '.svg')) &&
+      if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) &&
           node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
           img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
@@ -1104,7 +1104,7 @@ Your browser does not support the video tag.
       end
       img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{_encode_quotes node.alt}"#{attrs}#{@void_element_slash}>)
     end
-    if node.attr? 'link', nil, false
+    if node.attr? 'link'
       img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
     end
     if (role = node.role)
@@ -1138,7 +1138,7 @@ Your browser does not support the video tag.
     submenu_joiner = %(</b>#{caret}<b class="submenu">)
     menu = node.attr 'menu'
     if (submenus = node.attr 'submenus').empty?
-      if (menuitem = node.attr 'menuitem', nil, false)
+      if (menuitem = node.attr 'menuitem')
         %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="menuitem">#{menuitem}</b></span>)
       else
         %(<b class="menuref">#{menu}</b>)

@@ -392,10 +392,11 @@ class Converter::DocBook5Converter < Converter::Base
     has_body = false
     result = []
     pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
-    if (frame = node.attr 'frame', 'all') == 'ends'
+    if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
       frame = 'topbot'
     end
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(node.attr 'grid') ? 0 : 1}" colsep="#{['none', 'rows'].include?(node.attr 'grid') ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', false) ? ' orient="land"' : ''}>)
+    grid = node.attr 'grid', nil, 'table-grid'
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
     if (node.option? 'unbreakable')
       result << '<?dbfo keep-together="always"?>'
     elsif (node.option? 'breakable')
@@ -586,7 +587,7 @@ class Converter::DocBook5Converter < Converter::Base
   def inline_menu node
     menu = node.attr 'menu'
     if (submenus = node.attr 'submenus').empty?
-      if (menuitem = node.attr 'menuitem', nil, false)
+      if (menuitem = node.attr 'menuitem')
         %(<menuchoice><guimenu>#{menu}</guimenu> <guimenuitem>#{menuitem}</guimenuitem></menuchoice>)
       else
         %(<guimenu>#{menu}</guimenu>)

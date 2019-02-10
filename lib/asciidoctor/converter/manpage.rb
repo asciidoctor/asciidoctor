@@ -552,8 +552,8 @@ allbox tab(:);'
   end
 
   def video node
-    start_param = (node.attr? 'start', nil, false) ? %(&start=#{node.attr 'start'}) : ''
-    end_param = (node.attr? 'end', nil, false) ? %(&end=#{node.attr 'end'}) : ''
+    start_param = (node.attr? 'start') ? %(&start=#{node.attr 'start'}) : ''
+    end_param = (node.attr? 'end') ? %(&end=#{node.attr 'end'}) : ''
     result = []
     result << (node.title? ? %(.sp
 .B #{_manify node.title}
