@@ -370,9 +370,11 @@ context 'Links' do
   end
 
   test 'unescapes square bracket in reftext of anchor macro' do
-    input = 'see <<foo>>
+    input = <<~'EOS'
+    see <<foo>>
 
-anchor:foo[b[a\]r]text'
+    anchor:foo[b[a\]r]tex'
+    EOS
     result = convert_string_to_embedded input
     assert_includes result, 'see <a href="#foo">b[a]r</a>'
   end
@@ -396,21 +398,21 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax with label' do
-    input = <<-EOS
-<<tigers,About Tigers>>
+    input = <<~'EOS'
+    <<tigers,About Tigers>>
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', convert_string(input), 1
   end
 
   test 'xref using angled bracket syntax with quoted label' do
-    input = <<-EOS
-<<tigers,"About Tigers">>
+    input = <<~'EOS'
+    <<tigers,"About Tigers">>
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath %q(//a[@href="#tigers"][text() = '"About Tigers"']), convert_string(input), 1
   end
@@ -533,22 +535,22 @@ anchor:foo[b[a\]r]text'
   end
 
   test 'xref using angled bracket syntax inline with text' do
-    input = <<-EOS
-Want to learn <<tigers,about tigers>>?
+    input = <<~'EOS'
+    Want to learn <<tigers,about tigers>>?
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', convert_string(input), 1
   end
 
   test 'xref using angled bracket syntax with multi-line label inline with text' do
-    input = <<-EOS
-Want to learn <<tigers,about
-tigers>>?
+    input = <<~'EOS'
+    Want to learn <<tigers,about
+    tigers>>?
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, convert_string(input), 1
   end
@@ -556,11 +558,11 @@ tigers>>?
   test 'xref with escaped text' do
     # when \x0 was used as boundary character for passthrough, it was getting stripped
     # now using unicode marks as boundary characters, which resolves issue
-    input = <<-EOS
-See the <<tigers, `+[tigers]+`>> section for details about tigers.
+    input = <<~'EOS'
+    See the <<tigers, `+[tigers]+`>> section for details about tigers.
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     output = convert_string_to_embedded input
     assert_xpath %(//a[@href="#tigers"]/code[text()="[tigers]"]), output, 1
@@ -568,13 +570,13 @@ See the <<tigers, `+[tigers]+`>> section for details about tigers.
 
   test 'xref with target that begins with attribute reference in title' do
     ['<<{lessonsdir}/lesson-1#,Lesson 1>>', 'xref:{lessonsdir}/lesson-1#[Lesson 1]'].each do |xref|
-      input = <<-EOS
-:lessonsdir: lessons
+      input = <<~EOS
+      :lessonsdir: lessons
 
-[#lesson-1-listing]
-== #{xref}
+      [#lesson-1-listing]
+      == #{xref}
 
-A summary of the first lesson.
+      A summary of the first lesson.
       EOS
 
       output = convert_string_to_embedded input
@@ -589,14 +591,14 @@ A summary of the first lesson.
   end
 
   test 'multiple xref macros with implicit text in single line' do
-    input = <<-EOS
-This document has two sections, xref:sect-a[] and xref:sect-b[].
+    input = <<~'EOS'
+    This document has two sections, xref:sect-a[] and xref:sect-b[].
 
-[#sect-a]
-== Section A
+    [#sect-a]
+    == Section A
 
-[#sect-b]
-== Section B
+    [#sect-b]
+    == Section B
     EOS
     result = convert_string_to_embedded input
     assert_xpath '//a[@href="#sect-a"][text() = "Section A"]', result, 1
@@ -610,61 +612,63 @@ This document has two sections, xref:sect-a[] and xref:sect-b[].
   end
 
   test 'xref using macro syntax with label' do
-    input = <<-EOS
-xref:tigers[About Tigers]
+    input = <<~'EOS'
+    xref:tigers[About Tigers]
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath '//a[@href="#tigers"][text() = "About Tigers"]', convert_string(input), 1
   end
 
   test 'xref using macro syntax inline with text' do
-    input = <<-EOS
-Want to learn xref:tigers[about tigers]?
+    input = <<~'EOS'
+    Want to learn xref:tigers[about tigers]?
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
 
     assert_xpath '//a[@href="#tigers"][text() = "about tigers"]', convert_string(input), 1
   end
 
   test 'xref using macro syntax with multi-line label inline with text' do
-    input = <<-EOS
-Want to learn xref:tigers[about
-tigers]?
+    input = <<~'EOS'
+    Want to learn xref:tigers[about
+    tigers]?
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath %{//a[@href="#tigers"][normalize-space(text()) = "about tigers"]}, convert_string(input), 1
   end
 
   test 'xref using macro syntax with text that ends with an escaped closing bracket' do
-    input = <<-EOS
-xref:tigers[[tigers\\]]
+    input = <<~'EOS'
+    xref:tigers[[tigers\]]
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath '//a[@href="#tigers"][text() = "[tigers]"]', convert_string_to_embedded(input), 1
   end
 
   test 'xref using macro syntax with text that contains an escaped closing bracket' do
-    input = <<-EOS
-xref:tigers[[tigers\\] are cats]
+    input = <<~'EOS'
+    xref:tigers[[tigers\] are cats]
 
-[#tigers]
-== Tigers
+    [#tigers]
+    == Tigers
     EOS
     assert_xpath '//a[@href="#tigers"][text() = "[tigers] are cats"]', convert_string_to_embedded(input), 1
   end
 
   test 'unescapes square bracket in reftext used by xref' do
-    input = 'anchor:foo[b[a\]r]about
+    input = <<~'EOS'
+    anchor:foo[b[a\]r]about
 
-see <<foo>>'
+    see <<foo>>
+    EOS
     result = convert_string_to_embedded input
     assert_xpath '//a[@href="#foo"]', result, 1
     assert_xpath '//a[@href="#foo"][text()="b[a]r"]', result, 1
@@ -677,13 +681,13 @@ see <<foo>>'
   end
 
   test 'should warn and create link if verbose flag is set and reference is not found' do
-    input = <<-EOS
-[#foobar]
-== Foobar
+    input = <<~'EOS'
+    [#foobar]
+    == Foobar
 
-== Section B
+    == Section B
 
-See <<foobaz>>.
+    See <<foobaz>>.
     EOS
     using_memory_logger do |logger|
       in_verbose_mode do
@@ -695,13 +699,13 @@ See <<foobaz>>.
   end
 
   test 'should warn and create link if verbose flag is set and reference using # notation is not found' do
-    input = <<-EOS
-[#foobar]
-== Foobar
+    input = <<~'EOS'
+    [#foobar]
+    == Foobar
 
-== Section B
+    == Section B
 
-See <<#foobaz>>.
+    See <<#foobaz>>.
     EOS
     using_memory_logger do |logger|
       in_verbose_mode do
@@ -713,18 +717,18 @@ See <<#foobaz>>.
   end
 
   test 'should produce an internal anchor from an inter-document xref to file included into current file' do
-    input = <<-'EOS'
-= Book Title
-:doctype: book
+    input = <<~'EOS'
+    = Book Title
+    :doctype: book
 
-[#ch1]
-== Chapter 1
+    [#ch1]
+    == Chapter 1
 
-So it begins.
+    So it begins.
 
-Read <<other-chapters.adoc#ch2>> to find out what happens next!
+    Read <<other-chapters.adoc#ch2>> to find out what happens next!
 
-include::other-chapters.adoc[]
+    include::other-chapters.adoc[]
     EOS
 
     doc = document_from_string input, safe: :safe, base_dir: fixturedir
@@ -735,18 +739,18 @@ include::other-chapters.adoc[]
   end
 
   test 'should produce an internal anchor from an inter-document xref to file included entirely into current file using tags' do
-    input = <<-'EOS'
-= Book Title
-:doctype: book
+    input = <<~'EOS'
+    = Book Title
+    :doctype: book
 
-[#ch1]
-== Chapter 1
+    [#ch1]
+    == Chapter 1
 
-So it begins.
+    So it begins.
 
-Read <<other-chapters.adoc#ch2>> to find out what happens next!
+    Read <<other-chapters.adoc#ch2>> to find out what happens next!
 
-include::other-chapters.adoc[tags=**]
+    include::other-chapters.adoc[tags=**]
     EOS
 
     output = convert_string_to_embedded input, safe: :safe, base_dir: fixturedir
@@ -754,18 +758,18 @@ include::other-chapters.adoc[tags=**]
   end
 
   test 'should not produce an internal anchor for inter-document xref to file partially included into current file' do
-    input = <<-'EOS'
-= Book Title
-:doctype: book
+    input = <<~'EOS'
+    = Book Title
+    :doctype: book
 
-[#ch1]
-== Chapter 1
+    [#ch1]
+    == Chapter 1
 
-So it begins.
+    So it begins.
 
-Read <<other-chapters.adoc#ch2,the next chapter>> to find out what happens next!
+    Read <<other-chapters.adoc#ch2,the next chapter>> to find out what happens next!
 
-include::other-chapters.adoc[tags=ch2]
+    include::other-chapters.adoc[tags=ch2]
     EOS
 
     doc = document_from_string input, safe: :safe, base_dir: fixturedir
@@ -776,13 +780,13 @@ include::other-chapters.adoc[tags=ch2]
   end
 
   test 'should warn and create link if debug mode is enabled, inter-document xref points to current doc, and reference not found' do
-    input = <<-EOS
-[#foobar]
-== Foobar
+    input = <<~'EOS'
+    [#foobar]
+    == Foobar
 
-== Section B
+    == Section B
 
-See <<test.adoc#foobaz>>.
+    See <<test.adoc#foobaz>>.
     EOS
     using_memory_logger do |logger|
       in_verbose_mode do
@@ -794,12 +798,12 @@ See <<test.adoc#foobaz>>.
   end
 
   test 'should produce an internal anchor for inter-document xref to file outside of base directory' do
-    input = <<-EOS
-= Document Title
+    input = <<~'EOS'
+    = Document Title
 
-See <<../section-a.adoc#section-a>>.
+    See <<../section-a.adoc#section-a>>.
 
-include::../section-a.adoc[]
+    include::../section-a.adoc[]
     EOS
 
     doc = document_from_string input, safe: :unsafe, base_dir: (File.join fixturedir, 'subdir')
@@ -809,14 +813,14 @@ include::../section-a.adoc[]
   end
 
   test 'xref uses title of target as label for forward and backward references in html output' do
-    input = <<-EOS
-== Section A
+    input = <<~'EOS'
+    == Section A
 
-<<_section_b>>
+    <<_section_b>>
 
-== Section B
+    == Section B
 
-<<_section_a>>
+    <<_section_a>>
     EOS
 
     output = convert_string_to_embedded input
