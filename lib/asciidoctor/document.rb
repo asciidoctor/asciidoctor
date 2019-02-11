@@ -826,7 +826,7 @@ class Document < AbstractBlock
   # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
     unless attribute_locked? name
-      value = apply_attribute_value_subs value
+      value = apply_attribute_value_subs value unless value.empty?
       # NOTE if @header_attributes is set, we're beyond the document header
       if @header_attributes
         @attributes[name] = value
