@@ -942,21 +942,27 @@ module Substitutors
           fragment = refid
         elsif (hash_idx = refid.index '#')
           if hash_idx > 0
-            if (fragment_len = refid.length - hash_idx - 1) > 0
+            if (fragment_len = refid.length - 1 - hash_idx) > 0
               path, fragment = (refid.slice 0, hash_idx), (refid.slice hash_idx + 1, fragment_len)
             else
-              path = refid.slice 0, hash_idx
+              path = refid.chop
             end
-            if (ext = ::File.extname path).empty?
+            if macro
+              src2src = (path = path.slice 0, path.length - 5) if path.end_with? '.adoc'
+            elsif (last_dot_idx = path.rindex '.') && ASCIIDOC_EXTENSIONS[path.slice last_dot_idx, path.length]
+              src2src = (path = path.slice 0, last_dot_idx)
+            else
               src2src = path
-            elsif ASCIIDOC_EXTENSIONS[ext]
-              src2src = (path = path.slice 0, path.length - ext.length)
             end
           else
             target, fragment = refid, (refid.slice 1, refid.length)
           end
-        elsif macro && (refid.end_with? '.adoc')
-          src2src = (path = refid.slice 0, refid.length - 5)
+        elsif macro && (refid.include? '.')
+          if refid.end_with? '.adoc'
+            src2src = (path = refid.slice 0, refid.length - 5)
+          else
+            path = refid
+          end
         else
           fragment = refid
         end

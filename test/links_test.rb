@@ -429,19 +429,48 @@ context 'Links' do
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
-  test 'inter-document xref should not add suffix to path with a non-AsciiDoc extension' do
+  test 'inter-document xref shorthand syntax should assume AsciiDoc extension if AsciiDoc extension not present' do
     {
-      'using-.net-web-services' => 'Using .NET web services',
+      'using-.net-web-services#' => 'Using .NET web services',
+      'asciidoctor.1#' => 'Asciidoctor Manual',
+      'path/to/document#' => 'Document Title',
+    }.each do |target, text|
+      result = convert_string_to_embedded %(<<#{target},#{text}>>)
+      assert_xpath %(//a[@href="#{target.chop}.html"][text()="#{text}"]), result, 1
+    end
+  end
+
+  test 'xref macro with explicit inter-document target should not assume AsciiDoc extension if AsciiDoc extension not present' do
+    {
+      'using-.net-web-services#' => 'Using .NET web services',
+      'asciidoctor.1#' => 'Asciidoctor Manual',
+      'path/to/document#' => 'Document Title',
+    }.each do |target, text|
+      result = convert_string_to_embedded %(xref:#{target}[#{text}])
+      assert_xpath %(//a[@href="#{target.chop}"][text()="#{text}"]), result, 1
+    end
+  end
+
+  test 'xref macro with implicit inter-document target should preserve path with file extension' do
+    {
+      'refcard.pdf' => 'Refcard',
       'asciidoctor.1' => 'Asciidoctor Manual',
     }.each do |path, text|
-      result = convert_string_to_embedded %(<<#{path}#,#{text}>>)
-      assert_xpath %(//a[@href="#{path}"][text() = "#{text}"]), result, 1
+      result = convert_string_to_embedded %(xref:#{path}[#{text}])
+      assert_xpath %(//a[@href="#{path}"][text()="#{text}"]), result, 1
     end
   end
 
   test 'inter-document xref should only remove the file extension part if the path contains a period elsewhere' do
     result = convert_string_to_embedded '<<using-.net-web-services.adoc#,Using .NET web services>>'
     assert_xpath '//a[@href="using-.net-web-services.html"][text() = "Using .NET web services"]', result, 1
+  end
+
+  test 'xref macro target containing dot should be interpreted as a path unless prefixed by #' do
+    result = convert_string_to_embedded 'xref:using-.net-web-services[Using .NET web services]'
+    assert_xpath '//a[@href="using-.net-web-services"][text() = "Using .NET web services"]', result, 1
+    result = convert_string_to_embedded 'xref:#using-.net-web-services[Using .NET web services]'
+    assert_xpath '//a[@href="#using-.net-web-services"][text() = "Using .NET web services"]', result, 1
   end
 
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
@@ -569,7 +598,7 @@ context 'Links' do
   end
 
   test 'xref with target that begins with attribute reference in title' do
-    ['<<{lessonsdir}/lesson-1#,Lesson 1>>', 'xref:{lessonsdir}/lesson-1#[Lesson 1]'].each do |xref|
+    ['<<{lessonsdir}/lesson-1#,Lesson 1>>', 'xref:{lessonsdir}/lesson-1.adoc[Lesson 1]'].each do |xref|
       input = <<~EOS
       :lessonsdir: lessons
 
