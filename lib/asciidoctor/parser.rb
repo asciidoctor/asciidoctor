@@ -698,15 +698,15 @@ class Parser
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, (in_list = ListItem === parent) && skipped == 0, skip_line_comments: text_only
+        lines = read_paragraph_lines reader, (list_item = options[:list_item]) && skipped == 0, skip_line_comments: text_only
         adjust_indentation! lines
         block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
         # a literal gets special meaning inside of a description list
         # TODO this feels hacky, better way to distinguish from explicit literal block?
-        block.set_option 'listparagraph' if in_list
+        block.set_option 'listparagraph' if list_item
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
-        lines = read_paragraph_lines reader, skipped == 0 && ListItem === parent, skip_line_comments: true
+        lines = read_paragraph_lines reader, skipped == 0 && options[:list_item], skip_line_comments: true
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
         if text_only
@@ -1347,12 +1347,12 @@ class Parser
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
-      if (block = next_block(list_item_reader, list_item, {}, text: !has_text))
+      if (block = next_block(list_item_reader, list_item, {}, text: !has_text, list_item: true))
         list_item.blocks << block
       end
 
       while list_item_reader.has_more_lines?
-        if (block = next_block(list_item_reader, list_item))
+        if (block = next_block(list_item_reader, list_item, {}, list_item: true))
           list_item.blocks << block
         end
       end
