@@ -12,9 +12,8 @@ module Substitutors
 
   (BASIC_SUBS = [:specialcharacters]).freeze
   (HEADER_SUBS = [:specialcharacters, :attributes]).freeze
-  (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
   (NONE_SUBS = []).freeze
-  (TITLE_SUBS = [:specialcharacters, :quotes, :replacements, :macros, :attributes, :post_replacements]).freeze
+  (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
   (REFTEXT_SUBS = [:specialcharacters, :quotes, :replacements]).freeze
   (VERBATIM_SUBS = [:specialcharacters, :callouts]).freeze
 
@@ -124,7 +123,7 @@ module Substitutors
   #
   # Returns the String with normal substitutions applied.
   def apply_normal_subs text
-    apply_subs text
+    apply_subs text, NORMAL_SUBS
   end
 
   # Public: Apply substitutions for titles.
@@ -132,9 +131,7 @@ module Substitutors
   # title  - The String title to process
   #
   # returns - A String with title substitutions performed
-  def apply_title_subs(title)
-    apply_subs title, TITLE_SUBS
-  end
+  alias apply_title_subs apply_subs
 
   # Public: Apply substitutions for reftext.
   #

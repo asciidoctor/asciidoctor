@@ -678,6 +678,25 @@ context 'Sections' do
     end
   end
 
+  context 'Substitutions' do
+    test 'should apply substitutions in normal order' do
+      input = <<~'EOS'
+      == {link-url}[{link-text}]{tm}
+
+      The one and only!
+      EOS
+
+      output = convert_string_to_embedded input, attributes: {
+        'link-url' => 'https://acme.com',
+        'link-text' => 'ACME',
+        'tm' => '(TM)',
+      }
+      assert_css 'h2', output, 1
+      assert_css 'h2 a[href="https://acme.com"]', output, 1
+      assert_xpath %(//h2[contains(text(),"#{decode_char 8482}")]), output, 1
+    end
+  end
+
   context 'Nesting' do
     test 'should warn if section title is out of sequence' do
       input = <<~'EOS'

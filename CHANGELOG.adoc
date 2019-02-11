@@ -20,6 +20,7 @@ Enhancements::
   * drop support for Ruby < 2.3 and JRuby < 9.1 and remove workarounds (#2764)
   * drop support for Slim < 3 (#2998)
   * drop the converter for the docbook45 backend (#3005)
+  * apply substitutions to section and block titles in normal substitution order (#1173)
   * make syntax highlighter pluggable; extract all logic into adapter classes (#2106)
   * add syntax highlighter adapter for Rouge (#1040)
   * redesign Converter API based on SyntaxHighlighter API; remap deprecated API to new API to ensure compatibility (#2891)

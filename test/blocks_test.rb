@@ -1864,6 +1864,22 @@ context 'Blocks' do
       assert_xpath '//*[@class="sect1"]//*[@class="paragraph"]/*[@class="title"][text()="Block title"]', output, 1
     end
 
+    test 'should apply substitutions to a block title in normal order' do
+      input = <<~'EOS'
+      .{link-url}[{link-text}]{tm}
+      The one and only!
+      EOS
+
+      output = convert_string_to_embedded input, attributes: {
+        'link-url' => 'https://acme.com',
+        'link-text' => 'ACME',
+        'tm' => '(TM)',
+      }
+      assert_css '.title', output, 1
+      assert_css '.title a[href="https://acme.com"]', output, 1
+      assert_xpath %(//*[@class="title"][contains(text(),"#{decode_char 8482}")]), output, 1
+    end
+
     test 'empty attribute list should not appear in output' do
       input = <<~'EOS'
       []
