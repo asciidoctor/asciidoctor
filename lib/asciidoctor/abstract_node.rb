@@ -87,8 +87,8 @@ class AbstractNode
   #                 this node (default: same as name).
   #
   # Returns the [Object] value (typically a String) of the attribute or default_value if the attribute is not found.
-  def attr name, default_value = nil, fallback_name = name
-    @attributes[name.to_s] || (@parent && fallback_name && @document.attributes[fallback_name.to_s] || default_value)
+  def attr name, default_value = nil, fallback_name = nil
+    @attributes[name.to_s] || (fallback_name && @parent && @document.attributes[(fallback_name == true ? name : fallback_name).to_s] || default_value)
   end
 
   # Public: Check if the specified attribute is defined using the same logic as {#attr}, optionally performing a
@@ -106,11 +106,11 @@ class AbstractNode
   #
   # Returns a [Boolean] indicating whether the attribute exists and, if a truthy comparison value is specified, whether
   # the value of the attribute matches the comparison value.
-  def attr? name, expected_value = nil, fallback_name = name
+  def attr? name, expected_value = nil, fallback_name = nil
     if expected_value
-      expected_value == (@attributes[name.to_s] || (@parent && fallback_name ? @document.attributes[fallback_name.to_s] : nil))
+      expected_value == (@attributes[name.to_s] || (fallback_name && @parent ? @document.attributes[(fallback_name == true ? name : fallback_name).to_s] : nil))
     else
-      (@attributes.key? name.to_s) || (@parent && fallback_name ? (@document.attributes.key? fallback_name.to_s) : false)
+      (@attributes.key? name.to_s) || (fallback_name && @parent ? (@document.attributes.key? (fallback_name == true ? name : fallback_name).to_s) : false)
     end
   end
 
