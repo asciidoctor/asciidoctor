@@ -1034,7 +1034,8 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_post_replacements(text)
-    if @document.attributes['hardbreaks'] || @attributes['hardbreaks-option']
+    #if attr? 'hardbreaks-option', nil, 'hardbreaks'
+    if @attributes['hardbreaks-option'] || @document.attributes['hardbreaks']
       lines = text.split LF, -1
       return text if lines.size < 2
       last = lines.pop
