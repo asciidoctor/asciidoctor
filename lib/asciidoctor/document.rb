@@ -827,15 +827,20 @@ class Document < AbstractBlock
   def set_attribute name, value = ''
     unless attribute_locked? name
       value = apply_attribute_value_subs value
-      case name
-      when 'backend'
-        update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax')
-      when 'doctype'
-        update_doctype_attributes value
-      else
+      # NOTE if @header_attributes is set, we're beyond the document header
+      if @header_attributes
         @attributes[name] = value
+      else
+        case name
+        when 'backend'
+          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax')
+        when 'doctype'
+          update_doctype_attributes value
+        else
+          @attributes[name] = value
+        end
+        @attributes_modified << name
       end
-      @attributes_modified << name
       value
     end
   end
