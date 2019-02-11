@@ -1127,7 +1127,7 @@ class Document < AbstractBlock
     end
 
     # css-signature cannot be updated after header attributes are processed
-    @id = attrs['css-signature'] unless @id
+    @id ||= attrs['css-signature']
 
     if (toc_val = (attrs.delete 'toc2') ? 'left' : attrs['toc'])
       # toc-placement allows us to separate position from using fitted slot vs macro
