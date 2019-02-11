@@ -821,26 +821,22 @@ class Document < AbstractBlock
   # 'doctype', then the value of backend-related attributes are updated.
   #
   # name  - the String attribute name
-  # value - the String attribute value; must not be nil (default: '')
+  # value - the String attribute value; must not be nil (optional, default: '')
   #
-  # Returns the resolved value if the attribute was set or nil if it was not because it's locked.
+  # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
     unless attribute_locked? name
-      if @max_attribute_value_size
-        resolved_value = Helpers.limit_bytesize (apply_attribute_value_subs value), @max_attribute_value_size
-      else
-        resolved_value = apply_attribute_value_subs value
-      end
+      value = apply_attribute_value_subs value
       case name
       when 'backend'
-        update_backend_attributes resolved_value, (@attributes_modified.delete? 'htmlsyntax')
+        update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax')
       when 'doctype'
-        update_doctype_attributes resolved_value
+        update_doctype_attributes value
       else
-        @attributes[name] = resolved_value
+        @attributes[name] = value
       end
       @attributes_modified << name
-      resolved_value
+      value
     end
   end
 
@@ -1075,10 +1071,26 @@ class Document < AbstractBlock
   # Returns The String value with substitutions performed
   def apply_attribute_value_subs value
     if AttributeEntryPassMacroRx =~ value
-      $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
+      value = $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
     else
-      apply_header_subs value
+      value = apply_header_subs value
     end
+    @max_attribute_value_size ? (limit_bytesize value, @max_attribute_value_size) : value
+  end
+
+  # Internal: Safely truncates a string to the specified number of bytes.
+  #
+  # If a multibyte char gets split, the dangling fragment is dropped.
+  #
+  # str - The String the truncate.
+  # max - The maximum allowable size of the String, in bytes.
+  #
+  # Returns the String truncated to the specified bytesize.
+  def limit_bytesize str, max
+    if str.bytesize > max
+      max -= 1 until (str = str.byteslice 0, max).valid_encoding?
+    end
+    str
   end
 
   # Internal: Resolve the list of comma-delimited subs to apply to docinfo files.
