@@ -556,11 +556,9 @@ class Reader
     @saved = nil
   end
 
-  # Public: Get a summary of this Reader.
-  #
-  #
-  # Returns A string summary of this reader, which contains the path and line information
-  alias to_s line_info
+  def to_s
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line: #{@lineno}}>)
+  end
 
   private
 
@@ -776,7 +774,7 @@ class PreprocessorReader < Reader
   end
 
   def to_s
-    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line #: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
+    %(#<#{self.class}@#{object_id} {path: #{@path.inspect}, line: #{@lineno}, include depth: #{@include_stack.size}, include stack: [#{@include_stack.map {|inc| inc.to_s }.join ', '}]}>)
   end
 
   private

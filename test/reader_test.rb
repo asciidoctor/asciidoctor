@@ -265,17 +265,16 @@ class ReaderTest < Minitest::Test
     end
 
     context 'Line context' do
-      test 'to_s should return file name and line number of current line' do
+      test 'cursor.to_s should return file name and line number of current line' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
-        assert_equal 'sample.adoc: line 2', reader.to_s
+        assert_equal 'sample.adoc: line 2', reader.cursor.to_s
       end
 
       test 'line_info should return file name and line number of current line' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA, 'sample.adoc'
         reader.read_line
         assert_equal 'sample.adoc: line 2', reader.line_info
-        assert_equal 'sample.adoc: line 2', reader.cursor.to_s
       end
 
       test 'cursor_at_prev_line should return file name and line number of previous line read' do
