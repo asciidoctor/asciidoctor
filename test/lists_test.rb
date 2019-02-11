@@ -224,7 +224,7 @@ context "Bulleted lists (:ulist)" do
     end
 
     test 'wrapped list item with hanging indent followed by non-indented line' do
-      input = <<~'EOS'
+      input = <<~EOS
       == Lists
 
       - list item 1
@@ -4757,7 +4757,7 @@ context 'Callout lists' do
   end
 
   test 'should allow line comment chars that precede callout number to be specified' do
-    input = <<~'EOS'
+    input = <<~EOS
     [source,erlang,line-comment=%]
     ----
     hello_world() -> % <1>
