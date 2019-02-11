@@ -470,7 +470,7 @@ class Parser
     # used and block content is acceptable
     if (text_only = options[:text]) && skipped > 0
       options.delete :text
-      text_only = false
+      text_only = nil
     end
 
     document = parent.document
@@ -642,7 +642,7 @@ class Parser
         block = parse_list(reader, :ulist, parent, style)
         break
 
-      elsif (match = OrderedListRx.match(this_line))
+      elsif OrderedListRx.match? this_line
         reader.unshift_line this_line
         block = parse_list(reader, :olist, parent, style)
         attributes['style'] = block.style if block.style
