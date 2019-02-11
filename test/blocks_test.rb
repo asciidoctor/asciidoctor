@@ -53,12 +53,12 @@ context 'Blocks' do
 
   context 'Comments' do
     test 'line comment between paragraphs offset by blank lines' do
-      input = <<-EOS
-first paragraph
+      input = <<~'EOS'
+      first paragraph
 
-// line comment
+      // line comment
 
-second paragraph
+      second paragraph
       EOS
       output = convert_string_to_embedded input
       refute_match(/line comment/, output)
@@ -66,10 +66,10 @@ second paragraph
     end
 
     test 'adjacent line comment between paragraphs' do
-      input = <<-EOS
-first line
-// line comment
-second line
+      input = <<~'EOS'
+      first line
+      // line comment
+      second line
       EOS
       output = convert_string_to_embedded input
       refute_match(/line comment/, output)
@@ -78,14 +78,14 @@ second line
     end
 
     test 'comment block between paragraphs offset by blank lines' do
-      input = <<-EOS
-first paragraph
+      input = <<~'EOS'
+      first paragraph
 
-////
-block comment
-////
+      ////
+      block comment
+      ////
 
-second paragraph
+      second paragraph
       EOS
       output = convert_string_to_embedded input
       refute_match(/block comment/, output)
@@ -93,16 +93,16 @@ second paragraph
     end
 
     test 'comment block between paragraphs offset by blank lines inside delimited block' do
-      input = <<-EOS
-====
-first paragraph
+      input = <<~'EOS'
+      ====
+      first paragraph
 
-////
-block comment
-////
+      ////
+      block comment
+      ////
 
-second paragraph
-====
+      second paragraph
+      ====
       EOS
       output = convert_string_to_embedded input
       refute_match(/block comment/, output)
@@ -110,12 +110,12 @@ second paragraph
     end
 
     test 'adjacent comment block between paragraphs' do
-      input = <<-EOS
-first paragraph
-////
-block comment
-////
-second paragraph
+      input = <<~'EOS'
+      first paragraph
+      ////
+      block comment
+      ////
+      second paragraph
       EOS
       output = convert_string_to_embedded input
       refute_match(/block comment/, output)
@@ -123,12 +123,12 @@ second paragraph
     end
 
     test "can convert with block comment at end of document with trailing newlines" do
-      input = <<-EOS
-paragraph
+      input = <<~'EOS'
+      paragraph
 
-////
-block comment
-////
+      ////
+      block comment
+      ////
 
 
       EOS
@@ -137,12 +137,12 @@ block comment
     end
 
     test "trailing newlines after block comment at end of document does not create paragraph" do
-      input = <<-EOS
-paragraph
+      input = <<~'EOS'
+      paragraph
 
-////
-block comment
-////
+      ////
+      block comment
+      ////
 
 
       EOS
@@ -152,21 +152,18 @@ block comment
     end
 
     test 'line starting with three slashes should not be line comment' do
-      input = <<-EOS
-/// not a line comment
-      EOS
-
+      input = '/// not a line comment'
       output = convert_string_to_embedded input
       refute_empty output.strip, "Line should be emitted => #{input.rstrip}"
     end
 
     test 'preprocessor directives should not be processed within comment block within block metadata' do
-      input = <<-EOS
-.sample title
-////
-ifdef::asciidoctor[////]
-////
-line should be shown
+      input = <<~'EOS'
+      .sample title
+      ////
+      ifdef::asciidoctor[////]
+      ////
+      line should be shown
       EOS
 
       output = convert_string_to_embedded input
@@ -174,14 +171,14 @@ line should be shown
     end
 
     test 'preprocessor directives should not be processed within comment block' do
-      input = <<-EOS
-dummy line
+      input = <<~'EOS'
+      dummy line
 
-////
-ifdef::asciidoctor[////]
-////
+      ////
+      ifdef::asciidoctor[////]
+      ////
 
-line should be shown
+      line should be shown
       EOS
 
       output = convert_string_to_embedded input
@@ -189,13 +186,13 @@ line should be shown
     end
 
     test 'should warn if unterminated comment block is detected in body' do
-      input = <<-EOS
-before comment block
+      input = <<~'EOS'
+      before comment block
 
-////
-content that has been disabled
+      ////
+      content that has been disabled
 
-supposed to be after comment block, except it got swallowed by block comment
+      supposed to be after comment block, except it got swallowed by block comment
       EOS
 
       convert_string_to_embedded input
@@ -203,15 +200,15 @@ supposed to be after comment block, except it got swallowed by block comment
     end
 
     test 'should warn if unterminated comment block is detected inside another block' do
-      input = <<-EOS
-before sidebar block
+      input = <<~'EOS'
+      before sidebar block
 
-****
-////
-content that has been disabled
-****
+      ****
+      ////
+      content that has been disabled
+      ****
 
-supposed to be after sidebar block, except it got swallowed by block comment
+      supposed to be after sidebar block, except it got swallowed by block comment
       EOS
 
       convert_string_to_embedded input
@@ -221,13 +218,13 @@ supposed to be after sidebar block, except it got swallowed by block comment
     # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
     # it happens because we always look a line ahead...not sure what we can do about it
     test 'preprocessor directives should not be processed within comment open block' do
-      input = <<-EOS
-[comment]
---
-first line of comment
-ifdef::asciidoctor[--]
-line should not be shown
---
+      input = <<~'EOS'
+      [comment]
+      --
+      first line of comment
+      ifdef::asciidoctor[--]
+      line should not be shown
+      --
 
       EOS
 
@@ -238,12 +235,12 @@ line should not be shown
     # WARNING this assertion fails if the directive is the first line of the paragraph instead of the second
     # it happens because we always look a line ahead; not sure what we can do about it
     test 'preprocessor directives should not be processed on subsequent lines of a comment paragraph' do
-      input = <<-EOS
-[comment]
-first line of content
-ifdef::asciidoctor[////]
+      input = <<~'EOS'
+      [comment]
+      first line of content
+      ifdef::asciidoctor[////]
 
-this line should be shown
+      this line should be shown
       EOS
 
       output = convert_string_to_embedded input
@@ -251,15 +248,15 @@ this line should be shown
     end
 
     test 'comment style on open block should only skip block' do
-      input = <<-EOS
-[comment]
---
-skip
+      input = <<~'EOS'
+      [comment]
+      --
+      skip
 
-this block
---
+      this block
+      --
 
-not this text
+      not this text
       EOS
       result = convert_string_to_embedded input
       assert_xpath '//p', result, 1
@@ -267,12 +264,12 @@ not this text
     end
 
     test 'comment style on paragraph should only skip paragraph' do
-      input = <<-EOS
-[comment]
-skip
-this paragraph
+      input = <<~'EOS'
+      [comment]
+      skip
+      this paragraph
 
-not this text
+      not this text
       EOS
       result = convert_string_to_embedded input
       assert_xpath '//p', result, 1
@@ -280,12 +277,12 @@ not this text
     end
 
     test 'comment style on paragraph should not cause adjacent block to be skipped' do
-      input = <<-EOS
-[comment]
-skip
-this paragraph
-[example]
-not this text
+      input = <<~'EOS'
+      [comment]
+      skip
+      this paragraph
+      [example]
+      not this text
       EOS
       result = convert_string_to_embedded input
       assert_xpath '/*[@class="exampleblock"]', result, 1
@@ -294,15 +291,15 @@ not this text
 
     # NOTE this test verifies the nil return value of Parser#next_block
     test 'should not drop content that follows skipped content inside a delimited block' do
-      input = <<-EOS
-====
-paragraph
+      input = <<~'EOS'
+      ====
+      paragraph
 
-[comment#idname]
-skip
+      [comment#idname]
+      skip
 
-paragraph
-====
+      paragraph
+      ====
       EOS
       result = convert_string_to_embedded input
       assert_xpath '/*[@class="exampleblock"]', result, 1
@@ -328,10 +325,10 @@ paragraph
 
   context 'Quote and Verse Blocks' do
     test 'quote block with no attribution' do
-      input = <<-EOS
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      ____
+      A famous quote.
+      ____
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -342,11 +339,11 @@ ____
     end
 
     test 'quote block with attribution' do
-      input = <<-EOS
-[quote, Famous Person, Famous Book (1999)]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [quote, Famous Person, Famous Book (1999)]
+      ____
+      A famous quote.
+      ____
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -362,11 +359,11 @@ ____
     end
 
     test 'quote block with attribute and id and role shorthand' do
-      input = <<-EOS
-[quote#justice-to-all.solidarity, Martin Luther King, Jr.]
-____
-Injustice anywhere is a threat to justice everywhere.
-____
+      input = <<~'EOS'
+      [quote#justice-to-all.solidarity, Martin Luther King, Jr.]
+      ____
+      Injustice anywhere is a threat to justice everywhere.
+      ____
       EOS
 
       output = convert_string_to_embedded input
@@ -376,12 +373,12 @@ ____
     end
 
     test 'setting ID using style shorthand should not reset block style' do
-      input = <<-EOS
-[quote]
-[#justice-to-all.solidarity, Martin Luther King, Jr.]
-____
-Injustice anywhere is a threat to justice everywhere.
-____
+      input = <<~'EOS'
+      [quote]
+      [#justice-to-all.solidarity, Martin Luther King, Jr.]
+      ____
+      Injustice anywhere is a threat to justice everywhere.
+      ____
       EOS
 
       output = convert_string_to_embedded input
@@ -391,12 +388,12 @@ ____
     end
 
     test 'quote block with complex content' do
-      input = <<-EOS
-____
-A famous quote.
+      input = <<~'EOS'
+      ____
+      A famous quote.
 
-NOTE: _That_ was inspiring.
-____
+      NOTE: _That_ was inspiring.
+      ____
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -406,11 +403,11 @@ ____
     end
 
     test 'quote block with attribution converted to DocBook' do
-      input = <<-EOS
-[quote, Famous Person, Famous Book (1999)]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [quote, Famous Person, Famous Book (1999)]
+      ____
+      A famous quote.
+      ____
       EOS
       output = convert_string input, backend: :docbook
       assert_css 'blockquote', output, 1
@@ -424,11 +421,11 @@ ____
     end
 
     test 'epigraph quote block with attribution converted to DocBook' do
-      input = <<-EOS
-[.epigraph, Famous Person, Famous Book (1999)]
-____
-A famous quote.
-____
+      input = <<~'EOS'
+      [.epigraph, Famous Person, Famous Book (1999)]
+      ____
+      A famous quote.
+      ____
       EOS
       output = convert_string input, backend: :docbook
       assert_css 'epigraph', output, 1
@@ -442,9 +439,9 @@ ____
     end
 
     test 'markdown-style quote block with single paragraph and no attribution' do
-      input = <<-EOS
-> A famous quote.
-> Some more inspiring words.
+      input = <<~'EOS'
+      > A famous quote.
+      > Some more inspiring words.
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -455,9 +452,9 @@ ____
     end
 
     test 'lazy markdown-style quote block with single paragraph and no attribution' do
-      input = <<-EOS
-> A famous quote.
-Some more inspiring words.
+      input = <<~'EOS'
+      > A famous quote.
+      Some more inspiring words.
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -468,10 +465,10 @@ Some more inspiring words.
     end
 
     test 'markdown-style quote block with multiple paragraphs and no attribution' do
-      input = <<-EOS
-> A famous quote.
->
-> Some more inspiring words.
+      input = <<~'EOS'
+      > A famous quote.
+      >
+      > Some more inspiring words.
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -483,10 +480,10 @@ Some more inspiring words.
     end
 
     test 'markdown-style quote block with multiple blocks and no attribution' do
-      input = <<-EOS
-> A famous quote.
->
-> NOTE: Some more inspiring words.
+      input = <<~'EOS'
+      > A famous quote.
+      >
+      > NOTE: Some more inspiring words.
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -499,10 +496,10 @@ Some more inspiring words.
     end
 
     test 'markdown-style quote block with single paragraph and attribution' do
-      input = <<-EOS
-> A famous quote.
-> Some more inspiring words.
-> -- Famous Person, Famous Source, Volume 1 (1999)
+      input = <<~'EOS'
+      > A famous quote.
+      > Some more inspiring words.
+      > -- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -519,9 +516,7 @@ Some more inspiring words.
     end
 
     test 'markdown-style quote block with only attribution' do
-      input = <<-EOS
-> -- Anonymous
-      EOS
+      input = '> -- Anonymous'
       output = convert_string input
       assert_css '.quoteblock', output, 1
       assert_css '.quoteblock > blockquote', output, 1
@@ -531,10 +526,10 @@ Some more inspiring words.
     end
 
     test 'should parse credit line in markdown-style quote block like positional block attributes' do
-      input = <<-EOS
-> I hold it that a little rebellion now and then is a good thing,
-> and as necessary in the political world as storms in the physical.
--- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
+      input = <<~'EOS'
+      > I hold it that a little rebellion now and then is a good thing,
+      > and as necessary in the political world as storms in the physical.
+      -- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
       EOS
 
       output = convert_string_to_embedded input
@@ -543,10 +538,10 @@ Some more inspiring words.
     end
 
     test 'quoted paragraph-style quote block with attribution' do
-      input = <<-EOS
-"A famous quote.
-Some more inspiring words."
--- Famous Person, Famous Source, Volume 1 (1999)
+      input = <<~'EOS'
+      "A famous quote.
+      Some more inspiring words."
+      -- Famous Person, Famous Source, Volume 1 (1999)
       EOS
       output = convert_string input
       assert_css '.quoteblock', output, 1
@@ -562,10 +557,10 @@ Some more inspiring words."
     end
 
     test 'should parse credit line in quoted paragraph-style quote block like positional block attributes' do
-      input = <<-EOS
-"I hold it that a little rebellion now and then is a good thing,
-and as necessary in the political world as storms in the physical."
--- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
+      input = <<~'EOS'
+      "I hold it that a little rebellion now and then is a good thing,
+      and as necessary in the political world as storms in the physical."
+      -- Thomas Jefferson, https://jeffersonpapers.princeton.edu/selected-documents/james-madison-1[The Papers of Thomas Jefferson, Volume 11]
       EOS
 
       output = convert_string_to_embedded input
@@ -574,11 +569,11 @@ and as necessary in the political world as storms in the physical."
     end
 
     test 'single-line verse block without attribution' do
-      input = <<-EOS
-[verse]
-____
-A famous verse.
-____
+      input = <<~'EOS'
+      [verse]
+      ____
+      A famous verse.
+      ____
       EOS
       output = convert_string input
       assert_css '.verseblock', output, 1
@@ -589,11 +584,11 @@ ____
     end
 
     test 'single-line verse block with attribution' do
-      input = <<-EOS
-[verse, Famous Poet, Famous Poem]
-____
-A famous verse.
-____
+      input = <<~'EOS'
+      [verse, Famous Poet, Famous Poem]
+      ____
+      A famous verse.
+      ____
       EOS
       output = convert_string input
       assert_css '.verseblock', output, 1
@@ -609,11 +604,11 @@ ____
     end
 
     test 'single-line verse block with attribution converted to DocBook' do
-      input = <<-EOS
-[verse, Famous Poet, Famous Poem]
-____
-A famous verse.
-____
+      input = <<~'EOS'
+      [verse, Famous Poet, Famous Poem]
+      ____
+      A famous verse.
+      ____
       EOS
       output = convert_string input, backend: :docbook
       assert_css 'blockquote', output, 1
@@ -628,11 +623,11 @@ ____
     end
 
     test 'single-line epigraph verse block with attribution converted to DocBook' do
-      input = <<-EOS
-[verse.epigraph, Famous Poet, Famous Poem]
-____
-A famous verse.
-____
+      input = <<~'EOS'
+      [verse.epigraph, Famous Poet, Famous Poem]
+      ____
+      A famous verse.
+      ____
       EOS
       output = convert_string input, backend: :docbook
       assert_css 'epigraph', output, 1
@@ -647,13 +642,13 @@ ____
     end
 
     test 'multi-stanza verse block' do
-      input = <<-EOS
-[verse]
-____
-A famous verse.
+      input = <<~'EOS'
+      [verse]
+      ____
+      A famous verse.
 
-Stanza two.
-____
+      Stanza two.
+      ____
       EOS
       output = convert_string input
       assert_xpath '//*[@class="verseblock"]', output, 1
@@ -664,15 +659,15 @@ ____
     end
 
     test 'verse block does not contain block elements' do
-      input = <<-EOS
-[verse]
-____
-A famous verse.
+      input = <<~'EOS'
+      [verse]
+      ____
+      A famous verse.
 
-....
-not a literal
-....
-____
+      ....
+      not a literal
+      ....
+      ____
       EOS
       output = convert_string input
       assert_css '.verseblock', output, 1
@@ -682,11 +677,11 @@ ____
     end
 
     test 'verse should have normal subs' do
-      input = <<-EOS
-[verse]
-____
-A famous verse
-____
+      input = <<~'EOS'
+      [verse]
+      ____
+      A famous verse
+      ____
       EOS
 
       verse = block_from_string input
@@ -694,12 +689,12 @@ ____
     end
 
     test 'should not recognize callouts in a verse' do
-      input = <<-EOS
-[verse]
-____
-La la la <1>
-____
-<1> Not pointing to a callout
+      input = <<~'EOS'
+      [verse]
+      ____
+      La la la <1>
+      ____
+      <1> Not pointing to a callout
       EOS
 
       output = convert_string_to_embedded input
@@ -708,11 +703,11 @@ ____
     end
 
     test 'should perform normal subs on a verse block' do
-      input = <<-EOS
-[verse]
-____
-_GET /groups/link:#group-id[\{group-id\}]_
-____
+      input = <<~'EOS'
+      [verse]
+      ____
+      _GET /groups/link:#group-id[\{group-id\}]_
+      ____
       EOS
 
       output = convert_string_to_embedded input
@@ -722,12 +717,12 @@ ____
 
   context "Example Blocks" do
     test "can convert example block" do
-      input = <<-EOS
-====
-This is an example of an example block.
+      input = <<~'EOS'
+      ====
+      This is an example of an example block.
 
-How crazy is that?
-====
+      How crazy is that?
+      ====
       EOS
 
       output = convert_string input
@@ -735,20 +730,20 @@ How crazy is that?
     end
 
     test 'assigns sequential numbered caption to example block with title' do
-      input = <<-EOS
-.Writing Docs with AsciiDoc
-====
-Here's how you write AsciiDoc.
+      input = <<~'EOS'
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
 
-You just write.
-====
+      You just write.
+      ====
 
-.Writing Docs with DocBook
-====
-Here's how you write DocBook.
+      .Writing Docs with DocBook
+      ====
+      Here's how you write DocBook.
 
-You futz with XML.
-====
+      You futz with XML.
+      ====
       EOS
 
       doc = document_from_string input
@@ -763,22 +758,22 @@ You futz with XML.
     end
 
     test 'assigns sequential character caption to example block with title' do
-      input = <<-EOS
-:example-number: @
+      input = <<~'EOS'
+      :example-number: @
 
-.Writing Docs with AsciiDoc
-====
-Here's how you write AsciiDoc.
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
 
-You just write.
-====
+      You just write.
+      ====
 
-.Writing Docs with DocBook
-====
-Here's how you write DocBook.
+      .Writing Docs with DocBook
+      ====
+      Here's how you write DocBook.
 
-You futz with XML.
-====
+      You futz with XML.
+      ====
       EOS
 
       doc = document_from_string input
@@ -793,14 +788,14 @@ You futz with XML.
     end
 
     test "explicit caption is used if provided" do
-      input = <<-EOS
-[caption="Look! "]
-.Writing Docs with AsciiDoc
-====
-Here's how you write AsciiDoc.
+      input = <<~'EOS'
+      [caption="Look! "]
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
 
-You just write.
-====
+      You just write.
+      ====
       EOS
 
       doc = document_from_string input
@@ -811,26 +806,26 @@ You just write.
     end
 
     test 'automatic caption can be turned off and on and modified' do
-      input = <<-EOS
-.first example
-====
-an example
-====
+      input = <<~'EOS'
+      .first example
+      ====
+      an example
+      ====
 
-:caption:
+      :caption:
 
-.second example
-====
-another example
-====
+      .second example
+      ====
+      another example
+      ====
 
-:caption!:
-:example-caption: Exhibit
+      :caption!:
+      :example-caption: Exhibit
 
-.third example
-====
-yet another example
-====
+      .third example
+      ====
+      yet another example
+      ====
       EOS
 
       output = convert_string_to_embedded input
@@ -841,15 +836,15 @@ yet another example
     end
 
     test 'should warn if example block is not terminated' do
-      input = <<-EOS
-outside
+      input = <<~'EOS'
+      outside
 
-====
-inside
+      ====
+      inside
 
-still inside
+      still inside
 
-eof
+      eof
       EOS
 
       output = convert_string_to_embedded input
@@ -860,11 +855,11 @@ eof
 
   context 'Admonition Blocks' do
     test 'caption block-level attribute should be used as caption' do
-      input = <<-EOS
-:tip-caption: Pro Tip
+      input = <<~'EOS'
+      :tip-caption: Pro Tip
 
-[caption="Pro Tip"]
-TIP: Override the caption of an admonition block using an attribute entry
+      [caption="Pro Tip"]
+      TIP: Override the caption of an admonition block using an attribute entry
       EOS
 
       output = convert_string_to_embedded input
@@ -872,10 +867,10 @@ TIP: Override the caption of an admonition block using an attribute entry
     end
 
     test 'can override caption of admonition block using document attribute' do
-      input = <<-EOS
-:tip-caption: Pro Tip
+      input = <<~'EOS'
+      :tip-caption: Pro Tip
 
-TIP: Override the caption of an admonition block using an attribute entry
+      TIP: Override the caption of an admonition block using an attribute entry
       EOS
 
       output = convert_string_to_embedded input
@@ -883,10 +878,10 @@ TIP: Override the caption of an admonition block using an attribute entry
     end
 
     test 'blank caption document attribute should not blank admonition block caption' do
-      input = <<-EOS
-:caption:
+      input = <<~'EOS'
+      :caption:
 
-TIP: Override the caption of an admonition block using an attribute entry
+      TIP: Override the caption of an admonition block using an attribute entry
       EOS
 
       output = convert_string_to_embedded input
@@ -896,12 +891,12 @@ TIP: Override the caption of an admonition block using an attribute entry
 
   context "Preformatted Blocks" do
     test 'should separate adjacent paragraphs and listing into blocks' do
-      input = <<-EOS
-paragraph 1
-----
-listing content
-----
-paragraph 2
+      input = <<~'EOS'
+      paragraph 1
+      ----
+      listing content
+      ----
+      paragraph 2
       EOS
 
       output = convert_string_to_embedded input
@@ -911,15 +906,15 @@ paragraph 2
     end
 
     test 'should warn if listing block is not terminated' do
-      input = <<-EOS
-outside
+      input = <<~'EOS'
+      outside
 
-----
-inside
+      ----
+      inside
 
-still inside
+      still inside
 
-eof
+      eof
       EOS
 
       output = convert_string_to_embedded input
@@ -928,9 +923,9 @@ eof
     end
 
     test 'should not crash if listing block has no lines' do
-      input = <<-EOS
-----
-----
+      input = <<~'EOS'
+      ----
+      ----
       EOS
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
@@ -938,15 +933,15 @@ eof
     end
 
     test 'should preserve newlines in literal block' do
-      input = <<-EOS
-....
-line one
+      input = <<~'EOS'
+      ....
+      line one
 
-line two
+      line two
 
-line three
-....
-EOS
+      line three
+      ....
+      EOS
       [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//pre', output, 1
@@ -962,15 +957,15 @@ EOS
     end
 
     test 'should preserve newlines in listing block' do
-      input = <<-EOS
-----
-line one
+      input = <<~'EOS'
+      ----
+      line one
 
-line two
+      line two
 
-line three
-----
-EOS
+      line three
+      ----
+      EOS
       [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//pre', output, 1
@@ -986,18 +981,18 @@ EOS
     end
 
     test 'should preserve newlines in verse block' do
-      input = <<-EOS
---
-[verse]
-____
-line one
+      input = <<~'EOS'
+      --
+      [verse]
+      ____
+      line one
 
-line two
+      line two
 
-line three
-____
---
-EOS
+      line three
+      ____
+      --
+      EOS
       [true, false].each do |header_footer|
         output = convert_string input, header_footer: header_footer
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
@@ -1013,18 +1008,18 @@ EOS
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do
-      input = <<-EOS
-[subs="attributes"]
-....
+      input = <<~EOS
+      [subs="attributes"]
+      ....
 
 
-  first line
+        first line
 
-last line
+      last line
 
-{empty}
+      {empty}
 
-....
+      ....
       EOS
 
       doc = document_from_string input, header_footer: false
@@ -1035,11 +1030,11 @@ last line
     end
 
     test 'should process block with CRLF line endings' do
-      input = <<-EOS
-----\r
-source line 1\r
-source line 2\r
-----\r
+      input = <<~EOS
+      ----\r
+      source line 1\r
+      source line 2\r
+      ----\r
       EOS
 
       output = convert_string_to_embedded input
@@ -1048,23 +1043,23 @@ source line 2\r
     end
 
     test 'should remove block indent if indent attribute is 0' do
-      input = <<-EOS
-[indent="0"]
-----
-    def names
+      input = <<~EOS
+      [indent="0"]
+      ----
+          def names
 
-      @names.split
+            @names.split
 
-    end
-----
+          end
+      ----
       EOS
 
-      expected = <<-EOS
-def names
+      expected = <<~EOS
+      def names
 
-  @names.split
+        @names.split
 
-end
+      end
       EOS
 
       output = convert_string_to_embedded input
@@ -1075,24 +1070,18 @@ end
     end
 
     test 'should not remove block indent if indent attribute is -1' do
-      input = <<-EOS
-[indent="-1"]
-----
-    def names
+      input = <<~EOS
+      [indent="-1"]
+      ----
+          def names
 
-      @names.split
+            @names.split
 
-    end
-----
+          end
+      ----
       EOS
 
-      expected = <<-EOS
-    def names
-
-      @names.split
-
-    end
-      EOS
+      expected = (input.lines.slice 2, 5).join
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
@@ -1102,24 +1091,18 @@ end
     end
 
     test 'should set block indent to value specified by indent attribute' do
-      input = <<-EOS
-[indent="1"]
-----
-    def names
+      input = <<~EOS
+      [indent="1"]
+      ----
+          def names
 
-      @names.split
+            @names.split
 
-    end
-----
+          end
+      ----
       EOS
 
-      expected = <<-EOS
- def names
-
-   @names.split
-
- end
-      EOS
+      expected = (input.lines.slice 2, 5).map {|l| l.sub '    ', ' ' }.join
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
@@ -1129,26 +1112,20 @@ end
     end
 
     test 'should set block indent to value specified by indent document attribute' do
-      input = <<-EOS
-:source-indent: 1
+      input = <<~EOS
+      :source-indent: 1
 
-[source,ruby]
-----
-    def names
+      [source,ruby]
+      ----
+          def names
 
-      @names.split
+            @names.split
 
-    end
-----
+          end
+      ----
       EOS
 
-      expected = <<-EOS
- def names
-
-   @names.split
-
- end
-      EOS
+      expected = (input.lines.slice 4, 5).map {|l| l.sub '    ', ' '}.join
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
@@ -1158,25 +1135,25 @@ end
     end
 
     test 'should expand tabs if tabsize attribute is positive' do
-      input = <<-EOS
-:tabsize: 4
+      input = <<~EOS
+      :tabsize: 4
 
-[indent=0]
-----
-	def names
+      [indent=0]
+      ----
+      \tdef names
 
-		@names.split
+      \t\t@names.split
 
-	end
-----
+      \tend
+      ----
       EOS
 
-      expected = <<-EOS
-def names
+      expected = <<~EOS
+      def names
 
-    @names.split
+          @names.split
 
-end
+      end
       EOS
 
       output = convert_string_to_embedded input
@@ -1187,11 +1164,11 @@ end
     end
 
     test 'literal block should honor nowrap option' do
-      input = <<-EOS
-[options="nowrap"]
-----
-Do not wrap me if I get too long.
-----
+      input = <<~'EOS'
+      [options="nowrap"]
+      ----
+      Do not wrap me if I get too long.
+      ----
       EOS
 
       output = convert_string_to_embedded input
@@ -1199,12 +1176,12 @@ Do not wrap me if I get too long.
     end
 
     test 'literal block should set nowrap class if prewrap document attribute is disabled' do
-      input = <<-EOS
-:prewrap!:
+      input = <<~'EOS'
+      :prewrap!:
 
-----
-Do not wrap me if I get too long.
-----
+      ----
+      Do not wrap me if I get too long.
+      ----
       EOS
 
       output = convert_string_to_embedded input
@@ -1212,11 +1189,11 @@ Do not wrap me if I get too long.
     end
 
     test 'literal block should honor explicit subs list' do
-      input = <<-EOS
-[subs="verbatim,quotes"]
-----
-Map<String, String> *attributes*; //<1>
-----
+      input = <<~'EOS'
+      [subs="verbatim,quotes"]
+      ----
+      Map<String, String> *attributes*; //<1>
+      ----
       EOS
 
       block = block_from_string input
@@ -1227,11 +1204,11 @@ Map<String, String> *attributes*; //<1>
     end
 
     test 'should be able to disable callouts for literal block' do
-      input = <<-EOS
-[subs="specialcharacters"]
-----
-No callout here <1>
-----
+      input = <<~'EOS'
+      [subs="specialcharacters"]
+      ----
+      No callout here <1>
+      ----
       EOS
       block = block_from_string input
       assert_equal [:specialcharacters], block.subs
@@ -1240,15 +1217,15 @@ No callout here <1>
     end
 
     test 'listing block should honor explicit subs list' do
-      input = <<-EOS
-[subs="specialcharacters,quotes"]
-----
-$ *python functional_tests.py*
-Traceback (most recent call last):
-  File "functional_tests.py", line 4, in <module>
-    assert 'Django' in browser.title
-AssertionError
-----
+      input = <<~'EOS'
+      [subs="specialcharacters,quotes"]
+      ----
+      $ *python functional_tests.py*
+      Traceback (most recent call last):
+        File "functional_tests.py", line 4, in <module>
+          assert 'Django' in browser.title
+      AssertionError
+      ----
       EOS
 
       output = convert_string_to_embedded input
@@ -1257,15 +1234,15 @@ AssertionError
       assert_css '.listingblock pre strong', output, 1
       assert_css '.listingblock pre em', output, 0
 
-      input2 = <<-EOS
-[subs="specialcharacters,macros"]
-----
-$ pass:quotes[*python functional_tests.py*]
-Traceback (most recent call last):
-  File "functional_tests.py", line 4, in <module>
-    assert pass:quotes['Django'] in browser.title
-AssertionError
-----
+      input2 = <<~'EOS'
+      [subs="specialcharacters,macros"]
+      ----
+      $ pass:quotes[*python functional_tests.py*]
+      Traceback (most recent call last):
+        File "functional_tests.py", line 4, in <module>
+          assert pass:quotes['Django'] in browser.title
+      AssertionError
+      ----
       EOS
 
       output2 = convert_string_to_embedded input2
@@ -1275,13 +1252,13 @@ AssertionError
     end
 
     test 'first character of block title may be a period if not followed by space' do
-      input = <<-EOS
-..gitignore
-----
-/.bundle/
-/build/
-/Gemfile.lock
-----
+      input = <<~'EOS'
+      ..gitignore
+      ----
+      /.bundle/
+      /build/
+      /Gemfile.lock
+      ----
       EOS
 
       output = convert_string_to_embedded input
@@ -1289,10 +1266,10 @@ AssertionError
     end
 
     test 'listing block without title should generate screen element in docbook' do
-      input = <<-EOS
-----
-listing block
-----
+      input = <<~'EOS'
+      ----
+      listing block
+      ----
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1300,11 +1277,11 @@ listing block
     end
 
     test 'listing block with title should generate screen element inside formalpara element in docbook' do
-      input = <<-EOS
-.title
-----
-listing block
-----
+      input = <<~'EOS'
+      .title
+      ----
+      listing block
+      ----
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1314,11 +1291,11 @@ listing block
     end
 
     test 'source block with no title or language should generate screen element in docbook' do
-      input = <<-EOS
-[source]
-----
-source block
-----
+      input = <<~'EOS'
+      [source]
+      ----
+      source block
+      ----
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1326,12 +1303,12 @@ source block
     end
 
     test 'source block with title and no language should generate screen element inside formalpara element for docbook' do
-      input = <<-EOS
-[source]
-.title
-----
-source block
-----
+      input = <<~'EOS'
+      [source]
+      .title
+      ----
+      source block
+      ----
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -1343,12 +1320,12 @@ source block
 
   context "Open Blocks" do
     test "can convert open block" do
-      input = <<-EOS
---
-This is an open block.
+      input = <<~'EOS'
+      --
+      This is an open block.
 
-It can span multiple lines.
---
+      It can span multiple lines.
+      --
       EOS
 
       output = convert_string input
@@ -1356,16 +1333,16 @@ It can span multiple lines.
     end
 
     test "open block can contain another block" do
-      input = <<-EOS
---
-This is an open block.
+      input = <<~'EOS'
+      --
+      This is an open block.
 
-It can span multiple lines.
+      It can span multiple lines.
 
-____
-It can hold great quotes like this one.
-____
---
+      ____
+      It can hold great quotes like this one.
+      ____
+      --
       EOS
 
       output = convert_string input
@@ -1374,17 +1351,17 @@ ____
     end
 
     test 'should transfer id and reftext on open block to DocBook output' do
-      input = <<-EOS
-Check out that <<open>>!
+      input = <<~'EOS'
+      Check out that <<open>>!
 
-[[open,Open Block]]
---
-This is an open block.
+      [[open,Open Block]]
+      --
+      This is an open block.
 
-TIP: An open block can have other blocks inside of it.
---
+      TIP: An open block can have other blocks inside of it.
+      --
 
-Back to our regularly scheduled programming.
+      Back to our regularly scheduled programming.
       EOS
 
       output = convert_string input, backend: :docbook, keep_namespaces: true
@@ -1397,9 +1374,9 @@ Back to our regularly scheduled programming.
     end
 
     test 'should transfer id and reftext on open paragraph to DocBook output' do
-      input = <<-EOS
-[open#openpara,reftext="Open Paragraph"]
-This is an open paragraph.
+      input = <<~'EOS'
+      [open#openpara,reftext="Open Paragraph"]
+      This is an open paragraph.
       EOS
 
       output = convert_string input, backend: :docbook, keep_namespaces: true
@@ -1409,11 +1386,11 @@ This is an open paragraph.
     end
 
     test 'should transfer title on open block to DocBook output' do
-      input = <<-EOS
-.Behold the open
---
-This is an open block with a title.
---
+      input = <<~'EOS'
+      .Behold the open
+      --
+      This is an open block with a title.
+      --
       EOS
 
       output = convert_string input, backend: :docbook
@@ -1426,9 +1403,9 @@ This is an open block with a title.
     end
 
     test 'should transfer title on open paragraph to DocBook output' do
-      input = <<-EOS
-.Behold the open
-This is an open paragraph with a title.
+      input = <<~'EOS'
+      .Behold the open
+      This is an open paragraph with a title.
       EOS
 
       output = convert_string input, backend: :docbook
@@ -1441,12 +1418,12 @@ This is an open paragraph with a title.
     end
 
     test 'should transfer role on open block to DocBook output' do
-      input = <<-EOS
-[.container]
---
-This is an open block.
-It holds stuff.
---
+      input = <<~'EOS'
+      [.container]
+      --
+      This is an open block.
+      It holds stuff.
+      --
       EOS
 
       output = convert_string input, backend: :docbook
@@ -1455,10 +1432,10 @@ It holds stuff.
     end
 
     test 'should transfer role on open paragraph to DocBook output' do
-      input = <<-EOS
-[.container]
-This is an open block.
-It holds stuff.
+      input = <<~'EOS'
+      [.container]
+      This is an open block.
+      It holds stuff.
       EOS
 
       output = convert_string input, backend: :docbook
@@ -1468,10 +1445,10 @@ It holds stuff.
 
   context 'Passthrough Blocks' do
     test 'can parse a passthrough block' do
-      input = <<-EOS
-++++
-This is a passthrough block.
-++++
+      input = <<~'EOS'
+      ++++
+      This is a passthrough block.
+      ++++
       EOS
 
       block = block_from_string input
@@ -1481,14 +1458,14 @@ This is a passthrough block.
     end
 
     test 'does not perform subs on a passthrough block by default' do
-      input = <<-EOS
-:type: passthrough
+      input = <<~'EOS'
+      :type: passthrough
 
-++++
-This is a '{type}' block.
-http://asciidoc.org
-image:tiger.png[]
-++++
+      ++++
+      This is a '{type}' block.
+      http://asciidoc.org
+      image:tiger.png[]
+      ++++
       EOS
 
       expected = %(This is a '{type}' block.\nhttp://asciidoc.org\nimage:tiger.png[])
@@ -1497,15 +1474,15 @@ image:tiger.png[]
     end
 
     test 'does not perform subs on a passthrough block with pass style by default' do
-      input = <<-EOS
-:type: passthrough
+      input = <<~'EOS'
+      :type: passthrough
 
-[pass]
-++++
-This is a '{type}' block.
-http://asciidoc.org
-image:tiger.png[]
-++++
+      [pass]
+      ++++
+      This is a '{type}' block.
+      http://asciidoc.org
+      image:tiger.png[]
+      ++++
       EOS
 
       expected = %(This is a '{type}' block.\nhttp://asciidoc.org\nimage:tiger.png[])
@@ -1514,14 +1491,14 @@ image:tiger.png[]
     end
 
     test 'passthrough block honors explicit subs list' do
-      input = <<-EOS
-:type: passthrough
+      input = <<~'EOS'
+      :type: passthrough
 
-[subs="attributes,quotes,macros"]
-++++
-This is a _{type}_ block.
-http://asciidoc.org
-++++
+      [subs="attributes,quotes,macros"]
+      ++++
+      This is a _{type}_ block.
+      http://asciidoc.org
+      ++++
       EOS
 
       expected = %(This is a <em>passthrough</em> block.\n<a href="http://asciidoc.org" class="bare">http://asciidoc.org</a>)
@@ -1530,24 +1507,24 @@ http://asciidoc.org
     end
 
     test 'should strip leading and trailing blank lines when converting raw block' do
-      input = <<-EOS
-++++
-line above
-++++
+      input = <<~EOS
+      ++++
+      line above
+      ++++
 
-++++
-
-
-  first line
-
-last line
+      ++++
 
 
-++++
+        first line
 
-++++
-line below
-++++
+      last line
+
+
+      ++++
+
+      ++++
+      line below
+      ++++
       EOS
 
       doc = document_from_string input, header_footer: false
@@ -1560,11 +1537,11 @@ line below
 
   context 'Math blocks' do
     test 'should add LaTeX math delimiters around latexmath block content' do
-      input = <<-'EOS'
-[latexmath]
-++++
-\sqrt{3x-1}+(1+x)^2 < y
-++++
+      input = <<~'EOS'
+      [latexmath]
+      ++++
+      \sqrt{3x-1}+(1+x)^2 < y
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1574,11 +1551,11 @@ line below
     end
 
     test 'should not add LaTeX math delimiters around latexmath block content if already present' do
-      input = <<-'EOS'
-[latexmath]
-++++
-\[\sqrt{3x-1}+(1+x)^2 < y\]
-++++
+      input = <<~'EOS'
+      [latexmath]
+      ++++
+      \[\sqrt{3x-1}+(1+x)^2 < y\]
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1588,18 +1565,18 @@ line below
     end
 
     test 'should display latexmath block in alt of equation in DocBook backend' do
-      input = <<-'EOS'
-[latexmath]
-++++
-\sqrt{3x-1}+(1+x)^2 < y
-++++
+      input = <<~'EOS'
+      [latexmath]
+      ++++
+      \sqrt{3x-1}+(1+x)^2 < y
+      ++++
       EOS
 
-      expect = <<-'EOS'
-<informalequation>
-<alt><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></alt>
-<mathphrase><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></mathphrase>
-</informalequation>
+      expect = <<~'EOS'
+      <informalequation>
+      <alt><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></alt>
+      <mathphrase><![CDATA[\sqrt{3x-1}+(1+x)^2 < y]]></mathphrase>
+      </informalequation>
       EOS
 
       output = convert_string_to_embedded input, backend: :docbook
@@ -1607,16 +1584,16 @@ line below
     end
 
     test 'should not split equation in AsciiMath block at single newline' do
-      input = <<-'EOS'
-[asciimath]
-++++
-f: bbb"N" -> bbb"N"
-f: x |-> x + 1
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      f: bbb"N" -> bbb"N"
+      f: x |-> x + 1
+      ++++
       EOS
-      expected = <<-'EOS'.chomp
-\$f: bbb"N" -&gt; bbb"N"
-f: x |-&gt; x + 1\$
+      expected = <<~'EOS'.chomp
+      \$f: bbb"N" -&gt; bbb"N"
+      f: x |-&gt; x + 1\$
       EOS
 
       output = convert_string_to_embedded input
@@ -1626,16 +1603,16 @@ f: x |-&gt; x + 1\$
     end
 
     test 'should split equation in AsciiMath block at escaped newline' do
-      input = <<-'EOS'
-[asciimath]
-++++
-f: bbb"N" -> bbb"N" \
-f: x |-> x + 1
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      f: bbb"N" -> bbb"N" \
+      f: x |-> x + 1
+      ++++
       EOS
-      expected = <<-'EOS'.chomp
-\$f: bbb"N" -&gt; bbb"N"\$<br>
-\$f: x |-&gt; x + 1\$
+      expected = <<~'EOS'.chomp
+      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      \$f: x |-&gt; x + 1\$
       EOS
 
       output = convert_string_to_embedded input
@@ -1645,18 +1622,18 @@ f: x |-> x + 1
     end
 
     test 'should split equation in AsciiMath block at sequence of escaped newlines' do
-      input = <<-'EOS'
-[asciimath]
-++++
-f: bbb"N" -> bbb"N" \
-\
-f: x |-> x + 1
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      f: bbb"N" -> bbb"N" \
+      \
+      f: x |-> x + 1
+      ++++
       EOS
-      expected = <<-'EOS'.chomp
-\$f: bbb"N" -&gt; bbb"N"\$<br>
-<br>
-\$f: x |-&gt; x + 1\$
+      expected = <<~'EOS'.chomp
+      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      <br>
+      \$f: x |-&gt; x + 1\$
       EOS
 
       output = convert_string_to_embedded input
@@ -1666,21 +1643,21 @@ f: x |-> x + 1
     end
 
     test 'should split equation in AsciiMath block at newline sequence and preserve breaks' do
-      input = <<-'EOS'
-[asciimath]
-++++
-f: bbb"N" -> bbb"N"
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      f: bbb"N" -> bbb"N"
 
 
-f: x |-> x + 1
-++++
+      f: x |-> x + 1
+      ++++
       EOS
-      expected = <<-'EOS'.chomp
-\$f: bbb"N" -&gt; bbb"N"\$<br>
-<br>
-<br>
-\$f: x |-&gt; x + 1\$
-EOS
+      expected = <<~'EOS'.chomp
+      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      <br>
+      <br>
+      \$f: x |-&gt; x + 1\$
+      EOS
 
       output = convert_string_to_embedded input
       assert_css '.stemblock', output, 1
@@ -1689,11 +1666,11 @@ EOS
     end
 
     test 'should add AsciiMath delimiters around asciimath block content' do
-      input = <<-'EOS'
-[asciimath]
-++++
-sqrt(3x-1)+(1+x)^2 < y
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      sqrt(3x-1)+(1+x)^2 < y
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1703,11 +1680,11 @@ sqrt(3x-1)+(1+x)^2 < y
     end
 
     test 'should not add AsciiMath delimiters around asciimath block content if already present' do
-      input = <<-'EOS'
-[asciimath]
-++++
-\$sqrt(3x-1)+(1+x)^2 < y\$
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      \$sqrt(3x-1)+(1+x)^2 < y\$
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1718,16 +1695,18 @@ sqrt(3x-1)+(1+x)^2 < y
 
     test 'should convert contents of asciimath block to MathML in DocBook output if asciimath gem is available' do
       asciimath_available = !(Asciidoctor::Helpers.require_library 'asciimath', true, :ignore).nil?
-      input = <<-'EOS'
-[asciimath]
-++++
-x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
-++++
+      input = <<~'EOS'
+      [asciimath]
+      ++++
+      x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
+      ++++
       EOS
 
-      expect = %(<informalequation>
-<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&lt;</mml:mo><mml:mo>&#xB1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
-</informalequation>)
+      expect = <<~'EOS'.chomp
+      <informalequation>
+      <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&lt;</mml:mo><mml:mo>&#xB1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
+      </informalequation>
+      EOS
 
       using_memory_logger do |logger|
         doc = document_from_string input, backend: :docbook, header_footer: false
@@ -1743,16 +1722,16 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
     end
 
     test 'should output title for latexmath block if defined' do
-      input = <<-'EOS'
-.The Lorenz Equations
-[latexmath]
-++++
-\begin{aligned}
-\dot{x} & = \sigma(y-x) \\
-\dot{y} & = \rho x - y - xz \\
-\dot{z} & = -\beta z + xy
-\end{aligned}
-++++
+      input = <<~'EOS'
+      .The Lorenz Equations
+      [latexmath]
+      ++++
+      \begin{aligned}
+      \dot{x} & = \sigma(y-x) \\
+      \dot{y} & = \rho x - y - xz \\
+      \dot{z} & = -\beta z + xy
+      \end{aligned}
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1762,12 +1741,12 @@ x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
     end
 
     test 'should output title for asciimath block if defined' do
-      input = <<-'EOS'
-.Simple fraction
-[asciimath]
-++++
-a//b
-++++
+      input = <<~'EOS'
+      .Simple fraction
+      [asciimath]
+      ++++
+      a//b
+      ++++
       EOS
 
       output = convert_string_to_embedded input
@@ -1777,11 +1756,11 @@ a//b
     end
 
     test 'should add AsciiMath delimiters around stem block content if stem attribute is asciimath, empty, or not set' do
-      input = <<-'EOS'
-[stem]
-++++
-sqrt(3x-1)+(1+x)^2 < y
-++++
+      input = <<~'EOS'
+      [stem]
+      ++++
+      sqrt(3x-1)+(1+x)^2 < y
+      ++++
       EOS
 
       [
@@ -1798,11 +1777,11 @@ sqrt(3x-1)+(1+x)^2 < y
     end
 
     test 'should add LaTeX math delimiters around stem block content if stem attribute is latexmath, latex, or tex' do
-      input = <<-'EOS'
-[stem]
-++++
-\sqrt{3x-1}+(1+x)^2 < y
-++++
+      input = <<~'EOS'
+      [stem]
+      ++++
+      \sqrt{3x-1}+(1+x)^2 < y
+      ++++
       EOS
 
       [
@@ -1818,13 +1797,13 @@ sqrt(3x-1)+(1+x)^2 < y
     end
 
     test 'should allow stem style to be set using second positional argument of block attributes' do
-      input = <<-EOS
-:stem: latexmath
+      input = <<~'EOS'
+      :stem: latexmath
 
-[stem,asciimath]
-++++
-sqrt(3x-1)+(1+x)^2 < y
-++++
+      [stem,asciimath]
+      ++++
+      sqrt(3x-1)+(1+x)^2 < y
+      ++++
       EOS
 
       doc = document_from_string input
@@ -1840,11 +1819,11 @@ sqrt(3x-1)+(1+x)^2 < y
 
   context 'Metadata' do
     test 'block title above section gets carried over to first block in section' do
-      input = <<-EOS
-.Title
-== Section
+      input = <<~'EOS'
+      .Title
+      == Section
 
-paragraph
+      paragraph
       EOS
       output = convert_string input
       assert_xpath '//*[@class="paragraph"]', output, 1
@@ -1853,11 +1832,11 @@ paragraph
     end
 
     test 'block title above document title demotes document title to a section title' do
-      input = <<-EOS
-.Block title
-= Section Title
+      input = <<~'EOS'
+      .Block title
+      = Section Title
 
-section paragraph
+      section paragraph
       EOS
       output = convert_string input
       assert_xpath '//*[@id="header"]/*', output, 0
@@ -1869,14 +1848,14 @@ section paragraph
     end
 
     test 'block title above document title gets carried over to first block in first section if no preamble' do
-      input = <<-EOS
-:doctype: book
-.Block title
-= Document Title
+      input = <<~'EOS'
+      :doctype: book
+      .Block title
+      = Document Title
 
-== First Section
+      == First Section
 
-paragraph
+      paragraph
       EOS
       doc = document_from_string input
       # NOTE block title demotes document title to level-0 section
@@ -1886,11 +1865,11 @@ paragraph
     end
 
     test 'empty attribute list should not appear in output' do
-      input = <<-EOS
-[]
---
-Block content
---
+      input = <<~'EOS'
+      []
+      --
+      Block content
+      --
       EOS
 
       output = convert_string_to_embedded input
@@ -1899,11 +1878,11 @@ Block content
     end
 
     test 'empty block anchor should not appear in output' do
-      input = <<-EOS
-[[]]
---
-Block content
---
+      input = <<~'EOS'
+      [[]]
+      --
+      Block content
+      --
       EOS
 
       output = convert_string_to_embedded input
@@ -1914,29 +1893,23 @@ Block content
 
   context 'Images' do
     test 'can convert block image with alt text defined in macro' do
-      input = <<-EOS
-image::images/tiger.png[Tiger]
-      EOS
-
+      input = 'image::images/tiger.png[Tiger]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'converts SVG image using img element by default' do
-      input = <<-EOS
-image::tiger.svg[Tiger]
-      EOS
-
+      input = 'image::tiger.svg[Tiger]'
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '/*[@class="imageblock"]//img[@src="tiger.svg"][@alt="Tiger"]', output, 1
     end
 
     test 'converts interactive SVG image with alt text using object element' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-[%interactive]
-image::tiger.svg[Tiger,100]
+      [%interactive]
+      image::tiger.svg[Tiger,100]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
@@ -1944,9 +1917,9 @@ image::tiger.svg[Tiger,100]
     end
 
     test 'converts SVG image with alt text using img element when safe mode is secure' do
-      input = <<-EOS
-[%interactive]
-image::images/tiger.svg[Tiger,100]
+      input = <<~'EOS'
+      [%interactive]
+      image::images/tiger.svg[Tiger,100]
       EOS
 
       output = convert_string_to_embedded input
@@ -1954,11 +1927,11 @@ image::images/tiger.svg[Tiger,100]
     end
 
     test 'inserts fallback image for SVG inside object element using same dimensions' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-[%interactive]
-image::tiger.svg[Tiger,100,fallback=tiger.png]
+      [%interactive]
+      image::tiger.svg[Tiger,100,fallback=tiger.png]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
@@ -1966,11 +1939,11 @@ image::tiger.svg[Tiger,100,fallback=tiger.png]
     end
 
     test 'detects SVG image URI that contains a query string' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-[%interactive]
-image::http://example.org/tiger.svg?foo=bar[Tiger,100]
+      [%interactive]
+      image::http://example.org/tiger.svg?foo=bar[Tiger,100]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
@@ -1978,11 +1951,11 @@ image::http://example.org/tiger.svg?foo=bar[Tiger,100]
     end
 
     test 'detects SVG image when format attribute is svg' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-[%interactive]
-image::http://example.org/tiger-svg[Tiger,100,format=svg]
+      [%interactive]
+      image::http://example.org/tiger-svg[Tiger,100,format=svg]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
@@ -1990,11 +1963,11 @@ image::http://example.org/tiger-svg[Tiger,100,format=svg]
     end
 
     test 'converts inline SVG image using svg element' do
-      input = <<-EOS
-:imagesdir: fixtures
+      input = <<~'EOS'
+      :imagesdir: fixtures
 
-[%inline]
-image::circle.svg[Tiger,100]
+      [%inline]
+      image::circle.svg[Tiger,100]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
@@ -2005,12 +1978,12 @@ image::circle.svg[Tiger,100]
     end
 
     test 'converts inline SVG image using svg element even when data-uri is set' do
-      input = <<-EOS
-:imagesdir: fixtures
-:data-uri:
+      input = <<~'EOS'
+      :imagesdir: fixtures
+      :data-uri:
 
-[%inline]
-image::circle.svg[Tiger,100]
+      [%inline]
+      image::circle.svg[Tiger,100]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
@@ -2018,10 +1991,7 @@ image::circle.svg[Tiger,100]
     end
 
     test 'embeds remote inline SVG when allow-uri-read is set' do
-      input = <<-EOS
-image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=inline]
-      EOS
-
+      input = %(image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=inline])
       output = using_test_webserver do
         convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
       end
@@ -2034,9 +2004,9 @@ image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=
     end
 
     test 'converts alt text for inline svg element if svg cannot be read' do
-      input = <<-EOS
-[%inline]
-image::no-such-image.svg[Alt Text]
+      input = <<~'EOS'
+      [%inline]
+      image::no-such-image.svg[Alt Text]
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
@@ -2045,20 +2015,14 @@ image::no-such-image.svg[Alt Text]
     end
 
     test 'can convert block image with alt text defined in macro containing square bracket' do
-      input = <<-EOS
-image::images/tiger.png[A [Bengal] Tiger]
-      EOS
-
+      input = 'image::images/tiger.png[A [Bengal] Tiger]'
       output = convert_string input
       img = xmlnodes_at_xpath '//img', output, 1
       assert_equal 'A [Bengal] Tiger', img.attr('alt')
     end
 
     test 'can convert block image with target containing spaces' do
-      input = <<-EOS
-image::images/big tiger.png[A Big Tiger]
-      EOS
-
+      input = 'image::images/big tiger.png[A Big Tiger]'
       output = convert_string input
       img = xmlnodes_at_xpath '//img', output, 1
       assert_equal 'images/big%20tiger.png', img.attr('src')
@@ -2075,9 +2039,9 @@ image::images/big tiger.png[A Big Tiger]
     end
 
     test 'can convert block image with alt text defined in block attribute above macro' do
-      input = <<-EOS
-[Tiger]
-image::images/tiger.png[]
+      input = <<~'EOS'
+      [Tiger]
+      image::images/tiger.png[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2085,9 +2049,9 @@ image::images/tiger.png[]
     end
 
     test 'alt text in macro overrides alt text above macro' do
-      input = <<-EOS
-[Alt Text]
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      [Alt Text]
+      image::images/tiger.png[Tiger]
       EOS
 
       output = convert_string_to_embedded input
@@ -2095,19 +2059,19 @@ image::images/tiger.png[Tiger]
     end
 
     test 'should substitute attribute references in alt text defined in image block macro' do
-      input = <<-EOS
-:alt-text: Tiger
+      input = <<~'EOS'
+      :alt-text: Tiger
 
-image::images/tiger.png[{alt-text}]
+      image::images/tiger.png[{alt-text}]
       EOS
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'should set direction CSS class on image if float attribute is set' do
-      input = <<-EOS
-[float=left]
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      [float=left]
+      image::images/tiger.png[Tiger]
       EOS
 
       output = convert_string_to_embedded input
@@ -2116,9 +2080,9 @@ image::images/tiger.png[Tiger]
     end
 
     test 'should set text alignment CSS class on image if align attribute is set' do
-      input = <<-EOS
-[align=center]
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      [align=center]
+      image::images/tiger.png[Tiger]
       EOS
 
       output = convert_string_to_embedded input
@@ -2127,9 +2091,9 @@ image::images/tiger.png[Tiger]
     end
 
     test 'style attribute is dropped from image macro' do
-      input = <<-EOS
-[style=value]
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      [style=value]
+      image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
@@ -2153,10 +2117,7 @@ image::images/tiger.png[Tiger]
     end
 
     test 'should auto-generate alt text for block image if alt text is not specified' do
-      input = <<-EOS
-image::images/lions-and-tigers.png[]
-      EOS
-
+      input = 'image::images/lions-and-tigers.png[]'
       image = block_from_string input
       assert_equal 'lions and tigers', (image.attr 'alt')
       assert_equal 'lions and tigers', (image.attr 'default-alt')
@@ -2165,17 +2126,14 @@ image::images/lions-and-tigers.png[]
     end
 
     test "can convert block image with alt text and height and width" do
-      input = <<-EOS
-image::images/tiger.png[Tiger, 200, 300]
-      EOS
-
+      input = 'image::images/tiger.png[Tiger, 200, 300]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
     end
 
     test "can convert block image with link" do
-      input = <<-EOS
-image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
+      input = <<~'EOS'
+      image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
       EOS
 
       output = convert_string_to_embedded input
@@ -2183,36 +2141,27 @@ image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
     end
 
     test 'adds rel=noopener attribute to block image with link that targets _blank window' do
-      input = <<-EOS
-image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]
-      EOS
-
+      input = 'image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@target="_blank"][@rel="noopener"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'adds rel=noopener attribute to block image with link that targets name window when the noopener option is set' do
-      input = <<-EOS
-image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=name,opts=noopener]
-      EOS
-
+      input = 'image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=name,opts=noopener]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@target="name"][@rel="noopener"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'adds rel=nofollow attribute to block image with a link when the nofollow option is set' do
-      input = <<-EOS
-image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,opts=nofollow]
-      EOS
-
+      input = 'image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,opts=nofollow]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"][@rel="nofollow"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'can convert block image with caption' do
-      input = <<-EOS
-.The AsciiDoc Tiger
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      .The AsciiDoc Tiger
+      image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
@@ -2224,10 +2173,10 @@ image::images/tiger.png[Tiger]
     end
 
     test 'can convert block image with explicit caption' do
-      input = <<-EOS
-[caption="Voila! "]
-.The AsciiDoc Tiger
-image::images/tiger.png[Tiger]
+      input = <<~'EOS'
+      [caption="Voila! "]
+      .The AsciiDoc Tiger
+      image::images/tiger.png[Tiger]
       EOS
 
       doc = document_from_string input
@@ -2239,20 +2188,14 @@ image::images/tiger.png[Tiger]
     end
 
     test 'can align image in DocBook backend' do
-      input = <<-EOS
-image::images/sunset.jpg[Sunset,align=right]
-      EOS
-
+      input = 'image::images/sunset.jpg[Sunset,align=right]'
       output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
 
     test 'should set content width and depth in DocBook backend if no scaling' do
-      input = <<-EOS
-image::images/sunset.jpg[Sunset,500,332]
-      EOS
-
+      input = 'image::images/sunset.jpg[Sunset,500,332]'
       output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@contentwidth="500"]', output, 1
@@ -2262,10 +2205,7 @@ image::images/sunset.jpg[Sunset,500,332]
     end
 
     test 'can scale image in DocBook backend' do
-      input = <<-EOS
-image::images/sunset.jpg[Sunset,500,332,scale=200]
-      EOS
-
+      input = 'image::images/sunset.jpg[Sunset,500,332,scale=200]'
       output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@scale="200"]', output, 1
@@ -2276,10 +2216,7 @@ image::images/sunset.jpg[Sunset,500,332,scale=200]
     end
 
     test 'scale image width in DocBook backend' do
-      input = <<-EOS
-image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
-      EOS
-
+      input = 'image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]'
       output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
@@ -2289,20 +2226,17 @@ image::images/sunset.jpg[Sunset,500,332,scaledwidth=25%]
     end
 
     test 'adds % to scaled width if no units given in DocBook backend ' do
-      input = <<-EOS
-image::images/sunset.jpg[Sunset,scaledwidth=25]
-      EOS
-
+      input = 'image::images/sunset.jpg[Sunset,scaledwidth=25]'
       output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '//imagedata', output, 1
       assert_xpath '//imagedata[@width="25%"]', output, 1
     end
 
     test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
-      input = <<-EOS
-:attribute-missing: skip
+      input = <<~'EOS'
+      :attribute-missing: skip
 
-image::{bogus}[]
+      image::{bogus}[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2311,10 +2245,10 @@ image::{bogus}[]
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
-      input = <<-EOS
-:attribute-missing: drop
+      input = <<~'EOS'
+      :attribute-missing: drop
 
-image::{bogus}[]
+      image::{bogus}[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2323,10 +2257,10 @@ image::{bogus}[]
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
-      input = <<-EOS
-:attribute-missing: drop-line
+      input = <<~'EOS'
+      :attribute-missing: drop-line
 
-image::{bogus}[]
+      image::{bogus}[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2335,12 +2269,12 @@ image::{bogus}[]
     end
 
     test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
-      input = <<-EOS
-:attribute-missing: drop-line
+      input = <<~'EOS'
+      :attribute-missing: drop-line
 
-image::{bogus}[]
+      image::{bogus}[]
 
-== Section Title
+      == Section Title
       EOS
 
       output = convert_string_to_embedded input
@@ -2351,10 +2285,10 @@ image::{bogus}[]
     end
 
     test 'should pass through image that references uri' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-image::http://asciidoc.org/images/tiger.png[Tiger]
+      image::http://asciidoc.org/images/tiger.png[Tiger]
       EOS
 
       output = convert_string_to_embedded input
@@ -2362,19 +2296,16 @@ image::http://asciidoc.org/images/tiger.png[Tiger]
     end
 
     test 'should encode spaces in image target if value is a URI' do
-      input = <<-EOS
-image::http://example.org/svg?digraph=digraph G { a -> b; }[diagram]
-      EOS
-
+      input = 'image::http://example.org/svg?digraph=digraph G { a -> b; }[diagram]'
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="imageblock"]//img[@src="http://example.org/svg?digraph=digraph%20G%20{%20a%20-#{decode_char 62}%20b;%20}"]), output, 1
     end
 
     test 'can resolve image relative to imagesdir' do
-      input = <<-EOS
-:imagesdir: images
+      input = <<~'EOS'
+      :imagesdir: images
 
-image::tiger.png[Tiger]
+      image::tiger.png[Tiger]
       EOS
 
       output = convert_string_to_embedded input
@@ -2382,11 +2313,11 @@ image::tiger.png[Tiger]
     end
 
     test 'embeds base64-encoded data uri for image when data-uri attribute is set' do
-      input = <<-EOS
-:data-uri:
-:imagesdir: fixtures
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: fixtures
 
-image::dot.gif[Dot]
+      image::dot.gif[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2396,11 +2327,11 @@ image::dot.gif[Dot]
     end
 
     test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
-      input = <<-EOS
-:data-uri:
-:imagesdir: fixtures
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: fixtures
 
-image::unreadable.gif[Dot]
+      image::unreadable.gif[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2411,10 +2342,10 @@ image::unreadable.gif[Dot]
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
-      input = <<-EOS
-:data-uri:
+      input = <<~EOS
+      :data-uri:
 
-image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
+      image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
       EOS
 
       output = using_test_webserver do
@@ -2425,11 +2356,11 @@ image::http://#{resolve_localhost}:9876/fixtures/dot.gif[Dot]
     end
 
     test 'embeds base64-encoded data uri for remote image when imagesdir is a URI and data-uri attribute is set' do
-      input = <<-EOS
-:data-uri:
-:imagesdir: http://#{resolve_localhost}:9876/fixtures
+      input = <<~EOS
+      :data-uri:
+      :imagesdir: http://#{resolve_localhost}:9876/fixtures
 
-image::dot.gif[Dot]
+      image::dot.gif[Dot]
       EOS
 
       output = using_test_webserver do
@@ -2441,10 +2372,10 @@ image::dot.gif[Dot]
 
     test 'uses remote image uri when data-uri attribute is set and image cannot be retrieved' do
       image_uri = "http://#{resolve_localhost}:9876/fixtures/missing-image.gif"
-      input = <<-EOS
-:data-uri:
+      input = <<~EOS
+      :data-uri:
 
-image::#{image_uri}[Missing image]
+      image::#{image_uri}[Missing image]
       EOS
 
       output = using_test_webserver do
@@ -2457,10 +2388,10 @@ image::#{image_uri}[Missing image]
 
     test 'uses remote image uri when data-uri attribute is set and allow-uri-read is not set' do
       image_uri = "http://#{resolve_localhost}:9876/fixtures/dot.gif"
-      input = <<-EOS
-:data-uri:
+      input = <<~EOS
+      :data-uri:
 
-image::#{image_uri}[Dot]
+      image::#{image_uri}[Dot]
       EOS
 
       output = using_test_webserver do
@@ -2471,19 +2402,16 @@ image::#{image_uri}[Dot]
     end
 
     test 'can handle embedded data uri images' do
-      input = <<-EOS
-image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
-      EOS
-
+      input = 'image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]'
       output = convert_string_to_embedded input
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
     test 'can handle embedded data uri images when data-uri attribute is set' do
-      input = <<-EOS
-:data-uri:
+      input = <<~'EOS'
+      :data-uri:
 
-image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
+      image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
       EOS
 
       output = convert_string_to_embedded input
@@ -2491,11 +2419,11 @@ image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Do
     end
 
     test 'cleans reference to ancestor directories in imagesdir before reading image if safe mode level is at least SAFE' do
-      input = <<-EOS
-:data-uri:
-:imagesdir: ../..//fixtures/./../../fixtures
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: ../..//fixtures/./../../fixtures
 
-image::dot.gif[Dot]
+      image::dot.gif[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2508,11 +2436,11 @@ image::dot.gif[Dot]
     end
 
     test 'cleans reference to ancestor directories in target before reading image if safe mode level is at least SAFE' do
-      input = <<-EOS
-:data-uri:
-:imagesdir: ./
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: ./
 
-image::../..//fixtures/./../../fixtures/dot.gif[Dot]
+      image::../..//fixtures/./../../fixtures/dot.gif[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2527,20 +2455,14 @@ image::../..//fixtures/./../../fixtures/dot.gif[Dot]
 
   context 'Media' do
     test 'should detect and convert video macro' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
     end
 
     test 'should detect and convert video macro with positional attributes for poster and dimensions' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
@@ -2550,10 +2472,7 @@ video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
     end
 
     test 'should set direction CSS class on video block if float attribute is set' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[cats-and-dogs.png,float=right]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[cats-and-dogs.png,float=right]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
@@ -2561,10 +2480,7 @@ video::cats-vs-dogs.avi[cats-and-dogs.png,float=right]
     end
 
     test 'should set text alignment CSS class on video block if align attribute is set' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[cats-and-dogs.png,align=center]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[cats-and-dogs.png,align=center]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
@@ -2572,10 +2488,7 @@ video::cats-vs-dogs.avi[cats-and-dogs.png,align=center]
     end
 
     test 'video macro should honor all options' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop",preload="metadata"]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop",preload="metadata"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[autoplay]', output, 1
@@ -2585,40 +2498,31 @@ video::cats-vs-dogs.avi[options="autoplay,nocontrols,loop",preload="metadata"]
     end
 
     test 'video macro should add time range anchor with start time if start attribute is set' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[start="30"]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[start="30"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_xpath '//video[@src="cats-vs-dogs.avi#t=30"]', output, 1
     end
 
     test 'video macro should add time range anchor with end time if end attribute is set' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[end="30"]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[end="30"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_xpath '//video[@src="cats-vs-dogs.avi#t=,30"]', output, 1
     end
 
     test 'video macro should add time range anchor with start and end time if start and end attributes are set' do
-      input = <<-EOS
-video::cats-vs-dogs.avi[start="30",end="60"]
-      EOS
-
+      input = 'video::cats-vs-dogs.avi[start="30",end="60"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_xpath '//video[@src="cats-vs-dogs.avi#t=30,60"]', output, 1
     end
 
     test 'video macro should use imagesdir attribute to resolve target and poster' do
-      input = <<-EOS
-:imagesdir: assets
+      input = <<~'EOS'
+      :imagesdir: assets
 
-video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
+      video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
       EOS
 
       output = convert_string_to_embedded input
@@ -2630,10 +2534,10 @@ video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]
     end
 
     test 'video macro should not use imagesdir attribute to resolve target if target is a URL' do
-      input = <<-EOS
-:imagesdir: assets
+      input = <<~'EOS'
+      :imagesdir: assets
 
-video::http://example.org/videos/cats-vs-dogs.avi[]
+      video::http://example.org/videos/cats-vs-dogs.avi[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2642,9 +2546,7 @@ video::http://example.org/videos/cats-vs-dogs.avi[]
     end
 
     test 'video macro should output custom HTML with iframe for vimeo service' do
-      input = <<-EOS
-video::67480300[vimeo, 400, 300, start=60, options="autoplay,muted"]
-      EOS
+      input = 'video::67480300[vimeo, 400, 300, start=60, options="autoplay,muted"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
@@ -2654,9 +2556,7 @@ video::67480300[vimeo, 400, 300, start=60, options="autoplay,muted"]
     end
 
     test 'video macro should output custom HTML with iframe for youtube service' do
-      input = <<-EOS
-video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]
-      EOS
+      input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
@@ -2666,9 +2566,7 @@ video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=6
     end
 
     test 'video macro should output custom HTML with iframe for youtube service with dynamic playlist' do
-      input = <<-EOS
-video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=autoplay]
-      EOS
+      input = 'video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=autoplay]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
@@ -2678,20 +2576,17 @@ video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=
     end
 
     test 'should detect and convert audio macro' do
-      input = <<-EOS
-audio::podcast.mp3[]
-      EOS
-
+      input = 'audio::podcast.mp3[]'
       output = convert_string_to_embedded input
       assert_css 'audio', output, 1
       assert_css 'audio[src="podcast.mp3"]', output, 1
     end
 
     test 'audio macro should use imagesdir attribute to resolve target' do
-      input = <<-EOS
-:imagesdir: assets
+      input = <<~'EOS'
+      :imagesdir: assets
 
-audio::podcast.mp3[]
+      audio::podcast.mp3[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2700,10 +2595,10 @@ audio::podcast.mp3[]
     end
 
     test 'audio macro should not use imagesdir attribute to resolve target if target is a URL' do
-      input = <<-EOS
-:imagesdir: assets
+      input = <<~'EOS'
+      :imagesdir: assets
 
-video::http://example.org/podcast.mp3[]
+      video::http://example.org/podcast.mp3[]
       EOS
 
       output = convert_string_to_embedded input
@@ -2712,10 +2607,7 @@ video::http://example.org/podcast.mp3[]
     end
 
     test 'audio macro should honor all options' do
-      input = <<-EOS
-audio::podcast.mp3[options="autoplay,nocontrols,loop"]
-      EOS
-
+      input = 'audio::podcast.mp3[options="autoplay,nocontrols,loop"]'
       output = convert_string_to_embedded input
       assert_css 'audio', output, 1
       assert_css 'audio[autoplay]', output, 1
@@ -2724,10 +2616,7 @@ audio::podcast.mp3[options="autoplay,nocontrols,loop"]
     end
 
     test 'audio macro should support start and end time' do
-      input = <<-EOS
-audio::podcast.mp3[start=1,end=2]
-      EOS
-
+      input = 'audio::podcast.mp3[start=1,end=2]'
       output = convert_string_to_embedded input
       assert_css 'audio', output, 1
       assert_css 'audio[controls]', output, 1
@@ -2737,11 +2626,11 @@ audio::podcast.mp3[start=1,end=2]
 
   context 'Admonition icons' do
     test 'can resolve icon relative to default iconsdir' do
-      input = <<-EOS
-:icons:
+      input = <<~'EOS'
+      :icons:
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
@@ -2749,12 +2638,12 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'can resolve icon relative to custom iconsdir' do
-      input = <<-EOS
-:icons:
-:iconsdir: icons
+      input = <<~'EOS'
+      :icons:
+      :iconsdir: icons
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
@@ -2762,12 +2651,12 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'should add file extension to custom icon if not specified' do
-      input = <<-EOS
-:icons: font
-:iconsdir: images/icons
+      input = <<~'EOS'
+      :icons: font
+      :iconsdir: images/icons
 
-[TIP,icon=a]
-Override the icon of an admonition block using an attribute
+      [TIP,icon=a]
+      Override the icon of an admonition block using an attribute
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
@@ -2775,9 +2664,7 @@ Override the icon of an admonition block using an attribute
     end
 
     test 'should allow icontype to be specified when using built-in admonition icon' do
-      input = <<-EOS
-TIP: Set the icontype using either the icontype attribute on the icons attribute.
-      EOS
+      input = 'TIP: Set the icontype using either the icontype attribute on the icons attribute.'
       [
         { 'icons' => '', 'ext' => 'png' },
         { 'icons' => '', 'icontype' => 'jpg', 'ext' => 'jpg' },
@@ -2790,9 +2677,9 @@ TIP: Set the icontype using either the icontype attribute on the icons attribute
     end
 
     test 'should allow icontype to be specified when using custom admonition icon' do
-      input = <<-EOS
-[TIP,icon=hint]
-Set the icontype using either the icontype attribute on the icons attribute.
+      input = <<~'EOS'
+      [TIP,icon=hint]
+      Set the icontype using either the icontype attribute on the icons attribute.
       EOS
       [
         { 'icons' => '', 'ext' => 'png' },
@@ -2806,14 +2693,14 @@ Set the icontype using either the icontype attribute on the icons attribute.
     end
 
     test 'embeds base64-encoded data uri of icon when data-uri attribute is set and safe mode level is less than SECURE' do
-      input = <<-EOS
-:icons:
-:iconsdir: fixtures
-:icontype: gif
-:data-uri:
+      input = <<~'EOS'
+      :icons:
+      :iconsdir: fixtures
+      :icontype: gif
+      :data-uri:
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2821,14 +2708,14 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'should embed base64-encoded data uri of custom icon when data-uri attribute is set' do
-      input = <<-EOS
-:icons:
-:iconsdir: fixtures
-:icontype: gif
-:data-uri:
+      input = <<~'EOS'
+      :icons:
+      :iconsdir: fixtures
+      :icontype: gif
+      :data-uri:
 
-[TIP,icon=tip]
-You can set a custom icon using the icon attribute on the block.
+      [TIP,icon=tip]
+      You can set a custom icon using the icon attribute on the block.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2836,14 +2723,14 @@ You can set a custom icon using the icon attribute on the block.
     end
 
     test 'does not embed base64-encoded data uri of icon when safe mode level is SECURE or greater' do
-      input = <<-EOS
-:icons:
-:iconsdir: fixtures
-:icontype: gif
-:data-uri:
+      input = <<~'EOS'
+      :icons:
+      :iconsdir: fixtures
+      :icontype: gif
+      :data-uri:
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, attributes: { 'icons' => '' }
@@ -2851,14 +2738,14 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'cleans reference to ancestor directories before reading icon if safe mode level is at least SAFE' do
-      input = <<-EOS
-:icons:
-:iconsdir: ../fixtures
-:icontype: gif
-:data-uri:
+      input = <<~'EOS'
+      :icons:
+      :iconsdir: ../fixtures
+      :icontype: gif
+      :data-uri:
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2867,11 +2754,11 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'should import Font Awesome and use font-based icons when value of icons attribute is font' do
-      input = <<-EOS
-:icons: font
+      input = <<~'EOS'
+      :icons: font
 
-[TIP]
-You can use icons for admonitions by setting the 'icons' attribute.
+      [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
@@ -2880,12 +2767,12 @@ You can use icons for admonitions by setting the 'icons' attribute.
     end
 
     test 'font-based icon should not override icon specified on admonition' do
-      input = <<-EOS
-:icons: font
-:iconsdir: images/icons
+      input = <<~'EOS'
+      :icons: font
+      :iconsdir: images/icons
 
-[TIP,icon=a.png]
-Override the icon of an admonition block using an attribute
+      [TIP,icon=a.png]
+      Override the icon of an admonition block using an attribute
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
@@ -2894,15 +2781,15 @@ Override the icon of an admonition block using an attribute
     end
 
     test 'should use http uri scheme for assets when asset-uri-scheme is http' do
-      input = <<-EOS
-:asset-uri-scheme: http
-:icons: font
-:source-highlighter: highlightjs
+      input = <<~'EOS'
+      :asset-uri-scheme: http
+      :icons: font
+      :source-highlighter: highlightjs
 
-TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
+      TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
 
-[source,ruby]
-puts "AsciiDoc, FTW!"
+      [source,ruby]
+      puts "AsciiDoc, FTW!"
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
@@ -2911,15 +2798,15 @@ puts "AsciiDoc, FTW!"
     end
 
     test 'should use no uri scheme for assets when asset-uri-scheme is blank' do
-      input = <<-EOS
-:asset-uri-scheme:
-:icons: font
-:source-highlighter: highlightjs
+      input = <<~'EOS'
+      :asset-uri-scheme:
+      :icons: font
+      :source-highlighter: highlightjs
 
-TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
+      TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
 
-[source,ruby]
-puts "AsciiDoc, FTW!"
+      [source,ruby]
+      puts "AsciiDoc, FTW!"
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
@@ -2930,9 +2817,7 @@ puts "AsciiDoc, FTW!"
 
   context 'Image paths' do
     test 'restricts access to ancestor directories when safe mode level is at least SAFE' do
-      input = <<-EOS
-image::asciidoctor.png[Asciidoctor]
-      EOS
+      input = 'image::asciidoctor.png[Asciidoctor]'
       basedir = testdir
       block = block_from_string input, attributes: { 'docdir' => basedir }
       doc = block.document
@@ -2944,9 +2829,7 @@ image::asciidoctor.png[Asciidoctor]
     end
 
     test 'does not restrict access to ancestor directories when safe mode is disabled' do
-      input = <<-EOS
-image::asciidoctor.png[Asciidoctor]
-      EOS
+      input = 'image::asciidoctor.png[Asciidoctor]'
       basedir = testdir
       block = block_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => basedir }
       doc = block.document
@@ -2962,10 +2845,10 @@ image::asciidoctor.png[Asciidoctor]
 
   context 'Source code' do
     test 'should support fenced code block using backticks' do
-      input = <<-EOS
-```
-puts "Hello, World!"
-```
+      input = <<~'EOS'
+      ```
+      puts "Hello, World!"
+      ```
       EOS
 
       output = convert_string_to_embedded input
@@ -2975,14 +2858,14 @@ puts "Hello, World!"
     end
 
     test 'should not recognize fenced code blocks with more than three delimiters' do
-      input = <<-EOS
-````ruby
-puts "Hello, World!"
-````
+      input = <<~'EOS'
+      ````ruby
+      puts "Hello, World!"
+      ````
 
-~~~~ javascript
-alert("Hello, World!")
-~~~~
+      ~~~~ javascript
+      alert("Hello, World!")
+      ~~~~
       EOS
 
       output = convert_string_to_embedded input
@@ -2990,14 +2873,14 @@ alert("Hello, World!")
     end
 
     test 'should support fenced code blocks with languages' do
-      input = <<-EOS
-```ruby
-puts "Hello, World!"
-```
+      input = <<~'EOS'
+      ```ruby
+      puts "Hello, World!"
+      ```
 
-``` javascript
-alert("Hello, World!")
-```
+      ``` javascript
+      alert("Hello, World!")
+      ```
       EOS
 
       output = convert_string_to_embedded input
@@ -3007,14 +2890,14 @@ alert("Hello, World!")
     end
 
     test 'should support fenced code blocks with languages and numbering' do
-      input = <<-EOS
-```ruby,numbered
-puts "Hello, World!"
-```
+      input = <<~'EOS'
+      ```ruby,numbered
+      puts "Hello, World!"
+      ```
 
-``` javascript, numbered
-alert("Hello, World!")
-```
+      ``` javascript, numbered
+      alert("Hello, World!")
+      ```
       EOS
 
       output = convert_string_to_embedded input
@@ -3026,19 +2909,19 @@ alert("Hello, World!")
 
   context 'Abstract and Part Intro' do
     test 'should make abstract on open block without title a quote block for article' do
-      input = <<-EOS
-= Article
+      input = <<~'EOS'
+      = Article
 
-[abstract]
---
-This article is about stuff.
+      [abstract]
+      --
+      This article is about stuff.
 
-And other stuff.
---
+      And other stuff.
+      --
 
-== Section One
+      == Section One
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -3050,18 +2933,18 @@ content
     end
 
     test 'should make abstract on open block with title a quote block with title for article' do
-      input = <<-EOS
-= Article
+      input = <<~'EOS'
+      = Article
 
-.My abstract
-[abstract]
---
-This article is about stuff.
---
+      .My abstract
+      [abstract]
+      --
+      This article is about stuff.
+      --
 
-== Section One
+      == Section One
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -3074,12 +2957,12 @@ content
     end
 
     test 'should allow abstract in document with title if doctype is book' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-[abstract]
-Abstract for book with title is valid
+      [abstract]
+      Abstract for book with title is valid
       EOS
 
       output = convert_string input
@@ -3087,11 +2970,11 @@ Abstract for book with title is valid
     end
 
     test 'should not allow abstract as direct child of document if doctype is book' do
-      input = <<-EOS
-:doctype: book
+      input = <<~'EOS'
+      :doctype: book
 
-[abstract]
-Abstract for book without title is invalid.
+      [abstract]
+      Abstract for book without title is invalid.
       EOS
 
       output = convert_string input
@@ -3100,15 +2983,15 @@ Abstract for book without title is invalid.
     end
 
     test 'should make abstract on open block without title converted to DocBook' do
-      input = <<-EOS
-= Article
+      input = <<~'EOS'
+      = Article
 
-[abstract]
---
-This article is about stuff.
+      [abstract]
+      --
+      This article is about stuff.
 
-And other stuff.
---
+      And other stuff.
+      --
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3117,14 +3000,14 @@ And other stuff.
     end
 
     test 'should make abstract on open block with title converted to DocBook' do
-      input = <<-EOS
-= Article
+      input = <<~'EOS'
+      = Article
 
-.My abstract
-[abstract]
---
-This article is about stuff.
---
+      .My abstract
+      [abstract]
+      --
+      This article is about stuff.
+      --
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3134,12 +3017,12 @@ This article is about stuff.
     end
 
     test 'should allow abstract in document with title if doctype is book converted to DocBook' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-[abstract]
-Abstract for book with title is valid
+      [abstract]
+      Abstract for book with title is valid
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3147,11 +3030,11 @@ Abstract for book with title is valid
     end
 
     test 'should not allow abstract as direct child of document if doctype is book converted to DocBook' do
-      input = <<-EOS
-:doctype: book
+      input = <<~'EOS'
+      :doctype: book
 
-[abstract]
-Abstract for book is invalid.
+      [abstract]
+      Abstract for book is invalid.
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3161,22 +3044,22 @@ Abstract for book is invalid.
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place
     test 'should accept partintro on open block without title' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-= Part 1
+      = Part 1
 
-[partintro]
---
-This is a part intro.
+      [partintro]
+      --
+      This is a part intro.
 
-It can have multiple paragraphs.
---
+      It can have multiple paragraphs.
+      --
 
-== Chapter 1
+      == Chapter 1
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -3189,21 +3072,21 @@ content
     end
 
     test 'should accept partintro on open block with title' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-= Part 1
+      = Part 1
 
-.Intro title
-[partintro]
---
-This is a part intro with a title.
---
+      .Intro title
+      [partintro]
+      --
+      This is a part intro with a title.
+      --
 
-== Chapter 1
+      == Chapter 1
 
-content
+      content
       EOS
 
       output = convert_string input
@@ -3217,12 +3100,12 @@ content
     end
 
     test 'should exclude partintro if not a child of part' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-[partintro]
-part intro paragraph
+      [partintro]
+      part intro paragraph
       EOS
 
       output = convert_string input
@@ -3231,9 +3114,9 @@ part intro paragraph
     end
 
     test 'should not allow partintro unless doctype is book' do
-      input = <<-EOS
-[partintro]
-part intro paragraph
+      input = <<~'EOS'
+      [partintro]
+      part intro paragraph
       EOS
 
       output = convert_string input
@@ -3242,22 +3125,22 @@ part intro paragraph
     end
 
     test 'should accept partintro on open block without title converted to DocBook' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-= Part 1
+      = Part 1
 
-[partintro]
---
-This is a part intro.
+      [partintro]
+      --
+      This is a part intro.
 
-It can have multiple paragraphs.
---
+      It can have multiple paragraphs.
+      --
 
-== Chapter 1
+      == Chapter 1
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3267,21 +3150,21 @@ content
     end
 
     test 'should accept partintro on open block with title converted to DocBook' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-= Part 1
+      = Part 1
 
-.Intro title
-[partintro]
---
-This is a part intro with a title.
---
+      .Intro title
+      [partintro]
+      --
+      This is a part intro with a title.
+      --
 
-== Chapter 1
+      == Chapter 1
 
-content
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3292,12 +3175,12 @@ content
     end
 
     test 'should exclude partintro if not a child of part converted to DocBook' do
-      input = <<-EOS
-= Book
-:doctype: book
+      input = <<~'EOS'
+      = Book
+      :doctype: book
 
-[partintro]
-part intro paragraph
+      [partintro]
+      part intro paragraph
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3306,9 +3189,9 @@ part intro paragraph
     end
 
     test 'should not allow partintro unless doctype is book converted to DocBook' do
-      input = <<-EOS
-[partintro]
-part intro paragraph
+      input = <<~'EOS'
+      [partintro]
+      part intro paragraph
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -3319,11 +3202,11 @@ part intro paragraph
 
   context 'Substitutions' do
     test 'processor should not crash if subs are empty' do
-      input = <<-EOS
-[subs=","]
-....
-content
-....
+      input = <<~'EOS'
+      [subs=","]
+      ....
+      content
+      ....
       EOS
 
       doc = document_from_string input
@@ -3332,13 +3215,13 @@ content
     end
 
     test 'should be able to append subs to default block substitution list' do
-      input = <<-EOS
-:application: Asciidoctor
+      input = <<~'EOS'
+      :application: Asciidoctor
 
-[subs="+attributes,+macros"]
-....
-{application}
-....
+      [subs="+attributes,+macros"]
+      ....
+      {application}
+      ....
       EOS
 
       doc = document_from_string input
@@ -3347,13 +3230,13 @@ content
     end
 
     test 'should be able to prepend subs to default block substitution list' do
-      input = <<-EOS
-:application: Asciidoctor
+      input = <<~'EOS'
+      :application: Asciidoctor
 
-[subs="attributes+"]
-....
-{application}
-....
+      [subs="attributes+"]
+      ....
+      {application}
+      ....
       EOS
 
       doc = document_from_string input
@@ -3362,9 +3245,9 @@ content
     end
 
     test 'should be able to remove subs to default block substitution list' do
-      input = <<-EOS
-[subs="-quotes,-replacements"]
-content
+      input = <<~'EOS'
+      [subs="-quotes,-replacements"]
+      content
       EOS
 
       doc = document_from_string input
@@ -3373,13 +3256,13 @@ content
     end
 
     test 'should be able to prepend, append and remove subs from default block substitution list' do
-      input = <<-EOS
-:application: asciidoctor
+      input = <<~'EOS'
+      :application: asciidoctor
 
-[subs="attributes+,-verbatim,+specialcharacters,+macros"]
-....
-https://{application}.org[{gt}{gt}] <1>
-....
+      [subs="attributes+,-verbatim,+specialcharacters,+macros"]
+      ....
+      https://{application}.org[{gt}{gt}] <1>
+      ....
       EOS
 
       doc = document_from_string input, header_footer: false
@@ -3390,9 +3273,9 @@ https://{application}.org[{gt}{gt}] <1>
     end
 
     test 'should be able to set subs then modify them' do
-      input = <<-EOS
-[subs="verbatim,-callouts"]
-_hey now_ <1>
+      input = <<~'EOS'
+      [subs="verbatim,-callouts"]
+      _hey now_ <1>
       EOS
 
       doc = document_from_string input, header_footer: false
@@ -3405,11 +3288,11 @@ _hey now_ <1>
 
   context 'References' do
     test 'should not recognize block anchor with illegal id characters' do
-      input = <<-EOS
-[[illegal$id,Reference Text]]
-----
-content
-----
+      input = <<~'EOS'
+      [[illegal$id,Reference Text]]
+      ----
+      content
+      ----
       EOS
 
       doc = document_from_string input
@@ -3420,11 +3303,11 @@ content
     end
 
     test 'should not recognize block anchor that starts with digit' do
-      input = <<-EOS
-[[3-blind-mice]]
---
-see how they run
---
+      input = <<~'EOS'
+      [[3-blind-mice]]
+      --
+      see how they run
+      --
       EOS
 
       output = convert_string_to_embedded input
@@ -3433,11 +3316,11 @@ see how they run
     end
 
     test 'should recognize block anchor that starts with colon' do
-      input = <<-EOS
-[[:idname]]
---
-content
---
+      input = <<~'EOS'
+      [[:idname]]
+      --
+      content
+      --
       EOS
 
       output = convert_string_to_embedded input
@@ -3445,12 +3328,12 @@ content
     end
 
     test 'should use specified id and reftext when registering block reference' do
-      input = <<-EOS
-[[debian,Debian Install]]
-.Installation on Debian
-----
-$ apt-get install asciidoctor
-----
+      input = <<~'EOS'
+      [[debian,Debian Install]]
+      .Installation on Debian
+      ----
+      $ apt-get install asciidoctor
+      ----
       EOS
 
       doc = document_from_string input
@@ -3460,12 +3343,12 @@ $ apt-get install asciidoctor
     end
 
     test 'should allow square brackets in block reference text' do
-      input = <<-EOS
-[[debian,[Debian] Install]]
-.Installation on Debian
-----
-$ apt-get install asciidoctor
-----
+      input = <<~'EOS'
+      [[debian,[Debian] Install]]
+      .Installation on Debian
+      ----
+      $ apt-get install asciidoctor
+      ----
       EOS
 
       doc = document_from_string input
@@ -3475,12 +3358,12 @@ $ apt-get install asciidoctor
     end
 
     test 'should allow comma in block reference text' do
-      input = <<-EOS
-[[debian, Debian, Ubuntu]]
-.Installation on Debian
-----
-$ apt-get install asciidoctor
-----
+      input = <<~'EOS'
+      [[debian, Debian, Ubuntu]]
+      .Installation on Debian
+      ----
+      $ apt-get install asciidoctor
+      ----
       EOS
 
       doc = document_from_string input
@@ -3490,13 +3373,13 @@ $ apt-get install asciidoctor
     end
 
     test 'should substitute attribute references in reftext when registering block reference' do
-      input = <<-EOS
-:label-tiger: Tiger
+      input = <<~'EOS'
+      :label-tiger: Tiger
 
-[[tiger-evolution,Evolution of the {label-tiger}]]
-****
-Information about the evolution of the tiger.
-****
+      [[tiger-evolution,Evolution of the {label-tiger}]]
+      ****
+      Information about the evolution of the tiger.
+      ****
       EOS
 
       doc = document_from_string input
@@ -3509,13 +3392,13 @@ Information about the evolution of the tiger.
     end
 
     test 'should use specified reftext when registering block reference' do
-      input = <<-EOS
-[[debian]]
-[reftext="Debian Install"]
-.Installation on Debian
-----
-$ apt-get install asciidoctor
-----
+      input = <<~'EOS'
+      [[debian]]
+      [reftext="Debian Install"]
+      .Installation on Debian
+      ----
+      $ apt-get install asciidoctor
+      ----
       EOS
 
       doc = document_from_string input
