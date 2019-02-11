@@ -497,19 +497,21 @@ class Parser
     if (delimited_block = is_delimited_block? this_line, true)
       block_context = cloaked_context = delimited_block.context
       terminator = delimited_block.terminator
-      if !style
-        style = attributes['style'] = block_context.to_s
-      elsif style != block_context.to_s
-        if delimited_block.masq.include? style
-          block_context = style.to_sym
-        elsif delimited_block.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
-          block_context = :admonition
-        elsif block_extensions && extensions.registered_for_block?(style, block_context)
-          block_context = style.to_sym
-        else
-          logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark
-          style = block_context.to_s
+      if style
+        unless style == block_context.to_s
+          if delimited_block.masq.include? style
+            block_context = style.to_sym
+          elsif delimited_block.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
+            block_context = :admonition
+          elsif block_extensions && extensions.registered_for_block?(style, block_context)
+            block_context = style.to_sym
+          else
+            logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark
+            style = block_context.to_s
+          end
         end
+      else
+        style = attributes['style'] = block_context.to_s
       end
     end
 
@@ -518,7 +520,7 @@ class Parser
     # returns nil if the line should be dropped
     while true
       # process lines verbatim
-      if style && Compliance.strict_verbatim_paragraphs && VERBATIM_STYLES.include?(style)
+      if style && Compliance.strict_verbatim_paragraphs && (VERBATIM_STYLES.include? style)
         block_context = style.to_sym
         reader.unshift_line this_line
         # advance to block parsing =>
