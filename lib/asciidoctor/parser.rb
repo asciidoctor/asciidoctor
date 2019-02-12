@@ -291,7 +291,7 @@ class Parser
     # check if we are at the start of processing the document
     # NOTE we could drop a hint in the attributes to indicate
     # that we are at a section title (so we don't have to check)
-    if parent.context == :document && parent.blocks.empty? && ((has_header = parent.has_header?) ||
+    if parent.context == :document && parent.blocks.empty? && ((has_header = parent.header?) ||
         (attributes.delete 'invalid-header') || !(is_next_line_section? reader, attributes))
       book = (document = parent).doctype == 'book'
       if has_header || (book && attributes[1] != 'abstract')

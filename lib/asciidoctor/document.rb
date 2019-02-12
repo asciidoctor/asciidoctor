@@ -762,10 +762,10 @@ class Document < AbstractBlock
     @header || @blocks.find {|e| e.context == :section }
   end
 
-  def has_header?
+  def header?
     @header ? true : false
   end
-  alias header? has_header?
+  alias has_header? header?
 
   # Public: Append a content Block to this Document.
   #

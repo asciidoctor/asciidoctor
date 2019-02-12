@@ -680,7 +680,7 @@ class Converter::DocBook5Converter < Converter::Base
       result << %(<year>#{$2}</year>) if $2
       result << '</copyright>'
     end
-    if doc.has_header?
+    if doc.header?
       unless (authors = doc.authors).empty?
         if authors.size > 1
           result << '<authorgroup>'

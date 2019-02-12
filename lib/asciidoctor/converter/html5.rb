@@ -133,7 +133,7 @@ class Converter::Html5Converter < Converter::Base
         end
         result << (_generate_manname_section node) if node.attr? 'manpurpose'
       else
-        if node.has_header?
+        if node.header?
           result << %(<h1>#{node.header.title}</h1>) unless node.notitle
           details = []
           idx = 1
@@ -241,7 +241,7 @@ TeX: {#{eqnums_opt}}
       end
       result << (_generate_manname_section node) if node.attr? 'manpurpose'
     else
-      if node.has_header? && !node.notitle
+      if node.header? && !node.notitle
         id_attr = node.id ? %( id="#{node.id}") : ''
         result << %(<h1#{id_attr}>#{node.header.title}</h1>)
       end
