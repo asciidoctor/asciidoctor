@@ -52,6 +52,7 @@ Enhancements / Compliance::
   * always assume the target of a shorthand interdocument xref is a reference to an AsciiDoc document (source-to-source) (#3021)
   * if the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
   * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
+  * encode characters in URI to comply with RFC-3986
 
 Improvements::
 

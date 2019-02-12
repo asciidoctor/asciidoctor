@@ -373,27 +373,4 @@ context 'Path Resolver' do
       assert_equal '/etc/images/tiger.png', actual
     end
   end
-
-  context 'Helpers' do
-    test 'rootname should return file name without extension' do
-      assert_equal 'master', Asciidoctor::Helpers.rootname('master.adoc')
-      assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master.adoc')
-    end
-
-    test 'rootname should file name if it has no extension' do
-      assert_equal 'master', Asciidoctor::Helpers.rootname('master')
-      assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master')
-    end
-
-    test 'UriSniffRx should detect URIs' do
-      assert Asciidoctor::UriSniffRx =~ 'http://example.com'
-      assert Asciidoctor::UriSniffRx =~ 'https://example.com'
-      assert Asciidoctor::UriSniffRx =~ 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-    end
-
-    test 'UriSniffRx should not detect an absolute Windows path as a URI' do
-      assert Asciidoctor::UriSniffRx !~ 'c:/sample.adoc'
-      assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
-    end
-  end
 end
