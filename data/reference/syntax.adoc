@@ -1,45 +1,94 @@
 = AsciiDoc Syntax
+:icons: font
+:stem:
+:toc: left
+:url-docs: https://asciidoctor.org/docs
+:url-gem: https://rubygems.org/gems/asciidoctor
+
+A brief reference of the most commonly used AsciiDoc syntax.
+You can find the full documentation for the AsciiDoc syntax at {url-docs}.
 
 == Paragraphs
 
 A normal paragraph.
+Line breaks are not preserved.
+// line comments, which are lines that start with //, are skipped
 
-  An indented literal
-  paragraph.
+A blank line separates paragraphs.
 
-== Formatted Text
+[%hardbreaks]
+This paragraph carries the `hardbreaks` option.
+Notice how line breaks are now preserved.
 
-*bold text*.
-_emphasized text_.
-`monospaced text`.
+ An indented (literal) paragraph disables text formatting,
+ preserves spaces and line breaks, and is displayed in a
+ monospaced font.
 
-=== Unconstrained
+[sidebar#id.role]
+A style, ID, and/or role gives a paragraph (or block) special meaning, like this sidebar.
 
-In short, unconstrained means anywhere, including within a word:
+NOTE: An admonition paragraph, like this note, grabs the reader's attention.
 
-bold ** text with spaces **.
-emphasized le__tt__ers.
-m``o``n``o``spaced letters.
+TIP: Convert this document using the `asciidoctor` command to see the output produced from it.
 
-== Document Links
+== Text Formatting
+:hardbreaks:
 
-// define link target
-[[id]]
-// link to target id
-<<id,caption>>
-// link to an external file
-link:file#id[caption]
-// cross references between documents
-xref:sibling-document.adoc[caption]
+.Constrained (applied at word boundaries)
+*strong importance* (aka bold)
+_stress emphasis_ (aka italic)
+`literal text` (aka monospaced)
+"`double`" and '`single`' typographic quotes
++passthrough text+ (substitutions disabled)
+`+literal passthrough text+` (literal text with substitutions disabled)
 
-=== URLs
+.Unconstrained (applied anywhere)
+**C**reate+**R**ead+**U**pdate+**D**elete
+fan__freakin__tastic
+``mono``culture
 
-Use normal URL and email address syntax or:
+.Replacements
+A long time ago in a galaxy far, far away...
+(C) 1976 Arty Artisan
+I believe I shall--no, actually I won't.
 
-mailto:hello@domain.org[Say hello!]
-link:https://domain.org/page[Go to page]
-link:../path/to/file.txt[Read file]
-link:\\path\to\file.pdf[Download file.pdf]
+.Macros
+// where c=specialchars, q=quotes, a=attributes, r=replacements, m=macros, p=post_replacements, etc.
+The European icon:flag[role=blue] is blue & contains pass:[************] arranged in a icon:circle-o[role=yellow].
+The pass:c[->] operator is often referred to as the stabby lambda.
+Since `pass:[++]` has strong priority in AsciiDoc, you can rewrite pass:c,a,r[C++ => C{pp}].
+// activate stem support by adding `:stem:` to the document header
+stem:[sqrt(4) = 2]
+
+:!hardbreaks:
+== Attributes
+
+ // define attributes in the document header; must be flush with left margin
+ :name: value
+
+You can download and install Asciidoctor {asciidoctor-version} from {url-gem}.
+C{pp} is not required, only Ruby.
+Use a leading backslash to output a word enclosed in curly braces, like \{name}.
+
+== Links
+
+[%hardbreaks]
+https://example.org/page[A webpage]
+link:../path/to/file.txt[A local file]
+xref:document.adoc[A sibling document]
+mailto:hello@example.org[Email to say hello!]
+
+== Anchors
+
+[[idname,reference text]]
+// or written using normal block attributes as `[#idname,reftext=reference text]`
+A paragraph (or any block) with an anchor (aka ID) and reftext.
+
+See <<idname>> or <<idname,optional text of internal link>>.
+
+xref:document.adoc#idname[Jumps to anchor in another document].
+
+This paragraph has a footnote.footnote:[This is the text of the footnote.]
 
 == Lists
 
@@ -49,9 +98,13 @@ link:\\path\to\file.pdf[Download file.pdf]
 ** level 2
 *** level 3
 **** level 4
-***** level 5
-* level 1
+***** etc.
+* back at level 1
++
+Attach a block or paragraph to a list item using a list continuation (which you can enclose in an open block).
 
+.Some Authors
+[circle]
 - Edgar Allen Poe
 - Sheri S. Tepper
 - Bill Bryson
@@ -64,211 +117,167 @@ link:\\path\to\file.pdf[Download file.pdf]
 .. Step 2b
 . Step 3
 
+.Remember your Roman numerals?
+[upperroman]
+. is one
+. is two
+. is three
+
 === Checklist
 
-* [*] checked
-* [x] also checked
+* [x] checked
 * [ ] not checked
-*     normal list item
+
+=== Callout
+
+// enable callout bubbles by adding `:icons: font` to the document header
+[source,ruby]
+----
+puts 'Hello, World!' # <1>
+----
+<1> Prints `Hello, World!` to the console.
 
 === Description
 
-first term:: definition of first term
-second term:: definition of second term
+first term:: description of first term
+second term::
+description of second term
 
 == Document Structure
 
-=== Document Header
+=== Header
 
-// document header must begin at left margin.
- = My Document's Title
- Doc Writer <doc.writer@domain.org>
+ // header must be flush with left margin
+ = Document Title
+ Author Name <author@example.org>
  v1.0, 2019-01-01
 
-=== Section titles
+=== Sections
 
-// section titles must begin at left margin.
+ // must be flush with left margin
  = Document Title (Level 0)
- == Level 1 Section Title
- === Level 2 Section Title
- ==== Level 3 Section Title
- ===== Level 4 Section Title
- ====== Level 5 Section Title
- == Another Level 1 Section Title
+ == Level 1
+ === Level 2
+ ==== Level 3
+ ===== Level 4
+ ====== Level 5
+ == Back at Level 1
 
-=== Include files
+=== Includes
 
-include::basics.adoc[]
-// allow content to be read from a URI using the :allow-uri-read: attribute.
-include::https://domain.org/installation.adoc[]
+ // must be flush with left margin
+ include::basics.adoc[]
 
-== Delimited Blocks
+ // define -a allow-uri-read to allow content to be read from URI
+ include::https://example.org/installation.adoc[]
 
-////
-Comment
-////
+== Blocks
 
-// other types recognized: TIP, WARNING, IMPORTANT, CAUTION.
+--
+open - a general-purpose content wrapper; useful for enclosing content to attach to a list item
+--
+
+// recognized types include CAUTION, IMPORTANT, NOTE, TIP, and WARNING
+// enable admonition icons by setting `:icons: font` in the document header
 [NOTE]
 ====
-admonition
+admonition - a notice for the reader, ranging in severity from a tip to an alert
 ====
 
-[example]
 ====
-example
+example - a demonstration of the concept being documented
 ====
+
+****
+sidebar - auxiliary content that can be read independently of the main content
+****
+
+....
+literal - an exhibit that features program output
+....
+
+----
+listing - an exhibit that features program input, source code, or the contents of a file
+----
+
+[source,language]
+----
+source - a listing that is embellished with (colorized) syntax highlighting
+----
 
 ```language
-fenced
+fenced code - a shorthand syntax for the source block
 ```
 
-[listing]
-----
-listing
-----
-
-[literal]
-....
-literal
-....
-
---
-open
---
-
-[pass]
-++++
-passthrough
-++++
-
-[quote,attribution,citation title and information]
+[,attribution,citetitle]
 ____
-quote
+quote - a quotation or excerpt; attribution with title of source are optional
 ____
 
-[sidebar]
-****
-sidebar
-****
+[verse,attribution,citetitle]
+____
+verse - a literary excerpt, often a poem; attribution with title of source are optional
+____
 
-[source,language,options]
-----
-source
-----
+++++
+pass - content passed directly to the output document; often raw HTML
+++++
 
-// activate stem support using :stem: attribute.
+// activate stem support by adding `:stem:` to the document header
 [stem]
 ++++
 x = y^2
 ++++
 
-
-[verse]
-____
-verse
-____
+////
+comment - content which is not included in the output document
+////
 
 == Tables
 
-.An example table
-[%header,cols=^;2m,width=40%,frame=topbot]
+.Table Attributes
+[cols=>1h;2d,width=50%,frame=topbot]
 |===
-|Column 1 |Column 2
-|1        |Item 1
-|2        |Item 2
-|3        |Item 3
-|6        |Three items
+| Attribute Name | Values
+
+| options
+| header,footer,autowidth
+
+| cols
+| colspec[;colspec;...]
+
+| grid
+| all \| cols \| rows \| none
+
+| frame
+| all \| sides \| topbot \| none
+
+| stripes
+| all \| even \| odd \| none
+
+| width
+| (0%..100%)
+
+| format
+| psv {vbar} csv {vbar} dsv
 |===
 
-////
-Common attributes:
+== Multimedia
 
-grid:    none, cols, rows, all
-frame:   topbot, none, sides, all
-options: header, footer
-format:  psv, csv, dsv
-valign:  top, bottom, middle
-width:   1%..100%
-cols:    colspec[,colspec,...]
+image::screenshot.png[block image,800,450]
 
-colspec:    [multiplier*][align][width][style]
-multiplier: 1...
-width:      1... or 1%...100%
-align:      [horiz][.vert]
-            horiz: < (left), ^ (center), > (right)
-            vert:  < (top),  ^ (middle), > (bottom)
-style:      d[efault], e[mphasis], m[onospaced], a[sciidoc],
-            s[trong], l[iteral], v[erse], h[eader]
-cell:       [cellspec]|data
-cellspec:   [span*|+][align][style]
-span:       [colspan][.rowspan]
-            colspan: 1...
-            rowspan: 1...
-////
+Press image:reload.svg[reload,16,opts=interactive] to reload the page.
 
-== Admonition
+video::movie.mp4[width=640,start=60,end=140,options=autoplay]
 
-NOTE: Please note that...
+video::aHjpOzsQ9YI[youtube]
 
-TIP: Pro tip...
-
-IMPORTANT: Don't forget...
-
-WARNING: Watch out for...
-
-CAUTION: Ensure that...
-
-== Images
-
-image::path/to/file.jpg[caption,width,height]
-
-inline image:path/to/file.png[caption,title="title"].
-
-== Videos
-
-video::path/to/file.mp4[width=640,start=60,end=140,options=autoplay]
-
-video::rPQoq7ThGAU[youtube]
-
-video::67480300[vimeo]
-
-== Stem
-
-inline stem:[sqrt(4) = 2]
-
-== Source Code
-
-=== Code block with title, syntax highlighting and callouts
-
-.app.rb
-[source,ruby]
-----
-require 'sinatra' // <1>
-
-get '/hi' do // <2>
-  "Hello World!" // <3>
-end
-----
-<1> Library import
-<2> URL mapping
-<3> HTTP response body
-
-=== Code block sourced from file
-
-[source,ruby]
-----
-include::app.rb[]
-----
+video::300817511[vimeo]
 
 == Breaks
 
-// thematic break (aka horizontal rule).
+// thematic break (aka horizontal rule)
 ---
 
-// page break.
+// page break
 <<<
-
-== Footnotes
-
-footnote:[footnote text]
