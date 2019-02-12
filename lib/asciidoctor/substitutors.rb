@@ -358,14 +358,24 @@ module Substitutors
 
   # Public: Substitute special characters (i.e., encode XML)
   #
-  # The special characters <, &, and > get replaced with &lt;,
-  # &amp;, and &gt;, respectively.
+  # The special characters <, &, and > get replaced with &lt;, &amp;, and &gt;, respectively.
   #
   # text - The String text to process.
   #
   # returns The String text with special characters replaced.
-  def sub_specialchars text
-    (text.include? ?<) || (text.include? ?&) || (text.include? ?>) ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
+  if RUBY_ENGINE == 'opal'
+    def sub_specialchars text
+      (text.include? ?>) || (text.include? ?&) || (text.include? ?<) ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
+    end
+  else
+    CGI = ::CGI
+    def sub_specialchars text
+      if (text.include? ?>) || (text.include? ?&) || (text.include? ?<)
+        (text.include? ?') || (text.include? ?") ? (text.gsub SpecialCharsRx, SpecialCharsTr) : (CGI.escape_html text)
+      else
+        text
+      end
+    end
   end
   alias sub_specialcharacters sub_specialchars
 
