@@ -204,7 +204,7 @@ class Document < AbstractBlock
   # Public: Get the Hash of document counters
   attr_reader :counters
 
-  # Public: Get the level-0 Section
+  # Public: Get the level-0 Section (i.e., doctitle). (Only stores the title, not the header attributes).
   attr_reader :header
 
   # Public: Get the String base directory for converting this document.
