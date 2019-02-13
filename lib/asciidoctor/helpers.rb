@@ -124,9 +124,6 @@ module Helpers
     (str.include? ':') && UriSniffRx =~ str ? $& : nil
   end
 
-  # Matches the characters in a URI to encode
-  UriEncodeCharsRx = /[^\w\-.!~*';:@=+$,()\[\]]/
-
   # Internal: Encode a URI component String for safe inclusion in a URI.
   #
   # str - the URI component String to encode
