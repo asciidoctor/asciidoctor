@@ -1447,14 +1447,13 @@ class Parser
           # list item will throw off the exit from it
           if LiteralParagraphRx.match? this_line
             reader.unshift_line this_line
-            buffer.concat reader.read_lines_until(
-                preserve_last_line: true,
-                break_on_blank_lines: true,
-                break_on_list_continuation: true) {|line|
+            if list_type == :dlist
               # we may be in an indented list disguised as a literal paragraph
               # so we need to make sure we don't slurp up a legitimate sibling
-              list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-            }
+              buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
+            else
+              buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true)
+            end
             continuation = :inactive
           # let block metadata play out until we find the block
           elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
@@ -1501,14 +1500,13 @@ class Parser
               # NOTE we have to check for indented list items first
               elsif LiteralParagraphRx.match? this_line
                 reader.unshift_line this_line
-                buffer.concat reader.read_lines_until(
-                    preserve_last_line: true,
-                    break_on_blank_lines: true,
-                    break_on_list_continuation: true) {|line|
+                if list_type == :dlist
                   # we may be in an indented list disguised as a literal paragraph
                   # so we need to make sure we don't slurp up a legitimate sibling
-                  list_type == :dlist && is_sibling_list_item?(line, list_type, sibling_trait)
-                }
+                  buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
+                else
+                  buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true)
+                end
               else
                 break
               end
