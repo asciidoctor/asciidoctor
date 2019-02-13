@@ -2022,6 +2022,28 @@ end
 
 context "Description lists (:dlist)" do
   context "Simple lists" do
+    test 'should not parse a bare dlist delimiter as a dlist' do
+      input = '::'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 0
+      assert_xpath '//p[text()="::"]', output, 1
+    end
+
+    test 'should not parse an indented bare dlist delimiter as a dlist' do
+      input = ' ::'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 0
+      assert_xpath '//pre[text()="::"]', output, 1
+    end
+
+    test 'should parse a dlist delimiter preceded by a blank attribute as a dlist' do
+      input = '{blank}::'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_css 'dl > dt:empty', output, 1
+    end
+
     test "single-line adjacent elements" do
       input = <<~'EOS'
       term1:: def1
@@ -2050,6 +2072,17 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = ";; def1"]', output, 1
       assert_xpath '(//dl/dt)[2][normalize-space(text()) = "term2"]', output, 1
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = ";; def2"]', output, 1
+    end
+
+    test 'should allow term to end with a semicolon when using double semicolon delimiter' do
+      input = <<~'EOS'
+      term;;; def
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1][text() = "term;"]', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "def"]', output, 1
     end
 
     test "single-line indented adjacent elements" do
@@ -2593,7 +2626,7 @@ context "Description lists (:dlist)" do
       input = <<~'EOS'
       * item
 
-      //::
+      //term:: desc
       == Section
 
       section text
@@ -2624,30 +2657,31 @@ context "Description lists (:dlist)" do
 
     test 'should not hang on description list item in list that begins with ///' do
       input = <<~'EOS'
-      * x
-      ///::
-      y
+      * a
+      ///b::
+      c
       EOS
 
       output = convert_string_to_embedded input
-      assert_css '.ulist', output, 1
-      assert_css '.ulist .dlist', output, 1
-      assert_xpath '//dt[text()="///"]', output, 1
-      assert_xpath '//dd/p[text()="y"]', output, 1
+      assert_css 'ul', output, 1
+      assert_css 'ul li dl', output, 1
+      assert_xpath '//ul/li/p[text()="a"]', output, 1
+      assert_xpath '//dt[text()="///b"]', output, 1
+      assert_xpath '//dd/p[text()="c"]', output, 1
     end
 
     test 'should not hang on sibling description list item that begins with ///' do
       input = <<~'EOS'
-      ::
-      ///::
-      y
+      a::
+      ///b::
+      c
       EOS
 
       output = convert_string_to_embedded input
-      assert_css '.dlist', output, 1
-      assert_xpath '(//dl/dt)[1][not(text())]', output, 1
-      assert_xpath '(//dl/dt)[2][text()="///"]', output, 1
-      assert_xpath '//dl/dd/p[text()="y"]', output, 1
+      assert_css 'dl', output, 1
+      assert_xpath '(//dl/dt)[1][text()="a"]', output, 1
+      assert_xpath '(//dl/dt)[2][text()="///b"]', output, 1
+      assert_xpath '//dl/dd/p[text()="c"]', output, 1
     end
 
     test 'should skip dlist term that begins with // unless it begins with ///' do
@@ -2665,12 +2699,15 @@ context "Description lists (:dlist)" do
     end
 
     test 'more than 4 consecutive colons should become part of description list term' do
-      input = 'A term::::: a description'
+      input = <<~'EOS'
+      A term::::: a description
+      EOS
+
       output = convert_string_to_embedded input
-      assert_xpath '//dl', output, 1
-      assert_xpath '//dt', output, 1
-      assert_xpath '//dt[text()="A term:"]', output, 1
-      assert_xpath '//dd/p[text()="a description"]', output, 1
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '//dl/dt[text()="A term:"]', output, 1
+      assert_xpath '//dl/dd/p[text()="a description"]', output, 1
     end
 
     test 'text method of dd node should return nil if dd node only contains blocks' do
@@ -2711,6 +2748,27 @@ context "Description lists (:dlist)" do
   end
 
   context "Nested lists" do
+    test 'should not parse a nested dlist delimiter without a term as a dlist' do
+      input = <<~'EOS'
+      t::
+      ;;
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 1
+      assert_xpath '//dl/dd/p[text()=";;"]', output, 1
+    end
+
+    test 'should not parse a nested indented dlist delimiter without a term as a dlist' do
+      input = <<~EOS
+      t::
+      desc
+        ;;
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 1
+      assert_xpath %(//dl/dd/p[text()="desc\n  ;;"]), output, 1
+    end
+
     test "single-line adjacent nested elements" do
       input = <<~'EOS'
       term1:: def1
@@ -2887,7 +2945,7 @@ context "Description lists (:dlist)" do
       label1:::
       detail1
       EOS
-      output = convert_string input
+      output = convert_string_to_embedded input
       assert_xpath '//dl', output, 2
       assert_xpath '//dl//dl', output, 1
       assert_xpath '(//dl)[1]/dt[1][normalize-space(text()) = "term1"]', output, 1
