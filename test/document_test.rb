@@ -133,18 +133,19 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       cases = {
-        'docinfo'                => { head_script: 1, meta: 0, top_link: 0, footer_script: 1 },
-        'docinfo=private'        => { head_script: 1, meta: 0, top_link: 0, footer_script: 1 },
-        'docinfo1'               => { head_script: 0, meta: 1, top_link: 1, footer_script: 0 },
-        'docinfo=shared'         => { head_script: 0, meta: 1, top_link: 1, footer_script: 0 },
-        'docinfo2'               => { head_script: 1, meta: 1, top_link: 1, footer_script: 1 },
-        'docinfo docinfo2'       => { head_script: 1, meta: 1, top_link: 1, footer_script: 1 },
-        'docinfo=private,shared' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1 },
-        'docinfo=private-head'   => { head_script: 1, meta: 0, top_link: 0, footer_script: 0 },
-        'docinfo=shared-head'    => { head_script: 0, meta: 1, top_link: 0, footer_script: 0 },
-        'docinfo=private-footer' => { head_script: 0, meta: 0, top_link: 0, footer_script: 1 },
-        'docinfo=shared-footer'  => { head_script: 0, meta: 0, top_link: 1, footer_script: 0 },
-        'docinfo=private-head\ ,\ shared-footer' => { head_script: 1, meta: 0, top_link: 1, footer_script: 0 },
+        'docinfo'                => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo=private'        => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo1'               => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=shared'         => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo2'               => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo docinfo2'       => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo=private,shared' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo=private-head'   => { head_script: 1, meta: 0, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=private-header' => { head_script: 0, meta: 0, top_link: 0, footer_script: 0, navbar: 1 },
+        'docinfo=shared-head'    => { head_script: 0, meta: 1, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=private-footer' => { head_script: 0, meta: 0, top_link: 0, footer_script: 1, navbar: 0 },
+        'docinfo=shared-footer'  => { head_script: 0, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=private-head\ ,\ shared-footer' => { head_script: 1, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
       }
 
       cases.each do |attr_val, markup|
@@ -155,7 +156,18 @@ context 'Document' do
         assert_css 'meta[http-equiv="imagetoolbar"]', output, markup[:meta]
         assert_css 'body > a#top', output, markup[:top_link]
         assert_css 'body > script', output, markup[:footer_script]
+        assert_css 'body > nav.navbar', output, markup[:navbar]
+        assert_css 'body > nav.navbar + #header', output, markup[:navbar]
       end
+    end
+
+    test 'should include docinfo header even if noheader attribute is set' do
+      sample_input_path = fixture_path('basic.adoc')
+      output = Asciidoctor.convert_file sample_input_path, to_file: false,
+          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+      refute_empty output
+      assert_css 'body > nav.navbar', output, 1
+      assert_css 'body > nav.navbar + #content', output, 1
     end
 
     test 'should include docinfo footer even if nofooter attribute is set' do
@@ -231,6 +243,16 @@ context 'Document' do
       assert_css 'edition', output, 1
       assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 1
+    end
+
+    test 'should use header docinfo in place of default header' do
+      output = Asciidoctor.convert_file fixture_path('sample.adoc'), to_file: false,
+          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+      refute_empty output
+      assert_css 'article > info', output, 1
+      assert_css 'article > info > title', output, 1
+      assert_css 'article > info > revhistory', output, 1
+      assert_css 'article > info > revhistory > revision', output, 2
     end
 
     test 'should include docinfo footer files for html backend' do
