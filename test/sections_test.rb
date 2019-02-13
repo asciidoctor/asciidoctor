@@ -345,336 +345,338 @@ context 'Sections' do
     end
   end
 
-  context "document title (level 0)" do
-    test "document title with multiline syntax" do
-      title = "My Title"
-      chars = "=" * title.length
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
-    end
+  context 'Levels' do
+    context 'Document Title (Level 0)' do
+      test "document title with multiline syntax" do
+        title = "My Title"
+        chars = "=" * title.length
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      end
 
-    test "document title with multiline syntax, give a char" do
-      title = "My Title"
-      chars = "=" * (title.length + 1)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
-    end
+      test "document title with multiline syntax, give a char" do
+        title = "My Title"
+        chars = "=" * (title.length + 1)
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      end
 
-    test "document title with multiline syntax, take a char" do
-      title = "My Title"
-      chars = "=" * (title.length - 1)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
-    end
+      test "document title with multiline syntax, take a char" do
+        title = "My Title"
+        chars = "=" * (title.length - 1)
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      end
 
-    test 'document title with multiline syntax and unicode characters' do
-      input = <<~'EOS'
-      AsciiDoc Writer’s Guide
-      =======================
-      Author Name
+      test 'document title with multiline syntax and unicode characters' do
+        input = <<~'EOS'
+        AsciiDoc Writer’s Guide
+        =======================
+        Author Name
 
-      preamble
-      EOS
+        preamble
+        EOS
 
-      result = convert_string input
-      assert_xpath '//h1', result, 1
-      assert_xpath '//h1[text()="AsciiDoc Writer’s Guide"]', result, 1
-    end
+        result = convert_string input
+        assert_xpath '//h1', result, 1
+        assert_xpath '//h1[text()="AsciiDoc Writer’s Guide"]', result, 1
+      end
 
-    test "not enough chars for a multiline document title" do
-      title = "My Title"
-      chars = "=" * (title.length - 2)
-      using_memory_logger do |logger|
-        output = convert_string(title + "\n" + chars)
-        assert_xpath '//h1', output, 0
-        refute logger.empty?
-        logger.clear
-        output = convert_string(title + "\n" + chars + "\n")
-        assert_xpath '//h1', output, 0
-        refute logger.empty?
+      test "not enough chars for a multiline document title" do
+        title = "My Title"
+        chars = "=" * (title.length - 2)
+        using_memory_logger do |logger|
+          output = convert_string(title + "\n" + chars)
+          assert_xpath '//h1', output, 0
+          refute logger.empty?
+          logger.clear
+          output = convert_string(title + "\n" + chars + "\n")
+          assert_xpath '//h1', output, 0
+          refute logger.empty?
+        end
+      end
+
+      test "too many chars for a multiline document title" do
+        title = "My Title"
+        chars = "=" * (title.length + 2)
+        using_memory_logger do |logger|
+          output = convert_string(title + "\n" + chars)
+          assert_xpath '//h1', output, 0
+          refute logger.empty?
+          logger.clear
+          output = convert_string(title + "\n" + chars + "\n")
+          assert_xpath '//h1', output, 0
+          refute logger.empty?
+        end
+      end
+
+      test "document title with multiline syntax cannot begin with a dot" do
+        title = ".My Title"
+        chars = "=" * title.length
+        using_memory_logger do |logger|
+          output = convert_string(title + "\n" + chars)
+          assert_xpath '//h1', output, 0
+          refute logger.empty?
+        end
+      end
+
+      test "document title with atx syntax" do
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title")
+      end
+
+      test "document title with symmetric syntax" do
+        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title =")
+      end
+
+      test 'document title created from leveloffset shift defined in document' do
+        assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string(%(:leveloffset: -1\n== Document Title))
+      end
+
+      test 'document title created from leveloffset shift defined in API' do
+        assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string('== Document Title', attributes: { 'leveloffset' => '-1@' })
+      end
+
+      test 'should assign id on document title to body' do
+        input = <<~'EOS'
+        [[idname]]
+        = Document Title
+
+        content
+        EOS
+        output = convert_string input
+        assert_css 'body#idname', output, 1
+      end
+
+      test 'should assign id defined using shorthand syntax on document title to body' do
+        input = <<~'EOS'
+        [#idname]
+        = Document Title
+
+        content
+        EOS
+        output = convert_string input
+        assert_css 'body#idname', output, 1
+      end
+
+      test 'should use ID defined in block attributes instead of ID defined inline' do
+        input = <<~'EOS'
+        [#idname-block]
+        = Document Title [[idname-inline]]
+
+        content
+        EOS
+        output = convert_string input
+        assert_css 'body#idname-block', output, 1
+      end
+
+      test 'block id above document title sets id on document' do
+        input = <<~'EOS'
+        [[reference]]
+        = Reference Manual
+        :css-signature: refguide
+
+        preamble
+        EOS
+        doc = document_from_string input
+        assert_equal 'reference', doc.id
+        assert_equal 'refguide', doc.attr('css-signature')
+        output = doc.convert
+        assert_css 'body#reference', output, 1
+      end
+
+      test 'should register document in catalog if id is set' do
+        input = <<~'EOS'
+        [[manual,Manual]]
+        = Reference Manual
+
+        preamble
+        EOS
+        doc = document_from_string input
+        assert_equal 'manual', doc.id
+        assert_equal 'Manual', doc.attributes['reftext']
+        assert_equal doc, doc.catalog[:refs]['manual']
+      end
+
+      test 'should discard style, role and options shorthand attributes defined on document title' do
+        input = <<~'EOS'
+        [style#idname.rolename%optionname]
+        = Document Title
+
+        content
+        EOS
+        doc = document_from_string input
+        assert_empty doc.blocks[0].attributes
+        output = doc.convert
+        assert_css '#idname', output, 1
+        assert_css 'body#idname', output, 1
+        assert_css '.rolename', output, 1
+        assert_css 'body.rolename', output, 1
       end
     end
 
-    test "too many chars for a multiline document title" do
-      title = "My Title"
-      chars = "=" * (title.length + 2)
-      using_memory_logger do |logger|
-        output = convert_string(title + "\n" + chars)
-        assert_xpath '//h1', output, 0
-        refute logger.empty?
-        logger.clear
-        output = convert_string(title + "\n" + chars + "\n")
-        assert_xpath '//h1', output, 0
-        refute logger.empty?
+    context 'Level 1' do
+      test "with multiline syntax" do
+        assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", convert_string("My Section\n-----------")
       end
-    end
 
-    test "document title with multiline syntax cannot begin with a dot" do
-      title = ".My Title"
-      chars = "=" * title.length
-      using_memory_logger do |logger|
-        output = convert_string(title + "\n" + chars)
-        assert_xpath '//h1', output, 0
-        refute logger.empty?
-      end
-    end
+      test 'should not recognize underline containing a mix of characters as setext section title' do
+        input = <<~'EOS'
+        My Section
+        ----^^----
+        EOS
 
-    test "document title with atx syntax" do
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title")
-    end
-
-    test "document title with symmetric syntax" do
-      assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title =")
-    end
-
-    test 'document title created from leveloffset shift defined in document' do
-      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string(%(:leveloffset: -1\n== Document Title))
-    end
-
-    test 'document title created from leveloffset shift defined in API' do
-      assert_xpath "//h1[not(@id)][text() = 'Document Title']", convert_string('== Document Title', attributes: { 'leveloffset' => '-1@' })
-    end
-
-    test 'should assign id on document title to body' do
-      input = <<~'EOS'
-      [[idname]]
-      = Document Title
-
-      content
-      EOS
-      output = convert_string input
-      assert_css 'body#idname', output, 1
-    end
-
-    test 'should assign id defined using shorthand syntax on document title to body' do
-      input = <<~'EOS'
-      [#idname]
-      = Document Title
-
-      content
-      EOS
-      output = convert_string input
-      assert_css 'body#idname', output, 1
-    end
-
-    test 'should use ID defined in block attributes instead of ID defined inline' do
-      input = <<~'EOS'
-      [#idname-block]
-      = Document Title [[idname-inline]]
-
-      content
-      EOS
-      output = convert_string input
-      assert_css 'body#idname-block', output, 1
-    end
-
-    test 'block id above document title sets id on document' do
-      input = <<~'EOS'
-      [[reference]]
-      = Reference Manual
-      :css-signature: refguide
-
-      preamble
-      EOS
-      doc = document_from_string input
-      assert_equal 'reference', doc.id
-      assert_equal 'refguide', doc.attr('css-signature')
-      output = doc.convert
-      assert_css 'body#reference', output, 1
-    end
-
-    test 'should register document in catalog if id is set' do
-      input = <<~'EOS'
-      [[manual,Manual]]
-      = Reference Manual
-
-      preamble
-      EOS
-      doc = document_from_string input
-      assert_equal 'manual', doc.id
-      assert_equal 'Manual', doc.attributes['reftext']
-      assert_equal doc, doc.catalog[:refs]['manual']
-    end
-
-    test 'should discard style, role and options shorthand attributes defined on document title' do
-      input = <<~'EOS'
-      [style#idname.rolename%optionname]
-      = Document Title
-
-      content
-      EOS
-      doc = document_from_string input
-      assert_empty doc.blocks[0].attributes
-      output = doc.convert
-      assert_css '#idname', output, 1
-      assert_css 'body#idname', output, 1
-      assert_css '.rolename', output, 1
-      assert_css 'body.rolename', output, 1
-    end
-  end
-
-  context "level 1" do
-    test "with multiline syntax" do
-      assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", convert_string("My Section\n-----------")
-    end
-
-    test 'should not recognize underline containing a mix of characters as setext section title' do
-      input = <<~'EOS'
-      My Section
-      ----^^----
-      EOS
-
-      result = convert_string_to_embedded input
-      assert_xpath '//h2[@id="_my_section"][text() = "My Section"]', result, 0
-      assert_includes result, '----^^----'
-    end
-
-    test 'should not recognize section title that does not contain alphanumeric character' do
-      input = <<~'EOS'
-      !@#$
-      ----
-      EOS
-
-      using_memory_logger do |logger|
         result = convert_string_to_embedded input
-        assert_css 'h2', result, 0
+        assert_xpath '//h2[@id="_my_section"][text() = "My Section"]', result, 0
+        assert_includes result, '----^^----'
       end
-    end
 
-    test 'should not recognize section title that consists of only underscores' do
-      input = <<~'EOS'
-      ____
-      ----
-      EOS
+      test 'should not recognize section title that does not contain alphanumeric character' do
+        input = <<~'EOS'
+        !@#$
+        ----
+        EOS
 
-      using_memory_logger do |logger|
+        using_memory_logger do |logger|
+          result = convert_string_to_embedded input
+          assert_css 'h2', result, 0
+        end
+      end
+
+      test 'should not recognize section title that consists of only underscores' do
+        input = <<~'EOS'
+        ____
+        ----
+        EOS
+
+        using_memory_logger do |logger|
+          result = convert_string_to_embedded input
+          assert_css 'h2', result, 0
+        end
+      end
+
+      test 'should preprocess second line of setext section title' do
+        input = <<~'EOS'
+        Section Title
+        ifdef::asciidoctor[]
+        -------------
+        endif::[]
+        EOS
         result = convert_string_to_embedded input
-        assert_css 'h2', result, 0
+        assert_xpath '//h2', result, 1
+      end
+
+      test "heading title with multiline syntax cannot begin with a dot" do
+        title = ".My Title"
+        chars = "-" * title.length
+        using_memory_logger do |logger|
+          output = convert_string(title + "\n" + chars)
+          assert_xpath '//h2', output, 0
+          refute logger.empty?
+        end
+      end
+
+      test "with atx syntax" do
+        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title")
+      end
+
+      test "with atx symmetric syntax" do
+        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ==")
+      end
+
+      test "with atx non-matching symmetric syntax" do
+        assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", convert_string("== My Title ===")
+      end
+
+      test "with XML entity" do
+        assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", convert_string("== What's new?")
+      end
+
+      test "with non-word character" do
+        assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", convert_string("== What’s new?")
+      end
+
+      test "with sequential non-word characters" do
+        assert_xpath "//h2[@id='_what_the_is_this'][text() = 'What the \#@$ is this?']", convert_string('== What the #@$ is this?')
+      end
+
+      test "with trailing whitespace" do
+        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ")
+      end
+
+      test "with custom blank idprefix" do
+        assert_xpath "//h2[@id='my_title'][text() = 'My Title']", convert_string(":idprefix:\n\n== My Title ")
+      end
+
+      test "with custom non-blank idprefix" do
+        assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", convert_string(":idprefix: ref_\n\n== My Title ")
+      end
+
+      test 'with multibyte characters' do
+        input = '== Asciidoctor in 中文'
+        output = convert_string input
+        assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
+      end
+
+      test 'with only multibyte characters' do
+        input = '== 视图'
+        output = convert_string_to_embedded input
+        assert_xpath '//h2[@id="_视图"][text()="视图"]', output
+      end
+
+      test 'multiline syntax with only multibyte characters' do
+        input = <<~'EOS'
+        视图
+        --
+
+        content
+
+        连接器
+        ---
+
+        content
+        EOS
+        # see https://github.com/oracle/truffleruby/issues/1563
+        input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
+        output = convert_string_to_embedded input
+        assert_xpath '//h2[@id="_视图"][text()="视图"]', output
+        assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
       end
     end
 
-    test 'should preprocess second line of setext section title' do
-      input = <<~'EOS'
-      Section Title
-      ifdef::asciidoctor[]
-      -------------
-      endif::[]
-      EOS
-      result = convert_string_to_embedded input
-      assert_xpath '//h2', result, 1
-    end
+    context 'Level 2' do
+      test "with multiline syntax" do
+        assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n~~~~~~~~~~~")
+      end
 
-    test "heading title with multiline syntax cannot begin with a dot" do
-      title = ".My Title"
-      chars = "-" * title.length
-      using_memory_logger do |logger|
-        output = convert_string(title + "\n" + chars)
-        assert_xpath '//h2', output, 0
-        refute logger.empty?
+      test "with atx line syntax" do
+        assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n=== My Title")
       end
     end
 
-    test "with atx syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title")
+    context 'Level 3' do
+      test "with multiline syntax" do
+        assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n^^^^^^^^^^")
+      end
+
+      test 'with atx line syntax' do
+        assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n==== My Title")
+      end
     end
 
-    test "with atx symmetric syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ==")
+    context 'Level 4' do
+      test "with multiline syntax" do
+        assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n++++++++++")
+      end
+
+      test "with atx line syntax" do
+        assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n===== My Title")
+      end
     end
 
-    test "with atx non-matching symmetric syntax" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", convert_string("== My Title ===")
-    end
-
-    test "with XML entity" do
-      assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", convert_string("== What's new?")
-    end
-
-    test "with non-word character" do
-      assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", convert_string("== What’s new?")
-    end
-
-    test "with sequential non-word characters" do
-      assert_xpath "//h2[@id='_what_the_is_this'][text() = 'What the \#@$ is this?']", convert_string('== What the #@$ is this?')
-    end
-
-    test "with trailing whitespace" do
-      assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ")
-    end
-
-    test "with custom blank idprefix" do
-      assert_xpath "//h2[@id='my_title'][text() = 'My Title']", convert_string(":idprefix:\n\n== My Title ")
-    end
-
-    test "with custom non-blank idprefix" do
-      assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", convert_string(":idprefix: ref_\n\n== My Title ")
-    end
-
-    test 'with multibyte characters' do
-      input = '== Asciidoctor in 中文'
-      output = convert_string input
-      assert_xpath '//h2[@id="_asciidoctor_in_中文"][text()="Asciidoctor in 中文"]', output
-    end
-
-    test 'with only multibyte characters' do
-      input = '== 视图'
-      output = convert_string_to_embedded input
-      assert_xpath '//h2[@id="_视图"][text()="视图"]', output
-    end
-
-    test 'multiline syntax with only multibyte characters' do
-      input = <<~'EOS'
-      视图
-      --
-
-      content
-
-      连接器
-      ---
-
-      content
-      EOS
-      # see https://github.com/oracle/truffleruby/issues/1563
-      input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
-      output = convert_string_to_embedded input
-      assert_xpath '//h2[@id="_视图"][text()="视图"]', output
-      assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
-    end
-  end
-
-  context "level 2" do
-    test "with multiline syntax" do
-      assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n~~~~~~~~~~~")
-    end
-
-    test "with atx line syntax" do
-      assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n=== My Title")
-    end
-  end
-
-  context "level 3" do
-    test "with multiline syntax" do
-      assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n^^^^^^^^^^")
-    end
-
-    test "with atx line syntax" do
-      assert_xpath "//h4[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n==== My Title")
-    end
-  end
-
-  context "level 4" do
-    test "with multiline syntax" do
-      assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n++++++++++")
-    end
-
-    test "with atx line syntax" do
-      assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n===== My Title")
-    end
-  end
-
-  context "level 5" do
-    test "with atx line syntax" do
-      assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n====== My Title")
+    context 'Level 5' do
+      test "with atx line syntax" do
+        assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n====== My Title")
+      end
     end
   end
 
