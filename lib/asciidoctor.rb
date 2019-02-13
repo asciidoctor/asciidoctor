@@ -496,7 +496,7 @@ module Asciidoctor
     #
     if RUBY_ENGINE == 'opal'
       # NOTE In JavaScript, ^ and $ match the boundaries of the string when the m flag is not set
-      AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[([\S\s]*)\]$/
+      AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*)\]$/
     else
       AttributeEntryPassMacroRx = /\Apass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]\Z/m
     end
