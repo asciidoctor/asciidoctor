@@ -650,9 +650,9 @@ class Parser
         attributes['style'] = block.style if block.style
         break
 
-      elsif (match = DescriptionListRx.match(this_line))
+      elsif ((this_line.include? '::') || (this_line.include? ';;')) && DescriptionListRx =~ this_line
         reader.unshift_line this_line
-        block = parse_description_list(reader, match, parent)
+        block = parse_description_list(reader, $~, parent)
         break
 
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
