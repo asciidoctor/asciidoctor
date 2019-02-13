@@ -1393,6 +1393,8 @@ class Parser
     # it gets associated with the outermost block
     detached_continuation = nil
 
+    dlist = list_type == :dlist
+
     while reader.has_more_lines?
       this_line = reader.read_line
 
@@ -1437,7 +1439,7 @@ class Parser
       # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
       # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
       # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
-      elsif list_type == :dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
+      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
         break
       else
         if continuation == :active && !this_line.empty?
@@ -1447,7 +1449,7 @@ class Parser
           # list item will throw off the exit from it
           if LiteralParagraphRx.match? this_line
             reader.unshift_line this_line
-            if list_type == :dlist
+            if dlist
               # we may be in an indented list disguised as a literal paragraph
               # so we need to make sure we don't slurp up a legitimate sibling
               buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
@@ -1500,7 +1502,7 @@ class Parser
               # NOTE we have to check for indented list items first
               elsif LiteralParagraphRx.match? this_line
                 reader.unshift_line this_line
-                if list_type == :dlist
+                if dlist
                   # we may be in an indented list disguised as a literal paragraph
                   # so we need to make sure we don't slurp up a legitimate sibling
                   buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
