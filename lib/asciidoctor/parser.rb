@@ -1196,16 +1196,15 @@ class Parser
     list_block = List.new parent, :dlist
     # detects a description list item that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = DescriptionListSiblingRx[match[2]]
-    term, item = parse_list_item reader, list_block, match, sibling_pattern
-    list_block.items << (current_pair = [[term], item])
+    list_block.items << (current_pair = parse_list_item reader, list_block, match, sibling_pattern)
 
     while reader.has_more_lines? && sibling_pattern =~ reader.peek_line
-      term, item = parse_list_item reader, list_block, $~, sibling_pattern
+      next_pair = parse_list_item reader, list_block, $~, sibling_pattern
       if current_pair[1]
-        list_block.items << (current_pair = [[term], item])
+        list_block.items << (current_pair = next_pair)
       else
-        current_pair[0] << term
-        current_pair[1] = item
+        current_pair[0] << next_pair[0][0]
+        current_pair[1] = next_pair[1]
       end
     end
 
@@ -1267,7 +1266,7 @@ class Parser
   #                 marker pattern.
   # style         - The block style assigned to this list (optional, default: nil)
   #
-  # Returns the next ListItem or ListItem pair (description list) for the parent list Block.
+  # Returns the next ListItem or [[ListItem], ListItem] pair (description list) for the parent list Block.
   def self.parse_list_item(reader, list_block, match, sibling_trait, style = nil)
     if (list_type = list_block.context) == :dlist
       dlist = true
@@ -1360,11 +1359,7 @@ class Parser
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
     end
 
-    if dlist
-      list_item.text? || list_item.blocks? ? [list_term, list_item] : [list_term]
-    else
-      list_item
-    end
+    dlist ? (list_item.text? || list_item.blocks? ? [[list_term], list_item] : [[list_term]]) : list_item
   end
 
   # Internal: Collect the lines belonging to the current list item, navigating
