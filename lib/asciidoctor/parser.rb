@@ -2263,18 +2263,11 @@ class Parser
   #
   # Returns a Boolean indicating whether this line is a sibling list item given
   # the criteria provided
-  def self.is_sibling_list_item?(line, list_type, sibling_trait)
+  def self.is_sibling_list_item? line, list_type, sibling_trait
     if ::Regexp === sibling_trait
-      matcher = sibling_trait
+      sibling_trait.match? line
     else
-      matcher = ListRxMap[list_type]
-      expected_marker = sibling_trait
-    end
-
-    if matcher =~ line
-      expected_marker ? expected_marker == resolve_list_marker(list_type, $1) : true
-    else
-      false
+      ListRxMap[list_type] =~ line && sibling_trait == (resolve_list_marker list_type, $1)
     end
   end
 
