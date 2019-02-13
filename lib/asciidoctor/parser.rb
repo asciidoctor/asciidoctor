@@ -1192,23 +1192,21 @@ class Parser
   # parent    - The parent Block to which this description list belongs
   #
   # Returns the Block encapsulating the parsed description list
-  def self.parse_description_list(reader, match, parent)
-    list_block = List.new(parent, :dlist)
-    previous_pair = nil
-    # allows us to capture until we find a description item
-    # that uses the same delimiter (::, :::, :::: or ;;)
+  def self.parse_description_list reader, match, parent
+    list_block = List.new parent, :dlist
+    # detects a description list item that uses the same delimiter (::, :::, :::: or ;;)
     sibling_pattern = DescriptionListSiblingRx[match[2]]
+    term, item = parse_list_item reader, list_block, match, sibling_pattern
+    list_block.items << (current_pair = [[term], item])
 
-    # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
-    while match || (reader.has_more_lines? && (match = sibling_pattern.match(reader.peek_line)))
-      term, item = parse_list_item(reader, list_block, match, sibling_pattern)
-      if previous_pair && !previous_pair[1]
-        previous_pair[0] << term
-        previous_pair[1] = item
+    while reader.has_more_lines? && sibling_pattern =~ reader.peek_line
+      term, item = parse_list_item reader, list_block, $~, sibling_pattern
+      if current_pair[1]
+        list_block.items << (current_pair = [[term], item])
       else
-        list_block.items << (previous_pair = [[term], item])
+        current_pair[0] << term
+        current_pair[1] = item
       end
-      match = nil
     end
 
     list_block
