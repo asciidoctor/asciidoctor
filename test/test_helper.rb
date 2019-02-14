@@ -204,7 +204,7 @@ class Minitest::Test
     if keep_namespaces
       document_from_string(src, opts).convert
     else
-      # this is required because nokogiri is ignorant
+      # this is required because nokogiri is easily confused by namespaces
       result = document_from_string(src, opts).convert
       result = result.sub(RE_XMLNS_ATTRIBUTE, '') if result
       result
