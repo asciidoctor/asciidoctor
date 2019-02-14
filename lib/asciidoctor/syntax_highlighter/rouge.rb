@@ -36,7 +36,9 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    lang = (lang.split '?', 2)[0] if lang.include? '?'
+    if (query_idx = lang.index '?')
+      lang = lang.slice 0, query_idx
+    end
     if opts[:css_mode] != :class && (@style = (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE) &&
         (pre_style_attr_val = base_style @style)
       opts[:transform] = proc {|pre| pre['style'] = pre_style_attr_val }

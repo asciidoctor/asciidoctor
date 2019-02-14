@@ -85,8 +85,8 @@ module Asciidoctor
                   'defined in the source document') do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
             attr = attr.encode UTF_8 unless attr.encoding == UTF_8
-            key, val = attr.split '=', 2
-            self[:attributes][key] = val || ''
+            key, _, val = attr.partition '='
+            self[:attributes][key] = val
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|

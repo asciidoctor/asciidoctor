@@ -320,15 +320,15 @@ module Extensions
         names, defaults = [], {}
         args.each do |arg|
           if (arg = arg.to_s).include? '='
-            name, value = arg.split '=', 2
+            name, _, value = arg.partition '='
             if name.include? ':'
-              idx, name = name.split ':', 2
+              idx, _, name = name.partition ':'
               idx = idx == '@' ? names.size : idx.to_i
               names[idx] = name
             end
             defaults[name] = value
           elsif arg.include? ':'
-            idx, name = arg.split ':', 2
+            idx, _, name = arg.partition ':'
             idx = idx == '@' ? names.size : idx.to_i
             names[idx] = name
           else
@@ -341,7 +341,7 @@ module Extensions
         names, defaults = [], {}
         args.each do |key, val|
           if (name = key.to_s).include? ':'
-            idx, name = name.split ':', 2
+            idx, _, name = name.partition ':'
             idx = idx == '@' ? names.size : idx.to_i
             names[idx] = name
           end

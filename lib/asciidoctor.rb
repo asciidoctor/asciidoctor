@@ -1258,16 +1258,16 @@ module Asciidoctor
     elsif ::Array === attrs
       attrs = {}.tap do |accum|
         attrs.each do |entry|
-          k, v = entry.split '=', 2
-          accum[k] = v || ''
+          k, _, v = entry.partition '='
+          accum[k] = v
         end
       end
     elsif ::String === attrs
       # condense and convert non-escaped spaces to null, unescape escaped spaces, then split on null
       attrs = {}.tap do |accum|
         attrs.gsub(SpaceDelimiterRx, '\1' + NULL).gsub(EscapedSpaceRx, '\1').split(NULL).each do |entry|
-          k, v = entry.split '=', 2
-          accum[k] = v || ''
+          k, _, v = entry.partition '='
+          accum[k] = v
         end
       end
     elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])

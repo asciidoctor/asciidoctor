@@ -734,7 +734,7 @@ module Substitutors
           #unless attrs && (attrs.key? 'title')
           #  if text.include? '|'
           #    attrs ||= {}
-          #    text, attrs['title'] = text.split '|', 2
+          #    text, _, attrs['title'] = text.partition '|'
           #  end
           #end
 
@@ -801,7 +801,7 @@ module Substitutors
           #unless attrs && (attrs.key? 'title')
           #  if text.include? '|'
           #    attrs ||= {}
-          #    text, attrs['title'] = text.split '|', 2
+          #    text, _, attrs['title'] = text.partition '|'
           #  end
           #end
 
@@ -1111,12 +1111,11 @@ module Substitutors
     str = str.slice 0, (str.index ',') if str.include? ','
 
     if (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
-      segments = str.split('#', 2)
+      segments = str.split '#', 2
 
       if segments.size > 1
         id, *more_roles = segments[1].split('.')
       else
-        id = nil
         more_roles = []
       end
 
@@ -1426,7 +1425,7 @@ module Substitutors
         negate = true
       end
       if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
-        from, to = entry.split delim, 2
+        from, delim, to = entry.partition delim
         to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
         line_nums = (from.to_i..to).to_a
         if negate
