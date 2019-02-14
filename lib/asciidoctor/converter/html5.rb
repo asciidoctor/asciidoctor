@@ -556,11 +556,11 @@ Your browser does not support the audio tag.
       if svg
         img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif obj
-        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
         img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
       end
     end
-    img ||= %(<img src="#{node.image_uri target}" alt="#{_encode_quotes node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+    img ||= %(<img src="#{node.image_uri target}" alt="#{_encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     if node.attr? 'link'
       img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
     end
@@ -1106,11 +1106,11 @@ Your browser does not support the video tag.
         if svg
           img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_quotes node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
         end
       end
-      img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{_encode_quotes node.alt}"#{attrs}#{@void_element_slash}>)
+      img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{_encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
     end
     if node.attr? 'link'
       img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
@@ -1182,7 +1182,18 @@ Your browser does not support the video tag.
     xml ? %( #{name}="#{name}") : %( #{name})
   end
 
-  def _encode_quotes val
+  def _append_link_constraint_attrs node, attrs = []
+    rel = 'nofollow' if node.option? 'nofollow'
+    if (window = node.attributes['window'])
+      attrs << %( target="#{window}")
+      attrs << (rel ? %( rel="#{rel} noopener") : ' rel="noopener"') if window == '_blank' || (node.option? 'noopener')
+    elsif rel
+      attrs << %( rel="#{rel}")
+    end
+    attrs
+  end
+
+  def _encode_attribute_value val
     (val.include? '"') ? (val.gsub '"', '&quot;') : val
   end
 
@@ -1196,17 +1207,6 @@ Your browser does not support the video tag.
 <div class="sectionbody">
 <p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
 </div>)
-  end
-
-  def _append_link_constraint_attrs node, attrs = []
-    rel = 'nofollow' if node.option? 'nofollow'
-    if (window = node.attributes['window'])
-      attrs << %( target="#{window}")
-      attrs << (rel ? %( rel="#{rel} noopener") : ' rel="noopener"') if window == '_blank' || (node.option? 'noopener')
-    elsif rel
-      attrs << %( rel="#{rel}")
-    end
-    attrs
   end
 
   def _read_svg_contents node, target
