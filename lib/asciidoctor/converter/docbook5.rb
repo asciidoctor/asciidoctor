@@ -5,6 +5,26 @@ module Asciidoctor
 class Converter::DocBook5Converter < Converter::Base
   register_for 'docbook5'
 
+  # default represents variablelist
+  (DLIST_TAGS = {
+    'qanda' => { list:  'qandaset', entry: 'qandaentry', label: 'question', term:  'simpara', item:  'answer' },
+    'glossary' => { list:  nil, entry: 'glossentry', term:  'glossterm', item:  'glossdef' },
+  }).default = { list:  'variablelist', entry: 'varlistentry', term: 'term', item:  'listitem' }
+
+  (QUOTE_TAGS = {
+    monospaced:  ['<literal>', '</literal>'],
+    emphasis:    ['<emphasis>', '</emphasis>', true],
+    strong:      ['<emphasis role="strong">', '</emphasis>', true],
+    double:      ['<quote>', '</quote>', true],
+    single:      ['<quote>', '</quote>', true],
+    mark:        ['<emphasis role="marked">', '</emphasis>'],
+    superscript: ['<superscript>', '</superscript>'],
+    subscript:   ['<subscript>', '</subscript>'],
+  }).default = ['', '', true]
+
+  MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
+  TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
+
   CopyrightRx = /^(.+?)(?: ((?:\d{4}\-)?\d{4}))?$/
   ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
 
@@ -14,11 +34,7 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def document node
-    result = []
-    if (root_tag_name = node.doctype) == 'manpage'
-      root_tag_name = 'refentry'
-    end
-    result << '<?xml version="1.0" encoding="UTF-8"?>'
+    result = ['<?xml version="1.0" encoding="UTF-8"?>']
     if node.attr? 'toc'
       if node.attr? 'toclevels'
         result << %(<?asciidoc-toc maxdepth="#{node.attr 'toclevels'}"?>)
@@ -34,6 +50,9 @@ class Converter::DocBook5Converter < Converter::Base
       end
     end
     lang_attribute = (node.attr? 'nolang') ? '' : %( xml:lang="#{node.attr 'lang', 'en'}")
+    if (root_tag_name = node.doctype) == 'manpage'
+      root_tag_name = 'refentry'
+    end
     result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{_common_attributes node.id}>)
     result << (_document_info_tag node) unless node.noheader
     unless (docinfo_content = node.docinfo :header).empty?
@@ -48,8 +67,6 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   alias embedded _content_only
-
-  MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
 
   def section node
     if node.document.doctype == 'manpage'
@@ -84,27 +101,6 @@ class Converter::DocBook5Converter < Converter::Base
     result << %(</calloutlist>)
     result.join LF
   end
-
-  (DLIST_TAGS = {
-    'qanda' => {
-      list:  'qandaset',
-      entry: 'qandaentry',
-      label: 'question',
-      term:  'simpara',
-      item:  'answer',
-    },
-    'glossary' => {
-      list:  nil,
-      entry: 'glossentry',
-      term:  'glossterm',
-      item:  'glossdef',
-    },
-  }).default = { # default is variable
-    list:  'variablelist',
-    entry: 'varlistentry',
-    term:  'term',
-    item:  'listitem',
-  }
 
   def dlist node
     result = []
@@ -389,8 +385,6 @@ class Converter::DocBook5Converter < Converter::Base
 </sidebar>)
   end
 
-  TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
-
   def table node
     has_body = false
     result = []
@@ -599,17 +593,6 @@ class Converter::DocBook5Converter < Converter::Base
       %(<menuchoice><guimenu>#{menu}</guimenu> <guisubmenu>#{submenus.join '</guisubmenu> <guisubmenu>'}</guisubmenu> <guimenuitem>#{node.attr 'menuitem'}</guimenuitem></menuchoice>)
     end
   end
-
-  (QUOTE_TAGS = {
-    monospaced:  ['<literal>',                '</literal>',     false],
-    emphasis:    ['<emphasis>',               '</emphasis>',    true],
-    strong:      ['<emphasis role="strong">', '</emphasis>',    true],
-    double:      ['<quote>',                  '</quote>',       true],
-    single:      ['<quote>',                  '</quote>',       true],
-    mark:        ['<emphasis role="marked">', '</emphasis>',    false],
-    superscript: ['<superscript>',            '</superscript>', false],
-    subscript:   ['<subscript>',              '</subscript>',   false],
-  }).default = ['', '', true]
 
   def inline_quoted node
     if (type = node.type) == :asciimath
