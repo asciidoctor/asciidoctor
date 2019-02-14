@@ -78,8 +78,7 @@ module Substitutors
   def apply_subs text, subs = NORMAL_SUBS
     return text if text.empty? || !subs
 
-    if (multiline = ::Array === text)
-      #text = text.size > 1 ? (text.join LF) : text[0]
+    if (is_multiline = ::Array === text)
       text = text[1] ? (text.join LF) : text[0]
     end
 
@@ -112,7 +111,7 @@ module Substitutors
     end
     text = restore_passthroughs text if has_passthroughs
 
-    multiline ? (text.split LF, -1) : text
+    is_multiline ? (text.split LF, -1) : text
   end
 
   # Public: Apply normal substitutions.
