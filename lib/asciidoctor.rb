@@ -631,7 +631,7 @@ module Asciidoctor
     #
     # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
     # IMPORTANT if this regexp does not agree with the regexp for each list type, the parser will hang.
-    AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/])#{CC_ANY}*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
+    AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/])[ \t]*[^ \t]#{CC_ANY}*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
 
     # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
     #
@@ -693,15 +693,15 @@ module Asciidoctor
     #
     # NOTE we know trailing (.*) will match at least one character because we strip trailing spaces
     # NOTE must skip line comment when looking for next list item inside list
-    DescriptionListRx = %r(^(?!//[^/])[ \t]*(#{CC_ANY}*?)(:::{0,2}|;;)(?:$|[ \t]+(#{CC_ANY}*)$))
+    DescriptionListRx = %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(:::{0,2}|;;)(?:$|[ \t]+(#{CC_ANY}*)$))
 
-    # Matches a sibling description list item (which does not include the type in the key).
+    # Matches a sibling description list item (excluding the delimiter specified by the key).
     # NOTE must skip line comment when looking for sibling list item
     DescriptionListSiblingRx = {
-      '::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(::)(?:$|[ \t]+(#{CC_ANY}*)$)),
-      ':::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(:::)(?:$|[ \t]+(#{CC_ANY}*)$)),
-      '::::' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*[^:]|)(::::)(?:$|[ \t]+(#{CC_ANY}*)$)),
-      ';;' => %r(^(?!//[^/])[ \t]*(#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$))
+      '::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      ':::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(:::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      '::::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::::)(?:$|[ \t]+(#{CC_ANY}*)$)),
+      ';;' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$))
     }
 
     # Matches a callout list item.

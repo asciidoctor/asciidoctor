@@ -2254,8 +2254,7 @@ class Parser
   # list_type     - The context of the list (:olist, :ulist, :colist, :dlist)
   # sibling_trait - The String marker for the list or the Regexp to match a sibling
   #
-  # Returns a Boolean indicating whether this line is a sibling list item given
-  # the criteria provided
+  # Returns a Boolean indicating whether this line is a sibling list item given the criteria provided
   def self.is_sibling_list_item? line, list_type, sibling_trait
     if ::Regexp === sibling_trait
       sibling_trait.match? line
