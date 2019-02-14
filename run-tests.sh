@@ -4,7 +4,9 @@
 # This script will execute against all supported Ruby versions if "all" is the first argument to the script.
 
 if [ "$1" = "all" ]; then
-  rvm 2.3@asciidoctor-dev,2.4@asciidoctor-dev,2.5@asciidoctor-dev,2.6@asciidoctor-dev,jruby-9.1@asciidoctor-dev,jruby-9.2@asciidoctor-dev "do" ./run-tests.sh
+  rvm 2.3,2.6,jruby-9.2 "do" ./run-tests.sh
 else
-  rake test:all > /tmp/asciidoctor-test-results.txt 2>&1; cat /tmp/asciidoctor-test-results.txt
+  GEM_PATH=$(bundle exec ruby -e "puts ENV['GEM_HOME']")
+  CONSOLE_OUTPUT=$(rake test:all 2>&1)
+  echo "$CONSOLE_OUTPUT"
 fi
