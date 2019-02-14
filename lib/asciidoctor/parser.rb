@@ -549,7 +549,7 @@ class Parser
           indented, ch0 = false, this_line.chr
           layout_break_chars = md_syntax ? HYBRID_LAYOUT_BREAK_CHARS : LAYOUT_BREAK_CHARS
           if (layout_break_chars.key? ch0) && (md_syntax ? (ExtLayoutBreakRx.match? this_line) :
-              (this_line == ch0 * (ll = this_line.length) && ll > 2))
+              (this_line.count ch0) == (ll = this_line.length) && ll > 2)
             # NOTE we're letting break lines (horizontal rule, page_break, etc) have attributes
             block = Block.new(parent, layout_break_chars[ch0], content_model: :empty)
             break
@@ -954,14 +954,15 @@ class Parser
 
     if DELIMITED_BLOCKS.key? tip
       # tip is the full line when delimiter is minimum length
-      if tl < 4 || tl == line_len
+      if tl == line_len || tl < 4
         if return_match_data
           context, masq = DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, tip)
         else
           true
         end
-      elsif %(#{tip}#{tip.slice(-1, 1) * (line_len - tl)}) == line
+      #elsif %(#{tip}#{(tip.slice -1, 1) * (line_len - tl)}) == line
+      elsif ((line.slice 1, line_len).count DELIMITED_BLOCK_TAILS[tip]) == line_len - 1
         if return_match_data
           context, masq = DELIMITED_BLOCKS[tip]
           BlockMatchData.new(context, masq, tip, line)
@@ -1688,7 +1689,7 @@ class Parser
   # Returns the [Integer] section level if these lines are an setext section title, otherwise nothing.
   def self.setext_section_title? line1, line2
     if (level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
-        line2_ch1 * (line2_len = line2.length) == line2 && SetextSectionTitleRx.match?(line1) &&
+        (line2.count line2_ch1) == (line2_len = line2.length) && SetextSectionTitleRx.match?(line1) &&
         (line1.length - line2_len).abs < 2
       level
     end
@@ -1750,7 +1751,7 @@ class Parser
       end unless sect_id
     elsif Compliance.underline_style_section_titles && (line2 = reader.peek_line(true)) &&
         (sect_level = SETEXT_SECTION_LEVELS[line2_ch1 = line2.chr]) &&
-        line2_ch1 * (line2_len = line2.length) == line2 && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
+        (line2.count line2_ch1) == (line2_len = line2.length) && (sect_title = SetextSectionTitleRx =~ line1 && $1) &&
         (line1.length - line2_len).abs < 2
       atx = false
       if sect_title.end_with?(']]') && InlineSectionAnchorRx =~ sect_title && !$1 # escaped
@@ -2058,7 +2059,7 @@ class Parser
       elsif !normal || (next_line.start_with? '/')
         if next_line == '//'
           return true
-        elsif normal && '/' * (ll = next_line.length) == next_line
+        elsif normal && (next_line.count '/') == (ll = next_line.length)
           unless ll == 3
             reader.read_lines_until terminator: next_line, skip_first_line: true, preserve_last_line: true, skip_processing: true, context: :comment
             return true
