@@ -146,6 +146,15 @@ module Helpers
     end
   end
 
+  # Internal: Encode a URI String (namely the path portion).
+  #
+  # str - the String to encode
+  #
+  # Returns the String with all spaces replaced with %20.
+  def self.encode_uri str
+    (str.include? ' ') ? (str.gsub ' ', '%20') : str
+  end
+
   # Public: Removes the file extension from filename and returns the result
   #
   # filename - The String file name to process

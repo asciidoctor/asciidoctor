@@ -317,7 +317,7 @@ class AbstractNode
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
-      if ((Helpers.uriish? target_image) && (target_image = uri_encode_spaces target_image)) ||
+      if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_uri target_image)) ||
           (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
           (target_image = normalize_web_path target_image, images_base, false))
         if doc.attr? 'allow-uri-read'
@@ -478,7 +478,7 @@ class AbstractNode
   # Returns the resolved [String] path
   def normalize_web_path(target, start = nil, preserve_uri_target = true)
     if preserve_uri_target && (Helpers.uriish? target)
-      uri_encode_spaces target
+      Helpers.encode_uri target
     else
       @document.path_resolver.web_path target, start
     end
@@ -559,15 +559,6 @@ class AbstractNode
   # @deprecated Use Helpers.uriish? instead
   def is_uri? str
     Helpers.uriish? str
-  end
-
-  # Internal: URI encode spaces in a String
-  #
-  # str - the String to encode
-  #
-  # Returns the String with all spaces replaced with %20.
-  private def uri_encode_spaces str
-    (str.include? ' ') ? (str.gsub ' ', '%20') : str
   end
 end
 end
