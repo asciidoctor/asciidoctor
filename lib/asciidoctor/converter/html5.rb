@@ -6,20 +6,20 @@ class Converter::Html5Converter < Converter::Base
   register_for 'html5'
 
   (QUOTE_TAGS = {
-    monospaced:  ['<code>',   '</code>',   true],
-    emphasis:    ['<em>',     '</em>',     true],
+    monospaced:  ['<code>', '</code>', true],
+    emphasis:    ['<em>', '</em>', true],
     strong:      ['<strong>', '</strong>', true],
-    double:      ['&#8220;',  '&#8221;',   false],
-    single:      ['&#8216;',  '&#8217;',   false],
-    mark:        ['<mark>',   '</mark>',   true],
-    superscript: ['<sup>',    '</sup>',    true],
-    subscript:   ['<sub>',    '</sub>',    true],
-    asciimath:   ['\$',       '\$',        false],
-    latexmath:   ['\(',       '\)',        false],
+    double:      ['&#8220;', '&#8221;'],
+    single:      ['&#8216;', '&#8217;'],
+    mark:        ['<mark>', '</mark>', true],
+    superscript: ['<sup>', '</sup>', true],
+    subscript:   ['<sub>', '</sub>', true],
+    asciimath:   ['\$', '\$'],
+    latexmath:   ['\(', '\)'],
     # Opal can't resolve these constants when referenced here
     #asciimath:  INLINE_MATH_DELIMITERS[:asciimath] + [false],
     #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
-  }).default = ['', '', false]
+  }).default = ['', '']
 
   DropAnchorRx = /<(?:a[^>+]+|\/a)>/
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
@@ -1153,14 +1153,19 @@ Your browser does not support the video tag.
   end
 
   def inline_quoted node
-    open, close, is_tag = QUOTE_TAGS[node.type]
-    class_attr = %( class="#{node.role}") if node.role
-    id_attr = %( id="#{node.id}") if node.id
-    if class_attr || id_attr
-      if is_tag
-        %(#{open.chop}#{id_attr || ''}#{class_attr || ''}>#{node.text}#{close})
+    open, close, tag = QUOTE_TAGS[node.type]
+    if node.id
+      class_attr = node.role ? %( class="#{node.role}") : ''
+      if tag
+        %(#{open.chop} id="#{node.id}"#{class_attr}>#{node.text}#{close})
       else
-        %(<span#{id_attr || ''}#{class_attr || ''}>#{open}#{node.text}#{close}</span>)
+        %(<span id="#{node.id}"#{class_attr}>#{open}#{node.text}#{close}</span>)
+      end
+    elsif node.role
+      if tag
+        %(#{open.chop} class="#{node.role}">#{node.text}#{close})
+      else
+        %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
       end
     else
       %(#{open}#{node.text}#{close})
