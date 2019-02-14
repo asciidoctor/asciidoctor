@@ -8,15 +8,15 @@ context 'Manpage' do
   :doctype: manpage
   :man manual: Command Manual
   :man source: Command 1.2.3
-  
+
   == NAME
-  
+
   command - does stuff
-  
+
   == SYNOPSIS
-  
+
   *command* [_OPTION_]... _FILE_...
-  
+
   == DESCRIPTION
   EOS
 

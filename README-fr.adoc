@@ -201,7 +201,7 @@ Ouvrez un terminal et tapez :
 
  $ brew install asciidoctor
 
-Homebrew installe la gemme `asciidoctor` dans un répertoire spécifique qui est indépendant des gemmes système. 
+Homebrew installe la gemme `asciidoctor` dans un répertoire spécifique qui est indépendant des gemmes système.
 
 [#gem-install]
 === (c) gem install

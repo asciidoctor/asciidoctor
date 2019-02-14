@@ -534,7 +534,7 @@ class Reader
     @saved = {}.tap do |accum|
       instance_variables.each do |name|
         unless name == :@saved || name == :@source_lines
-          accum[name] = ::Array === (val = instance_variable_get name) ? (val.drop 0) : val 
+          accum[name] = ::Array === (val = instance_variable_get name) ? (val.drop 0) : val
         end
       end
     end
