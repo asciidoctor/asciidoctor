@@ -608,10 +608,13 @@ class PreprocessorReader < Reader
   def initialize document, data = nil, cursor = nil, opts = {}
     @document = document
     super data, cursor, opts
-    default_include_depth = (document.attributes['max-include-depth'] || 64).to_i
-    default_include_depth = 0 if default_include_depth < 0
-    # track both absolute depth for comparing to size of include stack and relative depth for reporting
-    @maxdepth = { abs: default_include_depth, rel: default_include_depth }
+    if (default_include_depth = (document.attributes['max-include-depth'] || 64).to_i) > 0
+      # track absolute max depth, current max depth for comparing to include stack size, and relative max depth for reporting
+      @maxdepth = { abs: default_include_depth, curr: default_include_depth, rel: default_include_depth }
+    else
+      # if @maxdepth is not set, built-in include functionality is disabled
+      @maxdepth = nil
+    end
     @include_stack = []
     @includes = document.catalog[:includes]
     @skipping = false
@@ -693,10 +696,16 @@ class PreprocessorReader < Reader
 
     @lineno = lineno
 
-    if attributes.key? 'depth'
-      depth = attributes['depth'].to_i
-      depth = 1 if depth <= 0
-      @maxdepth = { abs: (@include_stack.size - 1) + depth, rel: depth }
+    if @maxdepth && (attributes.key? 'depth')
+      if (rel_maxdepth = attributes['depth'].to_i) > 0
+        if (curr_maxdepth = @include_stack.size + rel_maxdepth) > (abs_maxdepth = @maxdepth[:abs])
+          # if relative depth exceeds absolute max depth, effectively ignore relative depth request
+          curr_maxdepth = rel_maxdepth = abs_maxdepth
+        end
+        @maxdepth = { abs: abs_maxdepth, curr: curr_maxdepth, rel: rel_maxdepth }
+      else
+        @maxdepth = { abs: @maxdepth[:abs], curr: @include_stack.size, rel: 0 }
+      end
     end
 
     # effectively fill the buffer
@@ -729,13 +738,14 @@ class PreprocessorReader < Reader
     @include_stack.size
   end
 
-  def exceeded_max_depth?
-    if (abs_maxdepth = @maxdepth[:abs]) > 0 && @include_stack.size >= abs_maxdepth
-      @maxdepth[:rel]
-    else
-      false
-    end
+  # Public: Reports whether pushing an include on the include stack exceeds the max include depth.
+  #
+  # Returns nil if no max depth is set and includes are disabled (max-include-depth=0), false if the current max depth
+  # will not be exceeded, and the relative max include depth if the current max depth will be exceed.
+  def exceeds_max_depth?
+    @maxdepth && @include_stack.size >= @maxdepth[:curr] && @maxdepth[:rel]
   end
+  alias exceeded_max_depth? exceeds_max_depth?
 
   # TODO Document this override
   # also, we now have the field in the super class, so perhaps
@@ -1010,8 +1020,8 @@ class PreprocessorReader < Reader
     elsif doc.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_next_line %(link:#{expanded_target}[])
-    elsif (abs_maxdepth = @maxdepth[:abs]) > 0
-      if @include_stack.size >= abs_maxdepth
+    elsif @maxdepth
+      if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
         return
       end

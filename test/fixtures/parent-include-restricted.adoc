@@ -1,5 +1,5 @@
 first line of parent
 
-include::child-include.adoc[depth=1]
+include::child-include.adoc[depth=0]
 
 last line of parent

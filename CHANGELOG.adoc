@@ -73,6 +73,7 @@ Improvements::
   * pass :input_mtime option to Document constructor; let Document constructor assign docdate/time/year attributes (#3029)
   * never mutate strings; add a `frozen_string_literal: true` magic comment to top of all Ruby source files (#3054)
   * always use docdate and doctime to compute docyear and docdatetime (#3064)
+  * rename PreprocessorReader#exceeded_max_depth? to PreprocessorReader#exceeds_max_depth? and return nil if includes are disabled
 
 Bug Fixes::
 
@@ -95,6 +96,7 @@ Bug Fixes::
   * fix deprecated ERB trim mode that was causing warning (#3006)
   * move time anchor after query string on vimeo video to avoid dropping options
   * allow color for generic text, line numbers, and line number border to inherit from Pygments style (#2106)
+  * enforce and report relative include depth properly (depth=0 rather than depth=1 disables nested includes)
 
 Build / Infrastructure::
 
