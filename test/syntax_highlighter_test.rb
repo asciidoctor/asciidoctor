@@ -723,7 +723,7 @@ context 'Syntax Highlighter' do
         ----
         EOS
         # NOTE notice the newline in inside the closing </span> of the highlight span
-        expected = <<~EOS.chomp
+        expected = <<~EOS.chop
         <span class="hll"><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
         </span><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>#{opts == '%linenums' ? ?\n : '</code>'}</pre>
         EOS
@@ -745,7 +745,7 @@ context 'Syntax Highlighter' do
         ----
         EOS
         # NOTE notice the newline in inside the closing </span> of the highlight span
-        expected = <<~EOS.chomp
+        expected = <<~EOS.chop
         <span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
         <span class="hll"><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>
         </span>#{opts == '%linenums' ? '' : '</code>'}</pre>
@@ -1001,7 +1001,7 @@ context 'Syntax Highlighter' do
       ----
       EOS
       # NOTE notice the newline is inside the closing </span> of the highlight span
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       <pre class="pygments highlight"><code data-lang="ruby"><span></span><span class="hll"><span class="tok-nb">puts</span> <span class="tok-s1">&#39;Hello, world!&#39;</span>
       </span><span class="hll"><span class="tok-nb">puts</span> <span class="tok-s1">&#39;Goodbye, world!&#39;</span>
       </span></code></pre>

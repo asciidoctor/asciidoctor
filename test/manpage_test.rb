@@ -2,7 +2,7 @@
 require_relative 'test_helper'
 
 context 'Manpage' do
-  SAMPLE_MANPAGE_HEADER = <<~'EOS'.chomp
+  SAMPLE_MANPAGE_HEADER = <<~'EOS'.chop
   = command (1)
   Author Name
   :doctype: manpage
@@ -153,14 +153,14 @@ context 'Manpage' do
     end
 
     test 'should require specialchars in value of man-linkstyle attribute defined in document to be escaped' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       :man-linkstyle: cyan R < >
       #{SAMPLE_MANPAGE_HEADER}
       EOS
       output = Asciidoctor.convert input, backend: :manpage, header_footer: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R &lt; &gt;\n)
 
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       :man-linkstyle: pass:[cyan R < >]
       #{SAMPLE_MANPAGE_HEADER}
       EOS
@@ -171,7 +171,7 @@ context 'Manpage' do
 
   context 'Manify' do
     test 'should unescape literal ampersand' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       (C) & (R) are translated to character references, but not the &.
@@ -181,7 +181,7 @@ context 'Manpage' do
     end
 
     test 'should replace em dashes' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       go -- to
@@ -194,7 +194,7 @@ context 'Manpage' do
     end
 
     test 'should escape lone period' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       .
@@ -204,7 +204,7 @@ context 'Manpage' do
     end
 
     test 'should escape raw macro' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       AAA this line of text should be show
@@ -217,7 +217,7 @@ context 'Manpage' do
     end
 
     test 'should normalize whitespace in a paragraph' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Oh, here it goes again
@@ -231,7 +231,7 @@ context 'Manpage' do
     end
 
     test 'should normalize whitespace in a list item' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       * Oh, here it goes again
@@ -245,7 +245,7 @@ context 'Manpage' do
     end
 
     test 'should collapse whitespace in the man manual and man source' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Describe this thing.
@@ -271,7 +271,7 @@ context 'Manpage' do
     end
 
     test 'should preserve backslashes in escape sequences' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       "`hello`" '`goodbye`' *strong* _weak_ `even`
@@ -281,7 +281,7 @@ context 'Manpage' do
     end
 
     test 'should escape backslashes in content' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       \\.foo \\ bar\\
@@ -292,7 +292,7 @@ context 'Manpage' do
     end
 
     test 'should escape literal escape sequence' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
        \\fB makes text bold
@@ -302,13 +302,13 @@ context 'Manpage' do
     end
 
     test 'should preserve inline breaks' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Before break. +
       After break.
       EOS
-      expected = <<~EOS.chomp
+      expected = <<~'EOS'.chop
       Before break.
       .br
       After break.
@@ -320,13 +320,13 @@ context 'Manpage' do
 
   context 'URL macro' do
     test 'should not leave blank line before URL macro' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
       First paragraph.
 
       http://asciidoc.org[AsciiDoc]
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       First paragraph.
       .sp
@@ -337,12 +337,12 @@ context 'Manpage' do
     end
 
     test 'should not swallow content following URL' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       http://asciidoc.org[AsciiDoc] can be used to create man pages.
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .URL "http://asciidoc.org" "AsciiDoc" " "
       can be used to create man pages.
       EOS
@@ -351,12 +351,12 @@ context 'Manpage' do
     end
 
     test 'should pass adjacent character as final argument of URL macro' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       This is http://asciidoc.org[AsciiDoc].
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       This is \c
       .URL "http://asciidoc.org" "AsciiDoc" "."
       EOS
@@ -365,12 +365,12 @@ context 'Manpage' do
     end
 
     test 'should pass adjacent character as final argument of URL macro and move trailing content to next line' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       This is http://asciidoc.org[AsciiDoc], which can be used to write content.
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       This is \c
       .URL "http://asciidoc.org" "AsciiDoc" ","
       which can be used to write content.
@@ -380,7 +380,7 @@ context 'Manpage' do
     end
 
     test 'should not leave blank lines between URLs on contiguous lines of input' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       The corresponding implementations are
@@ -390,7 +390,7 @@ context 'Manpage' do
       http://ecls.sf.net[ECL],
       and http://sbcl.sf.net[SBCL].
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       The corresponding implementations are
       .URL "http://clisp.sf.net" "CLISP" ","
@@ -405,12 +405,12 @@ context 'Manpage' do
     end
 
     test 'should not leave blank lines between URLs on same line of input' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       The corresponding implementations are http://clisp.sf.net[CLISP], http://ccl.clozure.com[Clozure CL], http://cmucl.org[CMUCL], http://ecls.sf.net[ECL], and http://sbcl.sf.net[SBCL].
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       The corresponding implementations are \c
       .URL "http://clisp.sf.net" "CLISP" ","
@@ -425,12 +425,12 @@ context 'Manpage' do
     end
 
     test 'should not insert space between link and non-whitespace characters surrounding it' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Please search |link:http://discuss.asciidoctor.org[the forums]| before asking.
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       Please search |\c
       .URL "http://discuss.asciidoctor.org" "the forums" "|"
@@ -441,12 +441,12 @@ context 'Manpage' do
     end
 
     test 'should be able to use monospaced text inside a link' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Enter the link:cat[`cat`] command.
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       Enter the \c
       .URL "cat" "\f(CRcat\fP" " "
@@ -459,13 +459,13 @@ context 'Manpage' do
 
   context 'MTO macro' do
     test 'should convert inline email macro into MTO macro' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
       First paragraph.
 
       mailto:doc@example.org[Contact the doc]
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       .sp
       First paragraph.
       .sp
@@ -476,11 +476,11 @@ context 'Manpage' do
     end
 
     test 'should set text of MTO macro to blank for implicit email' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
       Bugs fixed daily by doc@example.org.
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       Bugs fixed daily by \c
       .MTO "doc\(atexample.org" "" "."
       EOS
@@ -491,7 +491,7 @@ context 'Manpage' do
 
   context 'Table' do
     test 'should create header, body, and footer rows in correct order' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       [%header%footer]
@@ -502,7 +502,7 @@ context 'Manpage' do
       |Footer
       |===
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       allbox tab(:);
       lt.
       T{
@@ -529,7 +529,7 @@ context 'Manpage' do
     end
 
     test 'should manify normal table cell content' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       |===
@@ -544,7 +544,7 @@ context 'Manpage' do
     end
 
     test 'should manify table title' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       .Table of options
@@ -556,7 +556,7 @@ context 'Manpage' do
       | 3
       |===
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       .it 1 an-trap
       .nr an-no-space-flag 1
       .nr an-break-flag 1
@@ -593,7 +593,7 @@ context 'Manpage' do
     end
 
     test 'should manify and preserve whitespace in literal table cell' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       |===
@@ -602,7 +602,7 @@ context 'Manpage' do
       .
       |===
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       .TS
       allbox tab(:);
       lt lt.
@@ -625,7 +625,7 @@ context 'Manpage' do
     end
 
     test 'should manify and preserve whitespace in verse table cell' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       |===
@@ -634,7 +634,7 @@ context 'Manpage' do
       .
       |===
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       .TS
       allbox tab(:);
       lt lt.
@@ -659,7 +659,7 @@ context 'Manpage' do
 
   context 'Images' do
     test 'should replace block image with alt text enclosed in square brackets' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       Behold the wisdom of the Magic 8 Ball!
@@ -672,7 +672,7 @@ context 'Manpage' do
     end
 
     test 'should replace inline image with alt text enclosed in square brackets' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       The Magic 8 Ball says image:signs-point-to-yes.jpg[].
@@ -682,7 +682,7 @@ context 'Manpage' do
     end
 
     test 'should place link after alt text for inline image if link is defined' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       The Magic 8 Ball says image:signs-point-to-yes.jpg[link=https://en.wikipedia.org/wiki/Magic_8-Ball].
@@ -694,7 +694,7 @@ context 'Manpage' do
 
   context 'Quote Block' do
     test 'should indent quote block' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       [,James Baldwin]
@@ -703,7 +703,7 @@ context 'Manpage' do
       But nothing can be changed until it is faced.
       ____
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       .RS 3
       .ll -.6i
       .sp
@@ -725,7 +725,7 @@ context 'Manpage' do
 
   context 'Callout List' do
     test 'should generate callout list using proper formatting commands' do
-      input = <<~EOS.chomp
+      input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
       ----
@@ -733,7 +733,7 @@ context 'Manpage' do
       ----
       <1> Installs the asciidoctor gem from RubyGems.org
       EOS
-      expected_coda = <<~'EOS'.chomp
+      expected_coda = <<~'EOS'.chop
       .TS
       tab(:);
       r lw(\n(.lu*75u/100u).

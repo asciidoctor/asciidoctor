@@ -355,7 +355,7 @@ context "Parser" do
   end
 
   test 'use explicit authorinitials if set after implicit author line' do
-    input = <<~'EOS'.chomp
+    input = <<~'EOS'
     Jean-Claude Van Damme
     :authorinitials: JCVD
     EOS
@@ -365,7 +365,7 @@ context "Parser" do
   end
 
   test 'use explicit authorinitials if set after author attribute' do
-    input = <<~'EOS'.chomp
+    input = <<~'EOS'
     :author: Jean-Claude Van Damme
     :authorinitials: JCVD
     EOS
@@ -525,7 +525,7 @@ context "Parser" do
   end
 
   test "parse rev remark only" do
-    # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
     input = <<~EOS
     Joe Cool
      :Must start revremark-only line with space
@@ -606,16 +606,16 @@ context "Parser" do
   end
 
   test 'adjust indentation to 0' do
-    input = <<-'EOS'.chomp
-    def names
+    input = <<~EOS
+    \x20   def names
 
-      @name.split
+    \x20     @name.split
 
-    end
+    \x20   end
     EOS
 
-    # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
-    expected = <<~EOS.chomp
+    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+    expected = <<~EOS.chop
     def names
 
       @name.split
@@ -629,7 +629,7 @@ context "Parser" do
   end
 
   test 'adjust indentation mixed with tabs and spaces to 0' do
-    input = <<~EOS.chomp
+    input = <<~EOS
         def names
 
     \t  @name.split
@@ -637,7 +637,7 @@ context "Parser" do
         end
     EOS
 
-    expected = <<~EOS.chomp
+    expected = <<~EOS.chop
     def names
 
       @name.split
@@ -651,14 +651,14 @@ context "Parser" do
   end
 
   test 'expands tabs to spaces' do
-    input = <<~'EOS'.chomp
+    input = <<~'EOS'
     Filesystem				Size	Used	Avail	Use%	Mounted on
     Filesystem              Size    Used    Avail   Use%    Mounted on
     devtmpfs				3.9G	   0	 3.9G	  0%	/dev
     /dev/mapper/fedora-root	 48G	 18G	  29G	 39%	/
     EOS
 
-    expected = <<~'EOS'.chomp
+    expected = <<~'EOS'.chop
     Filesystem              Size    Used    Avail   Use%    Mounted on
     Filesystem              Size    Used    Avail   Use%    Mounted on
     devtmpfs                3.9G       0     3.9G     0%    /dev
@@ -671,20 +671,20 @@ context "Parser" do
   end
 
   test 'adjust indentation to non-zero' do
-    input = <<-'EOS'.chomp
-    def names
+    input = <<~EOS
+    \x20   def names
 
-      @name.split
+    \x20     @name.split
 
-    end
+    \x20   end
     EOS
 
-    expected = <<-'EOS'.chomp
-  def names
+    expected = <<~EOS.chop
+    \x20 def names
 
-    @name.split
+    \x20   @name.split
 
-  end
+    \x20 end
     EOS
 
     lines = input.split ?\n
@@ -693,12 +693,12 @@ context "Parser" do
   end
 
   test 'preserve block indent if indent is -1' do
-    input = <<-'EOS'
-    def names
+    input = <<~EOS
+    \x20   def names
 
-      @name.split
+    \x20     @name.split
 
-    end
+    \x20   end
     EOS
 
     expected = input

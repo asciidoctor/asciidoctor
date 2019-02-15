@@ -85,7 +85,7 @@ context 'Paragraphs' do
     end
 
     test 'removes indentation from literal paragraph marked as normal' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [normal]
         Normal paragraph.
@@ -222,7 +222,7 @@ context 'Paragraphs' do
 
   context 'Literal' do
     test 'single-line literal paragraphs' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       you know what?
 
@@ -237,7 +237,7 @@ context 'Paragraphs' do
     end
 
     test 'multi-line literal paragraph' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       Install instructions:
 
@@ -299,7 +299,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block attribute list' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
        literal text
       [normal]
@@ -311,7 +311,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block delimiter' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
        literal text
       --
@@ -324,7 +324,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at list continuation' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
        literal text
       +
@@ -420,7 +420,7 @@ context 'Paragraphs' do
       endif::[]
       EOS
 
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       <div class="sidebarblock">
       <div class="content">
       First line of sidebar.

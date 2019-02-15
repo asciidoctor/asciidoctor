@@ -1008,6 +1008,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [subs="attributes"]
       ....
@@ -1043,6 +1044,7 @@ context 'Blocks' do
     end
 
     test 'should remove block indent if indent attribute is 0' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [indent="0"]
       ----
@@ -1054,7 +1056,8 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = <<~EOS
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      expected = <<~EOS.chop
       def names
 
         @names.split
@@ -1066,10 +1069,11 @@ context 'Blocks' do
       assert_css 'pre', output, 1
       assert_css '.listingblock pre', output, 1
       result = xmlnodes_at_xpath('//pre', output, 1).text
-      assert_equal expected.chomp, result
+      assert_equal expected, result
     end
 
     test 'should not remove block indent if indent attribute is -1' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [indent="-1"]
       ----
@@ -1081,16 +1085,17 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = (input.lines.slice 2, 5).join
+      expected = (input.lines.slice 2, 5).join.chop
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
       assert_css '.listingblock pre', output, 1
       result = xmlnodes_at_xpath('//pre', output, 1).text
-      assert_equal expected.chomp, result
+      assert_equal expected, result
     end
 
     test 'should set block indent to value specified by indent attribute' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [indent="1"]
       ----
@@ -1102,16 +1107,17 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = (input.lines.slice 2, 5).map {|l| l.sub '    ', ' ' }.join
+      expected = (input.lines.slice 2, 5).map {|l| l.sub '    ', ' ' }.join.chop
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
       assert_css '.listingblock pre', output, 1
       result = xmlnodes_at_xpath('//pre', output, 1).text
-      assert_equal expected.chomp, result
+      assert_equal expected, result
     end
 
     test 'should set block indent to value specified by indent document attribute' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       :source-indent: 1
 
@@ -1125,13 +1131,13 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = (input.lines.slice 4, 5).map {|l| l.sub '    ', ' '}.join
+      expected = (input.lines.slice 4, 5).map {|l| l.sub '    ', ' '}.join.chop
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
       assert_css '.listingblock pre', output, 1
       result = xmlnodes_at_xpath('//pre', output, 1).text
-      assert_equal expected.chomp, result
+      assert_equal expected, result
     end
 
     test 'should expand tabs if tabsize attribute is positive' do
@@ -1148,7 +1154,8 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = <<~EOS
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      expected = <<~EOS.chop
       def names
 
           @names.split
@@ -1160,7 +1167,7 @@ context 'Blocks' do
       assert_css 'pre', output, 1
       assert_css '.listingblock pre', output, 1
       result = xmlnodes_at_xpath('//pre', output, 1).text
-      assert_equal expected.chomp, result
+      assert_equal expected, result
     end
 
     test 'literal block should honor nowrap option' do
@@ -1507,6 +1514,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting raw block' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       ++++
       line above
@@ -1591,7 +1599,7 @@ context 'Blocks' do
       f: x |-> x + 1
       ++++
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       \$f: bbb"N" -&gt; bbb"N"
       f: x |-&gt; x + 1\$
       EOS
@@ -1610,7 +1618,7 @@ context 'Blocks' do
       f: x |-> x + 1
       ++++
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       \$f: bbb"N" -&gt; bbb"N"\$<br>
       \$f: x |-&gt; x + 1\$
       EOS
@@ -1630,7 +1638,7 @@ context 'Blocks' do
       f: x |-> x + 1
       ++++
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       \$f: bbb"N" -&gt; bbb"N"\$<br>
       <br>
       \$f: x |-&gt; x + 1\$
@@ -1652,7 +1660,7 @@ context 'Blocks' do
       f: x |-> x + 1
       ++++
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       \$f: bbb"N" -&gt; bbb"N"\$<br>
       <br>
       <br>
@@ -1702,7 +1710,7 @@ context 'Blocks' do
       ++++
       EOS
 
-      expect = <<~'EOS'.chomp
+      expect = <<~'EOS'.chop
       <informalequation>
       <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&lt;</mml:mo><mml:mo>&#xB1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
       </informalequation>

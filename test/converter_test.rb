@@ -236,7 +236,7 @@ context 'Converter' do
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
       # NOTE verify behavior of trim mode
-      expected_output = <<~'EOS'.chomp
+      expected_output = <<~'EOS'.chop
       <div class="openblock wrapper">
       <div class="content">
       <div class="paragraph">
