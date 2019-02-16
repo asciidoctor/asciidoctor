@@ -98,6 +98,7 @@ Bug Fixes::
   * move time anchor after query string on vimeo video to avoid dropping options
   * allow color for generic text, line numbers, and line number border to inherit from Pygments style (#2106)
   * enforce and report relative include depth properly (depth=0 rather than depth=1 disables nested includes)
+  * allow outfilesuffix to be soft set from API (#2640)
 
 Build / Infrastructure::
 

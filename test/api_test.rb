@@ -1097,6 +1097,17 @@ context 'API' do
       end
     end
 
+    test 'should respect outfilesuffix soft set from API' do
+      sample_input_path = fixture_path('sample.adoc')
+      sample_output_path = fixture_path('sample.htm')
+      begin
+        Asciidoctor.convert_file sample_input_path, to_dir: (File.dirname sample_input_path), attributes: { 'outfilesuffix' => '.htm@' }
+        assert File.exist?(sample_output_path)
+      ensure
+        FileUtils.rm(sample_output_path)
+      end
+    end
+
     test 'output should be relative to to_dir option' do
       sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
