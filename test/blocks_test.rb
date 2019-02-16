@@ -3323,7 +3323,7 @@ context 'Blocks' do
       block = doc.blocks.first
       assert_nil block.id
       assert_nil(block.attr 'reftext')
-      refute doc.catalog[:ids].has_key?('illegal$id')
+      refute doc.catalog[:refs].key? 'illegal$id'
     end
 
     test 'should not recognize block anchor that starts with digit' do
@@ -3361,9 +3361,11 @@ context 'Blocks' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['debian']
-      refute_nil reftext
-      assert_equal 'Debian Install', reftext
+      ref = doc.catalog[:refs]['debian']
+      refute_nil ref
+      assert_equal 'Debian Install', ref.reftext
+      #assert_equal 'debian', doc.catalog[:reftexts]['Debian Install']
+      assert_equal 'debian', (doc.resolve_id 'Debian Install')
     end
 
     test 'should allow square brackets in block reference text' do
@@ -3376,9 +3378,11 @@ context 'Blocks' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['debian']
-      refute_nil reftext
-      assert_equal '[Debian] Install', reftext
+      ref = doc.catalog[:refs]['debian']
+      refute_nil ref
+      assert_equal '[Debian] Install', ref.reftext
+      #assert_equal 'debian', doc.catalog[:reftexts]['[Debian] Install']
+      assert_equal 'debian', (doc.resolve_id '[Debian] Install')
     end
 
     test 'should allow comma in block reference text' do
@@ -3391,9 +3395,11 @@ context 'Blocks' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['debian']
-      refute_nil reftext
-      assert_equal 'Debian, Ubuntu', reftext
+      ref = doc.catalog[:refs]['debian']
+      refute_nil ref
+      assert_equal 'Debian, Ubuntu', ref.reftext
+      #assert_equal 'debian', doc.catalog[:reftexts]['Debian, Ubuntu']
+      assert_equal 'debian', (doc.resolve_id 'Debian, Ubuntu')
     end
 
     test 'should substitute attribute references in reftext when registering block reference' do
@@ -3407,12 +3413,11 @@ context 'Blocks' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['tiger-evolution']
-      refute_nil reftext
-      assert_equal 'Evolution of the Tiger', reftext
       ref = doc.catalog[:refs]['tiger-evolution']
       refute_nil ref
       assert_equal 'Evolution of the Tiger', ref.attributes['reftext']
+      #assert_equal 'tiger-evolution', doc.catalog[:reftexts]['Evolution of the Tiger']
+      assert_equal 'tiger-evolution', (doc.resolve_id 'Evolution of the Tiger')
     end
 
     test 'should use specified reftext when registering block reference' do
@@ -3426,9 +3431,11 @@ context 'Blocks' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['debian']
-      refute_nil reftext
-      assert_equal 'Debian Install', reftext
+      ref = doc.catalog[:refs]['debian']
+      refute_nil ref
+      assert_equal 'Debian Install', ref.reftext
+      #assert_equal 'debian', doc.catalog[:reftexts]['Debian Install']
+      assert_equal 'debian', (doc.resolve_id 'Debian Install')
     end
   end
 end

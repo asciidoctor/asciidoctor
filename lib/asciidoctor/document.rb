@@ -279,7 +279,7 @@ class Document < AbstractBlock
     else
       @parent_document = nil
       @catalog = {
-        ids: {},
+        ids: {}, # deprecated; kept for backwards compatibility with converters
         refs: {},
         footnotes: [],
         links: [],
@@ -596,21 +596,20 @@ class Document < AbstractBlock
   def register type, value
     case type
     when :ids # deprecated
-      id, reftext = value
-      @catalog[:ids][id] ||= reftext || ('[' + id + ']')
+      register :refs, [(id = value[0]), (Inline.new self, :anchor, value[1], type: :ref, id: id)]
     when :refs
-      id, ref, reftext = value
-      unless (refs = @catalog[:refs]).key? id
-        @catalog[:ids][id] = reftext || ('[' + id + ']')
-        refs[id] = ref
-      end
+      @catalog[:refs][value[0]] ||= (ref = value[1])
+      ref
     when :footnotes, :indexterms
       @catalog[type] << value
     else
-      if @options[:catalog_assets]
-        @catalog[type] << (type == :images ? (ImageReference.new value[0], value[1]) : value)
-      end
+      @catalog[type] << (type == :images ? (ImageReference.new value[0], value[1]) : value) if @options[:catalog_assets]
     end
+  end
+
+  def resolve_id text
+    ((@reftexts ||= @parsed ? {}.tap {|accum| @catalog[:refs].each {|id, ref| accum[ref.xreftext] = id } } : nil) ||
+      {}.tap {|accum| @catalog[:refs].find {|id, ref| ref.xreftext == text ? accum[text] = id : nil } })[text]
   end
 
   def footnotes?

@@ -274,11 +274,10 @@ context 'Links' do
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.convert
-      assert_equal '[tigers]', doc.catalog[:ids]['tigers']
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_nil doc.catalog[:refs]['tigers'].text
-      assert_xpath '//a[@id = "tigers"]', output, 1
-      assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+      assert_xpath '//a[@id="tigers"]', output, 1
+      assert_xpath '//a[@id="tigers"]/child::text()', output, 0
     end
   end
 
@@ -287,16 +286,15 @@ context 'Links' do
     variations.each do |anchor|
       doc = document_from_string %(Here you can read about tigers.\\#{anchor})
       output = doc.convert
-      refute doc.catalog[:ids].key?('tigers')
       refute doc.catalog[:refs].key?('tigers')
-      assert_xpath '//a[@id = "tigers"]', output, 0
+      assert_xpath '//a[@id="tigers"]', output, 0
     end
   end
 
   test 'inline ref can start with colon' do
     input = '[[:idname]] text'
     output = convert_string_to_embedded input
-    assert_xpath '//a[@id = ":idname"]', output, 1
+    assert_xpath '//a[@id=":idname"]', output, 1
   end
 
   test 'inline ref cannot start with digit' do
@@ -310,11 +308,10 @@ context 'Links' do
     %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
       output = doc.convert
-      assert_equal 'Tigers', doc.catalog[:ids]['tigers']
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
-      assert_xpath '//a[@id = "tigers"]', output, 1
-      assert_xpath '//a[@id = "tigers"]/child::text()', output, 0
+      assert_xpath '//a[@id="tigers"]', output, 1
+      assert_xpath '//a[@id="tigers"]/child::text()', output, 0
     end
   end
 
@@ -330,7 +327,6 @@ context 'Links' do
       doc.convert
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
-      assert_equal 'Tigers', doc.catalog[:ids]['tigers']
     end
   end
 
@@ -340,15 +336,13 @@ context 'Links' do
       output = doc.convert header_footer: false
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal '<Tigers>', doc.catalog[:refs]['tigers'].text
-      assert_equal '<Tigers>', doc.references[:ids]['tigers']
       assert_includes output, '<anchor xml:id="tigers" xreflabel="&lt;Tigers&gt;"/>'
     end
   end
 
   test 'does not match bibliography anchor in prose when scanning for inline anchor' do
     doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry.'
-    refute doc.catalog[:ids].key?('label')
-    refute doc.catalog[:refs].key?('label')
+    refute doc.catalog[:refs].key? 'label'
   end
 
   test 'repeating inline anchor macro with empty reftext' do
@@ -860,22 +854,30 @@ context 'Links' do
   end
 
   test 'anchor creates reference' do
-    doc = document_from_string "[[tigers]]Tigers roam here."
-    assert_equal({ 'tigers' => '[tigers]' }, doc.catalog[:ids])
+    doc = document_from_string '[[tigers]]Tigers roam here.'
+    ref = doc.catalog[:refs]['tigers']
+    refute_nil ref
+    assert_nil ref.reftext
   end
 
-  test 'anchor with label creates reference' do
-    doc = document_from_string "[[tigers,Tigers]]Tigers roam here."
-    assert_equal({ 'tigers' => 'Tigers' }, doc.catalog[:ids])
+  test 'wip anchor with label creates reference' do
+    doc = document_from_string '[[tigers,Tigers]]Tigers roam here.'
+    ref = doc.catalog[:refs]['tigers']
+    refute_nil ref
+    assert_equal 'Tigers', ref.reftext
   end
 
   test 'anchor with quoted label creates reference with quoted label text' do
     doc = document_from_string %([[tigers,"Tigers roam here"]]Tigers roam here.)
-    assert_equal({ 'tigers' => '"Tigers roam here"' }, doc.catalog[:ids])
+    ref = doc.catalog[:refs]['tigers']
+    refute_nil ref
+    assert_equal '"Tigers roam here"', ref.reftext
   end
 
   test 'anchor with label containing a comma creates reference' do
     doc = document_from_string %([[tigers,Tigers, scary tigers, roam here]]Tigers roam here.)
-    assert_equal({ 'tigers' => 'Tigers, scary tigers, roam here' }, doc.catalog[:ids])
+    ref = doc.catalog[:refs]['tigers']
+    refute_nil ref
+    assert_equal 'Tigers, scary tigers, roam here', ref.reftext
   end
 end

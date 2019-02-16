@@ -245,9 +245,11 @@ context 'Sections' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['install']
-      refute_nil reftext
-      assert_equal 'Install Procedure', reftext
+      ref = doc.catalog[:refs]['install']
+      refute_nil ref
+      assert_equal 'Install Procedure', ref.reftext
+      #assert_equal 'install', doc.catalog[:reftexts]['Install Procedure']
+      assert_equal 'install', (doc.resolve_id 'Install Procedure')
     end
 
     test 'should use specified reftext when registering section reference' do
@@ -259,9 +261,11 @@ context 'Sections' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['_install']
-      refute_nil reftext
-      assert_equal 'Install Procedure', reftext
+      ref = doc.catalog[:refs]['_install']
+      refute_nil ref
+      assert_equal 'Install Procedure', ref.reftext
+      #assert_equal '_install', doc.catalog[:reftexts]['Install Procedure']
+      assert_equal '_install', (doc.resolve_id 'Install Procedure')
     end
 
     test 'should substitute attributes when registering reftext for section' do
@@ -275,9 +279,11 @@ context 'Sections' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['install']
-      refute_nil reftext
-      assert_equal 'install on Linux', reftext
+      ref = doc.catalog[:refs]['install']
+      refute_nil ref
+      assert_equal 'install on Linux', ref.reftext
+      #assert_equal 'install', doc.catalog[:reftexts]['install on Linux']
+      assert_equal 'install', (doc.resolve_id 'install on Linux')
     end
 
     test 'duplicate section id should not overwrite existing section id entry in references table' do
@@ -295,9 +301,12 @@ context 'Sections' do
 
       using_memory_logger do |logger|
         doc = document_from_string input
-        reftext = doc.catalog[:ids]['install']
-        refute_nil reftext
-        assert_equal 'First Install', reftext
+        ref = doc.catalog[:refs]['install']
+        refute_nil ref
+        assert_nil ref.reftext
+        assert_equal 'First Install', ref.title
+        #assert_equal 'install', doc.catalog[:reftexts]['First Install']
+        assert_equal 'install', (doc.resolve_id 'First Install')
         assert_message logger, :WARN, '<stdin>: line 7: id assigned to section already in use: install', Hash
       end
     end
@@ -316,9 +325,12 @@ context 'Sections' do
 
       using_memory_logger do |logger|
         doc = document_from_string input
-        reftext = doc.catalog[:ids]['_do_not_repeat_yourself']
-        refute_nil reftext
-        assert_equal 'Do Not Repeat Yourself', reftext
+        ref = doc.catalog[:refs]['_do_not_repeat_yourself']
+        refute_nil ref
+        assert_nil ref.reftext
+        assert_equal 'Do Not Repeat Yourself', ref.title
+        #assert_equal '_do_not_repeat_yourself', doc.catalog[:reftexts]['Do Not Repeat Yourself']
+        assert_equal '_do_not_repeat_yourself', (doc.resolve_id 'Do Not Repeat Yourself')
         assert_message logger, :WARN, '<stdin>: line 6: id assigned to section already in use: _do_not_repeat_yourself', Hash
         assert_equal 2, (doc.convert.scan 'id="_do_not_repeat_yourself"').size
       end
@@ -337,9 +349,12 @@ context 'Sections' do
 
       using_memory_logger do |logger|
         doc = document_from_string input
-        reftext = doc.catalog[:ids]['install']
-        refute_nil reftext
-        assert_equal 'First Install', reftext
+        ref = doc.catalog[:refs]['install']
+        refute_nil ref
+        assert_nil ref.reftext
+        assert_equal 'First Install', ref.title
+        #assert_equal 'install', doc.catalog[:reftexts]['First Install']
+        assert_equal 'install', (doc.resolve_id 'First Install')
         assert_message logger, :WARN, '<stdin>: line 7: id assigned to block already in use: install', Hash
       end
     end
@@ -1022,7 +1037,7 @@ context 'Sections' do
       assert_kind_of Asciidoctor::Block, heading
       assert_equal :floating_title, heading.context
       assert_equal '_independent_heading', heading.id
-      assert doc.catalog[:ids].has_key?('_independent_heading')
+      assert doc.catalog[:refs].key? '_independent_heading'
     end
 
     test 'should preprocess second line of setext discrete heading' do
@@ -1049,7 +1064,7 @@ context 'Sections' do
       doc = document_from_string input
       heading = doc.blocks.first
       assert_equal 'unchained', heading.id
-      assert doc.catalog[:ids].has_key?('unchained')
+      assert doc.catalog[:refs].key? 'unchained'
     end
 
     test 'should not include discrete heading in toc' do
@@ -1137,9 +1152,11 @@ context 'Sections' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['install']
-      refute_nil reftext
-      assert_equal 'Install Procedure', reftext
+      ref = doc.catalog[:refs]['install']
+      refute_nil ref
+      assert_equal 'Install Procedure', ref.reftext
+      #assert_equal 'install', doc.catalog[:reftexts]['Install Procedure']
+      assert_equal 'install', (doc.resolve_id 'Install Procedure')
     end
 
     test 'should use specified reftext when registering discrete section reference' do
@@ -1152,9 +1169,11 @@ context 'Sections' do
       EOS
 
       doc = document_from_string input
-      reftext = doc.catalog[:ids]['_install']
-      refute_nil reftext
-      assert_equal 'Install Procedure', reftext
+      ref = doc.catalog[:refs]['_install']
+      refute_nil ref
+      assert_equal 'Install Procedure', ref.reftext
+      #assert_equal '_install', doc.catalog[:reftexts]['Install Procedure']
+      assert_equal '_install', (doc.resolve_id 'Install Procedure')
     end
 
     test 'should not process inline anchor in discrete heading if explicit ID is assigned' do
