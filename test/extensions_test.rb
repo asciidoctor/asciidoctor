@@ -888,7 +888,7 @@ context 'Extensions' do
     end
 
     test 'should drop block macro line if target references missing attribute and attribute-missing is drop-line' do
-      input = <<~EOS
+      input = <<~'EOS'
       [.rolename]
       snippet::{gist-ns}12345[mode=edit]
 
@@ -1113,7 +1113,7 @@ context 'Extensions' do
         @target
         ++++
         EOS
-        expected = <<~'EOS'.chomp
+        expected = <<~'EOS'.chop
         target="", attributes=[]
         target="value,key=val", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
         target="", attributes=[["text", ""]]

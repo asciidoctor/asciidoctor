@@ -231,14 +231,14 @@ context 'API' do
 
     test 'converts block to output format when convert is called' do
       doc = Asciidoctor.load 'paragraph text'
-      expected = <<~'EOS'
+      expected = <<~'EOS'.chop
       <div class="paragraph">
       <p>paragraph text</p>
       </div>
       EOS
       assert_equal 1, doc.blocks.length
       assert_equal :paragraph, doc.blocks[0].context
-      assert_equal expected.chomp, doc.blocks[0].convert
+      assert_equal expected, doc.blocks[0].convert
     end
 
     test 'render method on node is aliased to convert method' do

@@ -4,11 +4,7 @@ require_relative 'test_helper'
 class ReaderTest < Minitest::Test
   DIRNAME = ASCIIDOCTOR_TEST_DIR
 
-  SAMPLE_DATA = <<~'EOS'.chomp.split(::Asciidoctor::LF)
-  first line
-  second line
-  third line
-  EOS
+  SAMPLE_DATA = ['first line', 'second line', 'third line']
 
   context 'Reader' do
     context 'Prepare lines' do
@@ -18,7 +14,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should prepare lines from String data' do
-        reader = Asciidoctor::Reader.new SAMPLE_DATA
+        reader = Asciidoctor::Reader.new SAMPLE_DATA.join(Asciidoctor::LF)
         assert_equal SAMPLE_DATA, reader.lines
       end
 
@@ -34,7 +30,7 @@ class ReaderTest < Minitest::Test
 
       test 'should remove UTF-8 BOM from first line of Array data' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = SAMPLE_DATA.dup
+          data = SAMPLE_DATA.drop 0
           data[0] = String.new %(\xef\xbb\xbf#{data.first}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
@@ -56,7 +52,7 @@ class ReaderTest < Minitest::Test
       test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
           # NOTE can't split a UTF-16LE string using .lines when encoding is set to UTF-8
-          data = SAMPLE_DATA.dup
+          data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
           data.each {|line| (line.encode 'UTF-16LE').force_encoding start_encoding }
           reader = Asciidoctor::Reader.new data, nil, normalize: true
@@ -78,7 +74,7 @@ class ReaderTest < Minitest::Test
 
       test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = SAMPLE_DATA.dup
+          data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
           data = data.map {|line| (line.encode 'UTF-16BE').force_encoding start_encoding }
           reader = Asciidoctor::Reader.new data, nil, normalize: true
@@ -315,7 +311,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until blank line preserving last line' do
-        lines = <<~'EOS'.chomp.split(::Asciidoctor::LF)
+        lines = <<~'EOS'.split ::Asciidoctor::LF
         This is one paragraph.
 
         This is another paragraph.
@@ -329,7 +325,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true' do
-        lines = <<~'EOS'.chomp.split(::Asciidoctor::LF)
+        lines = <<~'EOS'.split ::Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -348,7 +344,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true, taking last line' do
-        lines = <<~'EOS'.chomp.split(::Asciidoctor::LF)
+        lines = <<~'EOS'.split ::Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -367,7 +363,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true, taking and preserving last line' do
-        lines = <<~'EOS'.chomp.split(::Asciidoctor::LF)
+        lines = <<~'EOS'.split ::Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -448,7 +444,7 @@ class ReaderTest < Minitest::Test
 
     context 'Prepare lines' do
       test 'should prepare and normalize lines from Array data' do
-        data = SAMPLE_DATA.map {|line| line.chomp}
+        data = SAMPLE_DATA.drop 0
         data.unshift ''
         data.push ''
         doc = Asciidoctor::Document.new data
@@ -457,7 +453,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should prepare and normalize lines from String data' do
-        data = SAMPLE_DATA.map {|line| line.chomp}
+        data = SAMPLE_DATA.drop 0
         data.unshift ' '
         data.push ' '
         data_as_string = data * ::Asciidoctor::LF
@@ -503,10 +499,10 @@ class ReaderTest < Minitest::Test
         reader = doc.reader
         refute doc.attributes.key?('front-matter')
         assert_equal '---', reader.peek_line
-    end
+      end
 
-    test 'should skip front matter if specified by skip-front-matter attribute' do
-        front_matter = <<~'EOS'.chomp
+      test 'should skip front matter if specified by skip-front-matter attribute' do
+        front_matter = <<~'EOS'.chop
         layout: post
         title: Document Title
         author: username
@@ -788,9 +784,7 @@ class ReaderTest < Minitest::Test
       # IMPORTANT this test needs to be run on Windows to verify proper behavior in Windows
       test 'can resolve include directive with absolute path' do
         include_path = ::File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
-        input = <<~EOS
-        include::#{include_path}[]
-        EOS
+        input = %(include::#{include_path}[])
         result = document_from_string input, safe: :safe
         assert_equal 'Chapter A', result.doctitle
 
@@ -822,7 +816,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~'EOS'.chomp
+        expected = <<~'EOS'.chop
         first line of outer
 
         first line of middle
@@ -849,7 +843,7 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
         end
 
-        expected = <<~'EOS'.chomp
+        expected = <<~'EOS'.chop
         first line of outer
 
         first line of middle
@@ -898,7 +892,8 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
         end
 
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         <code class="language-ruby" data-lang="ruby">def initialize breed
           @breed = breed
         end</code>
@@ -1024,9 +1019,7 @@ class ReaderTest < Minitest::Test
           tmp_include_dir, tmp_include_path = File.split tmp_include.path
           tmp_include.write %(do not include\r\ntag::include-me[]\r\nincluded line\r\nend::include-me[]\r\ndo not include\r\n)
           tmp_include.close
-          input = <<~EOS
-          include::#{tmp_include_path}[tag=include-me]
-          EOS
+          input = %(include::#{tmp_include_path}[tag=include-me])
           output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
           assert_includes output, 'included line'
           refute_includes output, 'do not include'
@@ -1041,9 +1034,7 @@ class ReaderTest < Minitest::Test
           tmp_include_dir, tmp_include_path = File.split tmp_include.path
           tmp_include.write %(line not included\ntag::include-me[]\nline included\nend::include-me[])
           tmp_include.close
-          input = <<~EOS
-          include::#{tmp_include_path}[tag=include-me]
-          EOS
+          input = %(include::#{tmp_include_path}[tag=include-me])
           using_memory_logger do |logger|
             output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
             assert_empty logger.messages
@@ -1063,14 +1054,14 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expect = <<~'EOS'.chomp
+        expected = <<~'EOS'.chop
         snippetA content
 
         non-tagged content
 
         snippetB content
         EOS
-        assert_equal expect, output
+        assert_equal expected, output
       end
 
       test 'include directive skips lines marked with negated tags' do
@@ -1081,7 +1072,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1099,7 +1091,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1125,7 +1118,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1143,7 +1137,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1169,7 +1164,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         class Dog
 
           def bark
@@ -1205,7 +1201,8 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = <<~EOS.chomp
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
         def bark
           if @breed == 'beagle'
             'woof woof woof woof woof'
@@ -1356,7 +1353,7 @@ class ReaderTest < Minitest::Test
 
       test 'leveloffset attribute entries should be added to content if leveloffset attribute is specified' do
         input = 'include::fixtures/master.adoc[]'
-        expected = <<~'EOS'.chomp.split(::Asciidoctor::LF)
+        expected = <<~'EOS'.split ::Asciidoctor::LF
         = Master Document
 
         preamble
@@ -1502,7 +1499,7 @@ class ReaderTest < Minitest::Test
         reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
         reader.read_line
         result = reader.read_lines_until(terminator: '////', skip_processing: true)
-        assert_equal lines.map {|l| l.chomp}[1..1], result
+        assert_equal lines.map {|l| l.chomp }[1..1], result
       end
 
       test 'skip_comment_lines should not process lines read' do

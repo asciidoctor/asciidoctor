@@ -200,9 +200,9 @@ context 'Logger' do
       EOS
       messages = redirect_streams do |_, err|
         convert_string_to_embedded input
-        err.string
+        err.string.chomp
       end
-      assert_equal 'asciidoctor: WARNING: <stdin>: line 5: id assigned to block already in use: first', messages.chomp
+      assert_equal 'asciidoctor: WARNING: <stdin>: line 5: id assigned to block already in use: first', messages
     end
   end
 end

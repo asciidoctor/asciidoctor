@@ -1857,7 +1857,7 @@ context 'Substitutions' do
       stuff in between
       foo --
       EOS
-      expected = <<~'EOS'.chomp
+      expected = <<~'EOS'.chop
       &#8201;&#8212;&#8201;foo foo&#8212;&#8203;bar foo--bar foo&#8201;&#8212;&#8201;bar foo -- bar
       stuff in between&#8201;&#8212;&#8201;foo
       stuff in between

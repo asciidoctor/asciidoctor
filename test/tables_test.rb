@@ -266,7 +266,7 @@ context 'Tables' do
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [cols=2*]
       |===
@@ -284,7 +284,7 @@ context 'Tables' do
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in verse table cells' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [cols=2*]
       |===
@@ -1269,7 +1269,7 @@ context 'Tables' do
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
-      # NOTE JRuby does not preserve indentation in single-quoted heredoc string; see https://github.com/jruby/jruby/issues/4260
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       |===
       a|
