@@ -137,15 +137,15 @@ class Parser
     # if the first line is the document title, add a header to the document and parse the header metadata
     if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
-      document.id, _, doctitle, _, atx = parse_section_title reader, document
-      document.title = assigned_doctitle = doctitle unless assigned_doctitle
+      document.id, _, l0_section_title, _, atx = parse_section_title reader, document
+      document.title = assigned_doctitle = l0_section_title unless assigned_doctitle
       document.header.source_location = source_location if source_location
       # default to compat-mode if document uses atx-style doctitle
       doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
       if (separator = block_attrs['separator'])
         doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
       end
-      doc_attrs['doctitle'] = section_title = doctitle
+      doc_attrs['doctitle'] = l0_section_title
       if (doc_id = block_attrs['id'])
         document.id = doc_id
       else
@@ -162,7 +162,7 @@ class Parser
       document.register :refs, [doc_id, document] if doc_id
     end
 
-    unless (val = doc_attrs['doctitle']).nil_or_empty? || val == section_title
+    unless (val = doc_attrs['doctitle']).nil_or_empty? || val == l0_section_title
       document.title = assigned_doctitle = val
     end
 
