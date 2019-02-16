@@ -215,9 +215,10 @@ class Section < AbstractBlock
       # ensure id doesn't begin with idseparator if idprefix is empty (assuming idseparator is not empty)
       gen_id = gen_id.slice 1, gen_id.length if pre.empty? && (gen_id.start_with? sep)
     end
-    if document.catalog[:ids].key? gen_id
-      ids, cnt = document.catalog[:ids], Compliance.unique_id_start_index
-      cnt += 1 while ids.key?(candidate_id = %(#{gen_id}#{sep}#{cnt}))
+    if document.catalog[:refs].key? gen_id
+      ids = document.catalog[:refs]
+      cnt = Compliance.unique_id_start_index
+      cnt += 1 while ids[candidate_id = %(#{gen_id}#{sep}#{cnt})]
       candidate_id
     else
       gen_id
