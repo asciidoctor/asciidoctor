@@ -580,8 +580,15 @@ allbox tab(:);'
       target = target.sub '@', %[#{ESC_BS}(at] if macro == 'MTO'
       %(#{ESC_BS}c#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
     when :xref
-      refid = (node.attr 'refid') || target
-      node.text || (node.document.catalog[:ids][refid] || %([#{refid}]))
+      unless (text = node.text)
+        refid = node.attributes['refid']
+        if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid])
+          text = (ref.xreftext node.attr('xrefstyle', nil, true)) || %([#{refid}])
+        else
+          text = %([#{refid}])
+        end
+      end
+      text
     when :ref, :bibref
       # These are anchor points, which shouldn't be visible
       ''

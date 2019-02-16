@@ -690,6 +690,22 @@ context 'Manpage' do
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, 'The Magic 8 Ball says [signs point to yes] <https://en.wikipedia.org/wiki/Magic_8\-Ball>.'
     end
+
+    test 'should reference image with title usign styled xref' do
+      input = <<~EOS.chomp
+      #{SAMPLE_MANPAGE_HEADER}
+
+      To get your fortune, see <<magic-8-ball>>.
+
+      .Magic 8-Ball
+      [#magic-8-ball]
+      image::signs-point-to-yes.jpg[]
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'xrefstyle' => 'full' }
+      lines = output.lines.map(&:chomp)
+      assert_includes lines, 'To get your fortune, see Figure 1, \(lqMagic 8\-Ball\(rq.'
+      assert_includes lines, '.B Figure 1. Magic 8\-Ball'
+    end
   end
 
   context 'Quote Block' do
