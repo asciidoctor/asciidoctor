@@ -1060,7 +1060,7 @@ context 'Extensions' do
             with_format :short
             resolves_attributes '1:name'
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1069,7 +1069,7 @@ context 'Extensions' do
             with_format :short
             resolves_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1077,7 +1077,7 @@ context 'Extensions' do
             named :'full-attributes'
             resolves_attributes '1:name' => nil
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1085,7 +1085,7 @@ context 'Extensions' do
             named :'full-text'
             resolves_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1094,7 +1094,7 @@ context 'Extensions' do
             matching %r/@(\w+)/
             resolves_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|k, _| k.to_s }.inspect})
+              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
         end
@@ -1114,15 +1114,15 @@ context 'Extensions' do
         ++++
         EOS
         expected = <<~'EOS'.chop
-        target="", attributes=[]
-        target="value,key=val", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
-        target="", attributes=[["text", ""]]
-        target="[text]", attributes=[["text", "[text]"]]
-        target="target", attributes=[]
-        target="target", attributes=[[1, "value"], ["key", "val"], ["name", "value"]]
-        target="target", attributes=[["text", ""]]
-        target="target", attributes=[["text", "[text]"]]
-        target="target", attributes=[]
+        target="", attributes={}
+        target="value,key=val", attributes={1=>"value", "key"=>"val", "name"=>"value"}
+        target="", attributes={"text"=>""}
+        target="[text]", attributes={"text"=>"[text]"}
+        target="target", attributes={}
+        target="target", attributes={1=>"value", "key"=>"val", "name"=>"value"}
+        target="target", attributes={"text"=>""}
+        target="target", attributes={"text"=>"[text]"}
+        target="target", attributes={}
         EOS
         output = convert_string_to_embedded input
         assert_equal expected, output
