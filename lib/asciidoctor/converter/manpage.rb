@@ -233,7 +233,7 @@ r lw(\n(.lu*75u/100u).'
   def image node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.title}
+.B #{_manify node.captioned_title}
 .br) : '.sp')
     result << %([#{node.alt}])
     result.join LF
