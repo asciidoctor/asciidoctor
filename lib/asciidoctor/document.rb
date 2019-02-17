@@ -479,12 +479,12 @@ class Document < AbstractBlock
     else
       # setup default backend and doctype
       @backend = nil
-      if (desired_backend = attrs['backend'] || DEFAULT_BACKEND) == 'manpage'
+      if (initial_backend = attrs['backend'] || DEFAULT_BACKEND) == 'manpage'
         @doctype = attrs['doctype'] = attr_overrides['doctype'] = 'manpage'
       else
         @doctype = (attrs['doctype'] ||= DEFAULT_DOCTYPE)
       end
-      update_backend_attributes desired_backend, true
+      update_backend_attributes initial_backend, true
 
       # dynamic intrinstic attribute values
 
@@ -833,7 +833,7 @@ class Document < AbstractBlock
       else
         case name
         when 'backend'
-          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax')
+          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
         when 'doctype'
           update_doctype_attributes value
         else
@@ -1259,8 +1259,8 @@ class Document < AbstractBlock
   # doctype attribute is assigned at the time this method is called.
   #
   # Returns the resolved String backend if updated, nothing otherwise.
-  def update_backend_attributes new_backend, force = nil
-    if force || new_backend != @backend
+  def update_backend_attributes new_backend, init = nil
+    if init || new_backend != @backend
       current_backend = @backend
       current_basebackend = (attrs = @attributes)['basebackend']
       current_doctype = @doctype
@@ -1293,13 +1293,20 @@ class Document < AbstractBlock
         if (htmlsyntax = converter.htmlsyntax)
           attrs['htmlsyntax'] = htmlsyntax
         end
-        # QUESTION should we pass outfilesuffix to converter initializer?
-        attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+        if init
+          attrs['outfilesuffix'] ||= converter.outfilesuffix
+        else
+          attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+        end
       elsif converter
         backend_traits = Converter::BackendTraits.derive_backend_traits new_backend
         new_basebackend = backend_traits[:basebackend]
         new_filetype = backend_traits[:filetype]
-        attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
+        if init
+          attrs['outfilesuffix'] ||= backend_traits[:outfilesuffix]
+        else
+          attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
+        end
       else
         # NOTE ideally we shouldn't need the converter before the converter phase, but we do
         raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
