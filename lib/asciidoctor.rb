@@ -285,7 +285,7 @@ module Asciidoctor
     '```'  => [:fenced_code, ::Set.new]
   }
 
-  DELIMITED_BLOCK_HEADS = DELIMITED_BLOCKS.keys.map {|key| key.slice 0, 2 }.to_set
+  DELIMITED_BLOCK_HEADS = ::Set.new.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum << (k.slice 0, 2) } }
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,

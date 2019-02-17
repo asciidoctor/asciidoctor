@@ -169,7 +169,7 @@ class AbstractNode
   #
   # Returns a [Set] of option names
   def options
-    ::Set.new.tap {|accum| @attributes.keys.each {|k| accum << (k.slice 0, k.length - 7) if k.to_s.end_with? '-option' } }
+    ::Set.new.tap {|accum| @attributes.each_key {|k| accum << (k.slice 0, k.length - 7) if k.to_s.end_with? '-option' } }
   end
 
   # Public: Update the attributes of this node with the new values in
