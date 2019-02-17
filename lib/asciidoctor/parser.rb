@@ -881,7 +881,7 @@ class Parser
     # TODO eventually remove the style attribute from the attributes hash
     #block.style = attributes.delete 'style'
     block.style = attributes['style']
-    if (block_id = (block.id ||= attributes['id']))
+    if (block_id = block.id || (block.id = attributes['id']))
       unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
         logger.warn message_with_context %(id assigned to block already in use: #{block_id}), source_location: reader.cursor_at_mark
       end
@@ -1087,10 +1087,11 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
-  def self.parse_list(reader, list_type, parent, style)
-    list_block = List.new(parent, list_type)
+  def self.parse_list reader, list_type, parent, style
+    list_block = List.new parent, list_type
+    list_rx = ListRxMap[list_type]
 
-    while reader.has_more_lines? && (list_rx ||= ListRxMap[list_type]) =~ reader.peek_line
+    while reader.has_more_lines? && list_rx =~ reader.peek_line
       # NOTE parse_list_item will stop at sibling item or end of list; never sees ancestor items
       if (list_item = parse_list_item reader, list_block, $~, $1, style)
         list_block.items << list_item
@@ -1129,7 +1130,7 @@ class Parser
   #
   # Returns nothing
   def self.catalog_inline_anchor id, reftext, node, location, doc = nil
-    doc ||= node.document
+    doc = node.document unless doc
     reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
     unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id), reftext]
       location = location.cursor if Reader === location
@@ -1611,7 +1612,7 @@ class Parser
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
-    if (id = section.id ||= ((document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
+    if (id = section.id || (section.id = (document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
       unless document.register :refs, [id, section, sect_reftext || section.title]
         logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
       end
@@ -2086,7 +2087,7 @@ class Parser
   end
 
   def self.process_attribute_entry reader, document, attributes = nil, match = nil
-    if (match ||= (reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil))
+    if match || (match = reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil)
       if (value = match[2]).nil_or_empty?
         value = ''
       elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
