@@ -1470,8 +1470,8 @@ class ReaderTest < Minitest::Test
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), normalize: true
           lines = reader.readlines
-          assert_includes lines, 'include::child-include.adoc[]'
-          assert_message logger, :ERROR, 'fixtures/parent-include.adoc: line 3: maximum include depth of 1 exceeded', Hash
+          assert_includes lines, 'include::grandchild-include.adoc[]'
+          assert_message logger, :ERROR, 'fixtures/child-include.adoc: line 3: maximum include depth of 1 exceeded', Hash
         end
       end
 
@@ -1484,7 +1484,7 @@ class ReaderTest < Minitest::Test
           lines = reader.readlines
           assert_includes lines, 'first line of child'
           assert_includes lines, 'include::grandchild-include.adoc[]'
-          assert_message logger, :ERROR, 'fixtures/child-include.adoc: line 3: maximum include depth of 1 exceeded', Hash
+          assert_message logger, :ERROR, 'fixtures/child-include.adoc: line 3: maximum include depth of 0 exceeded', Hash
         end
       end
 
