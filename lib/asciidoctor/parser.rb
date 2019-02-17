@@ -2091,7 +2091,7 @@ class Parser
       if (value = match[2]).nil_or_empty?
         value = ''
       elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
-        con, value = value.slice(-2, 2), (value.slice 0, value.length - 2).rstrip
+        con, value = (value.slice value.length - 2, 2), (value.slice 0, value.length - 2).rstrip
         while reader.advance && !(next_line = reader.peek_line || '').empty?
           next_line = next_line.lstrip
           next_line = (next_line.slice 0, next_line.length - 2).rstrip if (keep_open = next_line.end_with? con)
