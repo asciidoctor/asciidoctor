@@ -97,7 +97,7 @@ module Helpers
     elsif data.encoding != UTF_8
       data = data.encode UTF_8
     end
-    data.lines.map {|line| line.rstrip }
+    [].tap {|lines| data.each_line {|line| lines << line.rstrip } }
   end
 
   # Internal: Efficiently checks whether the specified String resembles a URI
