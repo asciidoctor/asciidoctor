@@ -882,7 +882,7 @@ class Parser
     #block.style = attributes.delete 'style'
     block.style = attributes['style']
     if (block_id = block.id || (block.id = attributes['id']))
-      unless document.register :refs, [block_id, block, attributes['reftext'] || (block.title? ? block.title : nil)]
+      unless document.register :refs, [block_id, block]
         logger.warn message_with_context %(id assigned to block already in use: #{block_id}), source_location: reader.cursor_at_mark
       end
     end
@@ -1133,7 +1133,7 @@ class Parser
   def self.catalog_inline_anchor id, reftext, node, location, doc = nil
     doc = node.document unless doc
     reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
-    unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id), reftext]
+    unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id)]
       location = location.cursor if Reader === location
       logger.warn message_with_context %(id assigned to anchor already in use: #{id}), source_location: location
     end
@@ -1160,7 +1160,7 @@ class Parser
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
         end
       end
-      unless document.register :refs, [id, (Inline.new block, :anchor, reftext, type: :ref, id: id), reftext]
+      unless document.register :refs, [id, (Inline.new block, :anchor, reftext, type: :ref, id: id)]
         location = reader.cursor_at_mark
         if (offset = ($`.count LF) + (($&.start_with? LF) ? 1 : 0)) > 0
           (location = location.dup).advance offset
@@ -1181,7 +1181,7 @@ class Parser
   # Returns nothing
   def self.catalog_inline_biblio_anchor id, reftext, node, reader
     # QUESTION should we sub attributes in reftext (like with regular anchors)?
-    unless node.document.register :refs, [id, (Inline.new node, :anchor, (styled_reftext = %([#{reftext || id}])), type: :bibref, id: id), styled_reftext]
+    unless node.document.register :refs, [id, (Inline.new node, :anchor, %([#{reftext || id}]), type: :bibref, id: id)]
       logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), source_location: reader.cursor
     end
     nil
@@ -1614,7 +1614,7 @@ class Parser
 
     # generate an ID if one was not embedded or specified as anchor above section title
     if (id = section.id || (section.id = (document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
-      unless document.register :refs, [id, section, sect_reftext || section.title]
+      unless document.register :refs, [id, section]
         logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
       end
     end

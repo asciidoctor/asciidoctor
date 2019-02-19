@@ -3325,33 +3325,41 @@ context "Description lists (:dlist)" do
       EOS
 
       doc = document_from_string input
-      ids = doc.catalog[:ids]
-      assert ids.key?('Fowler_1997')
-      assert_equal '[Fowler_1997]', ids['Fowler_1997']
+      assert doc.catalog[:refs].key? 'Fowler_1997'
     end
 
     test 'should use reftext from bibliography anchor at xref and entry' do
       input = <<~'EOS'
       = Article Title
 
-      Please read <<Fowler_1997>>.
+      Begin with <<TMMM>>.
+      Then move on to <<Fowler_1997>>.
 
       [bibliography]
       == References
 
+      * [[[TMMM]]] Brooks F. _The Mythical Man-Month_. Addison-Wesley. 1975.
       * [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
       EOS
 
       doc = document_from_string input, header_footer: false
-      ids = doc.catalog[:ids]
-      assert ids.key?('Fowler_1997')
-      assert_equal '[1]', ids['Fowler_1997']
+      tmmm_ref = doc.catalog[:refs]['TMMM']
+      refute_nil tmmm_ref
+      assert_equal '[TMMM]', tmmm_ref.reftext
+      fowler_1997_ref = doc.catalog[:refs]['Fowler_1997']
+      refute_nil fowler_1997_ref
+      assert_equal '[1]', fowler_1997_ref.reftext
       result = doc.convert header_footer: false
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
       assert_xpath '//a[@id="Fowler_1997"]', result, 1
-      text = (xmlnodes_at_xpath '(//a[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
-      assert text.start_with?('[1] ')
+      fowler_1997_text = (xmlnodes_at_xpath '(//a[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
+      assert fowler_1997_text.start_with?('[1] ')
+      assert_xpath '//a[@href="#TMMM"]', result, 1
+      assert_xpath '//a[@href="#TMMM"][text()="[TMMM]"]', result, 1
+      assert_xpath '//a[@id="TMMM"]', result, 1
+      tmmm_text = (xmlnodes_at_xpath '(//a[@id="TMMM"])[1]/following-sibling::text()', result, 1).text
+      assert tmmm_text.start_with?('[TMMM] ')
     end
 
     test 'should assign reftext of bibliography anchor to xreflabel in DocBook backend' do

@@ -918,8 +918,7 @@ module Substitutors
             reftext = reftext.gsub ESC_R_SB, R_SB
           end
         end
-        # NOTE target property on :ref is deprecated
-        Inline.new(self, :anchor, reftext, type: :ref, id: id, target: id).convert
+        Inline.new(self, :anchor, reftext, type: :ref, id: id).convert
       end
     end
 
@@ -1003,11 +1002,11 @@ module Substitutors
           refid, target = fragment, %(##{fragment})
           logger.debug %(possible invalid reference: #{refid}) if logger.debug? && doc.catalog[:refs][refid]
         # handles: id
-        elsif doc.catalog[:ids].key? fragment
+        elsif doc.catalog[:refs][fragment]
           refid, target = fragment, %(##{fragment})
         # handles: Node Title or Reference Text
         # do reverse lookup on fragment if not a known ID and resembles reftext (contains a space or uppercase char)
-        elsif (refid = doc.catalog[:ids].key fragment) && ((fragment.include? ' ') || fragment.downcase != fragment)
+        elsif (refid = doc.resolve_id fragment) && ((fragment.include? ' ') || fragment.downcase != fragment)
           fragment, target = refid, %(##{refid})
         else
           refid, target = fragment, %(##{fragment})

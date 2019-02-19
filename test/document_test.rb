@@ -1130,26 +1130,44 @@ context 'Document' do
   end
 
   context 'Catalog' do
-    test 'document catalog is aliased as references' do
+    test 'should alias document catalog as document references' do
       input = <<~'EOS'
       = Document Title
 
       == Section A
 
-      content
+      Content
 
       == Section B
 
-      content{blank}footnote:[commentary]
+      Content.footnote:[commentary]
       EOS
 
       doc = document_from_string input
       refute_nil doc.catalog
-      assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs, :callouts].to_set, doc.catalog.keys.to_set
+      assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs, :callouts].sort, doc.catalog.keys.sort
       assert_same doc.catalog, doc.references
       assert_same doc.catalog[:footnotes], doc.references[:footnotes]
-      assert_same doc.catalog[:ids], doc.references[:ids]
-      assert_equal 'Section A', doc.references[:ids]['_section_a']
+      assert_same doc.catalog[:refs], doc.references[:refs]
+      #assert_equal '_section_a', doc.references[:reftexts]['Section A']
+      assert_equal '_section_a', (doc.resolve_id 'Section A')
+    end
+
+    test 'should return empty :ids table' do
+      doc = empty_document
+      refute_nil doc.catalog[:ids]
+      assert_empty doc.catalog[:ids]
+      assert_nil doc.catalog[:ids]['foobar']
+    end
+
+    test 'should register entry in :refs table with reftext when request is made to register entry in :ids table' do
+      doc = empty_document
+      doc.register :ids, ['foobar', 'Foo Bar']
+      assert_empty doc.catalog[:ids]
+      refute_empty doc.catalog[:refs]
+      ref = doc.catalog[:refs]['foobar']
+      assert_equal 'Foo Bar', ref.reftext
+      assert_equal 'foobar', (doc.resolve_id 'Foo Bar')
     end
 
     test 'should catalog assets inside nested document' do

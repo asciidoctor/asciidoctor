@@ -741,7 +741,7 @@ Feature: Cross References
 
       content
 
-      == Section Two
+      == Section Two, continued from <<Section One>>
 
       refer to <<Section One>>
       """
@@ -752,7 +752,9 @@ Feature: Cross References
         h2#_section_one Section One
         .sectionbody: .paragraph: p content
       .sect1
-        h2#_section_two Section Two
+        h2#_section_two_continued_from_section_one
+          |Section Two, continued from
+          a< href='#_section_one' Section One
         .sectionbody: .paragraph: p
           |refer to
           a< href='#_section_one' Section One
