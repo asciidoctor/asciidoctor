@@ -511,8 +511,7 @@ class Converter::DocBook5Converter < Converter::Base
     when :link
       %(<link xl:href="#{node.target}">#{node.text}</link>)
     when :bibref
-      # NOTE technically node.text should be node.reftext, but subs have already been applied to text
-      %(<anchor#{_common_attributes node.id, nil, (text = node.text)}/>#{text})
+      %(<anchor#{_common_attributes node.id, nil, "[#{node.reftext || node.id}]"}/>#{text})
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil

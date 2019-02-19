@@ -897,10 +897,7 @@ module Substitutors
   # Internal: Substitute normal and bibliographic anchors
   def sub_inline_anchors(text, found = nil)
     if @context == :list_item && @parent.style == 'bibliography'
-      text = text.sub InlineBiblioAnchorRx do
-        # NOTE target property on :bibref is deprecated
-        Inline.new(self, :anchor, %([#{$2 || $1}]), type: :bibref, id: $1, target: $1).convert
-      end
+      text = text.sub(InlineBiblioAnchorRx) { (Inline.new self, :anchor, $2, type: :bibref, id: $1).convert }
     end
 
     if ((!found || found[:square_bracket]) && text.include?('[[')) ||

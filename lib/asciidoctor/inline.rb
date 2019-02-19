@@ -49,11 +49,15 @@ class Inline < AbstractNode
     attr 'alt'
   end
 
+  # For a reference node (:ref or :bibref), the text is the reftext (and the reftext attribute is not set).
+  #
   # (see AbstractNode#reftext?)
   def reftext?
     @text && (@type == :ref || @type == :bibref)
   end
 
+  # For a reference node (:ref or :bibref), the text is the reftext (and the reftext attribute is not set).
+  #
   # (see AbstractNode#reftext)
   def reftext
     (val = @text) ? (apply_reftext_subs val) : nil
