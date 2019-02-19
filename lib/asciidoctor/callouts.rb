@@ -28,7 +28,7 @@ class Callouts
   #
   # Returns The unique String id of this callout
   def register li_ordinal
-    current_list.push ordinal: li_ordinal.to_i, id: (id = generate_next_callout_id)
+    current_list << { ordinal: li_ordinal.to_i, id: (id = generate_next_callout_id) }
     @co_index += 1
     id
   end

@@ -1049,7 +1049,7 @@ module Substitutors
       last = lines.pop
       (lines.map do |line|
         Inline.new(self, :break, (line.end_with? HARD_LINE_BREAK) ? (line.slice 0, line.length - 2) : line, type: :line).convert
-      end.push last).join LF
+      end << last).join LF
     elsif (text.include? PLUS) && (text.include? HARD_LINE_BREAK)
       text.gsub(HardLineBreakRx) { Inline.new(self, :break, $1, type: :line).convert }
     else
