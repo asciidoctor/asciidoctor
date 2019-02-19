@@ -1181,7 +1181,7 @@ class Parser
   # Returns nothing
   def self.catalog_inline_biblio_anchor id, reftext, node, reader
     # QUESTION should we sub attributes in reftext (like with regular anchors)?
-    unless node.document.register :refs, [id, (Inline.new node, :anchor, %([#{reftext || id}]), type: :bibref, id: id)]
+    unless node.document.register :refs, [id, (Inline.new node, :anchor, reftext && %([#{reftext}]), type: :bibref, id: id)]
       logger.warn message_with_context %(id assigned to bibliography anchor already in use: #{id}), source_location: reader.cursor
     end
     nil

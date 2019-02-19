@@ -79,6 +79,8 @@ Improvements::
   * always use :refs table in document catalog to look for registered IDs (#3084)
   * don't compute and store reference text in document catalog (#3084)
   * populate reference text table lazily for resolving ID by reference text (#3084)
+  * don't store fallback reference text on :bibref node (#3085)
+  * call AbstractNode#reftext instead of AbstractNode#text to retrieve reference text for bibref node (#3085)
 
 Bug Fixes::
 

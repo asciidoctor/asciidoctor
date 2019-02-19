@@ -1048,8 +1048,7 @@ Your browser does not support the video tag.
       attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
       %(<a href="#{node.target}"#{(_append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
     when :bibref
-      # NOTE technically node.text should be node.reftext, but subs have already been applied to text
-      %(<a id="#{node.id}"></a>#{node.text})
+      %(<a id="#{node.id}"></a>[#{node.reftext || node.id}])
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil

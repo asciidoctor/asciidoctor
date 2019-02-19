@@ -3345,7 +3345,7 @@ context "Description lists (:dlist)" do
       doc = document_from_string input, header_footer: false
       tmmm_ref = doc.catalog[:refs]['TMMM']
       refute_nil tmmm_ref
-      assert_equal '[TMMM]', tmmm_ref.reftext
+      assert_nil tmmm_ref.reftext
       fowler_1997_ref = doc.catalog[:refs]['Fowler_1997']
       refute_nil fowler_1997_ref
       assert_equal '[1]', fowler_1997_ref.reftext
