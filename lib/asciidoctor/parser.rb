@@ -919,7 +919,7 @@ class Parser
   # returns the match data if this line is the first line of a delimited block or nil if not
   def self.is_delimited_block? line, return_match_data = false
     # highly optimized for best performance
-    return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_HEADS.include?(line.slice 0, 2)
+    return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_HEADS[line.slice 0, 2]
     # catches open block
     if line_len == 2
       tip = line

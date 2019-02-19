@@ -285,7 +285,7 @@ module Asciidoctor
     '```'  => [:fenced_code, ::Set.new]
   }
 
-  DELIMITED_BLOCK_HEADS = ::Set.new.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum << (k.slice 0, 2) } }
+  DELIMITED_BLOCK_HEADS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k.slice 0, 2] = k } }
   DELIMITED_BLOCK_TAILS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k] = k.slice k.length - 1 if k.length == 4 } }
 
   LAYOUT_BREAK_CHARS = {
