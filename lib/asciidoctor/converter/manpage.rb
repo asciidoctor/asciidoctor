@@ -199,11 +199,11 @@ r lw(\n(.lu*75u/100u).'
       case node.style
       when 'qanda'
         result << %(.sp
-#{counter}. #{_manify [*terms].map {|dt| dt.text }.join ' '}
+#{counter}. #{_manify terms.map {|dt| dt.text }.join ' '}
 .RS 4)
       else
         result << %(.sp
-#{_manify [*terms].map {|dt| dt.text }.join(', '), whitespace: :normalize}
+#{_manify terms.map {|dt| dt.text }.join(', '), whitespace: :normalize}
 .RS 4)
       end
       if dd

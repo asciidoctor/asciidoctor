@@ -42,8 +42,8 @@ end
 
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
 #
-# In dlists, each item is a tuple that consists of a 2-item Array of ListItem terms and a ListItem description (i.e.,
-# [[term, term, ...], desc]. If the description is not set, then the second entry in the tuple is nil.
+# In a description list (dlist), each item is a tuple that consists of a 2-item Array of ListItem terms and a ListItem
+# description (i.e., [[term, term, ...], desc]. If a description is not set, then the second entry in the tuple is nil.
 class ListItem < AbstractBlock
 
   # A contextual alias for the list parent node; counterpart to the items alias on List

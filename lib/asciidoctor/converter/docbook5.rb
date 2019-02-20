@@ -113,9 +113,7 @@ class Converter::DocBook5Converter < Converter::Base
       node.items.each do |terms, dd|
         result << %(<row>
 <entry>)
-        [*terms].each do |dt|
-          result << %(<simpara>#{dt.text}</simpara>)
-        end
+        terms.each {|dt| result << %(<simpara>#{dt.text}</simpara>) }
         result << %(</entry>
 <entry>)
         if dd
@@ -143,11 +141,7 @@ class Converter::DocBook5Converter < Converter::Base
       node.items.each do |terms, dd|
         result << %(<#{entry_tag}>)
         result << %(<#{label_tag}>) if label_tag
-
-        [*terms].each do |dt|
-          result << %(<#{term_tag}>#{dt.text}</#{term_tag}>)
-        end
-
+        terms.each {|dt| result << %(<#{term_tag}>#{dt.text}</#{term_tag}>) }
         result << %(</#{label_tag}>) if label_tag
         result << %(<#{item_tag}>)
         if dd

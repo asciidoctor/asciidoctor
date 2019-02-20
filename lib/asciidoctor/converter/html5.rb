@@ -468,7 +468,7 @@ Your browser does not support the audio tag.
       result << '<ol>'
       node.items.each do |terms, dd|
         result << '<li>'
-        [*terms].each do |dt|
+        terms.each do |dt|
           result << %(<p><em>#{dt.text}</em></p>)
         end
         if dd
@@ -492,11 +492,11 @@ Your browser does not support the audio tag.
       node.items.each do |terms, dd|
         result << '<tr>'
         result << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : ''}">)
-        terms_array = [*terms]
-        last_term = terms_array[-1]
-        terms_array.each do |dt|
+        first_term = true
+        terms.each do |dt|
+          result << %(<br#{slash}>) unless first_term
           result << dt.text
-          result << %(<br#{slash}>) if dt != last_term
+          first_term = nil
         end
         result << '</td>'
         result << '<td class="hdlist2">'
@@ -512,7 +512,7 @@ Your browser does not support the audio tag.
       result << '<dl>'
       dt_style_attribute = node.style ? '' : ' class="hdlist1"'
       node.items.each do |terms, dd|
-        [*terms].each do |dt|
+        terms.each do |dt|
           result << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
         end
         if dd
