@@ -85,8 +85,7 @@ class AttributeList
   def self.rekey attributes, pos_attrs
     pos_attrs.each_with_index do |key, index|
       next unless key
-      pos = index + 1
-      if (val = attributes[pos])
+      if (val = attributes[index + 1])
         # QUESTION should we delete the positional key?
         attributes[key] = val
       end
