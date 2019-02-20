@@ -852,9 +852,9 @@ class Parser
 
       else
         if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
-          if (content_model = extension.config[:content_model]) != :skip
-            if !(pos_attrs = extension.config[:pos_attrs] || []).empty?
-              AttributeList.rekey(attributes, [nil].concat(pos_attrs))
+          unless (content_model = extension.config[:content_model]) == :skip
+            unless (pos_attrs = extension.config[:pos_attrs] || []).empty?
+              AttributeList.rekey(attributes, [nil] + pos_attrs)
             end
             if (default_attrs = extension.config[:default_attrs])
               default_attrs.each {|k, v| attributes[k] ||= v }

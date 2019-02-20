@@ -117,9 +117,15 @@ end
 class UppercaseBlock < Asciidoctor::Extensions::BlockProcessor; use_dsl
   named :yell
   bound_to :paragraph
+  positional_attrs 'chars'
   parses_content_as :simple
   def process parent, reader, attributes
-    create_paragraph parent, reader.lines.map(&:upcase), attributes
+    if (chars = attributes['chars'])
+      upcase_chars = chars.upcase
+      create_paragraph parent, reader.lines.map {|l| l.downcase.tr chars, upcase_chars }, attributes
+    else
+      create_paragraph parent, reader.lines.map(&:upcase), attributes
+    end
   end
 end
 
@@ -793,6 +799,9 @@ context 'Extensions' do
       input = <<~'EOS'
       [yell]
       Hi there!
+
+      [yell,chars=aeiou]
+      Hi there!
       EOS
 
       begin
@@ -801,8 +810,9 @@ context 'Extensions' do
         end
 
         output = convert_string_to_embedded input
-        assert_xpath '//p', output, 1
-        assert_xpath '//p[text()="HI THERE!"]', output, 1
+        assert_xpath '//p', output, 2
+        assert_xpath '(//p)[1][text()="HI THERE!"]', output, 1
+        assert_xpath '(//p)[2][text()="hI thErE!"]', output, 1
       ensure
         Asciidoctor::Extensions.unregister_all
       end
