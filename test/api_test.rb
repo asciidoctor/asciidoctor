@@ -795,6 +795,21 @@ context 'API' do
       assert_kind_of Asciidoctor::ListItem, result[2]
     end
 
+    test 'dlist item should always have two entries for terms and desc' do
+      [
+        'term w/o desc::',
+        %(term::\nalias::),
+        %(primary:: 1\nsecondary:: 2),
+      ].each do |input|
+        dlist = (Asciidoctor.load input).blocks[0]
+        dlist.items.each do |item|
+          assert_equal 2, item.size
+          assert_kind_of ::Array, item[0]
+          assert_kind_of Asciidoctor::ListItem, item[1] if item[1]
+        end
+      end
+    end
+
     test 'timings are recorded for each step when load and convert are called separately' do
       sample_input_path = fixture_path 'asciidoc_index.txt'
       (Asciidoctor.load_file sample_input_path, timings: (timings = Asciidoctor::Timings.new)).convert

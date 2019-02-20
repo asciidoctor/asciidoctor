@@ -1361,7 +1361,7 @@ class Parser
       list_item.fold_first(continuation_connects_first_block, content_adjacent)
     end
 
-    dlist ? (list_item.text? || list_item.blocks? ? [[list_term], list_item] : [[list_term]]) : list_item
+    dlist ? [[list_term], (list_item.text? || list_item.blocks? ? list_item : nil)] : list_item
   end
 
   # Internal: Collect the lines belonging to the current list item, navigating
