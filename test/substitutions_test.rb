@@ -34,6 +34,12 @@ context 'Substitutions' do
       assert_equal %(this<br>\nis<br>\n&#8594; Asciidoctor<br>\n<br>\n), result
     end
 
+    test 'apply_subs should evaluate two inline macros' do
+      para = block_from_string %(pass:m[a] stem:[b])
+      result = para.apply_subs(para.lines)
+      assert_equal [%(a \\$b\\$)], result
+    end
+
     test 'should expand subs passe to expand_subs' do
       para = block_from_string %({program}\n*bold*\n2 > 1)
       para.document.attributes['program'] = 'Asciidoctor'

@@ -322,9 +322,6 @@ module Substitutors
       end
       subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
     end
-  ensure
-    # free memory if in outer call...we don't need these anymore
-    passes.clear if outer
   end
 
   # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
