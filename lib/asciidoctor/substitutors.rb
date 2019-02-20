@@ -52,6 +52,8 @@ module Substitutors
   # EPA, end of guarded protected area (\u0097)
   PASS_END = ?\u0097
 
+  PASS_UNRESOLVED = { text: '??pass??' }
+
   # match passthrough slot
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
 
@@ -71,11 +73,12 @@ module Substitutors
 
   # Public: Apply the specified substitutions to the text.
   #
-  # text  - The String or String Array of text to process; must not be nil.
-  # subs  - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
+  # text   - The String or String Array of text to process; must not be nil.
+  # subs   - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
+  # nested - A Boolean indicating whether we're in a nested substitution (internal use only) (default: nil)
   #
   # Returns a String or String Array to match the type of the text argument with substitutions applied.
-  def apply_subs text, subs = NORMAL_SUBS
+  def apply_subs text, subs = NORMAL_SUBS, nested = false
     return text if text.empty? || !subs
 
     if (is_multiline = ::Array === text)
@@ -109,7 +112,7 @@ module Substitutors
         logger.warn %(unknown substitution type #{type})
       end
     end
-    text = restore_passthroughs text if has_passthroughs
+    text = restore_passthroughs text, nested if has_passthroughs
 
     is_multiline ? (text.split LF, -1) : text
   end
@@ -302,29 +305,23 @@ module Substitutors
 
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
   #
-  # text  - The String text into which to restore the passthrough text
-  # outer - A Boolean indicating whether we are in the outer call (default: true)
+  # text   - The String text into which to restore the passthrough text
+  # nested - A Boolean indicating whether we're in a nested substitution (default: nil)
   #
   # returns The String text with the passthrough text restored
-  def restore_passthroughs text, outer = true
+  def restore_passthroughs text, nested = nil
     passes = @passthroughs
-    # passthroughs may have been eagerly restored (e.g., footnotes)
-    #if outer && (passes.empty? || !text.include?(PASS_START))
-    #  return text
-    #end
-
     text.gsub PassSlotRx do
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
-      pass = passes[$1.to_i]
-      subbed_text = apply_subs(pass[:text], pass[:subs])
+      pass = passes[$1.to_i] || PASS_UNRESOLVED
+      subbed_text = apply_subs(pass[:text], pass[:subs], true)
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
       end
-      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, false) : subbed_text
+      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, true) : subbed_text
     end
   ensure
-    # free memory if in outer call...we don't need these anymore
-    passes.clear if outer
+    passes.clear unless nested
   end
 
   # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
@@ -865,7 +862,7 @@ module Substitutors
         if id
           if text
             # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), true)
             index = doc.counter('footnote-number')
             doc.register(:footnotes, Document::Footnote.new(index, id, text))
             type, target = :ref, nil
@@ -880,7 +877,7 @@ module Substitutors
           end
         elsif text
           # REVIEW it's a dirty job, but somebody's gotta do it
-          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), false)
+          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), true)
           index = doc.counter('footnote-number')
           doc.register(:footnotes, Document::Footnote.new(index, id, text))
           type = target = nil

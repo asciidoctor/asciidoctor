@@ -1648,6 +1648,11 @@ context 'Substitutions' do
       assert_equal %q(Sometimes you feel <code>mono</code>. Sometimes you don't.), result
     end
 
+    test 'should not fail to restore remaining passthroughs after processing inline passthrough with macro substitution' do
+      input = 'pass:m[.] pass:[.]'
+      assert_equal '. .', (convert_inline_string input)
+    end
+
     test 'should honor role on double plus passthrough' do
       result = convert_inline_string 'Print the version using [var]++{asciidoctor-version}++.'
       assert_equal 'Print the version using <span class="var">{asciidoctor-version}</span>.', result
