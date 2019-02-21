@@ -159,7 +159,7 @@ module Substitutors
     compat_mode = @document.compat_mode
     passes = @passthroughs
     text = text.gsub InlinePassMacroRx do
-      preceding = nil
+      preceding = ''
 
       if (boundary = $4) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
