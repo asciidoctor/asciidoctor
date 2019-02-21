@@ -52,8 +52,6 @@ module Substitutors
   # EPA, end of guarded protected area (\u0097)
   PASS_END = ?\u0097
 
-  PASS_UNRESOLVED = { text: '??pass??' }
-
   # match passthrough slot
   PassSlotRx = /#{PASS_START}(\d+)#{PASS_END}/
 
@@ -86,6 +84,7 @@ module Substitutors
       if passthrus.empty?
         passthrus = nil
       else
+        # NOTE placeholders can move around, so we can only clear in the outermost substitution call
         @passthroughs_locked ||= (reset_passthrus = true)
       end
     end
@@ -318,13 +317,16 @@ module Substitutors
   def restore_passthroughs text
     passthrus = @passthroughs
     text.gsub PassSlotRx do
-      # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
-      pass = passthrus[$1.to_i] || PASS_UNRESOLVED
-      subbed_text = apply_subs(pass[:text], pass[:subs])
-      if (type = pass[:type])
-        subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
+      if (pass = passthrus[$1.to_i])
+        subbed_text = apply_subs(pass[:text], pass[:subs])
+        if (type = pass[:type])
+          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
+        end
+        subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
+      else
+        logger.error %(unresolved passthrough detected: #{text})
+        '??pass??'
       end
-      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
     end
   end
 
