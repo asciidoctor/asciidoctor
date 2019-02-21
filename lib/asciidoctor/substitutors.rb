@@ -167,7 +167,7 @@ module Substitutors
   # returns - A tuple of the String text with passthrough regions substituted with placeholders and the passthroughs Hash
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
-    passes = @passthroughs
+    passthrus = @passthroughs
     text = text.gsub InlinePassMacroRx do
       preceding = ''
 
@@ -203,22 +203,22 @@ module Substitutors
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
-        pass_key = passes.size
+        pass_key = passthrus.size
         if attributes
           if old_behavior
-            passes[pass_key] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
+            passthrus[pass_key] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
           else
-            passes[pass_key] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
+            passthrus[pass_key] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
           end
         else
-          passes[pass_key] = { text: content, subs: subs }
+          passthrus[pass_key] = { text: content, subs: subs }
         end
       else # pass:[]
         # NOTE we don't look for nested pass:[] macros
         # honor the escape
         next $&.slice 1, $&.length if $6 == RS
 
-        passes[pass_key = passes.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
+        passthrus[pass_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -260,18 +260,18 @@ module Substitutors
         next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
       end
 
-      pass_key = passes.size
+      pass_key = passthrus.size
       if compat_mode
-        passes[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
+        passthrus[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
           subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
-          passes[pass_key] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
+          passthrus[pass_key] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
-          passes[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
+          passthrus[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
         end
       else
-        passes[pass_key] = { text: content, subs: BASIC_SUBS }
+        passthrus[pass_key] = { text: content, subs: BASIC_SUBS }
       end
 
       %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
@@ -287,11 +287,11 @@ module Substitutors
       end
       content = unescape_brackets $3
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      passes[pass_key = passes.size] = { text: content, subs: subs, type: type }
+      passthrus[pass_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{pass_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
-    [text, passes]
+    [text, passthrus]
   end
 
   # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
@@ -316,10 +316,10 @@ module Substitutors
   #
   # returns The String text with the passthrough text restored
   def restore_passthroughs text
-    passes = @passthroughs
+    passthrus = @passthroughs
     text.gsub PassSlotRx do
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
-      pass = passes[$1.to_i] || PASS_UNRESOLVED
+      pass = passthrus[$1.to_i] || PASS_UNRESOLVED
       subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
