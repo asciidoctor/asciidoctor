@@ -68,26 +68,26 @@ module Substitutors
 
   PLUS = '+'
 
-  # Internal: A String Array of passthough (unprocessed) text captured from this block
-  attr_reader :passthroughs
-
   # Public: Apply the specified substitutions to the text.
   #
-  # text   - The String or String Array of text to process; must not be nil.
-  # subs   - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
-  # nested - A Boolean indicating whether we're in a nested substitution (internal use only) (default: nil)
+  # text  - The String or String Array of text to process; must not be nil.
+  # subs  - The substitutions to perform; must be a Symbol Array or nil (default: NORMAL_SUBS).
   #
   # Returns a String or String Array to match the type of the text argument with substitutions applied.
-  def apply_subs text, subs = NORMAL_SUBS, nested = false
+  def apply_subs text, subs = NORMAL_SUBS
     return text if text.empty? || !subs
 
     if (is_multiline = ::Array === text)
       text = text[1] ? (text.join LF) : text[0]
     end
 
-    if (has_passthroughs = subs.include? :macros)
-      text = extract_passthroughs text
-      has_passthroughs = false if @passthroughs.empty?
+    if subs.include? :macros
+      text, passthrus = extract_passthroughs text
+      if passthrus.empty?
+        passthrus = nil
+      else
+        @passthroughs_locked ||= (reset_passthrus = true)
+      end
     end
 
     subs.each do |type|
@@ -112,7 +112,14 @@ module Substitutors
         logger.warn %(unknown substitution type #{type})
       end
     end
-    text = restore_passthroughs text, nested if has_passthroughs
+
+    if passthrus
+      text = restore_passthroughs text
+      if reset_passthrus
+        passthrus.clear
+        @passthroughs_locked = nil
+      end
+    end
 
     is_multiline ? (text.split LF, -1) : text
   end
@@ -157,7 +164,7 @@ module Substitutors
   #
   # text - The String from which to extract passthrough fragements
   #
-  # returns - The text with the passthrough region substituted with placeholders
+  # returns - A tuple of the String text with passthrough regions substituted with placeholders and the passthroughs Hash
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
     passes = @passthroughs
@@ -167,7 +174,8 @@ module Substitutors
       if (boundary = $4) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
         if compat_mode && boundary == '++'
-          next $2 ? %(#{$1}[#{$2}]#{$3}++#{extract_passthroughs $5}++) : %(#{$1}#{$3}++#{extract_passthroughs $5}++)
+          content, _ = extract_passthroughs $5
+          next $2 ? %(#{$1}[#{$2}]#{$3}++#{content}++) : %(#{$1}#{$3}++#{content}++)
         end
 
         attributes = $2
@@ -234,8 +242,7 @@ module Substitutors
 
       if attributes
         if format_mark == '`' && !old_behavior
-          # extract nested single-plus passthrough; otherwise return unprocessed
-          next (extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes)
+          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes
         elsif escape_mark
           # honor the escape of the formatting mark
           next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
@@ -247,8 +254,7 @@ module Substitutors
           attributes = parse_quoted_text_attributes attributes
         end
       elsif format_mark == '`' && !old_behavior
-        # extract nested single-plus passthrough; otherwise return unprocessed
-        next (extract_inner_passthrough content, %(#{preceding}#{escape_mark}))
+        next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
       elsif escape_mark
         # honor the escape of the formatting mark
         next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
@@ -285,9 +291,10 @@ module Substitutors
       %(#{PASS_START}#{pass_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
-    text
+    [text, passes]
   end
 
+  # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
   def extract_inner_passthrough text, pre, attributes = nil
     if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
       if $1
@@ -305,23 +312,20 @@ module Substitutors
 
   # Internal: Restore the passthrough text by reinserting into the placeholder positions
   #
-  # text   - The String text into which to restore the passthrough text
-  # nested - A Boolean indicating whether we're in a nested substitution (default: nil)
+  # text  - The String text into which to restore the passthrough text
   #
   # returns The String text with the passthrough text restored
-  def restore_passthroughs text, nested = nil
+  def restore_passthroughs text
     passes = @passthroughs
     text.gsub PassSlotRx do
       # NOTE we can't remove entry from map because placeholder may have been duplicated by other substitutions
       pass = passes[$1.to_i] || PASS_UNRESOLVED
-      subbed_text = apply_subs(pass[:text], pass[:subs], true)
+      subbed_text = apply_subs(pass[:text], pass[:subs])
       if (type = pass[:type])
         subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
       end
-      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text, true) : subbed_text
+      subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
     end
-  ensure
-    passes.clear unless nested
   end
 
   # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
@@ -840,8 +844,8 @@ module Substitutors
 
     if text.include? '@'
       text = text.gsub InlineEmailRx do
-        # honor the escapes
-        next ($1 == RS ? ($&.slice 1, $&.length) : $&) if $1
+        # honor the escape
+        next $1 == RS ? ($&.slice 1, $&.length) : $& if $1
 
         target = %(mailto:#{$&})
         # QUESTION should this be registered as an e-mail address?
@@ -862,7 +866,7 @@ module Substitutors
         if id
           if text
             # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), true)
+            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
             index = doc.counter('footnote-number')
             doc.register(:footnotes, Document::Footnote.new(index, id, text))
             type, target = :ref, nil
@@ -877,7 +881,7 @@ module Substitutors
           end
         elsif text
           # REVIEW it's a dirty job, but somebody's gotta do it
-          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)), true)
+          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
           index = doc.counter('footnote-number')
           doc.register(:footnotes, Document::Footnote.new(index, id, text))
           type = target = nil

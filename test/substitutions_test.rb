@@ -1504,38 +1504,38 @@ context 'Substitutions' do
   context 'Passthroughs' do
     test 'collect inline triple plus passthroughs' do
       para = block_from_string('+++<code>inline code</code>+++')
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal '<code>inline code</code>', para.passthroughs[0][:text]
-      assert_empty para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal '<code>inline code</code>', passthroughs[0][:text]
+      assert_empty passthroughs[0][:subs]
     end
 
     test 'collect multi-line inline triple plus passthroughs' do
       para = block_from_string("+++<code>inline\ncode</code>+++")
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal "<code>inline\ncode</code>", para.passthroughs[0][:text]
-      assert_empty para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal "<code>inline\ncode</code>", passthroughs[0][:text]
+      assert_empty passthroughs[0][:subs]
     end
 
     test 'collect inline double dollar passthroughs' do
       para = block_from_string('$$<code>{code}</code>$$')
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal '<code>{code}</code>', para.passthroughs[0][:text]
-      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal '<code>{code}</code>', passthroughs[0][:text]
+      assert_equal [:specialcharacters], passthroughs[0][:subs]
     end
 
     test 'collect inline double plus passthroughs' do
       para = block_from_string('++<code>{code}</code>++')
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal '<code>{code}</code>', para.passthroughs[0][:text]
-      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal '<code>{code}</code>', passthroughs[0][:text]
+      assert_equal [:specialcharacters], passthroughs[0][:subs]
     end
 
     test 'should not crash if role on passthrough is enclosed in quotes' do
@@ -1562,38 +1562,38 @@ context 'Substitutions' do
 
     test 'collect multi-line inline double dollar passthroughs' do
       para = block_from_string("$$<code>\n{code}\n</code>$$")
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal "<code>\n{code}\n</code>", para.passthroughs[0][:text]
-      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal "<code>\n{code}\n</code>", passthroughs[0][:text]
+      assert_equal [:specialcharacters], passthroughs[0][:subs]
     end
 
     test 'collect multi-line inline double plus passthroughs' do
       para = block_from_string("++<code>\n{code}\n</code>++")
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal "<code>\n{code}\n</code>", para.passthroughs[0][:text]
-      assert_equal [:specialcharacters], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal "<code>\n{code}\n</code>", passthroughs[0][:text]
+      assert_equal [:specialcharacters], passthroughs[0][:subs]
     end
 
     test 'collect passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['code'\\]</code>]})
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal %q{<code>['code']</code>}, para.passthroughs[0][:text]
-      assert_equal [:specialcharacters, :quotes], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal %q{<code>['code']</code>}, passthroughs[0][:text]
+      assert_equal [:specialcharacters, :quotes], passthroughs[0][:subs]
     end
 
     test 'collect multi-line passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['more\ncode'\\]</code>]})
-      result = para.extract_passthroughs(para.source)
+      result, passthroughs = para.extract_passthroughs(para.source)
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
-      assert_equal 1, para.passthroughs.size
-      assert_equal %Q{<code>['more\ncode']</code>}, para.passthroughs[0][:text]
-      assert_equal [:specialcharacters, :quotes], para.passthroughs[0][:subs]
+      assert_equal 1, passthroughs.size
+      assert_equal %Q{<code>['more\ncode']</code>}, passthroughs[0][:text]
+      assert_equal [:specialcharacters, :quotes], passthroughs[0][:subs]
     end
 
     test 'should find and replace placeholder duplicated by substitution' do
@@ -1604,9 +1604,9 @@ context 'Substitutions' do
 
     test 'resolves sub shorthands on inline pass macro' do
       para = block_from_string 'pass:q,a[*<{backend}>*]'
-      result = para.extract_passthroughs para.source
-      assert_equal 1, para.passthroughs.size
-      assert_equal [:quotes, :attributes], para.passthroughs[0][:subs]
+      result, passthroughs = para.extract_passthroughs para.source
+      assert_equal 1, passthroughs.size
+      assert_equal [:quotes, :attributes], passthroughs[0][:subs]
       result = para.restore_passthroughs result
       assert_equal '<strong><html5></strong>', result
     end
@@ -1614,22 +1614,23 @@ context 'Substitutions' do
     test 'should not recognize pass macro with invalid subsitution list' do
       [',', '42', 'a,'].each do |subs|
         para = block_from_string %(pass:#{subs}[foobar])
-        result = para.extract_passthroughs para.source
+        result, _ = para.extract_passthroughs para.source
         assert_equal %(pass:#{subs}[foobar]), result
       end
     end
 
     test 'should allow content of inline pass macro to be empty' do
       para = block_from_string 'pass:[]'
-      result = para.extract_passthroughs para.source
-      assert_equal 1, para.passthroughs.size
+      result, passthroughs = para.extract_passthroughs para.source
+      assert_equal 1, passthroughs.size
       assert_equal '', para.restore_passthroughs(result)
     end
 
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study")
-      para.passthroughs[0] = { text: '<code>inline code</code>', subs: [] }
+      _, passthroughs = para.extract_passthroughs ''
+      passthroughs[0] = { text: '<code>inline code</code>', subs: [] }
       result = para.restore_passthroughs(para.source)
       assert_equal "some <code>inline code</code> to study", result
     end
@@ -1637,8 +1638,9 @@ context 'Substitutions' do
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs with subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study in the #{Asciidoctor::Substitutors::PASS_START}" + '1' + "#{Asciidoctor::Substitutors::PASS_END} programming language")
-      para.passthroughs[0] = { text: '<code>{code}</code>', subs: [:specialcharacters] }
-      para.passthroughs[1] = { text: '{language}', subs: [:specialcharacters] }
+      _, passthroughs = para.extract_passthroughs ''
+      passthroughs[0] = { text: '<code>{code}</code>', subs: [:specialcharacters] }
+      passthroughs[1] = { text: '{language}', subs: [:specialcharacters] }
       result = para.restore_passthroughs(para.source)
       assert_equal 'some &lt;code&gt;{code}&lt;/code&gt; to study in the {language} programming language', result
     end
@@ -1661,15 +1663,15 @@ context 'Substitutions' do
     test 'complex inline passthrough macro' do
       text_to_escape = %q{[(] <'basic form'> <'logical operator'> <'basic form'> [)]}
       para = block_from_string %($$#{text_to_escape}$$)
-      para.extract_passthroughs(para.source)
-      assert_equal 1, para.passthroughs.size
-      assert_equal text_to_escape, para.passthroughs[0][:text]
+      _, passthroughs = para.extract_passthroughs(para.source)
+      assert_equal 1, passthroughs.size
+      assert_equal text_to_escape, passthroughs[0][:text]
 
       text_to_escape_escaped = %q{[(\] <'basic form'> <'logical operator'> <'basic form'> [)\]}
       para = block_from_string %(pass:specialcharacters[#{text_to_escape_escaped}])
-      para.extract_passthroughs(para.source)
-      assert_equal 1, para.passthroughs.size
-      assert_equal text_to_escape, para.passthroughs[0][:text]
+      _, passthroughs = para.extract_passthroughs(para.source)
+      assert_equal 1, passthroughs.size
+      assert_equal text_to_escape, passthroughs[0][:text]
     end
 
     test 'inline pass macro with a composite sub' do
