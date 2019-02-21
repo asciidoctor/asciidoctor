@@ -1216,33 +1216,30 @@ module Substitutors
   # for double-quoted values (in which commas are ignored)
   def split_simple_csv str
     if str.empty?
-      values = []
+      []
     elsif str.include? '"'
       values = []
-      current = []
+      accum = ''
       quote_open = false
       str.each_char do |c|
         case c
         when ','
           if quote_open
-            current << c
+            accum = accum + c
           else
-            values << current.join.strip
-            current = []
+            values << accum.strip
+            accum = ''
           end
         when '"'
           quote_open = !quote_open
         else
-          current << c
+          accum = accum + c
         end
       end
-
-      values << current.join.strip
+      values << accum.strip
     else
-      values = str.split(',').map {|it| it.strip }
+      str.split(',').map {|it| it.strip }
     end
-
-    values
   end
 
   # Internal: Resolve the list of comma-delimited subs against the possible options.
