@@ -2561,15 +2561,15 @@ class Parser
       raw_style.each_char do |c|
         case c
         when '.'
-          save_buffered_attribute parsed_attrs, name, accum, reader
+          yield_buffered_attribute parsed_attrs, name, accum, reader
           accum = ''
           name = :role
         when '#'
-          save_buffered_attribute parsed_attrs, name, accum, reader
+          yield_buffered_attribute parsed_attrs, name, accum, reader
           accum = ''
           name = :id
         when '%'
-          save_buffered_attribute parsed_attrs, name, accum, reader
+          yield_buffered_attribute parsed_attrs, name, accum, reader
           accum = ''
           name = :option
         else
@@ -2579,7 +2579,7 @@ class Parser
 
       # small optimization if no shorthand is found
       if name
-        save_buffered_attribute parsed_attrs, name, accum, reader
+        yield_buffered_attribute parsed_attrs, name, accum, reader
 
         if (parsed_style = parsed_attrs[:style])
           attributes['style'] = parsed_style
@@ -2605,7 +2605,7 @@ class Parser
   end
 
   # Internal: Save the collected attribute (:id, :option, :role, or nil for :style) in the attribute Hash.
-  def self.save_buffered_attribute attrs, name, value, reader
+  def self.yield_buffered_attribute attrs, name, value, reader
     if name
       if value.empty?
         if reader
