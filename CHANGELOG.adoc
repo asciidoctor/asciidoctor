@@ -84,6 +84,7 @@ Improvements::
 
 Bug Fixes::
 
+  * fix crash caused by inline passthrough macro with the macros sub clearing the remaining passthrough placeholders (#3089)
   * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
   * enforce rule that Setext section title must have at least one alphanumeric character; fixes problem w/ block nested inside quote block (#3060)
   * don't fail if value of pygments-style attribute is not recognized; gracefully fallback to default style (#2106)
