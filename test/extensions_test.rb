@@ -116,9 +116,9 @@ end
 
 class UppercaseBlock < Asciidoctor::Extensions::BlockProcessor; use_dsl
   named :yell
-  bound_to :paragraph
-  positional_attrs 'chars'
-  parses_content_as :simple
+  on_context :paragraph
+  name_positional_attributes 'chars'
+  parse_content_as :simple
   def process parent, reader, attributes
     if (chars = attributes['chars'])
       upcase_chars = chars.upcase
@@ -137,7 +137,7 @@ end
 
 class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
   named :degrees
-  resolves_attributes '1:units', 'precision=1'
+  resolve_attributes '1:units', 'precision=1'
   def process parent, target, attributes
     units = attributes['units'] || (parent.document.attr 'temperature-unit', 'C')
     precision = attributes['precision'].to_i
@@ -355,8 +355,8 @@ context 'Extensions' do
       registry = Asciidoctor::Extensions.create 'sample' do
         block do
           named :whisper
-          bound_to :paragraph
-          parses_content_as :simple
+          on_context :paragraph
+          parse_content_as :simple
           def process parent, reader, attributes
             create_paragraph parent, reader.lines.map(&:downcase), attributes
           end
@@ -904,7 +904,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.register do
           block :eval do |processor|
-            processor.bound_to :literal
+            processor.on_context :literal
             processor.process do |parent, reader, attrs|
               create_paragraph parent, (eval reader.read_lines[0]), {}
             end
@@ -1133,8 +1133,8 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :label
-            with_format :short
-            parses_content_as :text
+            match_format :short
+            parse_content_as :text
             process do |parent, _, attrs|
               %(<label>#{attrs['text']}</label>)
             end
@@ -1153,7 +1153,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :label
-            with_format :short
+            match_format :short
             process do |parent, target|
               %(<label>#{target}</label>)
             end
@@ -1172,8 +1172,8 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :short_attributes
-            with_format :short
-            resolves_attributes '1:name'
+            match_format :short
+            resolve_attributes '1:name'
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
@@ -1181,8 +1181,8 @@ context 'Extensions' do
 
           inline_macro do
             named :short_text
-            with_format :short
-            resolves_attributes false
+            match_format :short
+            resolve_attributes false
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
@@ -1190,7 +1190,7 @@ context 'Extensions' do
 
           inline_macro do
             named :'full-attributes'
-            resolves_attributes '1:name' => nil
+            resolve_attributes '1:name' => nil
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
@@ -1198,7 +1198,7 @@ context 'Extensions' do
 
           inline_macro do
             named :'full-text'
-            resolves_attributes false
+            resolve_attributes false
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
@@ -1206,8 +1206,8 @@ context 'Extensions' do
 
           inline_macro do
             named :@short_match
-            matching %r/@(\w+)/
-            resolves_attributes false
+            match %r/@(\w+)/
+            resolve_attributes false
             process do |parent, target, attrs|
               %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
@@ -1251,7 +1251,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :mention
-            resolves_attributes false
+            resolve_attributes false
             process do |parent, target, attrs|
               if (text = attrs['text']).empty?
                 text = %(@#{target})
@@ -1274,7 +1274,7 @@ context 'Extensions' do
           block do
             named 'skip-me'
             on_context :paragraph
-            parses_content_as :raw
+            parse_content_as :raw
             process do |parent, reader, attrs|
               nil
             end
@@ -1304,7 +1304,7 @@ context 'Extensions' do
           block do
             named :ignore
             on_context :paragraph
-            parses_content_as :skip
+            parse_content_as :skip
             process do |parent, reader, attrs|
               process_method_called = true
               nil
@@ -1335,7 +1335,7 @@ context 'Extensions' do
           block do
             named :foo
             on_context :paragraph
-            parses_content_as :raw
+            parse_content_as :raw
             process do |parent, reader, attrs|
               original_attrs = attrs.dup
               attrs.delete('title')

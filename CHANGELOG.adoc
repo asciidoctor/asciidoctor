@@ -38,6 +38,7 @@ Enhancements / Compliance::
   * add FILE_READ_MODE, URI_READ_MODE, and FILE_WRITE_MODE constants to control open mode when reading files and URIs and writing files (#2764)
   * set visibility of private and protected methods (#2764)
   * always run docinfo processor extensions regardless of safe mode (gives control to extension) (#2966)
+  * use infinitive verb form for extension DSL method names; map deprecated method names where appropriate
   * add docinfo insertion slot for header location to built-in converters (#1720)
   * add support for the `muted` option on vimeo videos (allows autoplay to work in Chrome) (#3014)
   * use value of prettify-theme attribute as is if it starts with http:// or https:// (#3020)
