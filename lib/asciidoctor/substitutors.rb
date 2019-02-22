@@ -1449,7 +1449,8 @@ module Substitutors
     process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
   end
 
-  alias sub_placeholder sprintf
+  # Internal: Inserts text into a formatted text enclosure; used by xreftext
+  alias sub_placeholder sprintf unless RUBY_ENGINE == 'opal'
 
   # Internal: Lock-in the substitutions for this block
   #
