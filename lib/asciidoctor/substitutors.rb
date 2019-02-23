@@ -202,25 +202,24 @@ module Substitutors
         end
         subs = (boundary == '+++' ? [] : BASIC_SUBS)
 
-        pass_key = passthrus.size
         if attributes
           if old_behavior
-            passthrus[pass_key] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
+            passthrus[passthru_key = passthrus.size] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
           else
-            passthrus[pass_key] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
+            passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
           end
         else
-          passthrus[pass_key] = { text: content, subs: subs }
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs }
         end
       else # pass:[]
         # NOTE we don't look for nested pass:[] macros
         # honor the escape
         next $&.slice 1, $&.length if $6 == RS
 
-        passthrus[pass_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
+        passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
-      %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
@@ -259,21 +258,20 @@ module Substitutors
         next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
       end
 
-      pass_key = passthrus.size
       if compat_mode
-        passthrus[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
+        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
           subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
-          passthrus[pass_key] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
-          passthrus[pass_key] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
         end
       else
-        passthrus[pass_key] = { text: content, subs: BASIC_SUBS }
+        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS }
       end
 
-      %(#{preceding}#{PASS_START}#{pass_key}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
 
     # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
@@ -286,8 +284,8 @@ module Substitutors
       end
       content = unescape_brackets $3
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      passthrus[pass_key = passthrus.size] = { text: content, subs: subs, type: type }
-      %(#{PASS_START}#{pass_key}#{PASS_END})
+      passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
+      %(#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     [text, passthrus]
@@ -299,10 +297,10 @@ module Substitutors
       if $1
         %(#{pre}`+#{$2}+`)
       else
-        @passthroughs[pass_key = @passthroughs.size] = attributes ?
+        @passthroughs[passthru_key = @passthroughs.size] = attributes ?
             { text: $2, subs: BASIC_SUBS, attributes: attributes, type: :unquoted } :
             { text: $2, subs: BASIC_SUBS }
-        %(#{pre}`#{PASS_START}#{pass_key}#{PASS_END}`)
+        %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
       end
     else
       %(#{pre}`#{text}`)
