@@ -469,13 +469,9 @@ class Converter::DocBook5Converter < Converter::Base
       result << %(<itemizedlist#{_common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
-        text_marker = if checklist && (item.attr? 'checkbox')
-          (item.attr? 'checked') ? '&#10003; ' : '&#10063; '
-        else
-          ''
-        end
+        text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
         result << '<listitem>'
-        result << %(<simpara>#{text_marker}#{item.text}</simpara>)
+        result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'
       end
@@ -614,16 +610,22 @@ class Converter::DocBook5Converter < Converter::Base
   private
 
   def _common_attributes id, role = nil, reftext = nil
-    attrs = id ? %( xml:id="#{id}") : ''
-    attrs = %(#{attrs} role="#{role}") if role
+    if id
+      attrs = %( xml:id="#{id}"#{role ? %[ role="#{role}"] : ''})
+    elsif role
+      attrs = %( role="#{role}")
+    else
+      attrs = ''
+    end
     if reftext
       if (reftext.include? '<') && ((reftext = reftext.gsub XmlSanitizeRx, '').include? ' ')
         reftext = (reftext.squeeze ' ').strip
       end
       reftext = (reftext.gsub '"', '&quot;') if reftext.include? '"'
-      attrs = %(#{attrs} xreflabel="#{reftext}")
+      %(#{attrs} xreflabel="#{reftext}")
+    else
+      attrs
     end
-    attrs
   end
 
   def _author_tag author
