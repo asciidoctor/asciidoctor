@@ -55,6 +55,7 @@ Enhancements / Compliance::
   * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
   * encode characters in URI to comply with RFC-3986
   * implement full support for styled xreftext in manpage converter (#3077)
+  * allow the ID and role properties to be set on a list item of ordered and unordered lists via the API (#2840)
 
 Improvements::
 
