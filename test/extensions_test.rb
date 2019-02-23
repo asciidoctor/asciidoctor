@@ -195,6 +195,36 @@ def create_cat_in_sink_block_macro
   end
 end
 
+def create_santa_list_block_macro
+  Asciidoctor::Extensions.create do
+    block_macro do
+      named :santa_list
+      process do |parent, target|
+        list = create_list parent, target
+        guillaume = (create_list_item list, 'Guillaume')
+        guillaume.add_role('friendly')
+        guillaume.id = 'santa-list-guillaume'
+        list << guillaume
+        robert = (create_list_item list, 'Robert')
+        robert.add_role('kind')
+        robert.add_role('contributor')
+        robert.add_role('java')
+        list << robert
+        pepijn = (create_list_item list, 'Pepijn')
+        pepijn.id = 'santa-list-pepijn'
+        list << pepijn
+        dan = (create_list_item list, 'Dan')
+        dan.add_role('naughty')
+        dan.id = 'santa-list-dan'
+        list << dan
+        sarah = (create_list_item list, 'Sarah')
+        list << sarah
+        list
+      end
+    end
+  end
+end
+
 context 'Extensions' do
   context 'Register' do
     test 'should not activate registry if no extension groups are registered' do
@@ -1472,6 +1502,30 @@ context 'Extensions' do
       doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
       output = doc.convert
       assert_xpath '/*[@class="imageblock"]/*[@class="title"][text()="Figure 1. Cat in Sink?"]', output, 1
+    end
+
+    test 'should assign id and role on list items unordered' do
+      input = 'santa_list::ulist[]'
+      doc = document_from_string input, header_footer: false, extension_registry: create_santa_list_block_macro
+      output = doc.convert
+      assert_xpath '/div[@class="ulist"]/ul/li[@class="friendly"][@id="santa-list-guillaume"]', output, 1
+      assert_xpath '/div[@class="ulist"]/ul/li[@class="kind contributor java"]', output, 1
+      assert_xpath '/div[@class="ulist"]/ul/li[@class="kind contributor java"][not(@id)]', output, 1
+      assert_xpath '/div[@class="ulist"]/ul/li[@id="santa-list-pepijn"][not(@class)]', output, 1
+      assert_xpath '/div[@class="ulist"]/ul/li[@id="santa-list-dan"][@class="naughty"]', output, 1
+      assert_xpath '/div[@class="ulist"]/ul/li[not(@id)][not(@class)]/p[text()="Sarah"]', output, 1
+    end
+
+    test 'should assign id and role on list items ordered' do
+      input = 'santa_list::olist[]'
+      doc = document_from_string input, header_footer: false, extension_registry: create_santa_list_block_macro
+      output = doc.convert
+      assert_xpath '/div[@class="olist"]/ol/li[@class="friendly"][@id="santa-list-guillaume"]', output, 1
+      assert_xpath '/div[@class="olist"]/ol/li[@class="kind contributor java"]', output, 1
+      assert_xpath '/div[@class="olist"]/ol/li[@class="kind contributor java"][not(@id)]', output, 1
+      assert_xpath '/div[@class="olist"]/ol/li[@id="santa-list-pepijn"][not(@class)]', output, 1
+      assert_xpath '/div[@class="olist"]/ol/li[@id="santa-list-dan"][@class="naughty"]', output, 1
+      assert_xpath '/div[@class="olist"]/ol/li[not(@id)][not(@class)]/p[text()="Sarah"]', output, 1
     end
   end
 end
