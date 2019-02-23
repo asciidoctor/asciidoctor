@@ -244,11 +244,9 @@ TeX: {#{eqnums_opt}}
         result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
       end
       result << (_generate_manname_section node) if node.attr? 'manpurpose'
-    else
-      if node.header? && !node.notitle
-        id_attr = node.id ? %( id="#{node.id}") : ''
-        result << %(<h1#{id_attr}>#{node.header.title}</h1>)
-      end
+    elsif node.header? && !node.notitle
+      id_attr = node.id ? %( id="#{node.id}") : ''
+      result << %(<h1#{id_attr}>#{node.header.title}</h1>)
     end
 
     if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
@@ -883,14 +881,12 @@ Your browser does not support the audio tag.
           marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
           marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
         end
+      elsif node.document.attr? 'icons', 'font'
+        marker_checked = '<i class="fa fa-check-square-o"></i> '
+        marker_unchecked = '<i class="fa fa-square-o"></i> '
       else
-        if node.document.attr? 'icons', 'font'
-          marker_checked = '<i class="fa fa-check-square-o"></i> '
-          marker_unchecked = '<i class="fa fa-square-o"></i> '
-        else
-          marker_checked = '&#10003; '
-          marker_unchecked = '&#10063; '
-        end
+        marker_checked = '&#10003; '
+        marker_unchecked = '&#10063; '
       end
     else
       ul_class_attribute = node.style ? %( class="#{node.style}") : ''
