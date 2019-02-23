@@ -975,6 +975,14 @@ context 'Extensions' do
       end
     end
 
+    test 'should log debug message if custom block macro is unknown' do
+      input = 'unknown::[]'
+      using_memory_logger Logger::Severity::DEBUG do |logger|
+        convert_string_to_embedded input
+        assert_message logger, :DEBUG, '<stdin>: line 1: unknown name for block macro: unknown', Hash
+      end
+    end
+
     test 'should drop block macro line if target references missing attribute and attribute-missing is drop-line' do
       input = <<~'EOS'
       [.rolename]

@@ -62,6 +62,7 @@ Enhancements / Compliance::
   * implement block? and inline? methods on Column, both which return false (#2963)
   * drop verse table cell style (treat as normal table cell) (#3111)
   * log warning if footnoteref macro is found and compat mode is not enabled (#3114)
+  * log debug message instead of warning if block style is unknown (#3092)
 
 Improvements::
 
