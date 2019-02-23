@@ -215,7 +215,6 @@ module Substitutors
         # NOTE we don't look for nested pass:[] macros
         # honor the escape
         next $&.slice 1, $&.length if $6 == RS
-
         passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
