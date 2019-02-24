@@ -1128,7 +1128,26 @@ context 'Extensions' do
           inline_macro do
             named :label
             with_format :short
-            resolves_attributes false
+            parses_content_as :text
+            process do |parent, _, attrs|
+              %(<label>#{attrs['text']}</label>)
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'label:[Checkbox]'
+        assert_includes output, '<label>Checkbox</label>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should map unparsed attrlist to target when format is short' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :label
+            with_format :short
             process do |parent, target|
               %(<label>#{target}</label>)
             end

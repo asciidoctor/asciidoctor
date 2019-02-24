@@ -559,27 +559,27 @@ module Substitutors
         text = text.gsub extension.instance.regexp do
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
-
+          extconf = extension.config
           if $~.names.empty?
-            target, content, extconf = $1, $2, extension.config
+            target, content = $1, $2
           else
-            target, content, extconf = ($~[:target] rescue nil), ($~[:content] rescue nil), extension.config
+            target, content = ($~[:target] rescue nil), ($~[:content] rescue nil)
           end
           attributes = (attributes = extconf[:default_attrs]) ? attributes.dup : {}
           if content.nil_or_empty?
             attributes['text'] = content if content && extconf[:content_model] != :attributes
           else
             content = unescape_bracketed_text content
+            # QUESTION should we store the unparsed attrlist in the attrlist key?
             if extconf[:content_model] == :attributes
-              # QUESTION should we store the text in the _text key?
-              # NOTE bracked text has already been escaped
               parse_attributes content, extconf[:pos_attrs] || [], into: attributes
             else
               attributes['text'] = content
             end
           end
-          # NOTE use content if target is not set (short form only); deprecated - remove in 1.6.0
-          replacement = extension.process_method[self, target || content, attributes]
+          # NOTE for convenience, map content (unparsed attrlist) to target when format is short
+          target ||= extconf[:format] == :short ? content : target
+          replacement = extension.process_method[self, target, attributes]
           Inline === replacement ? replacement.convert : replacement
         end
       end

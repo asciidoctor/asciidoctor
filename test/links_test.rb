@@ -860,7 +860,7 @@ context 'Links' do
     assert_nil ref.reftext
   end
 
-  test 'wip anchor with label creates reference' do
+  test 'anchor with label creates reference' do
     doc = document_from_string '[[tigers,Tigers]]Tigers roam here.'
     ref = doc.catalog[:refs]['tigers']
     refute_nil ref
