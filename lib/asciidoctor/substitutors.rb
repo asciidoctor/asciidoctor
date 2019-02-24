@@ -1148,8 +1148,8 @@ module Substitutors
   # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
   def parse_attributes attrlist, posattrs = [], opts = {}
     return {} unless attrlist && !attrlist.empty?
-    attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
     attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
+    attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
     # substitutions are only performed on attribute values if block is not nil
     block = self if opts[:sub_result]
     if (into = opts[:into])
