@@ -436,7 +436,7 @@ class AbstractBlock < AbstractNode
 
   # Internal: Performs the work for find_by, but does not handle the StopIteration exception.
   protected def find_by_internal selector = {}, result = [], &block
-    if ((any_context = !(context_selector = selector[:context])) || context_selector == @context) &&
+    if ((any_context = (context_selector = selector[:context]) ? nil : true) || context_selector == @context) &&
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
@@ -459,26 +459,35 @@ class AbstractBlock < AbstractNode
         result << self
       end
     end
-
-    # process document header as a section if present
-    if @context == :document && (any_context || context_selector == :section) && header?
-      @header.find_by_internal selector, result, &block
-    end
-
-    unless context_selector == :document # optimization
-      # yuck, dlist is a special case
-      if @context == :dlist
-        if any_context || context_selector != :section # optimization
-          @blocks.flatten.each do |li|
-            # NOTE the list item of a dlist can be nil, so we have to check
-            li.find_by_internal selector, result, &block if li
-          end
+    case @context
+    when :document
+      unless context_selector == :document
+        # process document header as a section, if present
+        if header? && (any_context || context_selector == :section)
+          @header.find_by_internal selector, result, &block
         end
-      else
         @blocks.each do |b|
           next if (context_selector == :section && b.context != :section) # optimization
           b.find_by_internal selector, result, &block
         end
+      end
+    when :dlist
+      # dlist has different structure than other blocks
+      if any_context || context_selector != :section # optimization
+        # NOTE the list item of a dlist can be nil, so we have to check
+        @blocks.flatten.each {|b| b.find_by_internal selector, result, &block if b }
+      end
+    when :table
+      if selector[:traverse_documents]
+        selector = selector.merge context: :document if context_selector == :inner_document
+        (rows.body + rows.foot).each do |r|
+          r.each {|c| c.inner_document.find_by_internal selector, result, &block if c.style == :asciidoc }
+        end
+      end
+    else
+      @blocks.each do |b|
+        next if (context_selector == :section && b.context != :section) # optimization
+        b.find_by_internal selector, result, &block
       end
     end
     result

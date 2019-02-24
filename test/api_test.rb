@@ -579,6 +579,47 @@ context 'API' do
       assert_equal 0, result.size
     end
 
+    test 'find_by should discover blocks inside AsciiDoc table cells if traverse_documents selector option is true' do
+      input = <<~'EOS'
+      paragraph in parent document (before)
+
+      [%footer,cols=2*]
+      |===
+      a|
+      paragraph in nested document (body)
+      |normal table cell
+
+      a|
+      paragraph in nested document (foot)
+      |normal table cell
+      |===
+
+      paragraph in parent document (after)
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by context: :paragraph
+      assert_equal 2, result.size
+      result = doc.find_by context: :paragraph, traverse_documents: true
+      assert_equal 4, result.size
+    end
+
+    test 'find_by should return inner document of AsciiDoc table cell if traverse_documents selector option is true' do
+      input = <<~'EOS'
+      |===
+      a|paragraph in nested document
+      |===
+      EOS
+
+      doc = Asciidoctor.load input
+      inner_doc = doc.blocks[0].rows.body[0][0].inner_document
+      result = doc.find_by traverse_documents: true
+      assert_includes result, inner_doc
+      result = doc.find_by context: :inner_document, traverse_documents: true
+      assert 1, result.size
+      assert_equal inner_doc, result[0]
+    end
+
     test 'find_by should return Array of blocks that match style criteria' do
       input = <<~'EOS'
       [square]
