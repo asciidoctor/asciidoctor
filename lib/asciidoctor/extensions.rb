@@ -245,18 +245,18 @@ module Extensions
     def process *args, &block
       if block_given?
         raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
+        unless block.binding && self == block.binding.receiver
+          # NOTE remap self in process method to processor instance
+          context = self
+          block.define_singleton_method(:call) {|*m_args| context.instance_exec(*m_args, &block) }
+        end
         @process_block = block
       # TODO enable if we want to support passing proc or lambda as argument instead of block
       #elsif ::Proc === args[0]
       #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size - 1}, expected 0)) unless args.size == 1
       #  @process_block = args.shift
       elsif defined? @process_block
-        if self == @process_block.binding.receiver
-          @process_block.call *args
-        else
-          # redefines self as processor instance
-          instance_exec *args, &@process_block
-        end
+        @process_block.call(*args)
       else
         raise ::NotImplementedError, %(#{self.class} ##{__method__} method called before being registered)
       end
