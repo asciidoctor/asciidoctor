@@ -1362,12 +1362,11 @@ module Extensions
       # style 1: specified as block
       if block_given?
         name, config = resolve_args args, 2
-        processor = kind_class.new (as_symbol name), config
-        processor.singleton_class.enable_dsl
-        if block.arity == 1
-          yield processor
-        else
+        (processor = kind_class.new (as_symbol name), config).singleton_class.enable_dsl
+        if block.arity == 0
           processor.instance_exec(&block)
+        else
+          yield processor
         end
         unless (name = as_symbol processor.name)
           raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location})

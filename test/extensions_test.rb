@@ -894,6 +894,32 @@ context 'Extensions' do
       end
     end
 
+    test 'should yield to syntax processor block if block has non-zero arity' do
+      input = <<~'EOS'
+      [eval]
+      ....
+      'yolo' * 5
+      ....
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          block :eval do |processor|
+            processor.bound_to :literal
+            processor.process do |parent, reader, attrs|
+              # FIXME processor prefix shouldn't be necessary here
+              processor.create_paragraph parent, (eval reader.read_lines[0]), {}
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_xpath '//p[text()="yoloyoloyoloyoloyolo"]', output, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should pass cloaked context in attributes passed to process method of custom block' do
       input = <<~'EOS'
       [custom]
