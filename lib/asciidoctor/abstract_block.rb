@@ -467,7 +467,7 @@ class AbstractBlock < AbstractNode
             li.find_by_internal selector, result, &block if li
           end
         end
-      elsif
+      else
         @blocks.each do |b|
           next if (context_selector == :section && b.context != :section) # optimization
           b.find_by_internal selector, result, &block
