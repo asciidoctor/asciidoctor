@@ -5201,6 +5201,36 @@ context 'Lists model' do
     assert_equal 'un', list.items[0].text
   end
 
+  test 'id and role assigned to ulist item in model are transmitted to output' do
+    input = <<~'EOS'
+		* one
+		* two
+		* three
+    EOS
+
+    doc = document_from_string input
+    item_0 = doc.blocks[0].items[0]
+    item_0.id = 'one'
+    item_0.add_role 'item'
+    output = doc.convert
+    assert_css 'li#one.item', output, 1
+  end
+
+  test 'id and role assigned to olist item in model are transmitted to output' do
+    input = <<~'EOS'
+    . one
+    . two
+    . three
+    EOS
+
+    doc = document_from_string input
+    item_0 = doc.blocks[0].items[0]
+    item_0.id = 'one'
+    item_0.add_role 'item'
+    output = doc.convert
+    assert_css 'li#one.item', output, 1
+  end
+
   test 'should allow API control over substitutions applied to ListItem text' do
     input = <<~'EOS'
     * *one*

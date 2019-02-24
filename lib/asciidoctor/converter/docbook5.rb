@@ -289,7 +289,7 @@ class Converter::DocBook5Converter < Converter::Base
     result << %(<orderedlist#{_common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
     result << %(<title>#{node.title}</title>) if node.title?
     node.items.each do |item|
-      result << '<listitem>'
+      result << %(<listitem#{_common_attributes item.id, item.role}>)
       result << %(<simpara>#{item.text}</simpara>)
       result << item.content if item.blocks?
       result << '</listitem>'
@@ -470,7 +470,7 @@ class Converter::DocBook5Converter < Converter::Base
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
-        result << '<listitem>'
+        result << %(<listitem#{_common_attributes item.id, item.role}>)
         result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'

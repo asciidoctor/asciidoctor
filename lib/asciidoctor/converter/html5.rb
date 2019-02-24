@@ -653,7 +653,13 @@ Your browser does not support the audio tag.
     result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}#{reversed_attribute}>)
 
     node.items.each do |item|
-      result << '<li>'
+      if item.id
+        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+      elsif item.role
+        result << %(<li class="#{item.role}">)
+      else
+        result << '<li>'
+      end
       result << %(<p>#{item.text}</p>)
       result << item.content if item.blocks?
       result << '</li>'
@@ -896,7 +902,13 @@ Your browser does not support the audio tag.
     result << %(<ul#{ul_class_attribute}>)
 
     node.items.each do |item|
-      result << '<li>'
+      if item.id
+        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+      elsif item.role
+        result << %(<li class="#{item.role}">)
+      else
+        result << '<li>'
+      end
       if checklist && (item.attr? 'checkbox')
         result << %(<p>#{(item.attr? 'checked') ? marker_checked : marker_unchecked}#{item.text}</p>)
       else
