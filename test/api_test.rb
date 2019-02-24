@@ -517,10 +517,12 @@ context 'API' do
       assert_equal [1, 3, 7], (doc.find_by context: :section).map(&:lineno)
     end
 
-    test 'should allow sourcemap option on document to be modified' do
+    test 'should allow sourcemap option on document to be modified before document is parsed' do
       doc = Asciidoctor.load_file fixture_path('sample.adoc'), parse: false
       doc.sourcemap = true
+      refute doc.parsed?
       doc = doc.parse
+      assert doc.parsed?
 
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title

@@ -57,6 +57,7 @@ Enhancements / Compliance::
   * implement full support for styled xreftext in manpage converter (#3077)
   * allow the ID and role properties to be set on a list item of ordered and unordered lists via the API (#2840)
   * yield processor instance to registration block for document processor if block has non-zero arity (i.e., has parameters)
+  * add Document#parsed? method to check whether document has been parsed
 
 Improvements::
 

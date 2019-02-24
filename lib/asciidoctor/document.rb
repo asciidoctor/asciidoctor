@@ -563,6 +563,11 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: Returns whether the source lines of the document have been parsed.
+  def parsed?
+    @parsed
+  end
+
   # Public: Get the named counter and take the next number in the sequence.
   #
   # name  - the String name of the counter
