@@ -257,8 +257,7 @@ module Extensions
         # TODO need a test for this!
         @process_block.call(*args)
       else
-        # FIXME add exception message here
-        raise ::NotImplementedError
+        raise ::NotImplementedError, %(#{self.class} ##{__method__} method called before being registered)
       end
     end
 
