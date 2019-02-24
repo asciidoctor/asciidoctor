@@ -56,25 +56,23 @@ module Extensions
         config[key] = default_value
       end
 
-      # Include the DSL class for this processor into this processor class or instance.
+      # Mixes the DSL class for this processor into this processor class or instance.
       #
-      # This method automatically detects whether to use the include or extend keyword
-      # based on what is appropriate.
+      # This method automatically detects whether to use the include or extend keyword to mix in the module.
       #
       # NOTE Inspiration for this DSL design comes from https://corcoran.io/2013/09/04/simple-pattern-ruby-dsl/
       #
-      # Returns nothing
-      def use_dsl
+      # Returns self
+      def enable_dsl
         if const_defined? :DSL
-          if self.name.nil_or_empty?
+          if singleton_class?
             include const_get :DSL
           else
             extend const_get :DSL
           end
         end
       end
-      alias extend_dsl use_dsl
-      alias include_dsl use_dsl
+      alias use_dsl enable_dsl
     end
 
     # Public: Get the configuration Hash for this processor instance.
@@ -1320,13 +1318,9 @@ module Extensions
       # style 1: specified as block
       extension = if block_given?
         config = resolve_args args, 1
-        # TODO if block arity is 0, assume block is process method
+        # FIXME if block arity is 0, assume block is process method
         processor = kind_class.new config
-        # NOTE class << processor idiom doesn't work in Opal
-        #class << processor
-        #  include_dsl
-        #end
-        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
+        processor.singleton_class.enable_dsl
         processor.instance_exec(&block)
         processor.freeze
         unless processor.process_block_given?
@@ -1366,12 +1360,8 @@ module Extensions
       # style 1: specified as block
       if block_given?
         name, config = resolve_args args, 2
-        processor = kind_class.new as_symbol(name), config
-        # NOTE class << processor idiom doesn't work in Opal
-        #class << processor
-        #  include_dsl
-        #end
-        processor.extend kind_class.const_get :DSL if kind_class.const_defined? :DSL
+        processor = kind_class.new (as_symbol name), config
+        processor.singleton_class.enable_dsl
         if block.arity == 1
           yield processor
         else
