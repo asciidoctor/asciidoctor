@@ -825,6 +825,30 @@ context 'Extensions' do
       end
     end
 
+    test 'should yield to document processor block if block has non-zero arity' do
+      input = <<~'EOS'
+      hi!
+      EOS
+
+      begin
+        Asciidoctor::Extensions.register do
+          tree_processor do |processor|
+            processor.process do |doc|
+              # FIXME processor prefix shouldn't be necessary here
+              doc << (processor.create_paragraph doc, 'bye!', {})
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_xpath '//p', output, 2
+        assert_xpath '//p[text()="hi!"]', output, 1
+        assert_xpath '//p[text()="bye!"]', output, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom block' do
       input = <<~'EOS'
       [yell]

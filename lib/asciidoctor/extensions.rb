@@ -1318,14 +1318,16 @@ module Extensions
       # style 1: specified as block
       extension = if block_given?
         config = resolve_args args, 1
-        # FIXME if block arity is 0, assume block is process method
-        processor = kind_class.new config
-        processor.singleton_class.enable_dsl
-        processor.instance_exec(&block)
-        processor.freeze
+        (processor = kind_class.new config).singleton_class.enable_dsl
+        if block.arity == 0
+          processor.instance_exec(&block)
+        else
+          yield processor
+        end
         unless processor.process_block_given?
           raise ::ArgumentError, %(No block specified to process #{kind_name} extension at #{block.source_location})
         end
+        processor.freeze
         ProcessorExtension.new kind, processor
       else
         processor, config = resolve_args args, 2
