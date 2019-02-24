@@ -248,14 +248,15 @@ module Extensions
         @process_block = block
       # TODO enable if we want to support passing proc or lambda as argument instead of block
       #elsif ::Proc === args[0]
-      #  block = args.shift
-      #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
-      #  @process_block = block
+      #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size - 1}, expected 0)) unless args.size == 1
+      #  @process_block = args.shift
       elsif defined? @process_block
-        # NOTE Proc automatically expands a single array argument
-        # ...but lambda doesn't (and we want to accept lambdas too)
-        # TODO need a test for this!
-        @process_block.call(*args)
+        if self == @process_block.binding.receiver
+          @process_block.call *args
+        else
+          # redefines self as processor instance
+          instance_exec *args, &@process_block
+        end
       else
         raise ::NotImplementedError, %(#{self.class} ##{__method__} method called before being registered)
       end

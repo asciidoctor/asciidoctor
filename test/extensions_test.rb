@@ -834,8 +834,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           tree_processor do |processor|
             processor.process do |doc|
-              # FIXME processor prefix shouldn't be necessary here
-              doc << (processor.create_paragraph doc, 'bye!', {})
+              doc << (create_paragraph doc, 'bye!', {})
             end
           end
         end
@@ -907,8 +906,7 @@ context 'Extensions' do
           block :eval do |processor|
             processor.bound_to :literal
             processor.process do |parent, reader, attrs|
-              # FIXME processor prefix shouldn't be necessary here
-              processor.create_paragraph parent, (eval reader.read_lines[0]), {}
+              create_paragraph parent, (eval reader.read_lines[0]), {}
             end
           end
         end
