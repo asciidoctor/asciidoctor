@@ -85,6 +85,7 @@ Improvements::
   * don't store fallback reference text on :bibref node (#3085)
   * call AbstractNode#reftext instead of AbstractNode#text to retrieve reference text for bibref node (#3085)
   * only map unparsed attrlist of inline macro to target when format is short
+  * add clearer exception message when source data is binary or has invalid encoding (#2884)
 
 Bug Fixes::
 

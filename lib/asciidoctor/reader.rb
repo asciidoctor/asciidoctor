@@ -562,25 +562,33 @@ class Reader
 
   private
 
-  # Internal: Prepare the lines from the provided data
+  # Internal: Prepare the source data for parsing.
   #
-  # This method strips whitespace from the end of every line of the source data
-  # and appends a LF (i.e., line feed, the Unix line ending). This whitespace
-  # substitution is very important to how Asciidoctor works.
+  # Converts the source data into an Array of lines ready for parsing. If the +:normalize+ option is set, this method
+  # coerces the encoding of each line to UTF-8 and strips trailing whitespace, including the newline. (This whitespace
+  # cleaning is very important to how Asciidoctor works). Subclasses may choose to perform additional preparation.
   #
-  # Any leading or trailing blank lines are also removed.
+  # data - A String Array or String of source data to be normalized.
+  # opts - A Hash of options to control how lines are prepared.
+  #        :normalize - Enables line normalization, which coerces the encoding to UTF-8 and removes trailing whitespace
+  #        (optional, default: false).
   #
-  # data - A String Array of input data to be normalized
-  # opts - A Hash of options to control what cleansing is done
-  #
-  # Returns The String lines extracted from the data
+  # Returns A String Array of source lines. If the source data is an Array, this method returns a copy.
   def prepare_lines data, opts = {}
     if opts[:normalize]
-      ::String === data ? (Helpers.prepare_source_string data) : (Helpers.prepare_source_array data || [])
-    elsif ::String === data
+      ::Array === data ? (Helpers.prepare_source_array data) : (Helpers.prepare_source_string data)
+    elsif ::Array === data
+      data.drop 0
+    elsif data
       data.split LF, -1
     else
-      (data || []).drop 0
+      []
+    end
+  rescue
+    if (::Array === data ? data.join : data.to_s).valid_encoding?
+      raise
+    else
+      raise ::ArgumentError, 'source is either binary or contains invalid Unicode data'
     end
   end
 

@@ -1296,7 +1296,7 @@ module Asciidoctor
       source = input
     elsif ::Array === input
       source = input.drop 0
-    else
+    elsif input
       raise ::ArgumentError, %(unsupported input type: #{input.class})
     end
 
