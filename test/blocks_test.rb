@@ -20,6 +20,23 @@ context 'Blocks' do
       end
     end
 
+    test 'horizontal rule with markdown syntax disabled' do
+      old_markdown_syntax = Asciidoctor::Compliance.markdown_syntax
+      begin
+        Asciidoctor::Compliance.markdown_syntax = false
+        %w(''' '''' '''''').each do |line|
+          output = convert_string_to_embedded line
+          assert_includes output, '<hr>'
+        end
+        %w(--- *** ___).each do |line|
+          output = convert_string_to_embedded line
+          refute_includes output, '<hr>'
+        end
+      ensure
+        Asciidoctor::Compliance.markdown_syntax = old_markdown_syntax
+      end
+    end
+
     test '< 3 chars does not make horizontal rule' do
       %w(' '').each do |line|
         output = convert_string_to_embedded line
