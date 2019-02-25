@@ -154,6 +154,16 @@ context 'Converter' do
       assert_xpath '//aside/header/following-sibling::p[text()="Sidebar content"]', output, 1
     end
 
+    test 'should allow custom backend to emulate a known backend' do
+      doc = Asciidoctor.load 'content', backend: 'html5-tweaks:html', template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
+      assert doc.basebackend? 'html'
+      assert_equal 'html5-tweaks', doc.backend
+      converter = doc.converter
+      assert_kind_of Asciidoctor::Converter::TemplateConverter, (converter.find_converter 'embedded')
+      refute_kind_of Asciidoctor::Converter::TemplateConverter, (converter.find_converter 'admonition')
+      assert_equal '<p>content</p>', doc.convert
+    end
+
     test 'should create template converter even when a converter is not registered for the specified backend' do
       input = 'paragraph content'
       output = convert_string_to_embedded input, backend: :unknown, template_dir: (fixture_path 'custom-backends/haml/html5-tweaks'), template_cache: false
