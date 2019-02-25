@@ -1407,5 +1407,30 @@ context 'API' do
       block = (document_from_string input).blocks[0]
       assert_equal %w(compact reversed).to_set, block.options
     end
+
+    test 'table column should not be a block or inline' do
+      input = <<~'EOS'
+      |===
+      |a
+      |===
+      EOS
+
+      col = (document_from_string input).blocks[0].columns[0]
+      refute col.block?
+      refute col.inline?
+    end
+
+    test 'table cell should be a block' do
+      input = <<~'EOS'
+      |===
+      |a
+      |===
+      EOS
+
+      cell = (document_from_string input).blocks[0].rows.body[0][0]
+      assert_kind_of ::Asciidoctor::AbstractBlock, cell
+      assert cell.block?
+      refute cell.inline?
+    end
   end
 end
