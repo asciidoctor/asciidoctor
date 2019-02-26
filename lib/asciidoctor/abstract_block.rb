@@ -1,34 +1,39 @@
 # frozen_string_literal: true
 module Asciidoctor
 class AbstractBlock < AbstractNode
-  # Public: Get the Array of Asciidoctor::AbstractBlock sub-blocks for this block
+  # Public: Get the Array of {AbstractBlock} child blocks for this block. Only applies if content model is :compound.
   attr_reader :blocks
 
-  # Public: Set the caption for this block
+  # Public: Set the caption for this block.
   attr_writer :caption
 
-  # Public: The types of content that this block can accomodate
+  # Public: Describes the type of content this block accepts and how it should be converted. Acceptable values are:
+  # * :compound - this block contains other blocks
+  # * :simple - this block holds a paragraph of prose that receives normal substitutions
+  # * :verbatim - this block holds verbatim text (displayed "as is") that receives verbatim substitutions
+  # * :raw - this block holds unprocessed content passed directly to the output with no sustitutions applied
+  # * :empty - this block has no content
   attr_accessor :content_model
 
-  # Public: Set the Integer level of this Section or the Section level in which this Block resides
+  # Public: Set the Integer level of this {Section} or the level of the Section to which this {AbstractBlock} belongs.
   attr_accessor :level
 
-  # Public: Get/Set the numeral of this block (if section, relative to parent, otherwise absolute)
-  # Only assigned to section if automatic section numbering is enabled
-  # Only assigned to formal block (block with title) if corresponding caption attribute is present
+  # Public: Get/Set the numeral of this block (if section, relative to parent, otherwise absolute).
+  # Only assigned to section if automatic section numbering is enabled.
+  # Only assigned to formal block (block with title) if corresponding caption attribute is present.
   attr_accessor :numeral
 
-  # Deprecated: Legacy property to get/set the numeral of this block
+  # Deprecated: Legacy property to get/set the numeral of this block.
   alias number numeral
   alias number= numeral=
 
-  # Public: Gets/Sets the location in the AsciiDoc source where this block begins
+  # Public: Gets/Sets the location in the AsciiDoc source where this block begins.
   attr_accessor :source_location
 
   # Public: Get/Set the String style (block type qualifier) for this block.
   attr_accessor :style
 
-  # Public: Substitutions to be applied to content in this block
+  # Public: Substitutions to be applied to content in this block.
   attr_reader :subs
 
   def initialize parent, context, opts = {}
