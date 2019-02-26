@@ -720,8 +720,13 @@ module Substitutors
           return captured if target.end_with? '://'
         end
 
-        attrs, link_opts = nil, { type: :link }
-        unless text.empty?
+        link_opts = { type: :link }
+        if text.empty?
+          if macro && (target.end_with? '^')
+            target = target.chop
+            attrs = { 'window' => '_blank' }
+          end
+        else
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if !doc.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
@@ -737,8 +742,8 @@ module Substitutors
           #  end
           #end
 
-          if text.end_with? '^'
-            text = text.chop
+          if ((target.end_with? '^') && (target = target.chop)) ||
+              ((text.end_with? '^') && (text = text.chop))
             if attrs
               attrs['window'] ||= '_blank'
             else
@@ -775,8 +780,13 @@ module Substitutors
         else
           target = $2
         end
-        attrs, link_opts = nil, { type: :link }
-        unless (text = $3).empty?
+        link_opts = { type: :link }
+        if (text = $3).empty?
+          if target.end_with? '^'
+            target = target.chop
+            attrs = { 'window' => '_blank' }
+          end
+        else
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
             if !doc.compat_mode && (text.include? ',')
@@ -804,8 +814,8 @@ module Substitutors
           #  end
           #end
 
-          if text.end_with? '^'
-            text = text.chop
+          if ((target.end_with? '^') && (target = target.chop)) ||
+              ((text.end_with? '^') && (text = text.chop))
             if attrs
               attrs['window'] ||= '_blank'
             else

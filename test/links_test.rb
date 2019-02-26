@@ -235,6 +235,20 @@ context 'Links' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"]', convert_string_to_embedded('http://google.com[Google^]'), 1
   end
 
+  test 'url in link macro that ends in ^ should set link window to _blank' do
+    [
+      'https://duckduckgo.com^[DuckDuckGo]',
+      'link:https://duckduckgo.com^[]',
+    ].each do |input|
+      assert_xpath '//a[@href="https://duckduckgo.com"][@target="_blank"]', convert_string_to_embedded(input), 1
+    end
+  end
+
+  test 'email that ends in ^ should set link window to _blank' do
+    input = 'mailto:doc.writer@example.com^[Contact Me]'
+    assert_xpath '//a[@href="mailto:doc.writer@example.com"][@target="_blank"]', convert_string_to_embedded(input), 1
+  end
+
   test 'rel=noopener should be added to a link that targets the _blank window' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"][@rel="noopener"]', convert_string_to_embedded('http://google.com[Google^]'), 1
   end
