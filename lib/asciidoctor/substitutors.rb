@@ -650,7 +650,7 @@ module Substitutors
                 text, before, after = (text.slice 1, text.length), '(', ''
               end
             elsif text.end_with? ')'
-              text, before, after = (text.slice 0, text.length - 1), '', ')'
+              text, before, after = text.chop, '', ')'
             end
           end
           if visible
