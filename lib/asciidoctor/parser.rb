@@ -931,55 +931,42 @@ class Parser
   def self.is_delimited_block? line, return_match_data = nil
     # highly optimized for best performance
     return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_HEADS[line.slice 0, 2]
-    # catches open block
+    # open block
     if line_len == 2
       tip = line
-      tl = 2
+      tip_len = 2
     else
-      # catches all other delimited blocks, including fenced code
+      # all other delimited blocks, including fenced code
       if line_len < 5
         tip = line
-        tl = line_len
+        tip_len = line_len
       else
-        tip = line.slice 0, (tl = 4)
+        tip = line.slice 0, (tip_len = 4)
       end
-
       # special case for fenced code blocks
-      # REVIEW review this logic
-      if Compliance.markdown_syntax
-        tip_3 = (tl == 4 ? tip.chop : tip)
-        if tip_3 == '```'
-          if tl == 4 && tip.end_with?('`')
+      if Compliance.markdown_syntax && (tip.start_with? '`')
+        if tip_len == 4
+          if tip == '````'
+            return
+          elsif (tip = tip.chop) == '```'
+            line = tip
+            line_len = tip_len = 3
+          else
             return
           end
-          tip = tip_3
-          tl = 3
-          fenced_code = true
+        elsif tip == '```'
+          # keep it
+        else
+          return
         end
+      elsif tip_len == 3
+        return
       end
-
-      # short circuit if not a fenced code block
-      return if tl == 3 && !fenced_code
     end
-
-    # NOTE if no condition is met, this block returns nil
-    if DELIMITED_BLOCKS.key? tip
-      # tip is the full line when delimiter is minimum length
-      if tl == line_len || tl < 4
-        if return_match_data
-          context, masq = DELIMITED_BLOCKS[tip]
-          BlockMatchData.new context, masq, tip, tip
-        else
-          true
-        end
-      elsif uniform? (line.slice 1, line_len), DELIMITED_BLOCK_TAILS[tip], (line_len - 1)
-        if return_match_data
-          context, masq = DELIMITED_BLOCKS[tip]
-          BlockMatchData.new context, masq, tip, line
-        else
-          true
-        end
-      end
+    # NOTE line matches the tip when delimiter is minimum length or fenced code
+    context, masq = DELIMITED_BLOCKS[tip]
+    if context && (line_len == tip_len || (uniform? (line.slice 1, line_len), DELIMITED_BLOCK_TAILS[tip], (line_len - 1)))
+      return_match_data ? (BlockMatchData.new context, masq, tip, line) : true
     end
   end
 
