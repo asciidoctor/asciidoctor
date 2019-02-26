@@ -914,10 +914,11 @@ class Parser
     reader.read_lines_until opts, &break_condition
   end
 
-  # Public: Determines whether this line is the start of any of the delimited blocks
+  # Public: Determines whether this line is the start of a known delimited block.
   #
-  # returns the match data if this line is the first line of a delimited block or nil if not
-  def self.is_delimited_block? line, return_match_data = false
+  # Returns the BlockMatchData (if return_match_data is true) or true (if return_match_data is false) if this line is
+  # the start of a delimited block, otherwise nothing.
+  def self.is_delimited_block? line, return_match_data = nil
     # highly optimized for best performance
     return unless (line_len = line.length) > 1 && DELIMITED_BLOCK_HEADS[line.slice 0, 2]
     # catches open block
@@ -935,7 +936,6 @@ class Parser
 
       # special case for fenced code blocks
       # REVIEW review this logic
-      fenced_code = false
       if Compliance.markdown_syntax
         tip_3 = (tl == 4 ? tip.chop : tip)
         if tip_3 == '```'
@@ -952,35 +952,24 @@ class Parser
       return if tl == 3 && !fenced_code
     end
 
+    # NOTE if no condition is met, this block returns nil
     if DELIMITED_BLOCKS.key? tip
       # tip is the full line when delimiter is minimum length
       if tl == line_len || tl < 4
         if return_match_data
           context, masq = DELIMITED_BLOCKS[tip]
-          BlockMatchData.new(context, masq, tip, tip)
+          BlockMatchData.new context, masq, tip, tip
         else
           true
         end
       elsif uniform? (line.slice 1, line_len), DELIMITED_BLOCK_TAILS[tip], (line_len - 1)
         if return_match_data
           context, masq = DELIMITED_BLOCKS[tip]
-          BlockMatchData.new(context, masq, tip, line)
+          BlockMatchData.new context, masq, tip, line
         else
           true
         end
-      # only enable if/when we decide to support non-congruent block delimiters
-      #elsif (match = BlockDelimiterRx.match(line))
-      #  if return_match_data
-      #    context, masq = DELIMITED_BLOCKS[tip]
-      #    BlockMatchData.new(context, masq, tip, match[0])
-      #  else
-      #    true
-      #  end
-      else
-        nil
       end
-    else
-      nil
     end
   end
 
@@ -2024,7 +2013,7 @@ class Parser
   #              *  :text indicates the parser is only looking for text content,
   #                   thus neither a block title or attribute entry should be captured
   #
-  # returns true if the line contains metadata, otherwise false
+  # returns true if the line contains metadata, otherwise falsy
   def self.parse_block_metadata_line reader, document, attributes, options = {}
     if (next_line = reader.peek_line) &&
         (options[:text] ? (next_line.start_with? '[', '/') : (normal = next_line.start_with? '[', '.', '/', ':'))
