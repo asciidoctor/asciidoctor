@@ -140,7 +140,7 @@ class Parser
       document.id, _, l0_section_title, _, atx = parse_section_title reader, document
       document.title = assigned_doctitle = l0_section_title unless assigned_doctitle
       document.header.source_location = source_location if source_location
-      # default to compat-mode if document uses atx-style doctitle
+      # default to compat-mode if document has setext doctitle
       doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
       if (separator = block_attrs['separator'])
         doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
