@@ -41,7 +41,7 @@ class AbstractBlock < AbstractNode
     @content_model = :compound
     @blocks = []
     @subs = []
-    @id = @title = @title_converted = @caption = @numeral = @style = @default_subs = @source_location = nil
+    @id = @title = @caption = @numeral = @style = @default_subs = @source_location = nil
     case context
     when :document, :section
       @level = @next_section_index = 0
@@ -271,7 +271,7 @@ class AbstractBlock < AbstractNode
   # Returns the converted String title for this Block, or nil if the source title is falsy
   def title
     # prevent substitutions from being applied to title multiple times
-    @title_converted ? @converted_title : (@converted_title = (@title_converted = true) && @title && (apply_title_subs @title))
+    @converted_title ||= @title && (apply_title_subs @title)
   end
 
   # Public: A convenience method that checks whether the title of this block is defined.
@@ -285,7 +285,8 @@ class AbstractBlock < AbstractNode
   #
   # Returns the new String title assigned to this Block
   def title= val
-    @title, @title_converted = val, nil
+    @converted_title = nil
+    @title = val
   end
 
   # Public: A convenience method that checks whether the specified
