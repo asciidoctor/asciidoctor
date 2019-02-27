@@ -170,15 +170,11 @@ end
 # Public: Methods to manage the columns of an AsciiDoc table. In particular, it
 # keeps track of the column specs
 class Table::Column < AbstractNode
-  # Public: Get the Section level in which this node resides (matches table; required for compatibility)
-  attr_reader :level
-
   # Public: Get/Set the style Symbol for this column.
   attr_accessor :style
 
   def initialize table, index, attributes = {}
     super table, :column
-    @level = table.level
     @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1

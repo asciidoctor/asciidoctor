@@ -42,15 +42,13 @@ class AbstractBlock < AbstractNode
     @blocks = []
     @subs = []
     @id = @title = @title_converted = @caption = @numeral = @style = @default_subs = @source_location = nil
-    if context == :document
-      @level = 0
-    elsif parent && context != :section
-      @level = parent.level
+    case context
+    when :document, :section
+      @level = @next_section_index = 0
+      @next_section_ordinal = 1
     else
-      @level = nil
+      @level = AbstractBlock === parent ? parent.level : nil
     end
-    @next_section_index = 0
-    @next_section_ordinal = 1
   end
 
   def block?
