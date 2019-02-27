@@ -170,11 +170,15 @@ end
 # Public: Methods to manage the columns of an AsciiDoc table. In particular, it
 # keeps track of the column specs
 class Table::Column < AbstractNode
-  # Public: Get/Set the Symbol style for this column.
+  # Public: Get the Section level in which this node resides (matches table; required for compatibility)
+  attr_reader :level
+
+  # Public: Get/Set the style Symbol for this column.
   attr_accessor :style
 
   def initialize table, index, attributes = {}
     super table, :column
+    @level = table.level
     @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1
@@ -203,18 +207,19 @@ class Table::Column < AbstractNode
     end
     col_pcwidth
   end
+
+  def block?
+    false
+  end
+
+  def inline?
+    false
+  end
 end
 
 # Public: Methods for managing the a cell in an AsciiDoc table.
-class Table::Cell < AbstractNode
-  # Public: Gets/Sets the location in the AsciiDoc source where this cell begins
-  attr_reader :source_location
-
-  # Public: Get/Set the Symbol style for this cell (default: nil)
-  attr_accessor :style
-
-  # Public: Substitutions to be applied to content in this cell
-  attr_accessor :subs
+class Table::Cell < AbstractBlock
+  DOUBLE_LF = LF * 2
 
   # Public: An Integer of the number of columns this cell will span (default: nil)
   attr_accessor :colspan
@@ -225,7 +230,7 @@ class Table::Cell < AbstractNode
   # Public: An alias to the parent block (which is always a Column)
   alias column parent
 
-  # Public: The internal Asciidoctor::Document for a cell that has the asciidoc style
+  # Internal: Returns the nested Document in an AsciiDoc table cell (only set when style is :asciidoc)
   attr_reader :inner_document
 
   def initialize column, cell_text, attributes = {}, opts = {}
@@ -295,11 +300,13 @@ class Table::Cell < AbstractNode
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
       @subs = nil
     elsif literal
+      @content_model = :verbatim
       @subs = BASIC_SUBS
     else
       if normal_psv && (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
         Parser.catalog_inline_anchor $1, $2, self, opts[:cursor], @document
       end
+      @content_model = :simple
       @subs = NORMAL_SUBS
     end
     @text = cell_text
@@ -333,12 +340,18 @@ class Table::Cell < AbstractNode
   #
   # Returns the converted String for this Cell
   def content
-    if @style == :asciidoc
+    if (cell_style = @style) == :asciidoc
       @inner_document.convert
-    else
-      text.split(BlankLineRx).map do |p|
-        !@style || @style == :header ? p : Inline.new(parent, :quoted, p, type: @style).convert
+    elsif @text.include? DOUBLE_LF
+      (text.split BlankLineRx).map do |para|
+        cell_style && cell_style != :header ? (Inline.new parent, :quoted, para, type: cell_style).convert : para
       end
+    elsif (subbed_text = text).empty?
+      []
+    elsif cell_style && cell_style != :header
+      [(Inline.new parent, :quoted, subbed_text, type: cell_style).convert]
+    else
+      [subbed_text]
     end
   end
 
@@ -376,7 +389,7 @@ class Table::ParserContext
     'psv' => ['|', /\|/],
     'csv' => [',', /,/],
     'dsv' => [':', /:/],
-    'tsv' => [%(\t), /\t/],
+    'tsv' => [?\t, /\t/],
     '!sv' => ['!', /!/],
   }
 

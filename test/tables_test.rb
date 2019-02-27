@@ -1105,6 +1105,21 @@ context 'Tables' do
       assert_equal 26, literal.text.lines.size
     end
 
+    test 'should not split paragraph at line containing only {blank} that is directly adjacent to non-blank lines' do
+      input = <<~'EOS'
+      |===
+      |paragraph
+      {blank}
+      still one paragraph
+      {blank}
+      still one paragraph
+      |===
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_css 'p.tableblock', result, 1
+    end
+
     test 'should strip trailing newlines when splitting paragraphs' do
       input = <<~'EOS'
       |===
