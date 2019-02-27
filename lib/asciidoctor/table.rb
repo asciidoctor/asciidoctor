@@ -433,15 +433,15 @@ class Table::ParserContext
 
     if attributes.key? 'separator'
       if (sep = attributes['separator']).nil_or_empty?
-        @delimiter, @delimiter_re = DELIMITERS[xsv]
+        @delimiter, @delimiter_rx = DELIMITERS[xsv]
       # QUESTION should we support any other escape codes or multiple tabs?
       elsif sep == '\t'
-        @delimiter, @delimiter_re = DELIMITERS['tsv']
+        @delimiter, @delimiter_rx = DELIMITERS['tsv']
       else
-        @delimiter, @delimiter_re = sep, /#{::Regexp.escape sep}/
+        @delimiter, @delimiter_rx = sep, /#{::Regexp.escape sep}/
       end
     else
-      @delimiter, @delimiter_re = DELIMITERS[xsv]
+      @delimiter, @delimiter_rx = DELIMITERS[xsv]
     end
 
     @colcount = table.columns.empty? ? -1 : table.columns.size
@@ -467,7 +467,7 @@ class Table::ParserContext
   #
   # returns Regexp MatchData if the line contains the delimiter, false otherwise
   def match_delimiter(line)
-    @delimiter_re.match(line)
+    @delimiter_rx.match(line)
   end
 
   # Public: Skip past the matched delimiter because it's inside quoted text.
