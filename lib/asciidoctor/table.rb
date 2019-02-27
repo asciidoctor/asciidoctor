@@ -174,7 +174,7 @@ class Table::Column < AbstractNode
   attr_accessor :style
 
   def initialize table, index, attributes = {}
-    super table, :column
+    super table, :table_column
     @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1
@@ -230,7 +230,7 @@ class Table::Cell < AbstractBlock
   attr_reader :inner_document
 
   def initialize column, cell_text, attributes = {}, opts = {}
-    super column, :cell
+    super column, :table_cell
     @source_location = opts[:cursor].dup if @document.sourcemap
     if column
       cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
