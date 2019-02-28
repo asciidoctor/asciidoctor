@@ -143,7 +143,7 @@ class Parser
         l0_section_title = nil
       else
         document.title = l0_section_title
-        doc_attrs['doctitle'] = (doctitle_attr_val = document.apply_header_subs l0_section_title)
+        doc_attrs['doctitle'] = doctitle_attr_val = document.apply_header_subs l0_section_title
       end
       document.header.source_location = source_location if source_location
       # default to compat-mode if document has setext doctitle
@@ -243,7 +243,7 @@ class Parser
       if error_msg
         reader.restore_save
         logger.error message_with_context error_msg, source_location: reader.cursor
-        doc_attrs['manname'] = (manname = doc_attrs['docname'] || 'command')
+        doc_attrs['manname'] = manname = doc_attrs['docname'] || 'command'
         doc_attrs['mannames'] = [manname]
         if document.backend == 'manpage'
           doc_attrs['docname'] = manname
@@ -648,7 +648,7 @@ class Parser
 
       elsif UnorderedListRx.match? this_line
         reader.unshift_line this_line
-        attributes['style'] = (style = 'bibliography') if !style && Section === parent && parent.sectname == 'bibliography'
+        attributes['style'] = style = 'bibliography' if !style && Section === parent && parent.sectname == 'bibliography'
         block = parse_list(reader, :ulist, parent, style)
         break
 
