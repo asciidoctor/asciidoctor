@@ -129,48 +129,56 @@ class Parser
 
     # yep, document title logic in AsciiDoc is just insanity
     # definitely an area for spec refinement
-    assigned_doctitle = nil
+
     unless (val = doc_attrs['doctitle']).nil_or_empty?
-      document.title = assigned_doctitle = val
+      document.title = doctitle_attr_val = val
     end
 
     # if the first line is the document title, add a header to the document and parse the header metadata
     if implicit_doctitle
       source_location = reader.cursor if document.sourcemap
       document.id, _, l0_section_title, _, atx = parse_section_title reader, document
-      document.title = assigned_doctitle = l0_section_title unless assigned_doctitle
+      if doctitle_attr_val
+        # NOTE doctitle attribute (set above or below implicit doctitle) overrides implicit doctitle
+        l0_section_title = nil
+      else
+        document.title = l0_section_title
+        doc_attrs['doctitle'] = (doctitle_attr_val = document.apply_header_subs l0_section_title)
+      end
       document.header.source_location = source_location if source_location
       # default to compat-mode if document has setext doctitle
       doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
       if (separator = block_attrs['separator'])
         doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
       end
-      doc_attrs['doctitle'] = l0_section_title
       if (doc_id = block_attrs['id'])
         document.id = doc_id
       else
         doc_id = document.id
       end
-      if (doc_role = block_attrs['role'])
-        doc_attrs['role'] = doc_role
+      if (role = block_attrs['role'])
+        doc_attrs['role'] = role
       end
-      if (doc_reftext = block_attrs['reftext'])
-        doc_attrs['reftext'] = doc_reftext
+      if (reftext = block_attrs['reftext'])
+        doc_attrs['reftext'] = reftext
       end
       block_attrs.clear
+      (modified_attrs = document.instance_variable_get :@attributes_modified).delete 'doctitle'
       parse_header_metadata reader, document
+      if modified_attrs.include? 'doctitle'
+        if (val = doc_attrs['doctitle']).nil_or_empty? || val == doctitle_attr_val
+          doc_attrs['doctitle'] = doctitle_attr_val
+        else
+          document.title = val
+        end
+      elsif !l0_section_title
+        modified_attrs << 'doctitle'
+      end
       document.register :refs, [doc_id, document] if doc_id
     end
 
-    unless (val = doc_attrs['doctitle']).nil_or_empty? || val == l0_section_title
-      document.title = assigned_doctitle = val
-    end
-
-    # restore doctitle attribute to original assignment
-    doc_attrs['doctitle'] = assigned_doctitle if assigned_doctitle
-
     # parse title and consume name section of manpage document
-    parse_manpage_header(reader, document, block_attrs) if document.doctype == 'manpage'
+    parse_manpage_header reader, document, block_attrs if document.doctype == 'manpage'
 
     # NOTE block_attrs are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)

@@ -639,7 +639,7 @@ context 'Document' do
       assert_xpath '//*[@id="preamble"]//p[text()="Document Title, doctitle"]', doc.convert, 1
     end
 
-    test 'document with doctitle attribute entry overrides header title and doctitle' do
+    test 'document with doctitle attribute entry overrides implicit doctitle' do
       input = <<~'EOS'
       = Document Title
       :snapshot: {doctitle}
@@ -658,7 +658,7 @@ context 'Document' do
       assert_xpath '//*[@id="preamble"]//p[text()="Document Title, Override"]', doc.convert, 1
     end
 
-    test 'doctitle attribute entry above header overrides header title and doctitle' do
+    test 'doctitle attribute entry above header overrides implicit doctitle' do
       input = <<~'EOS'
       :doctitle: Override
       = Document Title
@@ -674,6 +674,18 @@ context 'Document' do
       assert_equal 'Override', doc.header.title
       assert_equal 'Override', doc.first_section.title
       assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.convert, 1
+    end
+
+    test 'header substitutions should be applied to the value of the doctitle attribute' do
+      input = <<~'EOS'
+      = <Foo> & <Bar>
+
+      The name of the game is {doctitle}.
+      EOS
+
+      doc = document_from_string input
+      assert_equal '&lt;Foo&gt; &amp; &lt;Bar&gt;', (doc.attr 'doctitle')
+      assert_includes doc.blocks[0].content, '&lt;Foo&gt; &amp; &lt;Bar&gt;'
     end
 
     test 'should recognize document title when preceded by blank lines' do
