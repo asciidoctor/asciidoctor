@@ -12,13 +12,13 @@ module Substitutors
 
   (BASIC_SUBS = [:specialcharacters]).freeze
   (HEADER_SUBS = [:specialcharacters, :attributes]).freeze
-  (NONE_SUBS = []).freeze
+  (NO_SUBS = []).freeze
   (NORMAL_SUBS = [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements]).freeze
   (REFTEXT_SUBS = [:specialcharacters, :quotes, :replacements]).freeze
   (VERBATIM_SUBS = [:specialcharacters, :callouts]).freeze
 
   SUB_GROUPS = {
-    none: NONE_SUBS,
+    none: NO_SUBS,
     normal: NORMAL_SUBS,
     verbatim: VERBATIM_SUBS,
     specialchars: BASIC_SUBS,
@@ -1473,7 +1473,7 @@ module Substitutors
         end
       when :raw
         # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
-        default_subs = @context == :stem ? BASIC_SUBS : NONE_SUBS
+        default_subs = @context == :stem ? BASIC_SUBS : NO_SUBS
       else
         return @subs
       end
