@@ -425,8 +425,6 @@ class Converter::DocBook5Converter < Converter::Base
             case cell.style
             when :asciidoc
               cell_content = cell.content
-            when :verse
-              cell_content = %(<literallayout>#{cell.text}</literallayout>)
             when :literal
               cell_content = %(<literallayout class="monospaced">#{cell.text}</literallayout>)
             when :header

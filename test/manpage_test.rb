@@ -623,38 +623,6 @@ context 'Manpage' do
       output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? expected_coda
     end
-
-    test 'should manify and preserve whitespace in verse table cell' do
-      input = <<~EOS.chop
-      #{SAMPLE_MANPAGE_HEADER}
-
-      |===
-      |a v|b
-      c    _d_
-      .
-      |===
-      EOS
-      expected_coda = <<~'EOS'.chop
-      .TS
-      allbox tab(:);
-      lt lt.
-      T{
-      .sp
-      a
-      T}:T{
-      .sp
-      .nf
-      b
-      c    \fId\fP
-      \&.
-      .fi
-      T}
-      .TE
-      .sp
-      EOS
-      output = Asciidoctor.convert input, backend: :manpage
-      assert output.end_with? expected_coda
-    end
   end
 
   context 'Images' do

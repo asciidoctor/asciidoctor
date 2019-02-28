@@ -258,7 +258,8 @@ class Table::Cell < AbstractBlock
         else
           cell_text = cell_text.lstrip
         end
-      elsif (literal = cell_style == :literal) || cell_style == :verse
+      elsif cell_style == :literal
+        literal = true
         cell_text = cell_text.rstrip
         # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?
         cell_text = cell_text.slice 1, cell_text.length while cell_text.start_with? LF

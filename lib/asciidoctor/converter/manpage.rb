@@ -432,8 +432,6 @@ allbox tab(:);'
               cell_content = cell.content
             when :literal
               cell_content = %(.nf#{LF}#{_manify cell.text, whitespace: :preserve}#{LF}.fi)
-            when :verse
-              cell_content = %(.nf#{LF}#{_manify cell.text, whitespace: :preserve}#{LF}.fi)
             else
               cell_content = _manify cell.content.join, whitespace: :normalize
             end
