@@ -1464,13 +1464,8 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        if @context == :listing || (@context == :literal && !@attributes['listparagraph-option'])
-          default_subs = VERBATIM_SUBS
-        elsif @context == :verse
-          default_subs = NORMAL_SUBS
-        else
-          default_subs = BASIC_SUBS
-        end
+        # NOTE :literal with listparagraph-option gets folded into text of list item later
+        default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
       when :raw
         # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
         default_subs = @context == :stem ? BASIC_SUBS : NONE_SUBS

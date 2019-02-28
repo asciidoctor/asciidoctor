@@ -71,6 +71,7 @@ class Block < AbstractBlock
           @attributes['subs'] = %(#{subs})
         end
         # resolve the subs eagerly only if subs option is specified
+        # QUESTION should we skip subsequent calls to lock_in_subs?
         lock_in_subs
       # e.g., subs: nil
       else
