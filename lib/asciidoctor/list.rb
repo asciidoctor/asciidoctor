@@ -115,10 +115,14 @@ class ListItem < AbstractBlock
   #
   # Returns nothing
   def fold_first(continuation_connects_first_block = false, content_adjacent = false)
-    if (first_block = @blocks[0]) &&
-        ((first_block.context == :paragraph && !continuation_connects_first_block) ||
-        ((content_adjacent || !continuation_connects_first_block) && first_block.attributes['listparagraph-option']))
-      @text = @text.nil_or_empty? ? blocks.shift.source : %(#{@text}#{LF}#{blocks.shift.source})
+    if (first_block = @blocks[0])
+      if first_block.context == :literal
+        if (content_adjacent || !continuation_connects_first_block) # && first_block.attributes['listparagraph-option']
+          @text = @text.nil_or_empty? ? @blocks.shift.source : %(#{@text}#{LF}#{@blocks.shift.source})
+        end
+      elsif first_block.context == :paragraph && !continuation_connects_first_block
+        @text = @text.nil_or_empty? ? @blocks.shift.source : %(#{@text}#{LF}#{@blocks.shift.source})
+      end
     end
     nil
   end
