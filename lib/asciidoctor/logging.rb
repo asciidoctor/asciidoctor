@@ -23,7 +23,7 @@ class Logger < ::Logger
     SEVERITY_LABELS = { 'WARN' => 'WARNING', 'FATAL' => 'FAILED' }
 
     def call severity, _, progname, msg
-      %(#{progname}: #{SEVERITY_LABELS[severity] || severity}: #{::String === msg ? msg : msg.inspect}\n)
+      %(#{progname}: #{SEVERITY_LABELS[severity] || severity}: #{::String === msg ? msg : msg.inspect}#{LF})
     end
   end
 

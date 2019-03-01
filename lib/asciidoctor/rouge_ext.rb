@@ -32,8 +32,8 @@ module Asciidoctor; module RougeExt; module Formatters
     end
   end
 
-  HangingEndSpanTagCs = %(\n</span>)
   LF = ?\n
+  HangingEndSpanTagCs = %(#{LF}</span>)
 
   private_constant :HangingEndSpanTagCs, :LF
 end; end; end
