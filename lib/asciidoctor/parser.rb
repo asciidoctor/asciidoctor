@@ -711,11 +711,10 @@ class Parser
         lines = read_paragraph_lines reader, (list_item = options[:list_item]) && skipped == 0, skip_line_comments: text_only
         adjust_indentation! lines
         block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
-        # a literal gets special meaning inside of a description list
-        # TODO this feels hacky, better way to distinguish from explicit literal block?
         if list_item
+          # a literal gets special meaning inside of a description list
           block.set_option 'listparagraph'
-          block.instance_variable_set :@default_subs, []
+          block.default_subs = []
         end
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
