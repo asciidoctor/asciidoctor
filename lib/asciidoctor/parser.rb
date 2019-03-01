@@ -66,7 +66,6 @@ class Parser
     'm' => :monospaced,
     'h' => :header,
     'l' => :literal,
-    'v' => :verse,
     'a' => :asciidoc
   }
 

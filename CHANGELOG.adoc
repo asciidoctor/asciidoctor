@@ -60,6 +60,7 @@ Enhancements / Compliance::
   * add Document#parsed? method to check whether document has been parsed
   * modify Cell class to extend from AbstractBlock instead of AbstractNode (#2963)
   * implement block? and inline? methods on Column, both which return false (#2963)
+  * drop verse table cell style (treat as normal table cell) (#3111)
 
 Improvements::
 

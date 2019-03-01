@@ -283,7 +283,7 @@ context 'Tables' do
       assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
     end
 
-    test 'should preserving leading spaces but not leading newlines or trailing spaces in verse table cells' do
+    test 'should ignore v table cell style' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [cols=2*]
@@ -297,8 +297,8 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//div[@class="verse"]', output, 1)
-      assert_equal %(<div class="verse">  one\n  two\nthree</div>), result.to_s
+      result = xmlnodes_at_xpath('/table//p[@class="tableblock"]', output, 1)
+      assert_equal %(<p class="tableblock">one\n  two\nthree</p>), result.to_s
     end
 
     test 'table and column width not assigned when autowidth option is specified' do
@@ -1054,11 +1054,12 @@ context 'Tables' do
       end
     end
 
-    test 'paragraph, verse and literal content' do
+    test 'paragraph and literal repeated content' do
       input = <<~'EOS'
-      [cols=",^v,^l",options="header"]
+      [cols=",^l"]
       |===
-      |Paragraphs |Verse |Literal
+      |Paragraphs |Literal
+
       3*|The discussion about what is good,
       what is beautiful, what is noble,
       what is pure, and what is true
@@ -1089,19 +1090,16 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col', output, 3
+      assert_css 'table > colgroup > col', output, 2
       assert_css 'table > thead', output, 1
       assert_css 'table > thead > tr', output, 1
-      assert_css 'table > thead > tr > th', output, 3
+      assert_css 'table > thead > tr > th', output, 2
       assert_css 'table > tbody', output, 1
       assert_css 'table > tbody > tr', output, 1
-      assert_css 'table > tbody > tr > td', output, 3
+      assert_css 'table > tbody > tr > td', output, 2
       assert_css 'table > tbody > tr > td:nth-child(1).halign-left.valign-top > p.tableblock', output, 7
-      assert_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.verse', output, 1
-      verse = xmlnodes_at_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.verse', output, 1
-      assert_equal 26, verse.text.lines.size
-      assert_css 'table > tbody > tr > td:nth-child(3).halign-center.valign-top > div.literal > pre', output, 1
-      literal = xmlnodes_at_css 'table > tbody > tr > td:nth-child(3).halign-center.valign-top > div.literal > pre', output, 1
+      assert_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.literal > pre', output, 1
+      literal = xmlnodes_at_css 'table > tbody > tr > td:nth-child(2).halign-center.valign-top > div.literal > pre', output, 1
       assert_equal 26, literal.text.lines.size
     end
 
