@@ -17,7 +17,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   end
 
   def docinfo location, doc, opts
-    base_url = doc.attr 'highlightjsdir', %(#{opts[:cdn_base_url]}/highlight.js/9.13.1)
+    base_url = doc.attr 'highlightjsdir', %(#{opts[:cdn_base_url]}/highlight.js/#{HIGHLIGHT_JS_VERSION})
     %(<link rel="stylesheet" href="#{base_url}/styles/#{doc.attr 'highlightjs-theme', 'github'}.min.css"#{opts[:self_closing_tag_slash]}>
 <script src="#{base_url}/highlight.min.js"></script>
 <script>hljs.initHighlighting()</script>)

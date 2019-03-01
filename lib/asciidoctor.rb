@@ -329,8 +329,6 @@ module Asciidoctor
 
   LINE_CONTINUATION_LEGACY = ' +'
 
-  MATHJAX_VERSION = '2.7.5'
-
   BLOCK_MATH_DELIMITERS = {
     asciimath: ['\$', '\$'],
     latexmath: ['\[', '\]'],
@@ -348,6 +346,10 @@ module Asciidoctor
   }).default = 'asciimath'
 
   FONT_AWESOME_VERSION = '4.7.0'
+
+  HIGHLIGHT_JS_VERSION = '9.15.6'
+
+  MATHJAX_VERSION = '2.7.5'
 
   # attributes which be changed within the content of the document (but not
   # header) because it has semantic meaning; ex. sectnums
