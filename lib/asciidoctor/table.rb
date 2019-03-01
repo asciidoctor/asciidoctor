@@ -18,7 +18,7 @@ class Table < AbstractBlock
 
     alias [] send
 
-    # Public: Returns the rows grouped by section.
+    # Public: Retrieve the rows grouped by section as a nested Array.
     #
     # Creates a 2-dimensional array of two element entries. The first element
     # is the section name as a symbol. The second element is the Array of rows
@@ -27,6 +27,16 @@ class Table < AbstractBlock
     # Returns a 2-dimentional Array of rows grouped by section.
     def by_section
       [[:head, @head], [:body, @body], [:foot, @foot]]
+    end
+
+    # Public: Retrieve the rows as a Hash.
+    #
+    # The keys are the names of the section groups and the values are the Array of rows in that section.
+    # The keys are in document order (head, foot, body).
+    #
+    # Returns a Hash of rows grouped by section.
+    def to_h
+      { head: @head, body: @body, foot: @foot }
     end
   end
 

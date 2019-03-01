@@ -406,7 +406,7 @@ class Converter::DocBook5Converter < Converter::Base
     node.columns.each do |col|
       result << %(<colspec colname="col_#{col.attr 'colnumber'}" colwidth="#{col.attr col_width_key}*"/>)
     end
-    node.rows.by_section.each do |tsec, rows|
+    node.rows.to_h.each do |tsec, rows|
       next if rows.empty?
       has_body = true if tsec == :body
       result << %(<t#{tsec}>)

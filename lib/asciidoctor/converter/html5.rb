@@ -811,7 +811,7 @@ Your browser does not support the audio tag.
         end
       end
       result << '</colgroup>'
-      node.rows.by_section.each do |tsec, rows|
+      node.rows.to_h.each do |tsec, rows|
         next if rows.empty?
         result << %(<t#{tsec}>)
         rows.each do |row|

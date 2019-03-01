@@ -390,7 +390,7 @@ allbox tab(:);'
     row_header = []
     row_text = []
     row_index = 0
-    node.rows.by_section.each do |tsec, rows|
+    node.rows.to_h.each do |tsec, rows|
       rows.each do |row|
         row_header[row_index] ||= []
         row_text[row_index] ||= []
