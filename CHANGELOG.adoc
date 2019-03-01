@@ -116,6 +116,7 @@ Bug Fixes::
   * enforce and report relative include depth properly (depth=0 rather than depth=1 disables nested includes)
   * allow outfilesuffix to be soft set from API (#2640)
   * don't split paragraphs in table cell at line that resolves to blank if adjacent to other non-blank lines (#2963)
+  * upgrade MathJax to 2.7.5
 
 Build / Infrastructure::
 

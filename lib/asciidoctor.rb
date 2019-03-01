@@ -329,7 +329,7 @@ module Asciidoctor
 
   LINE_CONTINUATION_LEGACY = ' +'
 
-  MATHJAX_VERSION = '2.7.4'
+  MATHJAX_VERSION = '2.7.5'
 
   BLOCK_MATH_DELIMITERS = {
     asciimath: ['\$', '\$'],
