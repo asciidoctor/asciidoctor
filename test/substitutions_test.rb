@@ -993,7 +993,7 @@ context 'Substitutions' do
     end
 
     test 'a footnoteref macro with id and single-line text should be registered and output as a footnote' do
-      para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.].')
+      para = block_from_string 'Sentence text footnoteref:[ex1, An example footnote.].', attributes: { 'compat-mode' => '' }
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote = para.document.catalog[:footnotes].first
@@ -1003,7 +1003,7 @@ context 'Substitutions' do
     end
 
     test 'a footnoteref macro with id and multi-line text should be registered and output as a footnote without newlines' do
-      para = block_from_string("Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].")
+      para = block_from_string "Sentence text footnoteref:[ex1, An example footnote\nwith wrapped text.].", attributes: { 'compat-mode' => '' }
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote = para.document.catalog[:footnotes].first
@@ -1013,7 +1013,7 @@ context 'Substitutions' do
     end
 
     test 'a footnoteref macro with id should refer to footnoteref with same id' do
-      para = block_from_string('Sentence text footnoteref:[ex1, An example footnote.]. Sentence text footnoteref:[ex1].')
+      para = block_from_string 'Sentence text footnoteref:[ex1, An example footnote.]. Sentence text footnoteref:[ex1].', attributes: { 'compat-mode' => '' }
       assert_equal %(Sentence text <sup class="footnote" id="_footnote_ex1">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>. Sentence text <sup class="footnoteref">[<a class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote = para.document.catalog[:footnotes].first
@@ -1031,6 +1031,15 @@ context 'Substitutions' do
       end
     end
 
+    test 'using a footnoteref macro should generate a warning when compat mode is not enabled' do
+      input = 'Sentence text.footnoteref:[fn1,Commentary on this sentence.]'
+      using_memory_logger do |logger|
+        para = block_from_string input
+        para.sub_macros para.source
+        assert_message logger, :WARN, 'found deprecated footnoteref macro: footnoteref:[fn1,Commentary on this sentence.]; use footnote macro with target instead'
+      end
+    end
+
     test 'inline footnote macro can be used to define and reference a footnote reference' do
       input = <<~'EOS'
       You can download the software from the product page.footnote:sub[Option only available if you have an active subscription.]
@@ -1040,10 +1049,13 @@ context 'Substitutions' do
       If all else fails, you can give us a call.footnoteref:[sub]
       EOS
 
-      output = convert_string_to_embedded input
-      assert_css '#_footnotedef_1', output, 1
-      assert_css 'p a[href="#_footnotedef_1"]', output, 3
-      assert_css '#footnotes .footnote', output, 1
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input, attributes: { 'compat-mode' => '' }
+        assert_css '#_footnotedef_1', output, 1
+        assert_css 'p a[href="#_footnotedef_1"]', output, 3
+        assert_css '#footnotes .footnote', output, 1
+        assert logger.empty?
+      end
     end
 
     test 'should parse multiple footnote references in a single line' do

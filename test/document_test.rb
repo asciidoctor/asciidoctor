@@ -1104,8 +1104,8 @@ context 'Document' do
     test 'outputs footnotes in footer' do
       input = <<~'EOS'
       A footnote footnote:[An example footnote.];
-      a second footnote with a reference ID footnoteref:[note2,Second footnote.];
-      finally a reference to the second footnote footnoteref:[note2].
+      a second footnote with a reference ID footnote:note2[Second footnote.];
+      and finally a reference to the second footnote footnote:note2[].
       EOS
 
       output = convert_string input
