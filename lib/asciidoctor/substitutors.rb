@@ -859,8 +859,19 @@ module Substitutors
         # honor the escape
         next $&.slice 1, $&.length if $&.start_with? RS
 
-        # $1 is footnoteref (legacy)
-        id, text = $1 ? ($3 || '').split(',', 2) : [$2, $3]
+        # footnoteref
+        if $1
+          if $3
+            id, text = $3.split ',', 2
+            logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
+          else
+            next $&
+          end
+        # footnote
+        else
+          id = $2
+          text = $3
+        end
 
         if id
           if text
