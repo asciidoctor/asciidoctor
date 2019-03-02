@@ -1,5 +1,5 @@
 = Asciidoctor Changelog
-:uri-asciidoctor: http://asciidoctor.org
+:uri-asciidoctor: https://asciidoctor.org
 :uri-asciidoc: {uri-asciidoctor}/docs/what-is-asciidoc
 :uri-repo: https://github.com/asciidoctor/asciidoctor
 :icons: font
@@ -1454,7 +1454,7 @@ Distribution Packages::
   * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
   * https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
 
-http://asciidoctor.org/news/2013/05/31/asciidoctor-0-1-3-released[release notes] |
+https://asciidoctor.org/news/2013/05/31/asciidoctor-0-1-3-released[release notes] |
 https://github.com/asciidoctor/asciidoctor/issues?milestone=4&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.3[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v0.1.2\...v0.1.3[full diff]
@@ -1467,7 +1467,7 @@ Performance::
 
 Enhancements::
 
-  * new website at http://asciidoctor.org
+  * new website at https://asciidoctor.org
   * added a default stylesheet (#76)
   * added viewport meta tag for mobile browsers (#238)
   * set attributes based on safe mode (#244)
@@ -1509,7 +1509,7 @@ Distribution Packages::
 
   * https://rubygems.org/gems/asciidoctor[RubyGem (asciidoctor)]
 
-http://asciidoctor.org/news/2013/04/25/asciidoctor-0-1-2-released[release notes] |
+https://asciidoctor.org/news/2013/04/25/asciidoctor-0-1-2-released[release notes] |
 https://github.com/asciidoctor/asciidoctor/issues?milestone=3&state=closed[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v0.1.2[git tag] |
 https://github.com/asciidoctor/asciidoctor/compare/v0.1.1\...v0.1.2[full diff]

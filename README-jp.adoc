@@ -23,7 +23,7 @@ endif::[]
 :uri-repo: {uri-org}/asciidoctor
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
-:uri-project: http://asciidoctor.org
+:uri-project: https://asciidoctor.org
 ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
@@ -53,7 +53,7 @@ endif::[]
 :uri-gitscm-repo: https://github.com/git/git-scm.com
 :uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
-:uri-foundation: http://foundation.zurb.com
+:uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://ruby-lang.org
 // images:
@@ -86,7 +86,7 @@ Javaや他のJVM言語からAsciidoctor APIを直接呼び出すには,  {uri-as
 AsciidoctorJに基づいた, AsciidoctorプロセッサをApache Maven, GradleやJavadocに統合するプラグインがあります.
 
 AsciidoctorはJavaScriptでも実行可能です.
-{uri-asciidoctorjs}[Asciidoctor.js], WebブラウザやNode.jsのようなJavaScript環境で動くAsciidoctorの完全機能版, を生成するために, RubyのソースをJavaScriptにトランスパイルするのに http://opalrb.org[Opal]を使います.
+{uri-asciidoctorjs}[Asciidoctor.js], WebブラウザやNode.jsのようなJavaScript環境で動くAsciidoctorの完全機能版, を生成するために, RubyのソースをJavaScriptにトランスパイルするのに https://opalrb.com[Opal]を使います.
 Asciidoctor.jsはChrome, Atom, Brackets や他のウェブベースのツールの拡張機能としてAsciiDocのプレビューのために使われます.
 ****
 
@@ -219,7 +219,7 @@ TIP: お使いのシステムは自動的にdebパッケージをアップデー
 ディストリビューションのリリース毎に, どのバージョンがパッケージされているかはパッケージリポジトリを調べてください.
 
 * https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Debian release]
-* http://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
+* https://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[asciidoctor package by Ubuntu release]
 * https://community.linuxmint.com/software/view/asciidoctor[asciidoctor package by Mint release]
 
 [CAUTION]
@@ -228,7 +228,7 @@ TIP: お使いのシステムは自動的にdebパッケージをアップデー
 そのようなことをするのは, パッケージマネージャがファイル(/usr/local下にインストールされた)を追跡できなくなるためにシステムが不安定な状態にするためです.
 単純に, システムgemはパッケージマネージャによってのみ管理されるべきです.
 
-もし, パッケージマネージャによってインストールされたのより新しいバージョンのAsciidoctorを使いたければ,  http://rvm.io[RVM] や https://github.com/rbenv/rbenv[rbenv]を使ってRubyをホームディレクトリ(すなわち, ユーザースペース)にインストールするべきです.
+もし, パッケージマネージャによってインストールされたのより新しいバージョンのAsciidoctorを使いたければ,  https://rvm.io[RVM] や https://github.com/rbenv/rbenv[rbenv]を使ってRubyをホームディレクトリ(すなわち, ユーザースペース)にインストールするべきです.
 それから, 安心して `gem` コマンドをAsciidoctorのアップデート, インストールのために使うことができます.
 RVMやrbenvを使っているなら, gemはシステムからは孤立した場所にインストールされます.
 ====
@@ -263,7 +263,7 @@ AsciidoctorのバージョンとRuby環境についての情報がターミナ�
 
 [.output,subs=attributes+]
 ....
-Asciidoctor {release-version} [http://asciidoctor.org]
+Asciidoctor {release-version} [https://asciidoctor.org]
 Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -314,7 +314,7 @@ AsciiDoc文字列を埋め込みHTML(HTMLページヘの挿入)へ変換する�
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
 ----
 
@@ -322,7 +322,7 @@ Asciidoctor.convert content, safe: :safe
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
@@ -330,7 +330,7 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
 puts document.doctitle
 html = document.convert

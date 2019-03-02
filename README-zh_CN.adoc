@@ -23,7 +23,7 @@ endif::[]
 :uri-repo: {uri-org}/asciidoctor
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
-:uri-project: http://asciidoctor.org
+:uri-project: https://asciidoctor.org
 ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
@@ -53,7 +53,7 @@ endif::[]
 :uri-gitscm-repo: https://github.com/git/git-scm.com
 :uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
-:uri-foundation: http://foundation.zurb.com
+:uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://ruby-lang.org
 // images:
@@ -84,7 +84,7 @@ Asciidoctor 是开源的，{uri-repo}[代码]托管在 GitHub，遵从 {uri-lice
 基于 AsciidoctorJ 有好多插件可用，这些插件可以将 Asciidoctor 整合到 Apache Maven，Gradle 或 Javadoc 构建中。
 
 Asciidoctor 也可以运行在 JavaScript 上。
-我们可以使用 http://opalrb.org[Opal] 将 Ruby 源码编译成 JavaScript 生成 {uri-asciidoctorjs}[Asciidoctor.js] 文件，这是一个全功能版的 Asciidoctor，可以运行在任意的 JavaScript 环境中，比如 Web 浏览器 或 Node.js。
+我们可以使用 https://opalrb.com[Opal] 将 Ruby 源码编译成 JavaScript 生成 {uri-asciidoctorjs}[Asciidoctor.js] 文件，这是一个全功能版的 Asciidoctor，可以运行在任意的 JavaScript 环境中，比如 Web 浏览器 或 Node.js。
 Asciidoctor.js 被用于预览 AsciiDoc，支持 Chrome 扩展，Atom，Brackets 或其他基于 Web 的工具。
 ****
 
@@ -230,7 +230,7 @@ TIP: 如果你的 Debian 或 Ubuntu 系统配置的是自动升级包，在这�
 请查看发行版的包库，来确定每个发行版是打包的哪个版本。
 
 * https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[Debian 发行版中的 asciidoctor]
-* http://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[Ubuntu 发行版中的 asciidoctor]
+* https://packages.ubuntu.com/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[Ubuntu 发行版中的 asciidoctor]
 * https://community.linuxmint.com/software/view/asciidoctor[Mint 发行版中的 asciidoctor]
 
 [CAUTION]
@@ -239,7 +239,7 @@ TIP: 如果你的 Debian 或 Ubuntu 系统配置的是自动升级包，在这�
 这样做会使系统进入不一致的状态，包管理工具将不再跟踪相关文件（通常安装在 /usr/local 下。）
 简单地说，系统的 gem 只能由包管理器进行管理。
 
-如果你想使用一个比包管理器安装的更新版本的 Asciidoctor，你应该使用 http://rvm.io[RVM] 在你的用户家目录（比如：用户空间）下安装 Ruby。
+如果你想使用一个比包管理器安装的更新版本的 Asciidoctor，你应该使用 https://rvm.io[RVM] 在你的用户家目录（比如：用户空间）下安装 Ruby。
 然后，你就可以放心地使用 `gem` 命令来安装或者更新 Asciidoctor gem。
 当使用 RVM 时，gem 将被安装到与系统隔离的位置。
 ====
@@ -275,7 +275,7 @@ TIP: 如果你的 Alpine Linux 系统配置的是自动升级包，在这种情�
 
 [.output,subs=attributes+]
 ....
-Asciidoctor {release-version} [http://asciidoctor.org]
+Asciidoctor {release-version} [https://asciidoctor.org]
 Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -328,7 +328,7 @@ WARNING: 当你通过 API 使用 Asciidoctor 时，默认的安全模式是 `:se
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
 ----
 
@@ -336,7 +336,7 @@ Asciidoctor.convert content, safe: :safe
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
@@ -344,7 +344,7 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
 puts document.doctitle
 html = document.convert

@@ -22,7 +22,7 @@ endif::[]
 :uri-repo: {uri-org}/asciidoctor
 :uri-asciidoctorj: {uri-org}/asciidoctorj
 :uri-asciidoctorjs: {uri-org}/asciidoctor.js
-:uri-project: http://asciidoctor.org
+:uri-project: https://asciidoctor.org
 ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
@@ -52,7 +52,7 @@ endif::[]
 :uri-gitscm-repo: https://github.com/git/git-scm.com
 :uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
-:uri-foundation: http://foundation.zurb.com
+:uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://ruby-lang.org
 // images:
@@ -295,7 +295,7 @@ Vous devriez voir les informations concernant la version d'Asciidoctor et celle 
 
 [.output,subs=attributes+]
 ....
-Asciidoctor {release-version} [http://asciidoctor.org]
+Asciidoctor {release-version} [https://asciidoctor.org]
 Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
@@ -346,7 +346,7 @@ Vous pouvez aussi convertir une chaîne de texte en fragment HTML (pour une inse
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
 ----
 
@@ -354,7 +354,7 @@ Si vous voulez le document HTML complet, activez l'option `header_footer` comme 
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
@@ -362,7 +362,7 @@ Si vous avez besoin d'accéder au document analysé, vous pouvez séparer la con
 
 [source]
 ----
-content = '_Zen_ in the art of writing http://asciidoctor.org[AsciiDoc].'
+content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
 puts document.doctitle
 html = document.convert
