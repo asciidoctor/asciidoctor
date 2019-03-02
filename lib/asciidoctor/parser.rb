@@ -513,7 +513,7 @@ class Parser
           elsif block_extensions && extensions.registered_for_block?(style, block_context)
             block_context = style.to_sym
           else
-            logger.warn message_with_context %(invalid style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark
+            logger.debug message_with_context %(unknown style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark if logger.debug?
             style = block_context.to_s
           end
         end
@@ -610,28 +610,34 @@ class Parser
               block.parse_attributes $1, [], into: attributes if $1
               break
 
-            elsif block_macro_extensions && CustomBlockMacroRx =~ this_line &&
-                (extension = extensions.registered_for_block_macro? $1)
-              target, content = $2, $3
-              if (target.include? ATTR_REF_HEAD) && (target = parent.sub_attributes target).empty? &&
-                (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line'
-                attributes.clear
-                return
-              end
-              if extension.config[:content_model] == :attributes
-                document.parse_attributes content, extension.config[:pos_attrs] || [], sub_input: true, into: attributes if content
+            elsif block_macro_extensions ? (CustomBlockMacroRx =~ this_line &&
+                (extension = extensions.registered_for_block_macro? $1) || (report_unknown_block_macro = logger.debug?)) :
+                (logger.debug? && (report_unknown_block_macro = CustomBlockMacroRx =~ this_line))
+              if report_unknown_block_macro
+                logger.debug message_with_context %(unknown name for block macro: #{$1}), source_location: reader.cursor_at_mark
               else
-                attributes['text'] = content || ''
-              end
-              if (default_attrs = extension.config[:default_attrs])
-                attributes.update(default_attrs) {|_, old_v| old_v }
-              end
-              if (block = extension.process_method[parent, target, attributes])
-                attributes.replace block.attributes
-                break
-              else
-                attributes.clear
-                return
+                target = $2
+                content = $3
+                if (target.include? ATTR_REF_HEAD) && (target = parent.sub_attributes target).empty? &&
+                  (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line'
+                  attributes.clear
+                  return
+                end
+                if extension.config[:content_model] == :attributes
+                  document.parse_attributes content, extension.config[:pos_attrs] || [], sub_input: true, into: attributes if content
+                else
+                  attributes['text'] = content || ''
+                end
+                if (default_attrs = extension.config[:default_attrs])
+                  attributes.update(default_attrs) {|_, old_v| old_v }
+                end
+                if (block = extension.process_method[parent, target, attributes])
+                  attributes.replace block.attributes
+                  break
+                else
+                  attributes.clear
+                  return
+                end
               end
             end
           end
@@ -696,7 +702,7 @@ class Parser
           # advance to block parsing =>
           break
         else
-          logger.warn message_with_context %(invalid style for paragraph: #{style}), source_location: reader.cursor_at_mark
+          logger.debug message_with_context %(unknown style for paragraph: #{style}), source_location: reader.cursor_at_mark if logger.debug?
           style = nil
           # continue to process paragraph
         end

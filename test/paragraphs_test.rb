@@ -555,4 +555,28 @@ context 'Paragraphs' do
       end
     end
   end
+
+  context 'Custom' do
+    test 'should not warn if paragraph style is unregisted' do
+      input = <<~'EOS'
+      [foo]
+      bar
+      EOS
+      using_memory_logger do |logger|
+        convert_string_to_embedded input
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should log debug message if paragraph style is unknown and debug level is enabled' do
+      input = <<~'EOS'
+      [foo]
+      bar
+      EOS
+      using_memory_logger Logger::Severity::DEBUG do |logger|
+        convert_string_to_embedded input
+        assert_message logger, :DEBUG, '<stdin>: line 2: unknown style for paragraph: foo', Hash
+      end
+    end
+  end
 end

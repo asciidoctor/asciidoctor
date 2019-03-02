@@ -1842,6 +1842,32 @@ context 'Blocks' do
     end
   end
 
+  context 'Custom Blocks' do
+    test 'should not warn if block style is unknown' do
+      input = <<~'EOS'
+      [foo]
+      --
+      bar
+      --
+      EOS
+      convert_string_to_embedded input
+      assert_empty @logger.messages
+    end
+
+    test 'should log debug message if block style is unknown and debug level is enabled' do
+      input = <<~'EOS'
+      [foo]
+      --
+      bar
+      --
+      EOS
+      using_memory_logger Logger::Severity::DEBUG do |logger|
+        convert_string_to_embedded input
+        assert_message logger, :DEBUG, '<stdin>: line 2: unknown style for open block: foo', Hash
+      end
+    end
+  end
+
   context 'Metadata' do
     test 'block title above section gets carried over to first block in section' do
       input = <<~'EOS'

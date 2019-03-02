@@ -309,9 +309,10 @@ class Minitest::Test
     Socket.ip_address_list.find {|addr| addr.ipv4? }.ip_address
   end
 
-  def using_memory_logger
+  def using_memory_logger level = nil
     old_logger = Asciidoctor::LoggerManager.logger
     memory_logger = Asciidoctor::MemoryLogger.new
+    memory_logger.level = level if level
     begin
       Asciidoctor::LoggerManager.logger = memory_logger
       yield memory_logger
