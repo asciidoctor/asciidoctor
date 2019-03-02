@@ -110,6 +110,7 @@ Bug Fixes::
   * remove hard-coded color values on source blocks in default stylesheet (#3020)
   * add fallback if relative path cannot be computed because the paths are located on different drives (#2944)
   * ignore explicit section level style (#1852)
+  * don't eat space before callout number in source block if line-comment attribute is empty (#3121)
   * check if type is defined in a way that's compatible with autoload
   * fix invalid check for DSL in extension class (previously always returned true)
   * scope constant lookups (#2764)
