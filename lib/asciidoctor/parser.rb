@@ -2107,15 +2107,19 @@ class Parser
     # TODO move processing of attribute value to utility method
     if name.end_with? '!'
       # a nil value signals the attribute should be deleted (unset)
-      name, value = name.chop, nil
+      name = name.chop
+      value = nil
     elsif name.start_with? '!'
       # a nil value signals the attribute should be deleted (unset)
-      name, value = (name.slice 1, name.length), nil
+      name = (name.slice 1, name.length)
+      value = nil
     end
 
-    name = sanitize_attribute_name name
-    # alias numbered attribute to sectnums
-    name = 'sectnums' if name == 'numbered'
+    if (name = sanitize_attribute_name name) == 'numbered'
+      name = 'sectnums'
+    elsif name == 'hardbreaks'
+      name = 'hardbreaks-option'
+    end
 
     if doc
       if value
