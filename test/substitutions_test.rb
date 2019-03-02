@@ -626,6 +626,8 @@ context 'Substitutions' do
       assert_equal %q{<a href="mailto:author+website@4fs.no">author+website@4fs.no</a>}, para.sub_macros(para.source)
       para = block_from_string('john@domain.uk.co')
       assert_equal %q{<a href="mailto:john@domain.uk.co">john@domain.uk.co</a>}, para.sub_macros(para.source)
+      para = block_from_string('bert&ernie@sesamestreet.com')
+      assert_equal %q{<a href="mailto:bert&amp;ernie@sesamestreet.com">bert&amp;ernie@sesamestreet.com</a>}, para.apply_subs(para.source)
     end
 
     test 'should ignore escaped inline email address' do
