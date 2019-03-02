@@ -1116,7 +1116,7 @@ class Document < AbstractBlock
   # Internal: Create and initialize an instance of the converter for this document
   #--
   # QUESTION is there any additional information we should be passing to the converter?
-  def create_converter backend
+  def create_converter backend, delegate_backend
     converter_opts = { document: self, htmlsyntax: @attributes['htmlsyntax'] }
     if (template_dirs = (opts = @options)[:template_dirs] || opts[:template_dir])
       converter_opts[:template_dirs] = [*template_dirs]
@@ -1125,6 +1125,7 @@ class Document < AbstractBlock
       converter_opts[:template_engine_options] = opts[:template_engine_options]
       converter_opts[:eruby] = opts[:eruby]
       converter_opts[:safe] = @safe
+      converter_opts[:delegate_backend] = delegate_backend if delegate_backend
     end
     if (converter = opts[:converter])
       (Converter::CustomFactory.new backend => converter).create backend, converter_opts
@@ -1268,15 +1269,15 @@ class Document < AbstractBlock
       current_backend = @backend
       current_basebackend = (attrs = @attributes)['basebackend']
       current_doctype = @doctype
+      actual_backend, _, new_backend = new_backend.partition ':' if new_backend.include? ':'
       if new_backend.start_with? 'xhtml'
         attrs['htmlsyntax'] = 'xml'
         new_backend = new_backend.slice 1, new_backend.length
       elsif new_backend.start_with? 'html'
         attrs['htmlsyntax'] ||= 'html'
       end
-      if (resolved_backend = BACKEND_ALIASES[new_backend])
-        new_backend = resolved_backend
-      end
+      new_backend = BACKEND_ALIASES[new_backend] || new_backend
+      new_backend, delegate_backend = actual_backend, new_backend if actual_backend
       if current_doctype
         if current_backend
           attrs.delete %(backend-#{current_backend})
@@ -1291,7 +1292,7 @@ class Document < AbstractBlock
       # QUESTION should we defer the @backend assignment until after the converter is created?
       @backend = attrs['backend'] = new_backend
       # (re)initialize converter
-      if Converter::BackendTraits === (converter = create_converter new_backend)
+      if Converter::BackendTraits === (converter = create_converter new_backend, delegate_backend)
         new_basebackend = converter.basebackend
         new_filetype = converter.filetype
         if (htmlsyntax = converter.htmlsyntax)

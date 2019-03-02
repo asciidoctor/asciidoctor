@@ -63,6 +63,7 @@ Enhancements / Compliance::
   * drop verse table cell style (treat as normal table cell) (#3111)
   * log warning if footnoteref macro is found and compat mode is not enabled (#3114)
   * log debug message instead of warning if block style is unknown (#3092)
+  * allow backend to delegate to a registered backend using the syntax synthetic:delegate when using custom templates (e.g., slides:html) (#891)
 
 Improvements::
 

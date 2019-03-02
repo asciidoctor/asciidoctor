@@ -213,22 +213,26 @@ module Converter
     # found, the built-in converter is returned or nil if no converter is found.
     #
     # backend - the String backend name.
-    # opts    - an optional Hash of options that get passed on to the converter's constructor. If the :template_dirs
-    #           key is found in the options Hash, this method returns a {CompositeConverter} that delegates to a
-    #           {TemplateConverter}. (optional, default: {})
+    # opts    - a Hash of options to customize creation; also passed to the converter's constructor:
+    #           :template_dirs - a String Array of directories used to instantiate a {TemplateConverter} (optional).
+    #           :delegate_backend - a backend String of the last converter in the {CompositeConverter} chain (optional).
     #
     # Returns the [Converter] instance.
     def create backend, opts = {}
-      template_dirs = opts[:template_dirs]
       if (converter = self.for backend)
         converter = converter.new backend, opts if ::Class === converter
-        if template_dirs && BackendTraits === converter && converter.supports_templates?
+        if (template_dirs = opts[:template_dirs]) && BackendTraits === converter && converter.supports_templates?
           CompositeConverter.new backend, (TemplateConverter.new backend, template_dirs, opts), converter, backend_traits_source: converter
         else
           converter
         end
-      elsif template_dirs
-        TemplateConverter.new backend, template_dirs, opts
+      elsif (template_dirs = opts[:template_dirs])
+        if (delegate_backend = opts[:delegate_backend]) && (converter = self.for delegate_backend)
+          converter = converter.new delegate_backend, opts if ::Class === converter
+          CompositeConverter.new backend, (TemplateConverter.new backend, template_dirs, opts), converter, backend_traits_source: converter
+        else
+          TemplateConverter.new backend, template_dirs, opts
+        end
       end
     end
 
