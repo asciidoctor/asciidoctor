@@ -731,13 +731,13 @@ module Asciidoctor
     # NOTE extract regexps are applied line-by-line, so we can use $ as end-of-line char
     CalloutExtractRx = %r(((?://|#|--|;;) ?)?(\\)?<!?(|--)(\d+|\.)\3>(?=(?: ?\\?<!?\3(?:\d+|\.)\3>)*$))
     CalloutExtractRxt = '(\\\\)?<()(\\d+|\\.)>(?=(?: ?\\\\?<(?:\\d+|\\.)>)*$)'
-    CalloutExtractRxMap = ::Hash.new {|h, k| h[k] = /(#{::Regexp.escape k} ?)?#{CalloutExtractRxt}/ }
+    CalloutExtractRxMap = ::Hash.new {|h, k| h[k] = /(#{k.empty? ? '' : "#{::Regexp.escape k} ?"})?#{CalloutExtractRxt}/ }
     # NOTE special characters have not been replaced when scanning
     CalloutScanRx = /\\?<!?(|--)(\d+|\.)\1>(?=(?: ?\\?<!?\1(?:\d+|\.)\1>)*#{CC_EOL})/
     # NOTE special characters have already been replaced when converting to an SGML format
     CalloutSourceRx = %r(((?://|#|--|;;) ?)?(\\)?&lt;!?(|--)(\d+|\.)\3&gt;(?=(?: ?\\?&lt;!?\3(?:\d+|\.)\3&gt;)*#{CC_EOL}))
     CalloutSourceRxt = "(\\\\)?&lt;()(\\d+|\\.)&gt;(?=(?: ?\\\\?&lt;(?:\\d+|\\.)&gt;)*#{CC_EOL})"
-    CalloutSourceRxMap = ::Hash.new {|h, k| h[k] = /(#{::Regexp.escape k} ?)?#{CalloutSourceRxt}/ }
+    CalloutSourceRxMap = ::Hash.new {|h, k| h[k] = /(#{k.empty? ? '' : "#{::Regexp.escape k} ?"})?#{CalloutSourceRxt}/ }
 
     # A Hash of regexps for lists used for dynamic access.
     ListRxMap = {

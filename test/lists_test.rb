@@ -4906,6 +4906,18 @@ context 'Callout lists' do
     assert_equal %(-# (1)\n%p Hello), nodes[0].text
   end
 
+  test 'should not eat whitespace before callout number if line-comment attribute is empty' do
+    input = <<~'EOS'
+    [source,asciidoc,line-comment=]
+    ----
+    -- <1>
+    ----
+    <1> The start of an open block.
+    EOS
+    output = convert_string_to_embedded input, attributes: { 'icons' => 'font' }
+    assert_includes output, '-- <i class="conum"'
+  end
+
   test 'literal block with callouts' do
     input = <<~'EOS'
     ....
