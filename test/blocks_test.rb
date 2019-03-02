@@ -1561,6 +1561,17 @@ context 'Blocks' do
   end
 
   context 'Math blocks' do
+    test 'should not crash when converting to HTML if stem block is empty' do
+      input = <<~'EOS'
+      [stem]
+      ++++
+      ++++
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.stemblock', output, 1
+    end
+
     test 'should add LaTeX math delimiters around latexmath block content' do
       input = <<~'EOS'
       [latexmath]
@@ -1725,11 +1736,18 @@ context 'Blocks' do
       ++++
       x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
       ++++
+
+      [asciimath]
+      ++++
+      ++++
       EOS
 
       expect = <<~'EOS'.chop
       <informalequation>
       <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mfrac><mml:mi>b</mml:mi><mml:mrow><mml:mn>2</mml:mn><mml:mi>a</mml:mi></mml:mrow></mml:mfrac><mml:mo>&lt;</mml:mo><mml:mo>&#xB1;</mml:mo><mml:msqrt><mml:mrow><mml:mfrac><mml:msup><mml:mi>b</mml:mi><mml:mn>2</mml:mn></mml:msup><mml:mrow><mml:mn>4</mml:mn><mml:msup><mml:mi>a</mml:mi><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2212;</mml:mo><mml:mfrac><mml:mi>c</mml:mi><mml:mi>a</mml:mi></mml:mfrac></mml:mrow></mml:msqrt></mml:math>
+      </informalequation>
+      <informalequation>
+      <mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"></mml:math>
       </informalequation>
       EOS
 

@@ -620,17 +620,17 @@ Your browser does not support the audio tag.
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
-    equation = node.content
-
-    if style == :asciimath && (equation.include? LF)
-      br = %(<br#{@void_element_slash}>#{LF})
-      equation = equation.gsub(StemBreakRx) { %(#{close}#{br * ($&.count LF)}#{open}) }
+    if (equation = node.content)
+      if style == :asciimath && (equation.include? LF)
+        br = %(<br#{@void_element_slash}>#{LF})
+        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * ($&.count LF)}#{open}) }
+      end
+      unless (equation.start_with? open) && (equation.end_with? close)
+        equation = %(#{open}#{equation}#{close})
+      end
+    else
+      equation = ''
     end
-
-    unless (equation.start_with? open) && (equation.end_with? close)
-      equation = %(#{open}#{equation}#{close})
-    end
-
     %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 #{equation}
