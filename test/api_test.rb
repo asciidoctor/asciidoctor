@@ -616,8 +616,35 @@ context 'API' do
       result = doc.find_by traverse_documents: true
       assert_includes result, inner_doc
       result = doc.find_by context: :inner_document, traverse_documents: true
-      assert 1, result.size
+      assert_equal 1, result.size
       assert_equal inner_doc, result[0]
+    end
+
+    test 'find_by should match table cells' do
+      input = <<~'EOS'
+      |===
+      |a |b |c
+
+      |1
+      a|NOTE: 2, as it goes.
+      l|
+      3
+       you
+        me
+      |===
+      EOS
+
+      doc = document_from_string input
+      table = doc.blocks[0]
+      first_head_cell = table.rows.head[0][0]
+      first_body_cell = table.rows.body[0][0]
+      result = doc.find_by
+      assert_includes result, first_head_cell
+      assert_includes result, first_body_cell
+      result = doc.find_by context: :table_cell, style: :asciidoc
+      assert_equal 1, result.size
+      assert_kind_of Asciidoctor::Table::Cell, result[0]
+      assert_equal :asciidoc, result[0].style
     end
 
     test 'find_by should return Array of blocks that match style criteria' do

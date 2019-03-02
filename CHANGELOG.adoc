@@ -66,6 +66,7 @@ Enhancements / Compliance::
   * log debug message instead of warning if block style is unknown (#3092)
   * allow backend to delegate to a registered backend using the syntax synthetic:delegate when using custom templates (e.g., slides:html) (#891)
   * AbstractBlock#find_by looks inside AsciiDoc table cells if traverse_documents selector option is true (#3101)
+  * AbstractBlock#find_by finds table cells, which can be selected using the :table_cell context in the selector (#2524)
 
 Improvements::
 

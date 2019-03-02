@@ -441,7 +441,7 @@ class AbstractBlock < AbstractNode
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
       if id_selector
-        result.replace block_given? ? ((yield self) ? [self] : []) : [self]
+        block_given? && !(yield self) ? result.clear : (result.replace [self])
         raise ::StopIteration
       elsif block_given?
         if (verdict = yield self)
@@ -479,10 +479,16 @@ class AbstractBlock < AbstractNode
       end
     when :table
       if selector[:traverse_documents]
+        rows.head.each {|r| r.each {|c| c.find_by_internal selector, result, &block } }
         selector = selector.merge context: :document if context_selector == :inner_document
         (rows.body + rows.foot).each do |r|
-          r.each {|c| c.inner_document.find_by_internal selector, result, &block if c.style == :asciidoc }
+          r.each do |c|
+            c.find_by_internal selector, result, &block
+            c.inner_document.find_by_internal selector, result, &block if c.style == :asciidoc
+          end
         end
+      else
+        (rows.head + rows.body + rows.foot).each {|r| r.each {|c| c.find_by_internal selector, result, &block } }
       end
     else
       @blocks.each do |b|
