@@ -291,21 +291,20 @@ module Extensions
       option :content_model, value
     end
     alias parse_content_as content_model
-    alias parses_content_as content_model
-    #alias parse_as content_model
-    #alias parsed_as content_model
 
-    def positional_attrs *value
+    def positional_attributes *value
       option :pos_attrs, value.flatten
     end
-    alias name_attributes positional_attrs
-    alias name_positional_attributes positional_attrs
+    alias name_positional_attributes positional_attributes
+    # NOTE positional_attrs alias is deprecated
+    alias positional_attrs positional_attributes
 
     def default_attrs value
       option :default_attrs, value
     end
+    alias default_attributes default_attrs
 
-    def resolves_attributes *args
+    def resolve_attributes *args
       # NOTE assume true as default value; rewrap single-argument string or symbol
       if (args = args.fetch 0, true).respond_to? :to_sym
         args = [args]
@@ -351,8 +350,8 @@ module Extensions
         raise ::ArgumentError, %(unsupported attributes specification for macro: #{args.inspect})
       end
     end
-    # NOTE we may decide to drop this alias
-    alias resolve_attributes resolves_attributes
+    # NOTE resolves_attributes alias is deprecated
+    alias resolves_attributes resolve_attributes
   end
 
   # Public: Preprocessors are run after the source text is split into lines and
@@ -544,7 +543,7 @@ module Extensions
     end
     alias on_contexts contexts
     alias on_context contexts
-    alias bound_to contexts
+    alias bind_to contexts
   end
   BlockProcessor::DSL = BlockProcessorDsl
 
@@ -565,7 +564,7 @@ module Extensions
   module MacroProcessorDsl
     include SyntaxProcessorDsl
 
-    def resolves_attributes *args
+    def resolve_attributes *args
       if args.size == 1 && !args[0]
         option :content_model, :text
         return
@@ -573,8 +572,8 @@ module Extensions
       super
       option :content_model, :attributes
     end
-    # NOTE we may decide to drop this alias
-    alias resolve_attributes resolves_attributes
+    # NOTE resolves_attributes alias is deprecated
+    alias resolves_attributes resolve_attributes
   end
 
   # Public: BlockMacroProcessors are used to handle block macros that have a
@@ -615,16 +614,16 @@ module Extensions
   module InlineMacroProcessorDsl
     include MacroProcessorDsl
 
-    def with_format value
+    def format value
       option :format, value
     end
-    alias using_format with_format
+    alias match_format format
+    # NOTE using_format alias is deprecated
+    alias using_format format
 
-    def matches value
+    def match value
       option :regexp, value
     end
-    alias match matches
-    alias matching matches
   end
   InlineMacroProcessor::DSL = InlineMacroProcessorDsl
 
