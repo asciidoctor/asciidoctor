@@ -218,6 +218,24 @@ context 'Paragraphs' do
       assert_xpath '//p', output, 1
       assert_includes output, "<p>read<br>\nmy<br>\nlips</p>"
     end
+
+    test 'should be able to toggle hardbreaks by setting hardbreaks-option on document' do
+      input = <<~'EOS'
+      :hardbreaks-option:
+
+      make
+      it
+      so
+
+      :!hardbreaks:
+
+      roll it back
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '(//p)[1]/br', output, 2
+      assert_xpath '(//p)[2]/br', output, 0
+    end
   end
 
   context 'Literal' do

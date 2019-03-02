@@ -394,8 +394,9 @@ class Document < AbstractBlock
 
     attr_overrides['user-home'] = USER_HOME
 
-    # legacy support for numbered attribute
+    # remap legacy attribute names
     attr_overrides['sectnums'] = attr_overrides.delete 'numbered' if attr_overrides.key? 'numbered'
+    attr_overrides['hardbreaks-option'] = attr_overrides.delete 'hardbreaks' if attr_overrides.key? 'hardbreaks'
 
     # If the base_dir option is specified, it overrides docdir and is used as the root for relative
     # paths. Otherwise, the base_dir is the directory of the source file (docdir), if set, otherwise

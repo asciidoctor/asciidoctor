@@ -96,6 +96,7 @@ Improvements::
   * only map unparsed attrlist of inline macro to target when format is short
   * add clearer exception message when source data is binary or has invalid encoding (#2884)
   * rename context for table cell and table column to :table_cell and :table_column, respectively
+  * rename hardbreaks document attribute to hardbreaks-option; retain hardbreaks as a deprecated alias (#3123)
 
 Bug Fixes::
 
