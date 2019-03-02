@@ -103,6 +103,7 @@ Bug Fixes::
   * apply header subs to doctitle value when assigning it back to the doctitle document attribute (#3106)
   * don't fail if value of pygments-style attribute is not recognized; gracefully fallback to default style (#2106)
   * do not alter the $LOAD_PATH (#2764)
+  * fix crash if stem block is empty (#3118)
   * remove conditional comment for IE in output of built-in HTML converter; fixes sidebar table of contents (#2983)
   * fix styling of source blocks with linenums enabled when using prettify as syntax highlighter (#640)
   * update default stylesheet to support prettify themes (#3020)

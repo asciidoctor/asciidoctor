@@ -256,10 +256,10 @@ class Converter::DocBook5Converter < Converter::Base
   def stem node
     if (idx = node.subs.index :specialcharacters)
       node.subs.delete_at idx
-      equation = node.content
+      equation = node.content || ''
       idx > 0 ? (node.subs.insert idx, :specialcharacters) : (node.subs.unshift :specialcharacters)
     else
-      equation = node.content
+      equation = node.content || ''
     end
     if node.style == 'asciimath'
       # NOTE fop requires jeuclid to process mathml markup
