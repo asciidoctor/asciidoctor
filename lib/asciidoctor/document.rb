@@ -613,6 +613,13 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: Scan all registered references and return the ID of the reference that matches the specified reference text.
+  #
+  # If multiple references in the document have the same reference text, the first match in document order is used.
+  #
+  # text - The String reference text to compare to the converted reference text of each registered reference.
+  #
+  # Returns the String ID of the first reference with matching reference text or nothing if no reference is found.
   def resolve_id text
     ((@reftexts ||= @parsed ? {}.tap {|accum| @catalog[:refs].each {|id, ref| accum[ref.xreftext] = id } } : nil) ||
       {}.tap {|accum| @catalog[:refs].find {|id, ref| ref.xreftext == text ? accum[text] = id : nil } })[text]
