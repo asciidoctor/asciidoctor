@@ -672,52 +672,55 @@ module Substitutors
     if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       text = text.gsub InlineLinkRx do
-        target = $2
-        # honor the escape
-        next %(#{$1}#{target.slice 1, target.length}#{$3}) if target.start_with? RS
-
-        # NOTE if text is non-nil, then we've matched a formal macro (i.e., trailing square brackets)
-        captured, prefix, text, suffix = $&, $1, (macro = $3) || '', ''
-        if prefix == 'link:'
-          if macro
-            prefix = ''
-          else
-            # invalid macro syntax (link: prefix w/o trailing square brackets)
-            # we probably shouldn't even get here...our regex is doing too much
-            next captured
-          end
+        if (target = $2).start_with? RS
+          # honor the escape
+          next %(#{$1}#{target.slice 1, target.length}#{$4})
         end
-        unless macro || UriTerminatorRx !~ target
-          case $&
+
+        prefix, suffix = $1, ''
+        # NOTE if $4 is set, then we're looking at a formal macro
+        if $4
+          prefix = '' if prefix == 'link:'
+          text = $4
+        else
+          # invalid macro syntax (link: prefix w/o trailing square brackets)
+          # FIXME we probably shouldn't even get here...our regex is doing too much
+          next $& if prefix == 'link:'
+          text = ''
+          case $3
           when ')'
-            # strip trailing )
+            # move trailing ) out of URL
             target = target.chop
             suffix = ')'
+            # NOTE handle case when modified target is a URI scheme (e.g., http://)
+            next $& if target.end_with? '://'
           when ';'
-            # strip <> around URI
-            if prefix.start_with?('&lt;') && target.end_with?('&gt;')
+            if (prefix.start_with? '&lt;') && (target.end_with? '&gt;')
+              # move surrounding <> out of URL
               prefix = prefix.slice 4, prefix.length
               target = target.slice 0, target.length - 4
-            # strip trailing ;
-            # check for trailing );
-            elsif (target = target.chop).end_with?(')')
+            elsif (target = target.chop).end_with? ')'
+              # move trailing ); out of URL
               target = target.chop
               suffix = ');'
             else
+              # move trailing ; out of URL
               suffix = ';'
             end
+            # NOTE handle case when modified target is a URI scheme (e.g., http://)
+            next $& if target.end_with? '://'
           when ':'
-            # strip trailing :
-            # check for trailing ):
-            if (target = target.chop).end_with?(')')
+            if (target = target.chop).end_with? ')'
+              # move trailing ): out of URL
               target = target.chop
               suffix = '):'
             else
+              # move trailing : out of URL
               suffix = ':'
             end
+            # NOTE handle case when modified target is a URI scheme (e.g., http://)
+            next $& if target.end_with? '://'
           end
-          # NOTE handle case when remaining target is a URI scheme (e.g., http://)
-          return captured if target.end_with? '://'
         end
 
         attrs, link_opts = nil, { type: :link }
@@ -759,7 +762,7 @@ module Substitutors
 
         doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
-        %(#{prefix}#{Inline.new(self, :anchor, text, link_opts).convert}#{suffix})
+        %(#{prefix}#{(Inline.new self, :anchor, text, link_opts).convert}#{suffix})
       end
     end
 
