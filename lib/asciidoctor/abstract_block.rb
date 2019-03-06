@@ -142,16 +142,14 @@ class AbstractBlock < AbstractNode
     @next_section_index > 0
   end
 
-  # Public: Walk the document tree and find all block-level nodes that match
-  # the specified selector (context, style, id, role, and/or custom filter).
+  # Public: Walk the document tree and find all block-level nodes that match the specified selector (context, style, id,
+  # role, and/or custom filter).
   #
-  # If a Ruby block is given, it's treated as an supplemental filter. If the
-  # filter returns true, the node is accepted and traversal continues. If the
-  # filter returns false, the node is rejected, but traversal continues. If the
-  # filter returns :skip, the node and all its descendants are rejected. If the
-  # filter returns :skip_children, the node is accepted, but its descendants
-  # are rejected. If no selector or filter block is supplied, all block-level
-  # nodes in the tree are returned.
+  # If a Ruby block is given, it's applied as a supplemental filter. If the filter returns true (which implies :accept),
+  # the node is accepted and node traversal continues. If the filter returns false (which implies :skip), the node is
+  # skipped, but its children are still visited. If the filter returns :reject, the node and all its descendants are
+  # rejected. If the filter returns :prune, the node is accepted, but its descendants are rejected. If no selector
+  # or filter block is supplied, all block-level nodes in the tree are returned.
   #
   # Examples
   #
@@ -446,10 +444,12 @@ class AbstractBlock < AbstractNode
       elsif block_given?
         if (verdict = yield self)
           case verdict
-          when :skip_children
+          # the :skip_children keyword is deprecated
+          when :prune, :skip_children
             result << self
             return result
-          when :skip
+          # the :skip keyword is deprecated and may be repurposed
+          when :reject, :skip
             return result
           else
             result << self
