@@ -245,8 +245,8 @@ a|
 ----
 * apples
 * oranges
- ** temple
- ** navel
+** temple
+** navel
 * bananas
 ----
 |Ordered list
