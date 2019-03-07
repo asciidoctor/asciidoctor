@@ -1347,32 +1347,7 @@ module Substitutors
     # NOTE the call to highlight? is a defensive check since, normally, we wouldn't arrive here unless it returns true
     return sub_source source, process_callouts unless (syntax_hl = @document.syntax_highlighter) && syntax_hl.highlight?
 
-    if process_callouts
-      callout_marks = {}
-      lineno = 0
-      last_lineno = nil
-      callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
-      # extract callout marks, indexed by line number
-      source = (source.split LF, -1).map do |line|
-        lineno += 1
-        line.gsub callout_rx do
-          # honor the escape
-          if $2
-            # use sub since it might be behind a line comment
-            $&.sub RS, ''
-          else
-            (callout_marks[lineno] ||= []) << [$1, $4]
-            last_lineno = lineno
-            nil
-          end
-        end
-      end.join LF
-      if last_lineno
-        source = %(#{source}#{LF}) if last_lineno == lineno
-      else
-        callout_marks = nil
-      end
-    end
+    source, callout_marks = extract_callouts source if process_callouts
 
     doc_attrs = @document.attributes
     syntax_hl_name = syntax_hl.name
@@ -1393,31 +1368,61 @@ module Substitutors
     highlighted = highlighted.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
 
     # NOTE highlight method may have depleted callouts
-    if callout_marks.nil_or_empty?
-      highlighted
-    else
-      if source_offset
-        preamble = highlighted.slice 0, source_offset
-        highlighted = highlighted.slice source_offset, highlighted.length
-      else
-        preamble = ''
-      end
-      autonum = lineno = 0
-      preamble + ((highlighted.split LF, -1).map do |line|
-        if (conums = callout_marks.delete lineno += 1)
-          if conums.size == 1
-            guard, conum = conums[0]
-            %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert})
-          else
-            %(#{line}#{conums.map do |guard_it, conum_it|
-              Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert
-            end.join ' '})
-          end
+    callout_marks.nil_or_empty? ? highlighted : (restore_callouts highlighted, callout_marks, source_offset)
+  end
+
+  # Internal: Extract the callout numbers from the source to prepare it for syntax highlighting.
+  def extract_callouts source
+    callout_marks = {}
+    lineno = 0
+    last_lineno = nil
+    callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
+    # extract callout marks, indexed by line number
+    source = (source.split LF, -1).map do |line|
+      lineno += 1
+      line.gsub callout_rx do
+        # honor the escape
+        if $2
+          # use sub since it might be behind a line comment
+          $&.sub RS, ''
         else
-          line
+          (callout_marks[lineno] ||= []) << [$1, $4]
+          last_lineno = lineno
+          ''
         end
-      end.join LF)
+      end
+    end.join LF
+    if last_lineno
+      source = %(#{source}#{LF}) if last_lineno == lineno
+    else
+      callout_marks = nil
     end
+    [source, callout_marks]
+  end
+
+  # Internal: Restore the callout numbers to the highlighted source.
+  def restore_callouts source, callout_marks, source_offset = nil
+    if source_offset
+      preamble = source.slice 0, source_offset
+      source = source.slice source_offset, source.length
+    else
+      preamble = ''
+    end
+    autonum = lineno = 0
+    preamble + ((source.split LF, -1).map do |line|
+      if (conums = callout_marks.delete lineno += 1)
+        if conums.size == 1
+          guard, conum = conums[0]
+          %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert})
+        else
+          %(#{line}#{conums.map do |guard_it, conum_it|
+            Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert
+          end.join ' '})
+        end
+      else
+        line
+      end
+    end.join LF)
   end
 
   # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
