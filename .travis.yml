@@ -4,11 +4,11 @@ git:
   depth: 2
 language: ruby
 rvm:
-- &release_ruby 2.6.0
+- &release_ruby 2.6.1
 - 2.5.3
 - 2.4.5
 - 2.3.8
-- jruby-9.2.5.0
+- jruby-9.2.6.0
 - jruby-9.1.17.0
 #- truffleruby-rc10
 env:
