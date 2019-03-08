@@ -1122,70 +1122,54 @@ module Asciidoctor
     'gt'         => '>'
   }
 
-  # unconstrained quotes:: can appear anywhere
-  # constrained quotes:: must be bordered by non-word characters
-  # NOTE these substitutions are processed in the order they appear here and
-  # the order in which they are replaced is important
-  quote_subs = [
-    # **strong**
-    [:strong, :unconstrained, /\\?(?:\[([^\]]+)\])?\*\*(#{CC_ALL}+?)\*\*/m],
+  QUOTE_SUBS = {}.tap do |accum|
+    # unconstrained quotes:: can appear anywhere
+    # constrained quotes:: must be bordered by non-word characters
+    # NOTE these substitutions are processed in the order they appear here and
+    # the order in which they are replaced is important
+    accum[false] = normal = [
+      # **strong**
+      [:strong, :unconstrained, /\\?(?:\[([^\]]+)\])?\*\*(#{CC_ALL}+?)\*\*/m],
+      # *strong*
+      [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\*(\S|\S#{CC_ALL}*?\S)\*(?!#{CG_WORD})/m],
+      # "`double-quoted`"
+      [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?"`(\S|\S#{CC_ALL}*?\S)`"(?!#{CG_WORD})/m],
+      # '`single-quoted`'
+      [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+)\])?'`(\S|\S#{CC_ALL}*?\S)`'(?!#{CG_WORD})/m],
+      # ``monospaced``
+      [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?``(#{CC_ALL}+?)``/m],
+      # `monospaced`
+      [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)`(?![#{CC_WORD}"'`])/m],
+      # __emphasis__
+      [:emphasis, :unconstrained, /\\?(?:\[([^\]]+)\])?__(#{CC_ALL}+?)__/m],
+      # _emphasis_
+      [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
+      # ##mark## (referred to in AsciiDoc Python as unquoted)
+      [:mark, :unconstrained, /\\?(?:\[([^\]]+)\])?##(#{CC_ALL}+?)##/m],
+      # #mark# (referred to in AsciiDoc Python as unquoted)
+      [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:\[([^\]]+)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
+      # ^superscript^
+      [:superscript, :unconstrained, /\\?(?:\[([^\]]+)\])?\^(\S+?)\^/],
+      # ~subscript~
+      [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/]
+    ]
 
-    # *strong*
-    [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\*(\S|\S#{CC_ALL}*?\S)\*(?!#{CG_WORD})/m],
-
-    # "`double-quoted`"
-    [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?"`(\S|\S#{CC_ALL}*?\S)`"(?!#{CG_WORD})/m],
-
-    # '`single-quoted`'
-    [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+)\])?'`(\S|\S#{CC_ALL}*?\S)`'(?!#{CG_WORD})/m],
-
-    # ``monospaced``
-    [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?``(#{CC_ALL}+?)``/m],
-
-    # `monospaced`
-    [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)`(?![#{CC_WORD}"'`])/m],
-
-    # __emphasis__
-    [:emphasis, :unconstrained, /\\?(?:\[([^\]]+)\])?__(#{CC_ALL}+?)__/m],
-
-    # _emphasis_
-    [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
-
-    # ##mark## (referred to in AsciiDoc Python as unquoted)
-    [:mark, :unconstrained, /\\?(?:\[([^\]]+)\])?##(#{CC_ALL}+?)##/m],
-
-    # #mark# (referred to in AsciiDoc Python as unquoted)
-    [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:\[([^\]]+)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
-
-    # ^superscript^
-    [:superscript, :unconstrained, /\\?(?:\[([^\]]+)\])?\^(\S+?)\^/],
-
-    # ~subscript~
-    [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/]
-  ]
-
-  compat_quote_subs = quote_subs.drop 0
-  # ``quoted''
-  compat_quote_subs[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
-  # `quoted'
-  compat_quote_subs[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
-  # ++monospaced++
-  compat_quote_subs[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?\+\+(#{CC_ALL}+?)\+\+/m]
-  # +monospaced+
-  compat_quote_subs[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\+(\S|\S#{CC_ALL}*?\S)\+(?!#{CG_WORD})/m]
-  # #unquoted#
-  #compat_quote_subs[8] = [:unquoted, *compat_quote_subs[8][1..-1]]
-  # ##unquoted##
-  #compat_quote_subs[9] = [:unquoted, *compat_quote_subs[9][1..-1]]
-  # 'emphasis'
-  compat_quote_subs.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?'(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
-
-  QUOTE_SUBS = {
-    false => quote_subs,
-    true  => compat_quote_subs
-  }
-  quote_subs = nil
-  compat_quote_subs = nil
+    accum[true] = compat = normal.drop 0
+    # ``quoted''
+    compat[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
+    # `quoted'
+    compat[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
+    # ++monospaced++
+    compat[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?\+\+(#{CC_ALL}+?)\+\+/m]
+    # +monospaced+
+    compat[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\+(\S|\S#{CC_ALL}*?\S)\+(?!#{CG_WORD})/m]
+    # #unquoted#
+    #compat[8] = [:unquoted, *compat[8][1..-1]]
+    # ##unquoted##
+    #compat[9] = [:unquoted, *compat[9][1..-1]]
+    # 'emphasis'
+    compat.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?'(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
+  end
 
   # NOTE order of replacements is significant
   REPLACEMENTS = [
