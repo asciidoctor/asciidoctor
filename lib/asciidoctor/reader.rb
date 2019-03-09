@@ -957,12 +957,8 @@ class PreprocessorReader < Reader
         lhs = resolve_expr_val $1
         rhs = resolve_expr_val $3
 
-        # regex enforces a restricted set of math-related operations
-        if $2 == '!='
-          skip = lhs.send :==, rhs
-        else
-          skip = !(lhs.send $2.to_sym, rhs)
-        end
+        # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
+        skip = (lhs.send $2, rhs) ? false : true
       end
     end
 
