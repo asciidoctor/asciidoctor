@@ -1760,6 +1760,12 @@ context 'Substitutions' do
         assert_equal 'latexmath:[]', para.content
       end
 
+      test 'should unescape escaped square bracket in equation' do
+        input = 'latexmath:[\sqrt[3\]{x}]'
+        para = block_from_string input
+        assert_equal '\(\sqrt[3]{x}\)', para.content
+      end
+
       test 'should perform specialcharacters subs on latexmath macro in html backend by default' do
         input = 'latexmath:[a < b]'
         para = block_from_string input
