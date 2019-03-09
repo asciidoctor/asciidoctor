@@ -18,7 +18,7 @@ class AbstractBlock < AbstractNode
   # Public: Set the Integer level of this {Section} or the level of the Section to which this {AbstractBlock} belongs.
   attr_accessor :level
 
-  # Public: Get/Set the numeral of this block (if section, relative to parent, otherwise absolute).
+  # Public: Get/Set the String numeral of this block (if section, relative to parent, otherwise absolute).
   # Only assigned to section if automatic section numbering is enabled.
   # Only assigned to formal block (block with title) if corresponding caption attribute is present.
   attr_accessor :numeral
