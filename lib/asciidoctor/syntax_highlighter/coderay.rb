@@ -15,8 +15,8 @@ class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
 
   def highlight node, source, lang, opts
     @requires_stylesheet = true if (css_mode = opts[:css_mode]) == :class
-    # NOTE CodeRay::Duo gracefully falls back to no highlighting if lang isn't recognized
-    highlighted = ::CodeRay::Duo[lang ? lang.to_sym : :text, :html,
+    lang = lang ? (::CodeRay::Scanners[lang = lang.to_sym] && lang rescue :text) : :text
+    highlighted = ::CodeRay::Duo[lang, :html,
       css: css_mode,
       line_numbers: (line_numbers = opts[:number_lines]),
       line_number_start: opts[:start_line_number],
