@@ -71,10 +71,8 @@ class Table < AbstractBlock
     end
     @attributes['tablepcwidth'] = pcwidth_intval
 
-    if @document.attributes.key? 'pagewidth'
-      # FIXME calculate more accurately (only used in DocBook output)
-      @attributes['tableabswidth'] ||=
-          ((@attributes['tablepcwidth'].to_f / 100) * @document.attributes['pagewidth']).round
+    if @document.attributes['pagewidth']
+      @attributes['tableabswidth'] = (abswidth_val = (((pcwidth_intval / 100.0) * @document.attributes['pagewidth'].to_f).truncate DEFAULT_PRECISION)) == abswidth_val.to_i ? abswidth_val.to_i : abswidth_val
     end
 
     @attributes['orientation'] = 'landscape' if attributes['rotate-option']
@@ -206,12 +204,10 @@ class Table::Column < AbstractNode
       col_pcwidth = (@attributes['width'].to_f * 100.0 / width_base).truncate precision
       col_pcwidth = col_pcwidth.to_i if col_pcwidth.to_i == col_pcwidth
     end
-    @attributes['colpcwidth'] = col_pcwidth
-    if parent.attributes.key? 'tableabswidth'
-      # FIXME calculate more accurately (only used in DocBook output)
-      @attributes['colabswidth'] = ((col_pcwidth / 100.0) * parent.attributes['tableabswidth']).round
+    if parent.attributes['tableabswidth']
+      @attributes['colabswidth'] = (col_abswidth = ((col_pcwidth / 100.0) * parent.attributes['tableabswidth']).truncate precision) == col_abswidth.to_i ? col_abswidth.to_i : col_abswidth
     end
-    col_pcwidth
+    @attributes['colpcwidth'] = col_pcwidth
   end
 
   def block?

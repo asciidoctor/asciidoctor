@@ -386,6 +386,25 @@ context 'Tables' do
       assert_css 'tgroup colspec[colwidth="28.3334*"]', output, 1
     end
 
+    test 'should compute column widths based on pagewidth when width is set on table in DocBook output' do
+      input = <<~'EOS'
+      :pagewidth: 500
+
+      [width=50%]
+      |=======
+      |A |B |C |D
+
+      |a |b |c |d
+      |1 |2 |3 |4
+      |=======
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook5'
+      assert_css 'tgroup[cols="4"]', output, 1
+      assert_css 'tgroup colspec', output, 4
+      assert_css 'tgroup colspec[colwidth]', output, 4
+      assert_css 'tgroup colspec[colwidth="62.5*"]', output, 4
+    end
+
     test 'explicit table width is used even when autowidth option is specified' do
       input = <<~'EOS'
       [%autowidth,width=75%]
