@@ -282,6 +282,8 @@ module Substitutors
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
       end
       content = unescape_brackets $3
+      # NOTE for backwards compatibility with AsciiDoc Python, drop enclosing $ signs around latexmath
+      content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{passthru_key}#{PASS_END})
