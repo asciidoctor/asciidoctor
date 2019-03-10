@@ -236,6 +236,19 @@ context 'Syntax Highlighter' do
       assert_match(/\.CodeRay *\{/, output)
     end
 
+    test 'should not fail if source language is invalid' do
+      input = <<~'EOS'
+      :source-highlighter: coderay
+
+      [source, n/a]
+      ----
+      PRINT 'yo'
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
+      assert_css 'code[data-lang="n/a"]', output, 1
+    end
+
     test 'should number lines if third positional attribute is set' do
       input = <<~'EOS'
       :source-highlighter: coderay
