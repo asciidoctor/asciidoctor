@@ -99,6 +99,7 @@ Improvements::
   * rename context for table cell and table column to :table_cell and :table_column, respectively
   * rename hardbreaks document attribute to hardbreaks-option; retain hardbreaks as a deprecated alias (#3123)
   * truncate with precision (instead of rounding) when computing absolute width for columns in DocBook output (#3131)
+  * drop legacy LaTeX math delimiters (e.g, `$..$`) if present (#1339)
 
 Bug Fixes::
 

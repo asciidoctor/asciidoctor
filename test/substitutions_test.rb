@@ -1754,6 +1754,12 @@ context 'Substitutions' do
         assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
       end
 
+      test 'should strip legacy LaTeX math delimiters around latexmath content if present' do
+        input = 'latexmath:[$C = \alpha + \beta Y^{\gamma} + \epsilon$]'
+        para = block_from_string input
+        assert_equal '\(C = \alpha + \beta Y^{\gamma} + \epsilon\)', para.content
+      end
+
       test 'should not recognize latexmath macro with no content' do
         input = 'latexmath:[]'
         para = block_from_string input
