@@ -68,6 +68,7 @@ Enhancements / Compliance::
   * AbstractBlock#find_by looks inside AsciiDoc table cells if traverse_documents selector option is true (#3101)
   * AbstractBlock#find_by finds table cells, which can be selected using the :table_cell context in the selector (#2524)
   * allow ampersand to be used in e-mail address (#2553)
+  * propogate ID assigned to inline passthrough (#2912)
 
 Improvements::
 

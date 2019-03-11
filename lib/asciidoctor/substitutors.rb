@@ -232,7 +232,7 @@ module Substitutors
       if compat_mode
         old_behavior = true
       else
-        if (old_behavior = (attributes && (attributes.end_with? 'x-')))
+        if (old_behavior = attributes && (attributes.end_with? 'x-'))
           attributes = attributes.slice 0, attributes.length - 2
         end
       end
@@ -319,7 +319,10 @@ module Substitutors
       if (pass = passthrus[$1.to_i])
         subbed_text = apply_subs(pass[:text], pass[:subs])
         if (type = pass[:type])
-          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, attributes: pass[:attributes]).convert
+          if (attributes = pass[:attributes])
+            id = attributes.delete 'id'
+          end
+          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
         end
         subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
       else
