@@ -77,6 +77,12 @@ context 'Logger' do
       assert_includes err_string, %(asciidoctor: WARNING: this is a call)
       assert_includes err_string, %(asciidoctor: FAILED: it cannot be done)
     end
+
+    test 'NullLogger level is not nil' do
+      logger = Asciidoctor::NullLogger.new
+      refute_nil logger.level
+      assert_equal Logger::WARN, logger.level
+    end
   end
 
   context ':logger API option' do

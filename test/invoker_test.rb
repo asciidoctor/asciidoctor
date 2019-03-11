@@ -190,6 +190,25 @@ context 'Invoker' do
     assert_equal '', warnings
   end
 
+  test 'should not fail to check log level when -q flag is specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    begin
+      old_stderr, $stderr = $stderr, ::StringIO.new
+      old_stdout, $stdout = $stdout, ::StringIO.new
+      invoker = invoke_cli(%w(-q), '-') { input }
+      assert_equal 0, invoker.code
+    ensure
+      $stderr = old_stderr
+      $stdout = old_stdout
+    end
+  end
+
   test 'should return non-zero exit code if failure level is reached' do
     input = <<~'EOS'
     2. second

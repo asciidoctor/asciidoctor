@@ -100,6 +100,7 @@ Improvements::
   * rename hardbreaks document attribute to hardbreaks-option; retain hardbreaks as a deprecated alias (#3123)
   * truncate with precision (instead of rounding) when computing absolute width for columns in DocBook output (#3131)
   * drop legacy LaTeX math delimiters (e.g, `$..$`) if present (#1339)
+  * upgrade MathJax to 2.7.5
 
 Bug Fixes::
 
@@ -129,7 +130,7 @@ Bug Fixes::
   * enforce and report relative include depth properly (depth=0 rather than depth=1 disables nested includes)
   * allow outfilesuffix to be soft set from API (#2640)
   * don't split paragraphs in table cell at line that resolves to blank if adjacent to other non-blank lines (#2963)
-  * upgrade MathJax to 2.7.5
+  * initialize the level to WARN when instantiating the NullLogger
 
 Build / Infrastructure::
 

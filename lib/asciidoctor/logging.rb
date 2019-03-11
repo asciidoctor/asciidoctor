@@ -66,7 +66,9 @@ end
 class NullLogger < ::Logger
   attr_reader :max_severity
 
-  def initialize; end
+  def initialize
+    self.level = WARN
+  end
 
   def add severity, message = nil, progname = nil
     if (severity ||= UNKNOWN) > (@max_severity ||= severity)
