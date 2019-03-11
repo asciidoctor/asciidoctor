@@ -33,7 +33,7 @@ class Converter::DocBook5Converter < Converter::Base
     init_backend_traits basebackend: 'docbook', filetype: 'xml', outfilesuffix: '.xml', supports_templates: true
   end
 
-  def document node
+  def convert_document node
     result = ['<?xml version="1.0" encoding="UTF-8"?>']
     if node.attr? 'toc'
       if node.attr? 'toclevels'
@@ -53,8 +53,8 @@ class Converter::DocBook5Converter < Converter::Base
     if (root_tag_name = node.doctype) == 'manpage'
       root_tag_name = 'refentry'
     end
-    result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{_common_attributes node.id}>)
-    result << (_document_info_tag node) unless node.noheader
+    result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{common_attributes node.id}>)
+    result << (document_info_tag node) unless node.noheader
     unless (docinfo_content = node.docinfo :header).empty?
       result << docinfo_content
     end
@@ -66,31 +66,31 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  alias embedded _content_only
+  alias convert_embedded content_only
 
-  def section node
+  def convert_section node
     if node.document.doctype == 'manpage'
       tag_name = MANPAGE_SECTION_TAGS[tag_name = node.sectname] || tag_name
     else
       tag_name = node.sectname
     end
     title_el = node.special && (node.option? 'untitled') ? '' : %(<title>#{node.title}</title>\n)
-    %(<#{tag_name}#{_common_attributes node.id, node.role, node.reftext}>
+    %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 #{title_el}#{node.content}
 </#{tag_name}>)
   end
 
-  def admonition node
-    %(<#{tag_name = node.attr 'name'}#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_enclose_content node}
+  def convert_admonition node
+    %(<#{tag_name = node.attr 'name'}#{common_attributes node.id, node.role, node.reftext}>
+#{title_tag node}#{enclose_content node}
 </#{tag_name}>)
   end
 
-  alias audio _skip
+  alias convert_audio skip
 
-  def colist node
+  def convert_colist node
     result = []
-    result << %(<calloutlist#{_common_attributes node.id, node.role, node.reftext}>)
+    result << %(<calloutlist#{common_attributes node.id, node.role, node.reftext}>)
     result << %(<title>#{node.title}</title>) if node.title?
     node.items.each do |item|
       result << %(<callout arearefs="#{item.attr 'coids'}">)
@@ -102,11 +102,11 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def dlist node
+  def convert_dlist node
     result = []
     if node.style == 'horizontal'
-      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
-#{_title_tag node}<tgroup cols="2">
+      result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext} tabstyle="horizontal" frame="none" colsep="0" rowsep="0">
+#{title_tag node}<tgroup cols="2">
 <colspec colwidth="#{node.attr 'labelwidth', 15}*"/>
 <colspec colwidth="#{node.attr 'itemwidth', 85}*"/>
 <tbody valign="top">)
@@ -134,7 +134,7 @@ class Converter::DocBook5Converter < Converter::Base
       term_tag = tags[:term]
       item_tag = tags[:item]
       if list_tag
-        result << %(<#{list_tag}#{_common_attributes node.id, node.role, node.reftext}>)
+        result << %(<#{list_tag}#{common_attributes node.id, node.role, node.reftext}>)
         result << %(<title>#{node.title}</title>) if node.title?
       end
 
@@ -158,24 +158,24 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def example node
+  def convert_example node
     if node.title?
-      %(<example#{_common_attributes node.id, node.role, node.reftext}>
+      %(<example#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
-#{_enclose_content node}
+#{enclose_content node}
 </example>)
     else
-      %(<informalexample#{_common_attributes node.id, node.role, node.reftext}>
-#{_enclose_content node}
+      %(<informalexample#{common_attributes node.id, node.role, node.reftext}>
+#{enclose_content node}
 </informalexample>)
     end
   end
 
-  def floating_title node
-    %(<bridgehead#{_common_attributes node.id, node.role, node.reftext} renderas="sect#{node.level}">#{node.title}</bridgehead>)
+  def convert_floating_title node
+    %(<bridgehead#{common_attributes node.id, node.role, node.reftext} renderas="sect#{node.level}">#{node.title}</bridgehead>)
   end
 
-  def image node
+  def convert_image node
     # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
     # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
     if node.attr? 'scaledwidth'
@@ -202,20 +202,20 @@ class Converter::DocBook5Converter < Converter::Base
 </mediaobject>)
 
     if node.title?
-      %(<figure#{_common_attributes node.id, node.role, node.reftext}>
+      %(<figure#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 #{mediaobject}
 </figure>)
     else
-      %(<informalfigure#{_common_attributes node.id, node.role, node.reftext}>
+      %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
 #{mediaobject}
 </informalfigure>)
     end
   end
 
-  def listing node
+  def convert_listing node
     informal = !node.title?
-    common_attrs = _common_attributes node.id, node.role, node.reftext
+    common_attrs = common_attributes node.id, node.role, node.reftext
     if node.style == 'source'
       if (attrs = node.attributes).key? 'linenums'
         numbering_attrs = (attrs.key? 'start') ? %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}") : ' linenumbering="numbered"'
@@ -238,22 +238,22 @@ class Converter::DocBook5Converter < Converter::Base
 </formalpara>)
   end
 
-  def literal node
+  def convert_literal node
     if node.title?
-      %(<formalpara#{_common_attributes node.id, node.role, node.reftext}>
+      %(<formalpara#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 <para>
 <literallayout class="monospaced">#{node.content}</literallayout>
 </para>
 </formalpara>)
     else
-      %(<literallayout#{_common_attributes node.id, node.role, node.reftext} class="monospaced">#{node.content}</literallayout>)
+      %(<literallayout#{common_attributes node.id, node.role, node.reftext} class="monospaced">#{node.content}</literallayout>)
     end
   end
 
-  alias pass _content_only
+  alias convert_pass content_only
 
-  def stem node
+  def convert_stem node
     if (idx = node.subs.index :specialcharacters)
       node.subs.delete_at idx
       equation = node.content || ''
@@ -263,33 +263,33 @@ class Converter::DocBook5Converter < Converter::Base
     end
     if node.style == 'asciimath'
       # NOTE fop requires jeuclid to process mathml markup
-      equation_data = _asciimath_available? ? ((::AsciiMath.parse equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML') : %(<mathphrase><![CDATA[#{equation}]]></mathphrase>)
+      equation_data = asciimath_available? ? ((::AsciiMath.parse equation).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML') : %(<mathphrase><![CDATA[#{equation}]]></mathphrase>)
     else
       # unhandled math; pass source to alt and required mathphrase element; dblatex will process alt as LaTeX math
       equation_data = %(<alt><![CDATA[#{equation}]]></alt>
 <mathphrase><![CDATA[#{equation}]]></mathphrase>)
     end
     if node.title?
-      %(<equation#{_common_attributes node.id, node.role, node.reftext}>
+      %(<equation#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 #{equation_data}
 </equation>)
     else
       # WARNING dblatex displays the <informalequation> element inline instead of block as documented (except w/ mathml)
-      %(<informalequation#{_common_attributes node.id, node.role, node.reftext}>
+      %(<informalequation#{common_attributes node.id, node.role, node.reftext}>
 #{equation_data}
 </informalequation>)
     end
   end
 
-  def olist node
+  def convert_olist node
     result = []
     num_attribute = node.style ? %( numeration="#{node.style}") : ''
     start_attribute = (node.attr? 'start') ? %( startingnumber="#{node.attr 'start'}") : ''
-    result << %(<orderedlist#{_common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
+    result << %(<orderedlist#{common_attributes node.id, node.role, node.reftext}#{num_attribute}#{start_attribute}>)
     result << %(<title>#{node.title}</title>) if node.title?
     node.items.each do |item|
-      result << %(<listitem#{_common_attributes item.id, item.role}>)
+      result << %(<listitem#{common_attributes item.id, item.role}>)
       result << %(<simpara>#{item.text}</simpara>)
       result << item.content if item.blocks?
       result << '</listitem>'
@@ -298,7 +298,7 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def open node
+  def convert_open node
     case node.style
     when 'abstract'
       if node.parent == node.document && node.document.doctype == 'book'
@@ -306,7 +306,7 @@ class Converter::DocBook5Converter < Converter::Base
         ''
       else
         %(<abstract>
-#{_title_tag node}#{_enclose_content node}
+#{title_tag node}#{enclose_content node}
 </abstract>)
       end
     when 'partintro'
@@ -314,72 +314,72 @@ class Converter::DocBook5Converter < Converter::Base
         logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
         ''
       else
-        %(<partintro#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_enclose_content node}
+        %(<partintro#{common_attributes node.id, node.role, node.reftext}>
+#{title_tag node}#{enclose_content node}
 </partintro>)
       end
     else
       reftext = node.reftext if (id = node.id)
       role = node.role
       if node.title?
-        %(<formalpara#{_common_attributes id, role, reftext}>
+        %(<formalpara#{common_attributes id, role, reftext}>
 <title>#{node.title}</title>
 <para>#{content_spacer = node.content_model == :compound ? LF : ''}#{node.content}#{content_spacer}</para>
 </formalpara>)
       elsif id || role
         if node.content_model == :compound
-          %(<para#{_common_attributes id, role, reftext}>
+          %(<para#{common_attributes id, role, reftext}>
 #{node.content}
 </para>)
         else
-          %(<simpara#{_common_attributes id, role, reftext}>#{node.content}</simpara>)
+          %(<simpara#{common_attributes id, role, reftext}>#{node.content}</simpara>)
         end
       else
-        _enclose_content node
+        enclose_content node
       end
     end
   end
 
-  def page_break node
+  def convert_page_break node
     '<simpara><?asciidoc-pagebreak?></simpara>'
   end
 
-  def paragraph node
+  def convert_paragraph node
     if node.title?
-      %(<formalpara#{_common_attributes node.id, node.role, node.reftext}>
+      %(<formalpara#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
 <para>#{node.content}</para>
 </formalpara>)
     else
-      %(<simpara#{_common_attributes node.id, node.role, node.reftext}>#{node.content}</simpara>)
+      %(<simpara#{common_attributes node.id, node.role, node.reftext}>#{node.content}</simpara>)
     end
   end
 
-  def preamble node
+  def convert_preamble node
     if node.document.doctype == 'book'
-      %(<preface#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node, false}#{node.content}
+      %(<preface#{common_attributes node.id, node.role, node.reftext}>
+#{title_tag node, false}#{node.content}
 </preface>)
     else
       node.content
     end
   end
 
-  def quote node
-    _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { _enclose_content node }
+  def convert_quote node
+    blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { enclose_content node }
   end
 
-  def thematic_break node
+  def convert_thematic_break node
     '<simpara><?asciidoc-hr?></simpara>'
   end
 
-  def sidebar node
-    %(<sidebar#{_common_attributes node.id, node.role, node.reftext}>
-#{_title_tag node}#{_enclose_content node}
+  def convert_sidebar node
+    %(<sidebar#{common_attributes node.id, node.role, node.reftext}>
+#{title_tag node}#{enclose_content node}
 </sidebar>)
   end
 
-  def table node
+  def convert_table node
     has_body = false
     result = []
     pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
@@ -387,7 +387,7 @@ class Converter::DocBook5Converter < Converter::Base
       frame = 'topbot'
     end
     grid = node.attr 'grid', nil, 'table-grid'
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{_common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
     if (node.option? 'unbreakable')
       result << '<?dbfo keep-together="always"?>'
     elsif (node.option? 'breakable')
@@ -447,12 +447,12 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  alias toc _skip
+  alias convert_toc skip
 
-  def ulist node
+  def convert_ulist node
     result = []
     if node.style == 'bibliography'
-      result << %(<bibliodiv#{_common_attributes node.id, node.role, node.reftext}>)
+      result << %(<bibliodiv#{common_attributes node.id, node.role, node.reftext}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         result << '<bibliomixed>'
@@ -464,11 +464,11 @@ class Converter::DocBook5Converter < Converter::Base
     else
       mark_type = (checklist = node.option? 'checklist') ? 'none' : node.style
       mark_attribute = mark_type ? %( mark="#{mark_type}") : ''
-      result << %(<itemizedlist#{_common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
+      result << %(<itemizedlist#{common_attributes node.id, node.role, node.reftext}#{mark_attribute}>)
       result << %(<title>#{node.title}</title>) if node.title?
       node.items.each do |item|
         text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
-        result << %(<listitem#{_common_attributes item.id, item.role}>)
+        result << %(<listitem#{common_attributes item.id, item.role}>)
         result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'
@@ -478,16 +478,16 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def verse node
-    _blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
+  def convert_verse node
+    blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
   end
 
-  alias video _skip
+  alias convert_video skip
 
-  def inline_anchor node
+  def convert_inline_anchor node
     case node.type
     when :ref
-      %(<anchor#{_common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
+      %(<anchor#{common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
     when :xref
       if (path = node.attributes['path'])
         # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
@@ -499,34 +499,34 @@ class Converter::DocBook5Converter < Converter::Base
     when :link
       %(<link xl:href="#{node.target}">#{node.text}</link>)
     when :bibref
-      %(<anchor#{_common_attributes node.id, nil, "[#{node.reftext || node.id}]"}/>#{text})
+      %(<anchor#{common_attributes node.id, nil, "[#{node.reftext || node.id}]"}/>#{text})
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil
     end
   end
 
-  def inline_break node
+  def convert_inline_break node
     %(#{node.text}<?asciidoc-br?>)
   end
 
-  def inline_button node
+  def convert_inline_button node
     %(<guibutton>#{node.text}</guibutton>)
   end
 
-  def inline_callout node
-    %(<co#{_common_attributes node.id}/>)
+  def convert_inline_callout node
+    %(<co#{common_attributes node.id}/>)
   end
 
-  def inline_footnote node
+  def convert_inline_footnote node
     if node.type == :xref
       %(<footnoteref linkend="#{node.target}"/>)
     else
-      %(<footnote#{_common_attributes node.id}><simpara>#{node.text}</simpara></footnote>)
+      %(<footnote#{common_attributes node.id}><simpara>#{node.text}</simpara></footnote>)
     end
   end
 
-  def inline_image node
+  def convert_inline_image node
     width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
     depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
     %(<inlinemediaobject>
@@ -537,7 +537,7 @@ class Converter::DocBook5Converter < Converter::Base
 </inlinemediaobject>)
   end
 
-  def inline_indexterm node
+  def convert_inline_indexterm node
     if node.type == :visible
       %(<indexterm><primary>#{node.text}</primary></indexterm>#{node.text})
     else
@@ -560,7 +560,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def inline_kbd node
+  def convert_inline_kbd node
     if (keys = node.attr 'keys').size == 1
       %(<keycap>#{keys[0]}</keycap>)
     else
@@ -568,7 +568,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def inline_menu node
+  def convert_inline_menu node
     menu = node.attr 'menu'
     if (submenus = node.attr 'submenus').empty?
       if (menuitem = node.attr 'menuitem')
@@ -581,10 +581,10 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def inline_quoted node
+  def convert_inline_quoted node
     if (type = node.type) == :asciimath
       # NOTE fop requires jeuclid to process mathml markup
-      _asciimath_available? ? %(<inlineequation>#{(::AsciiMath.parse node.text).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'}</inlineequation>) : %(<inlineequation><mathphrase><![CDATA[#{node.text}]]></mathphrase></inlineequation>)
+      asciimath_available? ? %(<inlineequation>#{(::AsciiMath.parse node.text).to_mathml 'mml:', 'xmlns:mml' => 'http://www.w3.org/1998/Math/MathML'}</inlineequation>) : %(<inlineequation><mathphrase><![CDATA[#{node.text}]]></mathphrase></inlineequation>)
     elsif type == :latexmath
       # unhandled math; pass source to alt and required mathphrase element; dblatex will process alt as LaTeX math
       %(<inlineequation><alt><![CDATA[#{equation = node.text}]]></alt><mathphrase><![CDATA[#{equation}]]></mathphrase></inlineequation>)
@@ -601,13 +601,13 @@ class Converter::DocBook5Converter < Converter::Base
         quoted_text = %(#{open}#{text}#{close})
       end
 
-      node.id ? %(<anchor#{_common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
+      node.id ? %(<anchor#{common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
     end
   end
 
   private
 
-  def _common_attributes id, role = nil, reftext = nil
+  def common_attributes id, role = nil, reftext = nil
     if id
       attrs = %( xml:id="#{id}"#{role ? %[ role="#{role}"] : ''})
     elsif role
@@ -626,7 +626,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def _author_tag author
+  def author_tag author
     result = []
     result << '<author>'
     result << '<personname>'
@@ -639,7 +639,7 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def _document_info_tag doc
+  def document_info_tag doc
     result = ['<info>']
     unless doc.notitle
       if (title = doc.doctitle partition: true, use_fallback: true).subtitle?
@@ -663,10 +663,10 @@ class Converter::DocBook5Converter < Converter::Base
       unless (authors = doc.authors).empty?
         if authors.size > 1
           result << '<authorgroup>'
-          authors.each {|author| result << (_author_tag author) }
+          authors.each {|author| result << (author_tag author) }
           result << '</authorgroup>'
         else
-          result << _author_tag(author = authors[0])
+          result << author_tag(author = authors[0])
           result << %(<authorinitials>#{author.initials}</authorinitials>) if author.initials
         end
       end
@@ -681,10 +681,10 @@ class Converter::DocBook5Converter < Converter::Base
 </revhistory>)
       end
       if (doc.attr? 'front-cover-image') || (doc.attr? 'back-cover-image')
-        if (back_cover_tag = _cover_tag doc, 'back')
-          result << (_cover_tag doc, 'front', true)
+        if (back_cover_tag = cover_tag doc, 'back')
+          result << (cover_tag doc, 'front', true)
           result << back_cover_tag
-        elsif (front_cover_tag = _cover_tag doc, 'front')
+        elsif (front_cover_tag = cover_tag doc, 'front')
           result << front_cover_tag
         end
       end
@@ -712,15 +712,15 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   # FIXME this should be handled through a template mechanism
-  def _enclose_content node
+  def enclose_content node
     node.content_model == :compound ? node.content : %(<simpara>#{node.content}</simpara>)
   end
 
-  def _title_tag node, optional = true
+  def title_tag node, optional = true
     !optional || node.title? ? %(<title>#{node.title}</title>\n) : ''
   end
 
-  def _cover_tag doc, face, use_placeholder = false
+  def cover_tag doc, face, use_placeholder = false
     if (cover_image = doc.attr %(#{face}-cover-image))
       width_attr = ''
       depth_attr = ''
@@ -749,13 +749,13 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def _blockquote_tag node, tag_name = nil
+  def blockquote_tag node, tag_name = nil
     if tag_name
       start_tag, end_tag = %(<#{tag_name}), %(</#{tag_name}>)
     else
       start_tag, end_tag = '<blockquote', '</blockquote>'
     end
-    result = [%(#{start_tag}#{_common_attributes node.id, node.role, node.reftext}>)]
+    result = [%(#{start_tag}#{common_attributes node.id, node.role, node.reftext}>)]
     result << %(<title>#{node.title}</title>) if node.title?
     if (node.attr? 'attribution') || (node.attr? 'citetitle')
       result << '<attribution>'
@@ -768,11 +768,11 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def _asciimath_available?
-    (@asciimath_status ||= _load_asciimath) == :loaded
+  def asciimath_available?
+    (@asciimath_status ||= load_asciimath) == :loaded
   end
 
-  def _load_asciimath
+  def load_asciimath
     (defined? ::AsciiMath.parse) ? :loaded : (Helpers.require_library 'asciimath', true, :warn).nil? ? :unavailable : :loaded
   end
 end

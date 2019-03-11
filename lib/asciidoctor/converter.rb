@@ -36,7 +36,7 @@ module Asciidoctor
 #
 #   class Html5Converter < (Asciidoctor::Converter.for 'html5')
 #     register_for 'html5'
-#     def paragraph node
+#     def convert_paragraph node
 #       %(<p>#{node.content}</p>)
 #     end
 #   end
@@ -73,13 +73,13 @@ module Converter
     raise ::NotImplementedError, %(#{self.class} (backend: #{@backend}) must implement the ##{__method__} method)
   end
 
-  # Public: Reports whether the current converter is able to convert this node (by its name). Used by the
+  # Public: Reports whether the current converter is able to convert this node (by its transform name). Used by the
   # {CompositeConverter} to select which converter to use to handle a given node. Returns true by default.
   #
-  # name - the String name of the node to convert.
+  # transform - the String name of the node transformation (typically the node name).
   #
-  # Returns a [Boolean] indicating whether this converter can handle the specified node by name.
-  def handles? name
+  # Returns a [Boolean] indicating whether this converter can handle the specified transform.
+  def handles? transform
     true
   end
 
@@ -368,35 +368,36 @@ module Converter
 
     # Public: Converts an {AbstractNode} by delegating to a method that matches the transform value.
     #
-    # This method looks for a method that matches the name of the transform to dispatch to. If the +opts+ argument is
-    # non-nil, this method assumes the dispatch method accepts two arguments, the node and an options Hash. The options
-    # Hash may be used by converters to delegate back to the top-level converter. Currently, it's used for the outline
-    # transform. If the +opts+ argument is nil, this method assumes the dispatch method accepts the node as its only
-    # argument. To distiguish from node dispatch methods, the convention is to prefix the name of helper method with
-    # underscore and mark them as private. Implementations may override this method to provide different behavior.
+    # This method looks for a method whose name matches the transform prefixed with "convert_" to dispatch to. If the
+    # +opts+ argument is non-nil, this method assumes the dispatch method accepts two arguments, the node and an options
+    # Hash. The options Hash may be used by converters to delegate back to the top-level converter. Currently, this
+    # feature is used for the outline transform. If the +opts+ argument is nil, this method assumes the dispatch method
+    # accepts the node as its only argument.
     #
     # See {Converter#convert} for details about the arguments and return value.
     def convert node, transform = node.node_name, opts = nil
-      opts.nil_or_empty? ? (send transform, node) : (send transform, node, opts)
+      opts ? (send 'convert_' + transform, node, opts) : (send 'convert_' + transform, node)
     rescue
       raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == transform
       logger.warn %(missing convert handler for #{ex.name} node in #{@backend} backend (#{self.class}))
       nil
     end
 
-    alias handles? respond_to?
+    def handles? transform
+      respond_to? %(convert_#{transform})
+    end
 
     # Public: Converts the {AbstractNode} using only its converted content.
     #
     # Returns the converted [String] content.
-    def _content_only node
+    def content_only node
       node.content
     end
 
     # Public: Skips conversion of the {AbstractNode}.
     #
     # Returns nothing.
-    def _skip node; end
+    def skip node; end
   end
 
   extend DefaultFactory # exports static methods
