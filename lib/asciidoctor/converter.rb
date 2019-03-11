@@ -21,8 +21,8 @@ module Asciidoctor
 #       super
 #       outfilesuffix '.txt'
 #     end
-#     def convert node, transform = nil, opts = nil
-#       case (transform ||= node.node_name)
+#     def convert node, transform = node.node_name, opts = nil
+#       case transform
 #       when 'document', 'section'
 #         [node.title, node.content].join %(\n\n)
 #       when 'paragraph'
@@ -376,10 +376,10 @@ module Converter
     # underscore and mark them as private. Implementations may override this method to provide different behavior.
     #
     # See {Converter#convert} for details about the arguments and return value.
-    def convert node, transform = nil, opts = nil
-      opts ? (send transform || node.node_name, node, opts) : (send transform || node.node_name, node)
+    def convert node, transform = node.node_name, opts = nil
+      opts ? (send transform, node, opts) : (send transform, node)
     rescue
-      raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == (transform || node.node_name)
+      raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == transform
       logger.warn %(missing convert handler for #{ex.name} node in #{@backend} backend (#{self.class}))
       nil
     end
