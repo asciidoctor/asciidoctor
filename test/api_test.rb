@@ -57,10 +57,7 @@ context 'API' do
         exception = assert_raises ArgumentError do
           Asciidoctor.load_file tmp_input.path, safe: :safe
         end
-        expected_message = 'source is either binary or contains invalid Unicode data'
-        # truffleruby does not support throwing a wrapped exception
-        # see https://github.com/oracle/truffleruby/issues/1542
-        expected_message = %(Failed to load AsciiDoc document - #{expected_message}) unless RUBY_ENGINE == 'truffleruby'
+        expected_message = 'Failed to load AsciiDoc document - source is either binary or contains invalid Unicode data'
         assert_includes exception.message, expected_message
       ensure
         tmp_input.close!
@@ -72,10 +69,7 @@ context 'API' do
       exception = assert_raises ArgumentError do
         Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
       end
-      expected_message = 'source is either binary or contains invalid Unicode data'
-      # truffleruby does not support throwing a wrapped exception
-      # see https://github.com/oracle/truffleruby/issues/1542
-      expected_message = %(Failed to load AsciiDoc document - #{expected_message}) unless RUBY_ENGINE == 'truffleruby'
+      expected_message = 'Failed to load AsciiDoc document - source is either binary or contains invalid Unicode data'
       assert_includes exception.message, expected_message
       # verify we have the correct backtrace (should be at least in the first 5 lines)
       assert_match(/reader\.rb.*prepare_lines/, exception.backtrace[0..4].join(?\n))
