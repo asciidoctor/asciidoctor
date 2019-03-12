@@ -1624,6 +1624,14 @@ context 'Substitutions' do
       assert_equal '<strong><html5></strong>', result
     end
 
+    test 'inline pass macro supports incremental subs' do
+      para = block_from_string 'pass:n,-a[<{backend}>]'
+      result, passthroughs = para.extract_passthroughs para.source
+      assert_equal 1, passthroughs.size
+      result = para.restore_passthroughs result
+      assert_equal '&lt;{backend}&gt;', result
+    end
+
     test 'should not recognize pass macro with invalid subsitution list' do
       [',', '42', 'a,'].each do |subs|
         para = block_from_string %(pass:#{subs}[foobar])

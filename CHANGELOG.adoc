@@ -62,6 +62,7 @@ Enhancements / Compliance::
   * modify Cell class to extend from AbstractBlock instead of AbstractNode (#2963)
   * implement block? and inline? methods on Column, both which return false (#2963)
   * drop verse table cell style (treat as normal table cell) (#3111)
+  * allow negated subs to be specified on inline pass macro (#2191)
   * log warning if footnoteref macro is found and compat mode is not enabled (#3114)
   * log debug message instead of warning if block style is unknown (#3092)
   * allow backend to delegate to a registered backend using the syntax synthetic:delegate when using custom templates (e.g., slides:html) (#891)

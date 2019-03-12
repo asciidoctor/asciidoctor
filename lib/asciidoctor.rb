@@ -502,9 +502,9 @@ module Asciidoctor
     #
     if RUBY_ENGINE == 'opal'
       # NOTE In JavaScript, ^ and $ match the boundaries of the string when the m flag is not set
-      AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*)\]$/
+      AttributeEntryPassMacroRx = /^pass:([a-z]+(?:,[a-z-]+)*)?\[(#{CC_ALL}*)\]$/
     else
-      AttributeEntryPassMacroRx = /\Apass:([a-z]+(?:,[a-z]+)*)?\[(.*)\]\Z/m
+      AttributeEntryPassMacroRx = /\Apass:([a-z]+(?:,[a-z-]+)*)?\[(.*)\]\Z/m
     end
 
     # Matches an inline attribute reference.
@@ -913,7 +913,7 @@ module Asciidoctor
     #   asciimath:[x != 0]
     #   latexmath:[\sqrt{4} = 2]
     #
-    InlineStemMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
+    InlineStemMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z-]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
 
     # Matches a menu inline macro.
     #
@@ -964,7 +964,7 @@ module Asciidoctor
     #   pass:quotes[text]
     #
     # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc Python
-    InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
+    InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
     # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
     #
