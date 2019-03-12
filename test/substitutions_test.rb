@@ -34,7 +34,7 @@ context 'Substitutions' do
       assert_equal %(this<br>\nis<br>\n&#8594; Asciidoctor<br>\n<br>\n), result
     end
 
-    test 'should expand subs passe to expand_subs' do
+    test 'should expand subs passed to expand_subs' do
       para = block_from_string %({program}\n*bold*\n2 > 1)
       para.document.attributes['program'] = 'Asciidoctor'
       assert_equal [:specialcharacters], (para.expand_subs [:specialchars])
@@ -567,8 +567,7 @@ context 'Substitutions' do
 
     test 'inline passthrough with id and role set using shorthand' do
       para = block_from_string '[#id.role]+pass+'
-      # FIXME id should be propogated
-      assert_equal '<span class="role">pass</span>', para.content
+      assert_equal '<span id="id" class="role">pass</span>', para.content
     end
 
     test 'should assign role attribute when shorthand style contains a role' do
