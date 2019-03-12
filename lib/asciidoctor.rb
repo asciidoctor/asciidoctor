@@ -14,34 +14,37 @@ else
   autoload :URI, 'uri'
 end
 
-# Public: Methods for parsing AsciiDoc input files and converting documents
-# using eRuby templates.
+# Public: The main application interface (API) for Asciidoctor. This API provides methods to parse AsciiDoc content and
+# convert it to various output formats using built-in or third-party converters or Tilt-supported templates.
 #
-# AsciiDoc documents comprise a header followed by zero or more sections.
-# Sections are composed of blocks of content.  For example:
+# An AsciiDoc document can be as simple as a single line of content, though it more commonly starts with a document
+# header that declares the document title and document attribute definitions. The document header is then followed by
+# zero or more section titles, optionally nested, to organize the paragraphs, blocks, lists, etc. of the document.
 #
-#   = Doc Title
+# By default, the processor converts the AsciiDoc document to HTML 5 using a built-in converter. However, this behavior
+# can be changed by specifying a different backend (e.g., +docbook+). A backend is a keyword for an output format (e.g.,
+# DocBook). That keyword, in turn, is used to select a converter, which carries out the request to convert the document
+# to that format.
 #
-#   == Section 1
+# In addition to this API, Asciidoctor also provides a command-line interface (CLI) named +asciidoctor+ for converting
+# AsciiDoc content. See the provided man(ual) page for usage and options.
 #
-#   This is a paragraph block in the first section.
+# Examples
 #
-#   == Section 2
+#   # Convert an AsciiDoc file
+#   Asciidoctor.convert_file 'document.adoc', safe: :safe
 #
-#   This section has a paragraph block and an olist block.
+#   # Convert an AsciiDoc string
+#   puts Asciidoctor.convert "I'm using *Asciidoctor* version {asciidoctor-version}.", safe: :safe
 #
-#   . Item 1
-#   . Item 2
+#   # Convert an AsciiDoc file using Tilt-supported templates
+#   Asciidoctor.convert_file 'document.adoc', safe: :safe, template_dir: '/path/to/templates'
 #
-# Examples:
+#   # Parse an AsciiDoc file into a document object
+#   doc = Asciidoctor.load_file 'document.adoc', safe: :safe
 #
-# Use built-in converter:
-#
-#   Asciidoctor.convert_file 'sample.adoc'
-#
-# Use custom (Tilt-supported) templates:
-#
-#   Asciidoctor.convert_file 'sample.adoc', template_dir: 'path/to/templates'
+#   # Parse an AsciiDoc string into a document object
+#   doc = Asciidoctor.load "= Document Title\n\nfirst paragraph\n\nsecond paragraph", safe: :safe
 #
 module Asciidoctor
   # alias the RUBY_ENGINE constant inside the Asciidoctor namespace and define a precomputed alias for runtime

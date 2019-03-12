@@ -13,7 +13,7 @@ module Asciidoctor
 # :safe (or :unsafe) to enable all of Asciidoctor's features.
 #
 #   Asciidoctor.load '= Hello, AsciiDoc!', safe: :safe
-#   # => Asciidoctor::Document { doctype: "article", doctitle: "Hello, Asciidoc!", blocks: 0 }
+#   # => Asciidoctor::Document { doctype: "article", doctitle: "Hello, AsciiDoc!", blocks: 0 }
 #
 # Instances of this class can be used to extract information from the document
 # or alter its structure. As such, the Document object is most often used in
