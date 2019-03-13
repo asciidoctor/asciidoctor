@@ -12,7 +12,7 @@ module Asciidoctor
         self[:input_files] = options[:input_files]
         self[:output_file] = options[:output_file]
         self[:safe] = options[:safe] || SafeMode::UNSAFE
-        self[:header_footer] = options.fetch :header_footer, true
+        self[:standalone] = options.fetch :standalone, true
         self[:template_dirs] = options[:template_dirs]
         self[:template_engine] = options[:template_engine]
         self[:attributes]['doctype'] = options[:doctype] if options[:doctype]
@@ -52,6 +52,9 @@ module Asciidoctor
                   'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doc_type|
             self[:attributes]['doctype'] = doc_type
           end
+          opts.on('-e', '--embedded', 'suppress enclosing document structure and output an embedded document (default: false)') do
+            self[:standalone] = false
+          end
           opts.on('-o', '--out-file FILE', 'output file (default: based on path of input file); use - to output to STDOUT') do |output_file|
             self[:output_file] = output_file
           end
@@ -66,13 +69,13 @@ module Asciidoctor
                   'disables potentially dangerous macros in source files, such as include::[]') do |name|
             self[:safe] = SafeMode.value_for_name name
           end
-          opts.on('-s', '--no-header-footer', 'suppress output of header and footer (default: false)') do
-            self[:header_footer] = false
+          opts.on('-s', '--no-header-footer', 'suppress enclosing document structure and output an embedded document (default: false)') do
+            self[:standalone] = false
           end
           opts.on('-n', '--section-numbers', 'auto-number section titles in the HTML backend; disabled by default') do
             self[:attributes]['sectnums'] = ''
           end
-          opts.on('-e', '--eruby ERUBY', ['erb', 'erubis'],
+          opts.on('--eruby ERUBY', ['erb', 'erubis'],
                   'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end

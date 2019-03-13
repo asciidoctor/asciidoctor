@@ -194,9 +194,7 @@ class Minitest::Test
   end
 
   def block_from_string(src, opts = {})
-    opts[:header_footer] = false
-    doc = document_from_string src, opts
-    doc.blocks.first
+    (document_from_string src, (opts.merge standalone: false)).blocks.first
   end
 
   def convert_string(src, opts = {})
@@ -212,8 +210,7 @@ class Minitest::Test
   end
 
   def convert_string_to_embedded(src, opts = {})
-    opts[:header_footer] = false
-    document_from_string(src, opts).convert
+    (document_from_string src, (opts.merge standalone: false)).convert
   end
 
   def convert_inline_string(src, opts = {})
@@ -227,9 +224,9 @@ class Minitest::Test
   end
 
   def assign_default_test_options(opts)
-    opts[:header_footer] = true unless opts.key? :header_footer
+    opts[:standalone] = true unless opts.key? :standalone
     opts[:parse] = true unless opts.key? :parse
-    if opts[:header_footer]
+    if opts[:standalone]
       # don't embed stylesheet unless test requests the default behavior
       if opts.has_key? :linkcss_default
         opts.delete(:linkcss_default)

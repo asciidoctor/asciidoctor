@@ -462,10 +462,12 @@ context 'Invoker' do
   end
 
   test 'should suppress header footer if specified' do
-    invoker = invoke_cli_to_buffer %w(-s -o -)
-    output = invoker.read_output
-    assert_xpath '/html', output, 0
-    assert_xpath '/*[@id="preamble"]', output, 1
+    [%w(-s -o -), %w(-e -o -)].each do |flags|
+      invoker = invoke_cli_to_buffer flags
+      output = invoker.read_output
+      assert_xpath '/html', output, 0
+      assert_xpath '/*[@id="preamble"]', output, 1
+    end
   end
 
   test 'should write page for each alternate manname' do

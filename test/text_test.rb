@@ -9,7 +9,7 @@ context "Text" do
   end
 
   test "proper encoding to handle utf8 characters in embedded document using html backend" do
-    output = example_document(:encoding, header_footer: false).convert
+    output = example_document(:encoding, standalone: false).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
@@ -21,7 +21,7 @@ context "Text" do
   end
 
   test 'proper encoding to handle utf8 characters in embedded document using docbook backend' do
-    output = example_document(:encoding, header_footer: false, attributes: { 'backend' => 'docbook' }).convert
+    output = example_document(:encoding, standalone: false, attributes: { 'backend' => 'docbook' }).convert
     assert_xpath '//simpara', output, 4
     assert_xpath '//link', output, 1
   end

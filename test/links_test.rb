@@ -58,9 +58,9 @@ context 'Links' do
 
   test 'qualified url with label containing square brackets using link macro' do
     str = 'http://example.com[[bracket1\]]'
-    doc = document_from_string str, header_footer: false, doctype: 'inline'
+    doc = document_from_string str, standalone: false, doctype: 'inline'
     assert_match '<a href="http://example.com">[bracket1]</a>', doc.convert, 1
-    doc = document_from_string str, header_footer: false, backend: 'docbook', doctype: 'inline'
+    doc = document_from_string str, standalone: false, backend: 'docbook', doctype: 'inline'
     assert_match '<link xl:href="http://example.com">[bracket1]</link>', doc.convert, 1
   end
 
@@ -341,7 +341,7 @@ context 'Links' do
   test 'inline ref with reftext converted to DocBook' do
     %w([[tigers,<Tigers>]] anchor:tigers[<Tigers>]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor}), backend: :docbook
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal '<Tigers>', doc.catalog[:refs]['tigers'].text
       assert_includes output, '<anchor xml:id="tigers" xreflabel="&lt;Tigers&gt;"/>'
@@ -421,13 +421,13 @@ context 'Links' do
 
   test 'should not interpret path sans extension in xref with angled bracket syntax in compat mode' do
     using_memory_logger do |logger|
-      doc = document_from_string '<<tigers#>>', header_footer: false, attributes: { 'compat-mode' => '' }
+      doc = document_from_string '<<tigers#>>', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers#"][text() = "[tigers#]"]', doc.convert, 1
     end
   end
 
   test 'xref using angled bracket syntax with path sans extension' do
-    doc = document_from_string '<<tigers#>>', header_footer: false
+    doc = document_from_string '<<tigers#>>', standalone: false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
@@ -476,75 +476,75 @@ context 'Links' do
   end
 
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
-    doc = document_from_string '<<tigers#>>', header_footer: false, backend: 'docbook'
+    doc = document_from_string '<<tigers#>>', standalone: false, backend: 'docbook'
     assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with ancestor path sans extension' do
-    doc = document_from_string '<<../tigers#,tigers>>', header_footer: false
+    doc = document_from_string '<<../tigers#,tigers>>', standalone: false
     assert_xpath '//a[@href="../tigers.html"][text() = "tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with absolute path sans extension' do
-    doc = document_from_string '<</path/to/tigers#,tigers>>', header_footer: false
+    doc = document_from_string '<</path/to/tigers#,tigers>>', standalone: false
     assert_xpath '//a[@href="/path/to/tigers.html"][text() = "tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and extension' do
     using_memory_logger do |logger|
-      doc = document_from_string '<<tigers.adoc>>', header_footer: false
+      doc = document_from_string '<<tigers.adoc>>', standalone: false
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
     end
   end
 
   test 'xref using angled bracket syntax with path and extension with hash' do
-    doc = document_from_string '<<tigers.adoc#>>', header_footer: false
+    doc = document_from_string '<<tigers.adoc#>>', standalone: false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and extension with fragment' do
-    doc = document_from_string '<<tigers.adoc#id>>', header_footer: false
+    doc = document_from_string '<<tigers.adoc#id>>', standalone: false
     assert_xpath '//a[@href="tigers.html#id"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using macro syntax with path and extension in compat mode' do
     using_memory_logger do |logger|
-      doc = document_from_string 'xref:tigers.adoc[]', header_footer: false, attributes: { 'compat-mode' => '' }
+      doc = document_from_string 'xref:tigers.adoc[]', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
     end
   end
 
   test 'xref using macro syntax with path and extension' do
-    doc = document_from_string 'xref:tigers.adoc[]', header_footer: false
+    doc = document_from_string 'xref:tigers.adoc[]', standalone: false
     assert_xpath '//a[@href="tigers.html"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and fragment' do
-    doc = document_from_string '<<tigers#about>>', header_footer: false
+    doc = document_from_string '<<tigers#about>>', standalone: false
     assert_xpath '//a[@href="tigers.html#about"][text() = "tigers.html"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path, fragment and text' do
-    doc = document_from_string '<<tigers#about,About Tigers>>', header_footer: false
+    doc = document_from_string '<<tigers#about,About Tigers>>', standalone: false
     assert_xpath '//a[@href="tigers.html#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and custom relfilesuffix and outfilesuffix' do
     attributes = { 'relfileprefix' => '../', 'outfilesuffix' => '/' }
-    doc = document_from_string '<<tigers#about,About Tigers>>', header_footer: false, attributes: attributes
+    doc = document_from_string '<<tigers#about,About Tigers>>', standalone: false, attributes: attributes
     assert_xpath '//a[@href="../tigers/#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path and custom relfilesuffix' do
     attributes = { 'relfilesuffix' => '/' }
-    doc = document_from_string '<<tigers#about,About Tigers>>', header_footer: false, attributes: attributes
+    doc = document_from_string '<<tigers#about,About Tigers>>', standalone: false, attributes: attributes
     assert_xpath '//a[@href="tigers/#about"][text() = "About Tigers"]', doc.convert, 1
   end
 
   test 'xref using angled bracket syntax with path which has been included in this document' do
     using_memory_logger do |logger|
       in_verbose_mode do
-        doc = document_from_string '<<tigers#about,About Tigers>>', header_footer: false
+        doc = document_from_string '<<tigers#about,About Tigers>>', standalone: false
         doc.catalog[:includes]['tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
@@ -556,7 +556,7 @@ context 'Links' do
   test 'xref using angled bracket syntax with nested path which has been included in this document' do
     using_memory_logger do |logger|
       in_verbose_mode do
-        doc = document_from_string '<<part1/tigers#about,About Tigers>>', header_footer: false
+        doc = document_from_string '<<part1/tigers#about,About Tigers>>', standalone: false
         doc.catalog[:includes]['part1/tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
@@ -839,7 +839,7 @@ context 'Links' do
 
     doc = document_from_string input, safe: :unsafe, base_dir: (File.join fixturedir, 'subdir')
     assert_includes doc.catalog[:includes], '../section-a'
-    output = doc.convert header_footer: false
+    output = doc.convert standalone: false
     assert_xpath '//a[@href="#section-a"][text()="Section A"]', output, 1
   end
 

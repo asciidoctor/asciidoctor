@@ -150,7 +150,7 @@ context 'Document' do
 
       cases.each do |attr_val, markup|
         output = Asciidoctor.convert_file sample_input_path, to_file: false,
-            header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: %(linkcss copycss! #{attr_val})
+            standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: %(linkcss copycss! #{attr_val})
         refute_empty output
         assert_css 'script[src="modernizr.js"]', output, markup[:head_script]
         assert_css 'meta[http-equiv="imagetoolbar"]', output, markup[:meta]
@@ -164,7 +164,7 @@ context 'Document' do
     test 'should include docinfo header even if noheader attribute is set' do
       sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
       refute_empty output
       assert_css 'body > nav.navbar', output, 1
       assert_css 'body > nav.navbar + #content', output, 1
@@ -173,7 +173,7 @@ context 'Document' do
     test 'should include docinfo footer even if nofooter attribute is set' do
       sample_input_path = fixture_path('basic.adoc')
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
       refute_empty output
       assert_css 'body > a#top', output, 1
     end
@@ -182,7 +182,7 @@ context 'Document' do
       sample_input_path = fixture_path 'basic.adoc'
       attrs = { 'docinfo' => 'shared', 'source-highlighter' => 'highlight.js', 'linkcss' => '', 'copycss' => nil }
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: :safe, attributes: attrs
+          standalone: true, safe: :safe, attributes: attrs
       assert_css 'link[rel=stylesheet] + meta[http-equiv=imagetoolbar]', output, 1
       assert_css 'meta[http-equiv=imagetoolbar] + *', output, 0
       assert_css 'script + a#top', output, 1
@@ -193,25 +193,25 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
+                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 1
       assert_css 'meta[name="robots"]', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'docinfodir' => 'custom-docinfodir' }
+                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'docinfodir' => 'custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 0
       assert_css 'meta[name="robots"]', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => './custom-docinfodir' }
+                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => './custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 1
       assert_css 'meta[name="robots"]', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => 'custom-docinfodir/subfolder' }
+                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => 'custom-docinfodir/subfolder' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 0
       assert_css 'meta[name="robots"]', output, 0
@@ -221,13 +221,13 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'productname', output, 1
       assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
@@ -236,7 +236,7 @@ context 'Document' do
       assert_css 'copyright', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'productname', output, 1
       assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
@@ -247,7 +247,7 @@ context 'Document' do
 
     test 'should use header docinfo in place of default header' do
       output = Asciidoctor.convert_file fixture_path('sample.adoc'), to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
       refute_empty output
       assert_css 'article > info', output, 1
       assert_css 'article > info > title', output, 1
@@ -259,19 +259,19 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'body script', output, 1
       assert_css 'a#top', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'body script', output, 0
       assert_css 'a#top', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'body script', output, 1
       assert_css 'a#top', output, 1
@@ -281,20 +281,20 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'glossary', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 0
       assert_css 'glossary[xml|id="_glossary"]', output, 1
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
@@ -310,7 +310,7 @@ context 'Document' do
         $VERBOSE = nil # disable warnings since we have to modify constants
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
         sample_input_path = fixture_path('basic.adoc')
-        output = Asciidoctor.convert_file sample_input_path, to_file: false, header_footer: true,
+        output = Asciidoctor.convert_file sample_input_path, to_file: false, standalone: true,
             backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private,shared' }
         refute_empty output
         assert_css 'productname', output, 1
@@ -329,13 +329,13 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, safe: Asciidoctor::SafeMode::SERVER
+          standalone: true, safe: Asciidoctor::SafeMode::SERVER
       refute_empty output
       assert_css 'script[src="modernizr.js"]', output, 0
       assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER
+          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 0
@@ -345,13 +345,13 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, attributes: { 'docinfo2' => '' }
+          standalone: true, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'script[src="modernizr.js"]', output, 0
       assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
 
       output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          header_footer: true, backend: 'docbook', attributes: { 'docinfo2' => '' }
+          standalone: true, backend: 'docbook', attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 0
@@ -362,7 +362,7 @@ context 'Document' do
       using_memory_logger do |logger|
         output = Asciidoctor.convert_file sample_input_path,
             to_file: false,
-            header_footer: true,
+            standalone: true,
             safe: :server,
             attributes: { 'docinfo' => '', 'bootstrap-version' => nil, 'linkcss' => '', 'attribute-missing' => 'drop-line' }
         refute_empty output
@@ -376,7 +376,7 @@ context 'Document' do
       sample_input_path = fixture_path 'subs.adoc'
       output = Asciidoctor.convert_file sample_input_path,
           to_file: false,
-          header_footer: true,
+          standalone: true,
           safe: :server,
           attributes: { 'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => '' }
       refute_empty output
@@ -1039,12 +1039,45 @@ context 'Document' do
       assert_xpath '//*[@id="footer-text"][normalize-space(text())=""]', result, 1
     end
 
-    test 'no header footer' do
-      doc = document_from_string "= Document Title\n\ncontent", header_footer: false
+    test 'should create embedded document if standalone option passed to constructor is false' do
+      doc = (Asciidoctor::Document.new "= Document Title\n\ncontent", standalone: false).parse
       assert doc.attr?('embedded')
       result = doc.convert
       assert_xpath '/html', result, 0
       assert_xpath '/h1', result, 0
+      assert_xpath '/*[@id="header"]', result, 0
+      assert_xpath '/*[@id="footer"]', result, 0
+      assert_xpath '/*[@class="paragraph"]', result, 1
+    end
+
+    test 'should create embedded document if standalone option passed to convert method is false' do
+      doc = (Asciidoctor::Document.new "= Document Title\n\ncontent", standalone: true).parse
+      refute doc.attr?('embedded')
+      result = doc.convert standalone: false
+      assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 1
+      assert_xpath '/*[@id="header"]', result, 0
+      assert_xpath '/*[@id="footer"]', result, 0
+      assert_xpath '/*[@class="paragraph"]', result, 1
+    end
+
+    test 'should create embedded document if deprecated header_footer option is false' do
+      doc = (Asciidoctor::Document.new "= Document Title\n\ncontent", header_footer: false).parse
+      assert doc.attr?('embedded')
+      result = doc.convert
+      assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 0
+      assert_xpath '/*[@id="header"]', result, 0
+      assert_xpath '/*[@id="footer"]', result, 0
+      assert_xpath '/*[@class="paragraph"]', result, 1
+    end
+
+    test 'should create embedded document if header_footer option passed to convert method is false' do
+      doc = (Asciidoctor::Document.new "= Document Title\n\ncontent", header_footer: true).parse
+      refute doc.attr?('embedded')
+      result = doc.convert header_footer: false
+      assert_xpath '/html', result, 0
+      assert_xpath '/h1', result, 1
       assert_xpath '/*[@id="header"]', result, 0
       assert_xpath '/*[@id="footer"]', result, 0
       assert_xpath '/*[@class="paragraph"]', result, 1
@@ -1236,7 +1269,7 @@ context 'Document' do
       doc = document_from_string input, safe: :safe, attributes: { 'htmlsyntax' => 'xml' }
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
-      result = doc.convert header_footer: false
+      result = doc.convert standalone: false
       assert_equal '<hr/>', result
     end
 
@@ -1250,7 +1283,7 @@ context 'Document' do
       doc = document_from_string input, safe: :safe
       assert_equal 'html5', doc.backend
       assert_equal 'xml', (doc.attr 'htmlsyntax')
-      result = doc.convert header_footer: false
+      result = doc.convert standalone: false
       assert_equal '<hr/>', result
     end
 

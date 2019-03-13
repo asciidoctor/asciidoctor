@@ -606,7 +606,7 @@ class ReaderTest < Minitest::Test
 
       test 'include directive is enabled when safe mode is less than SECURE' do
         input = 'include::fixtures/include-file.adoc[]'
-        doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
+        doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
         output = doc.convert
         assert_match(/included content/, output)
         assert doc.catalog[:includes]['fixtures/include-file']
@@ -619,7 +619,7 @@ class ReaderTest < Minitest::Test
         ----
         EOS
 
-        doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
+        doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
         assert doc.catalog[:includes].empty?
       end
 
@@ -629,7 +629,7 @@ class ReaderTest < Minitest::Test
         include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.adoc'
         begin
           FileUtils.cp include_file, include_file_with_sp
-          doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
+          doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
           output = doc.convert
           assert_match(/included content/, output)
         ensure
@@ -643,7 +643,7 @@ class ReaderTest < Minitest::Test
         include_file_with_sp = File.join DIRNAME, 'fixtures', 'include file.adoc'
         begin
           FileUtils.cp include_file, include_file_with_sp
-          doc = document_from_string input, safe: :safe, header_footer: false, base_dir: DIRNAME
+          doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
           output = doc.convert
           assert_match(/included content/, output)
         ensure

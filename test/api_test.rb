@@ -940,7 +940,19 @@ context 'API' do
       assert_equal Asciidoctor.method(:convert), Asciidoctor.method(:render)
     end
 
-    test 'should convert source document to string when to_file is false' do
+    test 'should convert source document to standalone document string when to_file is false and standalone is true' do
+      sample_input_path = fixture_path('sample.adoc')
+
+      output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
+      refute_empty output
+      assert_xpath '/html', output, 1
+      assert_xpath '/html/head', output, 1
+      assert_xpath '/html/body', output, 1
+      assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+      assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+    end
+
+    test 'should convert source document to standalone document string when to_file is false and header_footer is true' do
       sample_input_path = fixture_path('sample.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
@@ -955,7 +967,7 @@ context 'API' do
     test 'lines in output should be separated by line feed' do
       sample_input_path = fixture_path('sample.adoc')
 
-      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
+      output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       refute_empty output
       lines = output.split("\n")
       assert_equal lines.size, output.split(/\r\n|\r|\n/).size
@@ -978,7 +990,7 @@ context 'API' do
 
     test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
       sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
+      output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
@@ -990,7 +1002,7 @@ context 'API' do
       text
       EOS
 
-      output = Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, header_footer: true
+      output = Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, standalone: true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -1007,7 +1019,7 @@ context 'API' do
       text
       EOS
 
-      output = Asciidoctor.convert input, header_footer: true
+      output = Asciidoctor.convert input, standalone: true
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
     end
@@ -1021,7 +1033,7 @@ context 'API' do
 
       #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
       [{ 'linkcss!' => '' }, { 'linkcss' => nil }].each do |attrs|
-        output = Asciidoctor.convert input, header_footer: true, attributes: attrs
+        output = Asciidoctor.convert input, standalone: true, attributes: attrs
         assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
         assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
         stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -1033,7 +1045,7 @@ context 'API' do
 
     test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
       sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false,
+      output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false,
           safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
       assert_css 'html:root > head > style', output, 1
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -1049,7 +1061,7 @@ context 'API' do
       text
       EOS
 
-      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet!' => '' }
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet!' => '' }
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"]', output, 0
     end
@@ -1061,11 +1073,11 @@ context 'API' do
       text
       EOS
 
-      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => './custom.css' }
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet' => './custom.css' }
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
       assert_css 'html:root > head > link[rel="stylesheet"][href="./custom.css"]', output, 1
 
-      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => 'file:///home/username/custom.css' }
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet' => 'file:///home/username/custom.css' }
       assert_css 'html:root > head > link[rel="stylesheet"][href="file:///home/username/custom.css"]', output, 1
     end
 
@@ -1076,13 +1088,13 @@ context 'API' do
       text
       EOS
 
-      output = Asciidoctor.convert input, header_footer: true, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets' }
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets' }
       assert_css 'html:root > head > link[rel="stylesheet"][href="./stylesheets/custom.css"]', output, 1
     end
 
     test 'should resolve custom stylesheet to embed relative to stylesdir' do
       sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, header_footer: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false,
+      output = Asciidoctor.convert_file sample_input_path, standalone: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false,
           attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.content
@@ -1173,7 +1185,7 @@ context 'API' do
       sample_input = '{outfilesuffix}'
       sample_output_path = fixture_path('result.htm')
       begin
-        Asciidoctor.convert sample_input, to_file: sample_output_path, header_footer: false
+        Asciidoctor.convert sample_input, to_file: sample_output_path
         assert File.exist?(sample_output_path)
         output = File.read(sample_output_path)
         refute_empty output

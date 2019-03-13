@@ -299,7 +299,7 @@ class Table::Cell < AbstractBlock
           inner_document_lines.unshift(*preprocessed_lines) unless preprocessed_lines.empty?
         end
       end unless inner_document_lines.empty?
-      @inner_document = Document.new(inner_document_lines, header_footer: false, parent: @document, cursor: inner_document_cursor)
+      @inner_document = Document.new inner_document_lines, standalone: false, parent: @document, cursor: inner_document_cursor
       @document.attributes['doctitle'] = parent_doctitle unless parent_doctitle.nil?
       @subs = nil
     elsif literal

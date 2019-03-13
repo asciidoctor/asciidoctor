@@ -241,7 +241,7 @@ class Document < AbstractBlock
   #
   # data    - The AsciiDoc source data as a String or String Array. (default: nil)
   # options - A Hash of options to control processing (e.g., safe mode value (:safe), backend (:backend),
-  #           header/footer toggle (:header_footer), custom attributes (:attributes)). (default: {})
+  #           standalone enclosure (:standalone), custom attributes (:attributes)). (default: {})
   #
   # Duplication of the options Hash is handled in the enclosing API.
   #
@@ -328,6 +328,7 @@ class Document < AbstractBlock
       @path_resolver = PathResolver.new
       initialize_extensions = (defined? ::Asciidoctor::Extensions) ? true : nil
       @extensions = nil # initialize furthur down if initialize_extensions is true
+      options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 
     @parsed = false
@@ -335,20 +336,20 @@ class Document < AbstractBlock
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
-    header_footer = (options[:header_footer] ||= false)
+    standalone = options[:standalone]
     (@options = options).freeze
 
     attrs = @attributes
     #attrs['encoding'] = 'UTF-8'
     attrs['sectids'] = ''
     attrs['toc-placement'] = 'auto'
-    if header_footer
+    if standalone
       attrs['copycss'] = ''
-      # sync embedded attribute with :header_footer option value
+      # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = nil
     else
       attrs['notitle'] = ''
-      # sync embedded attribute with :header_footer option value
+      # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = ''
     end
     attrs['stylesheet'] = ''
@@ -928,7 +929,13 @@ class Document < AbstractBlock
         end
       end
     else
-      transform = ((opts.key? :header_footer) ? opts[:header_footer] : @options[:header_footer]) ? 'document' : 'embedded'
+      if opts.key? :standalone
+        transform = opts[:standalone] ? 'document' : 'embedded'
+      elsif opts.key? :header_footer
+        transform = opts[:header_footer] ? 'document' : 'embedded'
+      else
+        transform = @options[:standalone] ? 'document' : 'embedded'
+      end
       output = @converter.convert self, transform
     end
 

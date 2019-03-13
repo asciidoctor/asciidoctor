@@ -1823,7 +1823,7 @@ context 'Sections' do
         sect.number += 1
       end
 
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_xpath '//h2[text()="2. Somewhere in the Middle"]', output, 1
       assert_xpath '//h2[text()="3. The End"]', output, 1
     end
