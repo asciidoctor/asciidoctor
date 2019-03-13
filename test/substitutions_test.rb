@@ -1861,9 +1861,10 @@ context 'Substitutions' do
       end
 
       test 'should apply substitutions specified on stem macro' do
-        input = 'stem:c,a[sqrt(x) <=> {solve-for-x}]'
-        para = block_from_string input, attributes: { 'stem' => 'asciimath', 'solve-for-x' => '13' }
-        assert_equal '\$sqrt(x) &lt;=&gt; 13\$', para.content
+        ['stem:c,a[sqrt(x) <=> {solve-for-x}]', 'stem:n,-r[sqrt(x) <=> {solve-for-x}]'].each do |input|
+          para = block_from_string input, attributes: { 'stem' => 'asciimath', 'solve-for-x' => '13' }
+          assert_equal '\$sqrt(x) &lt;=&gt; 13\$', para.content
+        end
       end
 
       test 'should not recognize stem macro with invalid substitution list' do

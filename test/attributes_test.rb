@@ -257,6 +257,8 @@ context 'Attributes' do
       assert_equal '<>&', doc.attributes['xml-busters']
       doc = document_from_string(":xml-busters: pass:specialcharacters[<>&]")
       assert_equal '&lt;&gt;&amp;', doc.attributes['xml-busters']
+      doc = document_from_string(":xml-busters: pass:n,-c[<(C)>]")
+      assert_equal '<&#169;>', doc.attributes['xml-busters']
     end
 
     test 'should not recognize pass macro with invalid substitution list in attribute value' do
