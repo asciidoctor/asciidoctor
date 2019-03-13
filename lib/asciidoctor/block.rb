@@ -40,7 +40,7 @@ class Block < AbstractBlock
   #                 * :source a String or Array of raw source for this Block. (default: nil)
   #
   # IMPORTANT: If you don't specify the `:subs` option, you must explicitly call
-  # the `lock_in_subs` method to resolve and assign the substitutions to this
+  # the `commit_subs` method to resolve and assign the substitutions to this
   # block (which are resolved from the `subs` attribute, if specified, or the
   # default substitutions based on this block's context). If you want to use the
   # default subs for a block, pass the option `subs: :default`. You can
@@ -51,7 +51,7 @@ class Block < AbstractBlock
     super
     @content_model = opts[:content_model] || DEFAULT_CONTENT_MODEL[context]
     if opts.key? :subs
-      # FIXME feels funky; we have to be defensive to get lock_in_subs to honor override
+      # FIXME feels funky; we have to be defensive to get commit_subs to honor override
       # FIXME does not resolve substitution groups inside Array (e.g., [:normal])
       if (subs = opts[:subs])
         # e.g., subs: :defult
@@ -71,8 +71,8 @@ class Block < AbstractBlock
           @attributes['subs'] = %(#{subs})
         end
         # resolve the subs eagerly only if subs option is specified
-        # QUESTION should we skip subsequent calls to lock_in_subs?
-        lock_in_subs
+        # QUESTION should we skip subsequent calls to commit_subs?
+        commit_subs
       # e.g., subs: nil
       else
         # NOTE @subs is initialized as empty array by super constructor

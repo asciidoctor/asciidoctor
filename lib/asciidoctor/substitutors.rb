@@ -1473,7 +1473,7 @@ module Substitutors
   # Internal: Inserts text into a formatted text enclosure; used by xreftext
   alias sub_placeholder sprintf unless RUBY_ENGINE == 'opal'
 
-  # Internal: Lock-in the substitutions for this block
+  # Internal: Commit the requested substitutions to this block.
   #
   # Looks for an attribute named "subs". If present, resolves substitutions
   # from the value of that attribute and assigns them to the subs property on
@@ -1482,7 +1482,7 @@ module Substitutors
   # the content model of the block.
   #
   # Returns The Array of resolved substitutions now assigned to this block
-  def lock_in_subs
+  def commit_subs
     unless (default_subs = @default_subs)
       case @content_model
       when :simple

@@ -903,7 +903,7 @@ class Parser
     end
     # FIXME remove the need for this update!
     block.attributes.update(attributes) unless attributes.empty?
-    block.lock_in_subs
+    block.commit_subs
 
     #if doc_attrs.key? :pending_attribute_entries
     #  doc_attrs.delete(:pending_attribute_entries).each do |entry|

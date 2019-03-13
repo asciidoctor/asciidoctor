@@ -2000,7 +2000,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph
       block.attributes['subs'] = 'quotes,normal'
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:quotes, :specialcharacters, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
 
@@ -2010,7 +2010,7 @@ context 'Substitutions' do
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:highlight], block.subs
     end
 
@@ -2020,7 +2020,7 @@ context 'Substitutions' do
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:highlight], block.subs
     end if ENV['PYGMENTS']
 
@@ -2030,7 +2030,7 @@ context 'Substitutions' do
       block.style = 'source'
       block.attributes['subs'] = 'specialcharacters'
       block.attributes['language'] = 'ruby'
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:specialcharacters], block.subs
     end
 
@@ -2038,7 +2038,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: nil, attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
-      block.lock_in_subs
+      block.commit_subs
       assert_empty block.subs
     end
 
@@ -2046,7 +2046,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: [], attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
-      block.lock_in_subs
+      block.commit_subs
       assert_empty block.subs
     end
 
@@ -2054,7 +2054,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: [:specialcharacters], attributes: { 'subs' => 'quotes' }
       assert_equal [:specialcharacters], block.subs
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:specialcharacters], block.subs
     end
 
@@ -2062,8 +2062,8 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', attributes: { 'subs' => 'quotes' }
       assert_empty block.subs
-      # in this case, we have to call lock_in_subs to resolve the subs
-      block.lock_in_subs
+      # in this case, we have to call commit_subs to resolve the subs
+      block.commit_subs
       assert_equal [:quotes], block.subs
     end
 
@@ -2071,7 +2071,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: :default, attributes: { 'subs' => 'quotes' }
       assert_equal [:quotes], block.subs
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:quotes], block.subs
     end
 
@@ -2079,7 +2079,7 @@ context 'Substitutions' do
       doc = empty_document parse: true
       block = Asciidoctor::Block.new doc, :paragraph, source: '*bold* _italic_', subs: :default
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
-      block.lock_in_subs
+      block.commit_subs
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
   end
