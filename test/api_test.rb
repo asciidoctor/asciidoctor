@@ -712,7 +712,7 @@ context 'API' do
       assert_equal 'Section', result[0].title
     end
 
-    test 'find_by should skip node and its children if block returns :skip' do
+    test 'find_by should reject node and its children if block returns :reject' do
       input = <<~'EOS'
       paragraph 1
 
@@ -730,7 +730,7 @@ context 'API' do
       result = doc.find_by do |candidate|
         ctx = candidate.context
         if ctx == :example
-          :skip
+          :reject
         elsif ctx == :paragraph
           true
         end
@@ -741,7 +741,7 @@ context 'API' do
       assert_equal :paragraph, result[1].context
     end
 
-    test 'find_by should accept node but skip its children if block returns :skip_children' do
+    test 'find_by should accept node but reject its children if block returns :prune' do
       input = <<~'EOS'
       ====
       paragraph 2
@@ -754,7 +754,7 @@ context 'API' do
       doc = Asciidoctor.load input
       result = doc.find_by do |candidate|
         if candidate.context == :example
-          :skip_children
+          :prune
         end
       end
       refute_nil result
