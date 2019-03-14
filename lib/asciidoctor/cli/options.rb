@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 module Asciidoctor
   module Cli
-    FS = '/'
-    RS = '\\'
+    FS = ?/
+    RS = ?\\
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash
