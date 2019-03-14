@@ -9,26 +9,22 @@ module Asciidoctor
 
       def initialize(options = {})
         self[:attributes] = options[:attributes] || {}
-        self[:input_files] = options[:input_files] || nil
-        self[:output_file] = options[:output_file] || nil
+        self[:input_files] = options[:input_files]
+        self[:output_file] = options[:output_file]
         self[:safe] = options[:safe] || SafeMode::UNSAFE
-        self[:header_footer] = options[:header_footer] || true
-        self[:template_dirs] = options[:template_dirs] || nil
-        self[:template_engine] = options[:template_engine] || nil
-        if options[:doctype]
-          self[:attributes]['doctype'] = options[:doctype]
-        end
-        if options[:backend]
-          self[:attributes]['backend'] = options[:backend]
-        end
-        self[:eruby] = options[:eruby] || nil
-        self[:verbose] = options[:verbose] || 1
-        self[:warnings] = options[:warnings] || false
-        self[:load_paths] = options[:load_paths] || nil
-        self[:requires] = options[:requires] || nil
+        self[:header_footer] = options.fetch :header_footer, true
+        self[:template_dirs] = options[:template_dirs]
+        self[:template_engine] = options[:template_engine]
+        self[:attributes]['doctype'] = options[:doctype] if options[:doctype]
+        self[:attributes]['backend'] = options[:backend] if options[:backend]
+        self[:eruby] = options[:eruby]
+        self[:verbose] = options.fetch :verbose, 1
+        self[:warnings] = options.fetch :warnings, false
+        self[:load_paths] = options[:load_paths]
+        self[:requires] = options[:requires]
         self[:base_dir] = options[:base_dir]
-        self[:source_dir] = options[:source_dir] || nil
-        self[:destination_dir] = options[:destination_dir] || nil
+        self[:source_dir] = options[:source_dir]
+        self[:destination_dir] = options[:destination_dir]
         self[:failure_level] = ::Logger::Severity::FATAL
         self[:trace] = false
         self[:timings] = false
