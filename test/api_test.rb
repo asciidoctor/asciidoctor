@@ -1506,5 +1506,55 @@ context 'API' do
       assert cell.block?
       refute cell.inline?
     end
+
+    test 'next_adjacent_block should return next block' do
+      input = <<~'EOS'
+      first
+
+      second
+      EOS
+
+      doc = document_from_string input
+      assert_equal doc.blocks[1], doc.blocks[0].next_adjacent_block
+    end
+
+    test 'next_adjacent_block should return next sibling of parent if called on last sibling' do
+      input = <<~'EOS'
+      --
+      first
+      --
+
+      second
+      EOS
+
+      doc = document_from_string input
+      assert_equal doc.blocks[1], doc.blocks[0].blocks[0].next_adjacent_block
+    end
+
+    test 'next_adjacent_block should return next sibling of list if called on last item' do
+      input = <<~'EOS'
+      * first
+
+      second
+      EOS
+
+      doc = document_from_string input
+      assert_equal doc.blocks[1], doc.blocks[0].blocks[0].next_adjacent_block
+    end
+
+    test 'next_adjacent_block should return next item in dlist if called on last block of list item' do
+      input = <<~'EOS'
+      first::
+      desc
+      +
+      more desc
+
+      second::
+      desc
+      EOS
+
+      doc = document_from_string input
+      assert_equal doc.blocks[0].items[1], doc.blocks[0].items[0][1].blocks[0].next_adjacent_block
+    end
   end
 end
