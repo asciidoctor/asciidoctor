@@ -145,6 +145,7 @@ Build / Infrastructure::
   * add Ruby 2.6.0 to build matrix
   * stop running CI job on unsupported versions of Ruby
   * exclude test suite, build script, and Gemfile from gem (#3044)
+  * split build tasks out into individual files
 
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
