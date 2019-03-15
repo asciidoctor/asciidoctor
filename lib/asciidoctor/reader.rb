@@ -1014,7 +1014,9 @@ class PreprocessorReader < Reader
         unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
       true
-    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
+    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate|
+      (handles = candidate.instance.method :handles?).arity == 1 ? (handles.call expanded_target) : (handles.call expanded_target, doc)
+    })
       shift
       # FIXME parse attributes only if requested by extension
       ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], sub_input: true)]
