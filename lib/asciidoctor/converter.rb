@@ -377,7 +377,7 @@ module Converter
     #
     # See {Converter#convert} for details about the arguments and return value.
     def convert node, transform = node.node_name, opts = nil
-      opts ? (send transform, node, opts) : (send transform, node)
+      opts.nil_or_empty? ? (send transform, node) : (send transform, node, opts)
     rescue
       raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == transform
       logger.warn %(missing convert handler for #{ex.name} node in #{@backend} backend (#{self.class}))
