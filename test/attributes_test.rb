@@ -352,10 +352,10 @@ context 'Attributes' do
       ].each do |attributes|
         doc = document_from_string '== Heading', attributes: attributes
         refute doc.attr?('sectids')
-        assert_css '#_heading', (doc.convert header_footer: false), 0
+        assert_css '#_heading', (doc.convert standalone: false), 0
         doc = document_from_string %(:sectids:\n\n== Heading), attributes: attributes
         assert doc.attr?('sectids')
-        assert_css '#_heading', (doc.convert header_footer: false), 1
+        assert_css '#_heading', (doc.convert standalone: false), 1
       end
     end
 
@@ -1071,7 +1071,7 @@ context 'Attributes' do
       EOS
 
       doc = document_from_string input
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="1"]', output, 2
     end
@@ -1088,7 +1088,7 @@ context 'Attributes' do
       EOS
 
       doc = document_from_string input
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_equal 1, doc.attributes['mycounter']
       assert_xpath '//p[text()="before: 1 2 3"]', output, 1
       assert_xpath '//p[text()="after: 1"]', output, 1

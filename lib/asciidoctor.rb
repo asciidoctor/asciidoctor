@@ -1375,8 +1375,12 @@ module Asciidoctor
       write_to_target = (stream_output = to_file.respond_to? :write) ? false : (options[:to_file] = to_file)
     end
 
-    unless options.key? :header_footer
-      options[:header_footer] = true if write_to_same_dir || write_to_target
+    unless options.key? :standalone
+      if write_to_same_dir || write_to_target
+        options[:standalone] = true
+      elsif options.key? :header_footer
+        options[:standalone] = options[:header_footer]
+      end
     end
 
     # NOTE outfile may be controlled by document attributes, so resolve outfile after loading

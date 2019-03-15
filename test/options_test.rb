@@ -91,7 +91,7 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.parse!(%w(-w -v -s -d book test/fixtures/sample.adoc))
 
     assert_equal 2, options[:verbose]
-    assert_equal false, options[:header_footer]
+    assert_equal false, options[:standalone]
     assert_equal 'book', options[:attributes]['doctype']
     assert_equal 1, options[:input_files].size
     assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]

@@ -396,7 +396,7 @@ context "Bulleted lists (:ulist)" do
       colist = doc.blocks[0].items[0].blocks[-1]
       assert_equal :colist, colist.context
       refute_equal 'source', colist.style
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_css 'ul', output, 1
       assert_css 'ul > li', output, 1
       assert_css 'ul > li > p', output, 1
@@ -813,7 +813,7 @@ context "Bulleted lists (:ulist)" do
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
     end
@@ -833,7 +833,7 @@ context "Bulleted lists (:ulist)" do
       refs = doc.catalog[:refs]
       assert refs.key?('step-2')
       assert refs.key?('step-4')
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step 2"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
     end
@@ -2383,7 +2383,7 @@ context "Description lists (:dlist)" do
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '//dl', output, 1
@@ -3342,14 +3342,14 @@ context "Description lists (:dlist)" do
       * [[[Fowler_1997,1]]] Fowler M. _Analysis Patterns: Reusable Object Models_. Addison-Wesley. 1997.
       EOS
 
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       tmmm_ref = doc.catalog[:refs]['TMMM']
       refute_nil tmmm_ref
       assert_nil tmmm_ref.reftext
       fowler_1997_ref = doc.catalog[:refs]['Fowler_1997']
       refute_nil fowler_1997_ref
       assert_equal '[1]', fowler_1997_ref.reftext
-      result = doc.convert header_footer: false
+      result = doc.convert standalone: false
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
       assert_xpath '//a[@id="Fowler_1997"]', result, 1
@@ -5043,7 +5043,7 @@ context 'Checklists' do
     assert checklist.items[1].attr?('checked')
     refute checklist.items[4].attr?('checkbox')
 
-    output = doc.convert header_footer: false
+    output = doc.convert standalone: false
     assert_css '.ulist.checklist', output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[1]/p[text()="#{decode_char 10063} todo"]), output, 1
     assert_xpath %((/*[@class="ulist checklist"]/ul/li)[2]/p[text()="#{decode_char 10003} done"]), output, 1
@@ -5080,7 +5080,7 @@ context 'Checklists' do
     assert checklist.option?('checklist')
     assert checklist.option?('interactive')
 
-    output = doc.convert header_footer: false
+    output = doc.convert standalone: false
     assert_css '.ulist.checklist', output, 1
     assert_css '.ulist.checklist li input[type="checkbox"]', output, 2
     assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 0

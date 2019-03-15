@@ -12,7 +12,7 @@ context 'Tables' do
       |=======
       EOS
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       table = doc.blocks[0]
       assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
@@ -338,7 +338,7 @@ context 'Tables' do
         assert_equal expected_pcwidths[i], table_row0[i].attributes['colpcwidth']
         assert_equal '', table_row0[i].attributes['autowidth-option']
       end
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_css 'table', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 1
@@ -361,7 +361,7 @@ context 'Tables' do
         assert_equal 25, table_row0[i].attributes['colpcwidth']
         assert_equal '', table_row0[i].attributes['autowidth-option']
       end
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_css 'table', output, 1
       assert_css 'table[style*="width: 50%;"]', output, 1
       assert_css 'table colgroup col', output, 4
@@ -1292,7 +1292,7 @@ context 'Tables' do
       assert_equal 6, body_cell_1_3.inner_document.lineno
       note = (body_cell_1_3.inner_document.find_by context: :admonition)[0]
       assert_equal 9, note.lineno
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
 
       # NOTE JRuby matches the table inside the admonition block if the class is not specified on the table
       assert_css 'table.tableblock > tbody > tr', output, 2
@@ -1316,7 +1316,7 @@ context 'Tables' do
       assert_equal 2, tbody[0][0].lineno
       assert_equal 3, tbody[0][0].inner_document.lineno
       assert_equal 4, tbody[1][0].lineno
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_css 'td', output, 2
       assert_xpath '(//td)[1]//*[@class="literalblock"]', output, 1
       assert_xpath '(//td)[2]//*[@class="paragraph"]', output, 1
@@ -1371,7 +1371,7 @@ context 'Tables' do
       refs = doc.catalog[:refs]
       assert refs.key?('mount-evans')
       assert refs.key?('grays-peak')
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '(//table/tbody/tr)[1]//td//a[@id="mount-evans"]', output, 1
@@ -1765,7 +1765,7 @@ context 'Tables' do
       nobody:x:99:99:Nobody:/:/sbin/nologin
       |===
       EOS
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       table = doc.blocks[0]
       assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert

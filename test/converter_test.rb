@@ -400,7 +400,7 @@ context 'Converter' do
       doc = document_from_string input, converter: converter
       assert_equal converter, doc.converter
       assert_equal 'xml', (doc.attr 'htmlsyntax')
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_includes output, '<img src="sunset.jpg" alt="sunset"/>'
     end
 

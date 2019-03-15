@@ -959,8 +959,8 @@ context 'Blocks' do
       line three
       ....
       EOS
-      [true, false].each do |header_footer|
-        output = convert_string input, header_footer: header_footer
+      [true, false].each do |standalone|
+        output = convert_string input, standalone: standalone
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
@@ -983,8 +983,8 @@ context 'Blocks' do
       line three
       ----
       EOS
-      [true, false].each do |header_footer|
-        output = convert_string input, header_footer: header_footer
+      [true, false].each do |standalone|
+        output = convert_string input, standalone: standalone
         assert_xpath '//pre', output, 1
         assert_xpath '//pre/text()', output, 1
         text = xmlnodes_at_xpath('//pre/text()', output, 1).text
@@ -1010,8 +1010,8 @@ context 'Blocks' do
       ____
       --
       EOS
-      [true, false].each do |header_footer|
-        output = convert_string input, header_footer: header_footer
+      [true, false].each do |standalone|
+        output = convert_string input, standalone: standalone
         assert_xpath '//*[@class="verseblock"]/pre', output, 1
         assert_xpath '//*[@class="verseblock"]/pre/text()', output, 1
         text = xmlnodes_at_xpath('//*[@class="verseblock"]/pre/text()', output, 1).text
@@ -1040,7 +1040,7 @@ context 'Blocks' do
       ....
       EOS
 
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       block = doc.blocks.first
       assert_equal ['', '', '  first line', '', 'last line', '', '{empty}', ''], block.lines
       result = doc.convert
@@ -1552,7 +1552,7 @@ context 'Blocks' do
       ++++
       EOS
 
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       block = doc.blocks[1]
       assert_equal ['', '', '  first line', '', 'last line', '', ''], block.lines
       result = doc.convert
@@ -1752,7 +1752,7 @@ context 'Blocks' do
       EOS
 
       using_memory_logger do |logger|
-        doc = document_from_string input, backend: :docbook, header_footer: false
+        doc = document_from_string input, backend: :docbook, standalone: false
         actual = doc.convert
         if asciimath_available
           assert_equal expect, actual.strip
@@ -1853,7 +1853,7 @@ context 'Blocks' do
       stemblock = doc.blocks[0]
       assert_equal :stem, stemblock.context
       assert_equal 'asciimath', stemblock.attributes['style']
-      output = doc.convert header_footer: false
+      output = doc.convert standalone: false
       assert_css '.stemblock', output, 1
       nodes = xmlnodes_at_xpath '//*[@class="content"]/child::text()', output
       assert_equal '\$sqrt(3x-1)+(1+x)^2 &lt; y\$', nodes.first.to_s.strip
@@ -3350,7 +3350,7 @@ context 'Blocks' do
       ....
       EOS
 
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       block = doc.blocks.first
       assert_equal [:attributes, :specialcharacters, :macros], block.subs
       result = doc.convert
@@ -3363,7 +3363,7 @@ context 'Blocks' do
       _hey now_ <1>
       EOS
 
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       block = doc.blocks.first
       assert_equal [:specialcharacters], block.subs
       result = doc.convert

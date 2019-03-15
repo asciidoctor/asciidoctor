@@ -1142,7 +1142,7 @@ context 'Substitutions' do
 
     test 'should escape concealed index term if second bracket is preceded by a backslash' do
       input = %[National Institute of Science and Technology (#{BACKSLASH}((NIST)))]
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       output = doc.convert
       assert_xpath '//p[text()="National Institute of Science and Technology (((NIST)))"]', output, 1
       assert doc.catalog[:indexterms].empty?
@@ -1150,7 +1150,7 @@ context 'Substitutions' do
 
     test 'should only escape enclosing brackets if concealed index term is preceded by a backslash' do
       input = %[National Institute of Science and Technology #{BACKSLASH}(((NIST)))]
-      doc = document_from_string input, header_footer: false
+      doc = document_from_string input, standalone: false
       output = doc.convert
       assert_xpath '//p[text()="National Institute of Science and Technology (NIST)"]', output, 1
       term = doc.catalog[:indexterms].first

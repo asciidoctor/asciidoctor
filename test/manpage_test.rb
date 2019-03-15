@@ -36,7 +36,7 @@ context 'Manpage' do
 
     test 'should output multiple mannames in NAME section' do
       input = SAMPLE_MANPAGE_HEADER.sub(/^command - /, 'command, alt_command - ')
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
@@ -58,7 +58,7 @@ context 'Manpage' do
       EOS
 
       attrs = { 'manname' => 'foobar', 'manpurpose' => 'puts some foo on the bar' }
-      doc = Asciidoctor.load input, backend: :manpage, header_footer: true, attributes: attrs
+      doc = Asciidoctor.load input, backend: :manpage, standalone: true, attributes: attrs
       assert_equal 'foobar', (doc.attr 'manname')
       assert_equal ['foobar'], (doc.attr 'mannames')
       assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
@@ -90,14 +90,14 @@ context 'Manpage' do
       When you need to put some foo on the bar.
       EOS
 
-      doc = Asciidoctor.load input, backend: :manpage, header_footer: true
+      doc = Asciidoctor.load input, backend: :manpage, standalone: true
       assert_equal 'puts some foo on the bar', (doc.attr 'manpurpose')
     end
 
     test 'should parse malformed document with warnings' do
       input = 'garbage in'
       using_memory_logger do |logger|
-        doc = Asciidoctor.load input, backend: :manpage, header_footer: true, attributes: { 'docname' => 'cmd' }
+        doc = Asciidoctor.load input, backend: :manpage, standalone: true, attributes: { 'docname' => 'cmd' }
         assert_equal 'cmd', doc.attr('manname')
         assert_equal ['cmd'], doc.attr('mannames')
         assert_equal '.1', doc.attr('outfilesuffix')
@@ -142,13 +142,13 @@ context 'Manpage' do
 
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_includes output.lines, %(.  LINKSTYLE blue R < >\n)
     end
 
     test 'should use linkstyle defined by man-linkstyle attribute' do
       input = SAMPLE_MANPAGE_HEADER
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true, attributes: { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true, attributes: { 'man-linkstyle' => 'cyan B \[fo] \[fc]' }
       assert_includes output.lines, %(.  LINKSTYLE cyan B \\[fo] \\[fc]\n)
     end
 
@@ -157,14 +157,14 @@ context 'Manpage' do
       :man-linkstyle: cyan R < >
       #{SAMPLE_MANPAGE_HEADER}
       EOS
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R &lt; &gt;\n)
 
       input = <<~EOS.chop
       :man-linkstyle: pass:[cyan R < >]
       #{SAMPLE_MANPAGE_HEADER}
       EOS
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_includes output.lines, %(.  LINKSTYLE cyan R < >\n)
     end
   end
@@ -251,7 +251,7 @@ context 'Manpage' do
       Describe this thing.
       EOS
 
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true, attributes: {
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true, attributes: {
         'manmanual' => %(General\nCommands\nManual),
         'mansource' => %(Control\nAll\nThe\nThings\n5.0),
       }
@@ -264,7 +264,7 @@ context 'Manpage' do
   context 'Backslash' do
     test 'should not escape spaces for empty manual or source fields' do
       input = SAMPLE_MANPAGE_HEADER.lines.select {|l| !l.start_with?(':man ') }
-      output = Asciidoctor.convert input, backend: :manpage, header_footer: true
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_match ' Manual: \ \&', output
       assert_match ' Source: \ \&', output
       assert_match(/^\.TH "COMMAND" .* "\\ \\&" "\\ \\&"$/, output)
@@ -736,7 +736,7 @@ context 'Manpage' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
         ENV['SOURCE_DATE_EPOCH'] = '1234123412'
-        output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, header_footer: true
+        output = Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
         assert_match(/Date: 2009-02-08/, output)
         assert_match(/^\.TH "COMMAND" "1" "2009-02-08" "Command 1.2.3" "Command Manual"$/, output)
       ensure
@@ -752,7 +752,7 @@ context 'Manpage' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
         ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, header_footer: true
+        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
         assert false
       rescue
         assert true

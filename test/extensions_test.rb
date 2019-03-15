@@ -1503,7 +1503,7 @@ context 'Extensions' do
         sample_input_path = fixture_path('basic.adoc')
 
         output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                          header_footer: true,
+                                          standalone: true,
                                           safe: Asciidoctor::SafeMode::SERVER,
                                           attributes: { 'docinfo' => '' }
         refute_empty output
@@ -1544,7 +1544,7 @@ context 'Extensions' do
 
     test 'should assign alt attribute to image block if alt is not provided' do
       input = 'cat_in_sink::25[]'
-      doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_cat_in_sink_block_macro
       image = doc.blocks[0]
       assert_equal 'cat in sink day 25', (image.attr 'alt')
       assert_equal 'cat in sink day 25', (image.attr 'default-alt')
@@ -1554,7 +1554,7 @@ context 'Extensions' do
 
     test 'should create an image block if mandatory attributes are provided' do
       input = 'cat_in_sink::30[cat in sink (yes)]'
-      doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_cat_in_sink_block_macro
       image = doc.blocks[0]
       assert_equal 'cat in sink (yes)', (image.attr 'alt')
       refute(image.attr? 'default-alt')
@@ -1564,7 +1564,7 @@ context 'Extensions' do
 
     test 'should not assign caption on image block if title is not set on custom block macro' do
       input = 'cat_in_sink::30[]'
-      doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_cat_in_sink_block_macro
       output = doc.convert
       assert_xpath '/*[@class="imageblock"]/*[@class="title"]', output, 0
     end
@@ -1574,14 +1574,14 @@ context 'Extensions' do
       .Cat in Sink?
       cat_in_sink::30[]
       EOS
-      doc = document_from_string input, header_footer: false, extension_registry: create_cat_in_sink_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_cat_in_sink_block_macro
       output = doc.convert
       assert_xpath '/*[@class="imageblock"]/*[@class="title"][text()="Figure 1. Cat in Sink?"]', output, 1
     end
 
     test 'should assign id and role on list items unordered' do
       input = 'santa_list::ulist[]'
-      doc = document_from_string input, header_footer: false, extension_registry: create_santa_list_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_santa_list_block_macro
       output = doc.convert
       assert_xpath '/div[@class="ulist"]/ul/li[@class="friendly"][@id="santa-list-guillaume"]', output, 1
       assert_xpath '/div[@class="ulist"]/ul/li[@class="kind contributor java"]', output, 1
@@ -1593,7 +1593,7 @@ context 'Extensions' do
 
     test 'should assign id and role on list items ordered' do
       input = 'santa_list::olist[]'
-      doc = document_from_string input, header_footer: false, extension_registry: create_santa_list_block_macro
+      doc = document_from_string input, standalone: false, extension_registry: create_santa_list_block_macro
       output = doc.convert
       assert_xpath '/div[@class="olist"]/ol/li[@class="friendly"][@id="santa-list-guillaume"]', output, 1
       assert_xpath '/div[@class="olist"]/ol/li[@class="kind contributor java"]', output, 1

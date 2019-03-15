@@ -71,6 +71,7 @@ Enhancements / Compliance::
   * allow ampersand to be used in e-mail address (#2553)
   * propogate ID assigned to inline passthrough (#2912)
   * rename control keywords in find_by to better align with the standard NodeFilter terminology
+  * rename header_footer option to standalone (while still honoring header_footer for backwards compatibility) (#1444)
 
 Improvements::
 
@@ -85,6 +86,7 @@ Improvements::
   * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
   * rename CSS class of Pygments line numbering table to linenotable (to align with Rouge) (#1040)
   * remove unused Converter#convert_with_options method (#2891)
+  * add -e, --embedded CLI flag as alias for -s, --no-header-footer (require long option to specify eRuby impl) (#1444)
   * don't store the options attribute on the block once the options are parsed (#3051)
   * add an options method on AbstractNode to retrieve the set of option names (#3051)
   * pass :input_mtime option to Document constructor; let Document constructor assign docdate/time/year attributes (#3029)
