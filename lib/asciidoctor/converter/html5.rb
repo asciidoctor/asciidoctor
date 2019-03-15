@@ -1181,6 +1181,11 @@ Your browser does not support the video tag.
     end
   end
 
+  # NOTE export _read_svg_contents as read_svg_contents for Bespoke converter
+  def read_svg_contents node, target
+    _read_svg_contents node, target
+  end
+
   private
 
   def _append_boolean_attribute name, xml

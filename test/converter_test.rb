@@ -590,5 +590,12 @@ context 'Converter' do
       assert_kind_of Asciidoctor::Converter::CustomFactory, factory
       assert_equal MyConverter, (factory.for 'mine')
     end
+
+    test 'can call read_svg_contents on built-in HTML5 converter' do
+      doc = document_from_string 'image::circle.svg[]', base_dir: fixturedir
+      result = doc.converter.read_svg_contents doc.blocks[0], 'circle.svg'
+      refute_nil result
+      assert result.start_with? '<svg'
+    end
   end
 end
