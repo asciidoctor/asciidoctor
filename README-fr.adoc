@@ -93,12 +93,6 @@ endif::[]
 
 Nous souhaitons exprimer toute notre reconnaissance à nos généreux sponsors, sans qui Asciidoctor ne pourrait pas exister.
 Merci à vous pour votre engagement dans l'amélioration de la documentation technique !
-
-image:https://www.okta.com/sites/all/themes/Okta/images/blog/Logos/Okta_Logo_BrightBlue_Medium.png[Okta,280,link=https://developer.okta.com/signup?utm_source=asciidoctor&utm_medium=logo&utm_campaign=sponsor,title="Add User Auth to Your Apps in Minutes with Okta"]
-&nbsp; &nbsp; &nbsp;
-image:https://secure.gravatar.com/avatar/823717a797dbd78ceff7b26aa397f383.png?size=200[OpenDevise,100,link=https://opendevise.com,title="Let the Creators of Asciidoctor and Antora Help You to Accelerate Your Docs"]
-
-Asciidoctor est financé majoritairement par nos *Change Makers*, https://developer.okta.com/signup?utm_source=asciidoctor&utm_medium=text-link&utm_campaign=sponsor[Okta] et https://opendevise.com[OpenDevise], ainsi que par nos *Strategy Sponsors*, https://www.khronos.org/[Khronos Group] et Linda Roberts.
 Un apport financier supplémentaire est assuré par https://asciidoctor.org/supporters[la communauté].
 
 Vous pouvez aider ce projet en devant un sponsor sur https://opencollective.com/asciidoctor[OpenCollective].
