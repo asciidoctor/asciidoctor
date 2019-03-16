@@ -1188,7 +1188,7 @@ module Asciidoctor
     # foo--bar
     [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;&#8203;', :leading],
     # ellipsis
-    [/\\?\.\.\./, '&#8230;&#8203;', :leading],
+    [/\\?\.\.\./, '&#8230;&#8203;', :none],
     # right single quote
     [/\\?`'/, '&#8217;', :none],
     # apostrophe (inside a word)
