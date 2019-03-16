@@ -509,7 +509,7 @@ module Substitutors
               # NOTE handle special case where keys ends with delimiter (e.g., Ctrl++ or Ctrl,,)
               if keys.end_with? delim
                 keys = (keys.chop.split delim, -1).map {|key| key.strip }
-                keys[-1] = %(#{keys[-1]}#{delim})
+                keys[-1] += delim
               else
                 keys = keys.split(delim).map {|key| key.strip }
               end
@@ -778,8 +778,7 @@ module Substitutors
         if $&.start_with? RS
           next $&.slice 1, $&.length
         elsif (mailto = $1)
-          target = %(mailto:#{$2})
-          mailto_text = $2
+          target = 'mailto:' + (mailto_text = $2)
         else
           target = $2
         end
@@ -854,7 +853,7 @@ module Substitutors
         # honor the escape
         next $1 == RS ? ($&.slice 1, $&.length) : $& if $1
 
-        target = %(mailto:#{$&})
+        target = 'mailto:' + $&
         # QUESTION should this be registered as an e-mail address?
         doc.register(:links, target)
 
