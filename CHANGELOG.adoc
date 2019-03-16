@@ -78,6 +78,7 @@ Enhancements / Compliance::
 Improvements::
 
   * propagate document ID to DocBook output (#3011)
+  * always store section numeral as string; compute roman numeral for part at assignment time (@vmj)
   * refactor code to use modern Hash syntax
   * define LIB_DIR constant; rename *_PATH constants to *_DIR constants to be consistent with RubyGems terminology (#2764)
   * only define ROOT_DIR if not already defined (for compatibility with Asciidoctor.js)

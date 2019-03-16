@@ -111,14 +111,7 @@ class Section < AbstractBlock
   # Returns the section number as a String
   def sectnum(delimiter = '.', append = nil)
     append ||= (append == false ? '' : delimiter)
-    if @level == 1
-      %(#{@numeral}#{append})
-    elsif @level > 1
-      Section === @parent ? %(#{@parent.sectnum(delimiter, delimiter)}#{@numeral}#{append}) : %(#{@numeral}#{append})
-    else # @level == 0
-      # NOTE coerce @numeral to int just in case not set; can happen if section nesting is out of sequence
-      %(#{Helpers.int_to_roman @numeral.to_i}#{append})
-    end
+    @level > 1 && Section === @parent ? %(#{@parent.sectnum(delimiter, delimiter)}#{@numeral}#{append}) : %(#{@numeral}#{append})
   end
 
   # (see AbstractBlock#xreftext)

@@ -23,10 +23,6 @@ class AbstractBlock < AbstractNode
   # Only assigned to formal block (block with title) if corresponding caption attribute is present.
   attr_accessor :numeral
 
-  # Deprecated: Legacy property to get/set the numeral of this block.
-  alias number numeral
-  alias number= numeral=
-
   # Public: Gets/Sets the location in the AsciiDoc source where this block begins.
   attr_accessor :source_location
 
@@ -140,6 +136,11 @@ class AbstractBlock < AbstractNode
   # Returns A [Boolean] to indicate whether this block has child Section objects
   def sections?
     @next_section_index > 0
+  end
+
+  # Deprecated: Legacy property to get the String or Integer numeral of this section.
+  def number
+    (Integer @numeral) rescue @numeral
   end
 
   # Public: Walk the document tree and find all block-level nodes that match the specified selector (context, style, id,
@@ -401,16 +402,12 @@ class AbstractBlock < AbstractNode
     if (like = section.numbered)
       if (sectname = section.sectname) == 'appendix'
         section.numeral = @document.counter 'appendix-number', 'A'
-        if (caption = @document.attributes['appendix-caption'])
-          section.caption = %(#{caption} #{section.numeral}: )
-        else
-          section.caption = %(#{section.numeral}. )
-        end
+        section.caption = (caption = @document.attributes['appendix-caption']) ? %(#{caption} #{section.numeral}: ) : %(#{section.numeral}. )
       # NOTE currently chapters in a book doctype are sequential even for multi-part books (see #979)
       elsif sectname == 'chapter' || like == :chapter
-        section.numeral = @document.counter 'chapter-number', 1
+        section.numeral = (@document.counter 'chapter-number', 1).to_s
       else
-        section.numeral = @next_section_ordinal
+        section.numeral = sectname == 'part' ? (Helpers.int_to_roman @next_section_ordinal) : @next_section_ordinal.to_s
         @next_section_ordinal += 1
       end
     end

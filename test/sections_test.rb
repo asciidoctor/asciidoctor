@@ -1489,6 +1489,33 @@ context 'Sections' do
       assert_xpath '//h1[@id="_processor"][text() = "II: Processor"]', output, 1
     end
 
+    test 'should assign sequential roman numerals to book parts' do
+      input = <<~'EOS'
+      = Book Title
+      :doctype: book
+      :sectnums:
+      :partnums:
+
+      = First Part
+
+      part intro
+
+      == First Chapter
+
+      = Second Part
+
+      part intro
+
+      == Second Chapter
+      EOS
+
+      doc = document_from_string input
+      assert_equal 'I', doc.sections[0].numeral
+      assert_equal '1', doc.sections[0].sections[0].numeral
+      assert_equal 'II', doc.sections[1].numeral
+      assert_equal '2', doc.sections[1].sections[0].numeral
+    end
+
     test 'should prepend value of part-signifier attribute to title of numbered part' do
       input = <<~'EOS'
       = Book Title
@@ -1806,12 +1833,12 @@ context 'Sections' do
       sections = doc.sections
       [0, 1, 2].each do |index|
         assert_equal index, sections[index].index
-        assert_equal index + 1, sections[index].numeral
+        assert_equal (index + 1).to_s, sections[index].numeral
         assert_equal index + 1, sections[index].number
       end
     end
 
-    test 'should allow sections to be renumbered using deprecated number property' do
+    test 'should allow sections to be renumbered using numberal property' do
       input = <<~'EOS'
       == Somewhere in the Middle
 
@@ -1820,7 +1847,7 @@ context 'Sections' do
 
       doc = document_from_string input, attributes: { 'sectnums' => '' }
       doc.sections.each do |sect|
-        sect.number += 1
+        sect.numeral = sect.numeral.next
       end
 
       output = doc.convert standalone: false
