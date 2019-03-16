@@ -346,7 +346,10 @@ class Parser
     while reader.has_more_lines?
       parse_block_metadata_lines reader, document, attributes
       if (next_level = is_next_line_section?(reader, attributes))
-        next_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
+        if document.attr? 'leveloffset'
+          next_level += (document.attr 'leveloffset').to_i
+          next_level = 0 if next_level < 0
+        end
         if next_level > current_level
           if expected_next_level
             unless next_level == expected_next_level || (expected_next_level_alt && next_level == expected_next_level_alt) || expected_next_level < 0
@@ -1749,7 +1752,10 @@ class Parser
     else
       raise %(Unrecognized section at #{reader.cursor_at_prev_line})
     end
-    sect_level += document.attr('leveloffset').to_i if document.attr?('leveloffset')
+    if document.attr? 'leveloffset'
+      sect_level += (document.attr 'leveloffset').to_i
+      sect_level = 0 if sect_level < 0
+    end
     [sect_id, sect_reftext, sect_title, sect_level, atx]
   end
 
