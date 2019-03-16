@@ -486,10 +486,9 @@ module Substitutors
   def sub_macros(text)
     #return text if text.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
-    found = {}
-    found_square_bracket = found[:square_bracket] = text.include? '['
+    found_square_bracket = text.include? '['
     found_colon = text.include? ':'
-    found_macroish = found[:macroish] = found_square_bracket && found_colon
+    found_macroish = found_square_bracket && found_colon
     found_macroish_short = found_macroish && (text.include? ':[')
     doc_attrs = (doc = @document).attributes
 
@@ -861,65 +860,11 @@ module Substitutors
       end
     end
 
-    if found_macroish && (text.include? 'tnote')
-      text = text.gsub InlineFootnoteMacroRx do
-        # honor the escape
-        next $&.slice 1, $&.length if $&.start_with? RS
-
-        # footnoteref
-        if $1
-          if $3
-            id, text = $3.split ',', 2
-            logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
-          else
-            next $&
-          end
-        # footnote
-        else
-          id = $2
-          text = $3
-        end
-
-        if id
-          if text
-            # REVIEW it's a dirty job, but somebody's gotta do it
-            text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
-            index = doc.counter('footnote-number')
-            doc.register(:footnotes, Document::Footnote.new(index, id, text))
-            type, target = :ref, nil
-          else
-            if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
-              index, text = footnote.index, footnote.text
-            else
-              logger.warn %(invalid footnote reference: #{id})
-              index, text = nil, id
-            end
-            type, target, id = :xref, id, nil
-          end
-        elsif text
-          # REVIEW it's a dirty job, but somebody's gotta do it
-          text = restore_passthroughs(sub_inline_xrefs(sub_inline_anchors(normalize_string text, true)))
-          index = doc.counter('footnote-number')
-          doc.register(:footnotes, Document::Footnote.new(index, id, text))
-          type = target = nil
-        else
-          next $&
-        end
-        Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
-      end
-    end
-
-    sub_inline_xrefs(sub_inline_anchors(text, found), found)
-  end
-
-  # Internal: Substitute normal and bibliographic anchors
-  def sub_inline_anchors(text, found = nil)
-    if @context == :list_item && @parent.style == 'bibliography'
+    if found_square_bracket && @context == :list_item && @parent.style == 'bibliography'
       text = text.sub(InlineBiblioAnchorRx) { (Inline.new self, :anchor, $2, type: :bibref, id: $1).convert }
     end
 
-    if ((!found || found[:square_bracket]) && text.include?('[[')) ||
-        ((!found || found[:macroish]) && text.include?('or:'))
+    if (found_square_bracket && text.include?('[[')) || (found_macroish && text.include?('or:'))
       text = text.gsub InlineAnchorRx do
         # honor the escape
         next $&.slice 1, $&.length if $1
@@ -937,17 +882,13 @@ module Substitutors
       end
     end
 
-    text
-  end
-
-  # Internal: Substitute cross reference links
-  def sub_inline_xrefs(content, found = nil)
-    if ((found ? found[:macroish] : (content.include? '[')) && (content.include? 'xref:')) || ((content.include? '&') && (content.include? 'lt;&'))
-      content = content.gsub InlineXrefMacroRx do
+    #if (text.include? ';&l') || (found_macroish && (text.include? 'xref:'))
+    if ((text.include? '&') && (text.include? ';&l')) || (found_macroish && (text.include? 'xref:'))
+      text = text.gsub InlineXrefMacroRx do
         # honor the escape
         next $&.slice 1, $&.length if $&.start_with? RS
 
-        attrs, doc = {}, @document
+        attrs = {}
         if (refid = $1)
           refid, text = refid.split ',', 2
           text = text.lstrip if text
@@ -1027,12 +968,60 @@ module Substitutors
           refid, target = fragment, %(##{fragment})
           logger.debug %(possible invalid reference: #{refid}) if logger.debug?
         end
-        attrs['path'], attrs['fragment'], attrs['refid'] = path, fragment, refid
+        attrs['path'] = path
+        attrs['fragment'] = fragment
+        attrs['refid'] = refid
         Inline.new(self, :anchor, text, type: :xref, target: target, attributes: attrs).convert
       end
     end
 
-    content
+    if found_macroish && (text.include? 'tnote')
+      text = text.gsub InlineFootnoteMacroRx do
+        # honor the escape
+        next $&.slice 1, $&.length if $&.start_with? RS
+
+        # footnoteref
+        if $1
+          if $3
+            id, text = $3.split ',', 2
+            logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
+          else
+            next $&
+          end
+        # footnote
+        else
+          id = $2
+          text = $3
+        end
+
+        if id
+          if text
+            text = restore_passthroughs(normalize_string text, true)
+            index = doc.counter('footnote-number')
+            doc.register(:footnotes, Document::Footnote.new(index, id, text))
+            type, target = :ref, nil
+          else
+            if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
+              index, text = footnote.index, footnote.text
+            else
+              logger.warn %(invalid footnote reference: #{id})
+              index, text = nil, id
+            end
+            type, target, id = :xref, id, nil
+          end
+        elsif text
+          text = restore_passthroughs(normalize_string text, true)
+          index = doc.counter('footnote-number')
+          doc.register(:footnotes, Document::Footnote.new(index, id, text))
+          type = target = nil
+        else
+          next $&
+        end
+        Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
+      end
+    end
+
+    text
   end
 
   # Public: Substitute callout source references
