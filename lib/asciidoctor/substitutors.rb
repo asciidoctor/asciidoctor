@@ -460,7 +460,7 @@ module Substitutors
     if drop
       # drop lines from text
       if drop_empty_line
-        lines = (text.tr_s DEL, DEL).split LF, -1
+        lines = (text.squeeze DEL).split LF, -1
         if drop_line
           (lines.reject {|line| line == DEL || line == CAN || (line.start_with? CAN) || (line.include? CAN) }.join LF).delete DEL
         else
