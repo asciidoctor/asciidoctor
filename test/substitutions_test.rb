@@ -952,7 +952,7 @@ context 'Substitutions' do
       assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
-    test 'a footnote macro may contain an xref macro' do
+    test 'a footnote macro may contain a shorthand xref' do
       # specialcharacters escaping is simulated
       para = block_from_string('text footnote:[&lt;&lt;_install,install&gt;&gt;]')
       doc = para.document
@@ -964,8 +964,19 @@ context 'Substitutions' do
       assert_equal '<a href="#_install">install</a>', footnote1.text
     end
 
+    test 'a footnote macro may contain an xref macro' do
+      para = block_from_string('text footnote:[xref:_install[install]]')
+      doc = para.document
+      doc.register :refs, ['_install', (Asciidoctor::Inline.new doc, :anchor, 'Install', type: :ref, target: '_install'), 'Install']
+      catalog = doc.catalog
+      assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
+      assert_equal 1, catalog[:footnotes].size
+      footnote1 = catalog[:footnotes][0]
+      assert_equal '<a href="#_install">install</a>', footnote1.text
+    end
+
     test 'a footnote macro may contain an anchor macro' do
-      para = block_from_string('text footnote:[a [[b\]\] \[[c\]\] d]')
+      para = block_from_string('text footnote:[a [[b]] [[c\]\] d]')
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote1 = para.document.catalog[:footnotes][0]

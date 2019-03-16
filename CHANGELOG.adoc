@@ -72,6 +72,7 @@ Enhancements / Compliance::
   * propogate ID assigned to inline passthrough (#2912)
   * rename control keywords in find_by to better align with the standard NodeFilter terminology
   * rename header_footer option to standalone (while still honoring header_footer for backwards compatibility) (#1444)
+  * replace anchors and xrefs before footnotes (replace footnotes last in macros substitution group)
 
 Improvements::
 
