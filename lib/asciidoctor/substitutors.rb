@@ -395,9 +395,9 @@ module Substitutors
       when :none
         replacement
       when :bounding
-        %(#{m[1]}#{replacement}#{m[2]})
+        m[1] + replacement + m[2]
       else # :leading
-        %(#{m[1]}#{replacement})
+        m[1] + replacement
       end
     end
   end
