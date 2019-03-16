@@ -1464,6 +1464,24 @@ context 'Sections' do
       end
     end
 
+    test 'should not hang if relative leveloffset attempts to make resolved section level negative' do
+      input = <<~'EOS'
+      = Document Title
+      :doctype: book
+      :leveloffset: -1
+
+      = Part Title
+
+      == Chapter Title
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string input
+        assert_xpath '//h1[text()="Part Title"]', output, 1
+        assert_xpath '//h1[text()="Chapter Title"]', output, 1
+      end
+    end
+
     test 'should number parts when doctype is book and partnums attributes is set' do
       input = <<~'EOS'
       = Book Title
