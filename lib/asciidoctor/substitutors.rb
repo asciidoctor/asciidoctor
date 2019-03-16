@@ -771,7 +771,7 @@ module Substitutors
       end
     end
 
-    if found_macroish && ((text.include? 'link:') || (text.include? 'mailto:'))
+    if found_macroish && ((text.include? 'link:') || (text.include? 'ilto:'))
       # inline link macros, link:target[text]
       text = text.gsub InlineLinkMacroRx do
         # honor the escape
