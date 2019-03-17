@@ -616,6 +616,11 @@ context 'Substitutions' do
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">Doc Writer</a>}, para.sub_macros(para.source)
     end
 
+    test 'a mailto macro with subject and body only should use e-mail as text' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[,Pull request,Please accept my pull request]')
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
+    end
+
     test 'should recognize inline email addresses' do
       para = block_from_string('doc.writer@asciidoc.org')
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
