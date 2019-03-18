@@ -2656,6 +2656,30 @@ context 'Sections' do
       assert_xpath '/dedication', output, 1
       assert_xpath '/dedication/title', output, 0
     end
+
+    test 'should generate an index if index section is found' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) (Panthera tigris) is the largest ((cat)) species.
+      (((Big cats,Tigers,Panthera tigris)))
+
+      == Institutes
+
+      National Institute of Science and Technology \(((NIST)))
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'a.indexterm', output
+      assert_css '.indexblock > h3', output, 5
+      assert_xpath '//*[@class="indexblock"]//dl//dl//dl/dt[starts-with(text(),"Panthera tigris,")]', output, 1
+      assert_xpath '//*[@class="indexblock"]//dl//dl//dl/dt[starts-with(text(),"Panthera tigris,")]/a[text()="Animals"]', output, 1
+    end
   end
 
   context "heading patterns in blocks" do

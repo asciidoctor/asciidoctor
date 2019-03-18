@@ -420,7 +420,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
 <h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
 #{level == 1 ? %[<div class="sectionbody">
-#{node.content}
+#{node.special && node.sectname == 'index' ? (generate_index_body node) : node.content}
 </div>] : node.content}
 </div>)
     end
@@ -1209,7 +1209,7 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_indexterm node
-    node.type == :visible ? node.text : ''
+    %(<a id="#{node.id}"></a>#{node.type == :visible ? node.text : ''})
   end
 
   def convert_inline_kbd node
@@ -1295,6 +1295,32 @@ Your browser does not support the video tag.
 
   def encode_attribute_value val
     (val.include? '"') ? (val.gsub '"', '&quot;') : val
+  end
+
+  def generate_index_body node
+    lines = []
+    node.document.catalog[:indexterms].categories.each do |category|
+      lines << '<div class="indexblock">'
+      lines << %(<h3>#{category.name}</h3>)
+      lines << '<dl>'
+      lines += category.terms.map {|term| generate_index_list_item term }
+      lines << '</dl>'
+      lines << '</div>'
+    end
+    lines.join LF
+  end
+
+  def generate_index_list_item term
+    text = term.container? ? term.name : %(#{term.name}, #{term.dests.map {|dest| %[<a class="indexterm" href="##{dest.id}">#{dest.xreftext}</a>] }.join ', '})
+    lines = [%(<dt>#{text}</dt>)]
+    unless term.leaf?
+      lines << '<dd>'
+      lines << '<dl>'
+      lines += term.subterms.map {|subterm| generate_index_list_item subterm }
+      lines << '</dl>'
+      lines << '</dd>'
+    end
+    lines.join LF
   end
 
   def generate_manname_section node

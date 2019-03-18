@@ -1142,50 +1142,69 @@ context 'Substitutions' do
     end
 
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
       macros.each do |macro|
-        para = block_from_string("#{sentence}#{macro}")
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['Tigers'], para.document.catalog[:indexterms].first
+        para = block_from_string %(#{sentence}#{macro})
+        output = para.sub_macros para.source
+        assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+        category_t = para.document.catalog[:indexterms].find_category 'T'
+        refute_nil category_t
+        term_tigers = category_t.find_term 'Tigers'
+        refute_nil term_tigers
+        assert_empty term_tigers.subterms
+        assert_equal 1, term_tigers.dests.size
+        assert_equal para.document, term_tigers.dests.first.xref
       end
     end
 
     test 'a single-line index term macro with primary and secondary terms should be registered as an index reference' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macros = ['indexterm:[Big cats, Tigers]', '(((Big cats, Tigers)))']
       macros.each do |macro|
-        para = block_from_string("#{sentence}#{macro}")
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['Big cats', 'Tigers'], para.document.catalog[:indexterms].first
+        para = block_from_string %(#{sentence}#{macro})
+        output = para.sub_macros para.source
+        assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+        category_b = para.document.catalog[:indexterms].find_category 'B'
+        refute_nil category_b
+        category_t = para.document.catalog[:indexterms].find_category 'T'
+        refute_nil category_t
+        term_tigers = category_t.find_term 'Tigers'
+        refute_nil term_tigers
+        assert_empty term_tigers.subterms
+        term_big_cats = category_b.find_term 'Big cats'
+        refute_nil term_big_cats
+        assert_equal 1, term_big_cats.subterms.size
+        subterm_tigers = term_big_cats.subterms.first
+        assert_equal 'Tigers', subterm_tigers.name
       end
     end
 
     test 'a single-line index term macro with primary, secondary and tertiary terms should be registered as an index reference' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macros = ['indexterm:[Big cats,Tigers , Panthera tigris]', '(((Big cats,Tigers , Panthera tigris)))']
       macros.each do |macro|
-        para = block_from_string("#{sentence}#{macro}")
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.catalog[:indexterms].first
+        para = block_from_string %(#{sentence}#{macro})
+        output = para.sub_macros para.source
+        assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+        category_b = para.document.catalog[:indexterms].find_category 'B'
+        refute_nil category_b
+        assert_equal 'Big cats', category_b.terms.first.name
+        assert_equal 'Tigers', category_b.terms.first.subterms.first.name
+        assert_equal 'Panthera tigris', category_b.terms.first.subterms.first.subterms.first.name
       end
     end
 
     test 'a multi-line index term macro should be compacted and registered as an index reference' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
-      macros = ["indexterm:[Panthera\ntigris]", "(((Panthera\ntigris)))"]
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
+      macros = [%(indexterm:[Panthera\ntigris]), %((((Panthera\ntigris))))]
       macros.each do |macro|
-        para = block_from_string("#{sentence}#{macro}")
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['Panthera tigris'], para.document.catalog[:indexterms].first
+        para = block_from_string %(#{sentence}#{macro})
+        output = para.sub_macros para.source
+        assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+        category_p = para.document.catalog[:indexterms].find_category 'P'
+        refute_nil category_p
+        assert_equal 'Panthera tigris', category_p.terms.first.name
       end
     end
 
@@ -1198,13 +1217,14 @@ context 'Substitutions' do
     end
 
     test 'should only escape enclosing brackets if concealed index term is preceded by a backslash' do
-      input = %[National Institute of Science and Technology #{BACKSLASH}(((NIST)))]
+      input = %(National Institute of Science and Technology #{BACKSLASH}(((NIST))))
       doc = document_from_string input, standalone: false
       output = doc.convert
-      assert_xpath '//p[text()="National Institute of Science and Technology (NIST)"]', output, 1
-      #term = doc.catalog[:indexterms].first
-      #assert_equal 1, term.size
-      #assert_equal 'NIST', term.first
+      assert_includes output, '<p>National Institute of Science and Technology (<a id="_indexterm_1"></a>NIST)</p>'
+      refute doc.catalog[:indexterms].empty?
+      category_n = doc.catalog[:indexterms].find_category 'N'
+      refute_nil category_n
+      assert_equal 'NIST', category_n.terms.first.name
     end
 
     test 'should not split index terms on commas inside of quoted terms' do
@@ -1222,47 +1242,49 @@ context 'Substitutions' do
 
       inputs.each do |input|
         para = block_from_string input
-        output = para.sub_macros(para.source)
-        assert_equal input.lines.first, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #terms = para.document.catalog[:indexterms].first
-        #assert_equal 2, terms.size
-        #assert_equal 'Tigers', terms.first
-        #assert_equal '[Big], scary cats', terms.last
+        output = para.sub_macros para.source
+        assert_equal %(#{input.lines.first}<a id="_indexterm_1"></a>), output
+        assert_equal %w(@ T), para.document.catalog[:indexterms].categories.map(&:name)
+        assert_equal '[Big], scary cats', (para.document.catalog[:indexterms].find_category '@').terms.first.name
+        assert_equal 'Tigers', (para.document.catalog[:indexterms].find_category 'T').terms.first.name
       end
     end
 
-    test 'normal substitutions are performed on an index term macro' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+    test 'normal substitutions are performed on an index term macro and text is sanitized' do
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macros = ['indexterm:[*Tigers*]', '(((*Tigers*)))']
       macros.each do |macro|
-        para = block_from_string("#{sentence}#{macro}")
-        output = para.apply_subs(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['<strong>Tigers</strong>'], para.document.catalog[:indexterms].first
+        para = block_from_string %(#{sentence}#{macro})
+        output = para.apply_subs para.source
+        assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+        category_t = para.document.catalog[:indexterms].find_category 'T'
+        refute_nil category_t
+        assert_equal 'Tigers', category_t.terms.first.name
       end
     end
 
     test 'registers multiple index term macros' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species."
-      macros = "(((Tigers)))\n(((Animals,Cats)))"
-      para = block_from_string("#{sentence}\n#{macros}")
-      output = para.sub_macros(para.source)
-      assert_equal sentence, output.rstrip
-      #assert_equal 2, para.document.catalog[:indexterms].size
-      #assert_equal ['Tigers'], para.document.catalog[:indexterms][0]
-      #assert_equal ['Animals', 'Cats'], para.document.catalog[:indexterms][1]
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.)
+      macros = %[(((Tigers)))\n(((Animals,Cats)))]
+      para = block_from_string %(#{sentence}\n#{macros})
+      output = para.sub_macros para.source
+      assert_equal %(#{sentence}\n<a id="_indexterm_1"></a>\n<a id="_indexterm_2"></a>), output.rstrip
+      assert_equal 3, para.document.catalog[:indexterms].categories.size
+      assert_equal 'Tigers', (para.document.catalog[:indexterms].find_category 'T').terms.first.name
+      assert_equal 'Animals', (para.document.catalog[:indexterms].find_category 'A').terms.first.name
+      assert_equal 'Cats', (para.document.catalog[:indexterms].find_category 'A').terms.first.subterms.first.name
+      assert_equal 'Cats', (para.document.catalog[:indexterms].find_category 'C').terms.first.name
     end
 
     test 'an index term macro with round bracket syntax may contain round brackets in term' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macro = '(((Tiger (Panthera tigris))))'
-      para = block_from_string("#{sentence}#{macro}")
-      output = para.sub_macros(para.source)
-      assert_equal sentence, output
-      #assert_equal 1, para.document.catalog[:indexterms].size
-      #assert_equal ['Tiger (Panthera tigris)'], para.document.catalog[:indexterms].first
+      para = block_from_string %(#{sentence}#{macro})
+      output = para.sub_macros para.source
+      assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+      category_t = para.document.catalog[:indexterms].find_category 'T'
+      refute_nil category_t
+      assert_equal 'Tiger (Panthera tigris)', category_t.terms.first.name
     end
 
     test 'visible shorthand index term macro should not consume trailing round bracket' do
@@ -1272,13 +1294,11 @@ context 'Substitutions' do
       <primary>index term</primary>
       </indexterm>index term)
       EOS
-      #expected_term = ['index term']
+      expected_term = 'index term'
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
       assert_equal expected, output
-      #indexterms_table = para.document.catalog[:indexterms]
-      #assert_equal 1, indexterms_table.size
-      #assert_equal expected_term, indexterms_table[0]
+      assert_equal expected_term, (para.document.catalog[:indexterms].find_category 'I').terms.first.name
     end
 
     test 'visible shorthand index term macro should not consume leading round bracket' do
@@ -1288,57 +1308,49 @@ context 'Substitutions' do
       <primary>index term</primary>
       </indexterm>index term for text)
       EOS
-      #expected_term = ['index term']
+      expected_term = 'index term'
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
       assert_equal expected, output
-      #indexterms_table = para.document.catalog[:indexterms]
-      #assert_equal 1, indexterms_table.size
-      #assert_equal expected_term, indexterms_table[0]
+      assert_equal expected_term, (para.document.catalog[:indexterms].find_category 'I').terms.first.name
     end
 
     test 'an index term macro with square bracket syntax may contain square brackets in term' do
-      sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
+      sentence = %(The tiger (Panthera tigris) is the largest cat species.\n)
       macro = 'indexterm:[Tiger [Panthera tigris\\]]'
-      para = block_from_string("#{sentence}#{macro}")
-      output = para.sub_macros(para.source)
-      assert_equal sentence, output
-      #assert_equal 1, para.document.catalog[:indexterms].size
-      #assert_equal ['Tiger [Panthera tigris]'], para.document.catalog[:indexterms].first
+      para = block_from_string %(#{sentence}#{macro})
+      output = para.sub_macros para.source
+      assert_equal %(#{sentence}<a id="_indexterm_1"></a>), output
+      assert_equal 'Tiger [Panthera tigris]', para.document.catalog[:indexterms].categories.first.terms.first.name
     end
 
     test 'a single-line index term 2 macro should be registered as an index reference and retain term inline' do
-      sentence = 'The tiger (Panthera tigris) is the largest cat species.'
       macros = ['The indexterm2:[tiger] (Panthera tigris) is the largest cat species.', 'The ((tiger)) (Panthera tigris) is the largest cat species.']
       macros.each do |macro|
-        para = block_from_string(macro)
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['tiger'], para.document.catalog[:indexterms].first
+        para = block_from_string macro
+        output = para.sub_macros para.source
+        assert_equal 'The <a id="_indexterm_1"></a>tiger (Panthera tigris) is the largest cat species.', output
+        assert_equal 'tiger', para.document.catalog[:indexterms].categories.first.terms.first.name
       end
     end
 
     test 'a multi-line index term 2 macro should be compacted and registered as an index reference and retain term inline' do
-      sentence = 'The panthera tigris is the largest cat species.'
-      macros = ["The indexterm2:[ panthera\ntigris ] is the largest cat species.", "The (( panthera\ntigris )) is the largest cat species."]
+      macros = [%(The indexterm2:[ panthera\ntigris ] is the largest cat species.), %[The (( panthera\ntigris )) is the largest cat species.]]
       macros.each do |macro|
-        para = block_from_string(macro)
-        output = para.sub_macros(para.source)
-        assert_equal sentence, output
-        #assert_equal 1, para.document.catalog[:indexterms].size
-        #assert_equal ['panthera tigris'], para.document.catalog[:indexterms].first
+        para = block_from_string macro
+        output = para.sub_macros para.source
+        assert_equal 'The <a id="_indexterm_1"></a>panthera tigris is the largest cat species.', output
+        assert_equal 'panthera tigris', para.document.catalog[:indexterms].categories.first.terms.first.name
       end
     end
 
     test 'registers multiple index term 2 macros' do
-      sentence = "The ((tiger)) (Panthera tigris) is the largest ((cat)) species."
-      para = block_from_string(sentence)
-      output = para.sub_macros(para.source)
-      assert_equal 'The tiger (Panthera tigris) is the largest cat species.', output
-      #assert_equal 2, para.document.catalog[:indexterms].size
-      #assert_equal ['tiger'], para.document.catalog[:indexterms][0]
-      #assert_equal ['cat'], para.document.catalog[:indexterms][1]
+      sentence = 'The ((tiger)) (Panthera tigris) is the largest ((cat)) species.'
+      para = block_from_string sentence
+      output = para.sub_macros para.source
+      assert_equal 'The <a id="_indexterm_1"></a>tiger (Panthera tigris) is the largest <a id="_indexterm_2"></a>cat species.', output
+      assert_equal 'tiger', (para.document.catalog[:indexterms].find_category 'T').terms.first.name
+      assert_equal 'cat', (para.document.catalog[:indexterms].find_category 'C').terms.first.name
     end
 
     test 'should escape visible index term if preceded by a backslash' do
@@ -1349,24 +1361,22 @@ context 'Substitutions' do
       #assert para.document.catalog[:indexterms].empty?
     end
 
-    test 'normal substitutions are performed on an index term 2 macro' do
+    test 'normal substitutions are performed on an index term 2 macro and the text in the index is sanitized' do
       sentence = 'The ((*tiger*)) (Panthera tigris) is the largest cat species.'
       para = block_from_string sentence
-      output = para.apply_subs(para.source)
-      assert_equal 'The <strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
-      #assert_equal 1, para.document.catalog[:indexterms].size
-      #assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
+      output = para.apply_subs para.source
+      assert_equal 'The <a id="_indexterm_1"></a><strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
+      assert_equal 'tiger', para.document.catalog[:indexterms].categories.first.terms.first.name
     end
 
     test 'index term 2 macro with round bracket syntex should not interfer with index term macro with round bracket syntax' do
-      sentence = "The ((panthera tigris)) is the largest cat species.\n(((Big cats,Tigers)))"
+      sentence = %[The ((panthera tigris)) is the largest cat species.\n(((Big cats,Tigers)))]
       para = block_from_string sentence
-      output = para.sub_macros(para.source)
-      assert_equal "The panthera tigris is the largest cat species.\n", output
-      #terms = para.document.catalog[:indexterms]
-      #assert_equal 2, terms.size
-      #assert_equal ['panthera tigris'], terms[0]
-      #assert_equal ['Big cats', 'Tigers'], terms[1]
+      output = para.sub_macros para.source
+      assert_equal %(The <a id="_indexterm_1"></a>panthera tigris is the largest cat species.\n<a id="_indexterm_2"></a>), output
+      assert_equal 'panthera tigris', (para.document.catalog[:indexterms].find_category 'P').terms.first.name
+      assert_equal 'Big cats', (para.document.catalog[:indexterms].find_category 'B').terms.first.name
+      assert_equal 'Tigers', (para.document.catalog[:indexterms].find_category 'B').terms.first.subterms.first.name
     end
 
     test 'should parse visible shorthand index term with see and seealso' do
