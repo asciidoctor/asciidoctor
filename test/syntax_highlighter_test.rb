@@ -561,6 +561,21 @@ context 'Syntax Highlighter' do
       output = convert_string input, safe: :safe
       assert_css 'code.language-none', output, 1
     end
+
+    test 'should load additional languages specified by highlightjs-languages' do
+      input = <<~'EOS'
+      :source-highlighter: highlight.js
+      :highlightjs-languages: yaml, scilab
+
+      [source,yaml]
+      ----
+      key: value
+      ----
+      EOS
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+      assert_css '#footer ~ script[src*="languages/yaml.min.js"]', output, 1
+      assert_css '#footer ~ script[src*="languages/scilab.min.js"]', output, 1
+    end
   end
 
   context 'Prettify' do
