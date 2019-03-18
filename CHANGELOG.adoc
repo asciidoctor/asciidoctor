@@ -142,6 +142,7 @@ Bug Fixes::
   * don't split paragraphs in table cell at line that resolves to blank if adjacent to other non-blank lines (#2963)
   * initialize the level to WARN when instantiating the NullLogger
   * next_adjacent_block should not fail when called on dlist item (#3133)
+  * don't suppress browser styles for summary tag; add pointer cursor and panel margin bottom (#3155)
 
 Build / Infrastructure::
 
