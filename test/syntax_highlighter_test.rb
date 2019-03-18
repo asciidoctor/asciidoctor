@@ -532,17 +532,18 @@ context 'Syntax Highlighter' do
       input = <<~'EOS'
       :source-highlighter: highlight.js
 
-      [source, javascript]
+      [source,html]
       ----
-      <link rel="stylesheet" href="styles/default.css">
-      <script src="highlight.pack.js"></script>
-      <script>hljs.initHighlightingOnLoad();</script>
+      <p>Highlight me!</p>
       ----
       EOS
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
-      assert_match(/<link .*highlight\.js/, output)
-      assert_match(/<script .*highlight\.js/, output)
-      assert_match(/hljs.initHighlightingOnLoad/, output)
+      assert_css 'pre.highlightjs.highlight', output, 1
+      assert_css 'pre.highlightjs.highlight > code.language-html.hljs[data-lang="html"]', output, 1
+      assert_includes output, '&lt;p&gt;Highlight me!&lt;/p&gt;'
+      assert_css '#footer ~ link[href*="highlight.js"]', output, 1
+      assert_css '#footer ~ script[src*="highlight.min.js"]', output, 1
+      assert_xpath '//script[text()="hljs.initHighlighting()"]', output, 1
     end
 
     test 'should add language-none class to source block when source-highlighter is highlight.js and language is not set' do
