@@ -831,7 +831,7 @@ module Asciidoctor
     #
     #   doc.writer@example.com
     #
-    InlineEmailRx = %r(([\\>:/])?#{CG_WORD}(?:&amp;|[#{CC_WORD}.%+-])*@#{CG_ALNUM}[#{CC_ALNUM}_.-]*\.[a-z]{2,4}\b)
+    InlineEmailRx = %r(([\\>:/])?#{CG_WORD}(?:&amp;|[#{CC_WORD}.%+-])*@#{CG_ALNUM}[#{CC_ALNUM}_.-]*\.[a-zA-Z]{2,4}\b)
 
     # Matches an inline footnote macro, which is allowed to span multiple lines.
     #
