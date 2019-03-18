@@ -20,7 +20,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
     base_url = doc.attr 'highlightjsdir', %(#{opts[:cdn_base_url]}/highlight.js/#{HIGHLIGHT_JS_VERSION})
     %(<link rel="stylesheet" href="#{base_url}/styles/#{doc.attr 'highlightjs-theme', 'github'}.min.css"#{opts[:self_closing_tag_slash]}>
 <script src="#{base_url}/highlight.min.js"></script>
-<script>hljs.initHighlighting()</script>)
+#{(doc.attr? 'highlightjs-languages') ? ((doc.attr 'highlightjs-languages').split ',').map {|lang| %[<script src="#{base_url}/languages/#{lang.lstrip}.min.js"></script>\n] }.join : ''}<script>hljs.initHighlighting()</script>)
   end
 end
 end

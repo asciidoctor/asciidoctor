@@ -74,6 +74,7 @@ Enhancements / Compliance::
   * rename header_footer option to standalone (while still honoring header_footer for backwards compatibility) (#1444)
   * replace anchors and xrefs before footnotes (replace footnotes last in macros substitution group)
   * apply substitution for custom inline macro before all other macros
+  * load additional languages for highlight.js as defined in the comma-separated highlightjs-languages attribute (#3036)
 
 Improvements::
 
