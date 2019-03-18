@@ -1064,10 +1064,12 @@ class Document < AbstractBlock
 
     # TODO allow document to control whether extension docinfo is contributed
     if @extensions && (docinfo_processors? location)
-      (content ||= []).concat @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact
+      ((content || []).concat @docinfo_processor_extensions[location].map {|ext| ext.process_method[self] }.compact).join LF
+    elsif content
+      content.join LF
+    else
+      ''
     end
-
-    content ? (content.join LF) : ''
   end
 
   def docinfo_processors?(location = :head)
