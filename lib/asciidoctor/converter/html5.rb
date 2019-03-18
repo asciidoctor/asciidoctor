@@ -41,7 +41,49 @@ class Converter::Html5Converter < Converter::Base
     init_backend_traits basebackend: 'html', filetype: 'html', htmlsyntax: syntax, outfilesuffix: '.html', supports_templates: true
   end
 
-  def document node
+  def convert node, transform = node.node_name, opts = nil
+    if transform == 'inline_quoted'; return convert_inline_quoted node
+    elsif transform == 'paragraph'; return convert_paragraph node
+    elsif transform == 'inline_anchor'; return convert_inline_anchor node
+    elsif transform == 'section'; return convert_section node
+    elsif transform == 'listing'; return convert_listing node
+    elsif transform == 'literal'; return convert_literal node
+    elsif transform == 'ulist'; return convert_ulist node
+    elsif transform == 'olist'; return convert_olist node
+    elsif transform == 'dlist'; return convert_dlist node
+    elsif transform == 'admonition'; return convert_admonition node
+    elsif transform == 'colist'; return convert_colist node
+    elsif transform == 'embedded'; return convert_embedded node
+    elsif transform == 'example'; return convert_example node
+    elsif transform == 'floating_title'; return convert_floating_title node
+    elsif transform == 'image'; return convert_image node
+    elsif transform == 'inline_break'; return convert_inline_break node
+    elsif transform == 'inline_button'; return convert_inline_button node
+    elsif transform == 'inline_callout'; return convert_inline_callout node
+    elsif transform == 'inline_footnote'; return convert_inline_footnote node
+    elsif transform == 'inline_image'; return convert_inline_image node
+    elsif transform == 'inline_indexterm'; return convert_inline_indexterm node
+    elsif transform == 'inline_kbd'; return convert_inline_kbd node
+    elsif transform == 'inline_menu'; return convert_inline_menu node
+    elsif transform == 'open'; return convert_open node
+    elsif transform == 'page_break'; return convert_page_break node
+    elsif transform == 'preamble'; return convert_preamble node
+    elsif transform == 'quote'; return convert_quote node
+    elsif transform == 'sidebar'; return convert_sidebar node
+    elsif transform == 'stem'; return convert_stem node
+    elsif transform == 'table'; return convert_table node
+    elsif transform == 'thematic_break'; return convert_thematic_break node
+    elsif transform == 'verse'; return convert_verse node
+    elsif transform == 'video'; return convert_video node
+    elsif transform == 'document'; return convert_document node
+    elsif transform == 'toc'; return convert_toc node
+    elsif transform == 'pass'; return convert_pass node
+    elsif transform == 'audio'; return convert_audio node
+    else; return super
+    end
+  end
+
+  def convert_document node
     br = %(<br#{slash = @void_element_slash}>)
     unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
       asset_uri_scheme = %(#{asset_uri_scheme}:)
@@ -132,10 +174,10 @@ class Converter::Html5Converter < Converter::Base
         if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
           result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{outline node}
+#{convert_outline node}
 </div>)
         end
-        result << (_generate_manname_section node) if node.attr? 'manpurpose'
+        result << (generate_manname_section node) if node.attr? 'manpurpose'
       else
         if node.header?
           result << %(<h1>#{node.header.title}</h1>) unless node.notitle
@@ -165,7 +207,7 @@ class Converter::Html5Converter < Converter::Base
         if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
           result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{outline node}
+#{convert_outline node}
 </div>)
         end
       end
@@ -235,7 +277,7 @@ TeX: {#{eqnums_opt}}
     result.join LF
   end
 
-  def embedded node
+  def convert_embedded node
     result = []
     if node.doctype == 'manpage'
       # QUESTION should notitle control the manual page title?
@@ -243,7 +285,7 @@ TeX: {#{eqnums_opt}}
         id_attr = node.id ? %( id="#{node.id}") : ''
         result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
       end
-      result << (_generate_manname_section node) if node.attr? 'manpurpose'
+      result << (generate_manname_section node) if node.attr? 'manpurpose'
     elsif node.header? && !node.notitle
       id_attr = node.id ? %( id="#{node.id}") : ''
       result << %(<h1#{id_attr}>#{node.header.title}</h1>)
@@ -252,7 +294,7 @@ TeX: {#{eqnums_opt}}
     if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
       result << %(<div id="toc" class="toc">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{outline node}
+#{convert_outline node}
 </div>)
     end
 
@@ -272,7 +314,7 @@ TeX: {#{eqnums_opt}}
     result.join LF
   end
 
-  def outline node, opts = {}
+  def convert_outline node, opts = {}
     return unless node.sections?
     sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
     toclevels = opts[:toclevels] || (node.document.attributes['toclevels'] || 2).to_i
@@ -299,7 +341,7 @@ TeX: {#{eqnums_opt}}
         stitle = section.title
       end
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
-      if slevel < toclevels && (child_toc_level = outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
+      if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
         result << %(<li><a href="##{section.id}">#{stitle}</a>)
         result << child_toc_level
         result << '</li>'
@@ -311,7 +353,7 @@ TeX: {#{eqnums_opt}}
     result.join LF
   end
 
-  def section node
+  def convert_section node
     doc_attrs = node.document.attributes
     level = node.level
     if node.caption
@@ -360,7 +402,7 @@ TeX: {#{eqnums_opt}}
     end
   end
 
-  def admonition node
+  def convert_admonition node
     id_attr = node.id ? %( id="#{node.id}") : ''
     name = node.attr 'name'
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
@@ -387,7 +429,7 @@ TeX: {#{eqnums_opt}}
 </div>)
   end
 
-  def audio node
+  def convert_audio node
     xml = @xml_mode
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['audioblock', node.role].compact
@@ -398,14 +440,14 @@ TeX: {#{eqnums_opt}}
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (_append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (_append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (_append_boolean_attribute 'loop', xml) : ''}>
+<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
 Your browser does not support the audio tag.
 </audio>
 </div>
 </div>)
   end
 
-  def colist node
+  def convert_colist node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['colist', node.style, node.role].compact
@@ -444,7 +486,7 @@ Your browser does not support the audio tag.
     result.join LF
   end
 
-  def dlist node
+  def convert_dlist node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
 
@@ -527,7 +569,7 @@ Your browser does not support the audio tag.
     result.join LF
   end
 
-  def example node
+  def convert_example node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
 
@@ -538,29 +580,29 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def floating_title node
+  def convert_floating_title node
     tag_name = %(h#{node.level + 1})
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = [node.style, node.role].compact
     %(<#{tag_name}#{id_attribute} class="#{classes.join ' '}">#{node.title}</#{tag_name}>)
   end
 
-  def image node
+  def convert_image node
     target = node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
         ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
       if svg
-        img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+        img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif obj
-        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
         img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
       end
     end
-    img ||= %(<img src="#{node.image_uri target}" alt="#{_encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+    img ||= %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     if node.attr? 'link'
-      img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
+      img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
     end
     id_attr = node.id ? %( id="#{node.id}") : ''
     classes = ['imageblock']
@@ -576,7 +618,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def listing node
+  def convert_listing node
     nowrap = (node.option? 'nowrap') || !(node.document.attr? 'prewrap')
     if node.style == 'source'
       lang = node.attr 'language'
@@ -603,7 +645,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def literal node
+  def convert_literal node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     nowrap = !(node.document.attr? 'prewrap') || (node.option? 'nowrap')
@@ -614,9 +656,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  alias pass _content_only
-
-  def stem node
+  def convert_stem node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
@@ -638,7 +678,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def olist node
+  def convert_olist node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['olist', node.style, node.role].compact
@@ -649,7 +689,7 @@ Your browser does not support the audio tag.
 
     type_attribute = (keyword = node.list_marker_keyword) ? %( type="#{keyword}") : ''
     start_attribute = (node.attr? 'start') ? %( start="#{node.attr 'start'}") : ''
-    reversed_attribute = (node.option? 'reversed') ? (_append_boolean_attribute 'reversed', @xml_mode) : ''
+    reversed_attribute = (node.option? 'reversed') ? (append_boolean_attribute 'reversed', @xml_mode) : ''
     result << %(<ol class="#{node.style}"#{type_attribute}#{start_attribute}#{reversed_attribute}>)
 
     node.items.each do |item|
@@ -670,7 +710,7 @@ Your browser does not support the audio tag.
     result.join LF
   end
 
-  def open node
+  def convert_open node
     if (style = node.style) == 'abstract'
       if node.parent == node.document && node.document.doctype == 'book'
         logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
@@ -698,11 +738,11 @@ Your browser does not support the audio tag.
     end
   end
 
-  def page_break node
+  def convert_page_break node
     '<div style="page-break-after: always;"></div>'
   end
 
-  def paragraph node
+  def convert_paragraph node
     if node.role
       attributes = %(#{node.id ? %[ id="#{node.id}"] : ''} class="paragraph #{node.role}")
     elsif node.id
@@ -722,12 +762,14 @@ Your browser does not support the audio tag.
     end
   end
 
-  def preamble node
+  alias convert_pass content_only
+
+  def convert_preamble node
     if (doc = node.document).attr?('toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
       toc = %(
 <div id="toc" class="#{doc.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{doc.attr 'toc-title'}</div>
-#{outline doc}
+#{convert_outline doc}
 </div>)
     else
       toc = ''
@@ -740,7 +782,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def quote node
+  def convert_quote node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['quoteblock', node.role].compact
     class_attribute = %( class="#{classes.join ' '}")
@@ -762,11 +804,11 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def thematic_break node
+  def convert_thematic_break node
     %(<hr#{@void_element_slash}>)
   end
 
-  def sidebar node
+  def convert_sidebar node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     %(<div#{id_attribute} class="sidebarblock#{(role = node.role) ? " #{role}" : ''}">
@@ -776,7 +818,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def table node
+  def convert_table node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['tableblock', %(frame-#{node.attr 'frame', 'all', 'table-frame'}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
@@ -847,7 +889,7 @@ Your browser does not support the audio tag.
     result.join LF
   end
 
-  def toc node
+  def convert_toc node
     unless (doc = node.document).attr?('toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
       return '<!-- toc disabled -->'
     end
@@ -865,11 +907,11 @@ Your browser does not support the audio tag.
 
     %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
-#{outline doc, toclevels: levels}
+#{convert_outline doc, toclevels: levels}
 </div>)
   end
 
-  def ulist node
+  def convert_ulist node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
     div_classes = ['ulist', node.style, node.role].compact
@@ -921,7 +963,7 @@ Your browser does not support the audio tag.
     result.join LF
   end
 
-  def verse node
+  def convert_verse node
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['verseblock', node.role].compact
     class_attribute = %( class="#{classes.join ' '}")
@@ -941,7 +983,7 @@ Your browser does not support the audio tag.
 </div>)
   end
 
-  def video node
+  def convert_video node
     xml = @xml_mode
     id_attribute = node.id ? %( id="#{node.id}") : ''
     classes = ['videoblock']
@@ -964,7 +1006,7 @@ Your browser does not support the audio tag.
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (_append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     when 'youtube'
@@ -985,7 +1027,7 @@ Your browser does not support the audio tag.
         fs_attribute = ''
       else
         fs_param = ''
-        fs_attribute = _append_boolean_attribute 'allowfullscreen', xml
+        fs_attribute = append_boolean_attribute 'allowfullscreen', xml
       end
       modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : ''
       theme_param = (node.attr? 'theme') ? %(&amp;theme=#{node.attr 'theme'}) : ''
@@ -1020,7 +1062,7 @@ Your browser does not support the audio tag.
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (_append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (_append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (_append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
@@ -1028,11 +1070,11 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_anchor node
+  def convert_inline_anchor node
     case node.type
     when :xref
       if (path = node.attributes['path'])
-        attrs = (_append_link_constraint_attrs node, node.role ? [%( class="#{node.role}")] : []).join
+        attrs = (append_link_constraint_attrs node, node.role ? [%( class="#{node.role}")] : []).join
         text = node.text || path
       else
         attrs = node.role ? %( class="#{node.role}") : ''
@@ -1052,7 +1094,7 @@ Your browser does not support the video tag.
       attrs = node.id ? [%( id="#{node.id}")] : []
       attrs << %( class="#{node.role}") if node.role
       attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
-      %(<a href="#{node.target}"#{(_append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
+      %(<a href="#{node.target}"#{(append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
     when :bibref
       %(<a id="#{node.id}"></a>[#{node.reftext || node.id}])
     else
@@ -1061,15 +1103,15 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_break node
+  def convert_inline_break node
     %(#{node.text}<br#{@void_element_slash}>)
   end
 
-  def inline_button node
+  def convert_inline_button node
     %(<b class="button">#{node.text}</b>)
   end
 
-  def inline_callout node
+  def convert_inline_callout node
     if node.document.attr? 'icons', 'font'
       %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
@@ -1080,7 +1122,7 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_footnote node
+  def convert_inline_footnote node
     if (index = node.attr 'index')
       if node.type == :xref
         %(<sup class="footnoteref">[<a class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
@@ -1093,7 +1135,7 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_image node
+  def convert_inline_image node
     if (type = node.type) == 'icon' && (node.document.attr? 'icons', 'font')
       class_attr_val = %(fa fa-#{node.target})
       { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
@@ -1109,16 +1151,16 @@ Your browser does not support the video tag.
       if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) &&
           node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
-          img = (_read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+          img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{_encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
         end
       end
-      img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{_encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+      img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
     end
     if node.attr? 'link'
-      img = %(<a class="image" href="#{node.attr 'link'}"#{(_append_link_constraint_attrs node).join}>#{img}</a>)
+      img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
     end
     if (role = node.role)
       if node.attr? 'float'
@@ -1134,11 +1176,11 @@ Your browser does not support the video tag.
     %(<span class="#{class_attr_val}">#{img}</span>)
   end
 
-  def inline_indexterm node
+  def convert_inline_indexterm node
     node.type == :visible ? node.text : ''
   end
 
-  def inline_kbd node
+  def convert_inline_kbd node
     if (keys = node.attr 'keys').size == 1
       %(<kbd>#{keys[0]}</kbd>)
     else
@@ -1146,7 +1188,7 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_menu node
+  def convert_inline_menu node
     caret = (node.document.attr? 'icons', 'font') ? '&#160;<i class="fa fa-angle-right caret"></i> ' : '&#160;<b class="caret">&#8250;</b> '
     submenu_joiner = %(</b>#{caret}<b class="submenu">)
     menu = node.attr 'menu'
@@ -1161,7 +1203,7 @@ Your browser does not support the video tag.
     end
   end
 
-  def inline_quoted node
+  def convert_inline_quoted node
     open, close, tag = QUOTE_TAGS[node.type]
     if node.id
       class_attr = node.role ? %( class="#{node.role}") : ''
@@ -1181,45 +1223,8 @@ Your browser does not support the video tag.
     end
   end
 
-  # NOTE export _read_svg_contents as read_svg_contents for Bespoke converter
+  # NOTE expose read_svg_contents for Bespoke converter
   def read_svg_contents node, target
-    _read_svg_contents node, target
-  end
-
-  private
-
-  def _append_boolean_attribute name, xml
-    xml ? %( #{name}="#{name}") : %( #{name})
-  end
-
-  def _append_link_constraint_attrs node, attrs = []
-    rel = 'nofollow' if node.option? 'nofollow'
-    if (window = node.attributes['window'])
-      attrs << %( target="#{window}")
-      attrs << (rel ? %( rel="#{rel} noopener") : ' rel="noopener"') if window == '_blank' || (node.option? 'noopener')
-    elsif rel
-      attrs << %( rel="#{rel}")
-    end
-    attrs
-  end
-
-  def _encode_attribute_value val
-    (val.include? '"') ? (val.gsub '"', '&quot;') : val
-  end
-
-  def _generate_manname_section node
-    manname_title = node.attr 'manname-title', 'Name'
-    if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
-      manname_title = manname_title.upcase
-    end
-    manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
-    %(<h2#{manname_id_attr}>#{manname_title}</h2>
-<div class="sectionbody">
-<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
-</div>)
-  end
-
-  def _read_svg_contents node, target
     if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG')
       svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
       old_start_tag = new_start_tag = nil
@@ -1234,6 +1239,44 @@ Your browser does not support the video tag.
       svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
     end
     svg
+  end
+
+  private
+
+  def append_boolean_attribute name, xml
+    xml ? %( #{name}="#{name}") : %( #{name})
+  end
+
+  def append_link_constraint_attrs node, attrs = []
+    rel = 'nofollow' if node.option? 'nofollow'
+    if (window = node.attributes['window'])
+      attrs << %( target="#{window}")
+      attrs << (rel ? %( rel="#{rel} noopener") : ' rel="noopener"') if window == '_blank' || (node.option? 'noopener')
+    elsif rel
+      attrs << %( rel="#{rel}")
+    end
+    attrs
+  end
+
+  def encode_attribute_value val
+    (val.include? '"') ? (val.gsub '"', '&quot;') : val
+  end
+
+  def generate_manname_section node
+    manname_title = node.attr 'manname-title', 'Name'
+    if (next_section = node.sections[0]) && (next_section_title = next_section.title) == next_section_title.upcase
+      manname_title = manname_title.upcase
+    end
+    manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
+    %(<h2#{manname_id_attr}>#{manname_title}</h2>
+<div class="sectionbody">
+<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
+</div>)
+  end
+
+  # NOTE adapt to older converters that relied on unprefixed method names
+  def method_missing id, *params
+    !((name = id.to_s).start_with? 'convert_') && (handles? name) ? (send %(convert_#{name}), *params) : super
   end
 end
 end

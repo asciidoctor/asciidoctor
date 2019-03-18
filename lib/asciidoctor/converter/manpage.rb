@@ -28,7 +28,7 @@ class Converter::ManPageConverter < Converter::Base
     init_backend_traits basebackend: 'manpage', filetype: 'man', outfilesuffix: '.man', supports_templates: true
   end
 
-  def document node
+  def convert_document node
     unless node.attr? 'mantitle'
       raise 'asciidoctor: ERROR: doctype must be set to manpage when using manpage backend'
     end
@@ -49,7 +49,7 @@ class Converter::ManPageConverter < Converter::Base
 .\\"  Language: English
 .\\")
     # TODO add document-level setting to disable capitalization of manname
-    result << %(.TH "#{_manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{mansource ? (_manify mansource) : '\ \&'}" "#{manmanual ? (_manify manmanual) : '\ \&'}")
+    result << %(.TH "#{manify manname.upcase}" "#{manvolnum}" "#{docdate}" "#{mansource ? (manify mansource) : '\ \&'}" "#{manmanual ? (manify manmanual) : '\ \&'}")
     # define portability settings
     # see http://bugs.debian.org/507673
     # see http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
@@ -91,7 +91,7 @@ class Converter::ManPageConverter < Converter::Base
       if node.attr? 'manpurpose'
         mannames = node.attr 'mannames', [manname]
         result << %(.SH "#{(node.attr 'manname-title', 'NAME').upcase}"
-#{mannames.map {|n| _manify n }.join ', '} \\- #{_manify node.attr('manpurpose'), whitespace: :normalize})
+#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), whitespace: :normalize})
       end
     end
 
@@ -121,7 +121,7 @@ class Converter::ManPageConverter < Converter::Base
   end
 
   # NOTE embedded doesn't really make sense in the manpage backend
-  def embedded node
+  def convert_embedded node
     result = [node.content]
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
@@ -134,7 +134,7 @@ class Converter::ManPageConverter < Converter::Base
     result.join LF
   end
 
-  def section node
+  def convert_section node
     result = []
     if node.level > 1
       macro = 'SS'
@@ -144,12 +144,12 @@ class Converter::ManPageConverter < Converter::Base
       macro = 'SH'
       stitle = node.title.upcase
     end
-    result << %(.#{macro} "#{_manify stitle}"
+    result << %(.#{macro} "#{manify stitle}"
 #{node.content})
     result.join LF
   end
 
-  def admonition node
+  def convert_admonition node
     result = []
     result << %(.if n .sp
 .RS 4
@@ -158,19 +158,19 @@ class Converter::ManPageConverter < Converter::Base
 .nr an-break-flag 1
 .br
 .ps +1
-.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{_manify node.title}" : ''}
+.B #{node.attr 'textlabel'}#{node.title? ? "\\fP: #{manify node.title}" : ''}
 .ps -1
 .br
-#{_enclose_content node}
+#{enclose_content node}
 .sp .5v
 .RE)
     result.join LF
   end
 
-  def colist node
+  def convert_colist node
     result = []
     result << %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) if node.title?
     result << '.TS
 tab(:);
@@ -179,7 +179,7 @@ r lw(\n(.lu*75u/100u).'
     num = 0
     node.items.each do |item|
       result << %(\\fB(#{num += 1})\\fP\\h'-2n':T{)
-      result << (_manify item.text, whitespace: :normalize)
+      result << (manify item.text, whitespace: :normalize)
       result << item.content if item.blocks?
       result << 'T}'
     end
@@ -188,10 +188,10 @@ r lw(\n(.lu*75u/100u).'
   end
 
   # TODO implement horizontal (if it makes sense)
-  def dlist node
+  def convert_dlist node
     result = []
     result << %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) if node.title?
     counter = 0
     node.items.each do |terms, dd|
@@ -199,15 +199,15 @@ r lw(\n(.lu*75u/100u).'
       case node.style
       when 'qanda'
         result << %(.sp
-#{counter}. #{_manify terms.map {|dt| dt.text }.join ' '}
+#{counter}. #{manify terms.map {|dt| dt.text }.join ' '}
 .RS 4)
       else
         result << %(.sp
-#{_manify terms.map {|dt| dt.text }.join(', '), whitespace: :normalize}
+#{manify terms.map {|dt| dt.text }.join(', '), whitespace: :normalize}
 .RS 4)
       end
       if dd
-        result << (_manify dd.text, whitespace: :normalize) if dd.text?
+        result << (manify dd.text, whitespace: :normalize) if dd.text?
         result << dd.content if dd.blocks?
       end
       result << '.RE'
@@ -215,73 +215,73 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  def example node
+  def convert_example node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.captioned_title}
+.B #{manify node.captioned_title}
 .br) : '.sp')
     result << %(.RS 4
-#{_enclose_content node}
+#{enclose_content node}
 .RE)
     result.join LF
   end
 
-  def floating_title node
-    %(.SS "#{_manify node.title}")
+  def convert_floating_title node
+    %(.SS "#{manify node.title}")
   end
 
-  def image node
+  def convert_image node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.captioned_title}
+.B #{manify node.captioned_title}
 .br) : '.sp')
     result << %([#{node.alt}])
     result.join LF
   end
 
-  def listing node
+  def convert_listing node
     result = []
     result << %(.sp
-.B #{_manify node.captioned_title}
+.B #{manify node.captioned_title}
 .br) if node.title?
     result << %(.sp
 .if n .RS 4
 .nf
-#{_manify node.content, whitespace: :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
     result.join LF
   end
 
-  def literal node
+  def convert_literal node
     result = []
     result << %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) if node.title?
     result << %(.sp
 .if n .RS 4
 .nf
-#{_manify node.content, whitespace: :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .if n .RE)
     result.join LF
   end
 
-  def sidebar node
+  def convert_sidebar node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) : '.sp')
     result << %(.RS 4
-#{_enclose_content node}
+#{enclose_content node}
 .RE)
     result.join LF
   end
 
-  def olist node
+  def convert_olist node
     result = []
     result << %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) if node.title?
 
     node.items.each_with_index do |item, idx|
@@ -294,46 +294,46 @@ r lw(\n(.lu*75u/100u).'
 .  sp -1
 .  IP " #{idx + 1}." 4.2
 .\\}
-#{_manify item.text, whitespace: :normalize})
+#{manify item.text, whitespace: :normalize})
       result << item.content if item.blocks?
       result << '.RE'
     end
     result.join LF
   end
 
-  def open node
+  def convert_open node
     case node.style
     when 'abstract', 'partintro'
-      _enclose_content node
+      enclose_content node
     else
       node.content
     end
   end
 
   # TODO use Page Control https://www.gnu.org/software/groff/manual/html_node/Page-Control.html#Page-Control
-  alias page_break _skip
+  alias convert_page_break skip
 
-  def paragraph node
+  def convert_paragraph node
     if node.title?
       %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br
-#{_manify node.content, whitespace: :normalize})
+#{manify node.content, whitespace: :normalize})
     else
       %(.sp
-#{_manify node.content, whitespace: :normalize})
+#{manify node.content, whitespace: :normalize})
     end
   end
 
-  alias pass _content_only
-  alias preamble _content_only
+  alias convert_pass content_only
+  alias convert_preamble content_only
 
-  def quote node
+  def convert_quote node
     result = []
     if node.title?
       result << %(.sp
 .RS 3
-.B #{_manify node.title}
+.B #{manify node.title}
 .br
 .RE)
     end
@@ -341,7 +341,7 @@ r lw(\n(.lu*75u/100u).'
     attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
     result << %(.RS 3
 .ll -.6i
-#{_enclose_content node}
+#{enclose_content node}
 .br
 .RE
 .ll)
@@ -355,16 +355,16 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  def stem node
+  def convert_stem node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) : '.sp')
     open, close = BLOCK_MATH_DELIMITERS[node.style.to_sym]
     if ((equation = node.content).start_with? open) && (equation.end_with? close)
       equation = equation.slice open.length, equation.length - open.length - close.length
     end
-    result << %(#{_manify equation, whitespace: :preserve} (#{node.style}))
+    result << %(#{manify equation, whitespace: :preserve} (#{node.style}))
     result.join LF
   end
 
@@ -374,7 +374,7 @@ r lw(\n(.lu*75u/100u).'
   # create empty cells as placeholders of the span.
   # To fix this, asciidoctor needs to provide an API to tell the user if a
   # given cell is being used as a colspan or rowspan.
-  def table node
+  def convert_table node
     result = []
     if node.title?
       result << %(.sp
@@ -382,7 +382,7 @@ r lw(\n(.lu*75u/100u).'
 .nr an-no-space-flag 1
 .nr an-break-flag 1
 .br
-.B #{_manify node.captioned_title}
+.B #{manify node.captioned_title}
 )
     end
     result << '.TS
@@ -419,7 +419,7 @@ allbox tab(:);'
               row_header[row_index][cell_index + 1] ||= []
               row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
             end
-            row_text[row_index] << %(#{_manify cell.text, whitespace: :normalize}#{LF})
+            row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
           elsif tsec == :body
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
               row_header[row_index][cell_index] << %(#{cell_halign}t)
@@ -431,9 +431,9 @@ allbox tab(:);'
             when :asciidoc
               cell_content = cell.content
             when :literal
-              cell_content = %(.nf#{LF}#{_manify cell.text, whitespace: :preserve}#{LF}.fi)
+              cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
             else
-              cell_content = _manify cell.content.join, whitespace: :normalize
+              cell_content = manify cell.content.join, whitespace: :normalize
             end
             row_text[row_index] << %(#{cell_content}#{LF})
           elsif tsec == :foot
@@ -443,7 +443,7 @@ allbox tab(:);'
               row_header[row_index][cell_index + 1] ||= []
               row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
             end
-            row_text[row_index] << %(#{_manify cell.text, whitespace: :normalize}#{LF})
+            row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
           end
           if cell.colspan && cell.colspan > 1
             (cell.colspan - 1).times do |i|
@@ -496,18 +496,18 @@ allbox tab(:);'
     result.join
   end
 
-  def thematic_break node
+  def convert_thematic_break node
     '.sp
 .ce
 \l\'\n(.lu*25u/100u\(ap\''
   end
 
-  alias toc _skip
+  alias convert_toc skip
 
-  def ulist node
+  def convert_ulist node
     result = []
     result << %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) if node.title?
     node.items.map do |item|
       result << %[.sp
@@ -519,7 +519,7 @@ allbox tab(:);'
 .  sp -1
 .  IP \\(bu 2.3
 .\\}
-#{_manify item.text, whitespace: :normalize}]
+#{manify item.text, whitespace: :normalize}]
       result << item.content if item.blocks?
       result << '.RE'
     end
@@ -527,16 +527,16 @@ allbox tab(:);'
   end
 
   # FIXME git uses [verse] for the synopsis; detect this special case
-  def verse node
+  def convert_verse node
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) : '.sp')
     attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
     attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
     result << %(.sp
 .nf
-#{_manify node.content, whitespace: :preserve}
+#{manify node.content, whitespace: :preserve}
 .fi
 .br)
     if attribution_line
@@ -549,18 +549,18 @@ allbox tab(:);'
     result.join LF
   end
 
-  def video node
+  def convert_video node
     start_param = (node.attr? 'start') ? %(&start=#{node.attr 'start'}) : ''
     end_param = (node.attr? 'end') ? %(&end=#{node.attr 'end'}) : ''
     result = []
     result << (node.title? ? %(.sp
-.B #{_manify node.title}
+.B #{manify node.title}
 .br) : '.sp')
     result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
     result.join LF
   end
 
-  def inline_anchor node
+  def convert_inline_anchor node
     target = node.target
     case node.type
     when :link
@@ -596,20 +596,20 @@ allbox tab(:);'
     end
   end
 
-  def inline_break node
+  def convert_inline_break node
     %(#{node.text}#{LF}#{ESC_FS}br)
   end
 
-  def inline_button node
+  def convert_inline_button node
     %(#{ESC_BS}fB[#{ESC_BS}0#{node.text}#{ESC_BS}0]#{ESC_BS}fP)
   end
 
-  def inline_callout node
+  def convert_inline_callout node
     %(#{ESC_BS}fB(#{node.text})#{ESC_BS}fP)
   end
 
   # TODO supposedly groff has footnotes, but we're in search of an example
-  def inline_footnote node
+  def convert_inline_footnote node
     if (index = node.attr 'index')
       %([#{index}])
     elsif node.type == :xref
@@ -617,15 +617,15 @@ allbox tab(:);'
     end
   end
 
-  def inline_image node
+  def convert_inline_image node
     (node.attr? 'link') ? %([#{node.alt}] <#{node.attr 'link'}>) : %([#{node.alt}])
   end
 
-  def inline_indexterm node
+  def convert_inline_indexterm node
     node.type == :visible ? node.text : ''
   end
 
-  def inline_kbd node
+  def convert_inline_kbd node
     if (keys = node.attr 'keys').size == 1
       keys[0]
     else
@@ -633,7 +633,7 @@ allbox tab(:);'
     end
   end
 
-  def inline_menu node
+  def convert_inline_menu node
     caret = %[#{ESC_BS}0#{ESC_BS}(fc#{ESC_BS}0]
     menu = node.attr 'menu'
     if !(submenus = node.attr 'submenus').empty?
@@ -647,7 +647,7 @@ allbox tab(:);'
   end
 
   # NOTE use fake <BOUNDARY> element to prevent creating artificial word boundaries
-  def inline_quoted node
+  def convert_inline_quoted node
     case node.type
     when :emphasis
       %(#{ESC_BS}fI<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
@@ -680,7 +680,7 @@ allbox tab(:);'
   # Converts HTML entity references back to their original form, escapes
   # special man characters and strips trailing whitespace.
   #
-  # It's crucial that text only ever pass through _manify once.
+  # It's crucial that text only ever pass through manify once.
   #
   # str  - the String to convert
   # opts - an Hash of options to control processing (default: {})
@@ -689,7 +689,7 @@ allbox tab(:);'
   #          (remove spaces around newlines); :collapse - collapse adjacent whitespace to a single
   #          space (default: :collapse)
   #        * :append_newline a Boolean that indicates whether to append a newline to the result (default: false)
-  def _manify str, opts = {}
+  def manify str, opts = {}
     case opts.fetch :whitespace, :collapse
     when :preserve
       str = str.gsub TAB, ET
@@ -732,8 +732,8 @@ allbox tab(:);'
     opts[:append_newline] ? %(#{str}#{LF}) : str
   end
 
-  def _enclose_content node
-    node.content_model == :compound ? node.content : %(.sp#{LF}#{_manify node.content, whitespace: :normalize})
+  def enclose_content node
+    node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, whitespace: :normalize})
   end
 end
 end

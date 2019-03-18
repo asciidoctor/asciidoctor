@@ -381,7 +381,7 @@ context 'Converter' do
       EOS
 
       my_converter_class = Class.new Asciidoctor::Converter::Base do
-        def document node
+        def convert_document node
           'document'
         end
       end
@@ -435,17 +435,17 @@ context 'Converter' do
       end
     end
 
-    test 'should map handles? method on converter to respond_to? by default' do
+    test 'should map handles? method on converter to respond_to? implementation by default' do
       class CustomConverterC
         include Asciidoctor::Converter
-        def paragraph node
+        def convert_paragraph node
           'paragraph'
         end
       end
 
       converter = CustomConverterC.new 'myhtml'
       assert_respond_to converter, :handles?
-      assert converter.handles?(:paragraph)
+      assert converter.handles?(:convert_paragraph)
     end
 
     test 'should not configure converter to support templates by default' do
@@ -493,6 +493,8 @@ context 'Converter' do
             transform ||= node.node_name
             send transform, node
           end
+
+          alias handles? respond_to?
 
           def document node
             ['<!DOCTYPE html>', '<html>', '<body>', node.content, '</body>', '</html>'] * %(\n)
@@ -589,6 +591,12 @@ context 'Converter' do
       factory = Asciidoctor::Converter::Factory.new 'mine' => MyConverter
       assert_kind_of Asciidoctor::Converter::CustomFactory, factory
       assert_equal MyConverter, (factory.for 'mine')
+    end
+
+    test 'should delegate to method on HTML 5 converter with convert_ prefix if called without prefix' do
+      doc = document_from_string 'paragraph'
+      result = doc.converter.paragraph doc.blocks[0]
+      assert_css 'p', result, 1
     end
 
     test 'can call read_svg_contents on built-in HTML5 converter' do

@@ -405,7 +405,7 @@ context 'Document' do
       converter = doc.converter
       assert_kind_of Asciidoctor::Converter::Html5Converter, converter
       BUILT_IN_ELEMENTS.each do |element|
-        assert_respond_to converter, element
+        assert_respond_to converter, %(convert_#{element})
       end
     end
 
@@ -419,7 +419,7 @@ context 'Document' do
       converter = doc.converter
       assert_kind_of Asciidoctor::Converter::DocBook5Converter, converter
       BUILT_IN_ELEMENTS.each do |element|
-        assert_respond_to converter, element
+        assert_respond_to converter, %(convert_#{element})
       end
     end
 
