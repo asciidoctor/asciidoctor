@@ -724,6 +724,10 @@ class Document < AbstractBlock
   end
   alias name doctitle
 
+  def xreftext xrefstyle = nil
+    (val = reftext) && !val.empty? ? val : title
+  end
+
   # Public: Convenience method to retrieve the document attribute 'author'
   #
   # returns the full name of the author as a String

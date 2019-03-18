@@ -512,6 +512,18 @@ context 'Sections' do
         assert_equal doc, doc.catalog[:refs]['manual']
       end
 
+      test 'should compute xreftext to document title' do
+        input = <<~'EOS'
+        [#manual]
+        = Reference Manual
+        :xrefstyle: full
+
+        This is the <<manual>>.
+        EOS
+        output = convert_string input
+        assert_xpath '//a[text()="Reference Manual"]', output, 1
+      end
+
       test 'should discard style, role and options shorthand attributes defined on document title' do
         input = <<~'EOS'
         [style#idname.rolename%optionname]
