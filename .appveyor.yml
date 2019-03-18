@@ -23,5 +23,5 @@ build_script:
 - bundle exec rake build
 test_script:
 - bundle exec rake test:all
-artifacts:
-- path: pkg\*.gem
+#artifacts:
+#- path: pkg\*.gem
