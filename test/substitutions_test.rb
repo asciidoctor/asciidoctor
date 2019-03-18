@@ -622,16 +622,28 @@ context 'Substitutions' do
     end
 
     test 'should recognize inline email addresses' do
-      para = block_from_string('doc.writer@asciidoc.org')
-      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
-      para = block_from_string('<doc.writer@asciidoc.org>')
-      assert_equal %q{&lt;<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>&gt;}, para.apply_subs(para.source)
-      para = block_from_string('author+website@4fs.no')
-      assert_equal %q{<a href="mailto:author+website@4fs.no">author+website@4fs.no</a>}, para.sub_macros(para.source)
-      para = block_from_string('john@domain.uk.co')
-      assert_equal %q{<a href="mailto:john@domain.uk.co">john@domain.uk.co</a>}, para.sub_macros(para.source)
+      %w(
+        doc.writer@asciidoc.org
+        author+website@4fs.no
+        john@domain.uk.co
+        name@somewhere.else.com
+        joe_bloggs@mail_server.com
+        joe-bloggs@mail-server.com
+        joe.bloggs@mail.server.com
+      ).each do |input|
+        para = block_from_string input
+        assert_equal %(<a href="mailto:#{input}">#{input}</a>), (para.sub_macros para.source)
+      end
+    end
+
+    test 'should recognize inline email address containing an ampersand' do
       para = block_from_string('bert&ernie@sesamestreet.com')
       assert_equal %q{<a href="mailto:bert&amp;ernie@sesamestreet.com">bert&amp;ernie@sesamestreet.com</a>}, para.apply_subs(para.source)
+    end
+
+    test 'should recognize inline email address surrounded by angle brackets' do
+      para = block_from_string('<doc.writer@asciidoc.org>')
+      assert_equal %q{&lt;<a href="mailto:doc.writer@asciidoc.org">doc.writer@asciidoc.org</a>&gt;}, para.apply_subs(para.source)
     end
 
     test 'should ignore escaped inline email address' do

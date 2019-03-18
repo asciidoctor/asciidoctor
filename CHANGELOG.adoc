@@ -144,6 +144,8 @@ Bug Fixes::
   * initialize the level to WARN when instantiating the NullLogger
   * next_adjacent_block should not fail when called on dlist item (#3133)
   * don't suppress browser styles for summary tag; add pointer cursor and panel margin bottom (#3155)
+  * only consider TLDs in e-mail address that have ASCII alpha characters
+  * allow underscore in domain of e-mail address
 
 Build / Infrastructure::
 
