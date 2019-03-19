@@ -2135,6 +2135,19 @@ class ReaderTest < Minitest::Test
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 
+      test 'ifeval with no text is ignored' do
+        input = <<~'EOS'
+        ifeval::[]
+        content
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal input.chomp, (lines * ::Asciidoctor::LF)
+      end
+
       test 'ifdef with no target is ignored' do
         input = <<~'EOS'
         ifdef::[]

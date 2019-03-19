@@ -952,13 +952,16 @@ class PreprocessorReader < Reader
       when 'ifeval'
         # the text in brackets must match an expression
         # don't honor match if it doesn't meet this criteria
-        return false unless no_target && EvalExpressionRx =~ text.strip
-
-        lhs = resolve_expr_val $1
-        rhs = resolve_expr_val $3
-
-        # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
-        skip = (lhs.send $2, rhs) ? false : true
+        if no_target
+          if text && EvalExpressionRx =~ text.strip
+            # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
+            skip = ((resolve_expr_val $1).send $2, (resolve_expr_val $3)) ? false : true
+          else
+            return false
+          end
+        else
+          return false
+        end
       end
     end
 
