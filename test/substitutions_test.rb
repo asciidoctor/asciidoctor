@@ -1128,8 +1128,8 @@ context 'Substitutions' do
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['Tigers'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['Tigers'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1140,8 +1140,8 @@ context 'Substitutions' do
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['Big cats', 'Tigers'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['Big cats', 'Tigers'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1152,8 +1152,8 @@ context 'Substitutions' do
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['Big cats', 'Tigers', 'Panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1164,8 +1164,8 @@ context 'Substitutions' do
         para = block_from_string("#{sentence}#{macro}")
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['Panthera tigris'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['Panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1174,7 +1174,7 @@ context 'Substitutions' do
       doc = document_from_string input, standalone: false
       output = doc.convert
       assert_xpath '//p[text()="National Institute of Science and Technology (((NIST)))"]', output, 1
-      assert doc.catalog[:indexterms].empty?
+      #assert doc.catalog[:indexterms].empty?
     end
 
     test 'should only escape enclosing brackets if concealed index term is preceded by a backslash' do
@@ -1182,9 +1182,9 @@ context 'Substitutions' do
       doc = document_from_string input, standalone: false
       output = doc.convert
       assert_xpath '//p[text()="National Institute of Science and Technology (NIST)"]', output, 1
-      term = doc.catalog[:indexterms].first
-      assert_equal 1, term.size
-      assert_equal 'NIST', term.first
+      #term = doc.catalog[:indexterms].first
+      #assert_equal 1, term.size
+      #assert_equal 'NIST', term.first
     end
 
     test 'should not split index terms on commas inside of quoted terms' do
@@ -1204,11 +1204,11 @@ context 'Substitutions' do
         para = block_from_string input
         output = para.sub_macros(para.source)
         assert_equal input.lines.first, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        terms = para.document.catalog[:indexterms].first
-        assert_equal 2, terms.size
-        assert_equal 'Tigers', terms.first
-        assert_equal '[Big], scary cats', terms.last
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #terms = para.document.catalog[:indexterms].first
+        #assert_equal 2, terms.size
+        #assert_equal 'Tigers', terms.first
+        #assert_equal '[Big], scary cats', terms.last
       end
     end
 
@@ -1219,8 +1219,8 @@ context 'Substitutions' do
         para = block_from_string("#{sentence}#{macro}")
         output = para.apply_subs(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['<strong>Tigers</strong>'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['<strong>Tigers</strong>'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1230,9 +1230,9 @@ context 'Substitutions' do
       para = block_from_string("#{sentence}\n#{macros}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output.rstrip
-      assert_equal 2, para.document.catalog[:indexterms].size
-      assert_equal ['Tigers'], para.document.catalog[:indexterms][0]
-      assert_equal ['Animals', 'Cats'], para.document.catalog[:indexterms][1]
+      #assert_equal 2, para.document.catalog[:indexterms].size
+      #assert_equal ['Tigers'], para.document.catalog[:indexterms][0]
+      #assert_equal ['Animals', 'Cats'], para.document.catalog[:indexterms][1]
     end
 
     test 'an index term macro with round bracket syntax may contain round brackets in term' do
@@ -1241,8 +1241,8 @@ context 'Substitutions' do
       para = block_from_string("#{sentence}#{macro}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output
-      assert_equal 1, para.document.catalog[:indexterms].size
-      assert_equal ['Tiger (Panthera tigris)'], para.document.catalog[:indexterms].first
+      #assert_equal 1, para.document.catalog[:indexterms].size
+      #assert_equal ['Tiger (Panthera tigris)'], para.document.catalog[:indexterms].first
     end
 
     test 'visible shorthand index term macro should not consume trailing round bracket' do
@@ -1251,10 +1251,10 @@ context 'Substitutions' do
       expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
-      indexterms_table = para.document.catalog[:indexterms]
-      assert_equal 1, indexterms_table.size
-      assert_equal expected_term, indexterms_table[0]
       assert_equal expected, output
+      #indexterms_table = para.document.catalog[:indexterms]
+      #assert_equal 1, indexterms_table.size
+      #assert_equal expected_term, indexterms_table[0]
     end
 
     test 'visible shorthand index term macro should not consume leading round bracket' do
@@ -1263,10 +1263,10 @@ context 'Substitutions' do
       expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
-      indexterms_table = para.document.catalog[:indexterms]
-      assert_equal 1, indexterms_table.size
-      assert_equal expected_term, indexterms_table[0]
       assert_equal expected, output
+      #indexterms_table = para.document.catalog[:indexterms]
+      #assert_equal 1, indexterms_table.size
+      #assert_equal expected_term, indexterms_table[0]
     end
 
     test 'an index term macro with square bracket syntax may contain square brackets in term' do
@@ -1275,8 +1275,8 @@ context 'Substitutions' do
       para = block_from_string("#{sentence}#{macro}")
       output = para.sub_macros(para.source)
       assert_equal sentence, output
-      assert_equal 1, para.document.catalog[:indexterms].size
-      assert_equal ['Tiger [Panthera tigris]'], para.document.catalog[:indexterms].first
+      #assert_equal 1, para.document.catalog[:indexterms].size
+      #assert_equal ['Tiger [Panthera tigris]'], para.document.catalog[:indexterms].first
     end
 
     test 'a single-line index term 2 macro should be registered as an index reference and retain term inline' do
@@ -1286,8 +1286,8 @@ context 'Substitutions' do
         para = block_from_string(macro)
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['tiger'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['tiger'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1298,8 +1298,8 @@ context 'Substitutions' do
         para = block_from_string(macro)
         output = para.sub_macros(para.source)
         assert_equal sentence, output
-        assert_equal 1, para.document.catalog[:indexterms].size
-        assert_equal ['panthera tigris'], para.document.catalog[:indexterms].first
+        #assert_equal 1, para.document.catalog[:indexterms].size
+        #assert_equal ['panthera tigris'], para.document.catalog[:indexterms].first
       end
     end
 
@@ -1308,9 +1308,9 @@ context 'Substitutions' do
       para = block_from_string(sentence)
       output = para.sub_macros(para.source)
       assert_equal 'The tiger (Panthera tigris) is the largest cat species.', output
-      assert_equal 2, para.document.catalog[:indexterms].size
-      assert_equal ['tiger'], para.document.catalog[:indexterms][0]
-      assert_equal ['cat'], para.document.catalog[:indexterms][1]
+      #assert_equal 2, para.document.catalog[:indexterms].size
+      #assert_equal ['tiger'], para.document.catalog[:indexterms][0]
+      #assert_equal ['cat'], para.document.catalog[:indexterms][1]
     end
 
     test 'should escape visible index term if preceded by a backslash' do
@@ -1318,7 +1318,7 @@ context 'Substitutions' do
       para = block_from_string(sentence)
       output = para.sub_macros(para.source)
       assert_equal 'The ((tiger)) (Panthera tigris) is the largest ((cat)) species.', output
-      assert para.document.catalog[:indexterms].empty?
+      #assert para.document.catalog[:indexterms].empty?
     end
 
     test 'normal substitutions are performed on an index term 2 macro' do
@@ -1326,8 +1326,8 @@ context 'Substitutions' do
       para = block_from_string sentence
       output = para.apply_subs(para.source)
       assert_equal 'The <strong>tiger</strong> (Panthera tigris) is the largest cat species.', output
-      assert_equal 1, para.document.catalog[:indexterms].size
-      assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
+      #assert_equal 1, para.document.catalog[:indexterms].size
+      #assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
     end
 
     test 'index term 2 macro with round bracket syntex should not interfer with index term macro with round bracket syntax' do
@@ -1335,10 +1335,10 @@ context 'Substitutions' do
       para = block_from_string sentence
       output = para.sub_macros(para.source)
       assert_equal "The panthera tigris is the largest cat species.\n", output
-      terms = para.document.catalog[:indexterms]
-      assert_equal 2, terms.size
-      assert_equal ['panthera tigris'], terms[0]
-      assert_equal ['Big cats', 'Tigers'], terms[1]
+      #terms = para.document.catalog[:indexterms]
+      #assert_equal 2, terms.size
+      #assert_equal ['panthera tigris'], terms[0]
+      #assert_equal ['Big cats', 'Tigers'], terms[1]
     end
 
     context 'Button macro' do

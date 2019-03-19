@@ -624,7 +624,7 @@ module Substitutors
 
           # indexterm:[Tigers,Big cats]
           terms = split_simple_csv normalize_string $2, true
-          doc.register :indexterms, terms
+          #doc.register :indexterms, terms
           (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
         when 'indexterm2'
           # honor the escape
@@ -632,7 +632,7 @@ module Substitutors
 
           # indexterm2:[Tigers]
           term = normalize_string $2, true
-          doc.register :indexterms, [term]
+          #doc.register :indexterms, [term]
           (Inline.new self, :indexterm, term, type: :visible).convert
         else
           text = $3
@@ -660,12 +660,12 @@ module Substitutors
           if visible
             # ((Tigers))
             term = normalize_string text
-            doc.register :indexterms, [term]
+            #doc.register :indexterms, [term]
             subbed_term = (Inline.new self, :indexterm, term, type: :visible).convert
           else
             # (((Tigers,Big cats)))
             terms = split_simple_csv(normalize_string text)
-            doc.register :indexterms, terms
+            #doc.register :indexterms, terms
             subbed_term = (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
