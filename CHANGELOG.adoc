@@ -102,6 +102,7 @@ Improvements::
   * never mutate strings; add a `frozen_string_literal: true` magic comment to top of all Ruby source files (#3054)
   * always use docdate and doctime to compute docyear and docdatetime (#3064)
   * rename PreprocessorReader#exceeded_max_depth? to PreprocessorReader#exceeds_max_depth? and return nil if includes are disabled
+  * log warning when include directive is not resolved due to missing attribute or blank target; always include warning in output (#2868)
   * stop populating :ids table in document catalog (#3084)
   * always use :refs table in document catalog to look for registered IDs (#3084)
   * don't compute and store reference text in document catalog (#3084)
