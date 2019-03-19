@@ -902,14 +902,10 @@ class PreprocessorReader < Reader
     # attributes are case insensitive
     target = target.downcase unless (no_target = target.empty?)
 
-    # must have a target before brackets if ifdef or ifndef
-    # must not have text between brackets if endif
-    # skip line if it doesn't meet this criteria
-    # QUESTION should we warn for these bogus declarations?
-    return false if (no_target && (keyword == 'ifdef' || keyword == 'ifndef')) || (text && keyword == 'endif')
-
     if keyword == 'endif'
-      if @conditional_stack.empty?
+      if text
+        logger.error message_with_context %(malformed preprocessor directive - text not permitted: endif::#{target}[#{text}]), source_location: cursor
+      elsif @conditional_stack.empty?
         logger.error message_with_context %(unmatched preprocessor directive: endif::#{target}[]), source_location: cursor
       elsif no_target || target == (pair = @conditional_stack[-1])[:target]
         @conditional_stack.pop
@@ -918,14 +914,16 @@ class PreprocessorReader < Reader
         logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{pair[:target]}[]), source_location: cursor
       end
       return true
-    end
-
-    if @skipping
+    elsif @skipping
       skip = false
     else
       # QUESTION any way to wrap ifdef & ifndef logic up together?
       case keyword
       when 'ifdef'
+        if no_target
+          logger.error message_with_context %(malformed preprocessor directive - missing target: ifdef::[#{text}]), source_location: cursor
+          return true
+        end
         case delimiter
         when ','
           # skip if no attribute is defined
@@ -938,6 +936,10 @@ class PreprocessorReader < Reader
           skip = !@document.attributes.key?(target)
         end
       when 'ifndef'
+        if no_target
+          logger.error message_with_context %(malformed preprocessor directive - missing target: ifndef::[#{text}]), source_location: cursor
+          return true
+        end
         case delimiter
         when ','
           # skip if any attribute is defined
@@ -950,17 +952,18 @@ class PreprocessorReader < Reader
           skip = @document.attributes.key?(target)
         end
       when 'ifeval'
-        # the text in brackets must match an expression
-        # don't honor match if it doesn't meet this criteria
         if no_target
+          # the text in brackets must match a conditional expression
           if text && EvalExpressionRx =~ text.strip
             # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
             skip = ((resolve_expr_val $1).send $2, (resolve_expr_val $3)) ? false : true
           else
-            return false
+            logger.error message_with_context %(malformed preprocessor directive - #{text ? 'invalid expression' : 'missing expression'}: ifeval::[#{text}]), source_location: cursor
+            return true
           end
         else
-          return false
+          logger.error message_with_context %(malformed preprocessor directive - target not permitted: ifeval::#{target}[#{text}]), source_location: cursor
+          return true
         end
       end
     end
