@@ -1959,6 +1959,33 @@ class ReaderTest < Minitest::Test
         assert_equal 'Our quest is complete!', result
       end
 
+      test 'should log warning if endif is unmatched' do
+        input = <<~'EOS'
+        Our quest is complete!
+        endif::on-quest[]
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
+          assert_equal 'Our quest is complete!', result
+          assert_message logger, :ERROR, '~<stdin>: line 2: unmatched preprocessor directive: endif::on-quest[]', Hash
+        end
+      end
+
+      test 'should log warning if endif is mismatched' do
+        input = <<~'EOS'
+        ifdef::on-quest[]
+        Our quest is complete!
+        endif::on-journey[]
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
+          assert_equal 'Our quest is complete!', result
+          assert_message logger, :ERROR, '~<stdin>: line 3: mismatched preprocessor directive: endif::on-journey[]', Hash
+        end
+      end
+
       test 'escaped ifdef is unescaped and ignored' do
         input = <<~'EOS'
         \ifdef::holygrail[]
