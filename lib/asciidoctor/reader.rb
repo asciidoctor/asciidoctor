@@ -1011,7 +1011,7 @@ class PreprocessorReader < Reader
   def preprocess_include_directive target, attrlist
     doc = @document
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
-        (expanded_target = doc.sub_attributes target, attribute_missing: 'drop-line').empty?
+        (expanded_target = doc.sub_attributes target, attribute_missing: 'drop-line', drop_line_severity: :warn).empty?
       shift
       if (doc.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
         unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])

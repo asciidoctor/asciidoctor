@@ -582,7 +582,7 @@ class Parser
               end
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
-              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, attribute_missing: 'drop-line').empty?
+              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, attribute_missing: 'drop-line', drop_line_severity: :warn).empty?
                 # retain as unparsed if attribute-missing is skip
                 if (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'skip'
                   return Block.new(parent, :paragraph, content_model: :simple, source: [this_line])

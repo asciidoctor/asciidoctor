@@ -1002,7 +1002,7 @@ context 'Extensions' do
           assert_equal 1, doc.blocks.size
           assert_equal :paragraph, doc.blocks[0].context
           output = doc.convert
-          assert_message logger, :WARN, 'dropping line containing reference to missing attribute: gist-ns'
+          assert_message logger, :INFO, 'dropping line containing reference to missing attribute: gist-ns'
         end
         assert_css '.paragraph', output, 1
         assert_css '.rolename', output, 0
