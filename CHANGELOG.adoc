@@ -109,6 +109,7 @@ Improvements::
   * rename hardbreaks document attribute to hardbreaks-option; retain hardbreaks as a deprecated alias (#3123)
   * truncate with precision (instead of rounding) when computing absolute width for columns in DocBook output (#3131)
   * drop legacy LaTeX math delimiters (e.g, `$..$`) if present (#1339)
+  * use proper terminology in warning message about mismatched preprocessor directive (#3165)
   * upgrade MathJax to 2.7.5
 
 Bug Fixes::
