@@ -115,6 +115,7 @@ Improvements::
 Bug Fixes::
 
   * fix crash caused by inline passthrough macro with the macros sub clearing the remaining passthrough placeholders (#3089)
+  * fix crash if ifeval directive is missing expression (#3164)
   * prevent relative leveloffset from making section level negative and causing hang (#3152)
   * don't fail to parse Markdown-style quote block that only contains attribution line (#2989)
   * enforce rule that Setext section title must have at least one alphanumeric character; fixes problem w/ block nested inside quote block (#3060)
