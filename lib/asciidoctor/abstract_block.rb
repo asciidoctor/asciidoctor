@@ -451,6 +451,8 @@ class AbstractBlock < AbstractNode
           when :reject
             raise ::StopIteration if id_selector
             return result
+          when :stop
+            raise ::StopIteration
           else
             result << self
             raise ::StopIteration if id_selector
