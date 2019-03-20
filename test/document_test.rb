@@ -1190,7 +1190,8 @@ context 'Document' do
 
       doc = document_from_string input
       refute_nil doc.catalog
-      assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs, :callouts].sort, doc.catalog.keys.sort
+      #assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs, :callouts].sort, doc.catalog.keys.sort
+      assert_equal [:footnotes, :ids, :images, :includes, :links, :refs, :callouts].sort, doc.catalog.keys.sort
       assert_same doc.catalog, doc.references
       assert_same doc.catalog[:footnotes], doc.references[:footnotes]
       assert_same doc.catalog[:refs], doc.references[:refs]
