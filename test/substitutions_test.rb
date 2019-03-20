@@ -631,6 +631,7 @@ context 'Substitutions' do
         joe-bloggs@mail-server.com
         joe.bloggs@mail.server.com
         FOO@BAR.COM
+        docs@writing.ninja
       ).each do |input|
         para = block_from_string input
         assert_equal %(<a href="mailto:#{input}">#{input}</a>), (para.sub_macros para.source)
