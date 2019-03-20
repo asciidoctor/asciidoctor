@@ -444,13 +444,11 @@ class AbstractBlock < AbstractNode
       if block_given?
         if (verdict = yield self)
           case verdict
-          # the :skip_children keyword is deprecated
-          when :prune, :skip_children
+          when :prune
             result << self
             raise ::StopIteration if id_selector
             return result
-          # the :skip keyword is deprecated and may be repurposed
-          when :reject, :skip
+          when :reject
             raise ::StopIteration if id_selector
             return result
           else

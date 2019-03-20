@@ -79,6 +79,7 @@ Enhancements / Compliance::
   * load additional languages for highlight.js as defined in the comma-separated highlightjs-languages attribute (#3036)
   * log warning if conditional expression in ifeval directive is invalid (#3161)
   * drop lines that contain an invalid preprocessor directive (#3161)
+  * rename AbstractBlock#find_by directives; use :prune in place of :skip_children and :reject in place of :skip
 
 Improvements::
 
