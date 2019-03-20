@@ -1248,7 +1248,7 @@ context 'Substitutions' do
     test 'visible shorthand index term macro should not consume trailing round bracket' do
       input = '(text with ((index term)))'
       expected = '(text with <indexterm><primary>index term</primary></indexterm>index term)'
-      expected_term = ['index term']
+      #expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
       assert_equal expected, output
@@ -1260,7 +1260,7 @@ context 'Substitutions' do
     test 'visible shorthand index term macro should not consume leading round bracket' do
       input = '(((index term)) for text)'
       expected = '(<indexterm><primary>index term</primary></indexterm>index term for text)'
-      expected_term = ['index term']
+      #expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
       assert_equal expected, output
