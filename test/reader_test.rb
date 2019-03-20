@@ -730,7 +730,7 @@ class ReaderTest < Minitest::Test
             doc = document_from_string input, safe: :safe, base_dir: DIRNAME
             assert_equal 1, doc.blocks.size
             assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_empty logger
+            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
           end
         rescue
           flunk 'include directive should not raise exception on unresolved target'
@@ -749,7 +749,7 @@ class ReaderTest < Minitest::Test
             doc = document_from_string input, safe: :safe, base_dir: DIRNAME
             assert_equal 1, doc.blocks.size
             assert_equal ['trailing content'], doc.blocks[0].lines
-            assert logger.empty?
+            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
           end
         rescue
           flunk 'include directive should not raise exception on missing file'
@@ -1410,7 +1410,7 @@ class ReaderTest < Minitest::Test
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
           assert_equal 'Unresolved directive in <stdin> - include::{blank}[]', line
-          assert_message logger, :WARN, '<stdin>: line 1: include skipped because resolved target is blank: include::{blank}[]', Hash
+          assert_message logger, :WARN, '<stdin>: line 1: include dropped because resolved target is blank: include::{blank}[]', Hash
         end
       end
 
@@ -1443,7 +1443,7 @@ class ReaderTest < Minitest::Test
           assert_equal 'yo', line
           assert_messages logger, [
             [:INFO, 'dropping line containing reference to missing attribute: foodir'],
-            [:WARN, '<stdin>: line 1: include skipped due to missing attribute: include::{foodir}/include-file.adoc[]', Hash],
+            [:WARN, '<stdin>: line 1: include dropped due to missing attribute: include::{foodir}/include-file.adoc[]', Hash],
           ]
         end
       end
