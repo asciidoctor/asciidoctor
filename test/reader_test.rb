@@ -1986,6 +1986,20 @@ class ReaderTest < Minitest::Test
         end
       end
 
+      test 'should log warning if endif contains text' do
+        input = <<~'EOS'
+        ifdef::on-quest[]
+        Our quest is complete!
+        endif::on-quest[complete!]
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
+          assert_equal 'Our quest is complete!', result
+          assert_message logger, :ERROR, '~<stdin>: line 3: malformed preprocessor directive - text not permitted: endif::on-quest[complete!]', Hash
+        end
+      end
+
       test 'escaped ifdef is unescaped and ignored' do
         input = <<~'EOS'
         \ifdef::holygrail[]
@@ -2162,17 +2176,52 @@ class ReaderTest < Minitest::Test
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 
-      test 'ifeval with no text is ignored' do
+      test 'should warn if ifeval has target' do
+        input = <<~'EOS'
+        ifeval::target[1 == 1]
+        content
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - target not permitted: ifeval::target[1 == 1]', Hash
+        end
+      end
+
+      test 'should warn if ifeval has invalid expression' do
+        input = <<~'EOS'
+        ifeval::[1 | 2]
+        content
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - invalid expression: ifeval::[1 | 2]', Hash
+        end
+      end
+
+      test 'should warn if ifeval is missing expression' do
         input = <<~'EOS'
         ifeval::[]
         content
         EOS
 
-        doc = Asciidoctor::Document.new input
-        reader = doc.reader
-        lines = []
-        lines << reader.read_line while reader.has_more_lines?
-        assert_equal input.chomp, (lines * ::Asciidoctor::LF)
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - missing expression: ifeval::[]', Hash
+        end
       end
 
       test 'ifdef with no target is ignored' do
@@ -2181,13 +2230,30 @@ class ReaderTest < Minitest::Test
         content
         EOS
 
-        doc = Asciidoctor::Document.new input
-        reader = doc.reader
-        lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - missing target: ifdef::[]', Hash
         end
-        assert_equal "ifdef::[]\ncontent", (lines * ::Asciidoctor::LF)
+      end
+
+      test 'should not warn if preprocessor directive is invalid if already skipping' do
+        input = <<~'EOS'
+        ifdef::attribute-not-set[]
+        foo
+        ifdef::[]
+        bar
+        endif::[]
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input).reader.read
+          assert_empty result
+          assert_empty logger
+        end
       end
     end
   end
