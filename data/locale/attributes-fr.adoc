@@ -2,7 +2,7 @@
 :appendix-caption: Annexe
 :appendix-refsig: {appendix-caption}
 :caution-caption: Avertissement
-//:chapter-label: ???
+//:chapter-label: Chapitre
 //:chapter-refsig: {chapter-label}
 :example-caption: Exemple
 :figure-caption: Figure
