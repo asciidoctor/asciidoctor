@@ -1014,13 +1014,17 @@ class PreprocessorReader < Reader
   def preprocess_include_directive target, attrlist
     doc = @document
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
-        (intermediary_target = doc.sub_attributes target + ' ', attribute_missing: 'drop-line', drop_line_severity: :warn) &&
-        (expanded_target = intermediary_target.chop).empty?
-      if (doc.parse_attributes attrlist, [], sub_input: true)['optional-option']
+        (precursor_target = doc.sub_attributes target + ' ', attribute_missing: ((attr_missing = doc.attributes['attribute-missing'] || Compliance.attribute_missing) == 'warn' ? 'drop-line' : attr_missing)) &&
+        (expanded_target = precursor_target.chop).empty?
+      if attr_missing == 'drop-line' && precursor_target.empty?
+        logger.info message_with_context %(include dropped due to missing attribute: include::#{target}[#{attrlist}]), source_location: cursor if logger.info?
+        shift
+        true
+      elsif (doc.parse_attributes attrlist, [], sub_input: true)['optional-option']
         shift
         true
       else
-        logger.warn message_with_context %(#{intermediary_target.empty? ? 'include not found because of missing attribute' : 'include not found because target is blank'}: include::#{target}[#{attrlist}]), source_location: cursor
+        logger.warn message_with_context %(include skipped #{attr_missing == 'warn' && precursor_target.empty? ? 'due to missing attribute' : 'because resolved target is blank'}: include::#{target}[#{attrlist}]), source_location: cursor
         replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
