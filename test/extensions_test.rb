@@ -144,9 +144,9 @@ class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
     c = target.to_f
     case units
     when 'C'
-      %(#{c.round precision} &#176;C)
+      create_inline parent, :quoted, %(#{c.round precision} &#176;C)
     when 'F'
-      %(#{(c * 1.8 + 32).round precision} &#176;F)
+      create_inline parent, :quoted, %(#{(c * 1.8 + 32).round precision} &#176;F)
     else
       raise ::ArgumentError, %(Unknown temperature units: #{units})
     end
@@ -1136,7 +1136,7 @@ context 'Extensions' do
             match_format :short
             parse_content_as :text
             process do |parent, _, attrs|
-              %(<label>#{attrs['text']}</label>)
+              create_inline parent, :quoted, %(<label>#{attrs['text']}</label>)
             end
           end
         end
@@ -1155,7 +1155,7 @@ context 'Extensions' do
             named :label
             match_format :short
             process do |parent, target|
-              %(<label>#{target}</label>)
+              create_inline parent, :quoted, %(<label>#{target}</label>)
             end
           end
         end
@@ -1175,7 +1175,7 @@ context 'Extensions' do
             match_format :short
             resolve_attributes '1:name'
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1184,7 +1184,7 @@ context 'Extensions' do
             match_format :short
             resolve_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1192,7 +1192,7 @@ context 'Extensions' do
             named :'full-attributes'
             resolve_attributes '1:name' => nil
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1200,7 +1200,7 @@ context 'Extensions' do
             named :'full-text'
             resolve_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1209,7 +1209,7 @@ context 'Extensions' do
             match %r/@(\w+)/
             resolve_attributes false
             process do |parent, target, attrs|
-              %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
         end
@@ -1263,6 +1263,49 @@ context 'Extensions' do
 
         output = convert_string_to_embedded 'mention:mojavelinux[Dan]'
         assert_includes output, '<a href="https://github.com/mojavelinux">Dan</a>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should allow return value of inline macro to be nil' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :skipme
+            match_format :short
+            process do
+              nil
+            end
+          end
+        end
+
+        using_memory_logger do |logger|
+          output = convert_string_to_embedded '-skipme:[]-', doctype: :inline
+          assert_equal '--', output
+          assert_empty logger
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should warn if return value of inline macro is a string' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :say
+            process do |parent, target, attrs|
+              target
+            end
+          end
+        end
+
+        using_memory_logger do |logger|
+          output = convert_string_to_embedded 'say:yo[]', doctype: :inline
+          assert_equal 'yo', output
+          assert_message logger, :INFO, 'expected substitution value for custom inline macro to be of type Inline; got String: say:yo[]'
+        end
       ensure
         Asciidoctor::Extensions.unregister_all
       end

@@ -201,7 +201,7 @@ module Extensions
     end
 
     def create_inline parent, context, text, opts = {}
-      Inline.new parent, context, text, opts
+      Inline.new parent, context, text, context == :quoted ? ({ type: :unquoted }.merge opts) : opts
     end
 
     # Public: Parses blocks in the content and attaches the block to the parent.
@@ -225,7 +225,7 @@ module Extensions
       [:create_pass_block,    :create_block,  :pass],
       [:create_listing_block, :create_block,  :listing],
       [:create_literal_block, :create_block,  :literal],
-      [:create_anchor,        :create_inline, :anchor]
+      [:create_anchor,        :create_inline, :anchor],
     ].each do |method_name, delegate_method_name, context|
       define_method method_name do |*args|
         args.unshift args.shift, context
