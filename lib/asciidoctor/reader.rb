@@ -1014,12 +1014,15 @@ class PreprocessorReader < Reader
   def preprocess_include_directive target, attrlist
     doc = @document
     if ((expanded_target = target).include? ATTR_REF_HEAD) &&
-        (expanded_target = doc.sub_attributes target, attribute_missing: 'drop-line', drop_line_severity: :warn).empty?
-      shift
-      if (doc.attributes['attribute-missing'] || Compliance.attribute_missing) == 'skip'
-        unshift %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
+        (intermediary_target = doc.sub_attributes target + ' ', attribute_missing: 'drop-line', drop_line_severity: :warn) &&
+        (expanded_target = intermediary_target.chop).empty?
+      if (doc.parse_attributes attrlist, [], sub_input: true)['optional-option']
+        shift
+        true
+      else
+        logger.warn message_with_context %(#{intermediary_target.empty? ? 'include not found because of missing attribute' : 'include not found because target is blank'}: include::#{target}[#{attrlist}]), source_location: cursor
+        replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
-      true
     elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
