@@ -48,6 +48,7 @@ Enhancements / Compliance::
   * don't allow block role to inherit from document attribute; only look for role in block attributes (#1944)
   * split out functionality of -w CLI flag (script warnings) from -v CLI flag (verbose logging) (#3030)
   * log possible invalid references at debug level (#3030)
+  * log dropped lines at info level when attribute-missing=drop-line (#2861)
   * use the third argument of AbstractNode#attr / AbstractNode#attr? to set the name of a fallback attribute to look for on the document (#1934)
   * change default value of third argument to Abstractnode#attr / AbstractNode#attr? to nil so attribute doesn't inherit by default (#3059)
   * look for table-frame, table-grid, and table-stripes attributes on document as fallback for frame, grid, and stripes attributes on table (#3059)

@@ -137,7 +137,7 @@ context 'Attributes' do
     test 'assigns attribute to empty string if substitution fails to resolve attribute' do
       input = ':release: Asciidoctor {version}'
       document_from_string input, attributes: { 'attribute-missing' => 'drop-line' }
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'assigns multi-line attribute to empty string if substitution fails to resolve attribute' do
@@ -147,7 +147,7 @@ context 'Attributes' do
       EOS
       doc = document_from_string input, attributes: { 'attribute-missing' => 'drop-line' }
       assert_equal '', doc.attributes['release']
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: version'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: version'
     end
 
     test 'resolves attributes inside attribute value within header' do
@@ -648,7 +648,7 @@ context 'Attributes' do
       output = convert_string_to_embedded input
       para = xmlnodes_at_css 'p', output, 1
       refute_includes 'blah blah', para.content
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: foobarbaz'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
     test "attribute value gets interpretted when converting" do
@@ -669,7 +669,7 @@ context 'Attributes' do
       output = convert_string_to_embedded input
       assert_match(/Line 1/, output)
       refute_match(/Line 2/, output)
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus-attribute'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: bogus-attribute'
     end
 
     test 'should not drop line with reference to missing attribute by default' do
@@ -974,6 +974,7 @@ context 'Attributes' do
       output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p/child::text()', output, 0
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: foo'
     end
   end
 

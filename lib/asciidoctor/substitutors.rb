@@ -416,7 +416,7 @@ module Substitutors
   # Returns the [String] text with the attribute references replaced with resolved values
   def sub_attributes text, opts = {}
     doc_attrs = @document.attributes
-    drop = drop_line = drop_empty_line = attribute_undefined = attribute_missing = nil
+    drop = drop_line = drop_line_severity = drop_empty_line = attribute_undefined = attribute_missing = nil
     text = text.gsub AttributeReferenceRx do
       # escaped attribute, return unescaped
       if $1 == RS || $4 == RS
@@ -426,7 +426,7 @@ module Substitutors
         when 'set'
           _, value = Parser.store_attribute args[0], args[1] || '', @document
           # NOTE since this is an assignment, only drop-line applies here (skip and drop imply the same result)
-          if value || (attribute_undefined ||= doc_attrs['attribute-undefined'] || Compliance.attribute_undefined) != 'drop-line'
+          if value || (attribute_undefined ||= (doc_attrs['attribute-undefined'] || Compliance.attribute_undefined)) != 'drop-line'
             drop = drop_empty_line = DEL
           else
             drop = drop_line = CAN
@@ -442,11 +442,12 @@ module Substitutors
       elsif (value = INTRINSIC_ATTRIBUTES[key])
         value
       else
-        case (attribute_missing ||= opts[:attribute_missing] || doc_attrs['attribute-missing'] || Compliance.attribute_missing)
+        case (attribute_missing ||= (opts[:attribute_missing] || doc_attrs['attribute-missing'] || Compliance.attribute_missing))
         when 'drop'
           drop = drop_empty_line = DEL
         when 'drop-line'
-          logger.warn %(dropping line containing reference to missing attribute: #{key})
+          drop_line_severity ||= (opts[:drop_line_severity] || :info)
+          logger.send drop_line_severity, %(dropping line containing reference to missing attribute: #{key})
           drop = drop_line = CAN
         when 'warn'
           logger.warn %(skipping reference to missing attribute: #{key})

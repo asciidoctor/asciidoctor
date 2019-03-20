@@ -368,7 +368,7 @@ context 'Document' do
         refute_empty output
         assert_css 'script', output, 0
         assert_xpath %(//meta[@name="copyright"][@content="(C) OpenDevise"]), output, 1
-        assert_message logger, :WARN, 'dropping line containing reference to missing attribute: bootstrap-version'
+        assert_message logger, :INFO, 'dropping line containing reference to missing attribute: bootstrap-version'
       end
     end
 
