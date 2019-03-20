@@ -548,7 +548,7 @@ context 'Links' do
         doc.catalog[:includes]['tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-        assert_message logger, :DEBUG, 'possible invalid reference: about'
+        assert_message logger, :INFO, 'possible invalid reference: about'
       end
     end
   end
@@ -560,7 +560,7 @@ context 'Links' do
         doc.catalog[:includes]['part1/tigers'] = true
         output = doc.convert
         assert_xpath '//a[@href="#about"][text() = "About Tigers"]', output, 1
-        assert_message logger, :DEBUG, 'possible invalid reference: about'
+        assert_message logger, :INFO, 'possible invalid reference: about'
       end
     end
   end
@@ -724,7 +724,7 @@ context 'Links' do
       in_verbose_mode do
         output = convert_string_to_embedded input
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
+        assert_message logger, :INFO, 'possible invalid reference: foobaz'
       end
     end
   end
@@ -742,7 +742,7 @@ context 'Links' do
       in_verbose_mode do
         output = convert_string_to_embedded input
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
+        assert_message logger, :INFO, 'possible invalid reference: foobaz'
       end
     end
   end
@@ -823,7 +823,7 @@ context 'Links' do
       in_verbose_mode do
         output = convert_string_to_embedded input, attributes: { 'docname' => 'test' }
         assert_xpath '//a[@href="#foobaz"][text() = "[foobaz]"]', output, 1
-        assert_message logger, :DEBUG, 'possible invalid reference: foobaz'
+        assert_message logger, :INFO, 'possible invalid reference: foobaz'
       end
     end
   end
