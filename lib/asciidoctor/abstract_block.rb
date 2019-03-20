@@ -441,25 +441,28 @@ class AbstractBlock < AbstractNode
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
-      if id_selector
-        block_given? && !(yield self) ? result.clear : (result.replace [self])
-        raise ::StopIteration
-      elsif block_given?
+      if block_given?
         if (verdict = yield self)
           case verdict
           # the :skip_children keyword is deprecated
           when :prune, :skip_children
             result << self
+            raise ::StopIteration if id_selector
             return result
           # the :skip keyword is deprecated and may be repurposed
           when :reject, :skip
+            raise ::StopIteration if id_selector
             return result
           else
             result << self
+            raise ::StopIteration if id_selector
           end
+        elsif id_selector
+          raise ::StopIteration
         end
       else
         result << self
+        raise ::StopIteration if id_selector
       end
     end
     case @context

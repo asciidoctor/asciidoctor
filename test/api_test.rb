@@ -741,6 +741,45 @@ context 'API' do
       assert_equal :paragraph, result[1].context
     end
 
+    test 'find_by should reject node matched by ID selector if block returns :reject' do
+      input = <<~'EOS'
+      [.rolename]
+      paragraph 1
+
+      [.rolename#idname]
+      paragraph 2
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by id: 'idname', role: 'rolename'
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal doc.blocks[1], result[0]
+      result = doc.find_by(id: 'idname', role: 'rolename') { :reject }
+      refute_nil result
+      assert_equal 0, result.size
+    end
+
+    test 'find_by should accept node matched by ID selector if block returns :prune' do
+      input = <<~'EOS'
+      [.rolename]
+      paragraph 1
+
+      [.rolename#idname]
+      ====
+      paragraph 2
+      ====
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.find_by id: 'idname', role: 'rolename'
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal doc.blocks[1], result[0]
+      result = doc.find_by(id: 'idname', role: 'rolename') { :prune }
+      refute_nil result
+      assert_equal 1, result.size
+      assert_equal doc.blocks[1], result[0]
+    end
+
     test 'find_by should accept node but reject its children if block returns :prune' do
       input = <<~'EOS'
       ====
