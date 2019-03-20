@@ -571,13 +571,23 @@ Your browser does not support the audio tag.
 
   def convert_example node
     id_attribute = node.id ? %( id="#{node.id}") : ''
-    title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
-
-    %(<div#{id_attribute} class="exampleblock#{(role = node.role) ? " #{role}" : ''}">
+    if node.option? 'collapsible'
+      class_attribute = node.role ? %( class="#{node.role}") : ''
+      summary_element = node.title? ? %(<summary class="title">#{node.title}</summary>) : '<summary class="title">Details</summary>'
+      %(<details#{id_attribute}#{class_attribute}#{(node.option? 'open') ? ' open' : ''}>
+#{summary_element}
+<div class="content">
+#{node.content}
+</div>
+</details>)
+    else
+      title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
+      %(<div#{id_attribute} class="exampleblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
 #{node.content}
 </div>
 </div>)
+    end
   end
 
   def convert_floating_title node

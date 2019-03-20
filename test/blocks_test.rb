@@ -852,6 +852,54 @@ context 'Blocks' do
       assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
     end
 
+    test 'should create details/summary set if collapsible option is set' do
+      input = <<~'EOS'
+      .Toggle Me
+      [%collapsible]
+      ====
+      This content is revealed when the user clicks the words "Toggle Me".
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details', output, 1
+      assert_css 'details[open]', output, 0
+      assert_css 'details > summary.title', output, 1
+      assert_xpath '//details/summary[text()="Toggle Me"]', output, 1
+      assert_css 'details > summary.title + .content', output, 1
+      assert_css 'details > summary.title + .content p', output, 1
+    end
+
+    test 'should open details/summary set if collapsible and open options are set' do
+      input = <<~'EOS'
+      .Toggle Me
+      [%collapsible%open]
+      ====
+      This content is revealed when the user clicks the words "Toggle Me".
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details', output, 1
+      assert_css 'details[open]', output, 1
+      assert_css 'details > summary.title', output, 1
+      assert_xpath '//details/summary[text()="Toggle Me"]', output, 1
+    end
+
+    test 'should add default summary element if collapsible option is set and title is not specifed' do
+      input = <<~'EOS'
+      [%collapsible]
+      ====
+      This content is revealed when the user clicks the words "Toggle Me".
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details', output, 1
+      assert_css 'details > summary.title', output, 1
+      assert_xpath '//details/summary[text()="Details"]', output, 1
+    end
+
     test 'should warn if example block is not terminated' do
       input = <<~'EOS'
       outside
