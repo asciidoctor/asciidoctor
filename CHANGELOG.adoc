@@ -80,7 +80,8 @@ Enhancements / Compliance::
   * replace anchors and xrefs before footnotes (replace footnotes last in macros substitution group)
   * apply substitution for custom inline macro before all other macros
   * only promote index terms automatically (A, B, C becomes A > B > C + B > C + C) if indexterm-promotion option is set on document (#1487)
-  * drop indexterms table from document catalog (in preparation for solution to #450 in a 2.x release)
+  * add support for see and see-also on index terms; parse attributes on indexterm macros if text contains `=` (#2047)
+  * drop :indexterms table from document catalog (in preparation for solution to #450 in a 2.x release)
   * load additional languages for highlight.js as defined in the comma-separated highlightjs-languages attribute (#3036)
   * log warning if conditional expression in ifeval directive is invalid (#3161)
   * drop lines that contain an invalid preprocessor directive (#3161)

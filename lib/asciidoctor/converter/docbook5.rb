@@ -538,11 +538,21 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_inline_indexterm node
+    if (see = node.attr 'see')
+      rel = %(\n<see>#{see}</see>)
+    elsif (see_also_list = node.attr 'see-also')
+      rel = see_also_list.map {|see_also| %(\n<seealso>#{see_also}</seealso>) }.join
+    else
+      rel = ''
+    end
     if node.type == :visible
-      %(<indexterm><primary>#{node.text}</primary></indexterm>#{node.text})
-    elsif (numterms = (terms = node.attr 'terms').size) > 2
       %(<indexterm>
-<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>
+<primary>#{node.text}</primary>#{rel}
+</indexterm>#{node.text})
+    else
+      if (numterms = (terms = node.attr 'terms').size) > 2
+        %(<indexterm>
+<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>#{rel}
 </indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
 <indexterm>
 <primary>#{terms[1]}</primary><secondary>#{terms[2]}</secondary>
@@ -550,17 +560,18 @@ class Converter::DocBook5Converter < Converter::Base
 <indexterm>
 <primary>#{terms[2]}</primary>
 </indexterm>] : ''})
-    elsif numterms > 1
-      %(<indexterm>
-<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>
+      elsif numterms > 1
+        %(<indexterm>
+<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>#{rel}
 </indexterm>#{(node.document.option?  'indexterm-promotion') ? %[
 <indexterm>
 <primary>#{terms[1]}</primary>
 </indexterm>] : ''})
-    else
-      %(<indexterm>
-<primary>#{terms[0]}</primary>
+      else
+        %(<indexterm>
+<primary>#{terms[0]}</primary>#{rel}
 </indexterm>)
+      end
     end
   end
 

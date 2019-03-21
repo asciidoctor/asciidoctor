@@ -1248,7 +1248,11 @@ context 'Substitutions' do
 
     test 'visible shorthand index term macro should not consume trailing round bracket' do
       input = '(text with ((index term)))'
-      expected = '(text with <indexterm><primary>index term</primary></indexterm>index term)'
+      expected = <<~'EOS'.chop
+      (text with <indexterm>
+      <primary>index term</primary>
+      </indexterm>index term)
+      EOS
       #expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
@@ -1260,7 +1264,11 @@ context 'Substitutions' do
 
     test 'visible shorthand index term macro should not consume leading round bracket' do
       input = '(((index term)) for text)'
-      expected = '(<indexterm><primary>index term</primary></indexterm>index term for text)'
+      expected = <<~'EOS'.chop
+      (<indexterm>
+      <primary>index term</primary>
+      </indexterm>index term for text)
+      EOS
       #expected_term = ['index term']
       para = block_from_string input, backend: :docbook
       output = para.sub_macros para.source
@@ -1340,6 +1348,86 @@ context 'Substitutions' do
       #assert_equal 2, terms.size
       #assert_equal ['panthera tigris'], terms[0]
       #assert_equal ['Big cats', 'Tigers'], terms[1]
+    end
+
+    test 'should parse visible shorthand index term with see and seealso' do
+      sentence = '((Flash >> HTML 5)) has been supplanted by ((HTML 5 &> CSS 3 &> SVG)).'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm_flash = <<~'EOS'.chop
+      <indexterm>
+      <primary>Flash</primary>
+      <see>HTML 5</see>
+      </indexterm>
+      EOS
+      indexterm_html5 = <<~'EOS'.chop
+      <indexterm>
+      <primary>HTML 5</primary>
+      <seealso>CSS 3</seealso>
+      <seealso>SVG</seealso>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm_flash
+      assert_includes output, indexterm_html5
+    end
+
+    test 'should parse concealed shorthand index term with see and seealso' do
+      sentence = 'Flash(((Flash >> HTML 5))) has been supplanted by HTML 5(((HTML 5 &> CSS 3 &> SVG))).'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm_flash = <<~'EOS'.chop
+      <indexterm>
+      <primary>Flash</primary>
+      <see>HTML 5</see>
+      </indexterm>
+      EOS
+      indexterm_html5 = <<~'EOS'.chop
+      <indexterm>
+      <primary>HTML 5</primary>
+      <seealso>CSS 3</seealso>
+      <seealso>SVG</seealso>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm_flash
+      assert_includes output, indexterm_html5
+    end
+
+    test 'should parse visible index term macro with see and seealso' do
+      sentence = 'indexterm2:[Flash,see=HTML 5] has been supplanted by indexterm2:[HTML 5,see-also="CSS 3, SVG"].'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm_flash = <<~'EOS'.chop
+      <indexterm>
+      <primary>Flash</primary>
+      <see>HTML 5</see>
+      </indexterm>
+      EOS
+      indexterm_html5 = <<~'EOS'.chop
+      <indexterm>
+      <primary>HTML 5</primary>
+      <seealso>CSS 3</seealso>
+      <seealso>SVG</seealso>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm_flash
+      assert_includes output, indexterm_html5
+    end
+
+    test 'should parse concealed index term macro with see and seealso' do
+      sentence = 'Flashindexterm:[Flash,see=HTML 5] has been supplanted by HTML 5indexterm:[HTML 5,see-also="CSS 3, SVG"].'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm_flash = <<~'EOS'.chop
+      <indexterm>
+      <primary>Flash</primary>
+      <see>HTML 5</see>
+      </indexterm>
+      EOS
+      indexterm_html5 = <<~'EOS'.chop
+      <indexterm>
+      <primary>HTML 5</primary>
+      <seealso>CSS 3</seealso>
+      <seealso>SVG</seealso>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm_flash
+      assert_includes output, indexterm_html5
     end
 
     context 'Button macro' do
