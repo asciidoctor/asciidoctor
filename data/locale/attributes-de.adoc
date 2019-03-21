@@ -8,15 +8,16 @@
 :figure-caption: Abbildung
 :important-caption: Wichtig
 :last-update-label: Zuletzt aktualisiert
-//ifdef::listing-caption[:listing-caption: ???]
+ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Bezeichnung]
 :note-caption: Anmerkung
-//:part-refsig: ???
+:part-label: Teil
+:part-refsig: {part-label}
 ifdef::preface-title[:preface-title: Vorwort]
 :section-refsig: Abschnitt
 :table-caption: Tabelle
 :tip-caption: Hinweis
-:toc-title: Inhalt
+:toc-title: Inhaltsverzeichnis
 :untitled-label: Ohne Titel
 :version-label: Version
 :warning-caption: Warnung
