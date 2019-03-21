@@ -1919,16 +1919,11 @@ class Parser
     author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : [*author_line]
     author_entries.each do |author_entry|
       next if author_entry.empty?
-      author_idx += 1
       key_map = {}
-      if author_idx == 1
-        keys.each do |key|
-          key_map[key.to_sym] = key
-        end
+      if (author_idx += 1) == 1
+        keys.each {|key| key_map[key.to_sym] = key }
       else
-        keys.each do |key|
-          key_map[key.to_sym] = %(#{key}_#{author_idx})
-        end
+        keys.each {|key| key_map[key.to_sym] = %(#{key}_#{author_idx}) }
       end
 
       if names_only # when parsing an attribute value
