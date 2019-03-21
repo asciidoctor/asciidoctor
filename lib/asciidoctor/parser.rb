@@ -582,14 +582,14 @@ class Parser
               end
               # style doesn't have special meaning for media macros
               attributes.delete 'style' if attributes.key? 'style'
-              if (target.include? ATTR_REF_HEAD) && (target = block.sub_attributes target, attribute_missing: 'drop-line', drop_line_severity: :warn).empty?
-                # retain as unparsed if attribute-missing is skip
-                if (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'skip'
-                  return Block.new(parent, :paragraph, content_model: :simple, source: [this_line])
-                # otherwise, drop the line
-                else
+              if target.include? ATTR_REF_HEAD
+                if (expanded_target = block.sub_attributes target).empty? &&
+                    (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line' &&
+                    (block.sub_attributes target + ' ', attribute_missing: 'drop-line', drop_line_severity: :ignore).empty?
                   attributes.clear
                   return
+                else
+                  target = expanded_target
                 end
               end
               if blk_ctx == :image
@@ -619,12 +619,16 @@ class Parser
               if report_unknown_block_macro
                 logger.debug message_with_context %(unknown name for block macro: #{$1}), source_location: reader.cursor_at_mark
               else
-                target = $2
                 content = $3
-                if (target.include? ATTR_REF_HEAD) && (target = parent.sub_attributes target).empty? &&
-                  (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line'
-                  attributes.clear
-                  return
+                if (target = $2).include? ATTR_REF_HEAD
+                  if (expanded_target = parent.sub_attributes target).empty? &&
+                      (doc_attrs['attribute-missing'] || Compliance.attribute_missing) == 'drop-line' &&
+                      (parent.sub_attributes target + ' ', attribute_missing: 'drop-line', drop_line_severity: :ignore).empty?
+                    attributes.clear
+                    return
+                  else
+                    target = expanded_target
+                  end
                 end
                 if extension.config[:content_model] == :attributes
                   document.parse_attributes content, extension.config[:pos_attrs] || [], sub_input: true, into: attributes if content

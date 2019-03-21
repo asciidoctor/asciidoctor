@@ -2365,7 +2365,7 @@ context 'Blocks' do
       assert_xpath '//imagedata[@width="25%"]', output, 1
     end
 
-    test 'keeps line unprocessed if image target is missing attribute reference and attribute-missing is skip' do
+    test 'keeps attribute reference unprocessed if image target is missing attribute reference and attribute-missing is skip' do
       input = <<~'EOS'
       :attribute-missing: skip
 
@@ -2373,20 +2373,20 @@ context 'Blocks' do
       EOS
 
       output = convert_string_to_embedded input
-      assert_includes output, 'image::{bogus}[]'
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
+      assert_css 'img[src="{bogus}"]', output, 1
+      assert_empty @logger
     end
 
-    test 'drops line if image target is missing attribute reference and attribute-missing is drop' do
+    test 'should not drop line if image target is missing attribute reference and attribute-missing is drop' do
       input = <<~'EOS'
       :attribute-missing: drop
 
-      image::{bogus}[]
+      image::{bogus}/photo.jpg[]
       EOS
 
       output = convert_string_to_embedded input
-      assert_empty output.strip
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
+      assert_css 'img[src="/photo.jpg"]', output, 1
+      assert_empty @logger
     end
 
     test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
@@ -2398,7 +2398,19 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input
       assert_empty output.strip
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: bogus'
+    end
+
+    test 'should not drop line if image target resolves to blank and attribute-missing is drop-line' do
+      input = <<~'EOS'
+      :attribute-missing: drop-line
+
+      image::{blank}[]
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'img[src=""]', output, 1
+      assert_empty @logger
     end
 
     test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
@@ -2414,7 +2426,7 @@ context 'Blocks' do
       assert_css 'img', output, 0
       assert_css 'h2', output, 1
       refute_includes output, '== Section Title'
-      assert_message @logger, :WARN, 'dropping line containing reference to missing attribute: bogus'
+      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: bogus'
     end
 
     test 'should pass through image that references uri' do

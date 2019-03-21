@@ -730,7 +730,7 @@ class ReaderTest < Minitest::Test
             doc = document_from_string input, safe: :safe, base_dir: DIRNAME
             assert_equal 1, doc.blocks.size
             assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_message logger, :WARN, 'dropping line containing reference to missing attribute: no-such-file'
+            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
           end
         rescue
           flunk 'include directive should not raise exception on unresolved target'
@@ -749,7 +749,7 @@ class ReaderTest < Minitest::Test
             doc = document_from_string input, safe: :safe, base_dir: DIRNAME
             assert_equal 1, doc.blocks.size
             assert_equal ['trailing content'], doc.blocks[0].lines
-            assert logger.empty?
+            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
           end
         rescue
           flunk 'include directive should not raise exception on missing file'
@@ -1404,29 +1404,26 @@ class ReaderTest < Minitest::Test
       end
 
       test 'line is skipped by default if target of include directive resolves to empty' do
-        input = 'include::{foodir}/include-file.adoc[]'
+        input = 'include::{blank}[]'
         using_memory_logger do |logger|
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
-          assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.adoc[]', line
-          assert_messages logger, [
-            [:WARN, 'dropping line containing reference to missing attribute: foodir'],
-            [:WARN, '<stdin>: line 1: include not found because of missing attribute: include::{foodir}/include-file.adoc[]', Hash],
-          ]
+          assert_equal 'Unresolved directive in <stdin> - include::{blank}[]', line
+          assert_message logger, :WARN, '<stdin>: line 1: include dropped because resolved target is blank: include::{blank}[]', Hash
         end
       end
 
-      test 'line is dropped if target of include directive resolves to empty and attribute-missing attribute is not skip' do
+      test 'include is dropped if target contains missing attribute and attribute-missing is drop-line' do
         input = 'include::{foodir}/include-file.adoc[]'
-        using_memory_logger do |logger|
-          doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'drop' }
+        using_memory_logger Logger::INFO do |logger|
+          doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'drop-line' }
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
-          assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.adoc[]', line
+          assert_nil line
           assert_messages logger, [
-            [:WARN, 'dropping line containing reference to missing attribute: foodir'],
-            [:WARN, '<stdin>: line 1: include not found because of missing attribute: include::{foodir}/include-file.adoc[]', Hash],
+            [:INFO, 'dropping line containing reference to missing attribute: foodir'],
+            [:INFO, '<stdin>: line 1: include dropped due to missing attribute: include::{foodir}/include-file.adoc[]', Hash],
           ]
         end
       end
@@ -1438,15 +1435,15 @@ class ReaderTest < Minitest::Test
         EOS
 
         using_memory_logger do |logger|
-          doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'drop' }
+          doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'warn' }
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
           assert_equal 'Unresolved directive in <stdin> - include::{foodir}/include-file.adoc[]', line
           line = reader.read_line
           assert_equal 'yo', line
           assert_messages logger, [
-            [:WARN, 'dropping line containing reference to missing attribute: foodir'],
-            [:WARN, '<stdin>: line 1: include not found because of missing attribute: include::{foodir}/include-file.adoc[]', Hash],
+            [:INFO, 'dropping line containing reference to missing attribute: foodir'],
+            [:WARN, '<stdin>: line 1: include dropped due to missing attribute: include::{foodir}/include-file.adoc[]', Hash],
           ]
         end
       end
