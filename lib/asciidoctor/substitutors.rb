@@ -520,8 +520,14 @@ module Substitutors
           end
           # NOTE for convenience, map content (unparsed attrlist) to target when format is short
           target ||= extconf[:format] == :short ? content : target
-          replacement = extension.process_method[self, target, attributes]
-          Inline === replacement ? replacement.convert : replacement
+          if (Inline === (replacement = extension.process_method[self, target, attributes]))
+            replacement.convert
+          elsif replacement
+            logger.info %(expected substitution value for custom inline macro to be of type Inline; got #{replacement.class}: #{$&})
+            replacement
+          else
+            ''
+          end
         end
       end
     end
