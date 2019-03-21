@@ -144,9 +144,9 @@ class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
     c = target.to_f
     case units
     when 'C'
-      create_inline parent, :quoted, %(#{c.round precision} &#176;C)
+      create_inline parent, :quoted, %(#{c.round precision} &#176;C), type: :unquoted
     when 'F'
-      create_inline parent, :quoted, %(#{(c * 1.8 + 32).round precision} &#176;F)
+      create_inline parent, :quoted, %(#{(c * 1.8 + 32).round precision} &#176;F), type: :unquoted
     else
       raise ::ArgumentError, %(Unknown temperature units: #{units})
     end
@@ -1136,7 +1136,7 @@ context 'Extensions' do
             match_format :short
             parse_content_as :text
             process do |parent, _, attrs|
-              create_inline parent, :quoted, %(<label>#{attrs['text']}</label>)
+              create_inline_pass parent, %(<label>#{attrs['text']}</label>)
             end
           end
         end
@@ -1155,7 +1155,7 @@ context 'Extensions' do
             named :label
             match_format :short
             process do |parent, target|
-              create_inline parent, :quoted, %(<label>#{target}</label>)
+              create_inline_pass parent, %(<label>#{target}</label>)
             end
           end
         end
@@ -1175,7 +1175,7 @@ context 'Extensions' do
             match_format :short
             resolve_attributes '1:name'
             process do |parent, target, attrs|
-              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline_pass parent, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1184,7 +1184,7 @@ context 'Extensions' do
             match_format :short
             resolve_attributes false
             process do |parent, target, attrs|
-              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline_pass parent, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1192,7 +1192,7 @@ context 'Extensions' do
             named :'full-attributes'
             resolve_attributes '1:name' => nil
             process do |parent, target, attrs|
-              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline_pass parent, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1200,7 +1200,7 @@ context 'Extensions' do
             named :'full-text'
             resolve_attributes false
             process do |parent, target, attrs|
-              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline_pass parent, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
 
@@ -1209,7 +1209,7 @@ context 'Extensions' do
             match %r/@(\w+)/
             resolve_attributes false
             process do |parent, target, attrs|
-              create_inline parent, :quoted, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
+              create_inline_pass parent, %(target=#{target.inspect}, attributes=#{attrs.sort_by {|(k)| k.to_s }.to_h})
             end
           end
         end
@@ -1306,6 +1306,42 @@ context 'Extensions' do
           assert_equal 'yo', output
           assert_message logger, :INFO, 'expected substitution value for custom inline macro to be of type Inline; got String: say:yo[]'
         end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not apply subs to inline node returned by process method by default' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :say
+            process do |parent, target, attrs|
+              create_inline parent, :quoted, %(*#{target}*), type: :emphasis
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'say:yo[]', doctype: :inline
+        assert_equal '<em>*yo*</em>', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should apply specified subs to inline node returned by process method' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :say
+            process do |parent, target, attrs|
+              create_inline_pass parent, %(*#{target}*), attributes: { 'subs' => :normal }
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'say:yo[]', doctype: :inline
+        assert_equal '<strong>yo</strong>', output
       ensure
         Asciidoctor::Extensions.unregister_all
       end

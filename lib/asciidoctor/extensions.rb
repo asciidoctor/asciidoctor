@@ -226,6 +226,7 @@ module Extensions
       [:create_listing_block, :create_block,  :listing],
       [:create_literal_block, :create_block,  :literal],
       [:create_anchor,        :create_inline, :anchor],
+      [:create_inline_pass,   :create_inline, :quoted],
     ].each do |method_name, delegate_method_name, context|
       define_method method_name do |*args|
         args.unshift args.shift, context
