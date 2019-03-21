@@ -143,7 +143,7 @@ context 'Paragraphs' do
       assert_css '.paragraph:root > p', output, 1
     end
 
-    test 'expands index term macros in DocBook backend' do
+    test 'automatically promotes index terms in DocBook output if indexterm-promotion-option is set' do
       input = <<~'EOS'
       Here is an index entry for ((tigers)).
       indexterm:[Big cats,Tigers,Siberian Tiger]
@@ -152,7 +152,7 @@ context 'Paragraphs' do
       Note that multi-entry terms generate separate index entries.
       EOS
 
-      output = convert_string_to_embedded input, attributes: { 'backend' => 'docbook' }
+      output = convert_string_to_embedded input, backend: 'docbook', attributes: { 'indexterm-promotion-option' => '' }
       assert_xpath '/simpara', output, 1
       term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
       assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
@@ -183,6 +183,24 @@ context 'Paragraphs' do
       assert_xpath '(//indexterm)[6]/*', output, 3
       assert_xpath '(//indexterm)[7]/*', output, 2
       assert_xpath '(//indexterm)[8]/*', output, 1
+    end
+
+    test 'does not automatically promote index terms in DocBook output if indexterm-promotion-option is not set' do
+      input = <<~'EOS'
+      The Siberian Tiger is one of the biggest living cats.
+      indexterm:[Big cats,Tigers,Siberian Tiger]
+      EOS
+
+      output = convert_string_to_embedded input, backend: 'docbook'
+
+      assert_css 'indexterm', output, 1
+
+      term1 = xmlnodes_at_css 'indexterm', output, 1
+      term1_elements = term1.elements
+      assert_equal 3, term1_elements.size
+      assert_equal '<primary>Big cats</primary>', term1_elements[0].to_s
+      assert_equal '<secondary>Tigers</secondary>', term1_elements[1].to_s
+      assert_equal '<tertiary>Siberian Tiger</tertiary>', term1_elements[2].to_s
     end
 
     test 'normal paragraph should honor explicit subs list' do
