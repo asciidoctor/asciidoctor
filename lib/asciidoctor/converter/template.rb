@@ -58,7 +58,7 @@ class Converter::TemplateConverter < Converter::Base
     @safe = opts[:safe]
     @active_engines = {}
     @engine = opts[:template_engine]
-    @engine_options = {}.tap {|accum| DEFAULT_ENGINE_OPTIONS.each {|engine, engine_opts| accum[engine] = engine_opts.dup } }
+    @engine_options = {}.tap {|accum| DEFAULT_ENGINE_OPTIONS.each {|engine, engine_opts| accum[engine] = engine_opts.merge } }
     if opts[:htmlsyntax] == 'html' # if not set, assume xml since this converter is also used for DocBook (which doesn't specify htmlsyntax)
       @engine_options[:haml][:format] = :html5
       @engine_options[:slim][:format] = :html
@@ -124,7 +124,7 @@ class Converter::TemplateConverter < Converter::Base
   #
   # Returns a [Hash] of Tilt template objects keyed by template name.
   def templates
-    @templates.dup
+    @templates.merge
   end
 
   # Public: Registers a Tilt template with this converter.

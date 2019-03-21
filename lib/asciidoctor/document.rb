@@ -257,10 +257,10 @@ class Document < AbstractBlock
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
-      @catalog = parent_doc.catalog.dup.tap {|catalog| catalog[:footnotes] = [] }
+      @catalog = parent_doc.catalog.merge footnotes: []
       # QUESTION should we support setting attribute in parent document from nested document?
       # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
-      @attribute_overrides = attr_overrides = parent_doc.attributes.dup
+      @attribute_overrides = attr_overrides = parent_doc.attributes.merge
       parent_doctype = attr_overrides.delete 'doctype'
       attr_overrides.delete 'compat-mode'
       attr_overrides.delete 'toc'
@@ -1249,7 +1249,7 @@ class Document < AbstractBlock
       end
     end
 
-    @header_attributes = attrs.dup
+    @header_attributes = attrs.merge
   end
 
   # Internal: Assign the local and document datetime attributes, which includes localdate, localyear, localtime,

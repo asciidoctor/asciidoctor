@@ -448,7 +448,7 @@ class Parser
     # of a section that need to get transfered to the next section
     # see "trailing block attributes transfer to the following section" in
     # test/attributes_test.rb for an example
-    [section != parent ? section : nil, attributes.dup]
+    [section != parent ? section : nil, attributes.merge]
   end
 
   # Public: Parse and return the next Block at the Reader's current location
@@ -1028,7 +1028,7 @@ class Parser
     if (extension = options[:extension])
       # QUESTION do we want to delete the style?
       attributes.delete('style')
-      if (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.dup])
+      if (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge])
         attributes.replace block.attributes
         # FIXME if the content model is set to compound, but we only have simple in this context, then
         # forcefully set the content_model to simple to prevent parsing blocks from children
@@ -2454,7 +2454,7 @@ class Parser
         end
 
         if m[1]
-          1.upto(m[1].to_i) { specs << spec.dup }
+          1.upto(m[1].to_i) { specs << spec.merge }
         else
           specs << spec
         end
