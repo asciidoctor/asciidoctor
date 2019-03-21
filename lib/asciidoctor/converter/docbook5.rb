@@ -540,23 +540,27 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_inline_indexterm node
     if node.type == :visible
       %(<indexterm><primary>#{node.text}</primary></indexterm>#{node.text})
-    else
-      terms = node.attr 'terms'
-      result = []
-      if (numterms = terms.size) > 2
-        result << %(<indexterm>
+    elsif (numterms = (terms = node.attr 'terms').size) > 2
+      %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>
+</indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
+<indexterm>
+<primary>#{terms[1]}</primary><secondary>#{terms[2]}</secondary>
+</indexterm>
+<indexterm>
+<primary>#{terms[2]}</primary>
+</indexterm>] : ''})
+    elsif numterms > 1
+      %(<indexterm>
+<primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>
+</indexterm>#{(node.document.option?  'indexterm-promotion') ? %[
+<indexterm>
+<primary>#{terms[1]}</primary>
+</indexterm>] : ''})
+    else
+      %(<indexterm>
+<primary>#{terms[0]}</primary>
 </indexterm>)
-      end
-      if numterms > 1
-        result << %(<indexterm>
-<primary>#{terms[-2]}</primary><secondary>#{terms[-1]}</secondary>
-</indexterm>)
-      end
-      result << %(<indexterm>
-<primary>#{terms[-1]}</primary>
-</indexterm>)
-      result.join LF
     end
   end
 
