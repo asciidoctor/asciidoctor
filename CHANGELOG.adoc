@@ -13,7 +13,7 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+== 2.0.0.rc.3 (2019-03-21) - @mojavelinux
 
 Enhancements / Compliance::
 
