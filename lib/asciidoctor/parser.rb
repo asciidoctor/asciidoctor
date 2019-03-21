@@ -789,19 +789,20 @@ class Parser
     # either delimited block or styled paragraph
     unless block
       case block_context
-      when :listing, :literal
-        block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
-      when :source
-        AttributeList.rekey attributes, [nil, 'language', 'linenums']
-        if doc_attrs.key? 'source-language'
-          attributes['language'] = doc_attrs['source-language']
-        end unless attributes.key? 'language'
-        if attributes['linenums-option'] || doc_attrs['source-linenums-option']
-          attributes['linenums'] = ''
-        end unless attributes.key? 'linenums'
-        if doc_attrs.key? 'source-indent'
-          attributes['indent'] = doc_attrs['source-indent']
-        end unless attributes.key? 'indent'
+      when :listing, :source
+        if block_context == :source || (!attributes[1] && (attributes[2] || doc_attrs['source-language']))
+          attributes['style'] = 'source'
+          AttributeList.rekey attributes, [nil, 'language', 'linenums']
+          if doc_attrs.key? 'source-language'
+            attributes['language'] = doc_attrs['source-language']
+          end unless attributes.key? 'language'
+          if attributes['linenums-option'] || doc_attrs['source-linenums-option']
+            attributes['linenums'] = ''
+          end unless attributes.key? 'linenums'
+          if doc_attrs.key? 'source-indent'
+            attributes['indent'] = doc_attrs['source-indent']
+          end unless attributes.key? 'indent'
+        end
         block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
       when :fenced_code
         attributes['style'] = 'source'
@@ -839,14 +840,16 @@ class Parser
           attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
         end
         block = parse_table(block_reader, parent, attributes)
+      when :sidebar
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
       when :admonition
         attributes['name'] = admonition_name = style.downcase
         attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
         block = build_block(block_context, :compound, terminator, parent, reader, attributes)
       when :open, :abstract, :partintro
         block = build_block(:open, :compound, terminator, parent, reader, attributes)
-      when :sidebar
-        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+      when :literal
+        block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
       when :example
         block = build_block(block_context, :compound, terminator, parent, reader, attributes)
       when :quote, :verse
