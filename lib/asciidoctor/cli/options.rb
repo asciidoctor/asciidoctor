@@ -117,7 +117,7 @@ module Asciidoctor
               'may be specified more than once') do |path|
             (self[:requires] ||= []).concat(path.split ',')
           end
-          opts.on('--failure-level LEVEL', %w(warning WARNING error ERROR debug DEBUG), 'set minimum logging level that triggers non-zero exit code: [WARN, ERROR, DEBUG] (default: FATAL)') do |level|
+          opts.on('--failure-level LEVEL', %w(warning WARNING error ERROR info INFO), 'set minimum logging level that triggers non-zero exit code: [WARN, ERROR, INFO] (default: FATAL)') do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
             self[:failure_level] = ::Logger::Severity.const_get level, false
           end
