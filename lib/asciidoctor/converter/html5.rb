@@ -101,7 +101,7 @@ class Converter::Html5Converter < Converter::Base
     result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
     result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
     result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
-    result << %(<meta name="author" content="#{((authors = node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
+    result << %(<meta name="author" content="#{((authors = node.sub_replacements node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
     result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
     if node.attr? 'favicon'
       if (icon_href = node.attr 'favicon').empty?
@@ -184,7 +184,7 @@ class Converter::Html5Converter < Converter::Base
           details = []
           idx = 1
           node.authors.each do |author|
-            details << %(<span id="author#{idx > 1 ? idx : ''}" class="author">#{author.name}</span>#{br})
+            details << %(<span id="author#{idx > 1 ? idx : ''}" class="author">#{node.sub_replacements author.name}</span>#{br})
             details << %(<span id="email#{idx > 1 ? idx : ''}" class="email">#{node.sub_macros author.email}</span>#{br}) if author.email
             idx += 1
           end

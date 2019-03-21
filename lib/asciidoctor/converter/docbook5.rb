@@ -630,13 +630,13 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
-  def author_tag author
+  def author_tag doc, author
     result = []
     result << '<author>'
     result << '<personname>'
-    result << %(<firstname>#{author.firstname}</firstname>) if author.firstname
-    result << %(<othername>#{author.middlename}</othername>) if author.middlename
-    result << %(<surname>#{author.lastname}</surname>) if author.lastname
+    result << %(<firstname>#{doc.sub_replacements author.firstname}</firstname>) if author.firstname
+    result << %(<othername>#{doc.sub_replacements author.middlename}</othername>) if author.middlename
+    result << %(<surname>#{doc.sub_replacements author.lastname}</surname>) if author.lastname
     result << '</personname>'
     result << %(<email>#{author.email}</email>) if author.email
     result << '</author>'
@@ -667,10 +667,10 @@ class Converter::DocBook5Converter < Converter::Base
       unless (authors = doc.authors).empty?
         if authors.size > 1
           result << '<authorgroup>'
-          authors.each {|author| result << (author_tag author) }
+          authors.each {|author| result << (author_tag doc, author) }
           result << '</authorgroup>'
         else
-          result << author_tag(author = authors[0])
+          result << (author_tag doc, (author = authors[0]))
           result << %(<authorinitials>#{author.initials}</authorinitials>) if author.initials
         end
       end

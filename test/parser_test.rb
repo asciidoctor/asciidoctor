@@ -308,7 +308,7 @@ context "Parser" do
   end
 
   test "parse author condenses whitespace" do
-    metadata, _ = parse_header_metadata '   Stuart       Rackham     <founder@asciidoc.org>'
+    metadata, _ = parse_header_metadata 'Stuart       Rackham     <founder@asciidoc.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
     assert_equal 'Stuart Rackham', metadata['author']
@@ -336,6 +336,11 @@ context "Parser" do
     assert_equal 'Doc Writer', metadata['author']
     assert_equal 'Doc Writer', metadata['author_1']
     assert_equal 'John Smith', metadata['author_2']
+  end
+
+  test 'should not parse multiple authors if semi-colon is not followed by space' do
+    metadata, _ = parse_header_metadata 'Joe Doe;Smith Johnson'
+    assert_equal 1, metadata['authorcount']
   end
 
   test 'skips blank author entries in implicit author line' do

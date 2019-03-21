@@ -86,6 +86,8 @@ Enhancements / Compliance::
   * drop lines that contain an invalid preprocessor directive (#3161)
   * rename AbstractBlock#find_by directives; use :prune in place of :skip_children and :reject in place of :skip
   * convert example block into details/summary tag set if collapsible option is set; open by default if open option is set (#1699)
+  * substitute replacements in author values used in document header (#2441)
+  * require space after semi-colon that separates multiple authors (#2441)
 
 Improvements::
 

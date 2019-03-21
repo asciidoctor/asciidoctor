@@ -41,6 +41,8 @@ class Parser
 
   NoOp = nil
 
+  AuthorKeys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
+
   # Internal: A Hash mapping horizontal alignment abbreviations to alignments
   # that can be applied to a table cell (or to all cells in a column)
   TableCellHorzAlignments = {
@@ -1789,9 +1791,8 @@ class Parser
         if document
           # apply header subs and assign to document
           author_metadata.each do |key, val|
-            unless doc_attrs.key? key
-              doc_attrs[key] = ::String === val ? (document.apply_header_subs val) : val
-            end
+            # NOTE the attributes substitution only applies for the email record
+            doc_attrs[key] = ::String === val ? (document.apply_header_subs val) : val unless doc_attrs.key? key
           end
 
           implicit_author = doc_attrs['author']
@@ -1915,15 +1916,13 @@ class Parser
   def self.process_authors author_line, names_only = false, multiple = true
     author_metadata = {}
     author_idx = 0
-    keys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
-    author_entries = multiple ? (author_line.split ';').map {|it| it.strip } : [*author_line]
-    author_entries.each do |author_entry|
+    (multiple && (author_line.include? ';') ? (author_line.split AuthorDelimiterRx) : [*author_line]).each do |author_entry|
       next if author_entry.empty?
       key_map = {}
       if (author_idx += 1) == 1
-        keys.each {|key| key_map[key.to_sym] = key }
+        AuthorKeys.each {|key| key_map[key.to_sym] = key }
       else
-        keys.each {|key| key_map[key.to_sym] = %(#{key}_#{author_idx}) }
+        AuthorKeys.each {|key| key_map[key.to_sym] = %(#{key}_#{author_idx}) }
       end
 
       if names_only # when parsing an attribute value
@@ -1967,9 +1966,7 @@ class Parser
       else
         # only assign the _1 attributes once we see the second author
         if author_idx == 2
-          keys.each do |key|
-            author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.key? key
-          end
+          AuthorKeys.each {|key| author_metadata[%(#{key}_1)] = author_metadata[key] if author_metadata.key? key }
         end
         author_metadata['authors'] = %(#{author_metadata['authors']}, #{author_metadata[key_map[:author]]})
       end
