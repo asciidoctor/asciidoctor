@@ -352,11 +352,9 @@ module Substitutors
   #
   # returns The [String] text with the replacement characters substituted
   def sub_replacements text
-    if ReplaceableTextRx.match? text
-      REPLACEMENTS.each do |pattern, replacement, restore|
-        text = text.gsub(pattern) { do_replacement $~, replacement, restore }
-      end
-    end
+    REPLACEMENTS.each do |pattern, replacement, restore|
+      text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+    end if ReplaceableTextRx.match? text
     text
   end
 
