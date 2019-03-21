@@ -1221,7 +1221,7 @@ module Asciidoctor
   #
   # Returns the Document
   def load input, options = {}
-    options = options.dup
+    options = options.merge
 
     if (timings = options[:timings])
       timings.start :read
@@ -1233,7 +1233,9 @@ module Asciidoctor
 
     if !(attrs = options[:attributes])
       attrs = {}
-    elsif ::Hash === attrs || ((defined? ::Java::JavaUtil::Map) && ::Java::JavaUtil::Map === attrs)
+    elsif ::Hash === attrs
+      attrs = attrs.merge
+    elsif (defined? ::Java::JavaUtil::Map) && ::Java::JavaUtil::Map === attrs
       attrs = attrs.dup
     elsif ::Array === attrs
       attrs = {}.tap do |accum|
@@ -1351,7 +1353,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert input, options = {}
-    options = options.dup
+    options = options.merge
     options.delete(:parse)
     to_file = options.delete(:to_file)
     to_dir = options.delete(:to_dir)

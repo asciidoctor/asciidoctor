@@ -25,19 +25,15 @@ class AbstractNode
   attr_reader :parent
 
   def initialize parent, context, opts = {}
+    # document is a special case, should refer to itself
     if context == :document
-      # document is a special case, should refer to itself
-      @document, @parent = self, nil
-    else
-      if parent
-        @document, @parent = parent.document, parent
-      else
-        @document = @parent = nil
-      end
+      @document = self
+    elsif parent
+      @document = (@parent = parent).document
     end
     @node_name = (@context = context).to_s
-    # QUESTION are we correct in duplicating the attributes (seems to be just as fast)
-    @attributes = (opts.key? :attributes) ? opts[:attributes].dup : {}
+    # NOTE the value of the :attributes option may be nil on an Inline node
+    @attributes = (attrs = opts[:attributes]) ? attrs.merge : {}
     @passthroughs = []
   end
 

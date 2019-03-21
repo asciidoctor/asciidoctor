@@ -238,7 +238,7 @@ module Converter
 
     # Public: Get the Hash of Converter classes keyed by backend name. Intended for testing only.
     def converters
-      registry.dup
+      registry.merge
     end
 
     private def registry

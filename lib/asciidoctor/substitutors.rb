@@ -506,7 +506,7 @@ module Substitutors
           else
             target, content = ($~[:target] rescue nil), ($~[:content] rescue nil)
           end
-          attributes = (attributes = extconf[:default_attrs]) ? attributes.dup : {}
+          attributes = (attributes = extconf[:default_attrs]) ? attributes.merge : {}
           if content.nil_or_empty?
             attributes['text'] = content if content && extconf[:content_model] != :attributes
           else

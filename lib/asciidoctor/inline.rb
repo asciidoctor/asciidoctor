@@ -12,19 +12,12 @@ class Inline < AbstractNode
   attr_accessor :target
 
   def initialize(parent, context, text = nil, opts = {})
-    super(parent, context)
+    super(parent, context, opts)
     @node_name = %(inline_#{context})
-
     @text = text
-
     @id = opts[:id]
     @type = opts[:type]
     @target = opts[:target]
-
-    # value of attributes option for inline nodes may be nil
-    if (attrs = opts[:attributes])
-      @attributes = attrs.dup
-    end
   end
 
   def block?
