@@ -3,7 +3,7 @@ module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
 class Inline < AbstractNode
   # Public: Get the text of this inline element
-  attr_reader :text
+  attr_accessor :text
 
   # Public: Get the type (qualifier) of this inline element
   attr_reader :type

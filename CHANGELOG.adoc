@@ -66,6 +66,8 @@ Enhancements / Compliance::
   * allow negated subs to be specified on inline pass macro (#2191)
   * log warning if footnoteref macro is found and compat mode is not enabled (#3114)
   * log info message if inline macro processor returns a String value (#3176)
+  * apply subs to Inline node returned by inline macro processor if subs attribute is specified (#3178)
+  * add create_inline_pass helper method to base extension processor class (#3178)
   * log debug message instead of warning if block style is unknown (#3092)
   * allow backend to delegate to a registered backend using the syntax synthetic:delegate when using custom templates (e.g., slides:html) (#891)
   * AbstractBlock#find_by looks inside AsciiDoc table cells if traverse_documents selector option is true (#3101)
