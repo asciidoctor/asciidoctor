@@ -1362,6 +1362,59 @@ context 'Blocks' do
       assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
     end
 
+    test 'listing block without an explicit style and with a second positional argument should be promoted to a source block' do
+      input = <<~'EOS'
+      [,ruby]
+      ----
+      puts 'Hello, Ruby!'
+      ----
+      EOS
+      matches = (document_from_string input).find_by context: :listing, style: 'source'
+      assert_equal 1, matches.length
+      assert_equal 'ruby', (matches[0].attr 'language')
+    end
+
+    test 'listing block without an explicit style should be promoted to a source block if source-language is set' do
+      input = <<~'EOS'
+      :source-language: ruby
+
+      ----
+      puts 'Hello, Ruby!'
+      ----
+      EOS
+      matches = (document_from_string input).find_by context: :listing, style: 'source'
+      assert_equal 1, matches.length
+      assert_equal 'ruby', (matches[0].attr 'language')
+    end
+
+    test 'listing block with an explicit style and a second positional argument should not be promoted to a source block' do
+      input = <<~'EOS'
+      [listing,ruby]
+      ----
+      puts 'Hello, Ruby!'
+      ----
+      EOS
+      matches = (document_from_string input).find_by context: :listing
+      assert_equal 1, matches.length
+      assert_equal 'listing', matches[0].style
+      assert_nil (matches[0].attr 'language')
+    end
+
+    test 'listing block with an explicit style should not be promoted to a source block if source-language is set' do
+      input = <<~'EOS'
+      :source-language: ruby
+
+      [listing]
+      ----
+      puts 'Hello, Ruby!'
+      ----
+      EOS
+      matches = (document_from_string input).find_by context: :listing
+      assert_equal 1, matches.length
+      assert_equal 'listing', matches[0].style
+      assert_nil (matches[0].attr 'language')
+    end
+
     test 'source block with no title or language should generate screen element in docbook' do
       input = <<~'EOS'
       [source]

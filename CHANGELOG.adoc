@@ -44,6 +44,7 @@ Enhancements / Compliance::
   * use value of prettify-theme attribute as is if it starts with http:// or https:// (#3020)
   * allow icontype to be set using icons attribute (#2953)
   * when using a server-side syntax highlighter, highlight content of source block even if source language is not set (#3027)
+  * automatically promote a listing block without an explicit style to a source block if language is set (#1117)
   * remove the 2-character (i.e., `""`) quote block syntax
   * don't allow block role to inherit from document attribute; only look for role in block attributes (#1944)
   * split out functionality of -w CLI flag (script warnings) from -v CLI flag (verbose logging) (#3030)
