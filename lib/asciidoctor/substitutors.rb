@@ -319,7 +319,7 @@ module Substitutors
           if content.nil_or_empty?
             attributes['text'] = content if content && extconf[:content_model] != :attributes
           else
-            content = unescape_bracketed_text content
+            content = normalize_text content, true, true
             # QUESTION should we store the unparsed attrlist in the attrlist key?
             if extconf[:content_model] == :attributes
               parse_attributes content, extconf[:pos_attrs] || [], into: attributes
@@ -369,7 +369,7 @@ module Substitutors
             end
             (Inline.new self, :kbd, nil, attributes: { 'keys' => keys }).convert
           else # $2 == 'btn'
-            (Inline.new self, :button, (unescape_bracketed_text $3)).convert
+            (Inline.new self, :button, (normalize_text $3, true, true)).convert
           end
         end
       end
@@ -439,7 +439,7 @@ module Substitutors
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm:[Tigers,Big cats]
-          if (attrlist = normalize_string $2, true).include? '='
+          if (attrlist = normalize_text $2, true, true).include? '='
             if (primary = (attrs = (AttributeList.new attrlist, self).parse)[1])
               attrs['terms'] = terms = [primary]
               if (secondary = attrs[2])
@@ -464,7 +464,7 @@ module Substitutors
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm2:[Tigers]
-          if (term = normalize_string $2, true).include? '='
+          if (term = normalize_text $2, true, true).include? '='
             term = (attrs = (AttributeList.new term, self).parse)[1] || (attrs = nil) || term
             if attrs && (see_also = attrs['see-also'])
               attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
@@ -497,7 +497,7 @@ module Substitutors
           end
           if visible
             # ((Tigers))
-            if (term = normalize_string text).include? ';&'
+            if (term = normalize_text text, true).include? ';&'
               if term.include? ' &gt;&gt; '
                 term, _, see = term.partition ' &gt;&gt; '
                 attrs = { 'see' => see }
@@ -511,7 +511,7 @@ module Substitutors
           else
             # (((Tigers,Big cats)))
             attrs = {}
-            if (terms = normalize_string text).include? ';&'
+            if (terms = normalize_text text, true).include? ';&'
               if terms.include? ' &gt;&gt; '
                 terms, _, see = terms.partition ' &gt;&gt; '
                 attrs['see'] = see
@@ -834,7 +834,7 @@ module Substitutors
 
         if id
           if text
-            text = restore_passthroughs(normalize_string text, true)
+            text = restore_passthroughs(normalize_text text, true, true)
             index = doc.counter('footnote-number')
             doc.register(:footnotes, Document::Footnote.new(index, id, text))
             type, target = :ref, nil
@@ -848,7 +848,7 @@ module Substitutors
             type, target, id = :xref, id, nil
           end
         elsif text
-          text = restore_passthroughs(normalize_string text, true)
+          text = restore_passthroughs(normalize_text text, true, true)
           index = doc.counter('footnote-number')
           doc.register(:footnotes, Document::Footnote.new(index, id, text))
           type = target = nil
@@ -1041,7 +1041,7 @@ module Substitutors
         # NOTE we don't look for nested pass:[] macros
         # honor the escape
         next $&.slice 1, $&.length if $6 == RS
-        passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
+        passthrus[passthru_key = passthrus.size] = { text: (normalize_text $8, nil, true), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
       %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
@@ -1105,7 +1105,7 @@ module Substitutors
       if (type = $1.to_sym) == :stem
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
       end
-      content = unescape_brackets $3
+      content = normalize_text $3, nil, true
       # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
@@ -1302,7 +1302,7 @@ module Substitutors
   # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
   def parse_attributes attrlist, posattrs = [], opts = {}
     return {} if attrlist ? attrlist.empty? : true
-    attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
+    attrlist = normalize_text attrlist, true, true if opts[:unescape_input]
     attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
     # substitutions are only performed on attribute values if block is not nil
     block = self if opts[:sub_result]
@@ -1482,13 +1482,18 @@ module Substitutors
     end
   end
 
-  # Internal: Strip bounding whitespace and fold newlines
-  def normalize_string str, unescape_right_square_brackets = nil
-    unless str.empty?
-      str = str.strip.tr LF, ' '
-      str = str.gsub ESC_R_SB, R_SB if unescape_right_square_brackets && (str.include? R_SB)
+  # Internal: Normalize text to prepare it for parsing.
+  #
+  # If normalize_whitespace is true, strip surrounding whitespace and fold newlines. If unescape_closing_square_bracket
+  # is set, unescape any escaped closing square brackets.
+  #
+  # Returns the normalized text String
+  def normalize_text text, normalize_whitespace = nil, unescape_closing_square_brackets = nil
+    unless text.empty?
+      text = text.strip.tr LF, ' ' if normalize_whitespace
+      text = text.gsub ESC_R_SB, R_SB if unescape_closing_square_brackets && (text.include? R_SB)
     end
-    str
+    text
   end
 
   # Internal: Split text formatted as CSV with support
@@ -1519,24 +1524,6 @@ module Substitutors
     else
       str.split(',').map {|it| it.strip }
     end
-  end
-
-  # Internal: Unescape closing square brackets.
-  # Intended for text extracted from square brackets.
-  def unescape_brackets str
-    if str.include? RS
-      str = str.gsub ESC_R_SB, R_SB
-    end unless str.empty?
-    str
-  end
-
-  # Internal: Strip bounding whitespace, fold newlines and unescape closing
-  # square brackets from text extracted from brackets
-  def unescape_bracketed_text text
-    if (text = text.strip.tr LF, ' ').include? R_SB
-      text = text.gsub ESC_R_SB, R_SB
-    end unless text.empty?
-    text
   end
 end
 end
