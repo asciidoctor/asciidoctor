@@ -80,12 +80,11 @@ module Substitutors
     end
 
     if subs.include? :macros
-      text, passthrus = extract_passthroughs text
-      if passthrus.empty?
-        passthrus = nil
-      else
+      text = extract_passthroughs text
+      unless @passthroughs.empty?
+        passthrus = @passthroughs
         # NOTE placeholders can move around, so we can only clear in the outermost substitution call
-        @passthroughs_locked ||= (reset_passthrus = true)
+        @passthroughs_locked ||= (clear_passthrus = true)
       end
     end
 
@@ -114,7 +113,7 @@ module Substitutors
 
     if passthrus
       text = restore_passthroughs text
-      if reset_passthrus
+      if clear_passthrus
         passthrus.clear
         @passthroughs_locked = nil
       end
@@ -163,24 +162,21 @@ module Substitutors
   #
   # text - The String from which to extract passthrough fragements
   #
-  # returns - A tuple of the String text with passthrough regions substituted with placeholders and the passthroughs Hash
+  # Returns the String text with passthrough regions substituted with placeholders
   def extract_passthroughs(text)
     compat_mode = @document.compat_mode
     passthrus = @passthroughs
     text = text.gsub InlinePassMacroRx do
-      preceding = ''
-
       if (boundary = $4) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
         if compat_mode && boundary == '++'
-          content, _ = extract_passthroughs $5
+          content = extract_passthroughs $5
           next $2 ? %(#{$1}[#{$2}]#{$3}++#{content}++) : %(#{$1}#{$3}++#{content}++)
         end
 
         attributes = $2
         escape_count = $3.length
         content = $5
-        old_behavior = false
 
         if attributes
           if escape_count > 0
@@ -218,7 +214,7 @@ module Substitutors
         passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
-      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
+      %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
@@ -231,10 +227,8 @@ module Substitutors
 
       if compat_mode
         old_behavior = true
-      else
-        if (old_behavior = attributes && (attributes.end_with? 'x-'))
-          attributes = attributes.slice 0, attributes.length - 2
-        end
+      elsif (old_behavior = attributes && (attributes.end_with? 'x-'))
+        attributes = attributes.slice 0, attributes.length - 2
       end
 
       if attributes
@@ -282,14 +276,14 @@ module Substitutors
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
       end
       content = unescape_brackets $3
-      # NOTE for backwards compatibility with AsciiDoc Python, drop enclosing $ signs around latexmath
+      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
       subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
-    [text, passthrus]
+    text
   end
 
   # Internal: Extract nested single-plus passthrough; otherwise return unprocessed

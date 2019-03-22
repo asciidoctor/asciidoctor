@@ -1547,7 +1547,8 @@ context 'Substitutions' do
   context 'Passthroughs' do
     test 'collect inline triple plus passthroughs' do
       para = block_from_string('+++<code>inline code</code>+++')
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal '<code>inline code</code>', passthroughs[0][:text]
@@ -1556,7 +1557,8 @@ context 'Substitutions' do
 
     test 'collect multi-line inline triple plus passthroughs' do
       para = block_from_string("+++<code>inline\ncode</code>+++")
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal "<code>inline\ncode</code>", passthroughs[0][:text]
@@ -1565,7 +1567,8 @@ context 'Substitutions' do
 
     test 'collect inline double dollar passthroughs' do
       para = block_from_string('$$<code>{code}</code>$$')
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal '<code>{code}</code>', passthroughs[0][:text]
@@ -1574,7 +1577,8 @@ context 'Substitutions' do
 
     test 'collect inline double plus passthroughs' do
       para = block_from_string('++<code>{code}</code>++')
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal '<code>{code}</code>', passthroughs[0][:text]
@@ -1605,7 +1609,8 @@ context 'Substitutions' do
 
     test 'collect multi-line inline double dollar passthroughs' do
       para = block_from_string("$$<code>\n{code}\n</code>$$")
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal "<code>\n{code}\n</code>", passthroughs[0][:text]
@@ -1614,7 +1619,8 @@ context 'Substitutions' do
 
     test 'collect multi-line inline double plus passthroughs' do
       para = block_from_string("++<code>\n{code}\n</code>++")
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal "<code>\n{code}\n</code>", passthroughs[0][:text]
@@ -1623,7 +1629,8 @@ context 'Substitutions' do
 
     test 'collect passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['code'\\]</code>]})
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal %q{<code>['code']</code>}, passthroughs[0][:text]
@@ -1632,7 +1639,8 @@ context 'Substitutions' do
 
     test 'collect multi-line passthroughs from inline pass macro' do
       para = block_from_string(%Q{pass:specialcharacters,quotes[<code>['more\ncode'\\]</code>]})
-      result, passthroughs = para.extract_passthroughs(para.source)
+      result = para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal Asciidoctor::Substitutors::PASS_START + '0' + Asciidoctor::Substitutors::PASS_END, result
       assert_equal 1, passthroughs.size
       assert_equal %Q{<code>['more\ncode']</code>}, passthroughs[0][:text]
@@ -1647,7 +1655,8 @@ context 'Substitutions' do
 
     test 'resolves sub shorthands on inline pass macro' do
       para = block_from_string 'pass:q,a[*<{backend}>*]'
-      result, passthroughs = para.extract_passthroughs para.source
+      result = para.extract_passthroughs para.source
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal 1, passthroughs.size
       assert_equal [:quotes, :attributes], passthroughs[0][:subs]
       result = para.restore_passthroughs result
@@ -1656,7 +1665,8 @@ context 'Substitutions' do
 
     test 'inline pass macro supports incremental subs' do
       para = block_from_string 'pass:n,-a[<{backend}>]'
-      result, passthroughs = para.extract_passthroughs para.source
+      result = para.extract_passthroughs para.source
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal 1, passthroughs.size
       result = para.restore_passthroughs result
       assert_equal '&lt;{backend}&gt;', result
@@ -1665,14 +1675,15 @@ context 'Substitutions' do
     test 'should not recognize pass macro with invalid subsitution list' do
       [',', '42', 'a,'].each do |subs|
         para = block_from_string %(pass:#{subs}[foobar])
-        result, _ = para.extract_passthroughs para.source
+        result = para.extract_passthroughs para.source
         assert_equal %(pass:#{subs}[foobar]), result
       end
     end
 
     test 'should allow content of inline pass macro to be empty' do
       para = block_from_string 'pass:[]'
-      result, passthroughs = para.extract_passthroughs para.source
+      result = para.extract_passthroughs para.source
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal 1, passthroughs.size
       assert_equal '', para.restore_passthroughs(result)
     end
@@ -1680,7 +1691,8 @@ context 'Substitutions' do
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs without subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study")
-      _, passthroughs = para.extract_passthroughs ''
+      para.extract_passthroughs ''
+      passthroughs = para.instance_variable_get :@passthroughs
       passthroughs[0] = { text: '<code>inline code</code>', subs: [] }
       result = para.restore_passthroughs(para.source)
       assert_equal "some <code>inline code</code> to study", result
@@ -1689,7 +1701,8 @@ context 'Substitutions' do
     # NOTE placeholder is surrounded by text to prevent reader from stripping trailing boundary char (unique to test scenario)
     test 'restore inline passthroughs with subs' do
       para = block_from_string("some #{Asciidoctor::Substitutors::PASS_START}" + '0' + "#{Asciidoctor::Substitutors::PASS_END} to study in the #{Asciidoctor::Substitutors::PASS_START}" + '1' + "#{Asciidoctor::Substitutors::PASS_END} programming language")
-      _, passthroughs = para.extract_passthroughs ''
+      para.extract_passthroughs ''
+      passthroughs = para.instance_variable_get :@passthroughs
       passthroughs[0] = { text: '<code>{code}</code>', subs: [:specialcharacters] }
       passthroughs[1] = { text: '{language}', subs: [:specialcharacters] }
       result = para.restore_passthroughs(para.source)
@@ -1714,13 +1727,15 @@ context 'Substitutions' do
     test 'complex inline passthrough macro' do
       text_to_escape = %q{[(] <'basic form'> <'logical operator'> <'basic form'> [)]}
       para = block_from_string %($$#{text_to_escape}$$)
-      _, passthroughs = para.extract_passthroughs(para.source)
+      para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal 1, passthroughs.size
       assert_equal text_to_escape, passthroughs[0][:text]
 
       text_to_escape_escaped = %q{[(\] <'basic form'> <'logical operator'> <'basic form'> [)\]}
       para = block_from_string %(pass:specialcharacters[#{text_to_escape_escaped}])
-      _, passthroughs = para.extract_passthroughs(para.source)
+      para.extract_passthroughs(para.source)
+      passthroughs = para.instance_variable_get :@passthroughs
       assert_equal 1, passthroughs.size
       assert_equal text_to_escape, passthroughs[0][:text]
     end
