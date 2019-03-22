@@ -566,22 +566,15 @@ context 'Substitutions' do
     end
 
     test 'inline passthrough with id and role set using shorthand' do
-      para = block_from_string '[#id.role]+pass+'
-      assert_equal '<span id="id" class="role">pass</span>', para.content
-    end
-
-    test 'should assign role attribute when shorthand style contains a role' do
-      para = block_from_string 'blah'
-      result = para.parse_quoted_text_attributes '.red#idref'
-      expect = { 'id' => 'idref', 'role' => 'red' }
-      assert_equal expect, result
+      %w(#idname.rolename .rolename#idname).each do |attrlist|
+        para = block_from_string %([#{attrlist}]+pass+)
+        assert_equal '<span id="idname" class="rolename">pass</span>', para.content
+      end
     end
 
     test 'should not assign role attribute if shorthand style has no roles' do
-      para = block_from_string 'blah'
-      result = para.parse_quoted_text_attributes '#idref'
-      expect = { 'id' => 'idref' }
-      assert_equal expect, result
+      para = block_from_string '[#idname]*blah*'
+      assert_equal '<strong id="idname">blah</strong>', para.content
     end
   end
 
