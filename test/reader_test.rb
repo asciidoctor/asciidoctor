@@ -291,7 +291,7 @@ class ReaderTest < Minitest::Test
         reader = Asciidoctor::Reader.new lines, nil, normalize: true
         result = reader.read_lines_until
         assert_equal 3, result.size
-        assert_equal lines.map {|l| l.chomp }, result
+        assert_equal lines.map(&:chomp), result
         refute reader.has_more_lines?
         assert reader.eof?
       end
@@ -412,7 +412,7 @@ class ReaderTest < Minitest::Test
         captured yet again
         EOS
 
-        expected = lines[1..-1].map {|l| l.chomp }
+        expected = lines[1..-1].map(&:chomp)
 
         using_memory_logger do |logger|
           doc = empty_safe_document base_dir: DIRNAME
@@ -1526,7 +1526,7 @@ class ReaderTest < Minitest::Test
         reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
         reader.read_line
         result = reader.read_lines_until(terminator: '////', skip_processing: true)
-        assert_equal lines.map {|l| l.chomp }[1..1], result
+        assert_equal lines.map(&:chomp)[1..1], result
       end
 
       test 'skip_comment_lines should not process lines read' do

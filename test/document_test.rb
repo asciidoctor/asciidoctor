@@ -1256,7 +1256,7 @@ context 'Document' do
       images = doc.catalog[:images]
       refute_empty images
       assert_equal 2, images.size
-      assert_equal images.map {|it| it.target }, ['outer.png', 'inner.png']
+      assert_equal images.map(&:target), ['outer.png', 'inner.png']
     end
   end
 

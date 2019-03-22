@@ -800,7 +800,7 @@ context 'Extensions' do
         end
 
         (doc = empty_document).convert
-        assert_equal %w(SelfSigningTreeProcessor a b c d), doc.blocks.map {|b| b.lines[0] }
+        assert_equal %w(SelfSigningTreeProcessor a b c d), doc.blocks.map(&:lines).map(&:first)
       ensure
         Asciidoctor::Extensions.unregister_all
       end

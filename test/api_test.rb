@@ -1044,9 +1044,7 @@ context 'API' do
       refute_empty output
       lines = output.split("\n")
       assert_equal lines.size, output.split(/\r\n|\r|\n/).size
-      raw_lengths = lines.map(&:length)
-      trimmed_lengths = lines.map {|line| line.rstrip.length }
-      assert_equal raw_lengths, trimmed_lengths
+      assert_equal lines.map(&:length), lines.map(&:rstrip).map(&:length)
     end
 
     test 'should accept attributes as array' do

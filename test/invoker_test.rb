@@ -721,7 +721,7 @@ context 'Invoker' do
     begin
       ENV['TZ'] = 'UTC'
       result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
-      doctime, localtime = result.lines.map {|l| l.chomp }
+      doctime, localtime = result.lines.map(&:chomp)
       assert doctime.end_with?(' UTC')
       assert localtime.end_with?(' UTC')
     ensure
@@ -743,7 +743,7 @@ context 'Invoker' do
     begin
       ENV['TZ'] = 'EST+5'
       result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
-      doctime, localtime = result.lines.map {|l| l.chomp }
+      doctime, localtime = result.lines.map(&:chomp)
       assert doctime.end_with?(' -0500')
       assert localtime.end_with?(' -0500')
     ensure
