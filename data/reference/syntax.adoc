@@ -131,7 +131,7 @@ Attach a block or paragraph to a list item using a list continuation (which you 
 === Callout
 
 // enable callout bubbles by adding `:icons: font` to the document header
-[source,ruby]
+[,ruby]
 ----
 puts 'Hello, World!' # <1>
 ----
@@ -206,7 +206,7 @@ literal - an exhibit that features program output
 listing - an exhibit that features program input, source code, or the contents of a file
 ----
 
-[source,language]
+[,language]
 ----
 source - a listing that is embellished with (colorized) syntax highlighting
 ----
