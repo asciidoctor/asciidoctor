@@ -50,6 +50,8 @@ Enhancements / Compliance::
   * split out functionality of -w CLI flag (script warnings) from -v CLI flag (verbose logging) (#3030)
   * log possible invalid references at info level (#3030)
   * log dropped lines at info level when attribute-missing=drop-line (#2861)
+  * honor attribute-missing setting when processing include directives and block macros (#2855)
+  * log warning when include directive is not resolved due to missing attribute or blank target; always include warning in output document (#2868)
   * use the third argument of AbstractNode#attr / AbstractNode#attr? to set the name of a fallback attribute to look for on the document (#1934)
   * change default value of third argument to Abstractnode#attr / AbstractNode#attr? to nil so attribute doesn't inherit by default (#3059)
   * look for table-frame, table-grid, and table-stripes attributes on document as fallback for frame, grid, and stripes attributes on table (#3059)
@@ -113,8 +115,6 @@ Improvements::
   * never mutate strings; add a `frozen_string_literal: true` magic comment to top of all Ruby source files (#3054)
   * always use docdate and doctime to compute docyear and docdatetime (#3064)
   * rename PreprocessorReader#exceeded_max_depth? to PreprocessorReader#exceeds_max_depth? and return nil if includes are disabled
-  * log warning when include directive is not resolved due to missing attribute or blank target; always include warning in output (#2868)
-  * honor attribute-missing setting when processing include directives and block macros (#2855)
   * stop populating :ids table in document catalog (#3084)
   * always use :refs table in document catalog to look for registered IDs (#3084)
   * don't compute and store reference text in document catalog (#3084)
