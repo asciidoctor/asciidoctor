@@ -419,10 +419,7 @@ module Substitutors
         else
           type, posattrs = 'image', ['alt', 'width', 'height']
         end
-        if (target = $1).include? ATTR_REF_HEAD
-          # TODO remove this special case once titles use normal substitution order
-          target = sub_attributes target
-        end
+        target = $1
         attrs = parse_attributes $2, posattrs, unescape_input: true
         doc.register :images, [target, (attrs['imagesdir'] = doc_attrs['imagesdir'])] unless type == 'icon'
         attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
