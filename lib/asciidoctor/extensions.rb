@@ -292,16 +292,17 @@ module Extensions
     alias parse_content_as content_model
 
     def positional_attributes *value
-      option :pos_attrs, value.flatten
+      option :positional_attrs, value.flatten
     end
     alias name_positional_attributes positional_attributes
     # NOTE positional_attrs alias is deprecated
     alias positional_attrs positional_attributes
 
-    def default_attrs value
+    def default_attributes value
       option :default_attrs, value
     end
-    alias default_attributes default_attrs
+    # NOTE default_attrs alias is deprecated
+    alias default_attr default_attributes
 
     def resolve_attributes *args
       # NOTE assume true as default value; rewrap single-argument string or symbol
@@ -310,7 +311,7 @@ module Extensions
       end unless args.size > 1
       case args
       when true
-        option :pos_attrs, []
+        option :positional_attrs, []
         option :default_attrs, {}
       when ::Array
         names, defaults = [], {}
@@ -331,7 +332,7 @@ module Extensions
             names << arg
           end
         end
-        option :pos_attrs, names.compact
+        option :positional_attrs, names.compact
         option :default_attrs, defaults
       when ::Hash
         names, defaults = [], {}
@@ -343,7 +344,7 @@ module Extensions
           end
           defaults[name] = val if val
         end
-        option :pos_attrs, names.compact
+        option :positional_attrs, names.compact
         option :default_attrs, defaults
       else
         raise ::ArgumentError, %(unsupported attributes specification for macro: #{args.inspect})
@@ -505,7 +506,7 @@ module Extensions
   # * :named - The name of the block (required: true)
   # * :contexts - The blocks contexts on which this style can be used (default: [:paragraph, :open]
   # * :content_model - The structure of the content supported in this block (default: :compound)
-  # * :pos_attrs - A list of attribute names used to map positional attributes (default: nil)
+  # * :positional_attrs - A list of attribute names used to map positional attributes (default: nil)
   # * :default_attrs - A hash of attribute names and values used to seed the attributes hash (default: nil)
   # * ...
   #

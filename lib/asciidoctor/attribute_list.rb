@@ -4,7 +4,7 @@ module Asciidoctor
 # pairs. By default, attributes must each be separated by a comma and quotes
 # may be used around the value. If a key is not detected, the value is assigned
 # to a 1-based positional key, The positional attributes can be "rekeyed" when
-# given a posattrs array either during parsing or after the fact.
+# given a positional_attrs array either during parsing or after the fact.
 #
 # Examples
 #
@@ -56,11 +56,11 @@ class AttributeList
     @attributes = nil
   end
 
-  def parse_into attributes, posattrs = []
-    attributes.update(parse posattrs)
+  def parse_into attributes, positional_attrs = []
+    attributes.update parse positional_attrs
   end
 
-  def parse posattrs = []
+  def parse positional_attrs = []
     # return if already parsed
     return @attributes if @attributes
 
@@ -69,7 +69,7 @@ class AttributeList
     #attributes[0] = @scanner.string
     index = 0
 
-    while parse_attribute index, posattrs
+    while parse_attribute index, positional_attrs
       break if @scanner.eos?
       skip_delimiter
       index += 1
@@ -78,12 +78,12 @@ class AttributeList
     @attributes
   end
 
-  def rekey posattrs
-    AttributeList.rekey @attributes, posattrs
+  def rekey positional_attrs
+    AttributeList.rekey @attributes, positional_attrs
   end
 
-  def self.rekey attributes, pos_attrs
-    pos_attrs.each_with_index do |key, index|
+  def self.rekey attributes, positional_attrs
+    positional_attrs.each_with_index do |key, index|
       next unless key
       if (val = attributes[index + 1])
         # QUESTION should we delete the positional key?
@@ -96,7 +96,7 @@ class AttributeList
 
   private
 
-  def parse_attribute index = 0, pos_attrs = []
+  def parse_attribute index = 0, positional_attrs = []
     single_quoted_value = false
     skip_blank
     # example: "quote"
@@ -174,8 +174,8 @@ class AttributeList
       end
     else
       resolved_name = single_quoted_value && @block ? (@block.apply_subs name) : name
-      if (pos_name = pos_attrs[index])
-        @attributes[pos_name] = resolved_name
+      if (positional_attr_name = positional_attrs[index])
+        @attributes[positional_attr_name] = resolved_name
       end
       # QUESTION should we always assign the positional key?
       @attributes[index + 1] = resolved_name
