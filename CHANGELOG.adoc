@@ -129,6 +129,8 @@ Improvements::
   * truncate with precision (instead of rounding) when computing absolute width for columns in DocBook output (#3131)
   * drop legacy LaTeX math delimiters (e.g, `$..$`) if present (#1339)
   * use proper terminology in warning message about mismatched preprocessor directive (#3165)
+  * rename low-level extension attribute name :pos_attrs to :positional_attrs
+  * mark default_attrs extension DSL method deprecated in favor of default_attributes
   * upgrade MathJax to 2.7.5
 
 Bug Fixes::

@@ -322,7 +322,7 @@ module Substitutors
             content = normalize_text content, true, true
             # QUESTION should we store the unparsed attrlist in the attrlist key?
             if extconf[:content_model] == :attributes
-              parse_attributes content, extconf[:pos_attrs] || [], into: attributes
+              parse_attributes content, extconf[:positional_attrs] || [], into: attributes
             else
               attributes['text'] = content
             end
