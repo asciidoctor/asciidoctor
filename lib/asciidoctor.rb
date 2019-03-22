@@ -142,7 +142,9 @@ module Asciidoctor
     define :unwrap_standalone_preamble, true
 
     # AsciiDoc drops lines that contain references to missing attributes.
-    # This behavior is not intuitive to most writers
+    # This behavior is not intuitive to most writers.
+    # Asciidoctor allows this behavior to be configured.
+    # Possible options are 'skip', 'drop', 'drop-line', and 'warn'.
     # Compliance value: 'drop-line'
     define :attribute_missing, 'skip'
 

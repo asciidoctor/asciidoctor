@@ -133,11 +133,20 @@ module Substitutors
     apply_subs text, NORMAL_SUBS
   end
 
+  # Public: Apply substitutions for header metadata and attribute assignments
+  #
+  # text    - String containing the text process
+  #
+  # Returns A String with header substitutions performed
+  def apply_header_subs text
+    apply_subs text, HEADER_SUBS
+  end
+
   # Public: Apply substitutions for titles.
   #
   # title  - The String title to process
   #
-  # returns - A String with title substitutions performed
+  # Returns A String with title substitutions performed
   alias apply_title_subs apply_subs
 
   # Public: Apply substitutions for reftext.
@@ -149,216 +158,13 @@ module Substitutors
     apply_subs text, REFTEXT_SUBS
   end
 
-  # Public: Apply substitutions for header metadata and attribute assignments
-  #
-  # text    - String containing the text process
-  #
-  # returns - A String with header substitutions performed
-  def apply_header_subs(text)
-    apply_subs text, HEADER_SUBS
-  end
-
-  # Internal: Extract the passthrough text from the document for reinsertion after processing.
-  #
-  # text - The String from which to extract passthrough fragements
-  #
-  # Returns the String text with passthrough regions substituted with placeholders
-  def extract_passthroughs(text)
-    compat_mode = @document.compat_mode
-    passthrus = @passthroughs
-    text = text.gsub InlinePassMacroRx do
-      if (boundary = $4) # $$, ++, or +++
-        # skip ++ in compat mode, handled as normal quoted text
-        if compat_mode && boundary == '++'
-          content = extract_passthroughs $5
-          next $2 ? %(#{$1}[#{$2}]#{$3}++#{content}++) : %(#{$1}#{$3}++#{content}++)
-        end
-
-        attributes = $2
-        escape_count = $3.length
-        content = $5
-
-        if attributes
-          if escape_count > 0
-            # NOTE we don't look for nested unconstrained pass macros
-            next %(#{$1}[#{attributes}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
-          elsif $1 == RS
-            preceding = %([#{attributes}])
-            attributes = nil
-          else
-            if boundary == '++' && (attributes.end_with? 'x-')
-              old_behavior = true
-              attributes = attributes.slice 0, attributes.length - 2
-            end
-            attributes = parse_quoted_text_attributes attributes
-          end
-        elsif escape_count > 0
-          # NOTE we don't look for nested unconstrained pass macros
-          next %(#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
-        end
-        subs = (boundary == '+++' ? [] : BASIC_SUBS)
-
-        if attributes
-          if old_behavior
-            passthrus[passthru_key = passthrus.size] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
-          else
-            passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
-          end
-        else
-          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs }
-        end
-      else # pass:[]
-        # NOTE we don't look for nested pass:[] macros
-        # honor the escape
-        next $&.slice 1, $&.length if $6 == RS
-        passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
-      end
-
-      %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
-    end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
-
-    pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
-    text = text.gsub pass_inline_rx do
-      preceding = $1
-      attributes = $2
-      escape_mark = RS if (quoted_text = $3).start_with? RS
-      format_mark = $4
-      content = $5
-
-      if compat_mode
-        old_behavior = true
-      elsif (old_behavior = attributes && (attributes.end_with? 'x-'))
-        attributes = attributes.slice 0, attributes.length - 2
-      end
-
-      if attributes
-        if format_mark == '`' && !old_behavior
-          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes
-        elsif escape_mark
-          # honor the escape of the formatting mark
-          next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
-        elsif preceding == RS
-          # honor the escape of the attributes
-          preceding = %([#{attributes}])
-          attributes = nil
-        else
-          attributes = parse_quoted_text_attributes attributes
-        end
-      elsif format_mark == '`' && !old_behavior
-        next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
-      elsif escape_mark
-        # honor the escape of the formatting mark
-        next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
-      end
-
-      if compat_mode
-        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
-      elsif attributes
-        if old_behavior
-          subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
-          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
-        else
-          passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
-        end
-      else
-        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS }
-      end
-
-      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
-    end if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
-
-    # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
-    text = text.gsub InlineStemMacroRx do
-      # honor the escape
-      next $&.slice 1, $&.length if $&.start_with? RS
-
-      if (type = $1.to_sym) == :stem
-        type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
-      end
-      content = unescape_brackets $3
-      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
-      content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
-      subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
-      %(#{PASS_START}#{passthru_key}#{PASS_END})
-    end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
-
-    text
-  end
-
-  # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
-  def extract_inner_passthrough text, pre, attributes = nil
-    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
-      if $1
-        %(#{pre}`+#{$2}+`)
-      else
-        @passthroughs[passthru_key = @passthroughs.size] = attributes ?
-            { text: $2, subs: BASIC_SUBS, attributes: attributes, type: :unquoted } :
-            { text: $2, subs: BASIC_SUBS }
-        %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
-      end
-    else
-      %(#{pre}`#{text}`)
-    end
-  end
-
-  # Internal: Restore the passthrough text by reinserting into the placeholder positions
-  #
-  # text  - The String text into which to restore the passthrough text
-  #
-  # returns The String text with the passthrough text restored
-  def restore_passthroughs text
-    passthrus = @passthroughs
-    text.gsub PassSlotRx do
-      if (pass = passthrus[$1.to_i])
-        subbed_text = apply_subs(pass[:text], pass[:subs])
-        if (type = pass[:type])
-          if (attributes = pass[:attributes])
-            id = attributes.delete 'id'
-          end
-          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
-        end
-        subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
-      else
-        logger.error %(unresolved passthrough detected: #{text})
-        '??pass??'
-      end
-    end
-  end
-
-  # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
-  #
-  # text - The String text to process
-  #
-  # returns The converted [String] text
-  def sub_quotes text
-    if QuotedTextSniffRx[compat = @document.compat_mode].match? text
-      QUOTE_SUBS[compat].each do |type, scope, pattern|
-        text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
-      end
-    end
-    text
-  end
-
-  # Public: Substitute replacement characters (e.g., copyright, trademark, etc.)
-  #
-  # text - The String text to process
-  #
-  # returns The [String] text with the replacement characters substituted
-  def sub_replacements text
-    REPLACEMENTS.each do |pattern, replacement, restore|
-      text = text.gsub(pattern) { do_replacement $~, replacement, restore }
-    end if ReplaceableTextRx.match? text
-    text
-  end
-
   # Public: Substitute special characters (i.e., encode XML)
   #
   # The special characters <, &, and > get replaced with &lt;, &amp;, and &gt;, respectively.
   #
   # text - The String text to process.
   #
-  # returns The String text with special characters replaced.
+  # Returns The String text with special characters replaced.
   if RUBY_ENGINE == 'opal'
     def sub_specialchars text
       (text.include? ?>) || (text.include? ?&) || (text.include? ?<) ? (text.gsub SpecialCharsRx, SpecialCharsTr) : text
@@ -375,23 +181,18 @@ module Substitutors
   end
   alias sub_specialcharacters sub_specialchars
 
-  # Internal: Substitute replacement text for matched location
+  # Public: Substitute quoted text (includes emphasis, strong, monospaced, etc.)
   #
-  # returns The String text with the replacement characters substituted
-  def do_replacement m, replacement, restore
-    if (captured = m[0]).include? RS
-      # we have to use sub since we aren't sure it's the first char
-      captured.sub RS, ''
-    else
-      case restore
-      when :none
-        replacement
-      when :bounding
-        m[1] + replacement + m[2]
-      else # :leading
-        m[1] + replacement
+  # text - The String text to process
+  #
+  # returns The converted [String] text
+  def sub_quotes text
+    if QuotedTextSniffRx[compat = @document.compat_mode].match? text
+      QUOTE_SUBS[compat].each do |type, scope, pattern|
+        text = text.gsub(pattern) { convert_quoted_text $~, type, scope }
       end
     end
+    text
   end
 
   # Public: Substitutes attribute references in the specified text
@@ -403,7 +204,8 @@ module Substitutors
   #
   # text - The String text to process
   # opts - A Hash of options to control processing: (default: {})
-  #        * :attribute_missing controls how to handle a missing attribute
+  #        * :attribute_missing controls how to handle a missing attribute (see Compliance.attribute_missing for values)
+  #        * :drop_line_severity the severity level at which to log a dropped line (:info or :ignore)
   #
   # Returns the [String] text with the attribute references replaced with resolved values
   def sub_attributes text, opts = {}
@@ -472,6 +274,18 @@ module Substitutors
     end
   end
 
+  # Public: Substitute replacement characters (e.g., copyright, trademark, etc.)
+  #
+  # text - The String text to process
+  #
+  # returns The [String] text with the replacement characters substituted
+  def sub_replacements text
+    REPLACEMENTS.each do |pattern, replacement, restore|
+      text = text.gsub(pattern) { do_replacement $~, replacement, restore }
+    end if ReplaceableTextRx.match? text
+    text
+  end
+
   # Public: Substitute inline macros (e.g., links, images, etc)
   #
   # Replace inline macros, which may span multiple lines, in the provided text
@@ -479,7 +293,7 @@ module Substitutors
   # source - The String text to process
   #
   # returns The converted String text
-  def sub_macros(text)
+  def sub_macros text
     #return text if text.nil_or_empty?
     # some look ahead assertions to cut unnecessary regex calls
     found_square_bracket = text.include? '['
@@ -1069,31 +883,12 @@ module Substitutors
     text
   end
 
-  # Public: Substitute callout source references
-  #
-  # text - The String text to process
-  #
-  # Returns the converted String text
-  def sub_callouts(text)
-    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
-    autonum = 0
-    text.gsub callout_rx do
-      # honor the escape
-      if $2
-        # use sub since it might be behind a line comment
-        $&.sub(RS, '')
-      else
-        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
-      end
-    end
-  end
-
   # Public: Substitute post replacements
   #
   # text - The String text to process
   #
   # Returns the converted String text
-  def sub_post_replacements(text)
+  def sub_post_replacements text
     #if attr? 'hardbreaks-option', nil, true
     if @attributes['hardbreaks-option'] || @document.attributes['hardbreaks-option']
       lines = text.split LF, -1
@@ -1109,196 +904,271 @@ module Substitutors
     end
   end
 
-  # Internal: Convert a quoted text region
+  # Public: Apply verbatim substitutions on source (for use when highlighting is disabled).
   #
-  # match  - The MatchData for the quoted text region
-  # type   - The quoting type (single, double, strong, emphasis, monospaced, etc)
-  # scope  - The scope of the quoting (constrained or unconstrained)
+  # source - the source code String on which to apply verbatim substitutions
+  # process_callouts - a Boolean flag indicating whether callout marks should be substituted
   #
-  # Returns The converted String text for the quoted text region
-  def convert_quoted_text(match, type, scope)
-    if match[0].start_with? RS
-      if scope == :constrained && (attrs = match[2])
-        unescaped_attrs = %([#{attrs}])
+  # Returns the substituted source
+  def sub_source source, process_callouts
+    process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
+  end
+
+  # Public: Substitute callout source references
+  #
+  # text - The String text to process
+  #
+  # Returns the converted String text
+  def sub_callouts text
+    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
+    autonum = 0
+    text.gsub callout_rx do
+      # honor the escape
+      if $2
+        # use sub since it might be behind a line comment
+        $&.sub(RS, '')
       else
-        return match[0].slice 1, match[0].length
+        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
       end
     end
+  end
 
-    if scope == :constrained
-      if unescaped_attrs
-        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], type: type).convert})
-      else
-        if (attrlist = match[2])
-          id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
-          type = :unquoted if type == :mark
+  # Public: Highlight (i.e., colorize) the source code during conversion using a syntax highlighter, if activated by the
+  # source-highlighter document attribute. Otherwise return the text with verbatim substitutions applied.
+  #
+  # If the process_callouts argument is true, this method will extract the callout marks from the source before passing
+  # it to the syntax highlighter, then subsequently restore those callout marks to the highlighted source so the callout
+  # marks don't confuse the syntax highlighter.
+  #
+  # source - the source code String to syntax highlight
+  # process_callouts - a Boolean flag indicating whether callout marks should be located and substituted
+  #
+  # Returns the highlighted source code, if a syntax highlighter is defined on the document, otherwise the source with
+  # verbatim substituions applied
+  def highlight_source source, process_callouts
+    # NOTE the call to highlight? is a defensive check since, normally, we wouldn't arrive here unless it returns true
+    return sub_source source, process_callouts unless (syntax_hl = @document.syntax_highlighter) && syntax_hl.highlight?
+
+    source, callout_marks = extract_callouts source if process_callouts
+
+    doc_attrs = @document.attributes
+    syntax_hl_name = syntax_hl.name
+    if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
+      start_line_number = 1 if (start_line_number = (attr 'start', 1).to_i) < 1
+    end
+    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight'
+
+    highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language'),
+      callouts: callout_marks,
+      css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
+      highlight_lines: highlight_lines,
+      number_lines: linenums_mode,
+      start_line_number: start_line_number,
+      style: doc_attrs[%(#{syntax_hl_name}-style)]
+
+    # fix passthrough placeholders that got caught up in syntax highlighting
+    highlighted = highlighted.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
+
+    # NOTE highlight method may have depleted callouts
+    callout_marks.nil_or_empty? ? highlighted : (restore_callouts highlighted, callout_marks, source_offset)
+  end
+
+  # Public: Resolve the line numbers in the specified source to highlight from the provided spec.
+  #
+  # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
+  #
+  # source - The String source.
+  # spec   - The lines specifier (e.g., "1-5, !2, 10" or "1..5;!2;10")
+  #
+  # Returns an [Array] of unique, sorted line numbers.
+  def resolve_lines_to_highlight source, spec
+    lines = []
+    spec = spec.delete ' ' if spec.include? ' '
+    ((spec.include? ',') ? (spec.split ',') : (spec.split ';')).map do |entry|
+      if entry.start_with? '!'
+        entry = entry.slice 1, entry.length
+        negate = true
+      end
+      if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
+        from, delim, to = entry.partition delim
+        to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
+        line_nums = (from.to_i..to).to_a
+        if negate
+          lines -= line_nums
+        else
+          lines.concat line_nums
         end
-        %(#{match[1]}#{Inline.new(self, :quoted, match[3], type: type, id: id, attributes: attributes).convert})
-      end
-    else
-      if (attrlist = match[1])
-        id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
-        type = :unquoted if type == :mark
-      end
-      Inline.new(self, :quoted, match[2], type: type, id: id, attributes: attributes).convert
-    end
-  end
-
-  # Internal: Parse the attributes that are defined on quoted (aka formatted) text
-  #
-  # str - A non-nil String of unprocessed attributes;
-  #       space-separated roles (e.g., role1 role2) or the id/role shorthand syntax (e.g., #idname.role)
-  #
-  # Returns a Hash of attributes (role and id only)
-  def parse_quoted_text_attributes str
-    return {} if (str = str.rstrip).empty?
-    # NOTE attributes are typically resolved after quoted text, so substitute eagerly
-    str = sub_attributes str if str.include? ATTR_REF_HEAD
-    # for compliance, only consider first positional attribute (very unlikely)
-    str = str.slice 0, (str.index ',') if str.include? ','
-
-    if (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
-      segments = str.split '#', 2
-
-      if segments.size > 1
-        id, *more_roles = segments[1].split('.')
       else
-        more_roles = []
+        if negate
+          lines.delete entry.to_i
+        else
+          lines << entry.to_i
+        end
       end
-
-      roles = segments[0].empty? ? [] : segments[0].split('.')
-      if roles.size > 1
-        roles.shift
-      end
-
-      if more_roles.size > 0
-        roles.concat more_roles
-      end
-
-      attrs = {}
-      attrs['id'] = id if id
-      attrs['role'] = roles.join ' ' unless roles.empty?
-      attrs
-    else
-      { 'role' => str }
     end
+    lines.sort.uniq
   end
 
-  # Internal: Parse attributes in name or name=value format from a comma-separated String
+  # Public: Extract the passthrough text from the document for reinsertion after processing.
   #
-  # attrlist - A comma-separated String list of attributes in name or name=value format.
-  # posattrs - An Array of positional attribute names (default: []).
-  # opts     - A Hash of options to control how the string is parsed (default: {}):
-  #            :into           - The Hash to parse the attributes into (optional, default: false).
-  #            :sub_input      - A Boolean that indicates whether to substitute attributes prior to
-  #                              parsing (optional, default: false).
-  #            :sub_result     - A Boolean that indicates whether to apply substitutions
-  #                              single-quoted attribute values (optional, default: true).
-  #            :unescape_input - A Boolean that indicates whether to unescape square brackets prior
-  #                              to parsing (optional, default: false).
+  # text - The String from which to extract passthrough fragements
   #
-  # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
-  def parse_attributes attrlist, posattrs = [], opts = {}
-    return {} if attrlist ? attrlist.empty? : true
-    attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
-    attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
-    # substitutions are only performed on attribute values if block is not nil
-    block = self if opts[:sub_result]
-    if (into = opts[:into])
-      AttributeList.new(attrlist, block).parse_into(into, posattrs)
-    else
-      AttributeList.new(attrlist, block).parse(posattrs)
-    end
-  end
+  # Returns the String text with passthrough regions substituted with placeholders
+  def extract_passthroughs text
+    compat_mode = @document.compat_mode
+    passthrus = @passthroughs
+    text = text.gsub InlinePassMacroRx do
+      if (boundary = $4) # $$, ++, or +++
+        # skip ++ in compat mode, handled as normal quoted text
+        if compat_mode && boundary == '++'
+          content = extract_passthroughs $5
+          next $2 ? %(#{$1}[#{$2}]#{$3}++#{content}++) : %(#{$1}#{$3}++#{content}++)
+        end
 
-  # Expand all groups in the subs list and return. If no subs are resolve, return nil.
-  #
-  # subs - The substitutions to expand; can be a Symbol, Symbol Array or nil
-  #
-  # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
-  def expand_subs subs
-    if ::Symbol === subs
-      unless subs == :none
-        SUB_GROUPS[subs] || [subs]
-      end
-    else
-      expanded_subs = []
-      subs.each do |key|
-        unless key == :none
-          if (sub_group = SUB_GROUPS[key])
-            expanded_subs += sub_group
+        attributes = $2
+        escape_count = $3.length
+        content = $5
+
+        if attributes
+          if escape_count > 0
+            # NOTE we don't look for nested unconstrained pass macros
+            next %(#{$1}[#{attributes}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
+          elsif $1 == RS
+            preceding = %([#{attributes}])
+            attributes = nil
           else
-            expanded_subs << key
+            if boundary == '++' && (attributes.end_with? 'x-')
+              old_behavior = true
+              attributes = attributes.slice 0, attributes.length - 2
+            end
+            attributes = parse_quoted_text_attributes attributes
           end
+        elsif escape_count > 0
+          # NOTE we don't look for nested unconstrained pass macros
+          next %(#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
         end
+        subs = (boundary == '+++' ? [] : BASIC_SUBS)
+
+        if attributes
+          if old_behavior
+            passthrus[passthru_key = passthrus.size] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
+          else
+            passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
+          end
+        else
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs }
+        end
+      else # pass:[]
+        # NOTE we don't look for nested pass:[] macros
+        # honor the escape
+        next $&.slice 1, $&.length if $6 == RS
+        passthrus[passthru_key = passthrus.size] = { text: (unescape_brackets $8), subs: ($7 ? (resolve_pass_subs $7) : nil) }
       end
 
-      expanded_subs.empty? ? nil : expanded_subs
-    end
-  end
+      %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
+    end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
-  # Internal: Strip bounding whitespace, fold newlines and unescape closing
-  # square brackets from text extracted from brackets
-  def unescape_bracketed_text text
-    if (text = text.strip.tr LF, ' ').include? R_SB
-      text = text.gsub ESC_R_SB, R_SB
-    end unless text.empty?
+    pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
+    text = text.gsub pass_inline_rx do
+      preceding = $1
+      attributes = $2
+      escape_mark = RS if (quoted_text = $3).start_with? RS
+      format_mark = $4
+      content = $5
+
+      if compat_mode
+        old_behavior = true
+      elsif (old_behavior = attributes && (attributes.end_with? 'x-'))
+        attributes = attributes.slice 0, attributes.length - 2
+      end
+
+      if attributes
+        if format_mark == '`' && !old_behavior
+          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes
+        elsif escape_mark
+          # honor the escape of the formatting mark
+          next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
+        elsif preceding == RS
+          # honor the escape of the attributes
+          preceding = %([#{attributes}])
+          attributes = nil
+        else
+          attributes = parse_quoted_text_attributes attributes
+        end
+      elsif format_mark == '`' && !old_behavior
+        next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
+      elsif escape_mark
+        # honor the escape of the formatting mark
+        next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
+      end
+
+      if compat_mode
+        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
+      elsif attributes
+        if old_behavior
+          subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
+        else
+          passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
+        end
+      else
+        passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS }
+      end
+
+      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
+    end if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
+
+    # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
+    text = text.gsub InlineStemMacroRx do
+      # honor the escape
+      next $&.slice 1, $&.length if $&.start_with? RS
+
+      if (type = $1.to_sym) == :stem
+        type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
+      end
+      content = unescape_brackets $3
+      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
+      content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
+      subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
+      %(#{PASS_START}#{passthru_key}#{PASS_END})
+    end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
+
     text
   end
 
-  # Internal: Strip bounding whitespace and fold newlines
-  def normalize_string str, unescape_right_square_brackets = nil
-    unless str.empty?
-      str = str.strip.tr LF, ' '
-      str = str.gsub ESC_R_SB, R_SB if unescape_right_square_brackets && (str.include? R_SB)
-    end
-    str
-  end
-
-  # Internal: Unescape closing square brackets.
-  # Intended for text extracted from square brackets.
-  def unescape_brackets str
-    if str.include? RS
-      str = str.gsub ESC_R_SB, R_SB
-    end unless str.empty?
-    str
-  end
-
-  # Internal: Split text formatted as CSV with support
-  # for double-quoted values (in which commas are ignored)
-  def split_simple_csv str
-    if str.empty?
-      []
-    elsif str.include? '"'
-      values = []
-      accum = ''
-      quote_open = false
-      str.each_char do |c|
-        case c
-        when ','
-          if quote_open
-            accum = accum + c
-          else
-            values << accum.strip
-            accum = ''
+  # Public: Restore the passthrough text by reinserting into the placeholder positions
+  #
+  # text  - The String text into which to restore the passthrough text
+  #
+  # returns The String text with the passthrough text restored
+  def restore_passthroughs text
+    passthrus = @passthroughs
+    text.gsub PassSlotRx do
+      if (pass = passthrus[$1.to_i])
+        subbed_text = apply_subs(pass[:text], pass[:subs])
+        if (type = pass[:type])
+          if (attributes = pass[:attributes])
+            id = attributes.delete 'id'
           end
-        when '"'
-          quote_open = !quote_open
-        else
-          accum = accum + c
+          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
         end
+        subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
+      else
+        logger.error %(unresolved passthrough detected: #{text})
+        '??pass??'
       end
-      values << accum.strip
-    else
-      str.split(',').map {|it| it.strip }
     end
   end
 
-  # Internal: Resolve the list of comma-delimited subs against the possible options.
+  # Public: Resolve the list of comma-delimited subs against the possible options.
   #
-  # subs - A comma-delimited String of substitution aliases
+  # subs     - The comma-delimited String of substitution names or aliases.
+  # type     - A Symbol representing the context for which the subs are being resolved (default: :block).
+  # defaults - An Array of substitutions to start with when computing incremental substitutions (default: nil).
+  # subject  - The String to use in log messages to communicate the subject for which subs are being resolved (default: nil)
   #
-  # returns An Array of Symbols representing the substitution operation or nothing if no subs are found.
+  # Returns An Array of Symbols representing the substitution operation or nothing if no subs are found.
   def resolve_subs subs, type = :block, defaults = nil, subject = nil
     return if subs.nil_or_empty?
     # QUESTION should we store candidates as a Set instead of an Array?
@@ -1361,53 +1231,110 @@ module Substitutors
     resolved
   end
 
+  # Public: Call resolve_subs for the :block type.
   def resolve_block_subs subs, defaults, subject
     resolve_subs subs, :block, defaults, subject
   end
 
+  # Public: Call resolve_subs for the :inline type with the subject set as passthrough macro.
   def resolve_pass_subs subs
     resolve_subs subs, :inline, nil, 'passthrough macro'
   end
 
-  # Public: Highlight (i.e., colorize) the source code during conversion using a syntax highlighter, if activated by the
-  # source-highlighter document attribute. Otherwise return the text with verbatim substitutions applied.
+  # Public: Expand all groups in the subs list and return. If no subs are resolve, return nil.
   #
-  # If the process_callouts argument is true, this method will extract the callout marks from the source before passing
-  # it to the syntax highlighter, then subsequently restore those callout marks to the highlighted source so the callout
-  # marks don't confuse the syntax highlighter.
+  # subs - The substitutions to expand; can be a Symbol, Symbol Array or nil
   #
-  # source - the source code String to syntax highlight
-  # process_callouts - a Boolean flag indicating whether callout marks should be located and substituted
-  #
-  # Returns the highlighted source code, if a syntax highlighter is defined on the document, otherwise the source with
-  # verbatim substituions applied
-  def highlight_source source, process_callouts
-    # NOTE the call to highlight? is a defensive check since, normally, we wouldn't arrive here unless it returns true
-    return sub_source source, process_callouts unless (syntax_hl = @document.syntax_highlighter) && syntax_hl.highlight?
+  # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
+  def expand_subs subs
+    if ::Symbol === subs
+      unless subs == :none
+        SUB_GROUPS[subs] || [subs]
+      end
+    else
+      expanded_subs = []
+      subs.each do |key|
+        unless key == :none
+          if (sub_group = SUB_GROUPS[key])
+            expanded_subs += sub_group
+          else
+            expanded_subs << key
+          end
+        end
+      end
 
-    source, callout_marks = extract_callouts source if process_callouts
-
-    doc_attrs = @document.attributes
-    syntax_hl_name = syntax_hl.name
-    if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
-      start_line_number = 1 if (start_line_number = (attr 'start', 1).to_i) < 1
+      expanded_subs.empty? ? nil : expanded_subs
     end
-    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight'
-
-    highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language'),
-      callouts: callout_marks,
-      css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
-      highlight_lines: highlight_lines,
-      number_lines: linenums_mode,
-      start_line_number: start_line_number,
-      style: doc_attrs[%(#{syntax_hl_name}-style)]
-
-    # fix passthrough placeholders that got caught up in syntax highlighting
-    highlighted = highlighted.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
-
-    # NOTE highlight method may have depleted callouts
-    callout_marks.nil_or_empty? ? highlighted : (restore_callouts highlighted, callout_marks, source_offset)
   end
+
+  # Internal: Commit the requested substitutions to this block.
+  #
+  # Looks for an attribute named "subs". If present, resolves substitutions
+  # from the value of that attribute and assigns them to the subs property on
+  # this block. Otherwise, uses the substitutions assigned to the default_subs
+  # property, if specified, or selects a default set of substitutions based on
+  # the content model of the block.
+  #
+  # Returns nothing
+  def commit_subs
+    unless (default_subs = @default_subs)
+      case @content_model
+      when :simple
+        default_subs = NORMAL_SUBS
+      when :verbatim
+        # NOTE :literal with listparagraph-option gets folded into text of list item later
+        default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
+      when :raw
+        # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
+        default_subs = @context == :stem ? BASIC_SUBS : NO_SUBS
+      else
+        return @subs
+      end
+    end
+
+    if (custom_subs = @attributes['subs'])
+      @subs = (resolve_block_subs custom_subs, default_subs, @context) || []
+    else
+      @subs = default_subs.drop 0
+    end
+
+    # QUESION delegate this logic to a method?
+    if @context == :listing && @style == 'source' && (syntax_hl = @document.syntax_highlighter) &&
+        syntax_hl.highlight? && (idx = @subs.index :specialcharacters)
+      @subs[idx] = :highlight
+    end
+
+    nil
+  end
+
+  # Internal: Parse attributes in name or name=value format from a comma-separated String
+  #
+  # attrlist - A comma-separated String list of attributes in name or name=value format.
+  # posattrs - An Array of positional attribute names (default: []).
+  # opts     - A Hash of options to control how the string is parsed (default: {}):
+  #            :into           - The Hash to parse the attributes into (optional, default: false).
+  #            :sub_input      - A Boolean that indicates whether to substitute attributes prior to
+  #                              parsing (optional, default: false).
+  #            :sub_result     - A Boolean that indicates whether to apply substitutions
+  #                              single-quoted attribute values (optional, default: true).
+  #            :unescape_input - A Boolean that indicates whether to unescape square brackets prior
+  #                              to parsing (optional, default: false).
+  #
+  # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
+  def parse_attributes attrlist, posattrs = [], opts = {}
+    return {} if attrlist ? attrlist.empty? : true
+    attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
+    attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
+    # substitutions are only performed on attribute values if block is not nil
+    block = self if opts[:sub_result]
+    if (into = opts[:into])
+      AttributeList.new(attrlist, block).parse_into(into, posattrs)
+    else
+      AttributeList.new(attrlist, block).parse(posattrs)
+    end
+  end
+
+  private
 
   # Internal: Extract the callout numbers from the source to prepare it for syntax highlighting.
   def extract_callouts source
@@ -1463,87 +1390,174 @@ module Substitutors
     end.join LF)
   end
 
-  # e.g., highlight="1-5, !2, 10" or highlight=1-5;!2,10
-  def resolve_lines_to_highlight source, spec
-    lines = []
-    spec = spec.delete ' ' if spec.include? ' '
-    ((spec.include? ',') ? (spec.split ',') : (spec.split ';')).map do |entry|
-      negate = false
-      if entry.start_with? '!'
-        entry = entry.slice 1, entry.length
-        negate = true
-      end
-      if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
-        from, delim, to = entry.partition delim
-        to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
-        line_nums = (from.to_i..to).to_a
-        if negate
-          lines -= line_nums
-        else
-          lines.concat line_nums
-        end
+  # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
+  def extract_inner_passthrough text, pre, attributes = nil
+    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
+      if $1
+        %(#{pre}`+#{$2}+`)
       else
-        if negate
-          lines.delete entry.to_i
-        else
-          lines << entry.to_i
-        end
+        @passthroughs[passthru_key = @passthroughs.size] = attributes ?
+            { text: $2, subs: BASIC_SUBS, attributes: attributes, type: :unquoted } :
+            { text: $2, subs: BASIC_SUBS }
+        %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
       end
+    else
+      %(#{pre}`#{text}`)
     end
-    lines.sort.uniq
   end
 
-  # Public: Apply verbatim substitutions on source (for use when highlighting is disabled).
+  # Internal: Convert a quoted text region
   #
-  # source - the source code String on which to apply verbatim substitutions
-  # process_callouts - a Boolean flag indicating whether callout marks should be substituted
+  # match  - The MatchData for the quoted text region
+  # type   - The quoting type (single, double, strong, emphasis, monospaced, etc)
+  # scope  - The scope of the quoting (constrained or unconstrained)
   #
-  # returns the substituted source
-  def sub_source source, process_callouts
-    process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
+  # Returns The converted String text for the quoted text region
+  def convert_quoted_text match, type, scope
+    if match[0].start_with? RS
+      if scope == :constrained && (attrs = match[2])
+        unescaped_attrs = %([#{attrs}])
+      else
+        return match[0].slice 1, match[0].length
+      end
+    end
+
+    if scope == :constrained
+      if unescaped_attrs
+        %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], type: type).convert})
+      else
+        if (attrlist = match[2])
+          id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
+          type = :unquoted if type == :mark
+        end
+        %(#{match[1]}#{Inline.new(self, :quoted, match[3], type: type, id: id, attributes: attributes).convert})
+      end
+    else
+      if (attrlist = match[1])
+        id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
+        type = :unquoted if type == :mark
+      end
+      Inline.new(self, :quoted, match[2], type: type, id: id, attributes: attributes).convert
+    end
+  end
+
+  # Internal: Substitute replacement text for matched location
+  #
+  # returns The String text with the replacement characters substituted
+  def do_replacement m, replacement, restore
+    if (captured = m[0]).include? RS
+      # we have to use sub since we aren't sure it's the first char
+      captured.sub RS, ''
+    else
+      case restore
+      when :none
+        replacement
+      when :bounding
+        m[1] + replacement + m[2]
+      else # :leading
+        m[1] + replacement
+      end
+    end
   end
 
   # Internal: Inserts text into a formatted text enclosure; used by xreftext
   alias sub_placeholder sprintf unless RUBY_ENGINE == 'opal'
 
-  # Internal: Commit the requested substitutions to this block.
+  # Internal: Parse the attributes that are defined on quoted (aka formatted) text
   #
-  # Looks for an attribute named "subs". If present, resolves substitutions
-  # from the value of that attribute and assigns them to the subs property on
-  # this block. Otherwise, uses the substitutions assigned to the default_subs
-  # property, if specified, or selects a default set of substitutions based on
-  # the content model of the block.
+  # str - A non-nil String of unprocessed attributes;
+  #       space-separated roles (e.g., role1 role2) or the id/role shorthand syntax (e.g., #idname.role)
   #
-  # Returns The Array of resolved substitutions now assigned to this block
-  def commit_subs
-    unless (default_subs = @default_subs)
-      case @content_model
-      when :simple
-        default_subs = NORMAL_SUBS
-      when :verbatim
-        # NOTE :literal with listparagraph-option gets folded into text of list item later
-        default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
-      when :raw
-        # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
-        default_subs = @context == :stem ? BASIC_SUBS : NO_SUBS
+  # Returns a Hash of attributes (role and id only)
+  def parse_quoted_text_attributes str
+    return {} if (str = str.rstrip).empty?
+    # NOTE attributes are typically resolved after quoted text, so substitute eagerly
+    str = sub_attributes str if str.include? ATTR_REF_HEAD
+    # for compliance, only consider first positional attribute (very unlikely)
+    str = str.slice 0, (str.index ',') if str.include? ','
+
+    if (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
+      segments = str.split '#', 2
+
+      if segments.size > 1
+        id, *more_roles = segments[1].split('.')
       else
-        return @subs
+        more_roles = []
       end
-    end
 
-    if (custom_subs = @attributes['subs'])
-      @subs = (resolve_block_subs custom_subs, default_subs, @context) || []
+      roles = segments[0].empty? ? [] : segments[0].split('.')
+      if roles.size > 1
+        roles.shift
+      end
+
+      if more_roles.size > 0
+        roles.concat more_roles
+      end
+
+      attrs = {}
+      attrs['id'] = id if id
+      attrs['role'] = roles.join ' ' unless roles.empty?
+      attrs
     else
-      @subs = default_subs.drop 0
+      { 'role' => str }
     end
+  end
 
-    # QUESION delegate this logic to a method?
-    if @context == :listing && @style == 'source' && (syntax_hl = @document.syntax_highlighter) &&
-        syntax_hl.highlight? && (idx = @subs.index :specialcharacters)
-      @subs[idx] = :highlight
+  # Internal: Strip bounding whitespace and fold newlines
+  def normalize_string str, unescape_right_square_brackets = nil
+    unless str.empty?
+      str = str.strip.tr LF, ' '
+      str = str.gsub ESC_R_SB, R_SB if unescape_right_square_brackets && (str.include? R_SB)
     end
+    str
+  end
 
-    @subs
+  # Internal: Split text formatted as CSV with support
+  # for double-quoted values (in which commas are ignored)
+  def split_simple_csv str
+    if str.empty?
+      []
+    elsif str.include? '"'
+      values = []
+      accum = ''
+      quote_open = nil
+      str.each_char do |c|
+        case c
+        when ','
+          if quote_open
+            accum = accum + c
+          else
+            values << accum.strip
+            accum = ''
+          end
+        when '"'
+          quote_open = !quote_open
+        else
+          accum = accum + c
+        end
+      end
+      values << accum.strip
+    else
+      str.split(',').map {|it| it.strip }
+    end
+  end
+
+  # Internal: Unescape closing square brackets.
+  # Intended for text extracted from square brackets.
+  def unescape_brackets str
+    if str.include? RS
+      str = str.gsub ESC_R_SB, R_SB
+    end unless str.empty?
+    str
+  end
+
+  # Internal: Strip bounding whitespace, fold newlines and unescape closing
+  # square brackets from text extracted from brackets
+  def unescape_bracketed_text text
+    if (text = text.strip.tr LF, ' ').include? R_SB
+      text = text.gsub ESC_R_SB, R_SB
+    end unless text.empty?
+    text
   end
 end
 end
