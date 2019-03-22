@@ -215,6 +215,21 @@ module Extensions
       parent
     end
 
+    # Public: Parses the attrlist String into a Hash of attributes
+    #
+    # block    - the current AbstractBlock or the parent AbstractBlock if there is no current block (used for applying subs)
+    # attrlist - the list of attributes as a String
+    # opts     - an optional Hash of options to control processing:
+    #            :positional_attributes - an Array of attribute names to map positional arguments to (optional, default: false)
+    #            :sub_attributes - enables attribute substitution on the attrlist argument (optional, default: false)
+    #
+    # Returns a Hash of parsed attributes
+    def parse_attributes block, attrlist, opts = {}
+      return {} if attrlist ? attrlist.empty? : true
+      attrlist = block.sub_attributes attrlist if opts[:sub_attributes] && (attrlist.include? ATTR_REF_HEAD)
+      (AttributeList.new attrlist).parse (opts[:positional_attributes] || [])
+    end
+
     # TODO fill out remaining methods
     [
       [:create_paragraph,     :create_block,  :paragraph],
