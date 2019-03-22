@@ -90,6 +90,7 @@ Enhancements / Compliance::
   * convert example block into details/summary tag set if collapsible option is set; open by default if open option is set (#1699)
   * substitute replacements in author values used in document header (#2441)
   * require space after semi-colon that separates multiple authors (#2441)
+  * catalog inline anchors at start of callout list items (#2818) (*@owenh000*)
 
 Improvements::
 
