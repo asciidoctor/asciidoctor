@@ -122,6 +122,7 @@ AsciidoctorはLinux, OS X (Mac)とWindowsで動き, 下記の {uri-ruby}[Ruby]�
 
 * CRuby (aka MRI) 2.3 - 2.6
 * JRuby 9.1 - 9.2
+* TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
 [CAUTION]

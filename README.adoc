@@ -140,6 +140,7 @@ Asciidoctor works on Linux, macOS and Windows and requires one of the following 
 
 * CRuby (aka MRI) 2.3 - 2.6
 * JRuby 9.1 - 9.2
+* TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
 [CAUTION]

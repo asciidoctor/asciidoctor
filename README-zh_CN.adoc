@@ -124,6 +124,7 @@ Asciidoctor 可以运行在 Linux，OSX (Mac) 和 Windows 系统，但需要安�
 
 * CRuby (aka MRI) 2.3 - 2.6
 * JRuby 9.1 - 9.2
+* TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
 我们欢迎你来帮助在这些以及其他平台测试 Asciidoctor。
