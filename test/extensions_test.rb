@@ -1496,7 +1496,7 @@ context 'Extensions' do
         a,b,c,key=val
         --
         EOS
-        doc = document_from_string input
+        convert_string_to_embedded input
         assert_equal 'a', parsed_attrs['a']
         assert_equal 'b', parsed_attrs['b']
         assert_equal 'val', parsed_attrs['key']
