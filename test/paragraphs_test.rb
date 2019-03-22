@@ -155,7 +155,7 @@ context 'Paragraphs' do
       output = convert_string_to_embedded input, backend: 'docbook', attributes: { 'indexterm-promotion-option' => '' }
       assert_xpath '/simpara', output, 1
       term1 = xmlnodes_at_xpath '(//indexterm)[1]', output, 1
-      assert_equal '<indexterm><primary>tigers</primary></indexterm>', term1.to_s
+      assert_equal %(<indexterm>\n<primary>tigers</primary>\n</indexterm>), term1.to_s
       assert term1.next.content.start_with?('tigers')
 
       term2 = xmlnodes_at_xpath '(//indexterm)[2]', output, 1
@@ -177,7 +177,7 @@ context 'Paragraphs' do
       assert_equal '<primary>Siberian Tiger</primary>', term4_elements[0].to_s
 
       term5 = xmlnodes_at_xpath '(//indexterm)[5]', output, 1
-      assert_equal '<indexterm><primary>Linux</primary></indexterm>', term5.to_s
+      assert_equal %(<indexterm>\n<primary>Linux</primary>\n</indexterm>), term5.to_s
       assert term5.next.content.start_with?('Linux')
 
       assert_xpath '(//indexterm)[6]/*', output, 3

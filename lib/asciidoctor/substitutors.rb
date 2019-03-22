@@ -628,17 +628,39 @@ module Substitutors
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm:[Tigers,Big cats]
-          terms = split_simple_csv normalize_string $2, true
+          if (attrlist = normalize_string $2, true).include? '='
+            if (primary = (attrs = (AttributeList.new attrlist, self).parse)[1])
+              attrs['terms'] = terms = [primary]
+              if (secondary = attrs[2])
+                terms << secondary
+                if (tertiary = attrs[3])
+                  terms << tertiary
+                end
+              end
+              if (see_also = attrs['see-also'])
+                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+              end
+            else
+              attrs = { 'terms' => (terms = attrlist) }
+            end
+          else
+            attrs = { 'terms' => (terms = split_simple_csv attrlist) }
+          end
           #doc.register :indexterms, terms
-          (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
+          (Inline.new self, :indexterm, nil, attributes: attrs).convert
         when 'indexterm2'
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm2:[Tigers]
-          term = normalize_string $2, true
+          if (term = normalize_string $2, true).include? '='
+            term = (attrs = (AttributeList.new term, self).parse)[1] || (attrs = nil) || term
+            if attrs && (see_also = attrs['see-also'])
+              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+            end
+          end
           #doc.register :indexterms, [term]
-          (Inline.new self, :indexterm, term, type: :visible).convert
+          (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
         else
           text = $3
           # honor the escape
@@ -664,14 +686,32 @@ module Substitutors
           end
           if visible
             # ((Tigers))
-            term = normalize_string text
+            if (term = normalize_string text).include? ';&'
+              if term.include? ' &gt;&gt; '
+                term, _, see = term.partition ' &gt;&gt; '
+                attrs = { 'see' => see }
+              elsif term.include? ' &amp;&gt; '
+                term, *see_also = term.split ' &amp;&gt; '
+                attrs = { 'see-also' => see_also }
+              end
+            end
             #doc.register :indexterms, [term]
-            subbed_term = (Inline.new self, :indexterm, term, type: :visible).convert
+            subbed_term = (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
           else
             # (((Tigers,Big cats)))
-            terms = split_simple_csv(normalize_string text)
+            attrs = {}
+            if (terms = normalize_string text).include? ';&'
+              if terms.include? ' &gt;&gt; '
+                terms, _, see = terms.partition ' &gt;&gt; '
+                attrs['see'] = see
+              elsif terms.include? ' &amp;&gt; '
+                terms, *see_also = terms.split ' &amp;&gt; '
+                attrs['see-also'] = see_also
+              end
+            end
+            attrs['terms'] = terms = split_simple_csv terms
             #doc.register :indexterms, terms
-            subbed_term = (Inline.new self, :indexterm, nil, attributes: { 'terms' => terms }).convert
+            subbed_term = (Inline.new self, :indexterm, nil, attributes: attrs).convert
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end
@@ -1159,7 +1199,7 @@ module Substitutors
   #
   # Returns an empty Hash if attrlist is nil or empty, otherwise a Hash of parsed attributes.
   def parse_attributes attrlist, posattrs = [], opts = {}
-    return {} unless attrlist && !attrlist.empty?
+    return {} if attrlist ? attrlist.empty? : true
     attrlist = unescape_bracketed_text attrlist if opts[:unescape_input]
     attrlist = @document.sub_attributes attrlist if opts[:sub_input] && (attrlist.include? ATTR_REF_HEAD)
     # substitutions are only performed on attribute values if block is not nil
@@ -1207,10 +1247,10 @@ module Substitutors
   end
 
   # Internal: Strip bounding whitespace and fold newlines
-  def normalize_string str, unescape_brackets = false
+  def normalize_string str, unescape_right_square_brackets = nil
     unless str.empty?
       str = str.strip.tr LF, ' '
-      str = str.gsub ESC_R_SB, R_SB if unescape_brackets && (str.include? R_SB)
+      str = str.gsub ESC_R_SB, R_SB if unescape_right_square_brackets && (str.include? R_SB)
     end
     str
   end
