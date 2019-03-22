@@ -594,15 +594,6 @@ module Substitutors
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
 
-          # TODO enable in Asciidoctor 1.6.x
-          # support pipe-separated text and title
-          #unless attrs && (attrs.key? 'title')
-          #  if text.include? '|'
-          #    attrs ||= {}
-          #    text, _, attrs['title'] = text.partition '|'
-          #  end
-          #end
-
           if text.end_with? '^'
             text = text.chop
             if attrs
@@ -659,15 +650,6 @@ module Substitutors
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
             link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
           end
-
-          # TODO enable in Asciidoctor 1.6.x
-          # support pipe-separated text and title
-          #unless attrs && (attrs.key? 'title')
-          #  if text.include? '|'
-          #    attrs ||= {}
-          #    text, _, attrs['title'] = text.partition '|'
-          #  end
-          #end
 
           if text.end_with? '^'
             text = text.chop
