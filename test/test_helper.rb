@@ -137,6 +137,14 @@ class Minitest::Test
     end
   end
 
+  def assert_include expected, actual
+    assert_includes actual, expected
+  end
+
+  def refute_include not_expected, actual
+    refute_includes actual, not_expected
+  end
+
   def assert_message logger, severity, expected_message, kind = String, idx = nil
     unless idx
       assert_equal 1, logger.messages.size

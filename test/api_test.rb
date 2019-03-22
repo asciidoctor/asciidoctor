@@ -40,7 +40,7 @@ context 'API' do
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
         output = Asciidoctor.convert_file input_path, to_file: false, safe: :safe
         assert_equal Encoding::UTF_8, output.encoding
-        assert_includes output, 'Romé'
+        assert_include 'Romé', output
       ensure
         Encoding.default_external = old_external
         Encoding.default_internal = old_internal
@@ -58,7 +58,7 @@ context 'API' do
           Asciidoctor.load_file tmp_input.path, safe: :safe
         end
         expected_message = 'Failed to load AsciiDoc document - source is either binary or contains invalid Unicode data'
-        assert_includes exception.message, expected_message
+        assert_include expected_message, exception.message
       ensure
         tmp_input.close!
       end
@@ -70,7 +70,7 @@ context 'API' do
         Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
       end
       expected_message = 'Failed to load AsciiDoc document - source is either binary or contains invalid Unicode data'
-      assert_includes exception.message, expected_message
+      assert_include expected_message, exception.message
       # verify we have the correct backtrace (should be at least in the first 5 lines)
       assert_match(/reader\.rb.*prepare_lines/, exception.backtrace[0..4].join(?\n))
     end
@@ -91,7 +91,7 @@ context 'API' do
         output = File.read tmp_output, mode: 'rb', encoding: 'utf-8:utf-8'
         assert_equal ::Encoding::UTF_8, output.encoding
         refute_empty output
-        assert_includes output, 'ＵＴＦ８'
+        assert_include 'ＵＴＦ８', output
       ensure
         tmp_input.close!
         FileUtils.rm_f tmp_output
@@ -608,7 +608,7 @@ context 'API' do
       doc = Asciidoctor.load input
       inner_doc = doc.blocks[0].rows.body[0][0].inner_document
       result = doc.find_by traverse_documents: true
-      assert_includes result, inner_doc
+      assert_include inner_doc, result
       result = doc.find_by context: :inner_document, traverse_documents: true
       assert_equal 1, result.size
       assert_equal inner_doc, result[0]
@@ -633,8 +633,8 @@ context 'API' do
       first_head_cell = table.rows.head[0][0]
       first_body_cell = table.rows.body[0][0]
       result = doc.find_by
-      assert_includes result, first_head_cell
-      assert_includes result, first_body_cell
+      assert_include first_head_cell, result
+      assert_include first_body_cell, result
       result = doc.find_by context: :table_cell, style: :asciidoc
       assert_equal 1, result.size
       assert_kind_of Asciidoctor::Table::Cell, result[0]
@@ -979,7 +979,7 @@ context 'API' do
       doc = Asciidoctor.load input, safe: :safe, syntax_highlighter_factory: syntax_hl_factory, attributes: { 'source-highlighter' => 'github' }
       refute_nil doc.syntax_highlighter
       assert_kind_of Asciidoctor::SyntaxHighlighter::HtmlPipelineAdapter, doc.syntax_highlighter
-      assert_includes doc.convert, '<pre lang="ruby"><code>'
+      assert_include '<pre lang="ruby"><code>', doc.convert
     end
 
     test 'can substitute an extended syntax highlighter factory implementation using the :syntax_highlighters option' do
@@ -999,8 +999,8 @@ context 'API' do
       doc = Asciidoctor.load input, safe: :safe, syntax_highlighter_factory: syntax_hl_factory_class.new, attributes: { 'source-highlighter' => 'coderay' }
       refute_nil doc.syntax_highlighter
       output = doc.convert
-      refute_includes output, 'CodeRay'
-      assert_includes output, 'hljs'
+      refute_include 'CodeRay', output
+      assert_include 'hljs', output
     end
   end
 
@@ -1260,7 +1260,7 @@ context 'API' do
         assert File.exist?(sample_output_path)
         output = File.read(sample_output_path)
         refute_empty output
-        assert_includes output, '<p>.htm</p>'
+        assert_include '<p>.htm</p>', output
       ensure
         FileUtils.rm(sample_output_path)
       end
