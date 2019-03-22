@@ -790,12 +790,17 @@ class Parser
     unless block
       case block_context
       when :listing, :source
-        if block_context == :source || (!attributes[1] && (attributes[2] || doc_attrs['source-language']))
-          attributes['style'] = 'source'
-          AttributeList.rekey attributes, [nil, 'language', 'linenums']
-          if doc_attrs.key? 'source-language'
-            attributes['language'] = doc_attrs['source-language']
-          end unless attributes.key? 'language'
+        if block_context == :source || (!attributes[1] && (language = attributes[2] || doc_attrs['source-language']))
+          if language
+            attributes['style'] = 'source'
+            attributes['language'] = language
+            AttributeList.rekey attributes, [nil, nil, 'linenums']
+          else
+            AttributeList.rekey attributes, [nil, 'language', 'linenums']
+            if doc_attrs.key? 'source-language'
+              attributes['language'] = doc_attrs['source-language']
+            end unless attributes.key? 'language'
+          end
           if attributes['linenums-option'] || doc_attrs['source-linenums-option']
             attributes['linenums'] = ''
           end unless attributes.key? 'linenums'
