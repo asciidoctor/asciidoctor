@@ -876,6 +876,32 @@ context 'Document' do
       assert_xpath '/article/info/authorinitials[text()="DW"]', output, 1
     end
 
+    test 'should substitute replacements in author names in HTML output' do
+      input = <<~'EOS'
+      = Document Title
+      Stephen O'Grady <founder@redmonk.com>
+
+      content
+      EOS
+
+      output = convert_string input
+      assert_xpath %(//meta[@name="author"][@content="Stephen O#{decode_char 8217}Grady"]), output, 1
+      assert_xpath %(//span[@id="author"][text()="Stephen O#{decode_char 8217}Grady"]), output, 1
+    end
+
+    test 'should substitute replacements in author names in DocBook output' do
+      input = <<~'EOS'
+      = Document Title
+      Stephen O'Grady <founder@redmonk.com>
+
+      content
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '//author', output, 1
+      assert_xpath %(//author/personname/surname[text()="O#{decode_char 8217}Grady"]), output, 1
+    end
+
     test 'should sanitize content of HTML meta authors tag' do
       input = <<~'EOS'
       = Document Title

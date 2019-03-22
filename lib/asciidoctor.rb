@@ -396,6 +396,14 @@ module Asciidoctor
     #
     AuthorInfoLineRx = /^(#{CG_WORD}[#{CC_WORD}\-'.]*)(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +(#{CG_WORD}[#{CC_WORD}\-'.]*))?(?: +<([^>]+)>)?$/
 
+    # Matches the delimiter that separates multiple authors.
+    #
+    # Examples
+    #
+    #   Doc Writer; Junior Writer
+    #
+    AuthorDelimiterRx = /;(?: |$)/
+
     # Matches the revision info line, which appears immediately following
     # the author info line beneath the document title.
     #
