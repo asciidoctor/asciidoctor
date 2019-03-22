@@ -143,7 +143,9 @@ module Extensions
       else
         sect.numbered = true if opts.fetch :numbered, (book && (doc.attr? 'partnums'))
       end
-      unless (id = attrs.delete 'id') == false
+      if (id = attrs['id']) == false
+        attrs.delete 'id'
+      else
         sect.id = attrs['id'] = id || ((doc.attr? 'sectids') ? (Section.generate_id sect.title, doc) : nil)
       end
       sect.update_attributes attrs

@@ -588,7 +588,7 @@ module Substitutors
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if !doc.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
-            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
+            link_opts[:id] = attrs['id']
           end
 
           if text.end_with? '^'
@@ -634,7 +634,7 @@ module Substitutors
           if mailto
             if !doc.compat_mode && (text.include? ',')
               text = (attrs = (AttributeList.new text, self).parse)[1] || ''
-              link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
+              link_opts[:id] = attrs['id']
               if attrs.key? 2
                 if attrs.key? 3
                   target = %(#{target}?subject=#{Helpers.encode_uri_component attrs[2]}&amp;body=#{Helpers.encode_uri_component attrs[3]})
@@ -645,7 +645,7 @@ module Substitutors
             end
           elsif !doc.compat_mode && (text.include? '=')
             text = (attrs = (AttributeList.new text, self).parse)[1] || ''
-            link_opts[:id] = attrs.delete 'id' if attrs.key? 'id'
+            link_opts[:id] = attrs['id']
           end
 
           if text.end_with? '^'
@@ -1128,7 +1128,7 @@ module Substitutors
         subbed_text = apply_subs(pass[:text], pass[:subs])
         if (type = pass[:type])
           if (attributes = pass[:attributes])
-            id = attributes.delete 'id'
+            id = attributes['id']
           end
           subbed_text = Inline.new(self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
         end
@@ -1406,14 +1406,14 @@ module Substitutors
         %(#{unescaped_attrs}#{Inline.new(self, :quoted, match[3], type: type).convert})
       else
         if (attrlist = match[2])
-          id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
+          id = (attributes = parse_quoted_text_attributes attrlist)['id']
           type = :unquoted if type == :mark
         end
         %(#{match[1]}#{Inline.new(self, :quoted, match[3], type: type, id: id, attributes: attributes).convert})
       end
     else
       if (attrlist = match[1])
-        id = (attributes = parse_quoted_text_attributes attrlist).delete 'id'
+        id = (attributes = parse_quoted_text_attributes attrlist)['id']
         type = :unquoted if type == :mark
       end
       Inline.new(self, :quoted, match[2], type: type, id: id, attributes: attributes).convert
