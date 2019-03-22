@@ -174,12 +174,11 @@ class AbstractNode
   # If an attribute already exists with the same key, it's value will
   # be overwritten.
   #
-  # attributes - A Hash of attributes to assign to this node.
+  # new_attributes - A Hash of additional attributes to assign to this node.
   #
-  # Returns nothing
-  def update_attributes(attributes)
-    @attributes.update(attributes)
-    nil
+  # Returns the updated attributes [Hash] on this node.
+  def update_attributes new_attributes
+    @attributes.update new_attributes
   end
 
   # Public: Retrieves the space-separated String role for this node.
