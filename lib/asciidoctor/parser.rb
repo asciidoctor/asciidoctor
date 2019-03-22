@@ -1122,8 +1122,7 @@ class Parser
   # doc      - The document to which the node belongs; computed from node if not specified
   #
   # Returns nothing
-  def self.catalog_inline_anchor id, reftext, node, location, doc = nil
-    doc = node.document unless doc
+  def self.catalog_inline_anchor id, reftext, node, location, doc = node.document
     reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
     unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id)]
       location = location.cursor if Reader === location
