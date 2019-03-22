@@ -83,14 +83,14 @@ class AttributeList
   end
 
   def self.rekey attributes, positional_attrs
-    positional_attrs.each_with_index do |key, index|
-      next unless key
-      if (val = attributes[index + 1])
+    index = 0
+    positional_attrs.each do |key|
+      index += 1
+      if (val = attributes[index])
         # QUESTION should we delete the positional key?
         attributes[key] = val
-      end
+      end if key
     end
-
     attributes
   end
 
