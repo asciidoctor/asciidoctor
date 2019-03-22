@@ -188,6 +188,12 @@ admonition - a notice for the reader, ranging in severity from a tip to an alert
 example - a demonstration of the concept being documented
 ====
 
+.Toggle Me
+[%collapsible]
+====
+collapsible - these details are revealed by clicking the title
+====
+
 ****
 sidebar - auxiliary content that can be read independently of the main content
 ****
