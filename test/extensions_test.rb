@@ -1474,6 +1474,38 @@ context 'Extensions' do
       end
     end
 
+    test 'can use parse_attributes to parse attrlist' do
+      begin
+        parsed_attrs = nil
+        Asciidoctor::Extensions.register do
+          block do
+            named :attrs
+            on_context :open
+            process do |parent, reader, attrs|
+              parsed_attrs = parse_attributes parent, reader.read_line, positional_attributes: ['a', 'b']
+              parsed_attrs.update parse_attributes parent, 'foo={foo}', sub_attributes: true
+              nil
+            end
+          end
+        end
+        input = <<~'EOS'
+        :foo: bar
+
+        [attrs]
+        --
+        a,b,c,key=val
+        --
+        EOS
+        doc = document_from_string input
+        assert_equal 'a', parsed_attrs['a']
+        assert_equal 'b', parsed_attrs['b']
+        assert_equal 'val', parsed_attrs['key']
+        assert_equal 'bar', parsed_attrs['foo']
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'create_section should set up all section properties' do
       begin
         sect = nil
