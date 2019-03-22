@@ -1063,9 +1063,13 @@ class Parser
   # parent - The parent Block to which to attach the parsed blocks
   #
   # Returns nothing.
-  def self.parse_blocks(reader, parent)
-    while ((block = next_block reader, parent) && parent.blocks << block) || reader.has_more_lines?
+  def self.parse_blocks(reader, parent, attributes = nil)
+    if attributes
+      while ((block = next_block reader, parent, attributes.merge) && parent.blocks << block) || reader.has_more_lines?; end
+    else
+      while ((block = next_block reader, parent) && parent.blocks << block) || reader.has_more_lines?; end
     end
+    nil
   end
 
   # Internal: Parse and construct an ordered or unordered list at the current position of the Reader

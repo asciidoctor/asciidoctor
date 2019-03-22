@@ -211,9 +211,7 @@ module Extensions
     # QUESTION is parse_content the right method name? should we wrap in open block automatically?
     def parse_content parent, content, attributes = nil
       reader = Reader === content ? content : (Reader.new content)
-      while ((block = Parser.next_block reader, parent, (attributes ? attributes.merge : {})) && parent << block) ||
-          reader.has_more_lines?
-      end
+      Parser.parse_blocks reader, parent, attributes
       parent
     end
 
