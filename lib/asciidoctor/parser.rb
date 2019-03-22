@@ -788,27 +788,9 @@ class Parser
 
     # either delimited block or styled paragraph
     unless block
-      # abstract and partintro should be handled by open block
-      # FIXME kind of hackish...need to sort out how to generalize this
-      block_context = :open if block_context == :abstract || block_context == :partintro
-
       case block_context
-      when :admonition
-        attributes['name'] = admonition_name = style.downcase
-        attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
-        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
-
-      when :comment
-        build_block(block_context, :skip, terminator, parent, reader, attributes)
-        attributes.clear
-        return
-
-      when :example
-        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
-
       when :listing, :literal
         block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
-
       when :source
         AttributeList.rekey attributes, [nil, 'language', 'linenums']
         if doc_attrs.key? 'source-language'
@@ -821,7 +803,6 @@ class Parser
           attributes['indent'] = doc_attrs['source-indent']
         end unless attributes.key? 'indent'
         block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
-
       when :fenced_code
         attributes['style'] = 'source'
         if (ll = this_line.length) > 3
@@ -849,17 +830,6 @@ class Parser
         end unless attributes.key? 'indent'
         terminator = terminator.slice 0, 3
         block = build_block(:listing, :verbatim, terminator, parent, reader, attributes)
-
-      when :pass
-        block = build_block(block_context, :raw, terminator, parent, reader, attributes)
-
-      when :stem, :latexmath, :asciimath
-        attributes['style'] = STEM_TYPE_ALIASES[attributes[2] || doc_attrs['stem']] if block_context == :stem
-        block = build_block(:stem, :raw, terminator, parent, reader, attributes)
-
-      when :open, :sidebar
-        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
-
       when :table
         block_cursor = reader.cursor
         block_reader = Reader.new reader.read_lines_until(terminator: terminator, skip_line_comments: true, context: :table, cursor: :at_mark), block_cursor
@@ -869,13 +839,30 @@ class Parser
           attributes['format'] ||= (terminator.start_with? ',') ? 'csv' : 'dsv'
         end
         block = parse_table(block_reader, parent, attributes)
-
+      when :admonition
+        attributes['name'] = admonition_name = style.downcase
+        attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+      when :open, :abstract, :partintro
+        block = build_block(:open, :compound, terminator, parent, reader, attributes)
+      when :sidebar
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
+      when :example
+        block = build_block(block_context, :compound, terminator, parent, reader, attributes)
       when :quote, :verse
         AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
         block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
-
+      when :stem, :latexmath, :asciimath
+        attributes['style'] = STEM_TYPE_ALIASES[attributes[2] || doc_attrs['stem']] if block_context == :stem
+        block = build_block(:stem, :raw, terminator, parent, reader, attributes)
+      when :pass
+        block = build_block(block_context, :raw, terminator, parent, reader, attributes)
+      when :comment
+        build_block(block_context, :skip, terminator, parent, reader, attributes)
+        attributes.clear
+        return
       else
-        if block_extensions && (extension = extensions.registered_for_block?(block_context, cloaked_context))
+        if block_extensions && (extension = extensions.registered_for_block? block_context, cloaked_context)
           unless (content_model = extension.config[:content_model]) == :skip
             unless (pos_attrs = extension.config[:pos_attrs] || []).empty?
               AttributeList.rekey(attributes, [nil] + pos_attrs)
@@ -886,8 +873,7 @@ class Parser
             # QUESTION should we clone the extension for each cloaked context and set in config?
             attributes['cloaked-context'] = cloaked_context
           end
-          block = build_block block_context, content_model, terminator, parent, reader, attributes, extension: extension
-          unless block
+          unless (block = build_block block_context, content_model, terminator, parent, reader, attributes, extension: extension)
             attributes.clear
             return
           end
@@ -911,7 +897,7 @@ class Parser
       end
     end
     # FIXME remove the need for this update!
-    block.attributes.update(attributes) unless attributes.empty?
+    block.update_attributes attributes unless attributes.empty?
     block.commit_subs
 
     #if doc_attrs.key? :pending_attribute_entries
