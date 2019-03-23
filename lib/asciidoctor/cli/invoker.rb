@@ -65,7 +65,7 @@ module Asciidoctor
           when :timings
             show_timings = val
           when :trace
-            # no assignment
+            ::Thread.current.thread_variable_set :TRACE, true if val
           when :verbose
             case val
             when 0
@@ -141,10 +141,11 @@ module Asciidoctor
           @code = (e.respond_to? :status) ? e.status : 1
           raise e if @options[:trace]
           err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
-          err.puts '  Use --trace for backtrace'
+          err.puts '  Use --trace to see the backtrace'
         end
         nil
       ensure
+        ::Thread.current.thread_variable_set :TRACE, nil
         $VERBOSE = old_verbose
         if old_logger
           LoggerManager.logger = old_logger

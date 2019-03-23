@@ -119,4 +119,19 @@ context 'Helpers' do
       assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
     end
   end
+
+  context 'Require Library' do
+    test 'should include backtrace in error message if TRACE thread-local variable is set' do
+      begin
+        Thread.current.thread_variable_set :TRACE, true
+        ex = assert_raises LoadError do
+          Asciidoctor::Helpers.require_library 'does-not-exist'
+        end
+        assert_includes ex.message, %(Backtrace:\n  )
+        assert_includes ex.message, 'helpers.rb:'
+      ensure
+        Thread.current.thread_variable_set :TRACE, nil
+      end
+    end
+  end
 end

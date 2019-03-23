@@ -33,20 +33,25 @@ module Helpers
       case on_failure
       when :abort
         details = $!.path == gem_name ? '' : %[ (reason: #{$!.path ? %(cannot load '#{$!.path}') : $!.message})]
-        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not available#{details}. Processing aborted.)
+        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not available#{details}. Processing aborted.#{append_backtrace $@})
       when :warn
         details = $!.path == gem_name ? '' : %[ (reason: #{$!.path ? %(cannot load '#{$!.path}') : $!.message})]
-        logger.warn %(optional gem '#{gem_name}' is not available#{details}. Functionality disabled.)
+        logger.warn %(optional gem '#{gem_name}' is not available#{details}. Functionality disabled.#{append_backtrace $@})
       end
     else
       case on_failure
       when :abort
-        raise ::LoadError, %(asciidoctor: FAILED: #{$!.message.chomp '.'}. Processing aborted.)
+        raise ::LoadError, %(asciidoctor: FAILED: #{$!.message.chomp '.'}. Processing aborted.#{append_backtrace $@})
       when :warn
-        logger.warn %(#{$!.message.chomp '.'}. Functionality disabled.)
+        logger.warn %(#{$!.message.chomp '.'}. Functionality disabled.#{append_backtrace $@})
       end
     end
     nil
+  end
+
+  # Internal: Prepare backtrace of specified error for appending to error message if :trace thread-local variable is set
+  def append_backtrace backtrace
+    (defined? ::Thread) && (::Thread.current.thread_variable_get :TRACE) ? LF + 'Backtrace:' + LF + (backtrace.map {|l| %(  #{l}) }.join LF) : ''
   end
 
   # Internal: Prepare the source data Array for parsing.
