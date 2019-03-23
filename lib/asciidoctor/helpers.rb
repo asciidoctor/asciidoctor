@@ -29,16 +29,16 @@ module Helpers
       gem_name = name if gem_name == true
       case on_failure
       when :abort
-        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not installed. Processing aborted.)
+        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not installed. Processing aborted.#{$TRACE ? LF + (e.backtrace.join LF) : ''})
       when :warn
-        logger.warn %(optional gem '#{gem_name}' is not installed. Functionality disabled.)
+        logger.warn %(optional gem '#{gem_name}' is not installed. Functionality disabled.#{$TRACE ? LF + (e.backtrace.join LF) : ''})
       end
     else
       case on_failure
       when :abort
-        raise ::LoadError, %(asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted.)
+        raise ::LoadError, %(asciidoctor: FAILED: cannot load such file -- #{e.path}. Processing aborted.#{$TRACE ? LF + (e.backtrace.join LF) : ''})
       when :warn
-        logger.warn %(#{e.message.chomp '.'}. Functionality disabled.)
+        logger.warn %(cannot load such file -- #{e.path}. Functionality disabled.#{$TRACE ? LF + (e.backtrace.join LF) : ''})
       end
     end
     nil

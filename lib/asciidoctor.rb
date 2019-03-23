@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 require 'set'
 
+$TRACE = nil unless defined? $TRACE
+
 # NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor
 if RUBY_ENGINE == 'opal'
   # this require is satisfied by the Asciidoctor.js build; it augments the Ruby environment for Asciidoctor.js
