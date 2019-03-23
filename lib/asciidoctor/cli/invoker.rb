@@ -33,6 +33,7 @@ module Asciidoctor
       def invoke!
         return unless @options
 
+        old_trace = $TRACE
         old_logger = old_logger_level = nil
         old_verbose, $VERBOSE = $VERBOSE, @options[:warnings]
         opts = {}
@@ -62,7 +63,7 @@ module Asciidoctor
           when :timings
             show_timings = val
           when :trace
-            # no assignment
+            $TRACE = true if val
           when :verbose
             case val
             when 0
@@ -144,6 +145,7 @@ module Asciidoctor
         end
         nil
       ensure
+        $TRACE = old_trace
         $VERBOSE = old_verbose
         if old_logger
           LoggerManager.logger = old_logger
