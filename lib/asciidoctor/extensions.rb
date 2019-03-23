@@ -1527,6 +1527,31 @@ module Extensions
       names.each {|group| @groups.delete group.to_sym }
       nil
     end
+
+    protected
+
+    alias __create create
+    alias __register register
+    alias __unregister unregister
+    alias __unregister_all unregister_all
+  end
+
+  module_function
+
+  def create name = nil, &block
+    Extensions.__create name, &block
+  end
+
+  def register *args, &block
+    Extensions.__register *args, &block
+  end
+
+  def unregister *names
+    Extensions.__unregister *names
+  end
+
+  def unregister_all
+    Extensions.__unregister_all
   end
 end
 end
