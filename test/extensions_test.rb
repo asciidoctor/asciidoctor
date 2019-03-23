@@ -1167,6 +1167,38 @@ context 'Extensions' do
       end
     end
 
+    test 'should parse text in square brackets as attrlist by default' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro do
+            named :json
+            match_format :short
+            process do |parent, _, attrs|
+              create_inline_pass parent, %({ #{attrs.map {|k, v| %["#{k}": "#{v}"] }.join ', '} })
+            end
+          end
+
+          inline_macro do
+            named :data
+            process do |parent, target, attrs|
+              if target == 'json'
+                create_inline_pass parent, %({ #{attrs.map {|k, v| %["#{k}": "#{v}"] }.join ', '} })
+              else
+                nil
+              end
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'json:[a=A,b=B,c=C]', doctype: :inline
+        assert_equal '{ "a": "A", "b": "B", "c": "C" }', output
+        output = convert_string_to_embedded 'data:json[a=A,b=B,c=C]', doctype: :inline
+        assert_equal '{ "a": "A", "b": "B", "c": "C" }', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should assign captures correctly for inline macros' do
       begin
         Asciidoctor::Extensions.register do
