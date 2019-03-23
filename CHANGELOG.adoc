@@ -15,6 +15,10 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Bug Fixes::
+
+  * customize MathJax (using a postfilter hook) to apply displaymath formatting to AsciiMath block (#2498)
+
 Build / Infrastructure::
 
   * bundle .yardopts in RubyGem (#3193)
