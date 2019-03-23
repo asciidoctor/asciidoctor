@@ -23,22 +23,24 @@ module Helpers
   # Otherwise, nil is returned.
   def self.require_library name, gem_name = true, on_failure = :abort
     require name
-  rescue ::LoadError => e
+  rescue ::LoadError
     include Logging unless include? Logging
     if gem_name
       gem_name = name if gem_name == true
       case on_failure
       when :abort
-        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not installed. Processing aborted.)
+        details = $!.path == gem_name ? '' : %[ (reason: #{$!.path ? %(cannot load '#{$!.path}') : $!.message})]
+        raise ::LoadError, %(asciidoctor: FAILED: required gem '#{gem_name}' is not available#{details}. Processing aborted.)
       when :warn
-        logger.warn %(optional gem '#{gem_name}' is not installed. Functionality disabled.)
+        details = $!.path == gem_name ? '' : %[ (reason: #{$!.path ? %(cannot load '#{$!.path}') : $!.message})]
+        logger.warn %(optional gem '#{gem_name}' is not available#{details}. Functionality disabled.)
       end
     else
       case on_failure
       when :abort
-        raise ::LoadError, %(asciidoctor: FAILED: #{e.message.chomp '.'}. Processing aborted.)
+        raise ::LoadError, %(asciidoctor: FAILED: #{$!.message.chomp '.'}. Processing aborted.)
       when :warn
-        logger.warn %(#{e.message.chomp '.'}. Functionality disabled.)
+        logger.warn %(#{$!.message.chomp '.'}. Functionality disabled.)
       end
     end
     nil
