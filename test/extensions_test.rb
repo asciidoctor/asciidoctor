@@ -135,6 +135,13 @@ class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
   end
 end
 
+class LegacyPosAttrsBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
+  option :pos_attrs, ['target', 'format']
+  def process parent, _, attrs
+    create_image_block parent, { 'target' => %(#{attrs['target']}.#{attrs['format']}) }
+  end
+end
+
 class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
   named :degrees
   resolve_attributes '1:units', 'precision=1'
@@ -1074,6 +1081,37 @@ context 'Extensions' do
         assert_raises ArgumentError do
           convert_string_to_embedded input
         end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should honor legacy :pos_attrs option set via static method' do
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro LegacyPosAttrsBlockMacro, :diag
+        end
+
+        result = convert_string_to_embedded 'diag::[filename,png]'
+        assert_css 'img[src="filename.png"]', result, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should honor legacy :pos_attrs option set via DSL' do
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :diag do
+            option :pos_attrs, ['target', 'format']
+            process do |parent, _, attrs|
+              create_image_block parent, { 'target' => %(#{attrs['target']}.#{attrs['format']}) }
+            end
+          end
+        end
+
+        result = convert_string_to_embedded 'diag::[filename,png]'
+        assert_css 'img[src="filename.png"]', result, 1
       ensure
         Asciidoctor::Extensions.unregister_all
       end
