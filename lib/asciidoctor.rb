@@ -1362,32 +1362,26 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert input, options = {}
-    options = options.merge
-    options.delete(:parse)
-    to_file = options.delete(:to_file)
-    to_dir = options.delete(:to_dir)
-    mkdirs = options.delete(:mkdirs) || false
+    (options = options.merge).delete :parse
+    to_dir = options.delete :to_dir
+    mkdirs = options.delete :mkdirs
 
-    case to_file
+    case (to_file = options.delete :to_file)
     when true, nil
-      write_to_same_dir = !to_dir && ::File === input
-      stream_output = false
-      write_to_target = to_dir
+      unless (write_to_target = to_dir)
+        sibling_path = ::File.absolute_path input.path if ::File === input
+      end
       to_file = nil
     when false
-      write_to_same_dir = false
-      stream_output = false
-      write_to_target = false
       to_file = nil
     when '/dev/null'
       return self.load input, options
     else
-      write_to_same_dir = false
-      write_to_target = (stream_output = to_file.respond_to? :write) ? false : (options[:to_file] = to_file)
+      options[:to_file] = write_to_target = to_file unless (stream_output = to_file.respond_to? :write)
     end
 
     unless options.key? :standalone
-      if write_to_same_dir || write_to_target
+      if sibling_path || write_to_target
         options[:standalone] = true
       elsif options.key? :header_footer
         options[:standalone] = options[:header_footer]
@@ -1395,9 +1389,8 @@ module Asciidoctor
     end
 
     # NOTE outfile may be controlled by document attributes, so resolve outfile after loading
-    if write_to_same_dir
-      input_path = ::File.absolute_path input.path
-      options[:to_dir] = (outdir = ::File.dirname input_path)
+    if sibling_path
+      options[:to_dir] = outdir = ::File.dirname sibling_path
     elsif write_to_target
       if to_dir
         if to_file
@@ -1414,11 +1407,9 @@ module Asciidoctor
     # NOTE :to_file option only passed if assigned an explicit path
     doc = self.load input, options
 
-    if write_to_same_dir # write to file in same directory
+    if sibling_path # write to file in same directory
       outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
-      if outfile == input_path
-        raise ::IOError, %(input file and output file cannot be the same: #{outfile})
-      end
+      raise ::IOError, %(input file and output file cannot be the same: #{outfile}) if outfile == sibling_path
     elsif write_to_target # write to explicit file or directory
       working_dir = (options.key? :base_dir) ? (::File.expand_path options[:base_dir]) : ::Dir.pwd
       # QUESTION should the jail be the working_dir or doc.base_dir???
@@ -1446,15 +1437,18 @@ module Asciidoctor
         Helpers.mkdir_p outdir
       else
         # NOTE we intentionally refer to the directory as it was passed to the API
-        raise ::IOError, %(target directory does not exist: #{to_dir} (hint: set mkdirs option)) unless ::File.directory? outdir
+        raise ::IOError, %(target directory does not exist: #{to_dir} (hint: set :mkdirs option)) unless ::File.directory? outdir
       end
     else # write to stream
       outfile = to_file
       outdir = nil
     end
 
-    opts = outfile && !stream_output ? { 'outfile' => outfile, 'outdir' => outdir } : {}
-    output = doc.convert opts
+    if outfile && !stream_output
+      output = doc.convert 'outfile' => outfile, 'outdir' => outdir
+    else
+      output = doc.convert
+    end
 
     if outfile
       doc.write output, outfile
@@ -1476,7 +1470,7 @@ module Asciidoctor
           if mkdirs
             Helpers.mkdir_p stylesoutdir
           else
-            raise ::IOError, %(target stylesheet directory does not exist: #{stylesoutdir} (hint: set mkdirs option)) unless ::File.directory? stylesoutdir
+            raise ::IOError, %(target stylesheet directory does not exist: #{stylesoutdir} (hint: set :mkdirs option)) unless ::File.directory? stylesoutdir
           end
 
           if copy_asciidoctor_stylesheet
