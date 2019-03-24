@@ -309,26 +309,27 @@ module Substitutors
         text = text.gsub extension.instance.regexp do
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
-          extconf = extension.config
           if $~.names.empty?
             target, content = $1, $2
           else
             target, content = ($~[:target] rescue nil), ($~[:content] rescue nil)
           end
-          attributes = (attributes = extconf[:default_attrs]) ? attributes.merge : {}
-          if content.nil_or_empty?
-            attributes['text'] = content if content && extconf[:content_model] != :attributes
-          else
-            content = normalize_text content, true, true
-            # QUESTION should we store the unparsed attrlist in the attrlist key?
-            if extconf[:content_model] == :attributes
-              parse_attributes content, extconf[:positional_attrs] || [], into: attributes
+          attributes = (default_attrs = (ext_config = extension.config)[:default_attrs]) ? default_attrs.merge : {}
+          if content
+            if content.empty?
+              attributes['text'] = content unless ext_config[:content_model] == :attributes
             else
-              attributes['text'] = content
+              content = normalize_text content, true, true
+              # QUESTION should we store the unparsed attrlist in the attrlist key?
+              if ext_config[:content_model] == :attributes
+                parse_attributes content, ext_config[:positional_attrs] || [], into: attributes
+              else
+                attributes['text'] = content
+              end
             end
+            # NOTE for convenience, map content (unparsed attrlist) to target when format is short
+            target ||= ext_config[:format] == :short ? content : target
           end
-          # NOTE for convenience, map content (unparsed attrlist) to target when format is short
-          target ||= extconf[:format] == :short ? content : target
           if (Inline === (replacement = extension.process_method[self, target, attributes]))
             if (inline_subs = replacement.attributes.delete 'subs')
               replacement.text = apply_subs replacement.text, (expand_subs inline_subs)
