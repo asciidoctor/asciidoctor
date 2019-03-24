@@ -584,10 +584,10 @@ module Extensions
     def resolve_attributes *args
       if args.size == 1 && !args[0]
         option :content_model, :text
-        return
+      else
+        super
+        option :content_model, :attributes
       end
-      super
-      option :content_model, :attributes
     end
     # NOTE resolves_attributes alias is deprecated
     alias resolves_attributes resolve_attributes
