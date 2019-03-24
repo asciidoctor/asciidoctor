@@ -252,18 +252,18 @@ class Converter::Html5Converter < Converter::Base
       # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
       result << %(<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
-messageStyle: "none",
-tex2jax: {
-  inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-  displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-  ignoreClass: "nostem|nolatexmath"
-},
-asciimath2jax: {
-  delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-  ignoreClass: "nostem|noasciimath"
-},
-TeX: {#{eqnums_opt}}
-});
+  messageStyle: "none",
+  tex2jax: {
+    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
+    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
+    ignoreClass: "nostem|nolatexmath"
+  },
+  asciimath2jax: {
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
+    ignoreClass: "nostem|noasciimath"
+  },
+  TeX: {#{eqnums_opt}}
+})
 </script>
 <script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
     end
