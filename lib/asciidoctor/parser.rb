@@ -632,12 +632,12 @@ class Parser
                     target = expanded_target
                   end
                 end
-                if extension.config[:content_model] == :attributes
-                  document.parse_attributes content, extension.config[:positional_attrs] || [], sub_input: true, into: attributes if content
+                if (ext_config = extension.config)[:content_model] == :attributes
+                  document.parse_attributes content, ext_config[:positional_attrs] || [], sub_input: true, into: attributes if content
                 else
                   attributes['text'] = content || ''
                 end
-                if (default_attrs = extension.config[:default_attrs])
+                if (default_attrs = ext_config[:default_attrs])
                   attributes.update(default_attrs) {|_, old_v| old_v }
                 end
                 if (block = extension.process_method[parent, target, attributes])
@@ -871,11 +871,11 @@ class Parser
         return
       else
         if block_extensions && (extension = extensions.registered_for_block? block_context, cloaked_context)
-          unless (content_model = extension.config[:content_model]) == :skip
-            unless (positional_attrs = extension.config[:positional_attrs] || []).empty?
+          unless (content_model = (ext_config = extension.config)[:content_model]) == :skip
+            unless (positional_attrs = ext_config[:positional_attrs]).nil_or_empty?
               AttributeList.rekey(attributes, [nil] + positional_attrs)
             end
-            if (default_attrs = extension.config[:default_attrs])
+            if (default_attrs = ext_config[:default_attrs])
               default_attrs.each {|k, v| attributes[k] ||= v }
             end
             # QUESTION should we clone the extension for each cloaked context and set in config?
