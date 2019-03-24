@@ -20,6 +20,7 @@ Bug Fixes::
   * customize MathJax (using a postfilter hook) to apply displaymath formatting to AsciiMath block (#2498)
   * fix misspelling of deprecated default_attrs DSL function (missing trailing "s")
   * remove unused location property (attr_accessor :location) on DocinfoProcessor class
+  * look for deprecated extension option :pos_attrs if :positional_attrs option is missing (#3199)
 
 Build / Infrastructure::
 

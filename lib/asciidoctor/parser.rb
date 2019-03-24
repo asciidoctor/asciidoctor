@@ -633,7 +633,7 @@ class Parser
                   end
                 end
                 if (ext_config = extension.config)[:content_model] == :attributes
-                  document.parse_attributes content, ext_config[:positional_attrs] || [], sub_input: true, into: attributes if content
+                  document.parse_attributes content, ext_config[:positional_attrs] || ext_config[:pos_attrs] || [], sub_input: true, into: attributes if content
                 else
                   attributes['text'] = content || ''
                 end
@@ -872,7 +872,7 @@ class Parser
       else
         if block_extensions && (extension = extensions.registered_for_block? block_context, cloaked_context)
           unless (content_model = (ext_config = extension.config)[:content_model]) == :skip
-            unless (positional_attrs = ext_config[:positional_attrs]).nil_or_empty?
+            unless (positional_attrs = ext_config[:positional_attrs] || ext_config[:pos_attrs]).nil_or_empty?
               AttributeList.rekey(attributes, [nil] + positional_attrs)
             end
             if (default_attrs = ext_config[:default_attrs])
