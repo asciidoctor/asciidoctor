@@ -484,8 +484,6 @@ module Extensions
   # If a location is not specified, the DocinfoProcessor is assumed
   # to add content to the header.
   class DocinfoProcessor < Processor
-    attr_accessor :location
-
     def initialize config = {}
       super config
       @config[:location] ||= :head
