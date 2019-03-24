@@ -1374,8 +1374,8 @@ context 'Tables' do
       output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays Peak"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
-      assert_xpath '(//table/tbody/tr)[1]//td//a[@id="mount-evans"]', output, 1
-      assert_xpath '(//table/tbody/tr)[2]//th//a[@id="grays-peak"]', output, 1
+      assert_xpath '(//table/tbody/tr)[1]//td//span[@id="mount-evans"]', output, 1
+      assert_xpath '(//table/tbody/tr)[2]//th//span[@id="grays-peak"]', output, 1
     end
 
     test 'footnotes should not be shared between an AsciiDoc table cell and the main document' do

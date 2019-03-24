@@ -191,7 +191,7 @@ context 'Sections' do
     test 'should not process inline anchor in section title if section has explicit ID' do
       sec = block_from_string(%([#sect-one]\n== Section One [[one]]))
       assert_equal 'sect-one', sec.id
-      assert_equal 'Section One <a id="one"></a>', sec.title
+      assert_equal 'Section One <span id="one"></span>', sec.title
     end
 
     test 'title substitutions are applied before generating id' do
@@ -1198,7 +1198,7 @@ context 'Sections' do
 
       block = block_from_string input
       assert_equal block.id, 'install'
-      assert_equal 'Install <a id="installation"></a>', block.title
+      assert_equal 'Install <span id="installation"></span>', block.title
     end
   end
 

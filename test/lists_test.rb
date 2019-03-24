@@ -2412,8 +2412,8 @@ context "Description lists (:dlist)" do
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '//dl', output, 1
       assert_xpath '//dl/dt', output, 2
-      assert_xpath '(//dl/dt)[1]/a[@id="mount-evans"]', output, 1
-      assert_xpath '(//dl/dt)[2]/a[@id="grays-peak"]', output, 1
+      assert_xpath '(//dl/dt)[1]/span[@id="mount-evans"]', output, 1
+      assert_xpath '(//dl/dt)[2]/span[@id="grays-peak"]', output, 1
     end
 
     test "missing space before term does not produce description list" do
@@ -3247,9 +3247,9 @@ context "Description lists (:dlist)" do
       assert_css '.ulist.bibliography ul', output, 1
       assert_css '.ulist.bibliography ul li', output, 2
       assert_css '.ulist.bibliography ul li p', output, 2
-      assert_css '.ulist.bibliography ul li:nth-child(1) p a#taoup', output, 1
+      assert_css '.ulist.bibliography ul li:nth-child(1) p span#taoup', output, 1
       assert_xpath '//a/*', output, 0
-      text = xmlnodes_at_xpath '(//a)[1]/following-sibling::text()', output, 1
+      text = xmlnodes_at_xpath '(//span[@id])[1]/following-sibling::text()', output, 1
       assert text.text.start_with?('[taoup] ')
     end
 
@@ -3284,8 +3284,8 @@ context "Description lists (:dlist)" do
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
         assert_css '.ulist.bibliography', output, 1
-        assert_css '.ulist.bibliography ul li:nth-child(1) p a#Fowler', output, 1
-        assert_css '.ulist.bibliography ul li:nth-child(2) p a#Fowler', output, 1
+        assert_css '.ulist.bibliography ul li:nth-child(1) p span#Fowler', output, 1
+        assert_css '.ulist.bibliography ul li:nth-child(2) p span#Fowler', output, 1
         assert_message logger, :WARN, '<stdin>: line 4: id assigned to bibliography anchor already in use: Fowler', Hash
       end
     end
@@ -3321,7 +3321,7 @@ context "Description lists (:dlist)" do
 
       output = convert_string_to_embedded input
       assert_includes output, '[[[1984]]]'
-      assert_xpath '//a[@id="1984"]', output, 0
+      assert_xpath '//span[@id="1984"]', output, 0
     end
 
     test 'should recognize bibliography anchor that contains a digit but does not start with one' do
@@ -3333,7 +3333,7 @@ context "Description lists (:dlist)" do
       output = convert_string_to_embedded input
       refute_includes output, '[[[_1984]]]'
       assert_includes output, '[_1984]'
-      assert_xpath '//a[@id="_1984"]', output, 1
+      assert_xpath '//span[@id="_1984"]', output, 1
     end
 
     test 'should catalog bibliography anchors in bibliography list' do
@@ -3376,13 +3376,13 @@ context "Description lists (:dlist)" do
       result = doc.convert standalone: false
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
-      assert_xpath '//a[@id="Fowler_1997"]', result, 1
-      fowler_1997_text = (xmlnodes_at_xpath '(//a[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
+      assert_xpath '//span[@id="Fowler_1997"]', result, 1
+      fowler_1997_text = (xmlnodes_at_xpath '(//span[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
       assert fowler_1997_text.start_with?('[1] ')
       assert_xpath '//a[@href="#TMMM"]', result, 1
       assert_xpath '//a[@href="#TMMM"][text()="[TMMM]"]', result, 1
-      assert_xpath '//a[@id="TMMM"]', result, 1
-      tmmm_text = (xmlnodes_at_xpath '(//a[@id="TMMM"])[1]/following-sibling::text()', result, 1).text
+      assert_xpath '//span[@id="TMMM"]', result, 1
+      tmmm_text = (xmlnodes_at_xpath '(//span[@id="TMMM"])[1]/following-sibling::text()', result, 1).text
       assert tmmm_text.start_with?('[TMMM] ')
     end
 

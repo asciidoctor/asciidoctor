@@ -284,8 +284,8 @@ context 'Links' do
       output = doc.convert
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_nil doc.catalog[:refs]['tigers'].text
-      assert_xpath '//a[@id="tigers"]', output, 1
-      assert_xpath '//a[@id="tigers"]/child::text()', output, 0
+      assert_xpath '//span[@id="tigers"]', output, 1
+      assert_xpath '//span[@id="tigers"]/child::text()', output, 0
     end
   end
 
@@ -295,21 +295,21 @@ context 'Links' do
       doc = document_from_string %(Here you can read about tigers.\\#{anchor})
       output = doc.convert
       refute doc.catalog[:refs].key?('tigers')
-      assert_xpath '//a[@id="tigers"]', output, 0
+      assert_xpath '//span[@id="tigers"]', output, 0
     end
   end
 
   test 'inline ref can start with colon' do
     input = '[[:idname]] text'
     output = convert_string_to_embedded input
-    assert_xpath '//a[@id=":idname"]', output, 1
+    assert_xpath '//span[@id=":idname"]', output, 1
   end
 
   test 'inline ref cannot start with digit' do
     input = '[[1-install]] text'
     output = convert_string_to_embedded input
     assert_includes output, '[[1-install]]'
-    assert_xpath '//a[@id = "1-install"]', output, 0
+    assert_xpath '//span[@id = "1-install"]', output, 0
   end
 
   test 'inline ref with reftext' do
@@ -318,8 +318,8 @@ context 'Links' do
       output = doc.convert
       assert_kind_of Asciidoctor::Inline, doc.catalog[:refs]['tigers']
       assert_equal 'Tigers', doc.catalog[:refs]['tigers'].text
-      assert_xpath '//a[@id="tigers"]', output, 1
-      assert_xpath '//a[@id="tigers"]/child::text()', output, 0
+      assert_xpath '//span[@id="tigers"]', output, 1
+      assert_xpath '//span[@id="tigers"]/child::text()', output, 0
     end
   end
 
@@ -356,13 +356,13 @@ context 'Links' do
   test 'repeating inline anchor macro with empty reftext' do
     input = 'anchor:one[] anchor:two[] anchor:three[]'
     result = convert_inline_string input
-    assert_equal '<a id="one"></a> <a id="two"></a> <a id="three"></a>', result
+    assert_equal '<span id="one"></span> <span id="two"></span> <span id="three"></span>', result
   end
 
   test 'mixed inline anchor macro and anchor shorthand with empty reftext' do
     input = 'anchor:one[][[two]]anchor:three[][[four]]anchor:five[]'
     result = convert_inline_string input
-    assert_equal '<a id="one"></a><a id="two"></a><a id="three"></a><a id="four"></a><a id="five"></a>', result
+    assert_equal '<span id="one"></span><span id="two"></span><span id="three"></span><span id="four"></span><span id="five"></span>', result
   end
 
   test 'assigns xreflabel value for anchor macro without reftext in DocBook output' do

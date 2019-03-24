@@ -21,7 +21,7 @@ class Converter::Html5Converter < Converter::Base
     #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
-  DropAnchorRx = /<(?:a[^>+]+|\/a)>/
+  DropAnchorRx = /<(?:a[^>+]+|\/a|span id="[^"]+"><\/span)>/
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   SvgPreambleRx = /\A.*?(?=<svg\b)/m
   SvgStartTagRx = /\A<svg[^>]*>/
@@ -348,7 +348,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       else
         stitle = section.title
       end
-      stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
+      stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<'
       if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
         result << %(<li><a href="##{section.id}">#{stitle}</a>)
         result << child_toc_level
@@ -1107,14 +1107,14 @@ Your browser does not support the video tag.
       end
       %(<a href="#{node.target}"#{attrs}>#{text}</a>)
     when :ref
-      %(<a id="#{node.id}"></a>)
+      %(<span id="#{node.id}"></span>)
     when :link
       attrs = node.id ? [%( id="#{node.id}")] : []
       attrs << %( class="#{node.role}") if node.role
       attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
       %(<a href="#{node.target}"#{(append_link_constraint_attrs node, attrs).join}>#{node.text}</a>)
     when :bibref
-      %(<a id="#{node.id}"></a>[#{node.reftext || node.id}])
+      %(<span id="#{node.id}"></span>[#{node.reftext || node.id}])
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil
