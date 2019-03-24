@@ -18,6 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * customize MathJax (using a postfilter hook) to apply displaymath formatting to AsciiMath block (#2498)
+  * fix misspelling of deprecated default_attrs DSL function (missing trailing "s")
 
 Build / Infrastructure::
 

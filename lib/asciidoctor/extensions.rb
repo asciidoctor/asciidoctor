@@ -319,7 +319,7 @@ module Extensions
       option :default_attrs, value
     end
     # NOTE default_attrs alias is deprecated
-    alias default_attr default_attributes
+    alias default_attrs default_attributes
 
     def resolve_attributes *args
       # NOTE assume true as default value; rewrap single-argument string or symbol
