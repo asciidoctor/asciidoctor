@@ -1379,6 +1379,27 @@ context 'Extensions' do
       end
     end
 
+    test 'should prefer attributes parsed from inline macro over default attributes' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :attrs do
+            match_format :short
+            default_attributes 1 => 'a', 2 => 'b', 'foo' => 'baz'
+            positional_attributes 'a', 'b'
+            process do |parent, _, attrs|
+              create_inline_pass parent, %(a=#{attrs['a']},2=#{attrs[2]},b=#{attrs['b'] || 'nil'},foo=#{attrs['foo']})
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'attrs:[A,foo=bar]', doctype: :inline
+        # note that default attributes aren't considered when mapping positional attributes
+        assert_equal 'a=A,2=b,b=nil,foo=bar', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
