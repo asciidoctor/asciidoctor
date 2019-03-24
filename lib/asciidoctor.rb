@@ -1271,9 +1271,8 @@ module Asciidoctor
 
     if ::File === input
       options[:input_mtime] = input.mtime
-      # TODO cli checks if input path can be read and is file, but might want to add check to API too
-      input_path = ::File.absolute_path input.path
       # NOTE defer setting infile and indir until we get a better sense of their purpose
+      # TODO cli checks if input path can be read and is file, but might want to add check to API too
       attrs['docfile'] = input_path = ::File.absolute_path input.path
       attrs['docdir'] = ::File.dirname input_path
       attrs['docname'] = Helpers.basename input_path, (attrs['docfilesuffix'] = ::File.extname input_path)
