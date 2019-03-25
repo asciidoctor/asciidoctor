@@ -293,6 +293,8 @@ module Asciidoctor
   DELIMITED_BLOCK_HEADS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k.slice 0, 2] = true } }
   DELIMITED_BLOCK_TAILS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k] = k[k.length - 1] if k.length == 4 } }
 
+  CAPTIONABLE_BLOCKS = { example: true, listing: true, table: true }
+
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
     '<'  => :page_break
