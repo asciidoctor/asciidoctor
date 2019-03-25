@@ -9,7 +9,7 @@ module Helpers
   # passes a message to Kernel#raise if on_failure is :abort or Kernel#warn if
   # on_failure is :warn to communicate to the user that processing is being
   # aborted or functionality is disabled, respectively. If a gem_name is
-  # specified, the message communicates that a required gem is not installed.
+  # specified, the message communicates that a required gem is not available.
   #
   # name       - the String name of the library to require.
   # gem_name   - a Boolean that indicates whether this library is provided by a RubyGem,

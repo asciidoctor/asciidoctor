@@ -71,7 +71,7 @@ class Converter::TemplateConverter < Converter::Base
     end
     case opts[:template_cache]
     when true
-      logger.warn 'gem \'concurrent-ruby\' is not installed. This gem is recommended when using the built-in template cache.' unless defined? ::Concurrent::Hash
+      logger.warn 'optional gem \'concurrent-ruby\' is not available. This gem is recommended when using the default template cache.' unless defined? ::Concurrent::Hash
       @caches = self.class.caches
     when ::Hash
       @caches = opts[:template_cache]
