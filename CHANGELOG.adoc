@@ -21,6 +21,7 @@ Bug Fixes::
   * fix misspelling of deprecated default_attrs DSL function (missing trailing "s")
   * remove unused location property (attr_accessor :location) on DocinfoProcessor class
   * look for deprecated extension option :pos_attrs if :positional_attrs option is missing (#3199)
+  * add detail to load error message if path differs from gem name (#1884)
 
 Build / Infrastructure::
 
