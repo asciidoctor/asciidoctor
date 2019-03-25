@@ -1859,7 +1859,7 @@ context 'Blocks' do
           assert_equal expect, actual.strip
           assert_equal :loaded, doc.converter.instance_variable_get(:@asciimath_status)
         else
-          assert_message logger, :WARN, 'optional gem \'asciimath\' is not installed. Functionality disabled.'
+          assert_message logger, :WARN, 'optional gem \'asciimath\' is not available. Functionality disabled.'
           assert_equal :unavailable, doc.converter.instance_variable_get(:@asciimath_status)
         end
       end

@@ -1856,7 +1856,7 @@ context 'Substitutions' do
             assert_equal expected, actual
             assert_equal :loaded, para.document.converter.instance_variable_get(:@asciimath_status)
           else
-            assert_message logger, :WARN, 'optional gem \'asciimath\' is not installed. Functionality disabled.'
+            assert_message logger, :WARN, 'optional gem \'asciimath\' is not available. Functionality disabled.'
             assert_equal :unavailable, para.document.converter.instance_variable_get(:@asciimath_status)
           end
         end
