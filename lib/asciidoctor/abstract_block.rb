@@ -375,13 +375,13 @@ class AbstractBlock < AbstractNode
   # value - The explicit String caption to assign to this block (default: nil).
   # key   - The String prefix for the caption and counter attribute names.
   #         If not provided, the name of the context for this block is used.
-  #         (default: nil)
+  #         (default: @context)
   #
   # Returns nothing.
-  def assign_caption value = nil, key = nil
+  def assign_caption value = nil, key = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
-      if (prefix = @document.attributes[%(#{key ||= @context}-caption)])
-        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter "#{key}-number", self}. )
+      if (prefix = @document.attributes[%(#{key}-caption)])
+        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %[#{key}-number], self}. )
         nil
       end
     end

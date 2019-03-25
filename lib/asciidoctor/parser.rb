@@ -604,7 +604,7 @@ class Parser
                 end
                 if attributes.key? 'title'
                   block.title = attributes.delete 'title'
-                  block.assign_caption((attributes.delete 'caption'), 'figure')
+                  block.assign_caption (attributes.delete 'caption'), 'figure'
                 end
               end
               attributes['target'] = target
@@ -1045,10 +1045,10 @@ class Parser
     end
 
     # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
-    if (attributes.key? 'title') && block.context != :admonition &&
-        (parent.document.attributes.key? %(#{block.context}-caption))
+    if (attributes.key? 'title') && (block_context = block.context) != :admonition &&
+        (parent.document.attributes.key? %(#{block_context}-caption))
       block.title = attributes.delete 'title'
-      block.assign_caption(attributes.delete 'caption')
+      block.assign_caption (attributes.delete 'caption'), block_context
     end
 
     # reader is confined within boundaries of a delimited block, so look for
@@ -2270,7 +2270,7 @@ class Parser
     table = Table.new(parent, attributes)
     if attributes.key? 'title'
       table.title = attributes.delete 'title'
-      table.assign_caption(attributes.delete 'caption')
+      table.assign_caption (attributes.delete 'caption'), 'table'
     end
 
     if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?
