@@ -3573,6 +3573,33 @@ context 'Blocks' do
       assert_equal 'debian', (doc.resolve_id 'Debian, Ubuntu')
     end
 
+    test 'should resolve attribute reference in title using attribute defined at location of block' do
+      input = <<~'EOS'
+      = Document Title
+      :foo: baz
+
+      intro paragraph. see <<free-standing>>.
+
+      :foo: bar
+
+      .foo is {foo}
+      [#formal-para]
+      paragraph with title
+
+      [discrete#free-standing]
+      == foo is still {foo}
+      EOS
+
+      doc = document_from_string input
+      ref = doc.catalog[:refs]['formal-para']
+      refute_nil ref
+      assert_equal 'foo is bar', ref.title
+      assert_equal 'formal-para', (doc.resolve_id 'foo is bar')
+      output = doc.convert standalone: false
+      assert_include '<a href="#free-standing">foo is still bar</a>', output
+      assert_include '<h2 id="free-standing" class="discrete">foo is still bar</h2>', output
+    end
+
     test 'should substitute attribute references in reftext when registering block reference' do
       input = <<~'EOS'
       :label-tiger: Tiger

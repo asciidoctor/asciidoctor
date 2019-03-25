@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * convert titles of cataloged block and section nodes containing attribute references eagerly to resolve attributes while in scope (#3202)
   * customize MathJax (using a postfilter hook) to apply displaymath formatting to AsciiMath block (#2498)
   * fix misspelling of deprecated default_attrs DSL function (missing trailing "s")
   * remove unused location property (attr_accessor :location) on DocinfoProcessor class

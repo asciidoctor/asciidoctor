@@ -266,8 +266,37 @@ context 'Sections' do
       assert_equal '_install', (doc.resolve_id 'Install Procedure')
     end
 
+    test 'should resolve attribute reference in title using attribute defined at location of section title' do
+      input = <<~'EOS'
+      :platform-id: linux
+      :platform-name: Linux
+
+      [#install-{platform-id}]
+      == Install on {platform-name}
+
+      content
+
+      :platform-id: win32
+      :platform-name: Windows
+
+      [#install-{platform-id}]
+      == Install on {platform-name}
+
+      content
+      EOS
+
+      doc = document_from_string input
+      ref = doc.catalog[:refs]['install-win32']
+      refute_nil ref
+      assert_equal 'Install on Windows', ref.title
+      assert_equal 'install-win32', (doc.resolve_id 'Install on Windows')
+    end
+
     test 'should substitute attributes when registering reftext for section' do
       input = <<~'EOS'
+      :platform-name: n/a
+      == Overview
+
       :platform-name: Linux
 
       [[install,install on {platform-name}]]

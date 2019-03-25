@@ -602,8 +602,8 @@ class Parser
                   # NOTE assume % units if not specified
                   attributes['scaledwidth'] = (TrailingDigitsRx.match? scaledwidth) ? %(#{scaledwidth}%) : scaledwidth
                 end
-                if attributes.key? 'title'
-                  block.title = attributes.delete 'title'
+                if attributes['title']
+                  block.title = block_title = attributes.delete 'title'
                   block.assign_caption (attributes.delete 'caption'), 'figure'
                 end
               end
@@ -680,10 +680,10 @@ class Parser
       elsif (style == 'float' || style == 'discrete') && (Compliance.underline_style_section_titles ?
           (is_section_title? this_line, reader.peek_line) : !indented && (atx_section_title? this_line))
         reader.unshift_line this_line
-        float_id, float_reftext, float_title, float_level = parse_section_title reader, document, attributes['id']
+        float_id, float_reftext, block_title, float_level = parse_section_title reader, document, attributes['id']
         attributes['reftext'] = float_reftext if float_reftext
         block = Block.new(parent, :floating_title, content_model: :empty)
-        block.title = float_title
+        block.title = block_title
         attributes.delete 'title'
         block.id = float_id || ((doc_attrs.key? 'sectids') ? (Section.generate_id block.title, document) : nil)
         block.level = float_level
@@ -894,12 +894,19 @@ class Parser
 
     # FIXME we've got to clean this up, it's horrible!
     block.source_location = reader.cursor_at_mark if document.sourcemap
-    # FIXME title should be assigned when block is constructed
-    block.title = attributes.delete 'title' if attributes.key? 'title'
+    # FIXME title and caption should be assigned when block is constructed (though we need to handle all cases)
+    if attributes['title']
+      block.title = block_title = attributes.delete 'title'
+      if CAPTIONABLE_BLOCKS[block_context = block.context] && document.attributes[%(#{block.context}-caption)]
+        block.assign_caption (attributes.delete 'caption'), block_context
+      end
+    end
     # TODO eventually remove the style attribute from the attributes hash
     #block.style = attributes.delete 'style'
     block.style = attributes['style']
     if (block_id = block.id || (block.id = attributes['id']))
+      # convert title to resolve attributes while in scope
+      block.title if block_title ? (block_title.include? ATTR_REF_HEAD) : block.title?
       unless document.register :refs, [block_id, block]
         logger.warn message_with_context %(id assigned to block already in use: #{block_id}), source_location: reader.cursor_at_mark
       end
@@ -1042,13 +1049,6 @@ class Parser
       end
     else
       block = Block.new(parent, block_context, content_model: content_model, source: lines, attributes: attributes)
-    end
-
-    # QUESTION should we have an explicit map or can we rely on check for *-caption attribute?
-    if (attributes.key? 'title') && (block_context = block.context) != :admonition &&
-        (parent.document.attributes.key? %(#{block_context}-caption))
-      block.title = attributes.delete 'title'
-      block.assign_caption (attributes.delete 'caption'), block_context
     end
 
     # reader is confined within boundaries of a delimited block, so look for
@@ -1612,7 +1612,9 @@ class Parser
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
-    if (id = section.id || (section.id = (document.attributes.key? 'sectids') ? (Section.generate_id section.title, document) : nil))
+    if (id = section.id || (section.id = (document.attributes.key? 'sectids') ? (generated_id = Section.generate_id section.title, document) : nil))
+      # convert title to resolve attributes while in scope
+      section.title if sect_title.include? ATTR_REF_HEAD unless generated_id
       unless document.register :refs, [id, section]
         logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
       end
@@ -2268,10 +2270,6 @@ class Parser
   # returns an instance of Asciidoctor::Table parsed from the provided reader
   def self.parse_table(table_reader, parent, attributes)
     table = Table.new(parent, attributes)
-    if attributes.key? 'title'
-      table.title = attributes.delete 'title'
-      table.assign_caption (attributes.delete 'caption'), 'table'
-    end
 
     if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?
       table.create_columns colspecs
