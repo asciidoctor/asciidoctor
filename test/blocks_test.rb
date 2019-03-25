@@ -3538,7 +3538,6 @@ context 'Blocks' do
       ref = doc.catalog[:refs]['debian']
       refute_nil ref
       assert_equal 'Debian Install', ref.reftext
-      #assert_equal 'debian', doc.catalog[:reftexts]['Debian Install']
       assert_equal 'debian', (doc.resolve_id 'Debian Install')
     end
 
@@ -3555,7 +3554,6 @@ context 'Blocks' do
       ref = doc.catalog[:refs]['debian']
       refute_nil ref
       assert_equal '[Debian] Install', ref.reftext
-      #assert_equal 'debian', doc.catalog[:reftexts]['[Debian] Install']
       assert_equal 'debian', (doc.resolve_id '[Debian] Install')
     end
 
@@ -3572,7 +3570,6 @@ context 'Blocks' do
       ref = doc.catalog[:refs]['debian']
       refute_nil ref
       assert_equal 'Debian, Ubuntu', ref.reftext
-      #assert_equal 'debian', doc.catalog[:reftexts]['Debian, Ubuntu']
       assert_equal 'debian', (doc.resolve_id 'Debian, Ubuntu')
     end
 
@@ -3590,7 +3587,6 @@ context 'Blocks' do
       ref = doc.catalog[:refs]['tiger-evolution']
       refute_nil ref
       assert_equal 'Evolution of the Tiger', ref.attributes['reftext']
-      #assert_equal 'tiger-evolution', doc.catalog[:reftexts]['Evolution of the Tiger']
       assert_equal 'tiger-evolution', (doc.resolve_id 'Evolution of the Tiger')
     end
 
@@ -3608,7 +3604,6 @@ context 'Blocks' do
       ref = doc.catalog[:refs]['debian']
       refute_nil ref
       assert_equal 'Debian Install', ref.reftext
-      #assert_equal 'debian', doc.catalog[:reftexts]['Debian Install']
       assert_equal 'debian', (doc.resolve_id 'Debian Install')
     end
   end

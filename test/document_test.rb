@@ -1221,7 +1221,6 @@ context 'Document' do
       assert_same doc.catalog, doc.references
       assert_same doc.catalog[:footnotes], doc.references[:footnotes]
       assert_same doc.catalog[:refs], doc.references[:refs]
-      #assert_equal '_section_a', doc.references[:reftexts]['Section A']
       assert_equal '_section_a', (doc.resolve_id 'Section A')
     end
 

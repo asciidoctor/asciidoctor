@@ -248,7 +248,6 @@ context 'Sections' do
       ref = doc.catalog[:refs]['install']
       refute_nil ref
       assert_equal 'Install Procedure', ref.reftext
-      #assert_equal 'install', doc.catalog[:reftexts]['Install Procedure']
       assert_equal 'install', (doc.resolve_id 'Install Procedure')
     end
 
@@ -264,7 +263,6 @@ context 'Sections' do
       ref = doc.catalog[:refs]['_install']
       refute_nil ref
       assert_equal 'Install Procedure', ref.reftext
-      #assert_equal '_install', doc.catalog[:reftexts]['Install Procedure']
       assert_equal '_install', (doc.resolve_id 'Install Procedure')
     end
 
@@ -282,7 +280,6 @@ context 'Sections' do
       ref = doc.catalog[:refs]['install']
       refute_nil ref
       assert_equal 'install on Linux', ref.reftext
-      #assert_equal 'install', doc.catalog[:reftexts]['install on Linux']
       assert_equal 'install', (doc.resolve_id 'install on Linux')
     end
 
@@ -305,7 +302,6 @@ context 'Sections' do
         refute_nil ref
         assert_nil ref.reftext
         assert_equal 'First Install', ref.title
-        #assert_equal 'install', doc.catalog[:reftexts]['First Install']
         assert_equal 'install', (doc.resolve_id 'First Install')
         assert_message logger, :WARN, '<stdin>: line 7: id assigned to section already in use: install', Hash
       end
@@ -329,7 +325,6 @@ context 'Sections' do
         refute_nil ref
         assert_nil ref.reftext
         assert_equal 'Do Not Repeat Yourself', ref.title
-        #assert_equal '_do_not_repeat_yourself', doc.catalog[:reftexts]['Do Not Repeat Yourself']
         assert_equal '_do_not_repeat_yourself', (doc.resolve_id 'Do Not Repeat Yourself')
         assert_message logger, :WARN, '<stdin>: line 6: id assigned to section already in use: _do_not_repeat_yourself', Hash
         assert_equal 2, (doc.convert.scan 'id="_do_not_repeat_yourself"').size
@@ -353,7 +348,6 @@ context 'Sections' do
         refute_nil ref
         assert_nil ref.reftext
         assert_equal 'First Install', ref.title
-        #assert_equal 'install', doc.catalog[:reftexts]['First Install']
         assert_equal 'install', (doc.resolve_id 'First Install')
         assert_message logger, :WARN, '<stdin>: line 7: id assigned to block already in use: install', Hash
       end
@@ -1167,7 +1161,6 @@ context 'Sections' do
       ref = doc.catalog[:refs]['install']
       refute_nil ref
       assert_equal 'Install Procedure', ref.reftext
-      #assert_equal 'install', doc.catalog[:reftexts]['Install Procedure']
       assert_equal 'install', (doc.resolve_id 'Install Procedure')
     end
 
@@ -1184,7 +1177,6 @@ context 'Sections' do
       ref = doc.catalog[:refs]['_install']
       refute_nil ref
       assert_equal 'Install Procedure', ref.reftext
-      #assert_equal '_install', doc.catalog[:reftexts]['Install Procedure']
       assert_equal '_install', (doc.resolve_id 'Install Procedure')
     end
 
