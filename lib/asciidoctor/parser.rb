@@ -1521,7 +1521,7 @@ class Parser
             end
           end
         else
-          has_text = true if !this_line.empty?
+          has_text = true unless this_line.empty?
           if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
