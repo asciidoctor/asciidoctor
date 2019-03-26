@@ -470,6 +470,7 @@ class Parser
   #              associated with the parsed Block (default: {}).
   # options    - An options Hash to control parsing (default: {}):
   #              * :text_only indicates that the parser is only looking for text content
+  #              * :list_type indicates this block will be attached to a list item in a list of the specified type
   #
   # Returns a Block object built from the parsed content of the processed
   # lines, or nothing if no block is found.
@@ -722,17 +723,17 @@ class Parser
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, (list_item = options[:list_item]) && skipped == 0, skip_line_comments: text_only
+        lines = read_paragraph_lines reader, (list_type = options[:list_type]) && skipped == 0, skip_line_comments: text_only
         adjust_indentation! lines
         block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
-        if list_item
+        if list_type
           # a literal gets special meaning inside of a description list
           block.set_option 'listparagraph'
           block.default_subs = []
         end
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
-        lines = read_paragraph_lines reader, skipped == 0 && options[:list_item], skip_line_comments: true
+        lines = read_paragraph_lines reader, skipped == 0 && options[:list_type], skip_line_comments: true
         # NOTE don't check indented here since it's extremely rare
         #if text_only || indented
         if text_only
@@ -1347,12 +1348,12 @@ class Parser
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
-      if (block = next_block(list_item_reader, list_item, {}, text_only: has_text ? nil : true, list_item: true))
+      if (block = next_block(list_item_reader, list_item, {}, text_only: has_text ? nil : true, list_type: list_type))
         list_item.blocks << block
       end
 
       while list_item_reader.has_more_lines?
-        if (block = next_block(list_item_reader, list_item, {}, list_item: true))
+        if (block = next_block(list_item_reader, list_item, {}, list_type: list_type))
           list_item.blocks << block
         end
       end
