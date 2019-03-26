@@ -32,9 +32,6 @@ class AbstractBlock < AbstractNode
   # Public: Substitutions to be applied to content in this block.
   attr_reader :subs
 
-  # Internal: Set the default subs applied to this block; used during block creation
-  attr_writer :default_subs
-
   def initialize parent, context, opts = {}
     super
     @content_model = :compound

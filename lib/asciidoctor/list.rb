@@ -103,27 +103,11 @@ class ListItem < AbstractBlock
     !simple?
   end
 
-  # Internal: Fold the first paragraph block into the text
-  #
-  # Here are the rules for when a folding occurs:
-  #
-  # Given: this list item has at least one block
-  # When: the first block is a paragraph that's not connected by a list continuation
-  # Or: the first block is an indented paragraph that's adjacent (wrapped line)
-  # Or: the first block is an indented paragraph that's not connected by a list continuation
-  # Then: then drop the first block and fold it's content (buffer) into the list text
+  # Internal: Fold the adjacent paragraph block into the list item text
   #
   # Returns nothing
-  def fold_first(continuation_connects_first_block = false, content_adjacent = false)
-    if (first_block = @blocks[0])
-      if first_block.context == :literal
-        if (content_adjacent || !continuation_connects_first_block) # && first_block.attributes['listparagraph-option']
-          @text = @text.nil_or_empty? ? @blocks.shift.source : %(#{@text}#{LF}#{@blocks.shift.source})
-        end
-      elsif first_block.context == :paragraph && !continuation_connects_first_block
-        @text = @text.nil_or_empty? ? @blocks.shift.source : %(#{@text}#{LF}#{@blocks.shift.source})
-      end
-    end
+  def fold_first
+    @text = @text.nil_or_empty? ? @blocks.shift.source : %(#{@text}#{LF}#{@blocks.shift.source})
     nil
   end
 

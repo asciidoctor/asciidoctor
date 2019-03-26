@@ -489,7 +489,7 @@ class Parser
     document = parent.document
 
     if options.fetch :parse_metadata, true
-      # read lines until there are no more metadata lines to read
+      # read lines until there are no more metadata lines to read; note that :text_only option impacts parsing rules
       while parse_block_metadata_line reader, document, attributes, options
         # discard the line just processed
         reader.shift
@@ -723,13 +723,13 @@ class Parser
       # a literal paragraph: contiguous lines starting with at least one whitespace character
       # NOTE style can only be nil or "normal" at this point
       if indented && !style
-        lines = read_paragraph_lines reader, (list_type = options[:list_type]) && skipped == 0, skip_line_comments: text_only
+        lines = read_paragraph_lines reader, (content_adjacent = skipped == 0 ? options[:list_type] : nil), skip_line_comments: text_only
         adjust_indentation! lines
-        block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
-        if list_type
-          # a literal gets special meaning inside of a description list
-          block.set_option 'listparagraph'
-          block.default_subs = []
+        if text_only || content_adjacent == :dlist
+          # this block gets folded into the list item text
+          block = Block.new(parent, :paragraph, content_model: :simple, source: lines, attributes: attributes)
+        else
+          block = Block.new(parent, :literal, content_model: :verbatim, source: lines, attributes: attributes)
         end
       # a normal paragraph: contiguous non-blank/non-continuation lines (left-indented or normal style)
       else
@@ -1334,17 +1334,11 @@ class Parser
       comment_lines = list_item_reader.skip_line_comments
       if (subsequent_line = list_item_reader.peek_line)
         list_item_reader.unshift_lines comment_lines unless comment_lines.empty?
-        if (continuation_connects_first_block = subsequent_line.empty?)
-          content_adjacent = false
-        else
+        unless subsequent_line.empty?
           content_adjacent = true
           # treat lines as paragraph text if continuation does not connect first block (i.e., has_text = nil)
           has_text = nil unless dlist
         end
-      else
-        # NOTE we have no use for any trailing comment lines we might have found
-        continuation_connects_first_block = false
-        content_adjacent = false
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
@@ -1358,7 +1352,7 @@ class Parser
         end
       end
 
-      list_item.fold_first(continuation_connects_first_block, content_adjacent)
+      list_item.fold_first if content_adjacent && (first_block = list_item.blocks[0]) && first_block.context == :paragraph
     end
 
     dlist ? [[list_term], (list_item.text? || list_item.blocks? ? list_item : nil)] : list_item
