@@ -37,10 +37,10 @@ TIP: Convert this document using the `asciidoctor` command to see the output pro
 .Constrained (applied at word boundaries)
 *strong importance* (aka bold)
 _stress emphasis_ (aka italic)
-`literal text` (aka monospaced)
+`monospaced` (aka typewriter text)
 "`double`" and '`single`' typographic quotes
 +passthrough text+ (substitutions disabled)
-`+literal passthrough text+` (literal text with substitutions disabled)
+`+literal text+` (monospaced with substitutions disabled)
 
 .Unconstrained (applied anywhere)
 **C**reate+**R**ead+**U**pdate+**D**elete
