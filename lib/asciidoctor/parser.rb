@@ -1532,19 +1532,19 @@ class Parser
 
     reader.unshift_line this_line if this_line
 
-    if detached_continuation
-      buffer.delete_at detached_continuation
+    buffer.delete_at detached_continuation if detached_continuation
+
+    until buffer.empty?
+      # strip trailing blank lines to prevent empty blocks
+      if (last_line = buffer[-1]).empty?
+        buffer.pop
+      else
+        # drop optional trailing continuation
+        # (a blank line would have served the same purpose in the document)
+        buffer.pop if last_line == LIST_CONTINUATION
+        break
+      end
     end
-
-    # strip trailing blank lines to prevent empty blocks
-    buffer.pop while !buffer.empty? && buffer[-1].empty?
-
-    # We do need to replace the optional trailing continuation
-    # a blank line would have served the same purpose in the document
-    buffer.pop if !buffer.empty? && buffer[-1] == LIST_CONTINUATION
-
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.join LF}<BUFFER"
-    #warn "BUFFER[#{list_type},#{sibling_trait}]>#{buffer.inspect}<BUFFER"
 
     buffer
   end

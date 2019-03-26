@@ -66,7 +66,7 @@ class ListItem < AbstractBlock
   # Public: A convenience method that checks whether the text of this list item
   # is not blank (i.e., not nil or empty string).
   def text?
-    !@text.nil_or_empty?
+    @text.nil_or_empty? ? false : true
   end
 
   # Public: Get the String text of this ListItem with substitutions applied.

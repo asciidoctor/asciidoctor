@@ -123,7 +123,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns A Boolean indicating whether this Block has block content
   def blocks?
-    !@blocks.empty?
+    @blocks.empty? ? false : true
   end
 
   # Public: Check whether this block has any child Section objects.
