@@ -469,7 +469,7 @@ class Parser
   # attributes - A Hash of attributes that will become the attributes
   #              associated with the parsed Block (default: {}).
   # options    - An options Hash to control parsing (default: {}):
-  #              * :text indicates that the parser is only looking for text content
+  #              * :text_only indicates that the parser is only looking for text content
   #
   # Returns a Block object built from the parsed content of the processed
   # lines, or nothing if no block is found.
@@ -480,8 +480,8 @@ class Parser
     # check for option to find list item text only
     # if skipped a line, assume a list continuation was
     # used and block content is acceptable
-    if (text_only = options[:text]) && skipped > 0
-      options.delete :text
+    if (text_only = options[:text_only]) && skipped > 0
+      options.delete :text_only
       text_only = nil
     end
 
@@ -1347,7 +1347,7 @@ class Parser
       end
 
       # reader is confined to boundaries of list, which means only blocks will be found (no sections)
-      if (block = next_block(list_item_reader, list_item, {}, text: !has_text, list_item: true))
+      if (block = next_block(list_item_reader, list_item, {}, text_only: has_text ? nil : true, list_item: true))
         list_item.blocks << block
       end
 
@@ -1987,7 +1987,7 @@ class Parser
   # document   - the current Document
   # attributes - a Hash of attributes in which any metadata found will be stored (default: {})
   # options    - a Hash of options to control processing: (default: {})
-  #              *  :text indicates that parser is only looking for text content
+  #              *  :text_only indicates that parser is only looking for text content
   #                   and thus the block title should not be captured
   #
   # returns the Hash of attributes including any metadata found
@@ -2016,13 +2016,13 @@ class Parser
   # document   - the current Document
   # attributes - a Hash of attributes in which any metadata found will be stored
   # options    - a Hash of options to control processing: (default: {})
-  #              *  :text indicates the parser is only looking for text content,
+  #              *  :text_only indicates the parser is only looking for text content,
   #                   thus neither a block title or attribute entry should be captured
   #
   # returns true if the line contains metadata, otherwise falsy
   def self.parse_block_metadata_line reader, document, attributes, options = {}
     if (next_line = reader.peek_line) &&
-        (options[:text] ? (next_line.start_with? '[', '/') : (normal = next_line.start_with? '[', '.', '/', ':'))
+        (options[:text_only] ? (next_line.start_with? '[', '/') : (normal = next_line.start_with? '[', '.', '/', ':'))
       if next_line.start_with? '['
         if next_line.start_with? '[['
           if (next_line.end_with? ']]') && BlockAnchorRx =~ next_line
