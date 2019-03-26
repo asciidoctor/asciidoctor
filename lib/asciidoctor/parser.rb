@@ -605,7 +605,7 @@ class Parser
                 end
                 if attributes['title']
                   block.title = block_title = attributes.delete 'title'
-                  block.assign_caption (attributes.delete 'caption'), 'figure'
+                  block.assign_caption (attributes.delete 'caption')
                 end
               end
               attributes['target'] = target
@@ -898,8 +898,8 @@ class Parser
     # FIXME title and caption should be assigned when block is constructed (though we need to handle all cases)
     if attributes['title']
       block.title = block_title = attributes.delete 'title'
-      if CAPTIONABLE_BLOCKS[block_context = block.context] && document.attributes[%(#{block.context}-caption)]
-        block.assign_caption (attributes.delete 'caption'), block_context
+      if (caption_attr_name = CAPTION_ATTR_NAMES[block.context]) && document.attributes[caption_attr_name]
+        block.assign_caption (attributes.delete 'caption')
       end
     end
     # TODO eventually remove the style attribute from the attributes hash

@@ -339,13 +339,13 @@ class AbstractBlock < AbstractNode
       case xrefstyle
       when 'full'
         quoted_title = sub_placeholder (sub_quotes @document.compat_mode ? %q(``%s'') : '"`%s`"'), title
-        if @numeral && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
+        if @numeral && (caption_attr_name = CAPTION_ATTR_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
           %(#{prefix} #{@numeral}, #{quoted_title})
         else
           %(#{@caption.chomp '. '}, #{quoted_title})
         end
       when 'short'
-        if @numeral && (prefix = @document.attributes[@context == :image ? 'figure-caption' : %(#{@context}-caption)])
+        if @numeral && (caption_attr_name = CAPTION_ATTR_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
           %(#{prefix} #{@numeral})
         else
           @caption.chomp '. '
@@ -369,16 +369,17 @@ class AbstractBlock < AbstractNode
   # The parts of a complete caption are: <prefix> <number>. <title>
   # This partial caption represents the part the precedes the title.
   #
-  # value - The explicit String caption to assign to this block (default: nil).
-  # key   - The String prefix for the caption and counter attribute names.
-  #         If not provided, the name of the context for this block is used.
-  #         (default: @context)
+  # value           - The explicit String caption to assign to this block (default: nil).
+  # caption_context - The Symbol context to use when resolving caption-related attributes.
+  #                   If not provided, the name of the context for this block is used.
+  #                   (default: @context)
   #
   # Returns nothing.
-  def assign_caption value = nil, key = @context
+  def assign_caption value = nil, caption_context = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
-      if (prefix = @document.attributes[%(#{key}-caption)])
-        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %[#{key}-number], self}. )
+      if (attr_name = CAPTION_ATTR_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
+        counter_name = caption_context == :image ? 'figure-number' : %(#{caption_context}-number)
+        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter counter_name, self}. )
         nil
       end
     end
