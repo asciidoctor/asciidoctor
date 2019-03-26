@@ -358,6 +358,14 @@ class Table::Cell < AbstractBlock
     end
   end
 
+  def lines
+    @text.split LF
+  end
+
+  def source
+    @text
+  end
+
   # Public: Get the source file where this block started
   def file
     @source_location && @source_location.file

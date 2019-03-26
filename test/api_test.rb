@@ -620,6 +620,7 @@ context 'API' do
       |a |b |c
 
       |1
+      one
       a|NOTE: 2, as it goes.
       l|
       3
@@ -635,10 +636,15 @@ context 'API' do
       result = doc.find_by
       assert_include first_head_cell, result
       assert_include first_body_cell, result
+      assert_equal 'a', first_head_cell.source
+      assert_equal ['a'], first_head_cell.lines
+      assert_equal %(1\none), first_body_cell.source
+      assert_equal ['1', 'one'], first_body_cell.lines
       result = doc.find_by context: :table_cell, style: :asciidoc
       assert_equal 1, result.size
       assert_kind_of Asciidoctor::Table::Cell, result[0]
       assert_equal :asciidoc, result[0].style
+      assert_equal 'NOTE: 2, as it goes.', result[0].source
     end
 
     test 'find_by should return Array of blocks that match style criteria' do
