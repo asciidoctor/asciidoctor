@@ -314,6 +314,27 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '((//ul/li)[1]/*[@class="literalblock"])[1]//pre[text() = "literal"]', output, 1
     end
 
+    test 'should escape special characters in all literal paragraphs attached to list item' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      input = <<~EOS
+      * first item
+
+        <code>text</code>
+
+        more <code>text</code>
+
+      * second item
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'li', output, 2
+      assert_css 'code', output, 0
+      assert_css 'li:first-of-type > *', output, 3
+      assert_css 'li:first-of-type pre', output, 2
+      assert_xpath '((//li)[1]//pre)[1][text()="<code>text</code>"]', output, 1
+      assert_xpath '((//li)[1]//pre)[2][text()="more <code>text</code>"]', output, 1
+    end
+
     test "a literal paragraph offset by a blank line in list content followed by line with continuation is appended as two blocks" do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
@@ -487,8 +508,8 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul/li)[1]/p[text() = "Foo"]', output, 1
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]', output, 2
       assert_xpath '(//ul/li)[1]/p/following-sibling::*[@class="literalblock"]', output, 2
-      assert_xpath '((//ul/li)[1]/*[@class="literalblock"])[1]//pre[text() = "literal"]', output, 1
-      assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[2]//pre[text() = 'more\nliteral']", output, 1
+      assert_xpath '((//ul/li)[1]/*[@class="literalblock"])[1]//pre[text()="literal"]', output, 1
+      assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[2]//pre[text()='more\nliteral']", output, 1
     end
 
     test "a literal paragraph without a trailing blank line consumes following list items" do
@@ -1926,6 +1947,27 @@ context "Ordered lists (:olist)" do
       assert_xpath '//ol/li', output, 3
     end
 
+    test 'should escape special characters in all literal paragraphs attached to list item' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      input = <<~EOS
+      . first item
+
+        <code>text</code>
+
+        more <code>text</code>
+
+      . second item
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'li', output, 2
+      assert_css 'code', output, 0
+      assert_css 'li:first-of-type > *', output, 3
+      assert_css 'li:first-of-type pre', output, 2
+      assert_xpath '((//li)[1]//pre)[1][text()="<code>text</code>"]', output, 1
+      assert_xpath '((//li)[1]//pre)[2][text()="more <code>text</code>"]', output, 1
+    end
+
     test 'dot elements with interspersed line comments should be skipped and not break list' do
       input = <<~'EOS'
       == List
@@ -2286,6 +2328,30 @@ context "Description lists (:dlist)" do
       assert_xpath %(//*[@class="literalblock"]//pre[text()=" line 1\n// not a comment\n line 3"]), output, 1
     end
 
+    test 'should escape special characters in all literal paragraphs attached to list item' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      input = <<~EOS
+      term:: desc
+
+        <code>text</code>
+
+        more <code>text</code>
+
+      another term::
+
+        <code>text</code> in a paragraph
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'dt', output, 2
+      assert_css 'code', output, 0
+      assert_css 'dd:first-of-type > *', output, 3
+      assert_css 'dd:first-of-type pre', output, 2
+      assert_xpath '((//dd)[1]//pre)[1][text()="<code>text</code>"]', output, 1
+      assert_xpath '((//dd)[1]//pre)[2][text()="more <code>text</code>"]', output, 1
+      assert_xpath '((//dd)[2]//p)[1][text()="<code>text</code> in a paragraph"]', output, 1
+    end
+
     test 'multi-line element with paragraph starting with multiple dashes should not be seen as list' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
@@ -2536,6 +2602,25 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[1]//p', output, 2
       assert_xpath '((//dl/dd)[1]//p)[1][text()="def1"]', output, 1
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
+    end
+
+    test 'should continue to parse subsequent blocks attached to list item after first block is dropped' do
+      input = <<~'EOS'
+      :attribute-missing: drop-line
+
+      term::
+      +
+      image::{unresolved}[]
+      +
+      paragraph
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_css 'dl > dt + dd', output, 1
+      assert_css 'dl > dt + dd > .imageblock', output, 0
+      assert_css 'dl > dt + dd > .paragraph', output, 1
     end
 
     test "verse paragraph inside a description list" do
