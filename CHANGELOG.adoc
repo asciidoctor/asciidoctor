@@ -18,7 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * apply verbatim substitutions to literal paragraphs attached to list item (#3205)
-  * resolve caption attributes names against known set
+  * implement #lines and #source methods on Table::Cell based on cell text (#3207)
 
 == 2.0.1 (2019-03-25) - @mojavelinux
 
