@@ -1937,6 +1937,12 @@ context 'Substitutions' do
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
+      test 'should support attrlist on a literal monospace phrase' do
+        input = '[.baz]`+foo--bar+`'
+        para = block_from_string input
+        assert_equal '<code class="baz">foo--bar</code>', para.content
+      end
+
       test 'should not process an escaped passthrough macro inside a monospaced phrase' do
         input = 'use the `\pass:c[]` macro'
         para = block_from_string input
