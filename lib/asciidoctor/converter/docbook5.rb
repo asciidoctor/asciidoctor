@@ -740,9 +740,10 @@ class Converter::DocBook5Converter < Converter::Base
       width_attr = ''
       depth_attr = ''
       if (cover_image.include? ':') && ImageMacroRx =~ cover_image
+        attrlist = $2
         cover_image = doc.image_uri $1
-        unless $2.empty?
-          attrs = (AttributeList.new $2).parse ['alt', 'width', 'height']
+        unless attrlist.empty?
+          attrs = (AttributeList.new attrlist).parse ['alt', 'width', 'height']
           if attrs.key? 'scaledwidth'
             # NOTE scalefit="1" is the default in this case
             width_attr = %( width="#{attrs['scaledwidth']}")

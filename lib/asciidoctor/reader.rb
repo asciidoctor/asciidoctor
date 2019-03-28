@@ -955,8 +955,11 @@ class PreprocessorReader < Reader
         if no_target
           # the text in brackets must match a conditional expression
           if text && EvalExpressionRx =~ text.strip
+            lhs = $1
+            op = $2
+            rhs = $3
             # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
-            skip = ((resolve_expr_val $1).send $2, (resolve_expr_val $3)) ? false : true
+            skip = ((resolve_expr_val lhs).send op, (resolve_expr_val rhs)) ? false : true
           else
             logger.error message_with_context %(malformed preprocessor directive - #{text ? 'invalid expression' : 'missing expression'}: ifeval::[#{text}]), source_location: cursor
             return true
