@@ -308,7 +308,7 @@ module Substitutors
       extensions.inline_macros.each do |extension|
         text = text.gsub extension.instance.regexp do
           # honor the escape
-          next $&.slice 1, $&.length if $&.start_with? RS
+          next $&.slice 1, $&.length if (match = $&).start_with? RS
           if $~.names.empty?
             target, content = $1, $2
           else
@@ -336,7 +336,7 @@ module Substitutors
             end
             replacement.convert
           elsif replacement
-            logger.info %(expected substitution value for custom inline macro to be of type Inline; got #{replacement.class}: #{$&})
+            logger.info %(expected substitution value for custom inline macro to be of type Inline; got #{replacement.class}: #{match})
             replacement
           else
             ''
@@ -691,11 +691,11 @@ module Substitutors
         # honor the escape
         next $1 == RS ? ($&.slice 1, $&.length) : $& if $1
 
-        target = 'mailto:' + $&
+        target = 'mailto:' + (address = $&)
         # QUESTION should this be registered as an e-mail address?
         doc.register(:links, target)
 
-        Inline.new(self, :anchor, $&, type: :link, target: target).convert
+        Inline.new(self, :anchor, address, type: :link, target: target).convert
       end
     end
 
@@ -906,7 +906,7 @@ module Substitutors
       # honor the escape
       if $2
         # use sub since it might be behind a line comment
-        $&.sub(RS, '')
+        $&.sub RS, ''
       else
         Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
       end
@@ -1000,30 +1000,22 @@ module Substitutors
     text = text.gsub InlinePassMacroRx do
       if (boundary = $4) # $$, ++, or +++
         # skip ++ in compat mode, handled as normal quoted text
-        if compat_mode && boundary == '++'
-          content = extract_passthroughs $5
-          next $2 ? %(#{$1}[#{$2}]#{$3}++#{content}++) : %(#{$1}#{$3}++#{content}++)
-        end
+        next %(#{$2 ? "#{$1}[#{$2}]#{$3}" : "#{$1}#{$3}"}++#{extract_passthroughs $5}++) if compat_mode && boundary == '++'
 
-        attributes = $2
-        escape_count = $3.length
-        content = $5
-
-        if attributes
-          if escape_count > 0
+        if (attrlist = $2)
+          if (escape_count = $3.length) > 0
             # NOTE we don't look for nested unconstrained pass macros
-            next %(#{$1}[#{attributes}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
+            next %(#{$1}[#{attrlist}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
           elsif $1 == RS
-            preceding = %([#{attributes}])
-            attributes = nil
+            preceding = %([#{attrlist}])
           else
-            if boundary == '++' && (attributes.end_with? 'x-')
+            if boundary == '++' && (attrlist.end_with? 'x-')
               old_behavior = true
-              attributes = attributes.slice 0, attributes.length - 2
+              attrlist = attrlist.slice 0, attrlist.length - 2
             end
-            attributes = parse_quoted_text_attributes attributes
+            attributes = parse_quoted_text_attributes attrlist
           end
-        elsif escape_count > 0
+        elsif (escape_count = $3.length) > 0
           # NOTE we don't look for nested unconstrained pass macros
           next %(#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
         end
@@ -1031,18 +1023,22 @@ module Substitutors
 
         if attributes
           if old_behavior
-            passthrus[passthru_key = passthrus.size] = { text: content, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
+            passthrus[passthru_key = passthrus.size] = { text: $5, subs: NORMAL_SUBS, type: :monospaced, attributes: attributes }
           else
-            passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: :unquoted, attributes: attributes }
+            passthrus[passthru_key = passthrus.size] = { text: $5, subs: subs, type: :unquoted, attributes: attributes }
           end
         else
-          passthrus[passthru_key = passthrus.size] = { text: content, subs: subs }
+          passthrus[passthru_key = passthrus.size] = { text: $5, subs: subs }
         end
       else # pass:[]
         # NOTE we don't look for nested pass:[] macros
         # honor the escape
         next $&.slice 1, $&.length if $6 == RS
-        passthrus[passthru_key = passthrus.size] = { text: (normalize_text $8, nil, true), subs: ($7 ? (resolve_pass_subs $7) : nil) }
+        if (subs = $7)
+          passthrus[passthru_key = passthrus.size] = { text: (normalize_text $8, nil, true), subs: (resolve_pass_subs subs) }
+        else
+          passthrus[passthru_key = passthrus.size] = { text: (normalize_text $8, nil, true) }
+        end
       end
 
       %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
@@ -1051,29 +1047,28 @@ module Substitutors
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub pass_inline_rx do
       preceding = $1
-      attributes = $2
+      attrlist = $2
       escape_mark = RS if (quoted_text = $3).start_with? RS
       format_mark = $4
       content = $5
 
       if compat_mode
         old_behavior = true
-      elsif (old_behavior = attributes && (attributes.end_with? 'x-'))
-        attributes = attributes.slice 0, attributes.length - 2
+      elsif (old_behavior = attrlist && (attrlist.end_with? 'x-'))
+        attrlist = attrlist.slice 0, attrlist.length - 2
       end
 
-      if attributes
+      if attrlist
         if format_mark == '`' && !old_behavior
-          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark})
+          next extract_inner_passthrough content, %(#{preceding}[#{attrlist}]#{escape_mark})
         elsif escape_mark
           # honor the escape of the formatting mark
-          next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
+          next %(#{preceding}[#{attrlist}]#{quoted_text.slice 1, quoted_text.length})
         elsif preceding == RS
           # honor the escape of the attributes
-          preceding = %([#{attributes}])
-          attributes = nil
+          preceding = %([#{attrlist}])
         else
-          attributes = parse_quoted_text_attributes attributes
+          attributes = parse_quoted_text_attributes attrlist
         end
       elsif format_mark == '`' && !old_behavior
         next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
@@ -1106,10 +1101,11 @@ module Substitutors
       if (type = $1.to_sym) == :stem
         type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
       end
+      subs = $2
       content = normalize_text $3, nil, true
       # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
-      subs = $2 ? (resolve_pass_subs $2) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))

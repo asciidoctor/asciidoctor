@@ -1102,7 +1102,8 @@ class Document < AbstractBlock
   # Returns The String value with substitutions performed
   def apply_attribute_value_subs value
     if AttributeEntryPassMacroRx =~ value
-      value = $1 ? (apply_subs $2, (resolve_pass_subs $1)) : $2
+      value = $2
+      value = apply_subs value, (resolve_pass_subs $1) if $1
     else
       value = apply_header_subs value
     end

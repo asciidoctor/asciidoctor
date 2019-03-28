@@ -18,6 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * fix crash when attrlist is used on literal monospace phrase (#3216)
+  * update use of magic regexp variables to fix compatibility with Opal / Asciidoctor.js (#3214)
 
 == 2.0.2 (2019-03-26) - @mojavelinux
 
