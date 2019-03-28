@@ -1064,7 +1064,7 @@ module Substitutors
 
       if attributes
         if format_mark == '`' && !old_behavior
-          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark}), attributes
+          next extract_inner_passthrough content, %(#{preceding}[#{attributes}]#{escape_mark})
         elsif escape_mark
           # honor the escape of the formatting mark
           next %(#{preceding}[#{attributes}]#{quoted_text.slice 1, quoted_text.length})
@@ -1371,14 +1371,12 @@ module Substitutors
   end
 
   # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
-  def extract_inner_passthrough text, pre, attributes = nil
+  def extract_inner_passthrough text, pre
     if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
       if $1
         %(#{pre}`+#{$2}+`)
       else
-        @passthroughs[passthru_key = @passthroughs.size] = attributes ?
-            { text: $2, subs: BASIC_SUBS, attributes: attributes, type: :unquoted } :
-            { text: $2, subs: BASIC_SUBS }
+        @passthroughs[passthru_key = @passthroughs.size] = { text: $2, subs: BASIC_SUBS }
         %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
       end
     else
