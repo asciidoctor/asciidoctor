@@ -197,7 +197,7 @@ module Extensions
       block = create_block parent, :image, nil, attrs, opts
       if title
         block.title = title
-        block.assign_caption (attrs.delete 'caption'), (opts[:caption_context] || :image)
+        block.assign_caption (attrs.delete 'caption'), 'figure'
       end
       block
     end

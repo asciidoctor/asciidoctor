@@ -378,8 +378,7 @@ class AbstractBlock < AbstractNode
   def assign_caption value = nil, caption_context = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
       if (attr_name = CAPTION_ATTR_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
-        counter_name = caption_context == :image ? 'figure-number' : %(#{caption_context}-number)
-        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter counter_name, self}. )
+        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
         nil
       end
     end

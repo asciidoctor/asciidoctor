@@ -605,7 +605,7 @@ class Parser
                 end
                 if attributes['title']
                   block.title = block_title = attributes.delete 'title'
-                  block.assign_caption (attributes.delete 'caption')
+                  block.assign_caption (attributes.delete 'caption'), 'figure'
                 end
               end
               attributes['target'] = target
