@@ -1,15 +1,15 @@
-dist: trusty
+dist: xenial
 git:
   # use depth 2 just in case two refs get pushed at once (like a tag)
   depth: 2
 language: ruby
 rvm:
-- &release_ruby 2.6.2
-- 2.5.5
-- 2.4.5
-- 2.3.8
+#- &release_ruby 2.6.2
+#- 2.5.5
+#- 2.4.5
+#- 2.3.8
 - jruby-9.2.6.0
-- jruby-9.1.17.0
+#- jruby-9.1.17.0
 # the test suite currently crashes on truffleruby
 #- truffleruby-rc13
 env:
@@ -17,16 +17,19 @@ env:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
   - PYGMENTS=true
-script: bundle exec rake coverage test:all
-after_success: bundle exec rake build:dependents
+script:
+- sed -i 's/@log.error "Failed to get header."/puts $!.message; puts $!.backtrace/' /home/travis/.rvm/gems/*/gems/pygments.rb-1.2.1/lib/pygments/popen.rb
+- bundle exec ruby test/syntax_highlighter_test.rb
+#- bundle exec rake coverage test:all
+#after_success: bundle exec rake build:dependents
 #notifications:
 #  email: false
 #  irc: 'irc.freenode.org#asciidoctor'
-deploy:
-  provider: rubygems
-  gem: asciidoctor
-  api_key: ${RUBYGEMS_API_KEY}
-  on:
-    tags: true
-    repo: asciidoctor/asciidoctor
-    rvm: *release_ruby
+#deploy:
+#  provider: rubygems
+#  gem: asciidoctor
+#  api_key: ${RUBYGEMS_API_KEY}
+#  on:
+#    tags: true
+#    repo: asciidoctor/asciidoctor
+#    rvm: *release_ruby
