@@ -76,7 +76,7 @@ class Minitest::Test
   end
 
   def example_document name, opts = {}
-    document_from_string (File.read sample_doc_path name), opts
+    document_from_string (File.read (sample_doc_path name), mode: Asciidoctor::FILE_READ_MODE), opts
   end
 
   def xmlnodes_at_css css, content, count = nil

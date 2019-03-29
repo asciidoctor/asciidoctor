@@ -5,7 +5,7 @@ context 'API' do
   context 'Load' do
     test 'should load input file' do
       sample_input_path = fixture_path('sample.adoc')
-      doc = File.open(sample_input_path) {|file| Asciidoctor.load file, safe: Asciidoctor::SafeMode::SAFE }
+      doc = File.open(sample_input_path, Asciidoctor::FILE_READ_MODE) {|file| Asciidoctor.load file, safe: Asciidoctor::SafeMode::SAFE }
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
@@ -88,9 +88,11 @@ context 'API' do
         tmp_output = tmp_input.path.sub '.adoc', '.html'
         Asciidoctor.convert_file tmp_input.path, safe: :safe, attributes: 'linkcss !copycss'
         assert File.exist? tmp_output
-        output = File.read tmp_output, mode: 'rb', encoding: 'utf-8:utf-8'
-        assert_equal ::Encoding::UTF_8, output.encoding
+        output = File.binread tmp_output
         refute_empty output
+        # force encoding to UTF-8 and we should see that the string is in fact UTF-8 encoded
+        output = String.new output, encoding: Encoding::UTF_8
+        assert_equal Encoding::UTF_8, output.encoding
         assert_include 'ＵＴＦ８', output
       ensure
         tmp_input.close!
@@ -1185,7 +1187,7 @@ context 'API' do
       begin
         Asciidoctor.convert_file sample_input_path
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1203,7 +1205,7 @@ context 'API' do
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1222,7 +1224,7 @@ context 'API' do
       begin
         Asciidoctor.convert_file sample_input_path, to_file: 'result.html', base_dir: fixture_dir
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1264,7 +1266,7 @@ context 'API' do
       begin
         Asciidoctor.convert sample_input, to_file: sample_output_path
         assert File.exist?(sample_output_path)
-        output = File.read(sample_output_path)
+        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_include '<p>.htm</p>', output
       ensure

@@ -30,7 +30,7 @@ context "Text" do
   test 'proper encoding to handle utf8 characters in arbitrary block' do
     input = []
     input << "[verse]\n"
-    input.concat(File.readlines(sample_doc_path(:encoding)))
+    input += (File.readlines (sample_doc_path :encoding), mode: Asciidoctor::FILE_READ_MODE)
     doc = empty_document
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
     block = Asciidoctor::Parser.next_block(reader, doc)

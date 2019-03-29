@@ -251,7 +251,7 @@ context 'Invoker' do
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert File.exist?(sample_outpath)
-      output = File.read(sample_outpath)
+      output = File.read(sample_outpath, mode: Asciidoctor::FILE_READ_MODE)
       refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -495,7 +495,7 @@ context 'Invoker' do
       invoke_cli(%W(-b manpage -o #{outfile_1}), '-') { input }
       assert File.exist?(outfile_1)
       assert File.exist?(outfile_2)
-      assert_equal '.so eve.1', (File.read outfile_2).chomp
+      assert_equal '.so eve.1', (File.read outfile_2, mode: Asciidoctor::FILE_READ_MODE).chomp
     ensure
       FileUtils.rm_f outfile_1
       FileUtils.rm_f outfile_2
