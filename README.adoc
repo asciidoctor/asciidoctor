@@ -63,10 +63,12 @@ endif::[]
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
 {uri-project}[Asciidoctor] is a _fast_, {uri-license}[open source] text processor and publishing toolchain for converting {uri-what-is-asciidoc}[AsciiDoc] content to HTML5, DocBook, PDF, and other formats.
-Asciidoctor is written in Ruby and runs on all major operation systems.
-To simplify installation, Asciidoctor is packaged and distributed as a gem to {uri-rubygem}[RubyGems.org] and is packaged for popular Linux distributions and macOS.
-Asciidoctor can also be run in a JVM using {uri-asciidoctorj}[AsciidoctorJ] or in any JavaScript environment using {uri-asciidoctorjs}[Asciidoctor.js].
+Asciidoctor is written in Ruby and runs on all major operating systems.
 The Asciidoctor project is {uri-repo}[hosted on GitHub].
+
+To simplify installation, Asciidoctor is packaged and distributed as a RubyGem (aka gem) to {uri-rubygem}[RubyGems.org].
+It's also distributed as a package for popular Linux distributions and macOS.
+In addition to running on Ruby, Asciidoctor can be executed on a JVM using {uri-asciidoctorj}[AsciidoctorJ] or in any JavaScript environment (including the browser) using {uri-asciidoctorjs}[Asciidoctor.js].
 
 ifndef::env-site,env-yard[]
 This document is also available in the following languages: +
