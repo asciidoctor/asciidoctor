@@ -34,7 +34,7 @@ ifdef::env-site[:uri-project: link:]
 :uri-contributors: {uri-repo}/graphs/contributors
 :uri-rel-file-base: link:
 :uri-rel-tree-base: link:
-ifdef::env-site[]
+ifdef::env-site,env-yard[]
 :uri-rel-file-base: {uri-repo}/blob/master/
 :uri-rel-tree-base: {uri-repo}/tree/master/
 endif::[]
@@ -50,7 +50,7 @@ endif::[]
 :uri-install-docker: https://github.com/asciidoctor/docker-asciidoctor
 //:uri-install-doc: {uri-docs}/install-toolchain
 :uri-install-macos-doc: {uri-docs}/install-asciidoctor-macos
-:uri-render-doc: {uri-docs}/render-documents
+:uri-convert-doc: {uri-docs}/convert-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
 :uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
@@ -68,7 +68,7 @@ To simplify installation, Asciidoctor is packaged and distributed as a gem to {u
 Asciidoctor can also be run in a JVM using {uri-asciidoctorj}[AsciidoctorJ] or in any JavaScript environment using {uri-asciidoctorjs}[Asciidoctor.js].
 The Asciidoctor project is {uri-repo}[hosted on GitHub].
 
-ifndef::env-site[]
+ifndef::env-site,env-yard[]
 This document is also available in the following languages: +
 {uri-rel-file-base}README-zh_CN.adoc[汉语]
 |
@@ -97,13 +97,16 @@ endif::[]
 
 == Sponsors
 
-We want to recognize our generous sponsors, without whose support Asciidoctor would not be possible.
-Thank you sponsors for your dedication to improving the state of technical documentation!
+We want to recognize our {uri-project}/supporters[sponsors] for their commitment to improving the state of technical documentation by supporting this project.
+Thank you sponsors!
+Without your generous support, Asciidoctor would not be possible.
 
+ifndef::env-site,env-yard[]
 Major funding for Asciidoctor is provided by our *Change Maker*, https://opendevise.com[OpenDevise], our *Strategy Sponsors*, https://www.khronos.org/[Khronos Group] and Linda Roberts, and our *Pull Request Backers*, Brian Dominick, Guillaume Grossetie, and Abel Salgado Romero.
-Additional funding is provided by our https://asciidoctor.org/supporters[Community Backers].
+Additional funding is provided by the supporters listed on our {uri-project}/supporters[Community Backers] page.
+endif::[]
 
-You can support this project by becoming a sponsor on https://opencollective.com/asciidoctor[OpenCollective].
+You can support this project by becoming a sponsor through https://opencollective.com/asciidoctor[OpenCollective].
 
 == The Big Picture
 
@@ -117,8 +120,8 @@ image::{image-uri-screenshot}[Preview of AsciiDoc source and corresponding rende
 Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree to a set of built-in converters to produce HTML5, DocBook 5, and man(ual) page output.
 You have the option of using your own converter or loading {uri-tilt}[Tilt]-supported templates to customize the generated output or produce additional formats.
 
-Asciidoctor is a drop-in replacement for the original AsciiDoc Python processor (`asciidoc.py`).
-The Asciidoctor test suite has {uri-tests}[> 2,000 tests] to ensure compatibility with the AsciiDoc syntax.
+Asciidoctor is a drop-in replacement for its predecessor, AsciiDoc Python (`asciidoc.py`).
+The Asciidoctor test suite has {uri-tests}[> 2,350 tests] to ensure compatibility with the AsciiDoc syntax.
 
 In addition to the classic AsciiDoc syntax, Asciidoctor recognizes additional markup and formatting options, such as font-based icons (e.g., `+icon:fire[]+`) and UI elements (e.g., `+button:[Save]+`).
 Asciidoctor also offers a modern, responsive theme based on {uri-foundation}[Foundation] to style the HTML5 output.
@@ -351,7 +354,7 @@ The `asciidoctor` {uri-manpage}[man page] provides a complete reference of the c
 
 Refer to the following resources to learn more about how to use the `asciidoctor` command.
 
-* {uri-render-doc}[How do I convert a document?]
+* {uri-convert-doc}[How do I convert a document?]
 * {uri-themes-doc}[How do I use the Asciidoctor stylesheet factory to produce custom themes?]
 
 === Ruby API
