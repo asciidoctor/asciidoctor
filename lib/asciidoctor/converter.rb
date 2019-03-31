@@ -3,14 +3,13 @@ module Asciidoctor
 # A module for defining converters that are used to convert {AbstractNode} objects in a parsed AsciiDoc document to an
 # output (aka backend) format such as HTML or DocBook.
 #
-# Implementing a custom converter involves:
+# A {Converter} is typically instantiated each time an AsciiDoc document is processed (i.e., parsed and converted).
+# Implementing a custom converter entails:
 #
 # * Including the {Converter} module in a converter class and implementing the {Converter#convert} method or extending
 #   the {Converter::Base Base} class and implementing the dispatch methods that map to each node.
 # * Optionally registering the converter with one or more backend names statically using the +register_for+ DSL method
 #   contributed by the {Converter::Config Config} module.
-#
-# {Converter} instances are typically instantiated for each instance of a parsed AsciiDoc document.
 #
 # Examples
 #
@@ -32,7 +31,7 @@ module Asciidoctor
 #       end
 #     end
 #   end
-#   puts Asciidoctor.convert_file 'sample.adoc', backend: :text
+#   puts Asciidoctor.convert_file 'sample.adoc', backend: :text, safe: :safe
 #
 #   class Html5Converter < (Asciidoctor::Converter.for 'html5')
 #     register_for 'html5'
@@ -40,7 +39,7 @@ module Asciidoctor
 #       %(<p>#{node.content}</p>)
 #     end
 #   end
-#   puts Asciidoctor.convert_file 'sample.adoc'
+#   puts Asciidoctor.convert_file 'sample.adoc', safe: :safe
 module Converter
   autoload :CompositeConverter, %(#{__dir__}/converter/composite)
   autoload :TemplateConverter, %(#{__dir__}/converter/template)
@@ -252,10 +251,10 @@ module Converter
     def initialize seed_registry = nil
       if seed_registry
         seed_registry.default = seed_registry.delete '*'
+        @registry = seed_registry
       else
-        seed_registry = {}
+        @registry = {}
       end
-      @registry = seed_registry
     end
 
     # Public: Unregister all Converter classes that are registered with this factory. Intended for testing only.
@@ -306,11 +305,11 @@ module Converter
 
       def for backend
         @@registry.fetch backend do
-          PROVIDED[backend] ? @@mutex.synchronize do
+          PROVIDED[backend] ? (@@mutex.synchronize do
             # require is thread-safe, so no reason to refetch
             require PROVIDED[backend]
             @@registry[backend]
-          end : catch_all
+          end) : catch_all
         end
       end
 
