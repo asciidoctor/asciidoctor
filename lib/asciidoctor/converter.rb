@@ -82,6 +82,23 @@ module Converter
     true
   end
 
+  # Public: Derive backend traits (basebackend, filetype, outfilesuffix, htmlsyntax) from the given backend.
+  #
+  # backend - the String backend from which to derive the traits
+  #
+  # Returns the backend traits for the given backend as a [Hash].
+  def self.derive_backend_traits backend
+    return {} unless backend
+    if (t_outfilesuffix = DEFAULT_EXTENSIONS[(t_basebackend = backend.sub TrailingDigitsRx, '')])
+      t_filetype = t_outfilesuffix.slice 1, t_outfilesuffix.length
+    else
+      t_outfilesuffix = %(.#{t_filetype = t_basebackend})
+    end
+    t_filetype == 'html' ?
+      { basebackend: t_basebackend, filetype: t_filetype, htmlsyntax: 'html', outfilesuffix: t_outfilesuffix } :
+      { basebackend: t_basebackend, filetype: t_filetype, outfilesuffix: t_outfilesuffix }
+  end
+
   module BackendTraits
     def basebackend value = nil
       value ? (backend_traits[:basebackend] = value) : backend_traits[:basebackend]
@@ -112,21 +129,14 @@ module Converter
     end
 
     def backend_traits
-      @backend_traits ||= BackendTraits.derive_backend_traits @backend
+      @backend_traits ||= Converter.derive_backend_traits @backend
     end
 
     alias backend_info backend_traits
 
+    # Deprecated: Use {Converter.derive_backend_traits} instead.
     def self.derive_backend_traits backend
-      return {} unless backend
-      if (t_outfilesuffix = DEFAULT_EXTENSIONS[(t_basebackend = backend.sub TrailingDigitsRx, '')])
-        t_filetype = t_outfilesuffix.slice 1, t_outfilesuffix.length
-      else
-        t_outfilesuffix = %(.#{t_filetype = t_basebackend})
-      end
-      t_filetype == 'html' ?
-        { basebackend: t_basebackend, filetype: t_filetype, htmlsyntax: 'html', outfilesuffix: t_outfilesuffix } :
-        { basebackend: t_basebackend, filetype: t_filetype, outfilesuffix: t_outfilesuffix }
+      Converter.derive_backend_traits backend
     end
   end
 

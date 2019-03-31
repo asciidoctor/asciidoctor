@@ -1327,7 +1327,7 @@ class Document < AbstractBlock
           attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
         end
       elsif converter
-        backend_traits = Converter::BackendTraits.derive_backend_traits new_backend
+        backend_traits = Converter.derive_backend_traits new_backend
         new_basebackend = backend_traits[:basebackend]
         new_filetype = backend_traits[:filetype]
         if init

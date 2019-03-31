@@ -319,6 +319,12 @@ context 'Converter' do
   end
 
   context 'Custom converters' do
+    test 'should derive backend traits for the given backend' do
+      expected = { basebackend: 'dita', filetype: 'dita', outfilesuffix: '.dita' }
+      actual = Asciidoctor::Converter.derive_backend_traits 'dita2'
+      assert_equal expected, actual
+    end
+
     test 'should use specified converter for current backend' do
       input = <<~'EOS'
       = Document Title
