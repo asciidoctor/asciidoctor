@@ -137,7 +137,7 @@ module Converter
     # backends - One or more String backend names with which to associate this {Converter} class.
     #
     # Returns nothing.
-    private def register_for *backends
+    def register_for *backends
       Converter.register self, *backends
     end
   end

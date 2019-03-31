@@ -435,6 +435,21 @@ context 'Converter' do
       end
     end
 
+    test 'should be able to register converter from converter class itself' do
+      begin
+        assert_nil Asciidoctor::Converter.for 'foobar'
+
+        class AnotherCustomConverterB
+          include Asciidoctor::Converter
+        end
+
+        AnotherCustomConverterB.register_for 'foobar'
+        assert_equal AnotherCustomConverterB, (Asciidoctor::Converter.for 'foobar')
+      ensure
+        Asciidoctor::Converter.unregister_all
+      end
+    end
+
     test 'should map handles? method on converter to respond_to? implementation by default' do
       class CustomConverterC
         include Asciidoctor::Converter

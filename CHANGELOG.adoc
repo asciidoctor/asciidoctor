@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * make Asciidoctor::Converter::Config.register_for method public as documented
   * remove unused Asciidoctor::Converter::BackendTraits#derive_backend_traits private method
 
 == 2.0.3 (2019-03-28) - @mojavelinux
