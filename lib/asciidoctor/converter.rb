@@ -112,14 +112,10 @@ module Converter
     end
 
     def backend_traits
-      @backend_traits ||= derive_backend_traits
+      @backend_traits ||= BackendTraits.derive_backend_traits @backend
     end
 
     alias backend_info backend_traits
-
-    private def derive_backend_traits
-      BackendTraits.derive_backend_traits @backend
-    end
 
     def self.derive_backend_traits backend
       return {} unless backend
