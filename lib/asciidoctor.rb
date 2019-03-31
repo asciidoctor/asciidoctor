@@ -1502,7 +1502,7 @@ module Asciidoctor
     end
   end
 
-  # Alias render to convert to maintain backwards compatibility
+  # Deprecated: Use {Asciidoctor.convert} instead.
   alias render convert
 
   # Public: Parse the contents of the AsciiDoc source file into an
@@ -1519,7 +1519,7 @@ module Asciidoctor
     ::File.open(filename, FILE_READ_MODE) {|file| self.convert file, options }
   end
 
-  # Alias render_file to convert_file to maintain backwards compatibility
+  # Deprecated: Use {Asciidoctor.convert_file} instead.
   alias render_file convert_file
 
   # Internal: Automatically load the Asciidoctor::Extensions module.

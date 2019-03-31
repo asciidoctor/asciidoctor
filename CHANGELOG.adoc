@@ -20,6 +20,7 @@ Bug Fixes::
   * make Asciidoctor::Converter::Config.register_for method public as documented
   * remove unused Asciidoctor::Converter::BackendTraits#derive_backend_traits private method
   * move Asciidoctor::Converter::BackendTraits.derive_backend_traits method to Asciidoctor::Converter
+  * mark Asciidoctor.render and Asciidoctor.render_file as deprecated in API docs
 
 == 2.0.3 (2019-03-28) - @mojavelinux
 
