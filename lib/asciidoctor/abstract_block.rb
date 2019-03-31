@@ -432,8 +432,10 @@ class AbstractBlock < AbstractNode
     end
   end
 
+  protected
+
   # Internal: Performs the work for find_by, but does not handle the StopIteration exception.
-  protected def find_by_internal selector = {}, result = [], &block
+  def find_by_internal selector = {}, result = [], &block
     if ((any_context = (context_selector = selector[:context]) ? nil : true) || context_selector == @context) &&
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&

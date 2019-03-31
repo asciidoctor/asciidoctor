@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * allow Asciidoctor to load cleanly on Ruby 2.0 - 2.2 for distributions that provide support for these older Ruby versions
   * make Asciidoctor::Converter::Config.register_for method public as documented
   * remove unused Asciidoctor::Converter::BackendTraits#derive_backend_traits private method
   * move Asciidoctor::Converter::BackendTraits.derive_backend_traits method to Asciidoctor::Converter

@@ -112,7 +112,7 @@ module Logging
   # Returns nothing
   private_class_method def self.included into
     into.extend Logging
-  end
+  end || :included
 
   def logger
     LoggerManager.logger

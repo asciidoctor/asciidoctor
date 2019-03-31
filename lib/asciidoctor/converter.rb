@@ -246,7 +246,9 @@ module Converter
       registry.merge
     end
 
-    private def registry
+    private
+
+    def registry
       raise ::NotImplementedError, %(#{Factory} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
@@ -349,7 +351,9 @@ module Converter
         @registry.fetch(backend) { super }
       end
 
-      private def catch_all
+      private
+
+      def catch_all
         @registry.default || super
       end
     end
@@ -362,9 +366,9 @@ module Converter
   #
   # Returns nothing.
   private_class_method def self.included into
-    into.include BackendTraits
+    into.send :include, BackendTraits
     into.extend Config
-  end
+  end || :included
 
   # An abstract base class for defining converters that can be used to convert {AbstractNode} objects in a parsed
   # AsciiDoc document to a backend format such as HTML or DocBook.
