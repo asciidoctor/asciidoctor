@@ -1124,7 +1124,7 @@ Your browser does not support the video tag.
         class_attr_val = @font_awesome.get_constant["#{node.target}"]
         
         # define height width
-        if node.attr? 'height' and node.attr? 'width'
+        if node.attr? 'height' and node.attr? 'width' then
           class_attr_val.insert(4, " style=\"height:#{node.attr("height")};width:#{node.attr("width")};\"")
         end
         
