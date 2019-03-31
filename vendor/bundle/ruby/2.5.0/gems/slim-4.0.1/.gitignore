@@ -1,0 +1,13 @@
+*.swp
+*.gem
+Gemfile.lock
+.bundle
+.redcar
+.rvmrc
+.yardoc
+coverage
+pkg
+test/rails/log
+test/rails/tmp
+/.ruby-gemset
+/.ruby-version

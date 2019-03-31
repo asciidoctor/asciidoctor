@@ -1,0 +1,1 @@
+{"data":"@a\nFeature:\n  @b @c\n  Scenario Outline:\n    Given <x>\n\n    Examples:\n      | x |\n      | y |\n\n  @d @e\n  Scenario Outline:\n    Given <m>\n\n    @f\n    Examples:\n      | m |\n      | n |\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/scenario_outlines_with_tags.feature"}

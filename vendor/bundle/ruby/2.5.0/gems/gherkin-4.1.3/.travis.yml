@@ -1,0 +1,23 @@
+language: ruby
+
+rvm:
+  - ruby-head
+  - 2.4.0
+  - 2.3.3
+  - 2.2.6
+  - jruby-9.1.7.0
+
+matrix:
+  allow_failures:
+    - rvm: ruby-head
+  fast_finish: true
+
+script: make
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/5373e574ed4e88026838
+    on_success: change
+    on_failure: always
+    on_start: never

@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+$VERBOSE=nil # Shut up JRuby warnings on Travis
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__),"../lib"))
+require 'optparse'
+require 'json'
+require 'gherkin/stream/source_events'
+require 'gherkin/stream/gherkin_events'
+
+options = {
+  print_source: true,
+  print_ast: true,
+  print_pickles: true
+}
+
+OptionParser.new do |opts|
+  opts.on("--[no-]source", "Don't print source events") do |v|
+    options[:print_source] = v
+  end
+  opts.on("--[no-]ast", "Don't print ast events") do |v|
+    options[:print_ast] = v
+  end
+  opts.on("--[no-]pickles", "Don't print pickle events") do |v|
+    options[:print_pickles] = v
+  end
+end.parse!
+
+source_events = Gherkin::Stream::SourceEvents.new(ARGV)
+gherkin_events = Gherkin::Stream::GherkinEvents.new(options)
+
+source_events.enum.each do |source_event|
+  gherkin_events.enum(source_event).each do |event|
+    puts JSON.generate(event)
+  end
+end

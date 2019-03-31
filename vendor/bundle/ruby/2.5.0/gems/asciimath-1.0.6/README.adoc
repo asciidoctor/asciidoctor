@@ -1,0 +1,104 @@
+# AsciiMath
+ifndef::env-site[:status:]
+
+An http://asciimath.org[AsciiMath] parser and MathML generator written in pure Ruby.
+
+ifdef::status[]
+[discrete]
+## Status
+
+image:https://travis-ci.org/pepijnve/asciimath.svg?branch=master["Linux Build Status", link="https://travis-ci.org/asciidoctor/asciimath"]
+image:https://img.shields.io/gem/v/asciimath.svg?label=gem%20version[Gem Version, link=https://rubygems.org/gems/asciimath]
+endif::status[]
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+[source,ruby]
+----
+gem 'asciimath'
+----
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install asciimath
+
+## Usage
+
+### Library
+
+First require the library.
+
+[source,ruby]
+----
+require 'asciimath'
+----
+
+Then parse an AsciiMath string.
+
+[source,ruby]
+----
+parsed_expression = AsciiMath.parse(asciimath)
+----
+
+The parsed expression is a set of nested Array and Hash objects.
+
+This expression can then be converted to MathML or HTML (experimental.
+
+[source,ruby]
+----
+math_ml = parsed_expression.to_mathml
+html = parsed_expression.to_html
+----
+
+The MathML or HTML code is returned as a String.
+
+### Command line
+
+The AsciiMath parser and converters can be invoked via the command line as follows:
+
+.MathML Generation
+[source]
+----
+asciimath "an asciimath string"
+
+or
+
+asciimath mathml "an asciimath string"
+----
+
+.HTML Generation
+[source]
+----
+asciimath html "an asciimath string"
+----
+
+This command will print out the generated code on stdout.
+
+
+## Notes on the HTML Output
+
+The HTML output is still regarded somewhat experimental - for basic usage it is fine, but it is not yet complete.
+Known issues are as follows:
+
+ * `sqrt` function does not generate sane output
+ * Use of font commands (e.g. `bb`) will result in broken output.
+ * Accents do not extend to match what they cover.
+ * Rendering of "integrals" uses a generic path that does not look amazing.
+ * The size of braces does not account for complex content - so a matrix will render with the right sized braces if all of its elements are single-height text, but braces around e.g. fractions will render at the incorrect height.
+
+Rendering the HTML output correctly requires the inclusion of `style/math.css` in the html document.
+There is currently no specific required font for this output, it simply selects a `serif` font family - change the `@font-family` attribute in the `.math-inline` class to select something specific.
+
+## Contributing
+
+. Fork it (https://github.com/pepijnve/asciimath/fork)
+. Create your feature branch (`git checkout -b my-new-feature`)
+. Commit your changes (`git commit -am 'Add some feature'`)
+. Push to the branch (`git push origin my-new-feature`)
+. Create a new Pull Request

@@ -1,0 +1,67 @@
+.math-fraction {
+    display: table;
+    border-collapse: collapse;
+    border-style: hidden;
+}
+.math-fraction_row {
+    display: table-row;
+}
+.math-fraction_cell {
+    display: table-cell;
+    border: 0.5px solid black;
+    text-align: center;
+}
+.math-block {
+	font-family: serif;
+	display: flex;
+    justify-content: center;
+}
+.math-inline {
+	font-family: serif;
+	display: inline-flex;
+    align-content: center;
+}
+.math-underover {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height:60%;
+}
+.math-subsup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.math-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.math-matrix {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+}
+
+.math-identifier,
+.math-operator,
+.math-text,
+.math-number {
+    margin-right: 0.1em;
+    margin-left: 0.1em;
+}
+.math-smaller {
+    font-size: 75%;
+}
+.math-identifier {
+	font-style: italic;
+}
+.math-brace {
+    transform: scale(0.5,1.0);
+}
+.math-blank {
+    align-self: center;
+}

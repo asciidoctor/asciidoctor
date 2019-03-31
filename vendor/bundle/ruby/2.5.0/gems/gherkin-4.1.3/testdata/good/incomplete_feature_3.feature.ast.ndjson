@@ -1,0 +1,1 @@
+{"document":{"comments":[{"location":{"column":1,"line":1},"text":"# Just a comment","type":"Comment"}],"type":"GherkinDocument"},"type":"gherkin-document","uri":"testdata/good/incomplete_feature_3.feature"}

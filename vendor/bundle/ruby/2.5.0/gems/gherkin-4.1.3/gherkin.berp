@@ -1,0 +1,46 @@
+﻿[
+	Tokens -> #Empty,#Comment,#TagLine,#FeatureLine,#BackgroundLine,#ScenarioLine,#ScenarioOutlineLine,#ExamplesLine,#StepLine,#DocStringSeparator,#TableRow,#Language
+	IgnoredTokens -> #Comment,#Empty
+	ClassName -> Parser
+	Namespace -> Gherkin
+]
+
+GherkinDocument! := Feature?
+Feature! := Feature_Header Background? Scenario_Definition*
+Feature_Header! := #Language? Tags? #FeatureLine Feature_Description
+
+Background! := #BackgroundLine Background_Description Scenario_Step*
+
+// we could avoid defining Scenario_Definition, but that would require regular look-aheads, so worse performance
+Scenario_Definition! := Tags? (Scenario | ScenarioOutline)
+
+Scenario! := #ScenarioLine Scenario_Description Scenario_Step*
+
+ScenarioOutline! := #ScenarioOutlineLine ScenarioOutline_Description ScenarioOutline_Step* Examples_Definition*
+// after the first "Examples" block, interpreting a tag line is ambiguous (tagline of next examples or of next scenario)
+// because of this, we need a lookahead hint, that connects the tag line to the next examples, if there is an examples block ahead
+Examples_Definition! [#Empty|#Comment|#TagLine->#ExamplesLine]:= Tags? Examples
+Examples! := #ExamplesLine Examples_Description Examples_Table?
+Examples_Table! := #TableRow #TableRow*
+
+Scenario_Step := Step
+ScenarioOutline_Step := Step
+
+Step! := #StepLine Step_Arg?
+Step_Arg := (DataTable | DocString)
+
+DataTable! := #TableRow+
+DocString! := #DocStringSeparator #Other* #DocStringSeparator
+
+Tags! := #TagLine+
+
+Feature_Description := Description_Helper
+Background_Description := Description_Helper
+Scenario_Description := Description_Helper
+ScenarioOutline_Description := Description_Helper
+Examples_Description := Description_Helper
+
+// we need to explicitly mention comment, to avoid merging it into the description line's #Other token
+// we also eat the leading empty lines, the tailing lines are not removed by the parser to avoid lookahead, this has to be done by the AST builder
+Description_Helper := #Empty* Description? #Comment*
+Description! := #Other+

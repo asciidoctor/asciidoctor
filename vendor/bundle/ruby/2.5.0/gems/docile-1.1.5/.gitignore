@@ -1,0 +1,9 @@
+*.gem
+.bundle
+Gemfile.lock
+pkg
+.idea
+doc
+.yardoc
+coverage
+vendor

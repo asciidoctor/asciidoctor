@@ -1,0 +1,44 @@
+(1:1)FeatureLine:Feature/DocString variations/
+(2:1)Empty://
+(3:3)ScenarioLine:Scenario/minimalistic/
+(4:5)StepLine:Given /a simple DocString/
+(5:7)DocStringSeparator://
+(6:1)Other:/first line (no indent)/
+(7:1)Other:/  second line (indented with two spaces)/
+(8:1)Other://
+(9:1)Other:/third line was empty/
+(10:7)DocStringSeparator://
+(11:5)StepLine:Given /a DocString with content type/
+(12:7)DocStringSeparator:/xml/
+(13:1)Other:/<foo>/
+(14:1)Other:/  <bar />/
+(15:1)Other:/</foo>/
+(16:7)DocStringSeparator://
+(17:5)StepLine:And /a DocString with wrong indentation/
+(18:7)DocStringSeparator://
+(19:1)Other:/wrongly indented line/
+(20:7)DocStringSeparator://
+(21:5)StepLine:And /a DocString with alternative separator/
+(22:7)DocStringSeparator://
+(23:1)Other:/first line/
+(24:1)Other:/second line/
+(25:7)DocStringSeparator://
+(26:5)StepLine:And /a DocString with normal separator inside/
+(27:7)DocStringSeparator://
+(28:1)Other:/first line/
+(29:1)Other:/"""/
+(30:1)Other:/third line/
+(31:7)DocStringSeparator://
+(32:5)StepLine:And /a DocString with alternative separator inside/
+(33:7)DocStringSeparator://
+(34:1)Other:/first line/
+(35:1)Other:/```/
+(36:1)Other:/third line/
+(37:7)DocStringSeparator://
+(38:5)StepLine:And /a DocString with escaped separator inside/
+(39:7)DocStringSeparator://
+(40:1)Other:/first line/
+(41:1)Other:/"""/
+(42:1)Other:/third line/
+(43:7)DocStringSeparator://
+EOF

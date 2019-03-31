@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+$VERBOSE=nil # Shut up JRuby warnings on Travis
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__),"../lib"))
+require 'gherkin/parser'
+require 'gherkin/token_formatter_builder'
+
+parser = Gherkin::Parser.new(Gherkin::TokenFormatterBuilder.new)
+files = ARGV
+files.each do |file|
+  File.open(file, 'r:UTF-8') do |io|
+    print parser.parse(io)
+  end
+end

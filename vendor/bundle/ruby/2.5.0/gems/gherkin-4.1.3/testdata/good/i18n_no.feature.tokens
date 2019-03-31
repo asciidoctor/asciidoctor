@@ -1,0 +1,8 @@
+(1:1)Language:/no/
+(2:1)FeatureLine:Egenskap/i18n support/
+(3:1)Empty://
+(4:3)ScenarioLine:Scenario/Parsing many languages/
+(5:5)StepLine:Gitt /Gherkin supports many languages/
+(6:5)StepLine:Når /Norwegian keywords are parsed/
+(7:5)StepLine:Så /they should be recognized/
+EOF

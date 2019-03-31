@@ -1,0 +1,1 @@
+{"data":"Feature: Example token used multiple times\n\n  Scenario Outline: Token used twice in a single step\n    Given <what> <what>\n\n    Examples:\n      | what  |\n      | usage |\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/example_token_multiple.feature"}

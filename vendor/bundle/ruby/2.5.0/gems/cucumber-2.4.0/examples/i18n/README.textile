@@ -1,0 +1,3 @@
+h1. Internationalisation (i18n) examples
+
+Visit the "wiki":https://github.com/cucumber/cucumber/wiki/Spoken-languages for instructions on how to use Cucumber on different languages.

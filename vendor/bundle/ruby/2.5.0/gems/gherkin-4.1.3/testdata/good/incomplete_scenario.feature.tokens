@@ -1,0 +1,7 @@
+(1:1)FeatureLine:Feature/Incomplete scenarios/
+(2:1)Empty://
+(3:3)BackgroundLine:Background/Adding a background won't make a pickle/
+(4:5)StepLine:* /a step/
+(5:1)Empty://
+(6:3)ScenarioLine:Scenario/no steps/
+EOF

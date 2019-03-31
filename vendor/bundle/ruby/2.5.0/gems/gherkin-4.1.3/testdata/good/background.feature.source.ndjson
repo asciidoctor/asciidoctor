@@ -1,0 +1,1 @@
+{"data":"Feature: Background\n\n  Background: a simple background\n    Given the minimalism inside a background\n\n\n  Scenario: minimalistic\n    Given the minimalism\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/background.feature"}

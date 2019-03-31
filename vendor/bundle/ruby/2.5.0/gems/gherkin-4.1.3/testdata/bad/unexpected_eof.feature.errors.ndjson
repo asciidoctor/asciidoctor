@@ -1,0 +1,1 @@
+{"data":"(7:0): unexpected end of file, expected: #TagLine, #ScenarioLine, #ScenarioOutlineLine, #Comment, #Empty","media":{"encoding":"utf-8","type":"text/vnd.cucumber.stacktrace+plain"},"source":{"start":{"column":0,"line":7},"uri":"testdata/bad/unexpected_eof.feature"},"type":"attachment"}

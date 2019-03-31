@@ -1,0 +1,8 @@
+--title "TomParse"
+--readme README.md
+--plugin tomdoc
+--private
+lib/**/*.rb
+-
+*.md
+*.txt

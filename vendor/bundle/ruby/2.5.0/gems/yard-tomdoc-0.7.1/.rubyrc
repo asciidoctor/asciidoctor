@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+config 'rubytest' do |run|
+  require 'spectroscope'
+  require 'ae'
+
+  $:.unshift 'lib'
+  $:.unshift 'test'
+
+  run.files << 'test/**/test_*.rb'
+end
+
+config 'rubytest', :profile=>:cov do |run|
+  require 'spectroscope'
+  require 'ae'
+  require 'simplecov'
+
+  $:.unshift 'lib'
+  $:.unshift 'test'
+
+  run.files << 'test/**/test_*.rb'
+
+  dir = $properties.coverage_folder
+
+  SimpleCov.command_name 'Ruby Tests'
+
+  SimpleCov.start do
+    coverage_dir(dir || 'log/coverage')
+    #add_group "Label", "lib/qed/directory"
+  end
+end
+

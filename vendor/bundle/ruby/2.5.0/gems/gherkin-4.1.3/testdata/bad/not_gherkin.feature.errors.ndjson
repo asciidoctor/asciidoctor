@@ -1,0 +1,1 @@
+{"data":"(1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'not gherkin'","media":{"encoding":"utf-8","type":"text/vnd.cucumber.stacktrace+plain"},"source":{"start":{"column":1,"line":1},"uri":"testdata/bad/not_gherkin.feature"},"type":"attachment"}

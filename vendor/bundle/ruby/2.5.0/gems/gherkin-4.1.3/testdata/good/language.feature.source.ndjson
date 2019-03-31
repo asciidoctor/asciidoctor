@@ -1,0 +1,1 @@
+{"data":"#language:en\n\nFeature: Explicit language specification\n\n  Scenario: minimalistic\n    Given the minimalism\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/language.feature"}

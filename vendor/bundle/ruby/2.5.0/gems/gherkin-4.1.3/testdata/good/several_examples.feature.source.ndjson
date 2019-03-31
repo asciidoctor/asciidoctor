@@ -1,0 +1,1 @@
+{"data":"Feature: Tagged Examples\n\n  Scenario Outline: minimalistic\n    Given the <what>\n\n    @foo\n    Examples:\n      | what |\n      | foo  |\n\n    @bar\n    Examples:\n      | what |\n      | bar  |\n\n  @zap\n  Scenario: ha ok\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/several_examples.feature"}

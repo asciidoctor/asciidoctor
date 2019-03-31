@@ -1,0 +1,66 @@
+---
+revision: 2013
+type: ruby
+sources:
+- INDEX.yml
+authors:
+- name: Trans
+  email: transfire@gmail.com
+- name: Loren Segal
+organizations: []
+requirements:
+- name: yard
+- version: 0.4.0+
+  name: tomparse
+- groups:
+  - build
+  development: true
+  name: detroit
+- groups:
+  - build
+  - test
+  development: true
+  name: dotopts
+- groups:
+  - test
+  development: true
+  name: spectroscope
+- groups:
+  - test
+  development: true
+  name: ae
+conflicts: []
+alternatives: []
+resources:
+- type: home
+  uri: http://rubyworks.github.com/yard-tomdoc
+  label: Homepage
+- type: code
+  uri: http://github.com/rubyworks/yard-tomdoc
+  label: Source Code
+- type: bugs
+  uri: http://github.com/rubyworks/yard-tomdoc/issues
+  label: Issue Tracker
+- type: docs
+  uri: http://rubydoc.info/gems/yard-tomdoc/frames
+  label: Documentation
+repositories: []
+categories: []
+copyrights:
+- holder: Rubyworks
+  year: '2012'
+  license: MIT
+- holder: Loren Segal
+  year: '2010'
+  license: MIT
+customs: []
+paths:
+  lib:
+  - lib
+version: 0.7.1
+name: yard-tomdoc
+title: YARD TomDoc
+summary: TomDoc for YARD
+description: Use TomDoc documentation format with YARD.
+webcvs: https://github.com/rubyworks/yard-tomdoc/tree/master
+date: '2013-02-16'

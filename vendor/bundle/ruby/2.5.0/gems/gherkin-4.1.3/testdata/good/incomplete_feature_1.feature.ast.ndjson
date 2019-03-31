@@ -1,0 +1,1 @@
+{"document":{"comments":[],"feature":{"children":[],"description":"  A short description","keyword":"Feature","language":"en","location":{"column":1,"line":1},"name":"Just a description","tags":[],"type":"Feature"},"type":"GherkinDocument"},"type":"gherkin-document","uri":"testdata/good/incomplete_feature_1.feature"}
