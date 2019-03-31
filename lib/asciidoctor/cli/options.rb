@@ -36,7 +36,8 @@ module Asciidoctor
 
       def parse!(args)
         opts_parser = ::OptionParser.new do |opts|
-          opts.banner = <<~'EOS'
+          # NOTE don't use squiggly heredoc to maintain compatibility with Ruby < 2.3
+          opts.banner = <<-'EOS'.gsub '          ', ''
           Usage: asciidoctor [OPTION]... FILE...
           Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 5, etc.)
           By default, the output is written to a file with the basename of the source file and the appropriate extension.
