@@ -956,7 +956,7 @@ class Document < AbstractBlock
     output
   end
 
-  # Alias render to convert to maintain backwards compatibility
+  # Deprecated: Use {Document#convert} instead.
   alias render convert
 
   # Public: Write the output to the specified file

@@ -31,7 +31,7 @@ class List < AbstractBlock
     end
   end
 
-  # Alias render to convert to maintain backwards compatibility
+  # Deprecated: Use {List#convert} instead.
   alias render convert
 
   def to_s

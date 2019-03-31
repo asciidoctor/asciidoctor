@@ -32,7 +32,7 @@ class Inline < AbstractNode
     converter.convert self
   end
 
-  # Alias render to convert to maintain backwards compatibility
+  # Deprecated: Use {Inline#convert} instead.
   alias render convert
 
   # Public: Returns the converted alt text for this inline image.

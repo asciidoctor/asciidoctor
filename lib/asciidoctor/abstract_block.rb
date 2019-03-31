@@ -74,7 +74,7 @@ class AbstractBlock < AbstractNode
     converter.convert self
   end
 
-  # Alias render to convert to maintain backwards compatibility
+  # Deprecated: Use {AbstractBlock#convert} instead.
   alias render convert
 
   # Public: Get the converted result of the child blocks by converting the
