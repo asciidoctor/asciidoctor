@@ -70,15 +70,19 @@ context 'Invoker' do
   end
 
   test 'should not fail to rewind input if reading document from stdin' do
-    io = STDIN.dup
-    class << io
-      def read
-        'paragraph'
+    begin
+      $stdin = STDIN.dup
+      class << $stdin
+        def read
+          'paragraph'
+        end
       end
+      invoker = invoke_cli_to_buffer(%w(-s), '-')
+      assert_equal 0, invoker.code
+      assert_equal 1, invoker.document.blocks.size
+    ensure
+      $stdin = STDIN
     end
-    invoker = invoke_cli_to_buffer(%w(-s), '-') { io }
-    assert_equal 0, invoker.code
-    assert_equal 1, invoker.document.blocks.size
   end
 
   test 'should accept document from stdin and write to output file' do
