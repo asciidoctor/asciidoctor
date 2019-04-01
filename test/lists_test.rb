@@ -3138,7 +3138,7 @@ context "Description lists (:dlist)" do
       assert_css '.hdlist table colgroup', output, 0
       assert_css '.hdlist table tr', output, 2
       # see nokogiri#1803 for why this is necessary
-      tbody_path = RUBY_ENGINE == 'jruby' ? 'tbody/' : ''
+      tbody_path = jruby? ? 'tbody/' : ''
       refute_includes output, '<tbody>'
       assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td), output, 2
       assert_xpath %(/*[@class="hdlist"]/table/#{tbody_path}tr[1]/td[@class="hdlist1"]), output, 1

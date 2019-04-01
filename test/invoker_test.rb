@@ -676,35 +676,20 @@ context 'Invoker' do
   end
 
   test 'should force default external encoding to UTF-8' do
-    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'encoding.adoc'
-    old_lang = ENV['LANG']
-    begin
-      ENV['LANG'] = 'US-ASCII'
-      # using open3 to work around a bug in JRuby process_manager.rb,
-      # which tries to run a gsub on stdout prematurely breaking the test
-      # warnings may be issued, so don't assert on stderr
-      stdout_lines = Open3.popen3(%(#{ruby} #{executable} -o - --trace #{input_path})) {|_, out| out.readlines }
-      refute_empty stdout_lines
-      # NOTE Ruby on Windows runs with a IBM437 encoding by default
-      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless Encoding.default_external == Encoding::UTF_8
-      stdout_str = stdout_lines.join
-      assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
-    ensure
-      if old_lang
-        ENV['LANG'] = old_lang
-      else
-        ENV.delete 'LANG'
-      end
-    end
+    # using open3 to work around a bug in JRuby process_manager.rb,
+    # which tries to run a gsub on stdout prematurely breaking the test
+    # warnings may be issued, so don't assert on stderr
+    stdout_lines = run_command({ 'LANG' => 'US-ASCII' }, %(#{asciidoctor_cmd} -o - --trace #{input_path})) {|out| out.readlines }
+    refute_empty stdout_lines
+    # NOTE Ruby on Windows runs with a IBM437 encoding by default
+    stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless Encoding.default_external == Encoding::UTF_8
+    stdout_str = stdout_lines.join
+    assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
   end
 
   test 'should force stdio encoding to UTF-8' do
-    require_script = fixture_path 'configure-stdin.rb'
-    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join bindir, 'asciidoctor'
-    result = Open3.popen3(%(#{ruby} -E IBM866:IBM866 #{executable} -r #{require_script} -s -o - -)) {|_, out| out.read }
+    result = run_command(%(#{asciidoctor_cmd true, '-E IBM866:IBM866'} -r #{fixture_path 'configure-stdin.rb'} -s -o - -)) {|out| out.read }
     # NOTE Ruby on Windows runs with a IBM437 encoding by default
     result.force_encoding Encoding::UTF_8 unless Encoding.default_external == Encoding::UTF_8
     assert_equal Encoding::UTF_8, result.encoding
@@ -726,47 +711,19 @@ context 'Invoker' do
   end
 
   test 'should show timezone as UTC if system TZ is set to UTC' do
-    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
-    old_tz = ENV['TZ']
-    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
-    begin
-      ENV['TZ'] = 'UTC'
-      result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
-      doctime, localtime = result.lines.map(&:chomp)
-      assert doctime.end_with?(' UTC')
-      assert localtime.end_with?(' UTC')
-    ensure
-      if old_tz
-        ENV['TZ'] = old_tz
-      else
-        ENV.delete 'TZ'
-      end
-      ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
-    end
+    output = run_command({ 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil }, %(#{asciidoctor_cmd} -d inline -o - -s #{input_path})) {|out| out.read }
+    doctime, localtime = output.lines.map(&:chomp)
+    assert doctime.end_with?(' UTC')
+    assert localtime.end_with?(' UTC')
   end
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
-    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-    executable = File.join bindir, 'asciidoctor'
     input_path = fixture_path 'doctime-localtime.adoc'
-    old_tz = ENV['TZ']
-    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
-    begin
-      ENV['TZ'] = 'EST+5'
-      result = `#{ruby} #{executable} -d inline -o - -s #{input_path}`
-      doctime, localtime = result.lines.map(&:chomp)
-      assert doctime.end_with?(' -0500')
-      assert localtime.end_with?(' -0500')
-    ensure
-      if old_tz
-        ENV['TZ'] = old_tz
-      else
-        ENV.delete 'TZ'
-      end
-      ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch if old_source_date_epoch
-    end
+    output = run_command({ 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil }, %(#{asciidoctor_cmd} -d inline -o - -s #{input_path})) {|out| out.read }
+    doctime, localtime = output.lines.map(&:chomp)
+    assert doctime.end_with?(' -0500')
+    assert localtime.end_with?(' -0500')
   end
 
   test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do

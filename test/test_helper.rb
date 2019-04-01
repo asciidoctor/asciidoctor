@@ -31,6 +31,10 @@ require 'minitest/autorun'
 Minitest::Test = MiniTest::Unit::TestCase unless defined? Minitest::Test
 
 class Minitest::Test
+  def jruby?
+    RUBY_ENGINE == 'jruby'
+  end
+
   def windows?
     RbConfig::CONFIG['host_os'] =~ /win|ming/
   end
@@ -61,6 +65,17 @@ class Minitest::Test
 
   def bindir
     File.join Asciidoctor::ROOT_DIR, 'bin'
+  end
+
+  def asciidoctor_cmd use_ruby = true, ruby_opts = nil
+    executable = File.join bindir, 'asciidoctor'
+    if use_ruby
+      ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
+      ruby = %(#{ruby} #{ruby_opts}) if ruby_opts
+      %(#{ruby} #{executable})
+    else
+      executable
+    end
   end
 
   def testdir
@@ -317,6 +332,36 @@ class Minitest::Test
       yield
     ensure
       Asciidoctor::LoggerManager.logger.level = old_logger_level
+    end
+  end
+
+  def run_command *args, &block
+    if Hash === (env = args[0])
+      cmd = args[1]
+    else
+      cmd, env = env, nil
+    end
+    if env
+      if jruby?
+        begin
+          old_env, env = ENV, (ENV.merge env)
+          env.each {|key, val| env.delete key if val.nil? } if env.value? nil
+          ENV.replace env
+          IO.popen cmd, &block
+        ensure
+          ENV.replace old_env
+        end
+      elsif env.value? nil
+        env = env.inject(ENV.to_h) do |acc, (key, val)|
+          val.nil? ? (acc.delete key) : (acc[key] = val)
+          acc
+        end
+        IO.popen env, cmd, unsetenv_others: true, &block
+      else
+        IO.popen env, cmd, &block
+      end
+    else
+      IO.popen cmd, &block
     end
   end
 
