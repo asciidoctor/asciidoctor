@@ -101,7 +101,7 @@ module SyntaxHighlighter
     # Public: Statically register the current class in the registry for the specified names.
     #
     # Returns nothing.
-    private def register_for *names
+    def register_for *names
       SyntaxHighlighter.register self, *names
     end
   end
