@@ -95,7 +95,7 @@ module SyntaxHighlighter
 
   private_class_method def self.included into
     into.extend Config
-  end
+  end || :included
 
   module Config
     # Public: Statically register the current class in the registry for the specified names.
@@ -139,7 +139,9 @@ module SyntaxHighlighter
       end
     end
 
-    private def registry
+    private
+    
+    def registry
       raise ::NotImplementedError, %(#{Factory} subclass #{self.class} must implement the ##{__method__} method)
     end
   end
@@ -151,7 +153,9 @@ module SyntaxHighlighter
       @registry = seed_registry || {}
     end
 
-    private def registry
+    private
+    
+    def registry
       @registry
     end
   end

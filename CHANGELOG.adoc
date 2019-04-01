@@ -19,6 +19,7 @@ Bug Fixes::
 
   * fix crash when source highlighter is Rouge and source language is not set on block (#3223)
   * make Asciidoctor::SyntaxHighlighter::Config.register_for method public as documented
+  * update CLI and SyntaxHighlighter to allow Asciidoctor to load cleanly on Ruby 2.0 - 2.2
 
 == 2.0.4 (2019-03-31) - @mojavelinux
 
