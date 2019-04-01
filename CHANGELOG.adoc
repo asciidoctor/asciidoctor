@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug Fixes::
+
+  * fix crash when source highlighter is Rouge and source language is not set on block (#3223)
+
 == 2.0.4 (2019-03-31) - @mojavelinux
 
 Bug Fixes::

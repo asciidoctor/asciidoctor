@@ -646,6 +646,21 @@ context 'Syntax Highlighter' do
       assert_includes output, 'pre.rouge .no {'
     end
 
+    test 'should not crash if source-highlighter attribute is set and source block does not define a language' do
+      input = <<~'EOS'
+      :source-highlighter: rouge
+
+      [source]
+      ----
+      require 'rouge'
+
+      html = Rouge::Formatters::HTML.new.format(Rouge::Lexers::Ruby.new.lex('puts "Hello, world!"'))
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe
+      assert_css 'pre > code:not([data-lang])', output, 1
+    end
+
     test 'should default to plain text lexer if lexer cannot be resolved for language' do
       input = <<~'EOS'
       :source-highlighter: rouge

@@ -36,7 +36,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    if (query_idx = lang.index '?')
+    if (query_idx = lang && (lang.index '?'))
       lang = lang.slice 0, query_idx
     end
     if opts[:css_mode] != :class && (@style = (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE) &&
