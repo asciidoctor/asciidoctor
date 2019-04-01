@@ -86,7 +86,8 @@ module Asciidoctor
         end
 
         if outfile == '-'
-          tofile = @out || $stdout
+          # NOTE set_encoding returns nil on JRuby 9.1
+          (tofile = @out) || ((tofile = $stdout).set_encoding UTF_8)
         elsif outfile
           opts[:mkdirs] = true
           tofile = outfile
@@ -97,7 +98,8 @@ module Asciidoctor
 
         if stdin
           # allows use of block to supply stdin, particularly useful for tests
-          input = block_given? ? yield : $stdin
+          # NOTE set_encoding returns nil on JRuby 9.1
+          block_given? ? (input = yield) : ((input = $stdin).set_encoding UTF_8, UTF_8)
           input_opts = opts.merge to_file: tofile
           if show_timings
             @documents << (::Asciidoctor.convert input, (input_opts.merge timings: (timings = Timings.new)))

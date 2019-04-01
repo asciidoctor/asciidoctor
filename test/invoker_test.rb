@@ -71,17 +71,13 @@ context 'Invoker' do
 
   test 'should not fail to rewind input if reading document from stdin' do
     begin
-      $stdin = STDIN.dup
-      class << $stdin
-        def read
-          'paragraph'
-        end
-      end
+      old_stdin = $stdin
+      $stdin = StringIO.new 'paragraph'
       invoker = invoke_cli_to_buffer(%w(-s), '-')
       assert_equal 0, invoker.code
       assert_equal 1, invoker.document.blocks.size
     ensure
-      $stdin = STDIN
+      $stdin = old_stdin
     end
   end
 
@@ -691,7 +687,8 @@ context 'Invoker' do
       # warnings may be issued, so don't assert on stderr
       stdout_lines = Open3.popen3(%(#{ruby} #{executable} -o - --trace #{input_path})) {|_, out| out.readlines }
       refute_empty stdout_lines
-      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless stdout_lines[0].encoding == Encoding::UTF_8
+      # NOTE Ruby on Windows runs with a IBM437 encoding by default
+      stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless Encoding.default_external == Encoding::UTF_8
       stdout_str = stdout_lines.join
       assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
     ensure
@@ -701,6 +698,18 @@ context 'Invoker' do
         ENV.delete 'LANG'
       end
     end
+  end
+
+  test 'should force stdio encoding to UTF-8' do
+    require_script = fixture_path 'configure-stdin.rb'
+    ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
+    executable = File.join bindir, 'asciidoctor'
+    result = Open3.popen3(%(#{ruby} -E IBM866:IBM866 #{executable} -r #{require_script} -s -o - -)) {|_, out| out.read }
+    # NOTE Ruby on Windows runs with a IBM437 encoding by default
+    result.force_encoding Encoding::UTF_8 unless Encoding.default_external == Encoding::UTF_8
+    assert_equal Encoding::UTF_8, result.encoding
+    assert_include '<p>é</p>', result
+    assert_include '<p>IBM866:IBM866</p>', result
   end
 
   test 'should print timings when -t flag is specified' do
