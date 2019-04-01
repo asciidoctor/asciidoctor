@@ -97,7 +97,7 @@ module Asciidoctor
 
         if stdin
           # allows use of block to supply stdin, particularly useful for tests
-          input = block_given? ? yield : STDIN
+          input = block_given? ? yield : $stdin
           input_opts = opts.merge to_file: tofile
           if show_timings
             @documents << (::Asciidoctor.convert input, (input_opts.merge timings: (timings = Timings.new)))
