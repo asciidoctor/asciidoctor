@@ -1,1 +1,0 @@
-{"data":"Feature: Incomplete backgrounds, Part 2\n\n  Background: just a description\n    A short description\n\n  Scenario: still pickles up\n    * a step\n","media":{"encoding":"utf-8","type":"text/vnd.cucumber.gherkin+plain"},"type":"source","uri":"testdata/good/incomplete_background_2.feature"}

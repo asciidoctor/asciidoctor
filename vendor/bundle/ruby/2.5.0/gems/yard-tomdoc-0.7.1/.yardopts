@@ -1,9 +1,0 @@
---title "YARD TomDoc"
---readme README.md
---protected
---private
---plugin tomdoc
-lib
--
-*.md
-*.txt

@@ -1,7 +1,0 @@
-(1:1)Language:/en/
-(2:1)Empty://
-(3:1)FeatureLine:Feature/Explicit language specification/
-(4:1)Empty://
-(5:3)ScenarioLine:Scenario/minimalistic/
-(6:5)StepLine:Given /the minimalism/
-EOF

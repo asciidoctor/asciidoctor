@@ -1,9 +1,0 @@
-(1:1)FeatureLine:Feature/Background/
-(2:1)Empty://
-(3:3)BackgroundLine:Background/a simple background/
-(4:5)StepLine:Given /the minimalism inside a background/
-(5:1)Empty://
-(6:1)Empty://
-(7:3)ScenarioLine:Scenario/minimalistic/
-(8:5)StepLine:Given /the minimalism/
-EOF

@@ -1,3 +1,0 @@
-bundler_require.rb
-require_test_unit.rb
-test_unit_assertions.rb

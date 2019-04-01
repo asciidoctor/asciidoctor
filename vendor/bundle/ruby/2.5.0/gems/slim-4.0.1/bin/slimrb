@@ -1,6 +1,0 @@
-#!/usr/bin/env ruby
-
-$:.unshift File.dirname(__FILE__) + '/../lib'
-require 'slim/command'
-
-Slim::Command.new(ARGV).run

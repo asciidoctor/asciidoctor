@@ -1,9 +1,0 @@
-(1:1)FeatureLine:Feature/Minimal Scenario Outline/
-(2:1)Empty://
-(3:1)ScenarioOutlineLine:Scenario Outline/minimalistic/
-(4:5)StepLine:Given /the <what>/
-(5:1)Empty://
-(6:1)ExamplesLine:Examples//
-(7:3)TableRow://5:what
-(8:3)TableRow://5:minimalism
-EOF

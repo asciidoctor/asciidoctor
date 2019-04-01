@@ -1,8 +1,0 @@
-(1:1)FeatureLine:Feature/Incomplete backgrounds, Part 2/
-(2:1)Empty://
-(3:3)BackgroundLine:Background/just a description/
-(4:1)Other:/    A short description/
-(5:1)Other://
-(6:3)ScenarioLine:Scenario/still pickles up/
-(7:5)StepLine:* /a step/
-EOF
