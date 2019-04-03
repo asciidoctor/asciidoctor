@@ -688,7 +688,7 @@ class PreprocessorReader < Reader
       end
       @path = (path ||= ::File.basename file)
       # only process lines in AsciiDoc files
-      if (@process_lines = ASCIIDOC_EXTENSIONS[::File.extname file])
+      if (@process_lines = file.end_with?(*ASCIIDOC_EXTENSIONS.keys))
         @includes[path.slice 0, (path.rindex '.')] = attributes['partial-option'] ? nil : true
       end
     else
