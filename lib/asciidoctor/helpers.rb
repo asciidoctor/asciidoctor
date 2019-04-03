@@ -198,6 +198,15 @@ module Helpers
     end
   end
 
+  # Public: Returns whether this path has a file extension.
+  #
+  # path - The String path to check; expects a posix path
+  #
+  # Returns true if the path has a file extension, false otherwise
+  def self.extname? path
+    (last_dot_idx = path.rindex '.') && !(path.index '/', last_dot_idx)
+  end
+
   # Internal: Make a directory, ensuring all parent directories exist.
   def self.mkdir_p dir
     unless ::File.directory? dir

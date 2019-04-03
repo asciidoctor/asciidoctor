@@ -751,7 +751,11 @@ module Substitutors
               path = refid.chop
             end
             if macro
-              src2src = path = path.slice 0, path.length - 5 if path.end_with? '.adoc'
+              if path.end_with? '.adoc'
+                src2src = path = path.slice 0, path.length - 5
+              elsif !(Helpers.extname? path)
+                src2src = path
+              end
             elsif path.end_with?(*ASCIIDOC_EXTENSIONS.keys)
               src2src = path = path.slice 0, (path.rindex '.')
             else
@@ -760,11 +764,13 @@ module Substitutors
           else
             target, fragment = refid, (refid.slice 1, refid.length)
           end
-        elsif macro && (refid.include? '.')
+        elsif macro
           if refid.end_with? '.adoc'
             src2src = path = refid.slice 0, refid.length - 5
-          else
+          elsif Helpers.extname? refid
             path = refid
+          else
+            fragment = refid
           end
         else
           fragment = refid

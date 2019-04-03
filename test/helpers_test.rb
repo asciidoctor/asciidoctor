@@ -33,6 +33,13 @@ context 'Helpers' do
       assert_equal 'include.d/master', Asciidoctor::Helpers.rootname('include.d/master.adoc')
     end
 
+    test 'extname? should return whether path contains an extname' do
+      assert Asciidoctor::Helpers.extname?('document.adoc')
+      assert Asciidoctor::Helpers.extname?('path/to/document.adoc')
+      assert_nil Asciidoctor::Helpers.extname?('basename')
+      refute Asciidoctor::Helpers.extname?('include.d/basename')
+    end
+
     test 'UriSniffRx should detect URIs' do
       assert Asciidoctor::UriSniffRx =~ 'http://example.com'
       assert Asciidoctor::UriSniffRx =~ 'https://example.com'
