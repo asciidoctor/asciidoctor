@@ -564,6 +564,7 @@ class ReaderTest < Minitest::Test
         reader.push_include append_lines, '/tmp/lines.adoc'
         assert_equal '/tmp/lines.adoc', reader.file
         assert_equal 'lines.adoc', reader.path
+        assert doc.catalog[:includes]['lines']
       end
 
       test 'PreprocessorReader#push_include method should accept file as a URI and compute dir and path' do
@@ -593,6 +594,17 @@ class ReaderTest < Minitest::Test
         reader.push_include nil, '', '<stdin>'
         assert_equal 0, reader.include_stack.size
         assert_equal 'a', reader.read_line.rstrip
+      end
+
+      test 'PreprocessorReader#push_include method should ignore dot in directory name when computing include path' do
+        lines = %w(a b c)
+        doc = Asciidoctor::Document.new lines
+        reader = doc.reader
+        append_lines = %w(one two three)
+        reader.push_include append_lines, nil, 'include.d/data'
+        assert_nil reader.file
+        assert_equal 'include.d/data', reader.path
+        assert doc.catalog[:includes]['include.d/data']
       end
     end
 
