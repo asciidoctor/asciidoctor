@@ -342,6 +342,7 @@ class Minitest::Test
       cmd, env = env, nil
     end
     if env
+      # NOTE remove workaround once https://github.com/jruby/jruby/issues/3428 is resolved
       if jruby?
         begin
           old_env, env = ENV, (ENV.merge env)
