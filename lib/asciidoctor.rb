@@ -248,7 +248,8 @@ module Asciidoctor
     'asciidoc' => '.adoc'
   }
 
-  # Set of file extensions recognized as AsciiDoc documents (stored as a truth hash)
+  # A map of file extensions that are recognized as AsciiDoc documents
+  # TODO .txt should be deprecated
   ASCIIDOC_EXTENSIONS = {
     '.adoc' => true,
     '.asciidoc' => true,
