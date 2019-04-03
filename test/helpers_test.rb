@@ -28,6 +28,11 @@ context 'Helpers' do
       assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master')
     end
 
+    test 'rootname should ignore dot not in last segment' do
+      assert_equal 'include.d/master', Asciidoctor::Helpers.rootname('include.d/master')
+      assert_equal 'include.d/master', Asciidoctor::Helpers.rootname('include.d/master.adoc')
+    end
+
     test 'UriSniffRx should detect URIs' do
       assert Asciidoctor::UriSniffRx =~ 'http://example.com'
       assert Asciidoctor::UriSniffRx =~ 'https://example.com'

@@ -159,7 +159,7 @@ module Helpers
 
   # Public: Removes the file extension from filename and returns the result
   #
-  # filename - The String file name to process
+  # filename - The String file name to process; expected to be a posix path
   #
   # Examples
   #
@@ -168,7 +168,11 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def self.rootname filename
-    filename.slice 0, ((filename.rindex '.') || filename.length)
+    if (last_dot_idx = filename.rindex '.')
+      (filename.index '/', last_dot_idx) ? filename : (filename.slice 0, last_dot_idx)
+    else
+      filename
+    end
   end
 
   # Public: Retrieves the basename of the filename, optionally removing the extension, if present

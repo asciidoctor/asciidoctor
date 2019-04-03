@@ -686,20 +686,20 @@ class PreprocessorReader < Reader
         (@dir = file.dup).path = (dir = ::File.dirname file.path) == '/' ? '' : dir
         file = file.to_s
       end
-      path ||= ::File.basename file
+      @path = (path ||= ::File.basename file)
       # only process lines in AsciiDoc files
-      @process_lines = ASCIIDOC_EXTENSIONS[::File.extname file]
+      if (@process_lines = ASCIIDOC_EXTENSIONS[::File.extname file])
+        @includes[path.slice 0, (path.rindex '.')] = attributes['partial-option'] ? nil : true
+      end
     else
       @dir = '.'
       # we don't know what file type we have, so assume AsciiDoc
       @process_lines = true
-    end
-
-    if path
-      @path = path
-      @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true if @process_lines
-    else
-      @path = '<stdin>'
+      if (@path = path)
+        @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true
+      else
+        @path = '<stdin>'
+      end
     end
 
     @lineno = lineno
