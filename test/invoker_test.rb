@@ -697,6 +697,12 @@ context 'Invoker' do
     assert_include '<p>IBM866:IBM866</p>', result
   end
 
+  test 'should not fail to load if call to Dir.home fails' do
+    rubyopt = %(-r #{fixture_path 'undef-dir-home.rb'})
+    result = run_command(%(#{asciidoctor_cmd true, rubyopt} -s -o - #{fixture_path 'basic.adoc'})) {|out| out.read }
+    assert_include 'Body content', result
+  end
+
   test 'should print timings when -t flag is specified' do
     input = 'Sample *AsciiDoc*'
     invoker = nil

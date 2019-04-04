@@ -185,7 +185,8 @@ module Asciidoctor
   DATA_DIR = ::File.join ROOT_DIR, 'data'
 
   # The user's home directory, as best we can determine it
-  USER_HOME = ::Dir.home
+  # IMPORTANT this rescue is required for running Asciidoctor on GitHub.com
+  USER_HOME = ::Dir.home rescue (::ENV['HOME'] || ::Dir.pwd)
 
   # The newline character used for output; stored in constant table as an optimization
   LF = ?\n

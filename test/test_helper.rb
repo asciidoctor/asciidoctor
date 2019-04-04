@@ -341,6 +341,7 @@ class Minitest::Test
     else
       cmd, env = env, nil
     end
+    opts = { err: [:child, :out] }
     if env
       # NOTE remove workaround once https://github.com/jruby/jruby/issues/3428 is resolved
       if jruby?
@@ -348,7 +349,7 @@ class Minitest::Test
           old_env, env = ENV, (ENV.merge env)
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
           ENV.replace env
-          IO.popen cmd, &block
+          IO.popen cmd, opts, &block
         ensure
           ENV.replace old_env
         end
@@ -357,12 +358,12 @@ class Minitest::Test
           val.nil? ? (acc.delete key) : (acc[key] = val)
           acc
         end
-        IO.popen env, cmd, unsetenv_others: true, &block
+        IO.popen env, cmd, (opts.merge unsetenv_others: true), &block
       else
-        IO.popen env, cmd, &block
+        IO.popen env, cmd, opts, &block
       end
     else
-      IO.popen cmd, &block
+      IO.popen cmd, opts, &block
     end
   end
 
