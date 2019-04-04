@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * assume implicit AsciiDoc extension on interdoc xref macro target with no extension (e.g., `document#`); restores 1.5.x behavior (#3231)
   * don't fail to load application if call to Dir.home fails; use a rescue with fallback values (#3238)
   * Helpers.rootname should only consider final path segment when dropping file extension
   * check for AsciiDoc file extension using end_with? instead of resolving the extname and using a lookup

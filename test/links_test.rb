@@ -442,14 +442,21 @@ context 'Links' do
     end
   end
 
-  test 'xref macro with explicit inter-document target should not assume AsciiDoc extension if AsciiDoc extension not present' do
+  test 'xref macro with explicit inter-document target should assume implicit AsciiDoc file extension if no file extension is present' do
     {
       'using-.net-web-services#' => 'Using .NET web services',
       'asciidoctor.1#' => 'Asciidoctor Manual',
-      'path/to/document#' => 'Document Title',
     }.each do |target, text|
       result = convert_string_to_embedded %(xref:#{target}[#{text}])
       assert_xpath %(//a[@href="#{target.chop}"][text()="#{text}"]), result, 1
+    end
+    {
+      'document#' => 'Document Title',
+      'path/to/document#' => 'Document Title',
+      'include.d/document#' => 'Document Title',
+    }.each do |target, text|
+      result = convert_string_to_embedded %(xref:#{target}[#{text}])
+      assert_xpath %(//a[@href="#{target.chop}.html"][text()="#{text}"]), result, 1
     end
   end
 
@@ -460,6 +467,12 @@ context 'Links' do
     }.each do |path, text|
       result = convert_string_to_embedded %(xref:#{path}[#{text}])
       assert_xpath %(//a[@href="#{path}"][text()="#{text}"]), result, 1
+    end
+    {
+      'sections.d/first' => 'First Section',
+    }.each do |path, text|
+      result = convert_string_to_embedded %(xref:#{path}[#{text}])
+      assert_xpath %(//a[@href="##{path}"][text()="#{text}"]), result, 1
     end
   end
 
