@@ -280,11 +280,9 @@ class AbstractNode
   # Returns A String reference or data URI for an icon image
   def icon_uri name
     if attr? 'icon'
-      # Ruby 2.3 requires the extra brackets around the attr method call
-      if (::File.extname (icon = (attr 'icon'))).empty?
-        # QUESTION should we be adding the extension if the icon is an absolute URI?
-        icon = %(#{icon}.#{@document.attr 'icontype', 'png'})
-      end
+      icon = attr 'icon'
+      # QUESTION should we be adding the extension if the icon is an absolute URI?
+      icon = %(#{icon}.#{@document.attr 'icontype', 'png'}) unless Helpers.extname? icon
     else
       icon = %(#{name}.#{@document.attr 'icontype', 'png'})
     end
@@ -359,9 +357,12 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri(target_image, asset_dir_key = nil)
-    ext = ::File.extname target_image
-    # QUESTION what if ext is empty?
-    mimetype = (ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length}))
+    if (ext = Helpers.extname target_image, nil)
+      mimetype = ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length})
+    else
+      mimetype = 'application/octet-stream'
+    end
+
     if asset_dir_key
       image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
     else
