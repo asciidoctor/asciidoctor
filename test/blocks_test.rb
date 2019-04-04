@@ -2524,6 +2524,18 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'embeds SVG image with image/svg+xml mimetype when file extension is .svg' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+      :data-uri:
+
+      image::circle.svg[Tiger,100]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
+    end
+
     test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
       input = <<~'EOS'
       :data-uri:
@@ -2537,6 +2549,20 @@ context 'Blocks' do
       output = doc.convert
       assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
       assert_message @logger, :WARN, '~image to embed not found or not readable'
+    end
+
+    test 'embeds base64-encoded data uri with application/octet-stream mimetype when file extension is missing' do
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: fixtures
+
+      image::dot[Dot]
+      EOS
+
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
+      assert_equal 'fixtures', doc.attributes['imagesdir']
+      output = doc.convert
+      assert_xpath '//img[starts-with(@src,"data:application/octet-stream;base64,")]', output, 1
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do

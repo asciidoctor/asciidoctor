@@ -1280,7 +1280,7 @@ module Asciidoctor
       # TODO cli checks if input path can be read and is file, but might want to add check to API too
       attrs['docfile'] = input_path = ::File.absolute_path input.path
       attrs['docdir'] = ::File.dirname input_path
-      attrs['docname'] = Helpers.basename input_path, (attrs['docfilesuffix'] = ::File.extname input_path)
+      attrs['docname'] = Helpers.basename input_path, (attrs['docfilesuffix'] = Helpers.extname input_path)
       source = input.read
     elsif input.respond_to? :read
       # NOTE tty, pipes & sockets can't be rewound, but can't be sniffed easily either

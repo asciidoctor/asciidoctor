@@ -192,7 +192,7 @@ module Helpers
   # Returns the String filename with leading directories removed and, if specified, the extension removed
   def self.basename filename, drop_ext = nil
     if drop_ext
-      ::File.basename filename, (drop_ext == true ? (::File.extname filename) : drop_ext)
+      ::File.basename filename, (drop_ext == true ? (extname filename) : drop_ext)
     else
       ::File.basename filename
     end
@@ -200,11 +200,38 @@ module Helpers
 
   # Public: Returns whether this path has a file extension.
   #
-  # path - The String path to check; expects a posix path
+  # path - The path String to check; expects a posix path
   #
   # Returns true if the path has a file extension, false otherwise
   def self.extname? path
     (last_dot_idx = path.rindex '.') && !(path.index '/', last_dot_idx)
+  end
+
+  # Public: Retrieves the file extension of the specified path. The file extension is the portion of the path in the
+  # last path segment starting from the last period.
+  #
+  # This method differs from File.extname in that it gives us control over the fallback value and is more efficient.
+  #
+  # path     - The path String in which to look for a file extension
+  # fallback - The fallback String to return if no file extension is present (optional, default: '')
+  #
+  # Returns the String file extension (with the leading dot included) or the fallback value if the path has no file extension.
+  if ::File::ALT_SEPARATOR
+    def self.extname path, fallback = ''
+      if (last_dot_idx = path.rindex '.')
+        (path.index '/', last_dot_idx) || (path.index ::File::ALT_SEPARATOR, last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      else
+        fallback
+      end
+    end
+  else
+    def self.extname path, fallback = ''
+      if (last_dot_idx = path.rindex '.')
+        (path.index '/', last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      else
+        fallback
+      end
+    end
   end
 
   # Internal: Make a directory, ensuring all parent directories exist.

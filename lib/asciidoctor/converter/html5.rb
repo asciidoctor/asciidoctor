@@ -105,9 +105,12 @@ class Converter::Html5Converter < Converter::Base
     result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
     if node.attr? 'favicon'
       if (icon_href = node.attr 'favicon').empty?
-        icon_href, icon_type = 'favicon.ico', 'image/x-icon'
+        icon_href = 'favicon.ico'
+        icon_type = 'image/x-icon'
+      elsif (icon_ext = Helpers.extname icon_href, nil)
+        icon_type = icon_ext == '.ico' ? 'image/x-icon' : %(image/#{icon_ext.slice 1, icon_ext.length})
       else
-        icon_type = (icon_ext = ::File.extname icon_href) == '.ico' ? 'image/x-icon' : %(image/#{icon_ext.slice 1, icon_ext.length})
+        icon_type = 'image/x-icon'
       end
       result << %(<link rel="icon" type="#{icon_type}" href="#{icon_href}"#{slash}>)
     end
