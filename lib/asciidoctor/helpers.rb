@@ -2,7 +2,9 @@
 module Asciidoctor
 # Internal: Except where noted, a module that contains internal helper functions.
 module Helpers
-  # Internal: Require the specified library using Kernel#require.
+  module_function
+
+  # Public: Require the specified library using Kernel#require.
   #
   # Attempts to load the library specified in the first argument using the
   # Kernel#require. Rescues the LoadError if the library is not available and
@@ -21,7 +23,7 @@ module Helpers
   # Otherwise, if on_failure is :abort, Kernel#raise is called with an appropriate message.
   # Otherwise, if on_failure is :warn, Kernel#warn is called with an appropriate message and nil returned.
   # Otherwise, nil is returned.
-  def self.require_library name, gem_name = true, on_failure = :abort
+  def require_library name, gem_name = true, on_failure = :abort
     require name
   rescue ::LoadError
     include Logging unless include? Logging
@@ -57,7 +59,7 @@ module Helpers
   # data - the source data Array to prepare (no nil entries allowed)
   #
   # returns a String Array of prepared lines
-  def self.prepare_source_array data
+  def prepare_source_array data
     return [] if data.empty?
     if (leading_2_bytes = (leading_bytes = (first = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
       data[0] = first.byteslice 2, first.bytesize
@@ -87,7 +89,7 @@ module Helpers
   # data - the source data String to prepare
   #
   # returns a String Array of prepared lines
-  def self.prepare_source_string data
+  def prepare_source_string data
     return [] if data.nil_or_empty?
     if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
       data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16LE
@@ -110,20 +112,8 @@ module Helpers
   # str - the String to check
   #
   # returns true if the String is a URI, false if it is not
-  def self.uriish? str
+  def uriish? str
     (str.include? ':') && (UriSniffRx.match? str)
-  end
-
-  # Internal: Efficiently retrieves the URI prefix of the specified String
-  #
-  # Uses the Asciidoctor::UriSniffRx regex to match the URI prefix in the
-  # specified String (e.g., http://), if present.
-  #
-  # str - the String to check
-  #
-  # returns the string URI prefix if the string is a URI, otherwise nil
-  def self.uri_prefix str
-    (str.include? ':') && UriSniffRx =~ str ? $& : nil
   end
 
   # Internal: Encode a URI component String for safe inclusion in a URI.
@@ -132,7 +122,7 @@ module Helpers
   #
   # Returns the String with all reserved URI characters encoded (e.g., /, &, =, space, etc).
   if RUBY_ENGINE == 'opal'
-    def self.encode_uri_component str
+    def encode_uri_component str
       # patch necessary to adhere with RFC-3986 (and thus CGI.escape)
       # see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent#Description
       %x(
@@ -143,7 +133,7 @@ module Helpers
     end
   else
     CGI = ::CGI
-    def self.encode_uri_component str
+    def encode_uri_component str
       CGI.escape str
     end
   end
@@ -153,7 +143,7 @@ module Helpers
   # str - the String to encode
   #
   # Returns the specified String with all spaces replaced with %20.
-  def self.encode_spaces_in_uri str
+  def encode_spaces_in_uri str
     (str.include? ' ') ? (str.gsub ' ', '%20') : str
   end
 
@@ -167,7 +157,7 @@ module Helpers
   #   # => "part1/chapter1"
   #
   # Returns the String filename with the file extension removed
-  def self.rootname filename
+  def rootname filename
     if (last_dot_idx = filename.rindex '.')
       (filename.index '/', last_dot_idx) ? filename : (filename.slice 0, last_dot_idx)
     else
@@ -190,7 +180,7 @@ module Helpers
   #   # => "tiger"
   #
   # Returns the String filename with leading directories removed and, if specified, the extension removed
-  def self.basename filename, drop_ext = nil
+  def basename filename, drop_ext = nil
     if drop_ext
       ::File.basename filename, (drop_ext == true ? (extname filename) : drop_ext)
     else
@@ -203,7 +193,7 @@ module Helpers
   # path - The path String to check; expects a posix path
   #
   # Returns true if the path has a file extension, false otherwise
-  def self.extname? path
+  def extname? path
     (last_dot_idx = path.rindex '.') && !(path.index '/', last_dot_idx)
   end
 
@@ -217,7 +207,7 @@ module Helpers
   #
   # Returns the String file extension (with the leading dot included) or the fallback value if the path has no file extension.
   if ::File::ALT_SEPARATOR
-    def self.extname path, fallback = ''
+    def extname path, fallback = ''
       if (last_dot_idx = path.rindex '.')
         (path.index '/', last_dot_idx) || (path.index ::File::ALT_SEPARATOR, last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
       else
@@ -225,7 +215,7 @@ module Helpers
       end
     end
   else
-    def self.extname path, fallback = ''
+    def extname path, fallback = ''
       if (last_dot_idx = path.rindex '.')
         (path.index '/', last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
       else
@@ -235,7 +225,7 @@ module Helpers
   end
 
   # Internal: Make a directory, ensuring all parent directories exist.
-  def self.mkdir_p dir
+  def mkdir_p dir
     unless ::File.directory? dir
       unless (parent_dir = ::File.dirname dir) == '.'
         mkdir_p parent_dir
@@ -252,13 +242,14 @@ module Helpers
     'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
     'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1
   }
+  private_constant :ROMAN_NUMERALS
 
   # Internal: Converts an integer to a Roman numeral.
   #
   # val - the [Integer] value to convert
   #
   # Returns the [String] roman numeral for this integer
-  def self.int_to_roman val
+  def int_to_roman val
     ROMAN_NUMERALS.map do |l, i|
       repeat, val = val.divmod i
       l * repeat
@@ -272,7 +263,7 @@ module Helpers
   # current - the value to increment as a String or Integer
   #
   # returns the next value in the sequence according to the current value's type
-  def self.nextval current
+  def nextval current
     if ::Integer === current
       current + 1
     else
@@ -291,14 +282,14 @@ module Helpers
   #
   # Returns a Class if the specified object is a Class (but not a Module) or
   # a String that resolves to a Class; otherwise, nil
-  def self.resolve_class object
+  def resolve_class object
     ::Class === object ? object : (::String === object ? (class_for_name object) : nil)
   end
 
   # Internal: Resolves a Class object (not a Module) for the qualified name.
   #
   # Returns Class
-  def self.class_for_name qualified_name
+  def class_for_name qualified_name
     raise unless ::Class === (resolved = ::Object.const_get qualified_name, false)
     resolved
   rescue
