@@ -1333,7 +1333,7 @@ module Asciidoctor
   #
   # Returns the Asciidoctor::Document
   def load_file filename, options = {}
-    ::File.open(filename, FILE_READ_MODE) {|file| self.load file, options }
+    ::File.open(filename, FILE_READ_MODE) {|file| load file, options }
   end
 
   # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -1380,7 +1380,7 @@ module Asciidoctor
     when false
       to_file = nil
     when '/dev/null'
-      return self.load input, options
+      return load input, options
     else
       options[:to_file] = write_to_target = to_file unless (stream_output = to_file.respond_to? :write)
     end
@@ -1410,7 +1410,7 @@ module Asciidoctor
 
     # NOTE :to_dir is always set when outputting to a file
     # NOTE :to_file option only passed if assigned an explicit path
-    doc = self.load input, options
+    doc = load input, options
 
     if sibling_path # write to file in same directory
       outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
@@ -1518,7 +1518,7 @@ module Asciidoctor
   # Returns the Document object if the converted String is written to a
   # file, otherwise the converted String
   def convert_file filename, options = {}
-    ::File.open(filename, FILE_READ_MODE) {|file| self.convert file, options }
+    ::File.open(filename, FILE_READ_MODE) {|file| convert file, options }
   end
 
   # Deprecated: Use {Asciidoctor.convert_file} instead.
