@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Improvements::
+
+  * alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
+
 == 2.0.6 (2019-04-04) - @mojavelinux
 
 Bug Fixes::
