@@ -36,6 +36,9 @@ class Inline < AbstractNode
   # Deprecated: Use {Inline#convert} instead.
   alias render convert
 
+  # Public: Get the converted result of this node's primary content (aka text).
+  alias content text
+
   # Public: Returns the converted alt text for this inline image.
   #
   # Returns the [String] value of the alt attribute.
