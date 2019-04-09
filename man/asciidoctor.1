@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
 .\" Generator: Asciidoctor 2.0.6
-.\"      Date: 2019-04-04
+.\"      Date: 2019-04-07
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 2.0.6
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2019-04-04" "Asciidoctor 2.0.6" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2019-04-07" "Asciidoctor 2.0.6" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -65,11 +65,11 @@ If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is inv
 .sp
 \fB\-a, \-\-attribute\fP=\fIATTRIBUTE\fP
 .RS 4
-Define, override or delete a document attribute.
-Command\-line attributes take precedence over attributes defined in the source file unless the value ends with \fI@\fP.
+Define, override, or unset a document attribute.
+Command\-line attributes take precedence over attributes defined in the source file unless either the name or value ends in \fI@\fP.
 .sp
 \fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
-Alternate acceptable forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unassigns the \fINAME\fP attribute) and \fINAME=VALUE@\fP (where \fIVALUE\fP does not override value of \fINAME\fP attribute if it\(cqs already defined in the source document).
+Alternate forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unsets the \fINAME\fP attribute), and \fINAME=VALUE@\fP (or \fINAME@=VALUE\fP) (where \fIVALUE\fP does not override the \fINAME\fP attribute if it\(cqs already defined in the source document).
 Values containing spaces should be enclosed in quotes.
 .sp
 This option may be specified more than once.

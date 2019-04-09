@@ -42,11 +42,11 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 === Document Settings
 
 *-a, --attribute*=_ATTRIBUTE_::
-  Define, override or delete a document attribute.
-  Command-line attributes take precedence over attributes defined in the source file unless the value ends with _@_.
+  Define, override, or unset a document attribute.
+  Command-line attributes take precedence over attributes defined in the source file unless either the name or value ends in _@_.
 +
 _ATTRIBUTE_ is normally formatted as a key-value pair, in the form _NAME=VALUE_.
-Alternate acceptable forms are _NAME_ (where the _VALUE_ defaults to an empty string), _NAME!_ (unassigns the _NAME_ attribute) and _NAME=VALUE@_ (where _VALUE_ does not override value of _NAME_ attribute if it's already defined in the source document).
+Alternate forms are _NAME_ (where the _VALUE_ defaults to an empty string), _NAME!_ (unsets the _NAME_ attribute), and _NAME=VALUE@_ (or _NAME@=VALUE_) (where _VALUE_ does not override the _NAME_ attribute if it's already defined in the source document).
 Values containing spaces should be enclosed in quotes.
 +
 This option may be specified more than once.

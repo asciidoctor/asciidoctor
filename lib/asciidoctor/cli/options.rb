@@ -80,13 +80,13 @@ module Asciidoctor
                   'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end
-          opts.on('-a', '--attribute key[=value]', 'a document attribute to set in the form of key, key! or key=value pair',
-                  'unless @ is appended to the value, this attributes takes precedence over attributes',
-                  'defined in the source document') do |attr|
+          opts.on('-a', '--attribute name[=value]', 'a document attribute to set in the form of name, name!, or name=value pair',
+                  'this attribute takes precedence over the same attribute defined in the source document',
+                  'unless either the name or value ends in @ (i.e., name@=value or name=value@)') do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
             attr = attr.encode UTF_8 unless attr.encoding == UTF_8
-            key, _, val = attr.partition '='
-            self[:attributes][key] = val
+            name, _, val = attr.partition '='
+            self[:attributes][name] = val
           end
           opts.on('-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
                   'may be specified multiple times') do |template_dir|
