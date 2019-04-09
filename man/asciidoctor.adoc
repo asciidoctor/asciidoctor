@@ -7,7 +7,7 @@ Dan Allen; Sarah White; Ryan Waldron
 
 == NAME
 
-asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
+asciidoctor - converts AsciiDoc source files to HTML, DocBook, and other formats
 
 == SYNOPSIS
 
@@ -15,7 +15,7 @@ asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats
 
 == DESCRIPTION
 
-The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, man(ual) page and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, man(ual) page, and other custom output formats.
 
 If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
@@ -25,11 +25,11 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 *-B, --base-dir*=_DIR_::
   Base directory containing the document and resources.
-  Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+  Defaults to the directory containing the source file or, if the source is read from a stream, the working directory.
   When combined with the safe mode setting, can be used to chroot the execution of the program.
 
 *-S, --safe-mode*=_SAFE_MODE_::
-  Set safe mode level: _unsafe_, _safe_, _server_ or _secure_.
+  Set safe mode level: _unsafe_, _safe_, _server_, or _secure_.
   Disables potentially dangerous macros in source files, such as `include::[]`.
   If not set, the safe mode level defaults to _unsafe_ when Asciidoctor is invoked using this script.
 
@@ -52,13 +52,13 @@ Values containing spaces should be enclosed in quotes.
 This option may be specified more than once.
 
 *-b, --backend*=_BACKEND_::
-  Backend output file format: _html5_, _docbook5_, _docbook45_ and _manpage_ are supported out of the box.
+  Backend output file format: _html5_, _docbook5_, _docbook45_, and _manpage_ are supported out of the box.
   You can also use the backend alias names _html_ (aliased to _html5_) or _docbook_ (aliased to _docbook5_).
   Other values can be passed, but if Asciidoctor cannot resolve the backend to a converter, it will fail.
   Defaults to _html5_.
 
 *-d, --doctype*=_DOCTYPE_::
-  Document type: _article_, _book_, _manpage_ or _inline_.
+  Document type: _article_, _book_, _manpage_, or _inline_.
   Sets the root element when using the _docbook_ backend and the style class on the HTML body element when using the _html_ backend.
   The _book_ document type allows multiple level-0 section titles in a single document.
   The _manpage_ document type enables parsing of metadata necessary to produce a man page.
@@ -69,7 +69,7 @@ This option may be specified more than once.
 
 *-D, --destination-dir*=_DIR_::
   Destination output directory.
-  Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+  Defaults to the directory containing the source file or, if the source is read from a stream, the working directory.
   If specified, the directory is resolved relative to the working directory.
 
 *-E, --template-engine*=_NAME_::
@@ -141,7 +141,7 @@ Matching templates found in subsequent directories override ones previously disc
   Turn on script warnings (applies to executed code).
 
 *-t, --timings*::
-  Print timings report to stderr (time to read, parse and convert).
+  Print timings report to stderr (time to read, parse, and convert).
 
 === Program Information
 
@@ -175,7 +175,7 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == AUTHORS
 
-*Asciidoctor* was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors.
+*Asciidoctor* was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld, and other contributors.
 
 *AsciiDoc* was written by Stuart Rackham and has received contributions from many other individuals.
 
@@ -191,5 +191,5 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == COPYING
 
-Copyright \(C) 2012-2019 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright \(C) 2012-2019 Dan Allen, Ryan Waldron, and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.

@@ -2,12 +2,12 @@
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
 .\" Generator: Asciidoctor 2.0.6
-.\"      Date: 2019-04-07
+.\"      Date: 2019-04-09
 .\"    Manual: Asciidoctor Manual
 .\"    Source: Asciidoctor 2.0.6
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2019-04-07" "Asciidoctor 2.0.6" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2019-04-09" "Asciidoctor 2.0.6" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -28,13 +28,13 @@
 .  LINKSTYLE blue R < >
 .\}
 .SH "NAME"
-asciidoctor \- converts AsciiDoc source files to HTML, DocBook and other formats
+asciidoctor \- converts AsciiDoc source files to HTML, DocBook, and other formats
 .SH "SYNOPSIS"
 .sp
 \fBasciidoctor\fP [\fIOPTION\fP]... \fIFILE\fP...
 .SH "DESCRIPTION"
 .sp
-The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fP to HTML5, DocBook 5, man(ual) page and other custom output formats.
+The asciidoctor(1) command converts the AsciiDoc source file(s) \fIFILE\fP to HTML5, DocBook 5, man(ual) page, and other custom output formats.
 .sp
 If \fIFILE\fP is \fI\-\fP then the AsciiDoc source is read from standard input.
 .SH "OPTIONS"
@@ -43,13 +43,13 @@ If \fIFILE\fP is \fI\-\fP then the AsciiDoc source is read from standard input.
 \fB\-B, \-\-base\-dir\fP=\fIDIR\fP
 .RS 4
 Base directory containing the document and resources.
-Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+Defaults to the directory containing the source file or, if the source is read from a stream, the working directory.
 When combined with the safe mode setting, can be used to chroot the execution of the program.
 .RE
 .sp
 \fB\-S, \-\-safe\-mode\fP=\fISAFE_MODE\fP
 .RS 4
-Set safe mode level: \fIunsafe\fP, \fIsafe\fP, \fIserver\fP or \fIsecure\fP.
+Set safe mode level: \fIunsafe\fP, \fIsafe\fP, \fIserver\fP, or \fIsecure\fP.
 Disables potentially dangerous macros in source files, such as \f(CRinclude::[]\fP.
 If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is invoked using this script.
 .RE
@@ -77,7 +77,7 @@ This option may be specified more than once.
 .sp
 \fB\-b, \-\-backend\fP=\fIBACKEND\fP
 .RS 4
-Backend output file format: \fIhtml5\fP, \fIdocbook5\fP, \fIdocbook45\fP and \fImanpage\fP are supported out of the box.
+Backend output file format: \fIhtml5\fP, \fIdocbook5\fP, \fIdocbook45\fP, and \fImanpage\fP are supported out of the box.
 You can also use the backend alias names \fIhtml\fP (aliased to \fIhtml5\fP) or \fIdocbook\fP (aliased to \fIdocbook5\fP).
 Other values can be passed, but if Asciidoctor cannot resolve the backend to a converter, it will fail.
 Defaults to \fIhtml5\fP.
@@ -85,7 +85,7 @@ Defaults to \fIhtml5\fP.
 .sp
 \fB\-d, \-\-doctype\fP=\fIDOCTYPE\fP
 .RS 4
-Document type: \fIarticle\fP, \fIbook\fP, \fImanpage\fP or \fIinline\fP.
+Document type: \fIarticle\fP, \fIbook\fP, \fImanpage\fP, or \fIinline\fP.
 Sets the root element when using the \fIdocbook\fP backend and the style class on the HTML body element when using the \fIhtml\fP backend.
 The \fIbook\fP document type allows multiple level\-0 section titles in a single document.
 The \fImanpage\fP document type enables parsing of metadata necessary to produce a man page.
@@ -97,7 +97,7 @@ Defaults to \fIarticle\fP.
 \fB\-D, \-\-destination\-dir\fP=\fIDIR\fP
 .RS 4
 Destination output directory.
-Defaults to the directory containing the source file, or the working directory if the source is read from a stream.
+Defaults to the directory containing the source file or, if the source is read from a stream, the working directory.
 If specified, the directory is resolved relative to the working directory.
 .RE
 .sp
@@ -198,7 +198,7 @@ Turn on script warnings (applies to executed code).
 .sp
 \fB\-t, \-\-timings\fP
 .RS 4
-Print timings report to stderr (time to read, parse and convert).
+Print timings report to stderr (time to read, parse, and convert).
 .RE
 .SS "Program Information"
 .sp
@@ -239,7 +239,7 @@ Refer to the \fBAsciidoctor\fP issue tracker at \c
 .URL "https://github.com/asciidoctor/asciidoctor/issues?q=is%3Aopen" "" "."
 .SH "AUTHORS"
 .sp
-\fBAsciidoctor\fP was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld and other contributors.
+\fBAsciidoctor\fP was written by Dan Allen, Ryan Waldron, Jason Porter, Nick Hengeveld, and other contributors.
 .sp
 \fBAsciiDoc\fP was written by Stuart Rackham and has received contributions from many other individuals.
 .SH "RESOURCES"
@@ -257,7 +257,7 @@ Refer to the \fBAsciidoctor\fP issue tracker at \c
 .URL "http://discuss.asciidoctor.org" "" ""
 .SH "COPYING"
 .sp
-Copyright (C) 2012\-2019 Dan Allen, Ryan Waldron and the Asciidoctor Project.
+Copyright (C) 2012\-2019 Dan Allen, Ryan Waldron, and the Asciidoctor Project.
 Free use of this software is granted under the terms of the MIT License.
 .SH "AUTHORS"
 .sp
