@@ -23,10 +23,10 @@ Gem::Specification.new do |s|
   }
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
-  files = begin
-    (result = `git ls-files -z`.split ?\0).empty? ? Dir['**/*'] : result
+  begin
+    files = (result = `git ls-files -z`.split ?\0).empty? ? Dir['**/*'] : result
   rescue
-    Dir['**/*']
+    files = Dir['**/*']
   end
   s.files = files.grep %r/^(?:(?:data|lib|man)\/.+|LICENSE|(?:CHANGELOG|README(?:-\w+)?)\.adoc|\.yardopts|#{s.name}\.gemspec)$/
   s.executables = (files.grep %r/^bin\//).map {|f| File.basename f }
