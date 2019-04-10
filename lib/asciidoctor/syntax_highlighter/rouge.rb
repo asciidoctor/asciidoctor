@@ -5,8 +5,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
 
   def initialize *args
     super
-    @requires_stylesheet = nil
-    @style = nil
+    @requires_stylesheet = @style = nil
   end
 
   def highlight?
@@ -19,9 +18,9 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     @style ||= (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE
     if opts[:css_mode] == :class
       @requires_stylesheet = true
-      formatter = ::Rouge::Formatters::HTML.new @style
+      formatter = ::Rouge::Formatters::HTML.new inline_theme: @style
     else
-      formatter = ::Rouge::Formatters::HTMLInline.new @style
+      formatter = ::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new
     end
     if (highlight_lines = opts[:highlight_lines])
       formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines

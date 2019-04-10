@@ -15,6 +15,10 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Bug Fixes::
+
+  * Fix compatibility with Rouge 2.0
+
 Improvements::
 
   * improve documentation for the `-a` CLI option; explain that `@` modifier can be placed at end of name as alternative to end of value
