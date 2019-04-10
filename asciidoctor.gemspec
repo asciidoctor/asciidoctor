@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.files = files.grep %r/^(?:(?:data|lib|man)\/.+|LICENSE|(?:CHANGELOG|README(?:-\w+)?)\.adoc|\.yardopts|#{s.name}\.gemspec)$/
   s.executables = (files.grep %r/^bin\//).map {|f| File.basename f }
   s.require_paths = ['lib']
-  #s.test_files = files.grep %r/^(?:(?:features|test)\/.+)$/
+  #s.test_files = files.grep %r/^(?:features|test)\/.+$/
 
   # asciimath is needed for testing AsciiMath in DocBook backend
   s.add_development_dependency 'asciimath', '~> 1.0.0'
