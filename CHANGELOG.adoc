@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * fix crash when resolving ID from text and at least one candidate contains an unresolved xref (#3254)
   * fix compatibility with Rouge 2.0
 
 Improvements::

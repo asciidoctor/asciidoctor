@@ -331,8 +331,7 @@ class Document < AbstractBlock
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 
-    @parsed = false
-    @header = @header_attributes = nil
+    @parsed = @reftexts = @header = @header_attributes = nil
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -615,16 +614,25 @@ class Document < AbstractBlock
     end
   end
 
-  # Public: Scan all registered references and return the ID of the reference that matches the specified reference text.
-  #
-  # If multiple references in the document have the same reference text, the first match in document order is used.
+  # Public: Scan registered references and return the ID of the first reference that matches the specified reference text.
   #
   # text - The String reference text to compare to the converted reference text of each registered reference.
   #
   # Returns the String ID of the first reference with matching reference text or nothing if no reference is found.
   def resolve_id text
-    ((@reftexts ||= @parsed ? {}.tap {|accum| @catalog[:refs].each {|id, ref| accum[ref.xreftext] = id } } : nil) ||
-      {}.tap {|accum| @catalog[:refs].find {|id, ref| ref.xreftext == text ? accum[text] = id : nil } })[text]
+    if @reftexts
+      @reftexts[text]
+    elsif @parsed
+      # @reftexts is set eagerly to prevent nested lazy init
+      (@reftexts = {}).tap {|accum| @catalog[:refs].each {|id, ref| accum[ref.xreftext] ||= id } }[text]
+    else
+      # @reftexts is set eagerly to prevent nested lazy init
+      resolved_id = nil
+      # NOTE short-circuit early since we're throwing away this table
+      (@reftexts = {}).tap {|accum| @catalog[:refs].each {|id, ref| (xreftext = ref.xreftext) == text ? (break (resolved_id = id)) : (accum[xreftext] ||= id) } }
+      @reftexts = nil
+      resolved_id
+    end
   end
 
   def footnotes?

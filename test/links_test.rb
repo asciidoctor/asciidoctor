@@ -874,6 +874,91 @@ context 'Links' do
     assert_xpath '//a[@href="#_section_b"][text()="Section B"]', output, 1
   end
 
+  test 'should not fail to resolve broken xref in title of block with ID' do
+    input = <<~'EOS'
+    [#p1]
+    .<<DNE>>
+    paragraph text
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_xpath '//*[@class="title"]/a[@href="#DNE"][text()="[DNE]"]', output, 1
+  end
+
+  test 'should resolve forward xref in title of block with ID' do
+    input = <<~'EOS'
+    [#p1]
+    .<<conclusion>>
+    paragraph text
+
+    [#conclusion]
+    == Conclusion
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_xpath '//*[@class="title"]/a[@href="#conclusion"][text()="Conclusion"]', output, 1
+  end
+
+  test 'should not fail to resolve broken xref in section title' do
+    input = <<~'EOS'
+    [#s1]
+    == <<DNE>>
+
+    == <<s1>>
+    EOS
+
+    # NOTE this output is nonsensical, but we still need to verify the scenario
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#DNE"][text()="[DNE]"]', output, 2
+  end
+
+  test 'should not resolve forward xref evaluated during parsing' do
+    input = <<~'EOS'
+    [#s1]
+    == <<forward>>
+
+    == <<s1>>
+
+    [#forward]
+    == Forward
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#forward"][text()="Forward"]', output, 0
+  end
+
+  test 'should not resolve forward natural xref evaluated during parsing' do
+    input = <<~'EOS'
+    :idprefix:
+
+    [#s1]
+    == <<Forward>>
+
+    == <<s1>>
+
+    == Forward
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#forward"][text()="Forward"]', output, 0
+  end
+
+  test 'should resolve first matching natural xref' do
+    input = <<~'EOS'
+    see <<Section Title>>
+
+    [#s1]
+    == Section Title
+
+    [#s2]
+    == Section Title
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#s1"]', output, 1
+    assert_xpath '//a[@href="#s1"][text()="Section Title"]', output, 1
+  end
+
   test 'anchor creates reference' do
     doc = document_from_string '[[tigers]]Tigers roam here.'
     ref = doc.catalog[:refs]['tigers']
