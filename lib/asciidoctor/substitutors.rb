@@ -807,7 +807,7 @@ module Substitutors
           refid, target = fragment, %(##{fragment})
         # handles: Node Title or Reference Text
         # do reverse lookup on fragment if not a known ID and resembles reftext (contains a space or uppercase char)
-        elsif (refid = doc.resolve_id fragment) && ((fragment.include? ' ') || fragment.downcase != fragment)
+        elsif ((fragment.include? ' ') || fragment.downcase != fragment) && (refid = doc.resolve_id fragment)
           fragment, target = refid, %(##{refid})
         else
           refid, target = fragment, %(##{fragment})
