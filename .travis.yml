@@ -6,9 +6,9 @@ language: ruby
 rvm:
 - &release_ruby 2.6.2
 - 2.5.5
-- 2.4.5
+- 2.4.6
 - 2.3.8
-- jruby-9.2.6.0
+- jruby-9.2.7.0
 - jruby-9.1.17.0
 # the test suite currently crashes on truffleruby
 #- truffleruby-rc13
