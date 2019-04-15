@@ -230,7 +230,7 @@ module Asciidoctor
 
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
-    'html'    => 'html5',
+    'html' => 'html5',
     'docbook' => 'docbook5'
   }
 
@@ -277,7 +277,7 @@ module Asciidoctor
   VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
 
   DELIMITED_BLOCKS = {
-    '--'   => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
+    '--' => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
     '----' => [:listing, ['literal', 'source'].to_set],
     '....' => [:literal, ['listing', 'source'].to_set],
     '====' => [:example, ['admonition'].to_set],
@@ -289,7 +289,7 @@ module Asciidoctor
     ':===' => [:table, ::Set.new],
     '!===' => [:table, ::Set.new],
     '////' => [:comment, ::Set.new],
-    '```'  => [:fenced_code, ::Set.new]
+    '```' => [:fenced_code, ::Set.new]
   }
 
   DELIMITED_BLOCK_HEADS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k.slice 0, 2] = true } }
@@ -300,13 +300,13 @@ module Asciidoctor
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
-    '<'  => :page_break
+    '<' => :page_break
   }
 
   MARKDOWN_THEMATIC_BREAK_CHARS = {
-    '-'  => :thematic_break,
-    '*'  => :thematic_break,
-    '_'  => :thematic_break
+    '-' => :thematic_break,
+    '*' => :thematic_break,
+    '_' => :thematic_break
   }
 
   HYBRID_LAYOUT_BREAK_CHARS = LAYOUT_BREAK_CHARS.merge MARKDOWN_THEMATIC_BREAK_CHARS
@@ -319,8 +319,8 @@ module Asciidoctor
   ORDERED_LIST_STYLES = [:arabic, :loweralpha, :lowerroman, :upperalpha, :upperroman] #, :lowergreek]
 
   ORDERED_LIST_KEYWORDS = {
-    #'arabic'     => '1',
-    #'decimal'    => '1',
+    #'arabic' => '1',
+    #'decimal' => '1',
     'loweralpha' => 'a',
     'lowerroman' => 'i',
     #'lowergreek' => 'a',
@@ -389,7 +389,7 @@ module Asciidoctor
       CC_ALPHA = CG_ALPHA = '\p{Alpha}'
       CC_ALNUM = CG_ALNUM = '\p{Alnum}'
       CG_BLANK = '\p{Blank}'
-      CC_WORD  = CG_WORD = '\p{Word}'
+      CC_WORD = CG_WORD = '\p{Word}'
     end
 
     ## Document header
@@ -958,7 +958,7 @@ module Asciidoctor
     # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
     InlinePassRx = {
       false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
-      true  => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
+      true => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
     }
 
     # Matches an inline plus passthrough spanning multiple lines, but only when it occurs directly
@@ -1108,36 +1108,36 @@ module Asciidoctor
   #end
 
   INTRINSIC_ATTRIBUTES = {
-    'startsb'    => '[',
-    'endsb'      => ']',
-    'vbar'       => '|',
-    'caret'      => '^',
-    'asterisk'   => '*',
-    'tilde'      => '~',
-    'plus'       => '&#43;',
-    'backslash'  => '\\',
-    'backtick'   => '`',
-    'blank'      => '',
-    'empty'      => '',
-    'sp'         => ' ',
+    'startsb' => '[',
+    'endsb' => ']',
+    'vbar' => '|',
+    'caret' => '^',
+    'asterisk' => '*',
+    'tilde' => '~',
+    'plus' => '&#43;',
+    'backslash' => '\\',
+    'backtick' => '`',
+    'blank' => '',
+    'empty' => '',
+    'sp' => ' ',
     'two-colons' => '::',
     'two-semicolons' => ';;',
-    'nbsp'       => '&#160;',
-    'deg'        => '&#176;',
-    'zwsp'       => '&#8203;',
-    'quot'       => '&#34;',
-    'apos'       => '&#39;',
-    'lsquo'      => '&#8216;',
-    'rsquo'      => '&#8217;',
-    'ldquo'      => '&#8220;',
-    'rdquo'      => '&#8221;',
-    'wj'         => '&#8288;',
-    'brvbar'     => '&#166;',
-    'pp'         => '&#43;&#43;',
-    'cpp'        => 'C&#43;&#43;',
-    'amp'        => '&',
-    'lt'         => '<',
-    'gt'         => '>'
+    'nbsp' => '&#160;',
+    'deg' => '&#176;',
+    'zwsp' => '&#8203;',
+    'quot' => '&#34;',
+    'apos' => '&#39;',
+    'lsquo' => '&#8216;',
+    'rsquo' => '&#8217;',
+    'ldquo' => '&#8220;',
+    'rdquo' => '&#8221;',
+    'wj' => '&#8288;',
+    'brvbar' => '&#166;',
+    'pp' => '&#43;&#43;',
+    'cpp' => 'C&#43;&#43;',
+    'amp' => '&',
+    'lt' => '<',
+    'gt' => '>'
   }
 
   QUOTE_SUBS = {}.tap do |accum|
