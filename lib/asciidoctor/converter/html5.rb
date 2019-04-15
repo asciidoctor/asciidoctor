@@ -23,9 +23,9 @@ class Converter::Html5Converter < Converter::Base
 
   DropAnchorRx = /<(?:a[^>+]+|\/a)>/
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
-  SvgPreambleRx = /\A.*?(?=<svg\b)/m
+  SvgPreambleRx = /\A#{CC_ALL}*?(?=<svg\b)/m
   SvgStartTagRx = /\A<svg[^>]*>/
-  DimensionAttributeRx = /\s(?:width|height|style)=(["']).*?\1/
+  DimensionAttributeRx = /\s(?:width|height|style)=(["'])#{CC_ANY}*?\1/
 
   def initialize backend, opts = {}
     @backend = backend
