@@ -19,6 +19,7 @@ Bug Fixes::
 
   * restore background color applied to literal blocks by default stylesheet (#3258)
 
+// tag::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux
 
 Bug Fixes::
@@ -32,6 +33,7 @@ Improvements::
   * move source for main API entry points (load, load_file, convert, convert_file) to separate files
 
 Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
+// end::compact[]
 
 == 2.0.6 (2019-04-04) - @mojavelinux
 
@@ -276,7 +278,6 @@ Build / Infrastructure::
 
 Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 
-// tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
 
 Enhancements::
@@ -365,7 +366,6 @@ Documentation::
 Build / Infrastructure::
 
   * replace thread_safe with concurrent-ruby (PR #2822) (*@junaruga*)
-// end::compact[]
 
 == 1.5.7.1 (2018-05-10) - @mojavelinux
 
