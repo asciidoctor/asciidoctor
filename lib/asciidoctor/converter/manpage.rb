@@ -17,7 +17,7 @@ class Converter::ManPageConverter < Converter::Base
 
   LiteralBackslashRx = /(?:\A|[^#{ESC}])\\/
   LeadingPeriodRx = /^\./
-  EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) ".*?" ".*?" )( |[^\s]*)(.*?)(?: *#{ESC}\\c)?$/
+  EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) "#{CC_ANY}*?" "#{CC_ANY}*?" )( |[^\s]*)(#{CC_ANY}*?)(?: *#{ESC}\\c)?$/
   MockBoundaryRx = /<\/?BOUNDARY>/
   EmDashCharRefRx = /&#8212;(?:&#8203;)?/
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/

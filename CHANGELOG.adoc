@@ -18,7 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * restore background color applied to literal blocks by default stylesheet (#3258)
-  * use portability constants (CC_ALL, CC_ANY) in regular expressions defined in DocBook converter
+  * use portability constants (CC_ALL, CC_ANY) in regular expressions defined in built-in converters (DocBook5 and ManPage)
 
 Improvements::
 
