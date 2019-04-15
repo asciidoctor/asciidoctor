@@ -25,6 +25,7 @@ Improvements::
 
   * use Concurrent::Map instead of Concurrent::Hash in template converter
   * use module_function keyword to define methods in Helpers
+  * move regular expression definitions to separate source file (internal change)
 
 // tag::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux
@@ -37,7 +38,8 @@ Bug Fixes::
 Improvements::
 
   * improve documentation for the `-a` CLI option; explain that `@` modifier can be placed at end of name as alternative to end of value
-  * move source for main API entry points (load, load_file, convert, convert_file) to separate files
+  * move source for main API entry points (load, load_file, convert, convert_file) to separate files (internal change)
+  * define main API entry points (load, load_file, convert, convert_file) as module functions
 
 Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 // end::compact[]
