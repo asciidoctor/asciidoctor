@@ -25,6 +25,8 @@ Improvements::
   * improve documentation for the `-a` CLI option; explain that `@` modifier can be placed at end of name as alternative to end of value
   * move source for main API entry points (load, load_file, convert, convert_file) to separate files
 
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
+
 == 2.0.6 (2019-04-04) - @mojavelinux
 
 Bug Fixes::
@@ -38,6 +40,8 @@ Improvements::
   * implement Helpers.extname as a more efficient and flexible File.extname method
   * check for AsciiDoc file extension using end_with? instead of resolving the extname and using a lookup
 
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
+
 == 2.0.5 (2019-04-01) - @mojavelinux
 
 Bug Fixes::
@@ -47,6 +51,8 @@ Bug Fixes::
   * CLI should use $stdin instead of STDIN to be consistent with the use of $stdout
   * mark encoding of stdio objects used in CLI as UTF-8 (#3225)
   * make Asciidoctor::SyntaxHighlighter::Config.register_for method public as documented
+
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 
 == 2.0.4 (2019-03-31) - @mojavelinux
 
@@ -58,6 +64,8 @@ Bug Fixes::
   * move Asciidoctor::Converter::BackendTraits.derive_backend_traits method to Asciidoctor::Converter
   * mark render and render_file methods as deprecated in API docs
 
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
+
 == 2.0.3 (2019-03-28) - @mojavelinux
 
 Bug Fixes::
@@ -65,12 +73,16 @@ Bug Fixes::
   * fix crash when attrlist is used on literal monospace phrase (#3216)
   * update use of magic regexp variables to fix compatibility with Opal / Asciidoctor.js (#3214)
 
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
+
 == 2.0.2 (2019-03-26) - @mojavelinux
 
 Bug Fixes::
 
   * apply verbatim substitutions to literal paragraphs attached to list item (#3205)
   * implement #lines and #source methods on Table::Cell based on cell text (#3207)
+
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 
 == 2.0.1 (2019-03-25) - @mojavelinux
 
@@ -86,6 +98,8 @@ Bug Fixes::
 Build / Infrastructure::
 
   * bundle .yardopts in RubyGem (#3193)
+
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 
 == 2.0.0 (2019-03-22) - @mojavelinux
 
@@ -253,6 +267,8 @@ Build / Infrastructure::
   * stop running CI job on unsupported versions of Ruby
   * exclude test suite, build script, and Gemfile from gem (#3044)
   * split build tasks out into individual files
+
+Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
 
 // tag::compact[]
 == 1.5.8 (2018-10-28) - @mojavelinux
