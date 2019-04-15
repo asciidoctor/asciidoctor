@@ -148,12 +148,12 @@ module Helpers
     end
   end
 
-  # Internal: Encode a URI String (namely the path portion).
+  # Internal: Apply URI path encoding to spaces in the specified string (i.e., convert spaces to %20).
   #
   # str - the String to encode
   #
-  # Returns the String with all spaces replaced with %20.
-  def self.encode_uri str
+  # Returns the specified String with all spaces replaced with %20.
+  def self.encode_spaces_in_uri str
     (str.include? ' ') ? (str.gsub ' ', '%20') : str
   end
 

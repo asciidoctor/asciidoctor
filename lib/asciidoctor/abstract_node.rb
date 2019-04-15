@@ -310,14 +310,10 @@ class AbstractNode
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
-      if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_uri target_image)) ||
+      if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
           (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
           (target_image = normalize_web_path target_image, images_base, false))
-        if doc.attr? 'allow-uri-read'
-          generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')
-        else
-          target_image
-        end
+        (doc.attr? 'allow-uri-read') ? (generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')) : target_image
       else
         generate_data_uri target_image, asset_dir_key
       end
@@ -474,7 +470,7 @@ class AbstractNode
   # Returns the resolved [String] path
   def normalize_web_path(target, start = nil, preserve_uri_target = true)
     if preserve_uri_target && (Helpers.uriish? target)
-      Helpers.encode_uri target
+      Helpers.encode_spaces_in_uri target
     else
       @document.path_resolver.web_path target, start
     end
