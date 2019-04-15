@@ -1546,7 +1546,7 @@ context 'Document' do
       :doctype: book
       :imagesdir: images
       :front-cover-image: image:front-cover.jpg[scaledwidth=210mm]
-      :back-cover-image: image:back-cover.jpg[scaledwidth=210mm]
+      :back-cover-image: image:back-cover.jpg[]
 
       preamble
 

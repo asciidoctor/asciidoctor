@@ -25,8 +25,8 @@ class Converter::DocBook5Converter < Converter::Base
   MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
   TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
 
-  CopyrightRx = /^(.+?)(?: ((?:\d{4}\-)?\d{4}))?$/
-  ImageMacroRx = /^image::?(.+?)\[(.*?)\]$/
+  CopyrightRx = /^(#{CC_ANY}+?)(?: ((?:\d{4}\-)?\d{4}))?$/
+  ImageMacroRx = /^image::?(\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
   def initialize backend, opts = {}
     @backend = backend
@@ -742,7 +742,7 @@ class Converter::DocBook5Converter < Converter::Base
       if (cover_image.include? ':') && ImageMacroRx =~ cover_image
         attrlist = $2
         cover_image = doc.image_uri $1
-        unless attrlist.empty?
+        if attrlist
           attrs = (AttributeList.new attrlist).parse ['alt', 'width', 'height']
           if attrs.key? 'scaledwidth'
             # NOTE scalefit="1" is the default in this case
