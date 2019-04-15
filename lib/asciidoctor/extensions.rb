@@ -622,7 +622,7 @@ module Extensions
 
     def resolve_regexp name, format
       raise ::ArgumentError, %(invalid name for inline macro: #{name}) unless MacroNameRx.match? name
-      @@rx_cache[[name, format]] ||= /\\?#{name}:#{format == :short ? '(){0}' : '(\S+?)'}\[(|.*?[^\\])\]/
+      @@rx_cache[[name, format]] ||= /\\?#{name}:#{format == :short ? '(){0}' : '(\S+?)'}\[(|#{CC_ANY}*?[^\\])\]/
     end
   end
 

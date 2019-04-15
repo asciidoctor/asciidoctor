@@ -19,6 +19,7 @@ Bug Fixes::
 
   * restore background color applied to literal blocks by default stylesheet (#3258)
   * use portability constants (CC_ALL, CC_ANY) in regular expressions defined in built-in converters (DocBook5 and ManPage)
+  * use portability constant (CC_ANY) in regular expression for custom inline macros
 
 Improvements::
 
