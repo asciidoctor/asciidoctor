@@ -19,6 +19,10 @@ Bug Fixes::
 
   * restore background color applied to literal blocks by default stylesheet (#3258)
 
+Improvements::
+
+  * use Concurrent::Map instead of Concurrent::Hash in template converter
+
 // tag::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux
 

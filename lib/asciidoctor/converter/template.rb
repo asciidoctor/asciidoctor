@@ -34,8 +34,8 @@ class Converter::TemplateConverter < Converter::Base
   }
 
   begin
-    require 'concurrent/hash' unless defined? ::Concurrent::Hash
-    @caches = { scans: ::Concurrent::Hash.new, templates: ::Concurrent::Hash.new }
+    require 'concurrent/map' unless defined? ::Concurrent::Map
+    @caches = { scans: ::Concurrent::Map.new, templates: ::Concurrent::Map.new }
   rescue ::LoadError
     @caches = { scans: {}, templates: {} }
   end
@@ -71,7 +71,7 @@ class Converter::TemplateConverter < Converter::Base
     end
     case opts[:template_cache]
     when true
-      logger.warn 'optional gem \'concurrent-ruby\' is not available. This gem is recommended when using the default template cache.' unless defined? ::Concurrent::Hash
+      logger.warn 'optional gem \'concurrent-ruby\' is not available. This gem is recommended when using the default template cache.' unless defined? ::Concurrent::Map
       @caches = self.class.caches
     when ::Hash
       @caches = opts[:template_cache]
