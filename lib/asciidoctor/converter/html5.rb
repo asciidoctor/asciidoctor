@@ -23,8 +23,14 @@ class Converter::Html5Converter < Converter::Base
 
   DropAnchorRx = /<(?:a[^>+]+|\/a)>/
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
-  SvgPreambleRx = /\A#{CC_ALL}*?(?=<svg\b)/m
-  SvgStartTagRx = /\A<svg[^>]*>/
+  if RUBY_ENGINE == 'opal'
+    # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
+    SvgPreambleRx = /^#{CC_ALL}*?(?=<svg\b)/
+    SvgStartTagRx = /^<svg[^>]*>/
+  else
+    SvgPreambleRx = /\A.*?(?=<svg\b)/m
+    SvgStartTagRx = /\A<svg[^>]*>/
+  end
   DimensionAttributeRx = /\s(?:width|height|style)=(["'])#{CC_ANY}*?\1/
 
   def initialize backend, opts = {}
