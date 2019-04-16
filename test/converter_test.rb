@@ -620,7 +620,7 @@ context 'Converter' do
       assert_css 'p', result, 1
     end
 
-    test 'can call read_svg_contents on built-in HTML5 converter; should remove markup prior the root svg element' do
+    test 'can call read_svg_contents on built-in HTML5 converter' do
       doc = document_from_string 'image::circle.svg[]', base_dir: fixturedir
       result = doc.converter.read_svg_contents doc.blocks[0], 'circle.svg'
       refute_nil result
