@@ -20,11 +20,11 @@ begin
     t.verbose = true
     t.warning = true
   end
-rescue LoadError => e
-  warn e.message
+rescue LoadError
+  warn $!.message
 end
 
 namespace :test do
   desc 'Run unit and feature tests'
-  task :all => [:test, :features]
+  task all: [:test, :features]
 end

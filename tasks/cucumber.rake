@@ -5,6 +5,6 @@ begin
     t.cucumber_opts = %w(-f progress)
     t.cucumber_opts << '--no-color' if ENV['CI']
   end
-rescue LoadError => e
-  warn e.message
+rescue LoadError
+  warn $!.message
 end
