@@ -21,6 +21,15 @@ context 'API' do
       assert_equal '.adoc', doc.attr('docfilesuffix')
     end
 
+    test 'should load input file from filename' do
+      sample_input_path = Pathname fixture_path 'sample.adoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: :safe
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal sample_input_path.expand_path.to_s, (doc.attr 'docfile')
+      assert_equal sample_input_path.expand_path.dirname.to_s, (doc.attr 'docdir')
+      assert_equal '.adoc', (doc.attr 'docfilesuffix')
+    end
+
     test 'should load input file with alternate file extension' do
       sample_input_path = fixture_path 'sample-alt-extension.asciidoc'
       doc = Asciidoctor.load_file sample_input_path, safe: :safe
@@ -1196,6 +1205,25 @@ context 'API' do
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
         FileUtils.rm(sample_output_path)
+      end
+    end
+
+    test 'should convert source file specified by pathname and write result to adjacent file by default' do
+      sample_input_path = Pathname fixture_path 'sample.adoc'
+      sample_output_path = Pathname fixture_path 'sample.html'
+      begin
+        doc = Asciidoctor.convert_file sample_input_path, safe: :safe
+        assert_equal sample_output_path.expand_path.to_s, (doc.attr 'outfile')
+        assert sample_output_path.file?
+        output = sample_output_path.read mode: Asciidoctor::FILE_READ_MODE
+        refute_empty output
+        assert_xpath '/html', output, 1
+        assert_xpath '/html/head', output, 1
+        assert_xpath '/html/body', output, 1
+        assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
+        assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
+      ensure
+        sample_output_path.delete
       end
     end
 
