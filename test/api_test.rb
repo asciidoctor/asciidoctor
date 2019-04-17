@@ -21,7 +21,7 @@ context 'API' do
       assert_equal '.adoc', doc.attr('docfilesuffix')
     end
 
-    test 'should load input file from filename' do
+    test 'should load input file from pathname' do
       sample_input_path = Pathname fixture_path 'sample.adoc'
       doc = Asciidoctor.load_file sample_input_path, safe: :safe
       assert_equal 'Document Title', doc.doctitle
