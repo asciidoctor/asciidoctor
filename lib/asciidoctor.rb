@@ -270,7 +270,7 @@ module Asciidoctor
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
 
-  ADMONITION_STYLE_HEADS = ['N', 'T', 'I', 'W', 'C'].to_set
+  ADMONITION_STYLE_HEADS = ::Set.new.tap {|accum| ADMONITION_STYLES.each {|s| accum << s.chr } }
 
   PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
 
@@ -361,8 +361,7 @@ module Asciidoctor
 
   MATHJAX_VERSION = '2.7.5'
 
-  # attributes which be changed within the content of the document (but not
-  # header) because it has semantic meaning; ex. sectnums
+  # attributes which be changed throughout the flow of the document (e.g., sectnums)
   FLEXIBLE_ATTRIBUTES = ['sectnums']
 
   # A collection of regular expressions used by the parser.
