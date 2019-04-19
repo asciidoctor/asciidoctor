@@ -24,6 +24,7 @@ Bug Fixes::
 Improvements::
 
   * use Concurrent::Map instead of Concurrent::Hash in template converter
+  * use module_function keyword to define methods in Helpers
 
 // tag::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux

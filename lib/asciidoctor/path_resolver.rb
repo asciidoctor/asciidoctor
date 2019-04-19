@@ -476,25 +476,15 @@ class PathResolver
   def web_path target, start = nil
     target = posixify target
     start = posixify start
-    uri_prefix = nil
 
     unless start.nil_or_empty? || (web_root? target)
-      target = (start.end_with? SLASH) ? %(#{start}#{target}) : %(#{start}#{SLASH}#{target})
-      if (uri_prefix = Helpers.uri_prefix target)
-        target = target[uri_prefix.length..-1]
-      end
+      target, uri_prefix = extract_uri_prefix %(#{start}#{(start.end_with? SLASH) ? '' : SLASH}#{target})
     end
 
     # use this logic instead if we want to normalize target if it contains a URI
     #unless web_root? target
-    #  if preserve_uri_target && (uri_prefix = Helpers.uri_prefix target)
-    #    target = target[uri_prefix.length..-1]
-    #  elsif !start.nil_or_empty?
-    #    target = %(#{start}#{SLASH}#{target})
-    #    if (uri_prefix = Helpers.uri_prefix target)
-    #      target = target[uri_prefix.length..-1]
-    #    end
-    #  end
+    #  target, uri_prefix = extract_uri_prefix target if preserve_uri_target
+    #  target, uri_prefix = extract_uri_prefix %(#{start}#{SLASH}#{target}) unless uri_prefix || start.nil_or_empty?
     #end
 
     target_segments, target_root = partition_path target, true
@@ -520,6 +510,24 @@ class PathResolver
     end
 
     uri_prefix ? %(#{uri_prefix}#{resolved_path}) : resolved_path
+  end
+
+  private
+
+  # Internal: Efficiently extracts the URI prefix from the specified String if the String is a URI
+  #
+  # Uses the Asciidoctor::UriSniffRx regex to match the URI prefix in the specified String (e.g., http://). If present,
+  # the prefix is removed.
+  #
+  # str - the String to check
+  #
+  # returns a tuple containing the specified string without the URI prefix, if present, and the extracted URI prefix.
+  def extract_uri_prefix str
+    if (str.include? ':') && UriSniffRx =~ str
+      [(str.slice $&.length, str.length), $&]
+    else
+      str
+    end
   end
 end
 end
