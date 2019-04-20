@@ -1115,6 +1115,19 @@ context 'Substitutions' do
       assert_css '#footnotes #_footnotedef_1', output, 1
     end
 
+    test 'inline footnote macro can define an id that uses any word characters in Unicode' do
+      input = <<~'EOS'
+      L'origine du mot forêt{blank}footnote:forêt[un massif forestier] est complexe.
+
+      Qu'est-ce qu'une forêt ?{blank}footnote:forêt[]
+      EOS
+      output = convert_string_to_embedded input
+      puts output
+      assert_css '#_footnote_forêt', output, 1
+      assert_css '#_footnotedef_1', output, 1
+      assert_xpath '//a[@class="footnote"][text()="1"]', output, 2
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']

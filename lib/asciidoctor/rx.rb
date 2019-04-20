@@ -7,9 +7,6 @@ module Asciidoctor
   #
   #   Pattern: \[(|#{CC_ALL}*?[^\\])\]
   #   Matches: [enclosed text] and [enclosed [text\]], not [enclosed text \\] or [\\] (as these require a trailing space)
-  #
-  # NOTE \w only matches ASCII word characters, whereas [[:word:]] and \p{Word} match any character in the Unicode word
-  # category.
   module Rx; end
 
   ## Document header
@@ -472,7 +469,7 @@ module Asciidoctor
   #   footnoteref:[id,text] (legacy)
   #   footnoteref:[id] (legacy)
   #
-  InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([\w-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\]/m
+  InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([#{CC_WORD}-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\]/m
 
   # Matches an image or icon inline macro.
   #
