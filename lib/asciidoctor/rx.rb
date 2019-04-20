@@ -122,7 +122,7 @@ module Asciidoctor
   AttributeEntryRx = /^:(!?#{CG_WORD}[^:]*):(?:[ \t]+(#{CC_ANY}*))?$/
 
   # Matches invalid characters in an attribute name.
-  InvalidAttributeNameCharsRx = /[^-#{CC_WORD}]/
+  InvalidAttributeNameCharsRx = /[^#{CC_WORD}-]/
 
   # Matches a pass inline macro that surrounds the value of an attribute
   # entry once it has been parsed.
@@ -148,7 +148,7 @@ module Asciidoctor
   #   {set:foo:bar}
   #   {set:name!}
   #
-  AttributeReferenceRx = /(\\)?\{(#{CG_WORD}[-#{CC_WORD}]*|(set|counter2?):#{CC_ANY}+?)(\\)?\}/
+  AttributeReferenceRx = /(\\)?\{(#{CG_WORD}[#{CC_WORD}-]*|(set|counter2?):#{CC_ANY}+?)(\\)?\}/
 
   ## Paragraphs and delimited blocks
 
@@ -159,7 +159,7 @@ module Asciidoctor
   #   [[idname]]
   #   [[idname,Reference Text]]
   #
-  BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+))?)\]\]$/
+  BlockAnchorRx = /^\[\[(?:|([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+))?)\]\]$/
 
   # Matches an attribute list above a block element.
   #
@@ -179,7 +179,7 @@ module Asciidoctor
   # A combined pattern that matches either a block anchor or a block attribute list.
   #
   # TODO this one gets hit a lot, should be optimized as much as possible
-  BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"']#{CC_ANY}*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}:.-]*(?:, *#{CC_ANY}+)?)\])\]$/
+  BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"']#{CC_ANY}*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}\-:.]*(?:, *#{CC_ANY}+)?)\])\]$/
 
   # Matches a title above a block.
   #
@@ -252,7 +252,7 @@ module Asciidoctor
   #   Section Title [[idname]]
   #   Section Title [[idname,Reference Text]]
   #
-  InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+))?\]\]$/
+  InlineSectionAnchorRx = / (\\)?\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+))?\]\]$/
 
   # Matches invalid ID characters in a section title.
   #
@@ -407,7 +407,7 @@ module Asciidoctor
   #
   #--
   # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
-  CustomBlockMacroRx = /^(#{CG_WORD}[-#{CC_WORD}]*)::(|\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
+  CustomBlockMacroRx = /^(#{CG_WORD}[#{CC_WORD}-]*)::(|\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
   # Matches an image, video or audio block macro.
   #
@@ -438,13 +438,13 @@ module Asciidoctor
   #   anchor:idname[]
   #   anchor:idname[Reference Text]
   #
-  InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(#{CC_ANY}*?[^\\])\]))/
+  InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\]))/
 
   # Scans for a non-escaped anchor (i.e., id + optional reference text) in the flow of text.
-  InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)\[(?:\]|(#{CC_ANY}*?[^\\])\])/
+  InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\])/
 
   # Scans for a leading, non-escaped anchor (i.e., id + optional reference text).
-  LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]/
+  LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]/
 
   # Matches a bibliography anchor at the start of the list item text (in a bibliography list).
   #
@@ -452,13 +452,13 @@ module Asciidoctor
   #
   #   [[[Fowler_1997]]] Fowler M. ...
   #
-  InlineBiblioAnchorRx = /^\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}:.-]*)(?:, *(#{CC_ANY}+?))?\]\]\]/
+  InlineBiblioAnchorRx = /^\[\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]\]/
 
   # Matches an inline e-mail address.
   #
   #   doc.writer@example.com
   #
-  InlineEmailRx = %r(([\\>:/])?#{CG_WORD}(?:&amp;|[#{CC_WORD}.%+-])*@#{CG_ALNUM}[#{CC_ALNUM}_.-]*\.[a-zA-Z]{2,5}\b)
+  InlineEmailRx = %r(([\\>:/])?#{CG_WORD}(?:&amp;|[#{CC_WORD}\-.%+])*@#{CG_ALNUM}[#{CC_ALNUM}_\-.]*\.[a-zA-Z]{2,5}\b)
 
   # Matches an inline footnote macro, which is allowed to span multiple lines.
   #
@@ -530,7 +530,7 @@ module Asciidoctor
 
   # Matches the name of a macro.
   #
-  MacroNameRx = /^#{CG_WORD}[-#{CC_WORD}]*$/
+  MacroNameRx = /^#{CG_WORD}[#{CC_WORD}-]*$/
 
   # Matches a stem (and alternatives, asciimath and latexmath) inline macro, which may span multiple lines.
   #
