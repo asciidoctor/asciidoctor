@@ -35,20 +35,8 @@ class Converter::DocBook5Converter < Converter::Base
 
   def convert_document node
     result = ['<?xml version="1.0" encoding="UTF-8"?>']
-    if node.attr? 'toc'
-      if node.attr? 'toclevels'
-        result << %(<?asciidoc-toc maxdepth="#{node.attr 'toclevels'}"?>)
-      else
-        result << '<?asciidoc-toc?>'
-      end
-    end
-    if node.attr? 'sectnums'
-      if node.attr? 'sectnumlevels'
-        result << %(<?asciidoc-numbered maxdepth="#{node.attr 'sectnumlevels'}"?>)
-      else
-        result << '<?asciidoc-numbered?>'
-      end
-    end
+    result << ((node.attr? 'toclevels') ? %(<?asciidoc-toc maxdepth="#{node.attr 'toclevels'}"?>) : '<?asciidoc-toc?>') if node.attr? 'toc'
+    result << ((node.attr? 'sectnumlevels') ? %(<?asciidoc-numbered maxdepth="#{node.attr 'sectnumlevels'}"?>) : '<?asciidoc-numbered?>') if node.attr? 'sectnums'
     lang_attribute = (node.attr? 'nolang') ? '' : %( xml:lang="#{node.attr 'lang', 'en'}")
     if (root_tag_name = node.doctype) == 'manpage'
       root_tag_name = 'refentry'
