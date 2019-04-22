@@ -1122,7 +1122,6 @@ context 'Substitutions' do
       Qu'est-ce qu'une forêt ?{blank}footnote:forêt[]
       EOS
       output = convert_string_to_embedded input
-      puts output
       assert_css '#_footnote_forêt', output, 1
       assert_css '#_footnotedef_1', output, 1
       assert_xpath '//a[@class="footnote"][text()="1"]', output, 2
