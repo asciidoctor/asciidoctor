@@ -441,6 +441,23 @@ context 'Converter' do
       end
     end
 
+    test 'should be able to register converter using symbol' do
+      begin
+        converter = Class.new Asciidoctor::Converter::Base do
+          register_for :foobaz
+          def initialize *args
+            super
+            basebackend 'text'
+            filetype 'text'
+            outfilesuffix '.fb'
+          end
+        end
+        assert_equal converter, (Asciidoctor::Converter.for 'foobaz')
+      ensure
+        Asciidoctor::Converter.unregister_all
+      end
+    end
+
     test 'should be able to register converter from converter class itself' do
       begin
         assert_nil Asciidoctor::Converter.for 'foobar'

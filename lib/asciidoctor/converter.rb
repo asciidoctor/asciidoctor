@@ -148,7 +148,7 @@ module Converter
     #
     # Returns nothing.
     def register_for *backends
-      Converter.register self, *backends
+      Converter.register self, *(backends.map {|backend| backend.to_s })
     end
   end
 
