@@ -13,7 +13,8 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+// tag::compact[]
+== 2.0.8 (2019-04-22) - @mojavelinux
 
 Bug Fixes::
 
@@ -30,7 +31,7 @@ Improvements::
   * use module_function keyword to define methods in Helpers
   * move regular expression definitions to separate source file (internal change)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux
 
 Bug Fixes::
@@ -45,7 +46,6 @@ Improvements::
   * define main API entry points (load, load_file, convert, convert_file) as module functions
 
 Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues resolved in 2.0.x] (cumulative).
-// end::compact[]
 
 == 2.0.6 (2019-04-04) - @mojavelinux
 
