@@ -622,7 +622,7 @@ class Converter::DocBook5Converter < Converter::Base
       if (reftext.include? '<') && ((reftext = reftext.gsub XmlSanitizeRx, '').include? ' ')
         reftext = (reftext.squeeze ' ').strip
       end
-      reftext = (reftext.gsub '"', '&quot;') if reftext.include? '"'
+      reftext = reftext.gsub '"', '&quot;' if reftext.include? '"'
       %(#{attrs} xreflabel="#{reftext}")
     else
       attrs
