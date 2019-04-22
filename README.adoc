@@ -26,6 +26,7 @@ endif::[]
 :uri-maven-plugin: {uri-org}/asciidoctor-maven-plugin
 :uri-asciidoclet: {uri-org}/asciidoclet
 :uri-project: https://asciidoctor.org
+:uri-gem: https://rubygems.org/gems/asciidoctor
 ifdef::env-site[:uri-project: link:]
 :uri-docs: {uri-project}/docs
 :uri-news: {uri-project}/news
@@ -90,12 +91,13 @@ endif::[]
 
 ifdef::status[]
 //.*Project health*
+image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={uri-gem}]
+image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
 image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI),link=https://travis-ci.org/asciidoctor/asciidoctor]
 image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor),link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status,link=https://coveralls.io/r/asciidoctor/asciidoctor]
 //image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate,link=https://codeclimate.com/github/asciidoctor/asciidoctor]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
-image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
 endif::[]
 
 == Sponsors
