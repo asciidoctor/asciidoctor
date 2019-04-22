@@ -25,6 +25,7 @@ Bug Fixes::
 
 Improvements::
 
+  * register_for methods accept arguments as symbols (#3274)
   * use Concurrent::Map instead of Concurrent::Hash in template converter
   * use module_function keyword to define methods in Helpers
   * move regular expression definitions to separate source file (internal change)

@@ -100,14 +100,20 @@ module SyntaxHighlighter
   module Config
     # Public: Statically register the current class in the registry for the specified names.
     #
+    # names - one or more String or Symbol names with which to register the current class as a syntax highlighter
+    #         implementation. Symbol arguments are coerced to Strings.
+    #
     # Returns nothing.
     def register_for *names
-      SyntaxHighlighter.register self, *names
+      SyntaxHighlighter.register self, *(names.map {|name| name.to_s })
     end
   end
 
   module Factory
     # Public: Associates the syntax highlighter class or object with the specified names.
+    #
+    # syntax_highlighter - the syntax highlighter implementation to register
+    # names              - one or more String names with which to register this syntax highlighter implementation.
     #
     # Returns nothing.
     def register syntax_highlighter, *names

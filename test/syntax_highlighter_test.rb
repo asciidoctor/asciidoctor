@@ -106,6 +106,22 @@ context 'Syntax Highlighter' do
     assert_equal syntax_highlighter, (Asciidoctor::SyntaxHighlighter.for 'foobar')
   end
 
+  test 'should be able to register syntax highlighter using symbol' do
+    syntax_highlighter = Class.new Asciidoctor::SyntaxHighlighter::Base do
+      register_for :foobaz
+
+      def format node, language, opts
+        %(<pre class="highlight"><code class="language-#{language}" data-lang="#{language}">#{node.content}</code></pre>)
+      end
+
+      def highlight?
+        false
+      end
+    end
+
+    assert_equal syntax_highlighter, (Asciidoctor::SyntaxHighlighter.for 'foobaz')
+  end
+
   test 'should set language on output of source block when source-highlighter attribute is not set' do
     input = <<~'EOS'
     [source, ruby]
