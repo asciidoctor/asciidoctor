@@ -459,7 +459,7 @@ Siehe die {uri-license}[LIZENZ] für den vollen Lizenztext.
 
 == Authoren
 
-*Asciidoctor* wird von https://github.com/mojavelinux[Dan Allen] und https://github.com/graphitefriction[Sarah White] geleitet und hat Beiträge von {uri-contributors}[vielen Personen} in Asciidoctors großartiger Gemeinschaft erhalten.
+*Asciidoctor* wird von https://github.com/mojavelinux[Dan Allen] und https://github.com/graphitefriction[Sarah White] geleitet und hat Beiträge von {uri-contributors}[vielen Personen] in Asciidoctors großartiger Gemeinschaft erhalten.
 Das Projekt wurde 2012 von https://github.com/erebor[Ryan Waldron] initiiert und basiert auf einem {uri-prototype}[Prototyp] von https://github.com/nickh[Nick Hengeveld].
 
 *AsciiDoc* wurde von Stuart Rackham gegründet und hat Beiträge von vielen Personen aus der AsciiDoc-Community erhalten.
