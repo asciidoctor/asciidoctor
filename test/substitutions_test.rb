@@ -1550,6 +1550,11 @@ context 'Substitutions' do
         assert_equal %q{<guimenu>File</guimenu>}, para.sub_macros(para.source)
       end
 
+      test 'should process multiple menu macros in same line' do
+        para = block_from_string('menu:File[] and menu:Edit[]', attributes: { 'experimental' => '' })
+        assert_equal '<b class="menuref">File</b> and <b class="menuref">Edit</b>', para.sub_macros(para.source)
+      end
+
       test 'should process menu with menu item using macro syntax' do
         para = block_from_string('menu:File[Save As&#8230;]', attributes: { 'experimental' => '' })
         assert_equal %q{<span class="menuseq"><b class="menu">File</b>&#160;<b class="caret">&#8250;</b> <b class="menuitem">Save As&#8230;</b></span>}, para.sub_macros(para.source)
