@@ -596,7 +596,8 @@ class Parser
                 end
               end
               if blk_ctx == :image
-                document.register :images, [target, (attributes['imagesdir'] = doc_attrs['imagesdir'])]
+                document.register :images, target
+                attributes['imagesdir'] = doc_attrs['imagesdir']
                 # NOTE style is the value of the first positional attribute in the block attribute line
                 attributes['alt'] ||= style || (attributes['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
                 unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?

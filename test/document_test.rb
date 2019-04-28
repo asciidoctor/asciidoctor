@@ -1241,6 +1241,14 @@ context 'Document' do
       assert_equal 'foobar', (doc.resolve_id 'Foo Bar')
     end
 
+    test 'should record imagesdir when image is registered with catalog' do
+      doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
+      doc.register :images, 'diagram.svg'
+      assert_equal doc.catalog[:images].size, 1
+      assert_equal 'diagram.svg', doc.catalog[:images][0].target
+      assert_equal 'img', doc.catalog[:images][0].imagesdir
+    end
+
     test 'should catalog assets inside nested document' do
       input = <<~'EOS'
       image::outer.png[]
