@@ -19,6 +19,7 @@ Bug Fixes::
 
   * process multiple single-item menu macros in same line (#3279)
   * register images in catalog correctly (#3283)
+  * rename AbstractNode#options method to AbstractNode#enabled_options so it doesn't get shadowed by Document#options (#3282)
 
 // tag::compact[]
 == 2.0.8 (2019-04-22) - @mojavelinux

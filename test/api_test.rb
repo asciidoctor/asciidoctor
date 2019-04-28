@@ -1550,6 +1550,18 @@ context 'API' do
       assert_equal '', block.attributes['reversed-option']
     end
 
+    test 'enabled_options should return all options which are set' do
+      input = <<~'EOS'
+      [%interactive]
+      * [x] code
+      * [ ] test
+      * [ ] profit
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert_equal %w(checklist interactive).to_set, block.enabled_options
+    end
+
     test 'should append option to existing options' do
       input = <<~'EOS'
       [%fancy]
@@ -1586,7 +1598,7 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      assert_equal %w(compact reversed).to_set, block.options
+      assert_equal %w(compact reversed).to_set, block.enabled_options
     end
 
     test 'table column should not be a block or inline' do
