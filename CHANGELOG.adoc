@@ -18,6 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * process multiple single-item menu macros in same line (#3279)
+  * register images in catalog correctly (#3283)
 
 // tag::compact[]
 == 2.0.8 (2019-04-22) - @mojavelinux
