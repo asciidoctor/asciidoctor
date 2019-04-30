@@ -1781,6 +1781,41 @@ context 'Extensions' do
       assert_xpath '/*[@class="imageblock"]/*[@class="title"][text()="Figure 1. Cat in Sink?"]', output, 1
     end
 
+    test 'should not fail if alt attribute is not set on block image node' do
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :no_alt do
+            process do |parent, target, attrs|
+              create_block parent, 'image', nil, { 'target' => 'picture.jpg' }
+            end
+          end
+        end
+
+        output = Asciidoctor.convert 'no_alt::[]'
+        assert_include '<img src="picture.jpg" alt="">', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not fail if alt attribute is not set on inline image node' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :no_alt do
+            match_format :short
+            process do |parent, target, attrs|
+              create_inline parent, 'image', nil, target: 'picture.jpg'
+            end
+          end
+        end
+
+        output = Asciidoctor.convert 'no_alt:[]'
+        assert_include '<span class="image"><img src="picture.jpg" alt=""></span>', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should assign id and role on list items unordered' do
       input = 'santa_list::ulist[]'
       doc = document_from_string input, standalone: false, extension_registry: create_santa_list_block_macro

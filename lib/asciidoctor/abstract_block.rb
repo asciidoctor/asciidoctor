@@ -223,6 +223,8 @@ class AbstractBlock < AbstractNode
         text = sub_specialchars text
         (ReplaceableTextRx.match? text) ? (sub_replacements text) : text
       end
+    else
+      ''
     end
   end
 

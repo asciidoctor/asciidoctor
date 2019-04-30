@@ -39,7 +39,7 @@ class Inline < AbstractNode
   #
   # Returns the [String] value of the alt attribute.
   def alt
-    attr 'alt'
+    (attr 'alt') || ''
   end
 
   # For a reference node (:ref or :bibref), the text is the reftext (and the reftext attribute is not set).
