@@ -161,10 +161,10 @@ class AbstractNode
     nil
   end
 
-  # Public: Retrieve the Set of option names that are set on this node
+  # Public: Retrieve the Set of option names that are enabled on this node
   #
   # Returns a [Set] of option names
-  def options
+  def enabled_options
     ::Set.new.tap {|accum| @attributes.each_key {|k| accum << (k.slice 0, k.length - 7) if k.to_s.end_with? '-option' } }
   end
 
