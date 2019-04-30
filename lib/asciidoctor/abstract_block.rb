@@ -370,13 +370,13 @@ class AbstractBlock < AbstractNode
   # The parts of a complete caption are: <prefix> <number>. <title>
   # This partial caption represents the part the precedes the title.
   #
-  # value           - The explicit String caption to assign to this block (default: nil).
-  # caption_context - The Symbol context to use when resolving caption-related attributes.
-  #                   If not provided, the name of the context for this block is used.
+  # value           - The String caption to assign to this block or nil to use document attribute.
+  # caption_context - The Symbol context to use when resolving caption-related attributes. If not provided, the name of
+  #                   the context for this block is used. Only certain contexts allow the caption to be looked up.
   #                   (default: @context)
   #
   # Returns nothing.
-  def assign_caption value = nil, caption_context = @context
+  def assign_caption value, caption_context = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
       if (attr_name = CAPTION_ATTR_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
         @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
