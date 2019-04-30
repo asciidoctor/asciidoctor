@@ -514,6 +514,24 @@ context 'API' do
       assert_equal 96, unordered_complex_items[4].lineno
     end
 
+    # NOTE this does not work for a list continuation that attached to a grandparent
+    test 'should assign correct source location to blocks that follow a detached list continuation' do
+      input = <<~'EOS'
+      * parent
+       ** child
+
+      +
+      paragraph attached to parent
+
+      ****
+      sidebar outside list
+      ****
+      EOS
+
+      doc = document_from_string input, sourcemap: true
+      assert_equal [5, 8], (doc.find_by context: :paragraph).map(&:lineno)
+    end
+
     test 'should assign correct source location if section occurs on last line of input' do
       input = <<~'EOS'
       = Document Title

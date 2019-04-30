@@ -1533,7 +1533,7 @@ class Parser
 
     reader.unshift_line this_line if this_line
 
-    buffer.delete_at detached_continuation if detached_continuation
+    buffer[detached_continuation] = '' if detached_continuation
 
     until buffer.empty?
       # strip trailing blank lines to prevent empty blocks
