@@ -13,7 +13,8 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+// tag::compact[]
+== 2.0.9 (2019-04-30) - @mojavelinux
 
 Bug Fixes::
 
@@ -24,7 +25,7 @@ Bug Fixes::
   * fix lineno of source location on blocks that follow a detached list continuation (#3281)
   * assume inline image type is "image" if not set (typically by an extension)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.8 (2019-04-22) - @mojavelinux
 
 Bug Fixes::
@@ -42,7 +43,6 @@ Improvements::
   * use module_function keyword to define methods in Helpers
   * move regular expression definitions to separate source file (internal change)
 
-// end::compact[]
 == 2.0.7 (2019-04-13) - @mojavelinux
 
 Bug Fixes::
