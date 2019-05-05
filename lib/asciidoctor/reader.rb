@@ -1090,116 +1090,114 @@ class PreprocessorReader < Reader
         end
       end
 
-      if inc_linenos
-        inc_lines, inc_offset, inc_lineno = [], nil, 0
-        begin
+      begin
+        if inc_linenos
           reader.call inc_path, read_mode do |f|
-            select_remaining = nil
-            f.each_line do |l|
-              inc_lineno += 1
-              if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
-                # NOTE record line where we started selecting
-                inc_offset ||= inc_lineno
-                inc_lines << l
-              else
-                if select == inc_lineno
-                  # NOTE record line where we started selecting
-                  inc_offset ||= inc_lineno
-                  inc_lines << l
-                  inc_linenos.shift
-                end
-                break if inc_linenos.empty?
-              end
-            end
+            include_lines_filtering_numbers(f, inc_linenos, parsed_attrs, inc_path, relpath)
           end
-        rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
-        end
-        shift
-        # FIXME not accounting for skipped lines in reader line numbering
-        if inc_offset
-          parsed_attrs['partial-option'] = ''
-          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
-        end
-      elsif inc_tags
-        inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
-        if inc_tags.key? '**'
-          if inc_tags.key? '*'
-            select = base_select = inc_tags.delete '**'
-            wildcard = inc_tags.delete '*'
-          else
-            select = base_select = wildcard = inc_tags.delete '**'
+        elsif inc_tags
+          reader.call inc_path, read_mode do |f|
+            include_lines_filtering_tags(f, inc_tags, expanded_target, parsed_attrs, inc_path, relpath, target_type)
           end
         else
-          select = base_select = !(inc_tags.value? true)
-          wildcard = inc_tags.delete '*'
-        end
-        begin
-          reader.call inc_path, read_mode do |f|
-            dbl_co, dbl_sb = '::', '[]'
-            f.each_line do |l|
-              inc_lineno += 1
-              if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
-                this_tag = $2
-                if $1 # end tag
-                  if this_tag == active_tag
-                    tag_stack.pop
-                    active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
-                  elsif inc_tags.key? this_tag
-                    include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
-                    if (idx = tag_stack.rindex {|key, _| key == this_tag })
-                      idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
-                      logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
-                    else
-                      logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
-                    end
-                  end
-                elsif inc_tags.key? this_tag
-                  tags_used << this_tag
-                  # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
-                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
-                elsif !wildcard.nil?
-                  select = active_tag && !select ? false : wildcard
-                  tag_stack << [(active_tag = this_tag), select, inc_lineno]
-                end
-              elsif select
-                # NOTE record the line where we started selecting
-                inc_offset ||= inc_lineno
-                inc_lines << l
-              end
-            end
-          end
-        rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
-        end
-        unless tag_stack.empty?
-          tag_stack.each do |tag_name, _, tag_lineno|
-            logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: (create_include_cursor inc_path, expanded_target, tag_lineno)
-          end
-        end
-        unless (missing_tags = inc_tags.keys - tags_used.to_a).empty?
-          logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), source_location: cursor
-        end
-        shift
-        if inc_offset
-          parsed_attrs['partial-option'] = '' unless base_select && wildcard && inc_tags.empty?
-          # FIXME not accounting for skipped lines in reader line numbering
-          push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
-        end
-      else
-        begin
           # NOTE read content before shift so cursor is only advanced if IO operation succeeds
           inc_content = reader.call(inc_path, read_mode) {|f| f.read }
           shift
           push_include inc_content, inc_path, relpath, 1, parsed_attrs
-        rescue
-          logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
-          return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
+      rescue
+        logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
+        return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
       end
       true
+    end
+  end
+
+  def include_lines_filtering_tags(file, inc_tags, expanded_target, parsed_attrs, inc_path, relpath, target_type)
+    inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
+    if inc_tags.key? '**'
+      if inc_tags.key? '*'
+        select = base_select = inc_tags.delete '**'
+        wildcard = inc_tags.delete '*'
+      else
+        select = base_select = wildcard = inc_tags.delete '**'
+      end
+    else
+      select = base_select = !(inc_tags.value? true)
+      wildcard = inc_tags.delete '*'
+    end
+    dbl_co, dbl_sb = '::', '[]'
+    file.each_line do |l|
+      inc_lineno += 1
+      if (l.include? dbl_co) && (l.include? dbl_sb) && TagDirectiveRx =~ l
+        this_tag = $2
+        if $1 # end tag
+          if this_tag == active_tag
+            tag_stack.pop
+            active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
+          elsif inc_tags.key? this_tag
+            include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
+            if (idx = tag_stack.rindex {|key, _| key == this_tag})
+              idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
+              logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
+            else
+              logger.warn message_with_context %(unexpected end tag '#{this_tag}' at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
+            end
+          end
+        elsif inc_tags.key? this_tag
+          tags_used << this_tag
+          # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
+          tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
+        elsif !wildcard.nil?
+          select = active_tag && !select ? false : wildcard
+          tag_stack << [(active_tag = this_tag), select, inc_lineno]
+        end
+      elsif select
+        # NOTE record the line where we started selecting
+        inc_offset ||= inc_lineno
+        inc_lines << l
+      end
+    end
+    unless tag_stack.empty?
+      tag_stack.each do |tag_name, _, tag_lineno|
+        logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: (create_include_cursor inc_path, expanded_target, tag_lineno)
+      end
+    end
+    unless (missing_tags = inc_tags.keys - tags_used.to_a).empty?
+      logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), source_location: cursor
+    end
+    shift
+    if inc_offset
+      parsed_attrs['partial-option'] = '' unless base_select && wildcard && inc_tags.empty?
+      # FIXME not accounting for skipped lines in reader line numbering
+      push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
+    end
+  end
+
+  def include_lines_filtering_numbers(file, inc_linenos, parsed_attrs, inc_path, relpath)
+    inc_lines, inc_offset, inc_lineno = [], nil, 0
+    select_remaining = nil
+    file.each_line do |l|
+      inc_lineno += 1
+      if select_remaining || (::Float === (select = inc_linenos[0]) && (select_remaining = select.infinite?))
+        # NOTE record line where we started selecting
+        inc_offset ||= inc_lineno
+        inc_lines << l
+      else
+        if select == inc_lineno
+          # NOTE record line where we started selecting
+          inc_offset ||= inc_lineno
+          inc_lines << l
+          inc_linenos.shift
+        end
+        break if inc_linenos.empty?
+      end
+    end
+    shift
+    # FIXME not accounting for skipped lines in reader line numbering
+    if inc_offset
+      parsed_attrs['partial-option'] = ''
+      push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
     end
   end
 
