@@ -27,12 +27,17 @@ module SyntaxHighlighter
   # Returns a [Boolean] indicating whether the docinfo method should be called for this location.
   def docinfo? location; end
 
-  # Public: Generates docinfo markup to insert in the output document at the specified location.
+  # Public: Generates docinfo markup for this syntax highlighter to insert at the specified location in the output document.
   #
   # location - The Symbol representing the location slot (:head or :footer).
+  # doc      - The Document in which this syntax highlighter is being used.
+  # opts     - A Hash of options that configure the syntax highlighting:
+  #            :linkcss - A Boolean indicating whether the stylesheet should be linked instead of embedded (optional).
+  #            :cdn_base_url - The String base URL for assets loaded from the CDN.
+  #            :self_closing_tag_slash - The String '/' if the converter calling this method emits self-closing tags.
   #
   # Return the [String] markup to insert.
-  def docinfo location
+  def docinfo location, doc, opts
     raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #docinfo? returns true)
   end
 
