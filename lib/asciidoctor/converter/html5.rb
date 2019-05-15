@@ -153,7 +153,7 @@ class Converter::Html5Converter < Converter::Base
     end
 
     if (syntax_hl = node.syntax_highlighter) && (syntax_hl.docinfo? :head)
-      result << (syntax_hl.docinfo :head, node, linkcss: linkcss)
+      result << (syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
     end
 
     unless (docinfo_content = node.docinfo).empty?
