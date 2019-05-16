@@ -19,6 +19,7 @@ Bug Fixes::
 
   * fix placement of title on excerpt block (#3289)
   * always pass same options to SyntaxHighlighter#docinfo, regardless of value of location argument
+  * Fix signature of SyntaxHighlighter#docinfo method (#3300)
 
 // tag::compact[]
 == 2.0.9 (2019-04-30) - @mojavelinux
