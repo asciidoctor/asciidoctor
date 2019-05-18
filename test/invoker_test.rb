@@ -171,7 +171,7 @@ context 'Invoker' do
         warnings = err.string
       end
       assert_equal false, $VERBOSE
-      refute_empty warnings
+      refute_empty warnings unless RUBY_ENGINE == 'truffleruby'
     rescue
       $VERBOSE = old_verbose
     end
