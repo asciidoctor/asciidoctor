@@ -469,8 +469,8 @@ module Asciidoctor
     # (TM)
     [/\\?\(TM\)/, '&#8482;', :none],
     # foo -- bar (where either space character can be a newline)
-    # NOTE this necessarily drops the newline if it appears at end of line
-    [/(^|\n| |\\)--( |\n|$)/, '&#8201;&#8212;&#8201;', :none],
+    # NOTE this necessarily drops the newline if replacement appears at end of line
+    [/(?: |\n|^|\\)--(?: |\n|$)/, '&#8201;&#8212;&#8201;', :none],
     # foo--bar
     [/(#{CG_WORD})\\?--(?=#{CG_WORD})/, '&#8212;&#8203;', :leading],
     # ellipsis
