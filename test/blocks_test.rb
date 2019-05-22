@@ -2893,6 +2893,7 @@ context 'Blocks' do
         { 'icons' => '', 'ext' => 'png' },
         { 'icons' => '', 'icontype' => 'jpg', 'ext' => 'jpg' },
         { 'icons' => 'jpg', 'ext' => 'jpg' },
+        { 'icons' => 'image', 'ext' => 'png' },
       ].each do |attributes|
         expected_src = %(./images/icons/tip.#{attributes.delete 'ext'})
         output = convert_string input, attributes: attributes
@@ -2909,6 +2910,7 @@ context 'Blocks' do
         { 'icons' => '', 'ext' => 'png' },
         { 'icons' => '', 'icontype' => 'jpg', 'ext' => 'jpg' },
         { 'icons' => 'jpg', 'ext' => 'jpg' },
+        { 'icons' => 'image', 'ext' => 'png' },
       ].each do |attributes|
         expected_src = %(./images/icons/hint.#{attributes.delete 'ext'})
         output = convert_string input, attributes: attributes

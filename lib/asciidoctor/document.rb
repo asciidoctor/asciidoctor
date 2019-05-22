@@ -1217,7 +1217,7 @@ class Document < AbstractBlock
       when '', 'font'
       else
         attrs['icons'] = ''
-        attrs['icontype'] = icons_val
+        attrs['icontype'] = icons_val unless icons_val == 'image'
       end
     end
 
