@@ -821,9 +821,13 @@ class Parser
               attributes['language'] = doc_attrs['source-language']
             end unless attributes.key? 'language'
           end
-          if attributes['linenums-option'] || doc_attrs['source-linenums-option']
+          if attributes.key? 'linenums'
+            attributes['linenums-option'] = ''
+          elsif attributes.key? 'linenums-option'
             attributes['linenums'] = ''
-          end unless attributes.key? 'linenums'
+          elsif doc_attrs.key? 'source-linenums-option'
+            attributes['linenums'] = attributes['linenums-option'] = ''
+          end
           if doc_attrs.key? 'source-indent'
             attributes['indent'] = doc_attrs['source-indent']
           end unless attributes.key? 'indent'
@@ -848,9 +852,13 @@ class Parser
         else
           attributes['language'] = language
         end
-        if attributes['linenums-option'] || doc_attrs['source-linenums-option']
+        if attributes.key? 'linenums'
+          attributes['linenums-option'] = ''
+        elsif attributes.key? 'linenums-option'
           attributes['linenums'] = ''
-        end unless attributes.key? 'linenums'
+        elsif doc_attrs.key? 'source-linenums-option'
+          attributes['linenums'] = attributes['linenums-option'] = ''
+        end
         if doc_attrs.key? 'source-indent'
           attributes['indent'] = doc_attrs['source-indent']
         end unless attributes.key? 'indent'

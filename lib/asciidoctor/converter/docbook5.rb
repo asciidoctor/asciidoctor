@@ -210,7 +210,8 @@ class Converter::DocBook5Converter < Converter::Base
     informal = !node.title?
     common_attrs = common_attributes node.id, node.role, node.reftext
     if node.style == 'source'
-      if (attrs = node.attributes).key? 'linenums'
+      attrs = node.attributes
+      if node.option? 'linenums'
         numbering_attrs = (attrs.key? 'start') ? %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}") : ' linenumbering="numbered"'
       else
         numbering_attrs = ' linenumbering="unnumbered"'
