@@ -1619,6 +1619,18 @@ context 'API' do
       assert_equal %w(compact reversed).to_set, block.enabled_options
     end
 
+    test 'should set linenums option if linenums enabled on source block' do
+      input = <<~'EOS'
+      [,ruby,linenums]
+      ----
+      puts "Hello, World!"
+      ----
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert block.option? 'linenums'
+    end
+
     test 'table column should not be a block or inline' do
       input = <<~'EOS'
       |===

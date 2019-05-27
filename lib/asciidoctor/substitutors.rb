@@ -942,7 +942,7 @@ module Substitutors
 
     doc_attrs = @document.attributes
     syntax_hl_name = syntax_hl.name
-    if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
+    if (linenums_mode = (option? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
       start_line_number = 1 if (start_line_number = (attr 'start', 1).to_i) < 1
     end
     highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight'
