@@ -52,7 +52,7 @@ module Asciidoctor
 
     unless options.key? :standalone
       if sibling_path || write_to_target
-        options[:standalone] = true
+        options[:standalone] = options.fetch :header_footer, true
       elsif options.key? :header_footer
         options[:standalone] = options[:header_footer]
       end

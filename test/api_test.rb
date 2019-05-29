@@ -1048,6 +1048,24 @@ context 'API' do
       assert_equal Asciidoctor.method(:convert), Asciidoctor.method(:render)
     end
 
+    test 'should convert source document to embedded document when header_footer is false' do
+      sample_input_path = fixture_path('sample.adoc')
+      sample_output_path = fixture_path('sample.html')
+
+      [{ header_footer: false }, { header_footer: false, to_file: sample_output_path }].each do |opts|
+        begin
+          Asciidoctor.convert_file sample_input_path, opts
+          assert File.exist?(sample_output_path)
+          output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+          refute_empty output
+          assert_xpath '/html', output, 0
+          assert_css '#preamble', output, 1
+        ensure
+          FileUtils.rm(sample_output_path)
+        end
+      end
+    end
+
     test 'should convert source document to standalone document string when to_file is false and standalone is true' do
       sample_input_path = fixture_path('sample.adoc')
 
