@@ -184,6 +184,7 @@ Enhancements / Compliance::
   * use the third argument of AbstractNode#attr / AbstractNode#attr? to set the name of a fallback attribute to look for on the document (#1934)
   * change default value of third argument to Abstractnode#attr / AbstractNode#attr? to nil so attribute doesn't inherit by default (#3059)
   * look for table-frame, table-grid, and table-stripes attributes on document as fallback for frame, grid, and stripes attributes on table (#3059)
+  * add support for hover mode for table stripes (stripes=hover) (#3110)
   * always assume the target of a shorthand interdocument xref is a reference to an AsciiDoc document (source-to-source) (#3021)
   * if the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
   * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
@@ -236,6 +237,7 @@ Improvements::
   * value comparison in AbstractNode#attr? is only performed if expected value is truthy
   * align default CodeRay style with style for other syntax highlighters (#2106)
   * ensure linenos class is added to linenos column when source highlighter is pygments and pygments-css=style
+  * disable table stripes by default (#3110)
   * rename CSS class of Pygments line numbering table to linenotable (to align with Rouge) (#1040)
   * remove unused Converter#convert_with_options method (#2891)
   * add -e, --embedded CLI flag as alias for -s, --no-header-footer (require long option to specify eRuby impl) (#1444)
