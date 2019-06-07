@@ -5195,6 +5195,19 @@ context 'Checklists' do
     assert_css '.ulist.checklist li input[type="checkbox"][disabled]', output, 0
     assert_css '.ulist.checklist li input[type="checkbox"][checked]', output, 1
   end
+
+  test 'should not create checklist if checkbox on item is followed by a tab' do
+    ['[ ]', '[x]', '[*]'].each do |checkbox|
+      input = <<~EOS
+      - #{checkbox}\ttodo
+      EOS
+
+      doc = document_from_string input
+      list = doc.blocks[0]
+      assert_equal :ulist, list.context
+      refute list.option?('checklist')
+    end
+  end
 end
 
 context 'Lists model' do
