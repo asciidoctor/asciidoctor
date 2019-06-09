@@ -209,6 +209,7 @@ class Section < AbstractBlock
       gen_id = gen_id.slice 1, gen_id.length if pre.empty? && (gen_id.start_with? sep)
     end
     if document.catalog[:refs].key? gen_id
+      logger.warn %(auto-generated header id conflict: #{gen_id})
       ids = document.catalog[:refs]
       cnt = Compliance.unique_id_start_index
       cnt += 1 while ids[candidate_id = %(#{gen_id}#{sep}#{cnt})]
