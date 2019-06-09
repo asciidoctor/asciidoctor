@@ -141,6 +141,11 @@ class AbstractBlock < AbstractNode
     (Integer @numeral) rescue @numeral
   end
 
+  # Deprecated: Legacy property to set the numeral of this section by coercing the value to a String.
+  def number= val
+    @numeral = val.to_s
+  end
+
   # Public: Walk the document tree and find all block-level nodes that match the specified selector (context, style, id,
   # role, and/or custom filter).
   #

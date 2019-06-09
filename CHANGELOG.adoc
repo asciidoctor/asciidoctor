@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Restore deprecated writable number property on AbstractBlock
+
 // tag::compact[]
 == 2.0.10 (2019-05-31) - @mojavelinux
 
