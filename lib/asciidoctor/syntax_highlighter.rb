@@ -139,7 +139,7 @@ module SyntaxHighlighter
     # name    - The String name of the syntax highlighter to create.
     # backend - The String name of the backend for which this syntax highlighter is being used (default: 'html5').
     # opts    - A Hash of options providing information about the context in which this syntax highlighter is used:
-    #           :doc - The Document for which this syntax highlighter was created.
+    #           :document - The Document for which this syntax highlighter was created.
     #
     # Returns a [SyntaxHighlighter] instance for the specified name.
     def create name, backend = 'html5', opts = {}
