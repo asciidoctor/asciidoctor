@@ -5161,6 +5161,24 @@ context 'Checklists' do
     assert_xpath '(/*[@class="ulist checklist"]/ul/li)[5]/p[text()="plain"]', output, 1
   end
 
+  test 'entry is not a checklist item if the closing bracket is not immediately followed by the space character' do
+    input = <<~EOS
+    - [ ]    todo
+    - [x] \t done
+    - [ ]\t  another todo
+    - [x]\t  another done
+    EOS
+    doc = document_from_string input
+    checklist = doc.blocks[0]
+    assert checklist.option?('checklist')
+    assert checklist.items[0].attr?('checkbox')
+    refute checklist.items[0].attr?('checked')
+    assert checklist.items[1].attr?('checkbox')
+    assert checklist.items[1].attr?('checked')
+    refute checklist.items[2].attr?('checkbox')
+    refute checklist.items[3].attr?('checkbox')
+  end
+
   test 'should create checklist with font icons if at least one item has checkbox syntax and icons attribute is font' do
     input = <<~'EOS'
     - [ ] todo
