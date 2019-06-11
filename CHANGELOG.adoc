@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * Fix parsing of wrapped link and xref text, including when an attrlist signature is detected (#3331)
   * Restore deprecated writable number property on AbstractBlock
 
 Improvements::

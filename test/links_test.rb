@@ -212,6 +212,10 @@ context 'Links' do
     assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing = Search Engines"]', convert_string_to_embedded('http://search.example.com["Google, Yahoo, Bing = Search Engines"]'), 1
   end
 
+  test 'should leave link text as is if it contains an equals sign but no attributes are found' do
+    assert_xpath %(//a[@href="https://example.com"][text()="What You Need\n= What You Get"]), convert_string_to_embedded(%(https://example.com[What You Need\n= What You Get])), 1
+  end
+
   test 'link with quoted text but no equal sign should carry quotes over to output' do
     assert_xpath %(//a[@href="http://search.example.com"][text()='"Google, Yahoo, Bing"']), convert_string_to_embedded('http://search.example.com["Google, Yahoo, Bing"]'), 1
   end
@@ -220,8 +224,18 @@ context 'Links' do
     assert_xpath '//a[@href="http://search.example.com"][text()="Google, Yahoo, Bing"]', convert_string_to_embedded('http://search.example.com[Google, Yahoo, Bing]'), 1
   end
 
-  test 'role and window attributes on link are processed' do
+  test 'link with formatted wrapped text should not be separated into attributes' do
+    result = convert_string_to_embedded %(https://example.com[[.role]#Foo\nBar#])
+    assert_include %(<a href="https://example.com"><span class="role">Foo\nBar</span></a>), result
+  end
+
+  test 'should process role and window attributes on link' do
     assert_xpath '//a[@href="http://google.com"][@class="external"][@target="_blank"]', convert_string_to_embedded('http://google.com[Google, role=external, window="_blank"]'), 1
+  end
+
+  test 'should parse link with wrapped text that includes attributes' do
+    result = convert_string_to_embedded %(https://example.com[Foo\nBar,role=foobar])
+    assert_include %(<a href="https://example.com" class="foobar">Foo Bar</a>), result
   end
 
   test 'link macro with attributes but no text should use URL as text' do
