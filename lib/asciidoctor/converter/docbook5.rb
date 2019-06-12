@@ -401,12 +401,10 @@ class Converter::DocBook5Converter < Converter::Base
       rows.each do |row|
         result << '<row>'
         row.each do |cell|
-          halign_attribute = (cell.attr? 'halign') ? %( align="#{cell.attr 'halign'}") : ''
-          valign_attribute = (cell.attr? 'valign') ? %( valign="#{cell.attr 'valign'}") : ''
           colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : ''
           rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
           # NOTE <entry> may not have whitespace (e.g., line breaks) as a direct descendant according to DocBook rules
-          entry_start = %(<entry#{halign_attribute}#{valign_attribute}#{colspan_attribute}#{rowspan_attribute}>)
+          entry_start = %(<entry align="#{cell.attr 'halign'}" valign="#{cell.attr 'valign'}"#{colspan_attribute}#{rowspan_attribute}>)
           if tsec == :head
             cell_content = cell.text
           else
