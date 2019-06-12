@@ -623,7 +623,7 @@ context 'Tables' do
       >|C1
       |===
       EOS
-      output = convert_string_to_embedded input, backend: 'docbook'
+      output = convert_string input, backend: 'docbook'
       assert_css 'informaltable', output, 1
       assert_css 'informaltable thead > row > entry[align="left"][valign="top"]', output, 1
       assert_css 'informaltable thead > row > entry[align="center"][valign="middle"]', output, 1
