@@ -625,12 +625,12 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'informaltable', output, 1
-      assert_css 'informaltable thead > row > entry[@align="left"][@valign="top"]', output, 1
-      assert_css 'informaltable thead > row > entry[@align="center"][@valign="middle"]', output, 1
-      assert_css 'informaltable thead > row > entry[@align="right"][@valign="top"]', output, 1
-      assert_css 'informaltable tbody > row > entry[@align="left"][@valign="top"]', output, 1
-      assert_css 'informaltable tbody > row > entry[@align="center"][@valign="middle"]', output, 1
-      assert_css 'informaltable tbody > row > entry[@align="right"][@valign="top"]', output, 1
+      assert_css 'informaltable thead > row > entry[align="left"][valign="top"]', output, 1
+      assert_css 'informaltable thead > row > entry[align="center"][valign="middle"]', output, 1
+      assert_css 'informaltable thead > row > entry[align="right"][valign="top"]', output, 1
+      assert_css 'informaltable tbody > row > entry[align="left"][valign="top"]', output, 1
+      assert_css 'informaltable tbody > row > entry[align="center"][valign="middle"]', output, 1
+      assert_css 'informaltable tbody > row > entry[align="right"][valign="top"]', output, 1
     end
 
     test 'should recognize ends as an alias to topbot for frame when converting to DocBook' do
