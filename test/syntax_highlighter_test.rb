@@ -669,13 +669,77 @@ context 'Syntax Highlighter' do
       ----
       require 'rouge'
 
-      html = Rouge::Formatters::HTML.new.format(Rouge::Lexers::Ruby.new.lex('puts "Hello, world!"'))
+      html = Rouge::Formatters::HTML.format(Rouge::Lexers::Ruby.lex('puts "Hello, world!"'))
       ----
       EOS
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_xpath '//pre[@class="rouge highlight"]/code[@data-lang="ruby"]/span[@class="no"][text()="Rouge"]', output, 2
       assert_includes output, 'pre.rouge .no {'
     end
+
+    test 'should highlight source using a mixed lexer (HTML + JavaScript)' do
+      input = <<~'EOS'
+      [,html]
+      ----
+      <meta name="description" content="The dangerous and thrilling adventures of an open source documentation team.">
+      <script>alert("Do your worst!")</script>
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'pre.rouge > code[data-lang="html"]', output, 1
+    end
+
+    test 'should enable start_inline for PHP by default' do
+      input = <<~'EOS'
+      [,php]
+      ----
+      echo "<?php";
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'pre.rouge > code[data-lang="php"]', output, 1
+      assert_include '<span class="k">echo</span>', output
+    end
+
+    test 'should not enable start_inline for PHP if disabled using cgi-style option on language' do
+      input = <<~'EOS'
+      [,php?start_inline=0]
+      ----
+      echo "<?php";
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'pre.rouge > code[data-lang="php"]', output, 1
+      refute_include '<span class="k">echo</span>', output
+      assert_include '<span class="cp">&lt;?php</span>', output
+    end
+
+    test 'should not enable start_inline for PHP if mixed option is set' do
+      input = <<~'EOS'
+      [%mixed,php]
+      ----
+      echo "<?php";
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'pre.rouge > code[data-lang="php"]', output, 1
+      refute_include '<span class="k">echo</span>', output
+      assert_include '<span class="cp">&lt;?php</span>', output
+    end
+
+    test 'should preserve cgi-style options on language when setting start_inline option for PHP' do
+      input = <<~'EOS'
+      [,php?funcnamehighlighting=0]
+      ----
+      cal_days_in_month(CAL_GREGORIAN, 6, 2019)
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'pre.rouge > code[data-lang="php"]', output, 1
+      # if class is "nb", then the funcnamehighlighting option is not honored
+      assert_include '<span class="nx">cal_days_in_month</span>', output
+      assert_include '<span class="mi">2019</span>', output
+    end if Rouge.version >= '2.1.0'
 
     test 'should not crash if source-highlighter attribute is set and source block does not define a language' do
       input = <<~'EOS'
@@ -685,7 +749,7 @@ context 'Syntax Highlighter' do
       ----
       require 'rouge'
 
-      html = Rouge::Formatters::HTML.new.format(Rouge::Lexers::Ruby.new.lex('puts "Hello, world!"'))
+      html = Rouge::Formatters::HTML.format(Rouge::Lexers::Ruby.lex('puts "Hello, world!"'))
       ----
       EOS
       output = convert_string_to_embedded input, safe: :safe
@@ -713,7 +777,7 @@ context 'Syntax Highlighter' do
       input = <<~'EOS'
       :source-highlighter: rouge
 
-      [source,"console?prompt=$> "]
+      [source,console?prompt=$>]
       ----
       $> asciidoctor --version
       ----
@@ -721,7 +785,7 @@ context 'Syntax Highlighter' do
       output = convert_string_to_embedded input, safe: :safe
       assert_css 'code[data-lang=console]', output, 1
       assert_css 'code span.gp', output, 1
-    end
+    end if Rouge.version >= '2.1.0'
 
     test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
       input = <<~'EOS'
@@ -766,7 +830,7 @@ context 'Syntax Highlighter' do
         ----
         require 'rouge' # <1>
 
-        html = Rouge::Formatters::HTML.new.format(Rouge::Lexers::Ruby.new.lex('puts "Hello, world!"')) # <2>
+        html = Rouge::Formatters::HTML.format(Rouge::Lexers::Ruby.lex('puts "Hello, world!"')) # <2>
         puts html # <3> <4>
         exit 0 # <5><6>
         ----

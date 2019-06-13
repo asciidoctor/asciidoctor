@@ -13,8 +13,17 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   end
 
   def highlight node, source, lang, opts
-    lexer = (::Rouge::Lexer.find_fancy lang) || ::Rouge::Lexers::PlainText
-    lexer_opts = lexer.tag == 'php' && !(node.option? 'mixed') ? { start_inline: true } : {}
+    if lang.include? '?'
+      # NOTE cgi-style options only properly supported in Rouge >= 2.1
+      if (lexer = ::Rouge::Lexer.find_fancy lang)
+        unless lexer.tag != 'php' || (node.option? 'mixed') || ((lexer_opts = lexer.options).key? 'start_inline')
+          lexer = lexer.class.new lexer_opts.merge 'start_inline' => true
+        end
+      end
+    elsif (lexer = ::Rouge::Lexer.find lang)
+      lexer = lexer.tag == 'php' && !(node.option? 'mixed') ? (lexer.new start_inline: true) : lexer.new
+    end if lang
+    lexer ||= ::Rouge::Lexers::PlainText.new
     @style ||= (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE
     if opts[:css_mode] == :class
       @requires_stylesheet = true
@@ -28,18 +37,17 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     if opts[:number_lines]
       formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
       if opts[:callouts]
-        return [(highlighted = formatter.format lexer.lex source, lexer_opts), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
+        return [(highlighted = formatter.format lexer.lex source), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
       end
     end
-    formatter.format lexer.lex source, lexer_opts
+    formatter.format lexer.lex source
   end
 
   def format node, lang, opts
     if (query_idx = lang && (lang.index '?'))
       lang = lang.slice 0, query_idx
     end
-    if opts[:css_mode] != :class && (@style = (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE) &&
-        (pre_style_attr_val = base_style @style)
+    if opts[:css_mode] != :class && (@style = (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE) && (pre_style_attr_val = base_style @style)
       opts[:transform] = proc {|pre| pre['style'] = pre_style_attr_val }
     end
     super

@@ -7,16 +7,20 @@ rvm:
 - &release_ruby 2.6.3
 - 2.5.5
 - 2.4.6
-- 2.3.8
+- &oldest_ruby 2.3.8
 - jruby-9.2.7.0
 - jruby-9.1.17.0
 # the test suite currently crashes on truffleruby
 #- truffleruby-rc13
+matrix:
+  include:
+  - rvm: *oldest_ruby
+    env: ROUGE_VERSION='~> 2.0.0'
 env:
   global:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-  - PYGMENTS_VERSION='~> 1.2.1'
+  - PYGMENTS_VERSION='~> 1.2.0'
   - SOURCE_DATE_EPOCH=1521504000
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
