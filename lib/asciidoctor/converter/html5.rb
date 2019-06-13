@@ -122,6 +122,10 @@ class Converter::Html5Converter < Converter::Base
     end
     result << %(<title>#{node.doctitle sanitize: true, use_fallback: true}</title>)
 
+    if node.attr? 'stem'
+      # TODO only if katex is actually used.
+      result << %(<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">)
+    end
     if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
       if (webfonts = node.attr 'webfonts')
         result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
@@ -265,11 +269,11 @@ MathJax.Hub.Config({
   tex2jax: {
     inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
     displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
+    ignoreClass: "nostem|nolatexmath|katex"
   },
   asciimath2jax: {
     delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
+    ignoreClass: "nostem|noasciimath|katex"
   },
   TeX: {#{eqnums_opt}}
 })
@@ -691,6 +695,16 @@ Your browser does not support the audio tag.
       if style == :asciimath && (equation.include? LF)
         br = %(<br#{@void_element_slash}>#{LF})
         equation = equation.gsub(StemBreakRx) { %(#{close}#{br * ($&.count LF)}#{open}) }
+      end
+      if style == :katexmath
+        require 'open3'
+        Open3.popen3('katex', '--display-mode') do |stdin, stdout, stderr, wait_thr|
+          stdin.write equation
+          stdin.close
+          equation = stdout.read
+          exit_status = wait_thr.value
+          # TODO error handling: katex not found, exit_status non-zero.
+        end
       end
       unless (equation.start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})

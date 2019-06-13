@@ -540,7 +540,7 @@ module Asciidoctor
   #   asciimath:[x != 0]
   #   latexmath:[\sqrt{4} = 2]
   #
-  InlineStemMacroRx = /\\?(stem|(?:latex|ascii)math):([a-z]+(?:,[a-z-]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
+  InlineStemMacroRx = /\\?(stem|(?:latex|ascii|katex)math):([a-z]+(?:,[a-z-]+)*)?\[(#{CC_ALL}*?[^\\])\]/m
 
   # Matches a menu inline macro.
   #

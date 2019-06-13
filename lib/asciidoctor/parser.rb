@@ -862,7 +862,7 @@ class Parser
       when :quote, :verse
         AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])
         block = build_block(block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes)
-      when :stem, :latexmath, :asciimath
+      when :stem, :latexmath, :asciimath, :katexmath
         attributes['style'] = STEM_TYPE_ALIASES[attributes[2] || doc_attrs['stem']] if block_context == :stem
         block = build_block(:stem, :raw, terminator, parent, reader, attributes)
       when :pass
