@@ -591,7 +591,8 @@ module Substitutors
         unless text.empty?
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if !doc.compat_mode && (text.include? '=')
-            text = (attrs = (AttributeList.new text, self).parse)[1] || ''
+            # NOTE if an equals sign (=) is present, extract attributes from text
+            text, attrs = extract_attributes_from_text text, ''
             link_opts[:id] = attrs['id']
           end
 
@@ -637,7 +638,8 @@ module Substitutors
           text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
           if mailto
             if !doc.compat_mode && (text.include? ',')
-              text = (attrs = (AttributeList.new text, self).parse)[1] || ''
+              # NOTE if a comma (,) is present, extract attributes from text
+              text, attrs = extract_attributes_from_text text, ''
               link_opts[:id] = attrs['id']
               if attrs.key? 2
                 if attrs.key? 3
@@ -648,7 +650,8 @@ module Substitutors
               end
             end
           elsif !doc.compat_mode && (text.include? '=')
-            text = (attrs = (AttributeList.new text, self).parse)[1] || ''
+            # NOTE if an equals sign (=) is present, extract attributes from text
+            text, attrs = extract_attributes_from_text text, ''
             link_opts[:id] = attrs['id']
           end
 
@@ -739,8 +742,8 @@ module Substitutors
           refid = $2
           if (text = $3)
             text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-            # NOTE if an equal sign (=) is present, parse text as attributes
-            text = ((AttributeList.new text, self).parse_into attrs)[1] if !doc.compat_mode && (text.include? '=')
+            # NOTE if an equals sign (=) is present, extract attributes from text
+            text, attrs = extract_attributes_from_text text if !doc.compat_mode && (text.include? '=')
           end
         end
 
@@ -1320,6 +1323,19 @@ module Substitutors
   end
 
   private
+
+  # This method is used in cases when the attrlist can be mixed with the text of a macro.
+  # If no attributes are detected aside from the first positional attribute, and the first positional
+  # attribute matches the attrlist, then the original text is returned.
+  def extract_attributes_from_text text, default_text = nil
+    attrlist = (text.include? LF) ? (text.tr LF, ' ') : text
+    if (resolved_text = (attrs = (AttributeList.new attrlist, self).parse)[1])
+      # NOTE if resolved text remains unchanged, clear attributes and return unparsed text
+      resolved_text == attrlist ? [text, attrs.clear] : [resolved_text, attrs]
+    else
+      [default_text, attrs]
+    end
+  end
 
   # Internal: Extract the callout numbers from the source to prepare it for syntax highlighting.
   def extract_callouts source
