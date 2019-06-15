@@ -8,10 +8,10 @@ require File.join ASCIIDOCTOR_LIB_DIR, 'asciidoctor'
 Dir.chdir Asciidoctor::ROOT_DIR
 
 require 'nokogiri'
+# NOTE rouge has all sorts of warnings we don't want to see, so silence them
 proc do
   old_verbose, $VERBOSE = $VERBOSE, nil
   require 'rouge'
-  Rouge::Lexer.disable_debug!
   $VERBOSE = old_verbose
 end.call
 require 'socket'
