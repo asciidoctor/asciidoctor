@@ -16,7 +16,7 @@ env:
   global:
   # use system libraries to speed up installation of nokogiri
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-  - PYGMENTS_VERSION=~>1.2.1
+  - PYGMENTS_VERSION='~> 1.2.1'
   - SOURCE_DATE_EPOCH=1521504000
 script: bundle exec rake coverage test:all
 after_success: bundle exec rake build:dependents
