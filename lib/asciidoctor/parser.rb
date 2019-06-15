@@ -2579,9 +2579,7 @@ class Parser
           attributes['role'] = (existing_role = attributes['role']).nil_or_empty? ? (parsed_attrs[:role].join ' ') : %(#{existing_role} #{parsed_attrs[:role].join ' '})
         end
 
-        if parsed_attrs.key? :option
-          (opts = parsed_attrs[:option]).each {|opt| attributes[%(#{opt}-option)] = '' }
-        end
+        parsed_attrs[:option].each {|opt| attributes[%(#{opt}-option)] = '' } if parsed_attrs.key? :option
 
         parsed_style
       else
