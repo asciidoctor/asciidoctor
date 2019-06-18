@@ -89,14 +89,14 @@ module Converter
   # Returns the backend traits for the given backend as a [Hash].
   def self.derive_backend_traits backend
     return {} unless backend
-    if (t_outfilesuffix = DEFAULT_EXTENSIONS[(t_basebackend = backend.sub TrailingDigitsRx, '')])
-      t_filetype = t_outfilesuffix.slice 1, t_outfilesuffix.length
+    if (outfilesuffix = DEFAULT_EXTENSIONS[(basebackend = backend.sub TrailingDigitsRx, '')])
+      filetype = outfilesuffix.slice 1, outfilesuffix.length
     else
-      t_outfilesuffix = %(.#{t_filetype = t_basebackend})
+      outfilesuffix = %(.#{filetype = basebackend})
     end
-    t_filetype == 'html' ?
-      { basebackend: t_basebackend, filetype: t_filetype, htmlsyntax: 'html', outfilesuffix: t_outfilesuffix } :
-      { basebackend: t_basebackend, filetype: t_filetype, outfilesuffix: t_outfilesuffix }
+    filetype == 'html' ?
+      { basebackend: basebackend, filetype: filetype, htmlsyntax: 'html', outfilesuffix: outfilesuffix } :
+      { basebackend: basebackend, filetype: filetype, outfilesuffix: outfilesuffix }
   end
 
   module BackendTraits
