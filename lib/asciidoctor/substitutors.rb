@@ -1340,7 +1340,7 @@ module Substitutors
   # Internal: Extract the callout numbers from the source to prepare it for syntax highlighting.
   def extract_callouts source
     callout_marks = {}
-    lineno = 0
+    autonum = lineno = 0
     last_lineno = nil
     callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
     # extract callout marks, indexed by line number
@@ -1352,7 +1352,7 @@ module Substitutors
           # use sub since it might be behind a line comment
           $&.sub RS, ''
         else
-          (callout_marks[lineno] ||= []) << [$1, $4]
+          (callout_marks[lineno] ||= []) << [$1, $4 == '.' ? (autonum += 1).to_s : $4]
           last_lineno = lineno
           ''
         end
@@ -1374,15 +1374,15 @@ module Substitutors
     else
       preamble = ''
     end
-    autonum = lineno = 0
+    lineno = 0
     preamble + ((source.split LF, -1).map do |line|
       if (conums = callout_marks.delete lineno += 1)
         if conums.size == 1
-          guard, conum = conums[0]
-          %(#{line}#{Inline.new(self, :callout, conum == '.' ? (autonum += 1).to_s : conum, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert})
+          guard, numeral = conums[0]
+          %(#{line}#{Inline.new(self, :callout, numeral, id: @document.callouts.read_next_id, attributes: { 'guard' => guard }).convert})
         else
-          %(#{line}#{conums.map do |guard_it, conum_it|
-            Inline.new(self, :callout, conum_it == '.' ? (autonum += 1).to_s : conum_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert
+          %(#{line}#{conums.map do |guard_it, numeral_it|
+            Inline.new(self, :callout, numeral_it, id: @document.callouts.read_next_id, attributes: { 'guard' => guard_it }).convert
           end.join ' '})
         end
       else
