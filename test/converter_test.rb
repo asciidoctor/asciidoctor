@@ -458,6 +458,28 @@ context 'Converter' do
       end
     end
 
+    test 'should use basebackend to compute filetype and outfilesuffix' do
+      begin
+        assert_nil Asciidoctor::Converter.for 'slides'
+
+        class SlidesConverter < Asciidoctor::Converter::Base
+          register_for 'slides'
+
+          def initialize backend, opts = {}
+            super
+            basebackend 'html'
+          end
+        end
+
+        doc = document_from_string 'content', backend: 'slides'
+        assert_equal '.html', doc.outfilesuffix
+        expected_traits = { basebackend: 'html', filetype: 'html', htmlsyntax: 'html', outfilesuffix: '.html' }
+        assert_equal expected_traits, doc.converter.backend_traits
+      ensure
+        Asciidoctor::Converter.unregister_all
+      end
+    end
+
     test 'should be able to register converter from converter class itself' do
       begin
         assert_nil Asciidoctor::Converter.for 'foobar'

@@ -85,11 +85,12 @@ module Converter
   # Public: Derive backend traits (basebackend, filetype, outfilesuffix, htmlsyntax) from the given backend.
   #
   # backend - the String backend from which to derive the traits
+  # basebackend - the String basebackend to use in favor of deriving one from the backend (optional, default: nil)
   #
   # Returns the backend traits for the given backend as a [Hash].
-  def self.derive_backend_traits backend
+  def self.derive_backend_traits backend, basebackend = nil
     return {} unless backend
-    if (outfilesuffix = DEFAULT_EXTENSIONS[(basebackend = backend.sub TrailingDigitsRx, '')])
+    if (outfilesuffix = DEFAULT_EXTENSIONS[(basebackend ||= backend.sub TrailingDigitsRx, '')])
       filetype = outfilesuffix.slice 1, outfilesuffix.length
     else
       outfilesuffix = %(.#{filetype = basebackend})
@@ -101,7 +102,7 @@ module Converter
 
   module BackendTraits
     def basebackend value = nil
-      value ? (backend_traits[:basebackend] = value) : backend_traits[:basebackend]
+      value ? ((backend_traits value)[:basebackend] = value) : backend_traits[:basebackend]
     end
 
     def filetype value = nil
@@ -128,15 +129,15 @@ module Converter
       @backend_traits = value || {}
     end
 
-    def backend_traits
-      @backend_traits ||= Converter.derive_backend_traits @backend
+    def backend_traits basebackend = nil
+      @backend_traits ||= Converter.derive_backend_traits @backend, basebackend
     end
 
     alias backend_info backend_traits
 
     # Deprecated: Use {Converter.derive_backend_traits} instead.
-    def self.derive_backend_traits backend
-      Converter.derive_backend_traits backend
+    def self.derive_backend_traits backend, basebackend = nil
+      Converter.derive_backend_traits backend, basebackend
     end
   end
 
