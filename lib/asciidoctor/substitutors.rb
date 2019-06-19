@@ -920,7 +920,7 @@ module Substitutors
         # use sub since it might be behind a line comment
         $&.sub RS, ''
       else
-        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 }).convert
+        Inline.new(self, :callout, $4 == '.' ? (autonum += 1).to_s : $4, id: @document.callouts.read_next_id, attributes: { 'guard' => $1 || ($3 == '--' ? ['<!--', '-->'] : nil) }).convert
       end
     end
   end
@@ -1352,7 +1352,7 @@ module Substitutors
           # use sub since it might be behind a line comment
           $&.sub RS, ''
         else
-          (callout_marks[lineno] ||= []) << [$1, $4 == '.' ? (autonum += 1).to_s : $4]
+          (callout_marks[lineno] ||= []) << [$1 || ($3 == '--' ? ['<!--', '-->'] : nil), $4 == '.' ? (autonum += 1).to_s : $4]
           last_lineno = lineno
           ''
         end

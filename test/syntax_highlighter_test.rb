@@ -970,6 +970,34 @@ context 'Syntax Highlighter' do
       assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
     end
 
+    test 'should preserve guard in front of callout if icons are not enabled' do
+      input = <<~'EOS'
+      [,ruby]
+      ----
+      puts 'Hello, World!' # <1>
+      puts 'Goodbye, World ;(' # <2>
+      ----
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_include ' # <b class="conum">(1)</b>', result
+      assert_include ' # <b class="conum">(2)</b>', result
+    end
+
+    test 'should preserve guard around callout if icons are not enabled' do
+      input = <<~'EOS'
+      ----
+      <parent> <!--1-->
+        <child/> <!--2-->
+      </parent>
+      ----
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_include ' &lt;!--<b class="conum">(1)</b>--&gt;', result
+      assert_include ' &lt;!--<b class="conum">(2)</b>--&gt;', result
+    end
+
     test 'should read stylesheet for specified style' do
       css = (Asciidoctor::SyntaxHighlighter.for 'rouge').read_stylesheet 'monokai'
       refute_nil css
