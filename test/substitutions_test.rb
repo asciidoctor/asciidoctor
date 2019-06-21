@@ -1127,6 +1127,20 @@ context 'Substitutions' do
       assert_xpath '//a[@class="footnote"][text()="1"]', output, 2
     end
 
+    test 'should be able to reference a bibliography entry in a footnote' do
+      input = <<~'EOS'
+      Choose a design pattern.footnote:[See <<gof>> to find a collection of design patterns.]
+
+      [bibliography]
+      == Bibliography
+
+      * [[[gof]]] Erich Gamma, et al. _Design Patterns: Elements of Reusable Object-Oriented Software._ Addison-Wesley. 1994.
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_include '<a href="#_footnoteref_1">1</a>. See <a href="#gof">[gof]</a> to find a collection of design patterns.', result
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
