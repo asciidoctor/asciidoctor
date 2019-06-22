@@ -1260,6 +1260,33 @@ context 'Blocks' do
       assert_css 'pre.nowrap', output, 1
     end
 
+    test 'should preserve guard in front of callout if icons are not enabled' do
+      input = <<~'EOS'
+      ----
+      puts 'Hello, World!' # <1>
+      puts 'Goodbye, World ;(' # <2>
+      ----
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_include ' # <b class="conum">(1)</b>', result
+      assert_include ' # <b class="conum">(2)</b>', result
+    end
+
+    test 'should preserve guard around callout if icons are not enabled' do
+      input = <<~'EOS'
+      ----
+      <parent> <!--1-->
+        <child/> <!--2-->
+      </parent>
+      ----
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_include ' &lt;!--<b class="conum">(1)</b>--&gt;', result
+      assert_include ' &lt;!--<b class="conum">(2)</b>--&gt;', result
+    end
+
     test 'literal block should honor explicit subs list' do
       input = <<~'EOS'
       [subs="verbatim,quotes"]

@@ -26,6 +26,7 @@ Bug Fixes::
 
 Improvements::
 
+  * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
 
 // tag::compact[]

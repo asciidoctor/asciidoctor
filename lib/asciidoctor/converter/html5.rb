@@ -1144,8 +1144,10 @@ Your browser does not support the video tag.
     elsif node.document.attr? 'icons'
       src = node.icon_uri("callouts/#{node.text}")
       %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
+    elsif ::Array === (guard = node.attributes['guard'])
+      %(&lt;!--<b class="conum">(#{node.text})</b>--&gt;)
     else
-      %(#{node.attributes['guard']}<b class="conum">(#{node.text})</b>)
+      %(#{guard}<b class="conum">(#{node.text})</b>)
     end
   end
 
