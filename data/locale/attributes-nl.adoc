@@ -2,7 +2,7 @@
 :appendix-caption: Bijlage
 :appendix-refsig: {appendix-caption}
 :caution-caption: Opgelet
-//:chapter-label: ???
+//:chapter-label: Hoofdstuk
 //:chapter-refsig: {chapter-label}
 :example-caption: Voorbeeld
 :figure-caption: Figuur
