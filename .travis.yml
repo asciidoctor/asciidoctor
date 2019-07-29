@@ -8,12 +8,14 @@ rvm:
 - 2.5.5
 - 2.4.6
 - &oldest_ruby 2.3.8
-- jruby-9.2.7.0
-- jruby-9.1.17.0
 # the test suite currently crashes on truffleruby
 #- truffleruby-rc13
 matrix:
   include:
+  - rvm: jruby-9.2.7.0
+    env: JRUBY_OPTS='--dev'
+  - rvm: jruby-9.1.17.0
+    env: JRUBY_OPTS='--dev'
   - rvm: *oldest_ruby
     env: ROUGE_VERSION='~> 2.0.0'
 env:
