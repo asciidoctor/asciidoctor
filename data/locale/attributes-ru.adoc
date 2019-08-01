@@ -2,18 +2,19 @@
 :appendix-caption: Приложение
 :appendix-refsig: {appendix-caption}
 :caution-caption: Внимание
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+:chapter-label: Глава
+:chapter-refsig: {chapter-label}
 :example-caption: Пример
 :figure-caption: Рисунок
 :important-caption: Важно
-:last-update-label: Последний раз обновлено
+:last-update-label: Последнее обновление
 ifdef::listing-caption[:listing-caption: Листинг]
 ifdef::manname-title[:manname-title: Название]
 :note-caption: Примечание
-//:part-refsig: ???
+:part-label: Часть
+:part-refsig: {part-label}
 ifdef::preface-title[:preface-title: Предисловие]
-//:section-refsig: ???
+:section-refsig: Раздел
 :table-caption: Таблица
 :tip-caption: Подсказка
 :toc-title: Содержание
