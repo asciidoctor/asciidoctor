@@ -18,7 +18,7 @@ matrix:
     env: JRUBY_OPTS='--dev'
   - rvm: *oldest_ruby
     env: ROUGE_VERSION='~> 2.0.0'
-  - rvm: truffleruby-19.1.0
+  - rvm: truffleruby-19.2.0
     if: env(TRAVIS_EVENT_TYPE) = cron
     env:
     # use 3g to avoid OutOfMemoryError when running the tests suite against TruffleRuby

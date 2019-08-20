@@ -71,7 +71,7 @@ context 'API' do
       ensure
         tmp_input.close!
       end
-    end unless RUBY_ENGINE == 'truffleruby' # https://github.com/oracle/truffleruby/issues/1714
+    end
 
     test 'should not load invalid file' do
       sample_input_path = fixture_path('hello-asciidoctor.pdf')
