@@ -511,8 +511,8 @@ module Asciidoctor
   end unless RUBY_ENGINE == 'opal'
 
   unless RUBY_ENGINE == 'opal'
-    autoload :SyntaxHighlighter, %(#{LIB_DIR}/asciidoctor/syntax_highlighter)
-    autoload :Timings, %(#{LIB_DIR}/asciidoctor/timings)
+    autoload :SyntaxHighlighter, %(#{__dir__}/asciidoctor/syntax_highlighter)
+    autoload :Timings, %(#{__dir__}/asciidoctor/timings)
   end
 end
 
