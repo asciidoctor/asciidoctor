@@ -62,7 +62,7 @@ endif::[]
 {uri-project}/[Asciidoctor] 是一个 _快速_ 文本处理器和发布工具链，它可以将 {uri-what-is-asciidoc}[AsciiDoc] 文档转化成 HTML 5、 DocBook 5 以及其他格式。
 Asciidoctor 由 Ruby 编写，打包成 RubyGem，然后发布到 {uri-rubygem}[RubyGems.org] 上。
 这个 gem 还被包含道几个 Linux 发行版中，其中包括 Fedora、Debian 和 Ubuntu。
-Asciidoctor 是开源的，{uri-repo}[代码托管在 GitHub]，遵从 {uri-license}[MIT] 协议。
+Asciidoctor 是开源的，link:{uri-repo}[代码托管在 GitHub]，遵从 {uri-license}[MIT] 协议。
 
 该文档有如下语言的翻译版：
 
