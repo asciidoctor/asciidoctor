@@ -30,6 +30,10 @@ Improvements::
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
 
+Build / Infrastructure::
+
+  * Run test suite on TruffleRuby nightly (*@mogztter*, *@erebor*)
+
 // tag::compact[]
 == 2.0.10 (2019-05-31) - @mojavelinux
 
