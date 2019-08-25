@@ -167,7 +167,10 @@ context 'Invoker' do
     begin
       warnings = nil
       redirect_streams do |out, err|
-        invoke_cli_to_buffer(%w(-w -o /dev/null), '-') { $NO_SUCH_VARIABLE || 'text' }
+        invoke_cli_to_buffer(%w(-w -o /dev/null), '-') {
+          A_CONST = 10  
+          A_CONST = 20
+        }
         warnings = err.string
       end
       assert_equal false, $VERBOSE

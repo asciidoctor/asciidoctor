@@ -8,8 +8,6 @@ rvm:
 - 2.5.5
 - 2.4.6
 - &oldest_ruby 2.3.8
-# the test suite currently crashes on truffleruby
-#- truffleruby-rc13
 matrix:
   include:
   - rvm: jruby-9.2.7.0
@@ -18,6 +16,12 @@ matrix:
     env: JRUBY_OPTS='--dev'
   - rvm: *oldest_ruby
     env: ROUGE_VERSION='~> 2.0.0'
+  - rvm: truffleruby-19.2.0
+    # run against TruffleRuby nightly
+    if: type = cron
+    env:
+    # use 3g to avoid OutOfMemoryError when running the tests suite against TruffleRuby
+    - TRUFFLERUBYOPT="--vm.Xmx3g"
 env:
   global:
   # use system libraries to speed up installation of nokogiri

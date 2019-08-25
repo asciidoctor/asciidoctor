@@ -25,3 +25,7 @@ end
 group :ci do
   gem 'simplecov', '~> 0.16.0'
 end
+
+if RUBY_ENGINE == 'truffleruby'
+  gem 'haml', '~> 4.0'
+end
