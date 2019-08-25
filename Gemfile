@@ -6,6 +6,7 @@ gemspec
 group :development do
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
   gem 'rouge', ENV['ROUGE_VERSION'] if ENV.key? 'ROUGE_VERSION'
+  gem 'haml', '~> 4.0', platforms: [:truffleruby]
 end
 
 group :doc do
@@ -24,8 +25,4 @@ end
 
 group :ci do
   gem 'simplecov', '~> 0.16.0'
-end
-
-if RUBY_ENGINE == 'truffleruby'
-  gem 'haml', '~> 4.0'
 end
