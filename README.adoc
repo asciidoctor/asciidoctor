@@ -165,7 +165,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 == Installation
 
-Asciidoctor can be installed using (a) package managers for popular Linux distributions, (b) Homebrew for macOS, (c) the `gem install` command (recommended for Windows users), (d) the Asciidoctor Docker image, or (e) Bundler.
+Asciidoctor can be installed using (a) package managers for popular Linux distributions, (b) Homebrew for macOS, (c) the `gem install` command (recommended for Windows users or if you'll be installing additional gems), (d) the Asciidoctor Docker image, or (e) Bundler.
 
 The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
 
@@ -242,11 +242,11 @@ Or you use the https://rubyinstaller.org/downloads/[Rubyinstaller], download the
 [#gem-install]
 === (d) gem install
 
-Before installing Asciidoctor using `gem install`, you should use https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
-Then, you can safely use the `gem` command to install or update the Asciidoctor gem.
+Before installing Asciidoctor using `gem install`, you should set up https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
+Then, you can safely use the `gem` command to install or update the Asciidoctor gem, or any other gem for that matter.
 When using RVM, gems are installed in a location isolated from the system.
 
-Open a terminal and type:
+Once you've installed Ruby using RVM, and you have activated it using `rvm use 2.6`, open a terminal and type:
 
  $ gem install asciidoctor
 
