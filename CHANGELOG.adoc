@@ -25,6 +25,10 @@ Bug Fixes::
   * Allow a bibliography reference to be used inside a footnote (#3325)
   * Fix bottom margin collapsing on AsciiDoc table cell (#3370)
 
+Compliance::
+
+  * Add support for muted option to self-hosted video (#3408)
+
 Improvements::
 
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
