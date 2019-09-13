@@ -33,6 +33,7 @@ Improvements::
 
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
+  * Logger should provide file name with a path where errors/warnings occur (#3414)
 
 Build / Infrastructure::
 

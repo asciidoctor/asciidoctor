@@ -16,7 +16,11 @@ class Reader
     end
 
     def line_info
-      %(#{@path}: line #{@lineno})
+      if ::String === @file && @dir != '.'
+        %(#{@file}: line #{@lineno})
+      else
+        %(#{@path}: line #{@lineno})
+      end
     end
 
     alias to_s line_info
