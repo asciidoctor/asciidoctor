@@ -689,8 +689,8 @@ Your browser does not support the audio tag.
     open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
     if (equation = node.content)
       if style == :asciimath && (equation.include? LF)
-        br = %(<br#{@void_element_slash}>#{LF})
-        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * ($&.count LF)}#{open}) }
+        br = %(#{LF}<br#{@void_element_slash}>)
+        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
       end
       unless (equation.start_with? open) && (equation.end_with? close)
         equation = %(#{open}#{equation}#{close})

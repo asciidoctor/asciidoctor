@@ -1775,7 +1775,7 @@ context 'Blocks' do
       ++++
       EOS
       expected = <<~'EOS'.chop
-      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      \$f: bbb"N" -&gt; bbb"N"\$
       \$f: x |-&gt; x + 1\$
       EOS
 
@@ -1795,7 +1795,7 @@ context 'Blocks' do
       ++++
       EOS
       expected = <<~'EOS'.chop
-      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      \$f: bbb"N" -&gt; bbb"N"\$
       <br>
       \$f: x |-&gt; x + 1\$
       EOS
@@ -1817,7 +1817,7 @@ context 'Blocks' do
       ++++
       EOS
       expected = <<~'EOS'.chop
-      \$f: bbb"N" -&gt; bbb"N"\$<br>
+      \$f: bbb"N" -&gt; bbb"N"\$
       <br>
       <br>
       \$f: x |-&gt; x + 1\$
