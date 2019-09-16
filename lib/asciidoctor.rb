@@ -296,7 +296,13 @@ module Asciidoctor
   DELIMITED_BLOCK_TAILS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k] = k[k.length - 1] if k.length == 4 } }
 
   # NOTE the 'figure' key as a string is historical and used by image blocks
-  CAPTION_ATTR_NAMES = { example: 'example-caption', 'figure' => 'figure-caption', listing: 'listing-caption', table: 'table-caption' }
+  CAPTION_ATTR_NAMES = {
+    example: 'example-caption',
+    'figure' => 'figure-caption',
+    listing: 'listing-caption',
+    table: 'table-caption',
+    video: 'video-caption'
+  }
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,

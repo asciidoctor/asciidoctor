@@ -1018,7 +1018,7 @@ Your browser does not support the audio tag.
     classes << %(text-#{node.attr 'align'}) if node.attr? 'align'
     classes << node.role if node.role
     class_attribute = %( class="#{classes.join ' '}")
-    title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
+    title_element = node.title? ? %(\n<div class="title">#{node.captioned_title}</div>) : ''
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     case node.attr 'poster'
