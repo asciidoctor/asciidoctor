@@ -331,11 +331,12 @@ class PathResolver
 
   # Public: Securely resolve a system path
   #
-  # Resolve a system path from the target relative to the start path, jail path, or working
-  # directory (specified in the constructor), in that order. If a jail path is specified, enforce
-  # that the resolved path descends from the jail path. If a jail path is not provided, the resolved
-  # path may be any location on the system. If the resolved path is absolute, use it as is (unless
-  # it breaches the jail path). Expand all parent and self references in the resolved path.
+  # Resolves the target to an absolute path on the current filesystem. The target is assumed to be
+  # relative to the start path, jail path, or working directory (specified in the constructor), in
+  # that order. If a jail path is specified, the resolved path is forced to descend from the jail
+  # path. If a jail path is not provided, the resolved path may be any location on the system. If
+  # the target is an absolute path, use it as is (unless it breaches the jail path). Expands all
+  # parent and self references in the resolved path.
   #
   # target - the String target path
   # start  - the String start path from which to resolve a relative target; falls back to jail, if
@@ -347,8 +348,9 @@ class PathResolver
   #            automatically recover when an illegal path is encountered
   #          * :target_name is used in messages to refer to the path being resolved
   #
-  # returns a String path relative to the start path, if specified, and confined to the jail path,
-  # if specified. The path is posixified and all parent and self references in the path are expanded.
+  # Returns an absolute String path relative to the start path, if specified, and confined to the
+  # jail path, if specified. The path is posixified and all parent and self references in the path
+  # are expanded.
   def system_path target, start = nil, jail = nil, opts = {}
     if jail
       raise ::SecurityError, %(Jail is not an absolute path: #{jail}) unless root? jail
