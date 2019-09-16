@@ -326,6 +326,7 @@ module Converter
       PROVIDED = {
         'docbook5' => %(#{__dir__}/converter/docbook5),
         'html5' => %(#{__dir__}/converter/html5),
+        'sem-html5' => %(#{__dir__}/converter/semantic-html5),
         'manpage' => %(#{__dir__}/converter/manpage),
       }
 
