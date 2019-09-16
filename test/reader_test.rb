@@ -730,6 +730,47 @@ class ReaderTest < Minitest::Test
         assert_equal ['last line'], doc.blocks[2].lines
       end
 
+      test 'should fail to read include file if not UTF-8 encoded and encoding is not specified' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/iso-8859-1.txt[]
+        ....
+        EOS
+
+        assert_raises StandardError, 'invalid byte sequence in UTF-8' do
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 1, doc.blocks.size
+          refute_equal ['Où est l\'hôpital ?'], doc.blocks[0].lines
+          doc.convert
+        end
+      end
+
+      test 'should ignore encoding attribute if value is not an valid encoding' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/encoding.adoc[tag=romé,encoding=iso-1000-1]
+        ....
+        EOS
+
+        doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+        assert_equal 1, doc.blocks.size
+        assert_equal doc.blocks[0].lines[0].encoding, Encoding::UTF_8
+        assert_equal ['Gregory Romé has written an AsciiDoc plugin for the Redmine project management application.'], doc.blocks[0].lines
+      end
+
+      test 'should use encoding specified by encoding attribute when reading include file' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/iso-8859-1.txt[encoding=iso-8859-1]
+        ....
+        EOS
+
+        doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+        assert_equal 1, doc.blocks.size
+        assert_equal doc.blocks[0].lines[0].encoding, Encoding::UTF_8
+        assert_equal ['Où est l\'hôpital ?'], doc.blocks[0].lines
+      end
+
       test 'unresolved target referenced by include directive is skipped when optional option is set' do
         input = <<~'EOS'
         include::fixtures/{no-such-file}[opts=optional]
