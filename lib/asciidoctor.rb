@@ -300,6 +300,7 @@ module Asciidoctor
     example: 'example-caption',
     'figure' => 'figure-caption',
     listing: 'listing-caption',
+    stem: 'stem-caption',
     table: 'table-caption',
     video: 'video-caption'
   }
