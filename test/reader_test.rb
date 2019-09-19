@@ -680,7 +680,7 @@ class ReaderTest < Minitest::Test
 
         assert_equal 'first line of parent', reader.read_line
 
-        assert_equal 'fixtures/parent-include.adoc: line 1', reader.cursor_at_prev_line.to_s
+        assert_equal "#{File.join(DIRNAME, 'fixtures', 'parent-include.adoc')}: line 1", reader.cursor_at_prev_line.to_s
         assert_equal parent_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
@@ -689,7 +689,7 @@ class ReaderTest < Minitest::Test
 
         assert_equal 'first line of child', reader.read_line
 
-        assert_equal 'fixtures/child-include.adoc: line 1', reader.cursor_at_prev_line.to_s
+        assert_equal "#{File.join(DIRNAME, 'fixtures', 'child-include.adoc')}: line 1", reader.cursor_at_prev_line.to_s
         assert_equal child_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/child-include.adoc', reader.path
@@ -698,7 +698,7 @@ class ReaderTest < Minitest::Test
 
         assert_equal 'first line of grandchild', reader.read_line
 
-        assert_equal 'fixtures/grandchild-include.adoc: line 1', reader.cursor_at_prev_line.to_s
+        assert_equal "#{File.join(DIRNAME, 'fixtures', 'grandchild-include.adoc')}: line 1", reader.cursor_at_prev_line.to_s
         assert_equal grandchild_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/grandchild-include.adoc', reader.path
@@ -715,7 +715,7 @@ class ReaderTest < Minitest::Test
 
         assert_equal 'last line of parent', reader.read_line
 
-        assert_equal 'fixtures/parent-include.adoc: line 5', reader.cursor_at_prev_line.to_s
+        assert_equal "#{File.join(DIRNAME, 'fixtures', 'parent-include.adoc')}: line 5", reader.cursor_at_prev_line.to_s
         assert_equal parent_include_docfile, reader.file
         assert_equal fixtures_dir, reader.dir
         assert_equal 'fixtures/parent-include.adoc', reader.path
@@ -1510,7 +1510,7 @@ class ReaderTest < Minitest::Test
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), normalize: true
           lines = reader.readlines
           assert_includes lines, 'include::grandchild-include.adoc[]'
-          assert_message logger, :ERROR, 'fixtures/child-include.adoc: line 3: maximum include depth of 1 exceeded', Hash
+          assert_message logger, :ERROR, "#{File.join(DIRNAME, 'fixtures', 'child-include.adoc')}: line 3: maximum include depth of 1 exceeded", Hash
         end
       end
 
@@ -1523,7 +1523,7 @@ class ReaderTest < Minitest::Test
           lines = reader.readlines
           assert_includes lines, 'first line of child'
           assert_includes lines, 'include::grandchild-include.adoc[]'
-          assert_message logger, :ERROR, 'fixtures/child-include.adoc: line 3: maximum include depth of 0 exceeded', Hash
+          assert_message logger, :ERROR, "#{File.join(DIRNAME, 'fixtures', 'child-include.adoc')}: line 3: maximum include depth of 0 exceeded", Hash
         end
       end
 
