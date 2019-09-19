@@ -364,6 +364,7 @@ Enhancements::
   * add support for start attribute on source block to set starting line number when converting to DocBook (#2915)
   * track imagesdir for image on node and in catalog (#2779)
   * allow starting line number to be set using start attribute when highighting source block with Pygments or CodeRay (#1742)
+  * add intrinsic attribute named `pp` that effectively resolves to `++` (#2807)
   * upgrade highlight.js to 9.13.1
 
 Bug Fixes::
@@ -1198,7 +1199,7 @@ Improvements::
   * define JAVASCRIPT_PLATFORM constant to simplify conditional logic in the JavaScript environment (#897)
   * provide access to destination directory, outfile and outdir via Document object (#1203)
   * print encoding information in version report produced by `asciidoctor -v` (#1210)
-  * add intrinsic attribute named `cpp` with value `C++` (#1208)
+  * add intrinsic attribute named `cpp` that effectively resolves to `C++` (#1208)
   * preserve URI targets passed to `stylesheet` and related attributes (#1192)
   * allow numeric characters in block attribute name (#1103)
   * support custom YouTube playlists (#1105)
