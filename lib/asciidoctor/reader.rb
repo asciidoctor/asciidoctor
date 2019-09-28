@@ -1060,6 +1060,11 @@ class PreprocessorReader < Reader
         return inc_path
       end
 
+      if (enc = parsed_attrs['encoding']) && (::Encoding.find enc rescue nil)
+        (read_mode_params = read_mode.split ':')[1] = enc
+        read_mode = read_mode_params.join ':'
+      end unless RUBY_ENGINE_OPAL
+
       inc_linenos = inc_tags = nil
       if attrlist
         if parsed_attrs.key? 'lines'
