@@ -551,7 +551,7 @@ module Asciidoctor
   #   menu:View[Page Style > No Style]
   #   menu:View[Page Style, No Style]
   #
-  InlineMenuMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\n\[]*[^\s\[])\[ *(?:|(#{CC_ALL}*?[^\\]))?\]/m
+  InlineMenuMacroRx = /\\?menu:(#{CG_WORD}|[#{CC_WORD}&][^\n\[]*[^\s\[])\[ *(?:|(#{CC_ALL}*?[^\\]))\]/m
 
   # Matches an implicit menu inline macro.
   #

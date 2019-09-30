@@ -25,6 +25,7 @@ Bug Fixes::
   * Allow a bibliography reference to be used inside a footnote (#3325)
   * Fix bottom margin collapsing on AsciiDoc table cell (#3370)
   * Remove excess hard line break in multi-line AsciiMath blocks (#3407)
+  * Remove errant optional flag in regexp for menu macro that breaks Asciidoctor.js (#3433)
   * Upgrade MathJax from 2.7.5 to 2.7.6
 
 Compliance::
