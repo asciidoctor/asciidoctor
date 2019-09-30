@@ -580,7 +580,7 @@ class Reader
     elsif ::Array === data
       data.drop 0
     elsif data
-      data.split LF, -1
+      data.chomp.split LF, -1
     else
       []
     end

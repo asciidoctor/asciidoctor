@@ -18,6 +18,11 @@ class ReaderTest < Minitest::Test
         assert_equal SAMPLE_DATA, reader.lines
       end
 
+      test 'should prepare lines from String data with trailing newline' do
+        reader = Asciidoctor::Reader.new SAMPLE_DATA.join(Asciidoctor::LF) + Asciidoctor::LF
+        assert_equal SAMPLE_DATA, reader.lines
+      end
+
       test 'should remove UTF-8 BOM from first line of String data' do
         ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
           data = String.new %(\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}), encoding: start_encoding
