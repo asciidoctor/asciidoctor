@@ -71,11 +71,7 @@ module Helpers
     elsif leading_bytes == BOM_BYTES_UTF_8
       data[0] = first.byteslice 3, first.bytesize
     end
-    if first.encoding == UTF_8
-      data.map {|line| line.rstrip }
-    else
-      data.map {|line| (line.encode UTF_8).rstrip }
-    end
+    first.encoding == UTF_8 ? data.map {|line| line.rstrip } : data.map {|line| (line.encode UTF_8).rstrip }
   end
 
   # Internal: Prepare the source data String for parsing.
