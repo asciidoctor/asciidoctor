@@ -25,6 +25,8 @@ Bug Fixes::
   * Allow a bibliography reference to be used inside a footnote (#3325)
   * Fix bottom margin collapsing on AsciiDoc table cell (#3370)
   * Remove excess hard line break in multi-line AsciiMath blocks (#3407)
+  * Only skip front matter of main document if skip-front-matter attribute is set (#3437)
+  * Only skip front matter in include files if skip-front-matter option is set (#3437)
   * Upgrade MathJax from 2.7.5 to 2.7.6
 
 Compliance::
