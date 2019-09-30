@@ -1907,6 +1907,21 @@ context 'Tables' do
       assert_xpath %(/table/tbody/tr[1]/td[3]//pre[text()="do\n\nre\n\nme"]), output, 1
     end
 
+    test 'should not drop trailing empty cell in TSV data when loaded from an include file' do
+      input  = <<~'EOS'
+      [%header,format=tsv]
+      |===
+      include::fixtures/data.tsv[]
+      |===
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, base_dir: ASCIIDOCTOR_TEST_DIR
+      assert_css 'table > tbody > tr', output, 3
+      assert_css 'table > tbody > tr:nth-child(1) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(3) > td', output, 3
+      assert_css 'table > tbody > tr:nth-child(2) > td:nth-child(3):empty', output, 1
+    end
+
     test 'mixed unquoted records and quoted records with escaped quotes, commas, and wrapped lines' do
       input = <<~'EOS'
       [format="csv",options="header"]

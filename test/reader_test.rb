@@ -743,6 +743,18 @@ class ReaderTest < Minitest::Test
         assert_equal ['last line'], doc.blocks[2].lines
       end
 
+      test 'should only strip trailing newlines, not trailing whitespace, if include file is not AsciiDoc' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/data.tsv[]
+        ....
+        EOS
+
+        doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+        assert_equal 1, doc.blocks.size
+        assert doc.blocks[0].lines[2].end_with? ?\t
+      end
+
       test 'should fail to read include file if not UTF-8 encoded and encoding is not specified' do
         input = <<~'EOS'
         ....
