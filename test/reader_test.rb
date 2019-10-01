@@ -629,6 +629,14 @@ class ReaderTest < Minitest::Test
         assert doc.catalog[:includes]['fixtures/include-file']
       end
 
+      test 'strips BOM from include file' do
+        input = %(:showtitle:\ninclude::fixtures/file-with-utf8-bom.adoc[])
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        assert_css '.paragraph', output, 0
+        assert_css 'h1', output, 1
+        assert_match(/<h1>人<\/h1>/, output)
+      end
+
       test 'should not track include in catalog for non-AsciiDoc include files' do
         input = <<~'EOS'
         ----
