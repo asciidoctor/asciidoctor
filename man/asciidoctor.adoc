@@ -53,7 +53,7 @@ Values containing spaces should be enclosed in quotes.
 This option may be specified more than once.
 
 *-b, --backend*=_BACKEND_::
-  Backend output file format: _html5_, _docbook5_, _docbook45_, and _manpage_ are supported out of the box.
+  Backend output file format: _html5_, _docbook5_, and _manpage_ are supported out of the box.
   You can also use the backend alias names _html_ (aliased to _html5_) or _docbook_ (aliased to _docbook5_).
   Other values can be passed, but if Asciidoctor cannot resolve the backend to a converter, it will fail.
   Defaults to _html5_.
