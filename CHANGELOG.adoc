@@ -37,6 +37,7 @@ Improvements::
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
   * Allow encoding of include file to be specified using encoding attribute (#3248)
+  * Upgrade MathJax to 3.0.0 (#3449)
 
 Build / Infrastructure::
 

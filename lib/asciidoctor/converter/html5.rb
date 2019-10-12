@@ -256,33 +256,35 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'stem'
       eqnums_val = node.attr 'eqnums', 'none'
-      eqnums_val = 'AMS' if eqnums_val.empty?
-      eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
+      eqnums_val = 'ams' if eqnums_val.empty?
       # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-      result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
+      result << %(<script>
+function adjustDisplay(math, doc) {
+  let node = math.start.node.parentNode
+  if (node && (node = node.parentNode) && node.classList.contains('stemblock')) {
+    math.root.attributes.set('display', 'block')
+  }
+}
+window.MathJax = {
+  tex: {
     inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
     displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
+    processEscapes: false,
+    tags: "#{eqnums_val}"
   },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
+  options: {
+    ignoreHtmlClass: 'nostem|noasciimath',
+    renderActions: {
+      adjustDisplay: [25, (doc) => {for (math of doc.math) {adjustDisplay(math, doc)}}, adjustDisplay]
     }
-    return data
-  })
-})
+  },
+  asciimath: {
+    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}]
+  },
+  loader: {load: ['input/asciimath', 'output/chtml', 'ui/menu']}
+}
 </script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script async src="#{asset_uri_scheme}//cdn.jsdelivr.net/npm/mathjax@#{MATHJAX_VERSION}/es5/tex-chtml-full.js"></script>)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?

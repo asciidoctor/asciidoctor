@@ -359,7 +359,7 @@ module Asciidoctor
 
   HIGHLIGHT_JS_VERSION = '9.15.6'
 
-  MATHJAX_VERSION = '2.7.6'
+  MATHJAX_VERSION = '3.0.0'
 
   # attributes which be changed throughout the flow of the document (e.g., sectnums)
   FLEXIBLE_ATTRIBUTES = ['sectnums']
