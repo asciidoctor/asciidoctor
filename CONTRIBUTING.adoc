@@ -113,7 +113,7 @@ If you need to test the whole document, use `render_string` instead.
 The `assert_css` and `assert_xpath` assertion methods take a CSS or XPath selector, respectively, the rendered result and the number of expected matches.
 You can also use built-in assertions in Ruby's test library.
 
-To run all the tests, simply execute `rake`:
+To run all the tests, execute `rake`:
 
  $ rake
 
@@ -148,7 +148,7 @@ We plan on switching to a more elegant testing framework in the future, such as 
 === Running Asciidoctor in Development Mode
 
 Asciidoctor is designed so that you can run the script directly out of the cloned repository.
-Simply execute the `asciidoctor` command directly (referencing it either by relative or absolute path).
+Execute the `asciidoctor` command directly (referencing it either by relative or absolute path).
 There's no need to install it using the `gem` command first.
 
 For example, to convert the README file, switch to the root of the project and run:
