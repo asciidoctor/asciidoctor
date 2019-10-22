@@ -152,8 +152,8 @@ class Converter::Html5Converter < Converter::Base
       end
     end
 
-    if (syntax_hl = node.syntax_highlighter) && (syntax_hl.docinfo? :head)
-      result << (syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+    if (syntax_hl = node.syntax_highlighter)
+      result << (syntax_hl_docinfo_head_idx = result.size)
     end
 
     unless (docinfo_content = node.docinfo).empty?
@@ -250,8 +250,15 @@ class Converter::Html5Converter < Converter::Base
     # JavaScript (and auxiliary stylesheets) loaded at the end of body for performance reasons
     # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
 
-    if syntax_hl && (syntax_hl.docinfo? :footer)
-      result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+    if syntax_hl
+      if syntax_hl.docinfo? :head
+        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
+      else
+        result.delete_at syntax_hl_docinfo_head_idx
+      end
+      if syntax_hl.docinfo? :footer
+        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+      end
     end
 
     if node.attr? 'stem'

@@ -265,6 +265,9 @@ context 'Syntax Highlighter' do
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, linkcss_default: true
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
       assert_match(/\.CodeRay *\{/, output)
+      style_node = xmlnodes_at_xpath '//style[contains(text(), ".CodeRay")]', output, 1
+      refute_nil style_node
+      assert_equal 'head', style_node.parent.name
     end
 
     test 'should not fail if source language is invalid' do
@@ -531,7 +534,9 @@ context 'Syntax Highlighter' do
       EOS
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss' => '' }
       assert_xpath '//pre[@class="CodeRay highlight"]/code[@data-lang="ruby"]//span[@class = "constant"][text() = "CodeRay"]', output, 1
-      assert_css 'link[rel="stylesheet"][href="./coderay-asciidoctor.css"]', output, 1
+      link_node = xmlnodes_at_xpath '//link[@rel="stylesheet"][@href="./coderay-asciidoctor.css"]', output, 1
+      refute_nil link_node
+      assert_equal 'head', link_node.parent.name
     end
 
     test 'should highlight source inline if source-highlighter attribute is coderay and coderay-css is style' do
@@ -675,6 +680,9 @@ context 'Syntax Highlighter' do
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_xpath '//pre[@class="rouge highlight"]/code[@data-lang="ruby"]/span[@class="no"][text()="Rouge"]', output, 2
       assert_includes output, 'pre.rouge .no {'
+      style_node = xmlnodes_at_xpath '//style[contains(text(), "pre.rouge")]', output, 1
+      refute_nil style_node
+      assert_equal 'head', style_node.parent.name
     end
 
     test 'should highlight source using a mixed lexer (HTML + JavaScript)' do
@@ -1025,6 +1033,9 @@ context 'Syntax Highlighter' do
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_xpath '//pre[@class="pygments highlight"]/code[@data-lang="python"]/span[@class="tok-kn"][text()="import"]', output, 3
       assert_includes output, 'pre.pygments '
+      style_node = xmlnodes_at_xpath '//style[contains(text(), "pre.pygments")]', output, 1
+      refute_nil style_node
+      assert_equal 'head', style_node.parent.name
     end
 
     test 'should gracefully fallback to default style if specified style not recognized' do
