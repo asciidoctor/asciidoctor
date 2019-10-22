@@ -5,8 +5,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
 
   def initialize *args
     super
-    @requires_stylesheet = nil
-    @style = nil
+    @requires_stylesheet = @style = nil
   end
 
   def highlight?
