@@ -52,7 +52,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   end
 
   def docinfo? location
-    @requires_stylesheet && location == :footer
+    @requires_stylesheet && location == :head
   end
 
   def docinfo location, doc, opts
