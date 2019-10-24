@@ -20,7 +20,7 @@ module SyntaxHighlighter
   end
 
   # Public: Indicates whether this syntax highlighter has docinfo (i.e., markup) to insert into the output document at
-  # the specified location.
+  # the specified location. Should be called by converter after main content has been converted.
   #
   # location - The Symbol representing the location slot (:head or :footer).
   #
@@ -28,6 +28,7 @@ module SyntaxHighlighter
   def docinfo? location; end
 
   # Public: Generates docinfo markup for this syntax highlighter to insert at the specified location in the output document.
+  # Should be called by converter after main content has been converted.
   #
   # location - The Symbol representing the location slot (:head or :footer).
   # doc      - The Document in which this syntax highlighter is being used.
