@@ -4526,7 +4526,7 @@ end
 
 context 'Callout lists' do
   test 'does not recognize callout list denoted by markers that only have a trailing bracket' do
-    input  = <<~'EOS'
+    input = <<~'EOS'
     ----
     require 'asciidoctor' # <1>
     ----
@@ -4535,6 +4535,39 @@ context 'Callout lists' do
 
     output = convert_string_to_embedded input
     assert_css '.colist', output, 0
+  end
+
+  test 'should not hang if obsolete callout list is found inside list item' do
+    input = <<~'EOS'
+    * foo
+    1> bar
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_css '.colist', output, 0
+  end
+
+  test 'should not hang if obsolete callout list is found inside dlist item' do
+    input = <<~'EOS'
+    foo::
+    1> bar
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_css '.colist', output, 0
+  end
+
+  test 'should recognize auto-numberd callout list inside list' do
+    input = <<~'EOS'
+    ----
+    require 'asciidoctor' # <1>
+    ----
+    * foo
+    <.> bar
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_css '.colist', output, 1
   end
 
   test 'listing block with sequential callouts followed by adjacent callout list' do

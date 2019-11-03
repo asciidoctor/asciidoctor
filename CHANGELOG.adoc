@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * Fix infinite loop when callout list with obsolete syntax is found inside list item (#3472)
   * Initialize backend traits for converter (if not previously initialized) using assigned basebackend; mimics Asciidoctor < 2 behavior (#3341)
   * Pass options to constructor of Rouge lexer instead of #lex method; restores compatibility with Rouge >= 3.4 (#3336)
   * Don't clobber cgi-style options on language when enabling start_inline option on the Rouge PHP lexer (#3336)

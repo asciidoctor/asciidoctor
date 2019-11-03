@@ -269,7 +269,7 @@ module Asciidoctor
   #
   # NOTE we only have to check as far as the blank character because we know it means non-whitespace follows.
   # IMPORTANT if this regexp does not agree with the regexp for each list type, the parser will hang.
-  AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/])[ \t]*[^ \t]#{CC_ANY}*?(?::::{0,2}|;;)(?:$|[ \t])|<?\d+>[ \t]))
+  AnyListRx = %r(^(?:[ \t]*(?:-|\*\**|\.\.*|\u2022|\d+\.|[a-zA-Z]\.|[IVXivx]+\))[ \t]|(?!//[^/])[ \t]*[^ \t]#{CC_ANY}*?(?::::{0,2}|;;)(?:$|[ \t])|<(?:\d+|\.)>[ \t]))
 
   # Matches an unordered list item (one level for hyphens, up to 5 levels for asterisks).
   #
