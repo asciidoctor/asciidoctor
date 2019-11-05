@@ -388,7 +388,6 @@ context 'Document' do
   context 'MathJax' do
     test 'should add MathJax script to HTML head if stem attribute is set' do
       output = convert_string '', attributes: { 'stem' => '' }
-      assert_match('<script type="text/x-mathjax-config">', output)
       assert_match('inlineMath: [["\\\\(", "\\\\)"]]', output)
       assert_match('displayMath: [["\\\\[", "\\\\]"]]', output)
       assert_match('delimiters: [["\\\\$", "\\\\$"]]', output)
