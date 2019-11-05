@@ -430,10 +430,14 @@ context "Parser" do
     v0.0.7, 2013-12-18: The first release you can stand on
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 9, metadata.size
+    assert_equal 13, metadata.size
     assert_equal '0.0.7', metadata['revnumber']
     assert_equal '2013-12-18', metadata['revdate']
     assert_equal 'The first release you can stand on', metadata['revremark']
+    assert_equal '1', metadata['revcount']
+    assert_equal '0.0.7', metadata['revnumber_0']
+    assert_equal '2013-12-18', metadata['revdate_0']
+    assert_equal 'The first release you can stand on', metadata['revremark_0']
   end
 
   test 'parse rev number, data, and remark as attribute references' do
@@ -442,10 +446,14 @@ context "Parser" do
     v{project-version}, {release-date}: {release-summary}
     EOS
     metadata, _ = parse_header_metadata input
-    assert_equal 9, metadata.size
+    assert_equal 13, metadata.size
     assert_equal '{project-version}', metadata['revnumber']
     assert_equal '{release-date}', metadata['revdate']
     assert_equal '{release-summary}', metadata['revremark']
+    assert_equal '1', metadata['revcount']
+    assert_equal '{project-version}', metadata['revnumber_0']
+    assert_equal '{release-date}', metadata['revdate_0']
+    assert_equal '{release-summary}', metadata['revremark_0']
   end
 
   test 'should resolve attribute references in rev number, data, and remark' do
@@ -462,6 +470,10 @@ context "Parser" do
     assert_equal '1.0.1', (doc.attr 'revnumber')
     assert_equal '2018-05-15', (doc.attr 'revdate')
     assert_equal 'The one you can count on!', (doc.attr 'revremark')
+    assert_equal '1', (doc.attr 'revcount')
+    assert_equal '1.0.1', (doc.attr 'revnumber_0')
+    assert_equal '2018-05-15', (doc.attr 'revdate_0')
+    assert_equal 'The one you can count on!', (doc.attr 'revremark_0')
   end
 
   test "parse rev date" do
@@ -538,6 +550,30 @@ context "Parser" do
     metadata, _ = parse_header_metadata input
     assert_equal 'Must start revremark-only line with space', metadata['revremark']
     refute metadata.has_key?('revdate')
+  end
+
+  test "parse multiple rev number date remark" do
+    input = <<~'EOS'
+    Ryan Waldron
+    v0.0.7, 2013-12-18: The first release
+    v0.0.8, 2013-12-19: The second release
+    v0.0.9, 2013-12-20: The third release
+    EOS
+    metadata, _ = parse_header_metadata input
+    assert_equal 19, metadata.size
+    assert_equal '3', metadata['revcount']
+    assert_equal '0.0.7', metadata['revnumber_0']
+    assert_equal '2013-12-18', metadata['revdate_0']
+    assert_equal 'The first release', metadata['revremark_0']
+    assert_equal '0.0.8', metadata['revnumber_1']
+    assert_equal '2013-12-19', metadata['revdate_1']
+    assert_equal 'The second release', metadata['revremark_1']
+    assert_equal '0.0.9', metadata['revnumber_2']
+    assert_equal '2013-12-20', metadata['revdate_2']
+    assert_equal 'The third release', metadata['revremark_2']
+    assert_equal '0.0.9', metadata['revnumber']
+    assert_equal '2013-12-20', metadata['revdate']
+    assert_equal 'The third release', metadata['revremark']
   end
 
   test "skip line comments before author" do

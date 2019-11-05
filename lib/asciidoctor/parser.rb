@@ -1804,9 +1804,9 @@ class Parser
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries reader, document
 
-      rev_metadata = {}
       rev_metadatas = []
-
+      rev_metadata = {}
+      
       while reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line
         if (match = RevisionInfoLineRx.match(rev_line))
@@ -1820,6 +1820,9 @@ class Parser
             end
           end
           rev_metadata['revremark'] = match[3].rstrip if match[3]
+          unless rev_metadata['revnumber'] && rev_metadata['revdate'] && rev_metadata['revremark']
+            break
+          end
           rev_metadatas.push(rev_metadata.dup)
         else
           # throw it back
@@ -1828,22 +1831,20 @@ class Parser
         end
       end
 
-      doc_attrs["revcount"] = rev_metadatas.length
-
+      unless rev_metadatas.empty?
+        rev_metadatas.each_index do |i|
+          rev_metadata['revnumber_' + i.to_s] = rev_metadatas[i]['revnumber']
+          rev_metadata['revdate_'   + i.to_s] = rev_metadatas[i]['revdate']
+          rev_metadata['revremark_' + i.to_s] = rev_metadatas[i]['revremark']
+        end
+        rev_metadata['revcount'] = rev_metadatas.length.to_s
+      end
       unless rev_metadata.empty?
         if document
           # apply header subs and assign to document
           rev_metadata.each do |key, val|
             unless doc_attrs.key? key
               doc_attrs[key] = document.apply_header_subs val
-            end
-          end
-          rev_metadatas.each_index do |i|
-            rev_metadatas[i].each do |key, val|
-              key = key + i.to_s
-              unless doc_attrs.key? key
-                doc_attrs[key] = document.apply_header_subs val
-              end
             end
           end
         end
