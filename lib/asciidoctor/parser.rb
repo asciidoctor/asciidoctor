@@ -1805,8 +1805,9 @@ class Parser
       process_attribute_entries reader, document
 
       rev_metadata = {}
+      rev_metadatas = []
 
-      if reader.has_more_lines? && !reader.next_line_empty?
+      while reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line
         if (match = RevisionInfoLineRx.match(rev_line))
           rev_metadata['revnumber'] = match[1].rstrip if match[1]
@@ -1819,11 +1820,15 @@ class Parser
             end
           end
           rev_metadata['revremark'] = match[3].rstrip if match[3]
+          rev_metadatas.push(rev_metadata.dup)
         else
           # throw it back
           reader.unshift_line rev_line
+          break
         end
       end
+
+      doc_attrs["revcount"] = rev_metadatas.length
 
       unless rev_metadata.empty?
         if document
@@ -1831,6 +1836,14 @@ class Parser
           rev_metadata.each do |key, val|
             unless doc_attrs.key? key
               doc_attrs[key] = document.apply_header_subs val
+            end
+          end
+          rev_metadatas.each_index do |i|
+            rev_metadatas[i].each do |key, val|
+              key = key + i.to_s
+              unless doc_attrs.key? key
+                doc_attrs[key] = document.apply_header_subs val
+              end
             end
           end
         end
