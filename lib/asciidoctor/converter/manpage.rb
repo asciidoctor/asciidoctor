@@ -15,7 +15,7 @@ class Converter::ManPageConverter < Converter::Base
   ESC_BS = %(#{ESC}\\) # escaped backslash (indicates troff formatting sequence)
   ESC_FS = %(#{ESC}.)  # escaped full stop (indicates troff macro)
 
-  LiteralBackslashRx = /(?:\A|[^#{ESC}])\\/
+  LiteralBackslashRx = /(\A|[^#{ESC}\\])(\\+)/
   LeadingPeriodRx = /^\./
   EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) "#{CC_ANY}*?" "#{CC_ANY}*?" )( |[^\s]*)(#{CC_ANY}*?)(?: *#{ESC}\\c)?$/
   MockBoundaryRx = /<\/?BOUNDARY>/
@@ -699,7 +699,7 @@ allbox tab(:);'
       str = str.tr_s WHITESPACE, ' '
     end
     str = str.
-      gsub(LiteralBackslashRx, '\&(rs'). # literal backslash (not a troff escape sequence)
+      gsub(LiteralBackslashRx) { %[#{$1}#{'\\(rs' * $2.length}] }. # literal backslash (not a troff escape sequence)
       gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
       # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
       gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.

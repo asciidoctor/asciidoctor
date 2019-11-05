@@ -280,15 +280,15 @@ context 'Manpage' do
       assert_equal '\(lqhello\(rq \(oqgoodbye\(cq \fBstrong\fP \fIweak\fP \f(CReven\fP', output.lines.last.chomp
     end
 
-    test 'should escape backslashes in content' do
+    test 'should preserve literal backslashes in content' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
-      \\.foo \\ bar\\
-      baz
+      \\.foo \\ bar \\\\ baz\\
+      more
       EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '\(rs.foo \(rs bar\(rs', output.lines[-2].chomp
+      assert_equal '\(rs.foo \(rs bar \(rs\(rs baz\(rs', output.lines[-2].chomp
     end
 
     test 'should escape literal escape sequence' do
