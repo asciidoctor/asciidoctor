@@ -232,7 +232,7 @@ module Substitutors
           @document.counter(*args)
         end
       elsif doc_attrs.key?(key = $2.downcase)
-        doc_attrs[key]
+        sub_specialchars doc_attrs[key]
       elsif (value = INTRINSIC_ATTRIBUTES[key])
         value
       else
