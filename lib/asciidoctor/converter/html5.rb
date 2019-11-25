@@ -183,7 +183,7 @@ class Converter::Html5Converter < Converter::Base
         if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
           result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{convert_outline node}
+#{node.converter.convert node, 'outline'}
 </div>)
         end
         result << (generate_manname_section node) if node.attr? 'manpurpose'
@@ -216,7 +216,7 @@ class Converter::Html5Converter < Converter::Base
         if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
           result << %(<div id="toc" class="#{node.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{convert_outline node}
+#{node.converter.convert node, 'outline'}
 </div>)
         end
       end
@@ -318,7 +318,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
       result << %(<div id="toc" class="toc">
 <div id="toctitle">#{node.attr 'toc-title'}</div>
-#{convert_outline node}
+#{node.converter.convert node, 'outline'}
 </div>)
     end
 
@@ -803,7 +803,7 @@ Your browser does not support the audio tag.
       toc = %(
 <div id="toc" class="#{doc.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{doc.attr 'toc-title'}</div>
-#{convert_outline doc}
+#{doc.converter.convert doc, 'outline'}
 </div>)
     else
       toc = ''
@@ -941,7 +941,7 @@ Your browser does not support the audio tag.
 
     %(<div#{id_attr} class="#{role}">
 <div#{title_id_attr} class="title">#{title}</div>
-#{convert_outline doc, toclevels: levels}
+#{doc.converter.convert doc, 'outline', toclevels: levels}
 </div>)
   end
 
