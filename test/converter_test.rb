@@ -316,6 +316,24 @@ context 'Converter' do
       assert_xpath '//aside/header/h1[text()="Related"]', output, 1
       assert_xpath '//aside/header/following-sibling::p[text()="Sidebar content"]', output, 1
     end
+
+    test 'should be able to override the outline using a custom template' do
+      input = <<~'EOS'
+      :toc:
+      = Document Title
+
+      == Section One
+
+      == Section Two
+
+      == Section Three
+      EOS
+
+      output = document_from_string(input, template_dir: (fixture_path 'custom-backends/slim/html5-custom-outline'), template_cache: false).convert
+      assert_xpath '//*[@id="toc"]/ul', output, 1
+      assert_xpath '//*[@id="toc"]/ul[1]/li', output, 3
+      assert_xpath '//*[@id="toc"]/ul[1]/li[1][text()="Section One"]', output, 1
+    end
   end
 
   context 'Custom converters' do
