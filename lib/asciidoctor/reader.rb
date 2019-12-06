@@ -1066,6 +1066,7 @@ class PreprocessorReader < Reader
       end unless RUBY_ENGINE_OPAL
 
       inc_linenos = inc_tags = nil
+      # NOTE attrlist is nil if missing from include directive
       if attrlist
         if parsed_attrs.key? 'lines'
           inc_linenos = []
