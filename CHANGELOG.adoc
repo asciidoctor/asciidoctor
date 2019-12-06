@@ -45,6 +45,7 @@ Improvements::
 Build / Infrastructure::
 
   * Run test suite on TruffleRuby nightly (*@mogztter*, *@erebor*)
+  * Trigger upstream builds for AsciidoctorJ on Github Actions (*@robertpanzer*)
 
 // tag::compact[]
 == 2.0.10 (2019-05-31) - @mojavelinux
