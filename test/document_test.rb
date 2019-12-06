@@ -1408,7 +1408,7 @@ context 'Document' do
       assert_xpath '/book/info/subtitle[text()="Subtitle"]', result, 1
     end
 
-    test 'should be able to set doctype to article when converting to DocBoook' do
+    test 'should be able to set doctype to article when converting to DocBook' do
       input = <<~'EOS'
       = Title
       Author Name
@@ -1431,7 +1431,7 @@ context 'Document' do
       assert_css 'article:root > section[xml|id="_first_section"]', result, 1
     end
 
-    test 'should set doctype to article by default for document with no title when converting to DocBoook' do
+    test 'should set doctype to article by default for document with no title when converting to DocBook' do
       result = convert_string('text', attributes: { 'backend' => 'docbook' })
       assert_xpath '/article', result, 1
       assert_xpath '/article/info/title', result, 1
@@ -1493,7 +1493,7 @@ context 'Document' do
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
     end
 
-    test 'should be able to set doctype to book when converting to DocBoook' do
+    test 'should be able to set doctype to book when converting to DocBook' do
       input = <<~'EOS'
       = Title
       Author Name
@@ -1516,7 +1516,7 @@ context 'Document' do
       assert_css 'book:root > chapter[xml|id="_first_chapter"]', result, 1
     end
 
-    test 'should be able to set doctype to book for document with no title when converting to DocBoook' do
+    test 'should be able to set doctype to book for document with no title when converting to DocBook' do
       result = convert_string('text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
       assert_xpath '/book', result, 1
       assert_xpath '/book/info/date', result, 1
