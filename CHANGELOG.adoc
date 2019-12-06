@@ -28,7 +28,7 @@ Bug Fixes::
   * Remove excess hard line break in multi-line AsciiMath blocks (#3407)
   * Remove errant optional flag in regexp for menu macro that breaks Asciidoctor.js (#3433)
   * Preserve repeating backslashes when generating manpage output (#3456)
-  * Upgrade MathJax from 2.7.5 to 2.7.6
+  * Honor percentage width specified on macro of inline SVG (#3464)
 
 Compliance::
 
@@ -41,6 +41,7 @@ Improvements::
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
   * Allow encoding of include file to be specified using encoding attribute (#3248)
   * Allow template to be used to override outline by only specifying the outline template (#3491)
+  * Upgrade MathJax from 2.7.5 to 2.7.6
 
 Build / Infrastructure::
 
