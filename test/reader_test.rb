@@ -1062,6 +1062,18 @@ class ReaderTest < Minitest::Test
         assert_includes output, 'last line of included content'
       end
 
+      test 'include directive ignores lines attribute with invalid range' do
+        input = <<~'EOS'
+        ++++
+        include::fixtures/include-file.adoc[lines=10..5]
+        ++++
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        assert_includes output, 'first line of included content'
+        assert_includes output, 'last line of included content'
+      end
+
       test 'include directive supports selecting lines by tag' do
         input = 'include::fixtures/include-file.adoc[tag=snippetA]'
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
