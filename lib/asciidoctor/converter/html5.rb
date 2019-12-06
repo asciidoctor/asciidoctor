@@ -1268,8 +1268,11 @@ Your browser does not support the video tag.
       ['width', 'height'].each do |dim|
         if node.attr? dim
           new_start_tag = (old_start_tag = (svg.match SvgStartTagRx)[0]).gsub DimensionAttributeRx, '' unless new_start_tag
-          # QUESTION should we add px since it's already the default?
-          new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}px">)
+          unless (dim_val = node.attr dim).end_with? '%'
+            # QUESTION should we add px since it's already the default?
+            dim_val += 'px'
+          end
+          new_start_tag = %(#{new_start_tag.chop} #{dim}="#{dim_val}">)
         end
       end
       svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag

@@ -2190,6 +2190,17 @@ context 'Blocks' do
       refute_match(/<svg\s[^>]*style="width:500px;height:500px"[^>]*>/, output)
     end
 
+    test 'should honor percentage width for inline SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      image::circle.svg[Circle,50%,opts=inline]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg\s[^>]*width="50%"[^>]*>/, output, 1)
+    end
+
     test 'converts inline SVG image using svg element even when data-uri is set' do
       input = <<~'EOS'
       :imagesdir: fixtures
