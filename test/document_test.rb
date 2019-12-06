@@ -705,6 +705,23 @@ context 'Document' do
       assert_css '#content h1', output, 0
     end
 
+    test 'should recognize document title in include file when preceded by blank lines' do
+      input = <<~'EOS'
+      include::fixtures/include-with-leading-blank-line.adoc[]
+      EOS
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
+      assert_xpath '//h1[text()="Document Title"]', output, 1
+      assert_css '#toc', output, 1
+    end
+
+    test 'should include specified lines even when leading lines are skipped' do
+      input = <<~'EOS'
+      include::fixtures/include-with-leading-blank-line.adoc[lines=6]
+      EOS
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
+      assert_xpath '//h2[text()="Section"]', output, 1
+    end
+
     test 'document with multiline attribute entry but only one line should not crash' do
       input = ':foo: bar' + Asciidoctor::LINE_CONTINUATION
       doc = document_from_string input
