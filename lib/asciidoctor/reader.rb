@@ -717,7 +717,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: true, condense: false, indent: attributes['indent']).empty?
+    if (@lines = prepare_lines data, normalize: true, condense: @process_lines, indent: attributes['indent']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines

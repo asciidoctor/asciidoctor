@@ -29,6 +29,7 @@ Bug Fixes::
   * Remove errant optional flag in regexp for menu macro that breaks Asciidoctor.js (#3433)
   * Preserve repeating backslashes when generating manpage output (#3456)
   * Honor percentage width specified on macro of inline SVG (#3464)
+  * Removing leading and trailing blank lines in AsciiDoc include file to match assumption of parser (#3470)
 
 Compliance::
 
