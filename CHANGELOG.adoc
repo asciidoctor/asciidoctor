@@ -26,6 +26,7 @@ Bug Fixes::
   * Allow a bibliography reference to be used inside a footnote (#3325)
   * Fix bottom margin collapsing on AsciiDoc table cell (#3370)
   * Remove excess hard line break in multi-line AsciiMath blocks (#3407)
+  * Only strip trailing whitespace from lines of AsciiDoc include file (#3436)
   * Remove errant optional flag in regexp for menu macro that breaks Asciidoctor.js (#3433)
   * Preserve repeating backslashes when generating manpage output (#3456)
   * Honor percentage width specified on macro of inline SVG (#3464)

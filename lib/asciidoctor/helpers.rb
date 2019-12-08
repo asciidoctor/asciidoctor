@@ -56,22 +56,28 @@ module Helpers
   # If a BOM is found at the beginning of the data, a best attempt is made to
   # encode it to UTF-8 from the specified source encoding.
   #
-  # data - the source data Array to prepare (no nil entries allowed)
+  # data     - the source data Array to prepare (no nil entries allowed)
+  # trim_end - whether to trim whitespace from the end of each line;
+  #            (true cleans all whitespace; false only removes trailing newline) (default: true)
   #
   # returns a String Array of prepared lines
-  def prepare_source_array data
+  def prepare_source_array data, trim_end = true
     return [] if data.empty?
     if (leading_2_bytes = (leading_bytes = (first = data[0]).unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
       data[0] = first.byteslice 2, first.bytesize
       # NOTE you can't split a UTF-16LE string using .lines when encoding is UTF-8; doing so will cause this line to fail
-      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16LE).rstrip }
+      return trim_end ? data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16LE).rstrip } : data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16LE).chomp }
     elsif leading_2_bytes == BOM_BYTES_UTF_16BE
       data[0] = first.byteslice 2, first.bytesize
-      return data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16BE).rstrip }
+      return trim_end ? data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16BE).rstrip } : data.map {|line| (line.encode UTF_8, ::Encoding::UTF_16BE).chomp }
     elsif leading_bytes == BOM_BYTES_UTF_8
       data[0] = first.byteslice 3, first.bytesize
     end
-    first.encoding == UTF_8 ? data.map {|line| line.rstrip } : data.map {|line| (line.encode UTF_8).rstrip }
+    if first.encoding == UTF_8
+      trim_end ? data.map {|line| line.rstrip } : data.map {|line| line.chomp }
+    else
+      trim_end ? data.map {|line| (line.encode UTF_8).rstrip } : data.map {|line| (line.encode UTF_8).chomp }
+    end
   end
 
   # Internal: Prepare the source data String for parsing.
@@ -82,10 +88,12 @@ module Helpers
   # If a BOM is found at the beginning of the data, a best attempt is made to
   # encode it to UTF-8 from the specified source encoding.
   #
-  # data - the source data String to prepare
+  # data     - the source data String to prepare
+  # trim_end - whether to trim whitespace from the end of each line;
+  #            (true cleans all whitespace; false only removes trailing newline) (default: true)
   #
   # returns a String Array of prepared lines
-  def prepare_source_string data
+  def prepare_source_string data, trim_end = true
     return [] if data.nil_or_empty?
     if (leading_2_bytes = (leading_bytes = data.unpack 'C3').slice 0, 2) == BOM_BYTES_UTF_16LE
       data = (data.byteslice 2, data.bytesize).encode UTF_8, ::Encoding::UTF_16LE
@@ -97,7 +105,11 @@ module Helpers
     elsif data.encoding != UTF_8
       data = data.encode UTF_8
     end
-    [].tap {|lines| data.each_line {|line| lines << line.rstrip } }
+    if trim_end
+      [].tap {|lines| data.each_line {|line| lines << line.rstrip } }
+    else
+      [].tap {|lines| data.each_line {|line| lines << line.chomp } }
+    end
   end
 
   # Internal: Efficiently checks whether the specified String resembles a URI

@@ -570,13 +570,14 @@ class Reader
   #
   # data - A String Array or String of source data to be normalized.
   # opts - A Hash of options to control how lines are prepared.
-  #        :normalize - Enables line normalization, which coerces the encoding to UTF-8 and removes trailing whitespace
-  #        (optional, default: false).
+  #        :normalize - Enables line normalization, which coerces the encoding to UTF-8 and removes trailing whitespace;
+  #        :rstrip removes all trailing whitespace; :chomp removes trailing newline only (optional, not set).
   #
   # Returns A String Array of source lines. If the source data is an Array, this method returns a copy.
   def prepare_lines data, opts = {}
-    if opts[:normalize]
-      ::Array === data ? (Helpers.prepare_source_array data) : (Helpers.prepare_source_string data)
+    if (normalize = opts[:normalize])
+      trim_end = normalize == :chomp ? false : true
+      ::Array === data ? (Helpers.prepare_source_array data, trim_end) : (Helpers.prepare_source_string data, trim_end)
     elsif ::Array === data
       data.drop 0
     elsif data
@@ -717,7 +718,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: true, condense: @process_lines, indent: attributes['indent']).empty?
+    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: @process_lines, indent: attributes['indent']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
