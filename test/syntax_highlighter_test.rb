@@ -339,7 +339,7 @@ context 'Syntax Highlighter' do
     end
 
     test 'should highlight lines specified in highlight attribute if linenums is set and source-highlighter is coderay' do
-      %w(highlight="1,4-6" highlight=1;4..6 highlight=1;4..;!7).each do |highlight_attr|
+      %w(highlight="1,4-6" highlight="4-6,1" highlight="5-6,1,4,5" highlight=1;4..6 highlight=1;4..;!7).each do |highlight_attr|
         input = <<~EOS
         :source-highlighter: coderay
 

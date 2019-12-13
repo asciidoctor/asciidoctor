@@ -984,21 +984,18 @@ module Substitutors
       if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
         from, delim, to = entry.partition delim
         to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
-        line_nums = (from.to_i..to).to_a
         if negate
-          lines -= line_nums
+          lines -= (from.to_i..to).to_a
         else
-          lines.concat line_nums
+          lines |= (from.to_i..to).to_a
         end
-      else
-        if negate
-          lines.delete entry.to_i
-        else
-          lines << entry.to_i
-        end
+      elsif negate
+        lines.delete entry.to_i
+      elsif !lines.include?(line = entry.to_i)
+        lines << line
       end
     end
-    lines.sort.uniq
+    lines.sort
   end
 
   # Public: Extract the passthrough text from the document for reinsertion after processing.
