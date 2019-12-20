@@ -148,7 +148,7 @@ module Asciidoctor
     # Compliance value: 'drop-line'
     define :attribute_missing, 'skip'
 
-    # AsciiDoc drops lines that contain an attribute unassignemnt.
+    # AsciiDoc drops lines that contain an attribute unassignment.
     # This behavior may need to be tuned depending on the circumstances.
     # Compliance value: 'drop-line'
     define :attribute_undefined, 'drop-line'
