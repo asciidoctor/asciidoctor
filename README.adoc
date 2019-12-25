@@ -469,7 +469,7 @@ See the {uri-license}[LICENSE] for the full license text.
 *Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {uri-contributors}[many individuals] in Asciidoctor's awesome community.
 The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and based on {uri-prototype}[a prototype] written by https://github.com/nickh[Nick Hengeveld].
 
-*AsciiDoc* was started and maintained by Stuart Rackham from http://asciidoc.org/CHANGELOG.html[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc/asciidoc[AsciiDoc community].
+*AsciiDoc* was started and maintained by Stuart Rackham from https://github.com/asciidoc/asciidoc/blob/master/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc/asciidoc/graphs/contributors[AsciiDoc community].
 
 ifndef::env-site[]
 == Changelog
