@@ -3,13 +3,15 @@ version: '{build}'
 skip_tags: true
 clone_depth: 2
 environment:
+  PYGMENTS_VERSION: '~> 1.2.0'
+  SOURCE_DATE_EPOCH: '1521504000'
   matrix:
   # see https://www.appveyor.com/docs/linux-images-software/#ruby for list of installed Ruby runtimes
-  - ruby_version: '26'
-  - ruby_version: '26-x64'
-  - ruby_version: '25'
-  - ruby_version: '24'
-  - ruby_version: '23'
+  - RUBY_VERSION: '26'
+  - RUBY_VERSION: '26-x64'
+  - RUBY_VERSION: '25'
+  - RUBY_VERSION: '24'
+  - RUBY_VERSION: '23'
 init:
 # Prepend Ruby path from matrix while removing original Ruby entry (C:\Ruby193\bin)
 - set PATH=C:\Ruby%ruby_version%\bin;%PATH:C:\Ruby193\bin;=%
