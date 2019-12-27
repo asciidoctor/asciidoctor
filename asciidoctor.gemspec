@@ -46,8 +46,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.11.0'
   s.add_development_dependency 'nokogiri', '~> 1.10.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
-  # Asciidoctor supports Rouge >= 2; Rouge 3.4.1 emits a superfluous warning in verbose mode
-  s.add_development_dependency 'rouge', '~> 3.4.0', '!= 3.4.1'
+  # Asciidoctor supports Rouge >= 2
+  s.add_development_dependency 'rouge', '~> 3.14.0'
   s.add_development_dependency 'rspec-expectations', '~> 3.8.0'
   s.add_development_dependency 'slim', '~> 4.0.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'
