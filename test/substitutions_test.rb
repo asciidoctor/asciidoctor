@@ -2185,7 +2185,7 @@ context 'Substitutions' do
       block.attributes['language'] = 'ruby'
       block.commit_subs
       assert_equal [:highlight], block.subs
-    end if ENV['PYGMENTS']
+    end if ENV['PYGMENTS_VERSION']
 
     test 'should not replace specialcharacters sub with highlight for source block when source highlighter is not set' do
       doc = empty_document parse: true

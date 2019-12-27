@@ -1188,5 +1188,5 @@ context 'Syntax Highlighter' do
       output = convert_string_to_embedded input, safe: :safe
       assert_includes output, expected
     end
-  end if ENV['PYGMENTS']
+  end if ENV['PYGMENTS_VERSION']
 end
