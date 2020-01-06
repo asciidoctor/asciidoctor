@@ -1205,6 +1205,24 @@ context 'API' do
       assert_css 'html:root > head > link[rel="stylesheet"][href="file:///home/username/custom.css"]', output, 1
     end
 
+    test 'should link to multiple custom stylesheets if specified in stylesheet attribute' do
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet' => './themes/variables.css;./client-y-variables.css;themes/dark.css' }
+      assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 0
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./themes/variables.css"]', output, 1
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./client-y-variables.css"]', output, 1
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./themes/dark.css"]', output, 1
+
+      output = Asciidoctor.convert input, standalone: true, attributes: { 'stylesheet' => 'asciidoctor.css; override.css; ' }
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
+      assert_css 'html:root > head > link[rel="stylesheet"][href="./override.css"]', output, 1
+    end
+
     test 'should resolve custom stylesheet relative to stylesdir' do
       input = <<~'EOS'
       = Document Title

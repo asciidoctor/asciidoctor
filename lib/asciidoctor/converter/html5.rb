@@ -133,13 +133,13 @@ class Converter::Html5Converter < Converter::Base
 #{Stylesheets.instance.primary_stylesheet_data}
 </style>)
       end
-    elsif node.attr? 'stylesheet'
-      if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
+    elsif (stylesheet = node.attr 'stylesheet')
+      if stylesheet.include? ';'
+        (stylesheet.split ';').map {|v| v.strip }.reject {|v| v.empty? }.each do |style|
+          result << (generate_stylesheet node, style, linkcss, slash)
+        end
       else
-        result << %(<style>
-#{node.read_asset node.normalize_system_path((node.attr 'stylesheet'), (node.attr 'stylesdir', '')), warn_on_failure: true, label: 'stylesheet'}
-</style>)
+        result << (generate_stylesheet node, stylesheet, linkcss, slash)
       end
     end
 
@@ -1281,6 +1281,16 @@ Your browser does not support the video tag.
   end
 
   private
+
+  def generate_stylesheet node, stylesheet, linkcss, slash
+    if linkcss
+      %(<link rel="stylesheet" href="#{node.normalize_web_path(stylesheet, (node.attr 'stylesdir', ''))}"#{slash}>)
+    else
+      %(<style>
+#{node.read_asset node.normalize_system_path(stylesheet, (node.attr 'stylesdir', '')), warn_on_failure: true, label: 'stylesheet'}
+</style>)
+    end
+  end
 
   def append_boolean_attribute name, xml
     xml ? %( #{name}="#{name}") : %( #{name})
