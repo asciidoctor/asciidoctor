@@ -339,7 +339,7 @@ class Table::Cell < AbstractBlock
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
   #
-  # This method should not be used for cells in the head row or that have the literal or verse style.
+  # This method should not be used for cells in the head row or that have the literal style.
   #
   # Returns the converted String for this Cell
   def content
