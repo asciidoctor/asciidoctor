@@ -50,6 +50,9 @@ class Table < AbstractBlock
   # Public: Boolean specifies whether this table has a header row
   attr_accessor :has_header_option
 
+  # Public: An Integer of the number of rows in the header (default: 0)
+  attr_accessor :header_rowcount
+
   # Public: Get the caption for this table
   attr_reader :caption
 
@@ -59,6 +62,14 @@ class Table < AbstractBlock
     @columns = []
 
     @has_header_option = attributes['header-option'] ? true : false
+    if (hrows = attributes['hrows'])
+      @header_rowcount = hrows.to_i
+      @has_header_option = @header_rowcount > 0
+    elsif @has_header_option
+      @header_rowcount = 1
+    else
+      @header_rowcount = 0
+    end
 
     # smells like we need a utility method here
     # to resolve an integer width from potential bogus input
@@ -78,10 +89,24 @@ class Table < AbstractBlock
     @attributes['orientation'] = 'landscape' if attributes['rotate-option']
   end
 
+  def has_header_option= value
+    @has_header_option = value
+    if @has_header_option
+      @header_rowcount = 1 if @header_rowcount == 0
+    else
+      @header_rowcount = 0 if @header_rowcount > 0
+    end
+  end
+
+  def header_rowcount= value
+    @header_rowcount = value || 0
+    @has_header_option = @header_rowcount > 0
+  end
+
   # Internal: Returns whether the current row being processed is
   # the header row
   def header_row?
-    @has_header_option && @rows.body.empty?
+    @header_rowcount > @rows.body.size
   end
 
   # Internal: Creates the Column objects from the column spec
@@ -157,14 +182,14 @@ class Table < AbstractBlock
     @attributes['rowcount'] = @rows.body.size
 
     num_body_rows = @rows.body.size
-    if num_body_rows > 0 && @has_header_option
-      head = @rows.body.shift
+    if num_body_rows > 0 && @header_rowcount > 0
+      head = @rows.body.shift(@header_rowcount)
       num_body_rows -= 1
       # styles aren't applied to header row
-      head.each {|c| c.style = nil }
+      head.each{|r| r.each {|c| c.style = nil } }
       # QUESTION why does AsciiDoc use an array for head? is it
       # possible to have more than one based on the syntax?
-      @rows.head = [head]
+      @rows.head = head
     end
 
     if num_body_rows > 0 && attrs['footer-option']

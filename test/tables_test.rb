@@ -1770,6 +1770,116 @@ context 'Tables' do
       assert_css 'table > tbody > tr', output, 2
       assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
     end
+
+    test 'table with two rows in the header' do
+      input = <<~'EOS'
+      [cols=3,hrows=2]
+      |====
+      | A1
+      | B1
+      | C1
+
+      | A2
+      | B2
+      | C2
+
+      | A3
+      | B3
+      | C3
+
+      |====
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table > thead > tr', output, 2
+      assert_css 'table > tbody > tr', output, 1
+    end
+
+    test 'table with no row in the header' do
+      input = <<~'EOS'
+      [%header,cols=3,hrows=0]
+      |====
+      | A1
+      | B1
+      | C1
+
+      | A2
+      | B2
+      | C2
+
+      | A3
+      | B3
+      | C3
+
+      |====
+      EOS
+      # hrows=0 has an higher precedence over %header (as the attribute is more specific)
+      output = convert_string_to_embedded input
+      assert_css 'table > thead > tr', output, 0
+      assert_css 'table > tbody > tr', output, 3
+    end
+
+    test 'table with more header rows than total rows' do
+      input = <<~'EOS'
+      [cols=3,hrows=4]
+      |====
+      | A1
+      | B1
+      | C1
+
+      | A2
+      | B2
+      | C2
+
+      | A3
+      | B3
+      | C3
+
+      |====
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table > thead > tr', output, 3
+      assert_css 'table > tbody > tr', output, 0
+    end
+
+    test 'has_header_option is properly assigned when hrows attribute is defined' do
+      input = <<~'EOS'
+      [cols=3,hrows=1]
+      |====
+      | A1
+      | B1
+      | C1
+
+      | A2
+      | B2
+      | C2
+
+      |====
+      EOS
+      doc = document_from_string input, standalone: false
+      table = doc.blocks[0]
+      assert table.has_header_option
+      assert table.header_rowcount, 1
+    end
+
+    test 'header_rowcount is properly assigned when header option is defined' do
+      input = <<~'EOS'
+      [%header,cols=3]
+      |====
+      | A1
+      | B1
+      | C1
+
+      | A2
+      | B2
+      | C2
+
+      |====
+      EOS
+      doc = document_from_string input, standalone: false
+      table = doc.blocks[0]
+      assert table.has_header_option
+      assert table.header_rowcount, 1
+    end
   end
 
   context 'DSV' do
