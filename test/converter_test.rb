@@ -666,7 +666,8 @@ context 'Converter' do
 
     test 'should create a new custom factory when Converter::Factory.new is invoked' do
       class MyConverter < Asciidoctor::Converter::Base; end
-      factory = Asciidoctor::Converter::Factory.new 'mine' => MyConverter
+      converters = { 'mine' => MyConverter }
+      factory = Asciidoctor::Converter::Factory.new converters
       assert_kind_of Asciidoctor::Converter::CustomFactory, factory
       assert_equal MyConverter, (factory.for 'mine')
     end
