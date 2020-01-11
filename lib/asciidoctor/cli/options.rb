@@ -205,7 +205,7 @@ module Asciidoctor
         # shave off the file to process so that options errors appear correctly
         if args.size == 1 && args[0] == '-'
           infiles << args.pop
-        elsif
+        else
           args.each do |file|
             if file.start_with? '-'
               # warn, but don't panic; we may have enough to proceed, so we won't force a failure
