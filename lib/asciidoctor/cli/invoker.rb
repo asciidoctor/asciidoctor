@@ -42,6 +42,8 @@ module Asciidoctor
         non_posix_env = ::File::ALT_SEPARATOR == RS
         err = @err || $stderr
         show_timings = false
+        # NOTE in Ruby 2.7, RubyGems sets SOURCE_DATE_EPOCH if it's not set
+        ENV.delete 'SOURCE_DATE_EPOCH' if ENV.key? 'DELETE_SOURCE_DATE_EPOCH'
 
         @options.map do |key, val|
           case key
