@@ -4,6 +4,7 @@ git:
   depth: 2
 language: ruby
 rvm:
+- 2.7.0
 - &release_ruby 2.6.5
 - 2.5.7
 - 2.4.9
