@@ -43,7 +43,7 @@ module Asciidoctor
         err = @err || $stderr
         show_timings = false
         # NOTE in Ruby 2.7, RubyGems sets SOURCE_DATE_EPOCH if it's not set
-        ::ENV.delete 'SOURCE_DATE_EPOCH' if (::ENV.key? 'DELETE_SOURCE_DATE_EPOCH') && ::RUBY_ENGINE != 'jruby'
+        ::ENV.delete 'SOURCE_DATE_EPOCH' if (::ENV.key? 'IGNORE_SOURCE_DATE_EPOCH') && (::Gem.respond_to? :source_date_epoch)
 
         @options.map do |key, val|
           case key
