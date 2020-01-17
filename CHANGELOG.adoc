@@ -459,6 +459,10 @@ Enhancements::
 
   * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen, dot, and space) when auto-generating section IDs (#794)
    ** hyphen, dot, and space are replaced with value of idseparator, if set; otherwise, spaces are dropped
+  * BREAKING: disable interdocument xrefs in compat mode (#2740)
+  * pass non-AsciiDoc file extensions in target of xref through unprocessed (#2740)
+  * process any known AsciiDoc file extension in target of shorthand interdocument xref if hash is also present (e.g., `<<target.asciidoc#,text>>`) (#2740)
+  * only allow .adoc to be used in target of formal xref macro to create an interdocument xref (with or without a hash) (#2740)
   * allow attribute names to contain any word character defined by Unicode (#2376, PR #2393)
   * do not recognize attribute entry line if name contains a colon (PR #2377)
   * route all processor messages through a logger instead of using Kernel#warn (#44, PR #2660)
