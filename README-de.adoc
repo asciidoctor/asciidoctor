@@ -73,7 +73,7 @@ Dieses Dokument ist auch in folgenden Sprachen erhältlich: +
 |
 {uri-rel-file-base}README-fr.adoc[Français]
 |
-{uri-rel-file-base}README-jp.adoc[日本語]
+{uri-rel-file-base}README-ja.adoc[日本語]
 endif::[]
 
 .Wichtige Dokumentation

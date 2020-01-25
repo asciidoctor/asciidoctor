@@ -70,7 +70,7 @@ Ce document est traduit dans les langues suivantes : +
 |
 {uri-rel-file-base}README-zh_CN.adoc[Chinois]
 |
-{uri-rel-file-base}README-jp.adoc[Japonais]
+{uri-rel-file-base}README-ja.adoc[Japonais]
 endif::[]
 
 .Documentation clé
