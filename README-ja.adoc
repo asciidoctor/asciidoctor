@@ -63,13 +63,13 @@ endif::[]
 // images:
 :image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
-{uri-project}[Asciidoctor]は, {uri-what-is-asciidoc}[AsciiDoc] で書かれたコンテンツをHTML5, DocBook, PDFなどのフォーマットに変換する, _高速で_ {uri-license}[オープンソース] のテキストプロセッサおよびパブリッシングツールチェインです.
-AsciidoctorはRubyで書かれており, すべての主要オペレーティングシステムで動作します.
-Asciidoctorプロジェクトは {uri-repo}[GitHubにホスティング] されています.
+{uri-project}[Asciidoctor]は、link:{uri-what-is-asciidoc}[AsciiDoc]で書かれたコンテンツをHTML5、DocBook、PDFなどのフォーマットに変換する、_高速で_{uri-license}[オープンソース]のテキストプロセッサおよびパブリッシングツールチェインです。
+AsciidoctorはRubyで書かれており、すべての主要オペレーティングシステムで動作します。
+Asciidoctorプロジェクトはlink:{uri-repo}[GitHubにホスティング]されています。
 
-インストールをシンプルにするため, AsciidoctorはRubyGem（gem）パッケージとして, {uri-rubygem}[RubyGems.org] で配布されています.
-さらに, Asciidoctorは主要なLinuxディストリビューション用およびmacOS用パッケージとしても配布されています.
-AsciidctorはRubyで動作するだけでなく, {uri-asciidoctorj}[AsciidoctorJ]としてJVM上でも動作します. また, {uri-asciidoctorjs}[Asciidoctor.js]としてどのようなJavaScript環境（ブラウザを含む）でも実行できます.
+インストールをシンプルにするため、AsciidoctorはRubyGem（gem）パッケージとして、link:{uri-rubygem}[RubyGems.org]で配布されています。
+さらに、Asciidoctorは主要なLinuxディストリビューション用およびmacOS用パッケージとしても配布されています。
+AsciidctorはRubyで動作するだけでなく、link:{uri-asciidoctorj}[AsciidoctorJ]としてJVM上でも動作します。また、link:{uri-asciidoctorjs}[Asciidoctor.js]としてどのようなJavaScript環境（ブラウザを含む）でも実行できます。
 
 ifndef::env-site,env-yard[]
 このドキュメントには以下の言語版が存在します: +
@@ -102,77 +102,77 @@ endif::[]
 
 == スポンサー
 
-{uri-project}/supporters[スポンサー] のみなさまが, このプロジェクトをサポートし, より良いテクニカルドキュメンテーションの実現にコミットメントをしてくださっていることに感謝します.
-スポンサーのみなさま, ありがとうございます！
-みなさまの多くのサポートなくしてAsciidoctorは実現不可能です.
+{uri-project}/supporters[スポンサー]のみなさまが、このプロジェクトをサポートし、より良いテクニカルドキュメンテーションの実現にコミットメントをしてくださっていることに感謝します。
+スポンサーのみなさま、ありがとうございます！
+みなさまの多くのサポートなくしてAsciidoctorは実現不可能です。
 
 ifndef::env-site,env-yard[]
-Asciidoctorの主な資金的サポートは, *Change Maker* である https://opendevise.com[OpenDevise], *Strategy Sponsors* である https://www.khronos.org/[Khronos Group] とLinda Roberts, そして *Pull Request Backers* である Brian Dominick, Guillaume Grossetie, Abel Salgado Romero によって提供されています.
-さらに, {uri-project}/supporters[Community Backers] のページに掲載されているサポーターによって追加的な資金が提供されています.
+Asciidoctorの主な資金的サポートは、**Change Maker**であるlink:https://opendevise.com[OpenDevise]、**Strategy Sponsors**であるlink:https://www.khronos.org/[Khronos Group]とLinda Roberts、そして**Pull Request Backers**であるBrian Dominick、Guillaume Grossetie、Abel Salgado Romeroによって提供されています。
+さらに、link:{uri-project}/supporters[Community Backers]のページに掲載されているサポーターによって追加的な資金が提供されています。
 endif::[]
 
-https://opencollective.com/asciidoctor[OpenCollective] を通じてスポンサーになることにより, このプロジェクトを支援することができます.
+https://opencollective.com/asciidoctor[OpenCollective]を通じてスポンサーになることにより、このプロジェクトを支援することができます。
 
 == 全体像
 
-Asciidoctorは, 下図左側のようなプレーンテキストを読み込んで, 右側のようなHTML5に変換します.
-特別な設定をしなくてもきれいな表示が得られるよう, HTML5の出力にはデフォルトのスタイルシートが適用されます.
+Asciidoctorは、下図左側のようなプレーンテキストを読み込んで、右側のようなHTML5に変換します。
+特別な設定をしなくてもきれいな表示が得られるよう、HTML5の出力にはデフォルトのスタイルシートが適用されます。
 
 image::{image-uri-screenshot}[AsciiDocソースとレンダリングされたHTMLのプレビュー]
 
 == AsciiDocの処理
 
-Asciidoctorは, AsciiDoc文法で書かれたテキストを読み込んでパースします. 次に内蔵コンバータにパースツリーを渡します. これによりHTML5, DocBook 5やman(マニュアルmanページ)が出力されます.
-出力をカスタマイズしたりフォーマットを追加したりしたいときは, ユーザ独自のコンバータや {uri-tilt}[Tilt] 対応テンプレートを使用することができます.
+Asciidoctorは、AsciiDoc文法で書かれたテキストを読み込んでパースします。次に内蔵コンバータにパースツリーを渡します。これによりHTML5、DocBook 5やman(マニュアルmanページ)が出力されます。
+出力をカスタマイズしたりフォーマットを追加したりしたいときは、ユーザ独自のコンバータやlink:{uri-tilt}[Tilt]対応テンプレートを使用することができます。
 
-AsciidoctorはオリジナルのAsciiDoc Pythonプロセッサ(`asciidoc.py`)に完全互換です.
-Asciidoctorのテストスイートには, AsciiDoc文法との互換性を保証するために {uri-tests}[2350個を超えるテスト] が入っています.
+AsciidoctorはオリジナルのAsciiDoc Pythonプロセッサ(`asciidoc.py`)に完全互換です。
+Asciidoctorのテストスイートには、AsciiDoc文法との互換性を保証するために{uri-tests}[2,350個を超えるテスト]が入っています。
 
-Asciidoctorでは, AsciiDocの従来の文法のほかに, Asciidoctorで追加されたマークアップとフォーマッティングオプションが使用できます. フォントベースのアイコン (例えば, `+icon:fire[]+`) やUIエレメント(`+button:[Save]+`)がそれにあたります.
-またAsciidoctorは, HTML5出力時のスタイルとして {uri-foundation}[Foundation] に基づいたモダンでレスポンシブなテーマも提供します.
+Asciidoctorでは、AsciiDocの従来の文法のほかに、Asciidoctorで追加されたマークアップとフォーマッティングオプションが使用できます。フォントベースのアイコン(例えば、`+icon:fire[]+`)やUIエレメント(`+button:[Save]+`)がそれにあたります。
+またAsciidoctorは、HTML5出力時のスタイルとしてlink:{uri-foundation}[Foundation]に基づいたモダンでレスポンシブなテーマも提供します。
 
 == RubyのあるところAsciidoctorも動く
 
-AsciidoctorはJRubyを用いてJVM上でも実行できます.
-Javaや他のJVM言語からAsciidoctor APIを直接呼び出すには, {uri-asciidoctorj}[AsciidoctorJ] を使ってください.
-AsciidoctorJを使ったAsciiDocの処理をビルドに直接組み込むビルドツール用プラグインとして, {uri-maven-plugin}[Apache Maven用], {uri-gradle-plugin}[Gradle用], および {uri-asciidoclet}[Javadoc用] が存在します.
+AsciidoctorはJRubyを用いてJVM上でも実行できます。
+Javaや他のJVM言語からAsciidoctor APIを直接呼び出すには、link:{uri-asciidoctorj}[AsciidoctorJ]を使ってください。
+AsciidoctorJを使ったAsciiDocの処理をビルドに直接組み込むビルドツール用プラグインとして、link:{uri-maven-plugin}[Apache Maven用]、link:{uri-gradle-plugin}[Gradle用]、およびlink:{uri-asciidoclet}[Javadoc用]が存在します。
 
-AsciidoctorはJavaScriptでも実行可能です.
-Rubyで書かれたソースを {uri-opal}[Opal] を使ってJavaScriptにトランスパイルすることで {uri-asciidoctorjs}[Asciidoctor.js] が作成されています.
-Asciidoctor.jsはどんなJavaScript環境（WebブラウザやNode.jsを含む）でも動作する, JavaScript版の完全なAsciidoctorです.
-Chrome, Atom, Bracketsやその他のウェブベースのツールで, AsciiDocをプレビューするための拡張機能にAsciidoctor.jsが使われています.
+AsciidoctorはJavaScriptでも実行可能です。
+Rubyで書かれたソースをlink:{uri-opal}[Opal]を使ってJavaScriptにトランスパイルすることでlink:{uri-asciidoctorjs}[Asciidoctor.js]が作成されています。
+Asciidoctor.jsはどんなJavaScript環境（WebブラウザやNode.jsを含む）でも動作する、JavaScript版の完全なAsciidoctorです。
+Chrome、Atom、Bracketsやその他のウェブベースのツールで、AsciiDocをプレビューするための拡張機能にAsciidoctor.jsが使われています。
 
 == 必要条件
 
-AsciidoctorはLinux, macOS, およびWindowsで動作し, 下記の {uri-ruby}[Ruby]実装の一つを必要とします.
+AsciidoctorはLinux、macOS、およびWindowsで動作し、下記のlink:{uri-ruby}[Ruby]実装の一つを必要とします。
 
-* CRuby (aka MRI) 2.3 - 2.6
+* CRuby (別名 MRI) 2.3 - 2.6
 * JRuby 9.1 - 9.2
 * TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
 [CAUTION]
 ====
-もし非英語環境のWindowsを使っているなら, Asciidoctorを起動した時に `Encoding::UndefinedConversionError` に遭遇するかもしれません.
-これを解決するには, 以下のコマンドにより, 使っているコンソールの有効なコードページをUTF-8に変更することを推奨します:
+もし非英語環境のWindowsを使っているなら、Asciidoctorを起動した時に``Encoding::UndefinedConversionError``に遭遇するかもしれません。
+これを解決するには、以下のコマンドにより、使っているコンソールの有効なコードページをUTF-8に変更することを推奨します:
 
  chcp 65001
 
-一度この変更をすると, Unicode関連の頭痛の種は消えるでしょう.
-もしEclipseのようなIDEを使っているなら, 同様にエンコーディングをUTF-8にするのを忘れないでください.
-AsciidoctorはUTF-8の環境において最も良好に動作します.
+一度この変更をすると、Unicode関連の頭痛の種は消えるでしょう。
+もしEclipseのようなIDEを使っているなら、同様にエンコーディングをUTF-8にするのを忘れないでください。
+AsciidoctorはUTF-8の環境において最も良好に動作します。
 ====
 
 == インストール
 
-Asciidoctorは, (a) 主なLinuxディストリビューションのパッケージマネージャ, (b) macOSのHomebrew, (c) `gem install` コマンド（Windowsユーザに推奨）, (d) Asciidoctor Dockerイメージ, あるいは(e) Bundlerを用いてインストールできます.
+Asciidoctorは、(a) 主なLinuxディストリビューションのパッケージマネージャ、(b) macOSのHomebrew、(c) ``gem install``コマンド（Windowsユーザに推奨）、(d) Asciidoctor Dockerイメージ、あるいは(e) Bundlerを用いてインストールできます。
 
-Linuxパッケージマネージャを用いてインストールする利点は, もしRubyやRubyGemsライブラリがまだインストールされていなかったら, それらをインストールしてくれることです.
+Linuxパッケージマネージャを用いてインストールする利点は、もしRubyやRubyGemsライブラリがまだインストールされていなかったら、それらをインストールしてくれることです。
 
 === (a) Linuxのパッケージマネージャ
 
-パッケージマネージャによってインストールされるAsciidoctorは最新バージョンではないかもしれません.
-ディストリビューションの各リリースにおいてどのバージョンのAsciidoctorがパッケージされているかを確認するには, パッケージリポジトリを参照してください.
+パッケージマネージャによってインストールされるAsciidoctorは最新バージョンではないかもしれません。
+ディストリビューションの各リリースにおいてどのバージョンのAsciidoctorがパッケージされているかを確認するには、パッケージリポジトリを参照してください。
 
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 * https://www.archlinux.org/packages/?name=asciidoctor[Arch Linux (asciidoctor)]
@@ -181,82 +181,82 @@ Linuxパッケージマネージャを用いてインストールする利点は
 * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
-パッケージマネージャによってインストールされるバージョンよりも新しいAsciidoctorを使用したい場合は, <<gem-install,gemのインストール方法>> を参照してください.
+パッケージマネージャによってインストールされるバージョンよりも新しいAsciidoctorを使用したい場合は、<<gem-install,gemのインストール方法>>を参照してください。
 
 ==== apk (Alpine Linux)
 
-Alpine Linuxにgemをインストールするには, ターミナルを開き, 以下を入力してください:
+Alpine Linuxにgemをインストールするには、ターミナルを開き、以下を入力してください:
 
  $ sudo apk add asciidoctor
 
 ==== pacman (Arch Linux)
 
-Archベースのディストリビューションにgemをインストールするには, ターミナルを開き, 以下を入力してください:
+Archベースのディストリビューションにgemをインストールするには、ターミナルを開き、以下を入力してください:
 
  $ sudo pacman -S asciidoctor
 
 ==== APT
 
-Debian, またはUbuntuなどDebianベースのディストリビューションでは, APTを使ってAsciidoctorをインストールしてください.
-Asciidoctorパッケージをインストールするには, ターミナルを開き, 以下を入力してください:
+Debian、またはUbuntuなどDebianベースのディストリビューションでは、APTを使ってAsciidoctorをインストールしてください。
+Asciidoctorパッケージをインストールするには、ターミナルを開き、以下を入力してください:
 
  $ sudo apt-get install -y asciidoctor
 
 ==== DNF
 
-Fedora, CentOS, RHELなどRPMベースのLinuxディストリビューションでは, DNFパッケージマネージャを使ってAsciidoctorをインストールしてください.
-Asciidoctorパッケージをインストールするには, ターミナルを開き, 以下を入力してください:
+Fedora、CentOS、RHELなどRPMベースのLinuxディストリビューションでは、DNFパッケージマネージャを使ってAsciidoctorをインストールしてください。
+Asciidoctorパッケージをインストールするには、ターミナルを開き、以下を入力してください:
 
  $ sudo dnf install -y asciidoctor
 
 === (b) Homebrew (macOS)
 
-macOSでは, パッケージマネージャHomebrewを使用してAsciidoctorをインストールすることができます.
-Homebrewをお持ちでない場合は, まず https://brew.sh/[brew.sh] の説明に従ってHomebrewをインストールしてください.
-Homebrewをインストールできたら, `asciidoctor` gemをインストールすることができます.
-ターミナルを開き, 以下を入力してください:
+macOSでは、パッケージマネージャHomebrewを使用してAsciidoctorをインストールすることができます。
+Homebrewをお持ちでない場合は、まずlink:https://brew.sh/[brew.sh]の説明に従ってHomebrewをインストールしてください。
+Homebrewをインストールできたら、`asciidoctor` gemをインストールすることができます。
+ターミナルを開き、以下を入力してください:
 
  $ brew install asciidoctor
 
-Homebrewにより, システムレベルのgemとは別の独立したprefixのパスに `asciidoctor` gemがインストールされます.
+Homebrewにより、システムレベルのgemとは別の独立したprefixのパスに``asciidoctor`` gemがインストールされます。
 
 === (c) Windows
 
-WindowsでAsciidoctorを使う場合は, 簡単な方法が2つあります.
+WindowsでAsciidoctorを使う場合は、簡単な方法が2つあります。
 
 ==== Chocolatey
 
-すでにお使いのマシンで https://chocolatey.org[chocolatey] を使用しているなら, 以下の方法を使用することができます:
+すでにお使いのマシンでlink:https://chocolatey.org[chocolatey]を使用しているなら、以下の方法を使用することができます:
 
 [source]
 ----
 choco install ruby
 ----
 
-そのあとは <<gem-install,gemのインストール方法>> に従ってください.
+そのあとは<<gem-install,gemのインストール方法>>に従ってください。
 
 ==== Rubyinstaller
 
-https://rubyinstaller.org/downloads/[Rubyinstaller] を使用したい場合は, お使いのWindowsのバージョンに適したRubyinstallerをダウンロードしてRubyをインストールしたあと, <<gem-install,gemのインストール方法>> に従ってください.
+https://rubyinstaller.org/downloads/[Rubyinstaller]を使用したい場合は、お使いのWindowsのバージョンに適したRubyinstallerをダウンロードしてRubyをインストールしたあと、<<gem-install,gemのインストール方法>>に従ってください。
 
 [#gem-install]
 === (d) gem install
 
-Asciidoctorを `gem install` を使ってインストールするのであれば, その前に https://rvm.io[RVM] を使ってhomeディレクトリ（つまりユーザ領域）にRubyをインストールしておくべきです.
-そうすれば, `gem` コマンドを使用して安全にAsciidoctor gemのインストールやアップデートができます.
-RVMを使用すると, システムから隔離された場所にgemがインストールされます.
+Asciidoctorを``gem install``を使ってインストールするのであれば、その前にlink:https://rvm.io[RVM]を使ってhomeディレクトリ（つまりユーザ領域）にRubyをインストールしておくべきです。
+そうすれば、``gem``コマンドを使用して安全にAsciidoctor gemのインストールやアップデートができます。
+RVMを使用すると、システムから隔離された場所にgemがインストールされます。
 
-ターミナルを開き, 以下のように入力してください:
+ターミナルを開き、以下のように入力してください:
 
  $ gem install asciidoctor
 
-もし, 先行リリースバージョン(例えばリリース候補版)をインストールしたければ以下のようにします.
+もし、先行リリースバージョン(例えばリリース候補版)をインストールしたければ以下のようにします。
 
  $ gem install asciidoctor --pre
 
 === (e) Docker
 
-{uri-install-docker}[Installing Asciidoctor using Docker]を参照してください.
+{uri-install-docker}[Installing Asciidoctor using Docker]を参照してください。
 
 === (f) Bundler
 
@@ -272,62 +272,62 @@ gem 'asciidoctor'
 ----
 
 . Gemfileを保存
-. ターミナルを開き, gemをインストール:
+. ターミナルを開き、gemをインストール:
 
  $ bundle
 
-gemをアップグレードするには, Gemfileで新バージョンを指定し, `bundle` を再び実行してください.
-`bundle update` を（gemを指定せずに）行うことは推奨 *されません* . 他のgemもアップデートされて思わぬ結果になるかもしれないためです. 
+gemをアップグレードするには、Gemfileで新バージョンを指定し、``bundle``を再び実行してください。
+``bundle update``を（gemを指定せずに）行うことは推奨**されません**。他のgemもアップデートされて思わぬ結果になるかもしれないためです。
 
 == アップグレード
 
-オペレーティングシステムのパッケージマネージャでAsciidoctorをインストールしたのであれば, おそらくパッケージは自動的にアップデートされるように設定されています. その場合は, gemを手動でアップデートする必要はありません.
+オペレーティングシステムのパッケージマネージャでAsciidoctorをインストールしたのであれば、おそらくパッケージは自動的にアップデートされるように設定されています。その場合は、gemを手動でアップデートする必要はありません。
 
 === apk (Alpine Linux)
 
-gemをアップグレードするには, 以下を使用してください:
+gemをアップグレードするには、以下を使用してください:
 
  $ sudo apk add -u asciidoctor
 
 === APT
 
-gemをアップグレードするには, 以下を使用してください:
+gemをアップグレードするには、以下を使用してください:
 
  $ sudo apt-get upgrade -y asciidoctor
 
 === DNF
 
-gemをアップグレードするには, 以下を使用してください:
+gemをアップグレードするには、以下を使用してください:
 
  $ sudo dnf update -y asciidoctor
 
 === Homebrew (macOS)
 
-gemをアップグレードするには, 以下を使用してください:
+gemをアップグレードするには、以下を使用してください:
 
  $ brew update
  $ brew upgrade asciidoctor
 
 === gem install
 
-`gem` コマンドを使ってAsciidoctorをインストールした場合は, 新しいバージョンのAsciidoctorがリリースされたら手動でアップグレードする必要があります.
+``gem``コマンドを使ってAsciidoctorをインストールした場合は、新しいバージョンのAsciidoctorがリリースされたら手動でアップグレードする必要があります。
 以下を入力することでアップグレードできます:
 
  $ gem install asciidoctor
 
-`gem install` を使って新しいバージョンのgemをインストールすると, 複数のバージョンがインストールされた状態になります.
-以下のコマンドを使って古いバージョンを削除してください.
+``gem install``を使って新しいバージョンのgemをインストールすると、複数のバージョンがインストールされた状態になります。
+以下のコマンドを使って古いバージョンを削除してください。
 
  $ gem cleanup asciidoctor
 
 == 使い方
 
-Asciidoctorのインストールが成功すると, `asciidoctor` コマンドがPATHに存在するようになり, Asciidoctorのコマンドラインインターフェース(CLI)が使用できるようになります.
-確認のために, ターミナルで以下を実行しましょう:
+Asciidoctorのインストールが成功すると、``asciidoctor``コマンドがPATHに存在するようになり、Asciidoctorのコマンドラインインターフェース(CLI)が使用できるようになります。
+確認のために、ターミナルで以下を実行しましょう:
 
  $ asciidoctor --version
 
-AsciidoctorのバージョンとRuby環境についての情報がターミナルに出力されるはずです.
+AsciidoctorのバージョンとRuby環境についての情報がターミナルに出力されるはずです。
 
 [.output,subs=attributes+]
 ....
@@ -335,50 +335,50 @@ Asciidoctor {release-version} [https://asciidoctor.org]
 Runtime Environment (ruby 2.6.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
-AsciidoctorはAPIも提供します.
-APIは他のRubyソフトウェア, たとえばRails, Sinatra, GitHub, そして他の言語, たとえばJava ({uri-asciidoctorj}[AsciidoctorJ] 経由)やJavaScript ({uri-asciidoctorjs}[Asciidoctor.js] 経由)と組み合わせて使用するためのものです.
+AsciidoctorはAPIも提供します。
+APIは他のRubyソフトウェア、たとえばRails、Sinatra、GitHub、そして他の言語、たとえばJava({uri-asciidoctorj}[AsciidoctorJ]経由)やJavaScript({uri-asciidoctorjs}[Asciidoctor.js]経由)と組み合わせて使用するためのものです。
 
-=== コマンドラインインターフェース (CLI)
+=== コマンドラインインターフェース(CLI)
 
-`asciidoctor` コマンドによりコマンドライン(つまりターミナル)からAsciidoctorを起動することができます.
+``asciidoctor``コマンドによりコマンドライン(つまりターミナル)からAsciidoctorを起動することができます。
 
-次のコマンドにより, README.adocというファイルがHTMLに変換され, 結果が同じディレクトリのREADME.htmlとして保存されます.
-生成されるHTMLファイルの名前は, ソースファイルのファイル名の拡張子を `.html` に替えたものとなります.
+次のコマンドにより、README.adocというファイルがHTMLに変換され、結果が同じディレクトリのREADME.htmlとして保存されます。
+生成されるHTMLファイルの名前は、ソースファイルのファイル名の拡張子を``.html``に替えたものとなります。
 
  $ asciidoctor README.adoc
 
-さまざまなフラグやスイッチを与えることでAsciidoctorプロセッサをコントロールすることができます. フラグやスイッチの説明は以下のコマンドで表示されます:
+さまざまなフラグやスイッチを与えることでAsciidoctorプロセッサをコントロールすることができます。フラグやスイッチの説明は以下のコマンドで表示されます:
 
  $ asciidoctor --help
 
-例えば, ファイルを異なるディレクトリに書き出すには以下を使用します:
+例えば、ファイルを異なるディレクトリに書き出すには以下を使用します:
 
  $ asciidoctor -D output README.adoc
 
-コマンドラインインタフェースの完全なリファレンスは `asciidoctor` の {uri-manpage}[manページ] にあります.
+コマンドラインインタフェースの完全なリファレンスは``asciidoctor``のlink:{uri-manpage}[manページ]にあります。
 
-`asciidoctor` コマンドの使い方の詳細については以下を参照してください.
+``asciidoctor``コマンドの使い方の詳細については以下を参照してください。
 
 * {uri-convert-doc}[How do I convert a document?]
 * {uri-themes-doc}[How do I use the Asciidoctor stylesheet factory to produce custom themes?]
 
 === Ruby API
 
-Asciidoctorをアプリケーションの中で使うには, まずgemをrequireする必要があります:
+Asciidoctorをアプリケーションの中で使うには、まずgemをrequireする必要があります:
 
 [source]
 require 'asciidoctor'
 
-そうすると, 以下のようにしてAsciiDocソースファイルをHTMLファイルに変換できます:
+そうすると、以下のようにしてAsciiDocソースファイルをHTMLファイルに変換できます:
 
 [source]
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
 
-WARNING: AsciidoctorをAPI経由で使っているとき, デフォルトのセーフモードは `:secure` （セキュアモード）です.
-セキュアモードでは, `include` ディレクティブを含むいくつかのコア機能が無効化されています.
-これらの機能を有効化したい場合, 明示的にセーフモードを `:server` (推奨)か `:safe` にする必要があります.
+WARNING: AsciidoctorをAPI経由で使っているとき、デフォルトのセーフモードは``:secure``（セキュアモード）です。
+セキュアモードでは、``include``ディレクティブを含むいくつかのコア機能が無効化されています。
+これらの機能を有効化したい場合、明示的にセーフモードを``:server``(推奨)か``:safe``にする必要があります。
 
-AsciiDoc文字列を, 埋め込み用HTML(HTMLページヘの挿入用)に変換することもできます:
+AsciiDoc文字列を、埋め込み用HTML(HTMLページヘの挿入用)に変換することもできます:
 
 [source]
 ----
@@ -386,7 +386,7 @@ content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
 ----
 
-もし完全なHTMLドキュメントが必要であれば, 以下のように `header_footer` オプションを有効にしてください:
+もし完全なHTMLドキュメントが必要であれば、以下のように``header_footer``オプションを有効にしてください:
 
 [source]
 ----
@@ -394,7 +394,7 @@ content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
 ----
 
-パースされたドキュメントにアクセスしたい場合は, 変換を複数のステップに分割します:
+パースされたドキュメントにアクセスしたい場合は、変換を複数のステップに分割します:
 
 [source]
 ----
@@ -404,23 +404,23 @@ puts document.doctitle
 html = document.convert
 ----
 
-Asciidoctorの生成する出力が気に入らない場合は, _あなたはそれを変更できる_ ことを忘れないでください!
-パースされたドキュメントを出力形式に変換するコンバータは, カスタマイズが可能です.
+Asciidoctorの生成する出力が気に入らない場合は、__あなたはそれを変更できる__ことを忘れないでください!
+パースされたドキュメントを出力形式に変換するコンバータは、カスタマイズが可能です。
 
-出力を部分的にカスタマイズする簡単な方法としてはテンプレートコンバータがあります.
-テンプレートコンバータでは, ドキュメントの各ノードの変換に {uri-tilt}[Tilt]対応テンプレートファイルを使うことができます.
+出力を部分的にカスタマイズする簡単な方法としてはテンプレートコンバータがあります。
+テンプレートコンバータでは、ドキュメントの各ノードの変換にlink:{uri-tilt}[Tilt]対応テンプレートファイルを使うことができます。
 
-さまざまな方法を使って出力は100%制御することが _できます_ .
-APIの使い方や出力のカスタマイズ方法についてのより詳しい情報は {uri-user-manual}[ユーザマニュアル] を参照してください.
+さまざまな方法を使って出力は100%制御することが__できます__。
+APIの使い方や出力のカスタマイズ方法についてのより詳しい情報はlink:{uri-user-manual}[ユーザマニュアル]を参照してください。
 
-== コントリビューション
+== 貢献
 
-新しいコントリビューションを常に歓迎します!
-もしソースコード, ドキュメント, あるいはウェブサイトに間違いや不備を見つけたら遠慮なく, イシューを作成するか, 修正をおこなってpull requestを作成してください.
+新しい貢献を常に歓迎します!
+もしソースコード、ドキュメント、あるいはウェブサイトに間違いや不備を見つけたら遠慮なく、イシューを作成するか、修正をおこなってプルリクエストを作成してください。
 
-*あなた* にもできることがあります:
+**あなた**にもできることがあります:
 
-* 先行バージョン(alpha, beta, またはpreview版)の使用
+* 先行バージョン(アルファ、ベータ、またはプレビュー版)の使用
 * バグレポート
 * 新機能提案
 * ドキュメントの執筆または編集
@@ -430,28 +430,28 @@ APIの使い方や出力のカスタマイズ方法についてのより詳し�
 ** 一貫性のないホワイトスペースの除去
 ** テストの記述!
 * リファクタリング
-* {uri-issues}[イシュー] の解決
+* {uri-issues}[イシュー]の解決
 * パッチのレビュー
 
-Asciidoctorプロジェクトにイシュー, 機能リクエスト, コード, ドキュメントを送る際の, 作成方法, スタイル, および送り方は, {uri-contribute}[Contributing] ガイドに記載されています.
+Asciidoctorプロジェクトにイシュー、機能リクエスト、コード、ドキュメントを送る際の、作成方法、スタイル、および送り方は、{uri-contribute}[Contributing]ガイドに記載されています。
 
 == 助けを得る
 
-Asciidoctorは, コンテンツの執筆と公開を簡単にするために開発されています.
+Asciidoctorは、コンテンツの執筆と公開を簡単にするために開発されています。
 しかしあなたからのフィードバックがなくてはAsciidoctorの開発は進みません!
-ディスカッションリスト, Twitter, チャットルームを使って, 質問をしたりプロジェクトのさまざまな側面について話し合ったりすることをお勧めします.
+ディスカッションリスト、Twitter、チャットルームを使って、質問をしたりプロジェクトのさまざまな側面について話し合ったりすることをお勧めします。
 
 チャット(Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 ディスカッションリスト(Nabble):: {uri-discuss}
-Twitter:: ハッシュタグ https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] またはメンション https://twitter.com/asciidoctor[@asciidoctor]
+Twitter:: ハッシュタグlink:https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor]またはメンションlink:https://twitter.com/asciidoctor[@asciidoctor]
 
 ifdef::env-github[]
-以下のプロジェクトサイトに, Asciidoctorに関するさらに詳しい情報やドキュメントがあります.
+以下のプロジェクトサイトに、Asciidoctorに関するさらに詳しい情報やドキュメントがあります。
 
 {uri-project}[Home] | {uri-news}[News] | {uri-docs}[Docs]
 endif::[]
 
-GitHub上のAsciidoctorのorganizationではプロジェクトのソースコード, イシュートラッカー, サブプロジェクトが管理されています.
+GitHub上のAsciidoctorのorganizationではプロジェクトのソースコード、イシュートラッカー、サブプロジェクトが管理されています。
 
 ソースリポジトリ(git):: {uri-repo}
 イシュートラッカー:: {uri-issues}
@@ -460,16 +460,16 @@ GitHub上のAsciidoctorのorganization:: {uri-org}
 == ライセンス
 
 Copyright (C) 2012-2020 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
-本ソフトウェアはMITライセンスのもとで使用できます.
+本ソフトウェアはMITライセンスのもとで使用できます。
 
-ライセンスの詳細については {uri-license}[LICENSE] ファイルを参照してください.
+ライセンスの詳細については{uri-license}[LICENSE]ファイルを参照してください。
 
 == 作者
 
-*Asciidoctor* は https://github.com/mojavelinux[Dan Allen] と https://github.com/graphitefriction[Sarah White] がリードし, Asciidoctorの素晴らしきコミュニティの {uri-contributors}[数多くのメンバ] からコントリビューションを受けてきました．
-このプロジェクトは https://github.com/nickh[Nick Hengeveld] の {uri-prototype}[プロトタイプ] をベースに https://github.com/erebor[Ryan Waldron] により2012年から創始されました.
+**Asciidoctor**はlink:https://github.com/mojavelinux[Dan Allen]とlink:https://github.com/graphitefriction[Sarah White]がリードし、Asciidoctorの素晴らしきコミュニティのlink:{uri-contributors}[数多くのメンバ]から貢献を受けてきました。
+このプロジェクトはlink:https://github.com/nickh[Nick Hengeveld]のlink:{uri-prototype}[プロトタイプ]をベースにlink:https://github.com/erebor[Ryan Waldron]により2012年から創始されました。
 
-*AsciiDoc* は Stuart Rackham により創始され, AsciiDocコミュニティの数多くのメンバからコントリビューションを受けてきました.
+**AsciiDoc**はStuart Rackhamにより創始され、AsciiDocコミュニティの数多くのメンバから貢献を受けてきました。
 
 ifndef::env-site[]
 == 変更履歴
@@ -478,5 +478,5 @@ ifeval::[{safe-mode-level} < 20]
 include::CHANGELOG.adoc[tag=compact,leveloffset=+1]
 endif::[]
 
-過去のリリースの完全な変更点リストについては {uri-changelog}[CHANGELOG] を参照してください.
+過去のリリースの完全な変更点リストについては{uri-changelog}[CHANGELOG]を参照してください。
 endif::[]
