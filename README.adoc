@@ -177,8 +177,9 @@ Consult the package repository for your distribution to find out which version i
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 * https://www.archlinux.org/packages/?name=asciidoctor[Arch Linux (asciidoctor)]
 * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
-* https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
+* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+* https://packages.gentoo.org/packages/dev-ruby/asciidoctor[Gentoo Linux (dev-ruby/asciidoctor)]
+* https://software.opensuse.org/package/rubygem-asciidoctor[openSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, see the <<gem-install,gem installation instructions>>.
@@ -200,14 +201,14 @@ To install the gem on Arch-based distributions, open a terminal and type:
 On Debian and Debian-based distributions such as Ubuntu, use APT to install Asciidoctor.
 To install the package, open a terminal and type:
 
- $ sudo apt-get install -y asciidoctor
+ $ sudo apt install -y asciidoctor
 
 ==== DNF
 
 On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
 To install the package, open a terminal and type:
 
- $ sudo dnf install -y asciidoctor
+ $ sudo dnf install -y rubygem-asciidoctor
 
 === (b) Homebrew (macOS)
 
@@ -293,13 +294,13 @@ To upgrade the gem, use:
 
 To upgrade the gem, use:
 
- $ sudo apt-get upgrade -y asciidoctor
+ $ sudo apt upgrade -y asciidoctor
 
 === DNF
 
 To upgrade the gem, use:
 
- $ sudo dnf update -y asciidoctor
+ $ sudo dnf update -y rubygem-asciidoctor
 
 === Homebrew (macOS)
 

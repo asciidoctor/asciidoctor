@@ -164,8 +164,9 @@ Konsultieren Sie das Paket-Repository für Ihre Distribution, um herauszufinden,
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 * https://www.archlinux.org/packages/?name=asciidoctor[Arch Linux (asciidoctor)]
 * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
-* https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
+* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+* https://packages.gentoo.org/packages/dev-ruby/asciidoctor[Gentoo Linux (dev-ruby/asciidoctor)]
+* https://software.opensuse.org/package/rubygem-asciidoctor[openSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 Wenn Sie eine Version von Asciidoctor verwenden möchten, die neuer ist als die, die vom Paketmanager installiert wurde, lesen Sie bitte die <<gem-install, Installationsanweisungen>>.
@@ -187,14 +188,14 @@ Um ein Gem auf Arch-basierten Distributionen zu installieren, öffnen Sie ein Te
 Auf Debian und Debian-basierten Distributionen wie Ubuntu nutzen Sie APT um Asciidoctor zu installieren.
 Um das Paket zu installieren, öffnen Sie ein Terminal und geben Sie folgendes ein:
 
- $ sudo apt-get install -y asciidoctor
+ $ sudo apt install -y asciidoctor
 
 ==== DNF
 
 Auf RPM-basierten Linux-Distributionen, wie Fedora, CentOS und RHEL, nutzen Sie den DNF Paketmanager um Asciidoctor zu installieren.
 Um das Paket zu installieren, öffnen Sie ein Terminal und geben Sie folgendes ein:
 
- $ sudo dnf install -y asciidoctor
+ $ sudo dnf install -y rubygem-asciidoctor
 
 === (b) Homebrew (macOS)
 
@@ -282,13 +283,13 @@ Um das Gem zu aktualisieren, nutzen Sie:
 
 Um das Gem zu aktualisieren, nutzen Sie:
 
- $ sudo apt-get upgrade -y asciidoctor
+ $ sudo apt upgrade -y asciidoctor
 
 === DNF
 
 Um das Gem zu aktualisieren, nutzen Sie:
 
- $ sudo dnf update -y asciidoctor
+ $ sudo dnf update -y rubygem-asciidoctor
 
 === Homebrew (macOS)
 

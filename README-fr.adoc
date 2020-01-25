@@ -162,8 +162,9 @@ Consulter le dépôt de votre distribution Linux pour connaitre la dernière ver
 
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 * https://packages.debian.org/sid/asciidoctor[Debian (asciidoctor)]
-* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (asciidoctor)]
-* https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
+* https://apps.fedoraproject.org/packages/rubygem-asciidoctor[Fedora (rubygem-asciidoctor)]
+* https://packages.gentoo.org/packages/dev-ruby/asciidoctor[Gentoo Linux (dev-ruby/asciidoctor)]
+* https://software.opensuse.org/package/rubygem-asciidoctor[openSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
 Si vous souhaitez installer une version plus récente d'Asciidoctor que celle proposée par votre gestionnaire de paquets, suivre <<gem-install,la procédure d'installation gem>>.
@@ -179,14 +180,14 @@ Pour installer le paquet sur Alpine Linux, ouvrez un terminal et tapez :
 Sur Debian et les distributions dérivées de Debian, comme Ubuntu, utilisez APT pour installer Asciidoctor.
 Pour installer le paquet, ouvrez un terminal et tapez :
 
- $ sudo apt-get install -y asciidoctor
+ $ sudo apt install -y asciidoctor
 
 ==== DNF
 
 Sur les distributions Linux qui utilisent des RPM, comme Fedora, CentOS, et RHEL, utilisez le gestionnaire de paquets DNF pour installer Asciidoctor.
 Pour installer le paquet, ouvrez un terminal et tapez :
 
- $ sudo dnf install -y asciidoctor
+ $ sudo dnf install -y rubygem-asciidoctor
 
 === (b) Homebrew (macOS)
 
@@ -254,13 +255,13 @@ Pour mettre à jour Asciidoctor, tapez :
 
 Pour mettre à jour Asciidoctor, tapez :
 
- $ sudo apt-get upgrade -y asciidoctor
+ $ sudo apt upgrade -y asciidoctor
 
 === DNF
 
 Pour mettre à jour Asciidoctor, tapez :
 
- $ sudo dnf update -y asciidoctor
+ $ sudo dnf update -y rubygem-asciidoctor
 
 === Homebrew (macOS)
 

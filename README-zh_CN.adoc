@@ -215,20 +215,20 @@ gem 'asciidoctor'
 
 TIP: 如果你的 Fedora 系统配置的是自动升级包，在这种情况下，不需要你亲自动手升级。
 
-[#apt-get-debian-ubuntu-mint]
-==== apt-get (Debian, Ubuntu, Mint)
+[#apt-debian-ubuntu-mint]
+==== apt (Debian, Ubuntu, Mint)
 
 在 Debian，Ubuntu 或 Mint 中安装这个 gem，请打开终端并输入如下命令：
 
- $ sudo apt-get install -y asciidoctor
+ $ sudo apt install -y asciidoctor
 
 升级则使用：
 
- $ sudo apt-get upgrade -y asciidoctor
+ $ sudo apt upgrade -y asciidoctor
 
 TIP: 如果你的 Debian 或 Ubuntu 系统配置的是自动升级包，在这种情况下，不需要你亲自动手升级。
 
-使用包管理器（ apt-get ）安装的 Asciidoctor 的版本也许不是最新发布版。
+使用包管理器（ apt ）安装的 Asciidoctor 的版本也许不是最新发布版。
 请查看发行版的包库，来确定每个发行版是打包的哪个版本。
 
 * https://packages.debian.org/search?keywords=asciidoctor&searchon=names&exact=1&suite=all&section=all[Debian 发行版中的 asciidoctor]
