@@ -66,9 +66,10 @@ Asciidoctor 是开源的，link:{uri-repo}[代码托管在 GitHub]，遵从 {uri
 
 该文档有如下语言的翻译版：
 
-* {uri-rel-file-base}README.adoc[English]
-* {uri-rel-file-base}README-fr.adoc[Français]
-* {uri-rel-file-base}README-ja.adoc[日本語]
+* {uri-rel-file-base}README.adoc[英语]
+* {uri-rel-file-base}README-de.adoc[德语]
+* {uri-rel-file-base}README-fr.adoc[法语]
+* {uri-rel-file-base}README-ja.adoc[日语]
 
 .关键文档
 [.compact]

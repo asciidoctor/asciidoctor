@@ -70,6 +70,8 @@ Ce document est traduit dans les langues suivantes : +
 |
 {uri-rel-file-base}README-zh_CN.adoc[Chinois]
 |
+{uri-rel-file-base}README-de.adoc[Allemand]
+|
 {uri-rel-file-base}README-ja.adoc[Japonais]
 endif::[]
 

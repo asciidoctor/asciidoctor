@@ -73,13 +73,13 @@ AsciidctorはRubyで動作するだけでなく、link:{uri-asciidoctorj}[Asciid
 
 ifndef::env-site,env-yard[]
 このドキュメントには以下の言語版が存在します: +
-{uri-rel-file-base}README.adoc[English]
+{uri-rel-file-base}README.adoc[英語]
 |
-{uri-rel-file-base}README-zh_CN.adoc[汉语]
+{uri-rel-file-base}README-zh_CN.adoc[中国語]
 |
-{uri-rel-file-base}README-de.adoc[Deutsch]
+{uri-rel-file-base}README-de.adoc[ドイツ語]
 |
-{uri-rel-file-base}README-fr.adoc[Français]
+{uri-rel-file-base}README-fr.adoc[フランス語]
 endif::[]
 
 .主なドキュメント
