@@ -807,7 +807,7 @@ module Substitutors
         # handles: id (in compat mode or when natural xrefs are disabled)
         elsif doc.compat_mode || !Compliance.natural_xrefs
           refid, target = fragment, %(##{fragment})
-          logger.info %(possible invalid reference: #{refid}) if logger.info? && doc.catalog[:refs][refid]
+          logger.info %(possible invalid reference: #{refid}) if logger.info? && !doc.catalog[:refs][refid]
         # handles: id
         elsif doc.catalog[:refs][fragment]
           refid, target = fragment, %(##{fragment})

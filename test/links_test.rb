@@ -757,6 +757,24 @@ context 'Links' do
     end
   end
 
+  test 'should not warn if verbose flag is set and reference is found in compat mode' do
+    input = <<~'EOS'
+    [[foobar]]
+    == Foobar
+
+    == Section B
+
+    See <<foobar>>.
+    EOS
+    using_memory_logger do |logger|
+      in_verbose_mode do
+        output = convert_string_to_embedded input, attributes: { 'compat-mode' => '' }
+        assert_xpath '//a[@href="#foobar"][text() = "Foobar"]', output, 1
+        assert_empty logger
+      end
+    end
+  end
+
   test 'should warn and create link if verbose flag is set and reference using # notation is not found' do
     input = <<~'EOS'
     [#foobar]
