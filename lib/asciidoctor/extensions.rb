@@ -425,7 +425,7 @@ module Extensions
   # TIP: Postprocessors can also be used to relocate assets needed by the published
   # document.
   #
-  # Postprocessor implementations must Postprocessor.
+  # Postprocessor implementations must extend Postprocessor.
   class Postprocessor < Processor
     def process document, output
       raise ::NotImplementedError, %(#{Postprocessor} subclass #{self.class} must implement the ##{__method__} method)
