@@ -29,7 +29,6 @@ namespace :build do
     require 'yaml'
 
     %w(
-      asciidoctor/asciidoctor.js
       asciidoctor/asciidoctor-diagram
       asciidoctor/asciidoctor-reveal.js
     ).each do |project|
@@ -53,6 +52,7 @@ namespace :build do
     end if travis_token
 
     %w(
+      asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
     ).each do |project|
       org, name, branch = parse_project project
