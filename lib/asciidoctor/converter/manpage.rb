@@ -247,7 +247,9 @@ r lw(\n(.lu*75u/100u).'
     result << %(.sp
 .if n .RS 4
 .nf
+.fam C
 #{manify node.content, whitespace: :preserve}
+.fam
 .fi
 .if n .RE)
     result.join LF
@@ -261,7 +263,9 @@ r lw(\n(.lu*75u/100u).'
     result << %(.sp
 .if n .RS 4
 .nf
+.fam C
 #{manify node.content, whitespace: :preserve}
+.fam
 .fi
 .if n .RE)
     result.join LF
