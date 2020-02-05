@@ -610,7 +610,7 @@ module Extensions
   #--
   # TODO break this out into different pattern types
   # for example, FullInlineMacro, ShortInlineMacro (no target) and other patterns
-  # FIXME for inline passthrough, we need to have some way to specify the text as a passthrough
+  # FIXME for inline macro, we need to have some way to specify the text as a passthrough
   class InlineMacroProcessor < MacroProcessor
     @@rx_cache = {}
 
