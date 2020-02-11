@@ -579,6 +579,19 @@ context 'Invoker' do
     refute_match(/WARNING/, warnings)
   end
 
+  test 'should add source location to blocks when sourcemap option is specified' do
+    sample_filepath = fixture_path 'sample.adoc'
+    invoker = invoke_cli_to_buffer %w(--sourcemap -o -)
+    doc = invoker.document
+    all_blocks = doc.find_by
+    refute_equal 0, all_blocks.size
+    doc.find_by.each do |block|
+      refute_nil block.source_location
+    end
+    assert_equal sample_filepath, doc.blocks[0].source_location.file
+    assert_equal 6, doc.blocks[0].source_location.lineno
+  end
+
   test 'should locate custom templates based on template dir, template engine and backend' do
     custom_backend_root = fixture_path 'custom-backends'
     invoker = invoke_cli_to_buffer %W(-E haml -T #{custom_backend_root} -o -)
