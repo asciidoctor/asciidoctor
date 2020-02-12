@@ -574,6 +574,19 @@ context 'Extensions' do
       assert_equal 0, Asciidoctor::Extensions.groups.size
     end
 
+    test 'should not activate global registry if :extensions option is false' do
+      begin
+        Asciidoctor::Extensions.register :sample do
+        end
+        refute_nil Asciidoctor::Extensions.groups
+        assert_equal 1, Asciidoctor::Extensions.groups.size
+        doc = empty_document extensions: false
+        refute doc.extensions?, 'Extensions should not be enabled if :extensions option is false'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke preprocessors before parsing document' do
       input = <<~'EOS'
       junk line

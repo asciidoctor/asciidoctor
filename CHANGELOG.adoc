@@ -32,6 +32,8 @@ Bug Fixes::
   * Preserve repeating backslashes when generating manpage output (#3456)
   * Honor percentage width specified on macro of inline SVG (#3464)
   * Removing leading and trailing blank lines in AsciiDoc include file to match assumption of parser (#3470)
+  * Activate extensions when :extensions option is set even if Extensions API is not yet loaded (#3570)
+  * Don't activate global extensions if :extensions option is false (#3570)
 
 Compliance::
 
