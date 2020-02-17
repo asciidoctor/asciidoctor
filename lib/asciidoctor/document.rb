@@ -326,7 +326,7 @@ class Document < AbstractBlock
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
-      initialize_extensions = (defined? ::Asciidoctor::Extensions) ? true : nil
+      initialize_extensions = (defined? ::Asciidoctor::Extensions) || (options.key? :extensions) ? ::Asciidoctor::Extensions : nil
       @extensions = nil # initialize furthur down if initialize_extensions is true
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
@@ -505,10 +505,10 @@ class Document < AbstractBlock
               ::AsciidoctorJ::Extensions::ExtensionRegistry === ext_registry)
             @extensions = ext_registry.activate self
           end
-        elsif ::Proc === (ext_block = options[:extensions])
+        elsif (ext_block = options[:extensions]).nil?
+          @extensions = Extensions::Registry.new.activate self unless Extensions.groups.empty?
+        elsif ::Proc === ext_block
           @extensions = Extensions.create(&ext_block).activate self
-        elsif !Extensions.groups.empty?
-          @extensions = Extensions::Registry.new.activate self
         end
       end
 
