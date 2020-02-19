@@ -19,7 +19,6 @@ require 'tempfile'
 require 'tmpdir'
 
 autoload :FileUtils, 'fileutils'
-autoload :Open3, 'open3'
 autoload :Pathname,  'pathname'
 
 RE_XMLNS_ATTRIBUTE = / xmlns="[^"]+"/
@@ -65,17 +64,6 @@ class Minitest::Test
 
   def bindir
     File.join Asciidoctor::ROOT_DIR, 'bin'
-  end
-
-  def asciidoctor_cmd use_ruby = true, ruby_opts = nil
-    executable = File.join bindir, 'asciidoctor'
-    if use_ruby
-      ruby = File.join RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name']
-      ruby = %(#{ruby} #{ruby_opts}) if ruby_opts
-      %(#{ruby} #{executable})
-    else
-      executable
-    end
   end
 
   def testdir
@@ -335,35 +323,40 @@ class Minitest::Test
     end
   end
 
-  def run_command *args, &block
-    if Hash === (env = args[0])
-      cmd = args[1]
-    else
-      cmd, env = env, nil
+  def asciidoctor_cmd ruby_args = nil
+    [Gem.ruby, *ruby_args, (File.join bindir, 'asciidoctor')]
+  end
+
+  def run_command cmd, *args, &block
+    if Array === cmd
+      args.unshift(*cmd)
+      cmd = args.shift
     end
+    kw_args = Hash === args[-1] ? args.pop : {}
+    env = kw_args[:env]
+    (env ||= {})['RUBYOPT'] = nil unless kw_args[:use_bundler]
     opts = { err: [:child, :out] }
     if env
-      # NOTE remove workaround once https://github.com/jruby/jruby/issues/3428 is resolved
-      if jruby?
+      if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
         begin
           old_env, env = ENV, (ENV.merge env)
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
           ENV.replace env
-          IO.popen cmd, opts, &block
+          IO.popen [cmd, *args, opts], &block
         ensure
           ENV.replace old_env
         end
       elsif env.value? nil
-        env = env.inject(ENV.to_h) do |acc, (key, val)|
-          val.nil? ? (acc.delete key) : (acc[key] = val)
-          acc
+        env = env.reduce ENV.to_h do |accum, (key, val)|
+          val.nil? ? (accum.delete key) : (accum[key] = val)
+          accum
         end
-        IO.popen env, cmd, (opts.merge unsetenv_others: true), &block
+        IO.popen [env, cmd, *args, (opts.merge unsetenv_others: true)], &block
       else
-        IO.popen env, cmd, opts, &block
+        IO.popen [env, cmd, *args, opts], &block
       end
     else
-      IO.popen cmd, opts, &block
+      IO.popen [cmd, *args, opts], &block
     end
   end
 

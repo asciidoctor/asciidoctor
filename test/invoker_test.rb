@@ -683,7 +683,7 @@ context 'Invoker' do
     # using open3 to work around a bug in JRuby process_manager.rb,
     # which tries to run a gsub on stdout prematurely breaking the test
     # warnings may be issued, so don't assert on stderr
-    stdout_lines = run_command({ 'LANG' => 'US-ASCII' }, %(#{asciidoctor_cmd} -o - --trace #{input_path})) {|out| out.readlines }
+    stdout_lines = run_command(asciidoctor_cmd, '-o', '-', '--trace', input_path, env: { 'LANG' => 'US-ASCII' }) {|out| out.readlines }
     refute_empty stdout_lines
     # NOTE Ruby on Windows runs with a IBM437 encoding by default
     stdout_lines.each {|l| l.force_encoding Encoding::UTF_8 } unless Encoding.default_external == Encoding::UTF_8
@@ -692,7 +692,9 @@ context 'Invoker' do
   end
 
   test 'should force stdio encoding to UTF-8' do
-    result = run_command(%(#{asciidoctor_cmd true, '-E IBM866:IBM866'} -r #{fixture_path 'configure-stdin.rb'} -s -o - -)) {|out| out.read }
+    cmd = asciidoctor_cmd ['-E', 'IBM866:IBM866']
+    # NOTE configure-stdin.rb populates stdin
+    result = run_command(cmd, '-r', (fixture_path 'configure-stdin.rb'), '-s', '-o', '-', '-') {|out| out.read }
     # NOTE Ruby on Windows runs with a IBM437 encoding by default
     result.force_encoding Encoding::UTF_8 unless Encoding.default_external == Encoding::UTF_8
     assert_equal Encoding::UTF_8, result.encoding
@@ -701,8 +703,8 @@ context 'Invoker' do
   end
 
   test 'should not fail to load if call to Dir.home fails' do
-    rubyopt = %(-r #{fixture_path 'undef-dir-home.rb'})
-    result = run_command(%(#{asciidoctor_cmd true, rubyopt} -s -o - #{fixture_path 'basic.adoc'})) {|out| out.read }
+    cmd = asciidoctor_cmd ['-r', (fixture_path 'undef-dir-home.rb')]
+    result = run_command(cmd, '-s', '-o', '-', (fixture_path 'basic.adoc')) {|out| out.read }
     assert_include 'Body content', result
   end
 
@@ -721,7 +723,7 @@ context 'Invoker' do
 
   test 'should show timezone as UTC if system TZ is set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
-    output = run_command({ 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }, %(#{asciidoctor_cmd} -d inline -o - -s #{input_path})) {|out| out.read }
+    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)
     assert doctime.end_with?(' UTC')
     assert localtime.end_with?(' UTC')
@@ -729,7 +731,7 @@ context 'Invoker' do
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
-    output = run_command({ 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }, %(#{asciidoctor_cmd} -d inline -o - -s #{input_path})) {|out| out.read }
+    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)
     assert doctime.end_with?(' -0500')
     assert localtime.end_with?(' -0500')
