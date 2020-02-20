@@ -337,7 +337,9 @@ class Minitest::Test
     (env ||= {})['RUBYOPT'] = nil unless kw_args[:use_bundler]
     opts = { err: [:child, :out] }
     if env
-      if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
+      # NOTE while JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child
+      #if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
+      if jruby?
         begin
           old_env, env = ENV, (ENV.merge env)
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
