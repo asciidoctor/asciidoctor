@@ -364,7 +364,7 @@ class PathResolver
         if jail && !(descends_from? target_path, jail)
           if opts.fetch :recover, true
             logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
-            target_segments, _ = partition_path target_path
+            target_segments, = partition_path target_path
             jail_segments, jail_root = partition_path jail
             return join_path jail_segments + target_segments, jail_root
           else
@@ -373,7 +373,7 @@ class PathResolver
         end
         return target_path
       else
-        target_segments, _ = partition_path target
+        target_segments, = partition_path target
       end
     else
       target_segments = []
@@ -389,7 +389,7 @@ class PathResolver
           return expand_path start
         end
       else
-        target_segments, _ = partition_path start
+        target_segments, = partition_path start
         start = jail || @working_dir
       end
     elsif start.nil_or_empty?
@@ -421,7 +421,7 @@ class PathResolver
     if (resolved_segments = start_segments + target_segments).include? DOT_DOT
       unresolved_segments, resolved_segments = resolved_segments, []
       if jail
-        jail_segments, _ = partition_path jail unless jail_segments
+        jail_segments, = partition_path jail unless jail_segments
         warned = false
         unresolved_segments.each do |segment|
           if segment == DOT_DOT
@@ -452,7 +452,7 @@ class PathResolver
         target_path
       elsif opts.fetch :recover, true
         logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
-        jail_segments, _ = partition_path jail unless jail_segments
+        jail_segments, = partition_path jail unless jail_segments
         join_path jail_segments + target_segments, jail_root
       else
         raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))

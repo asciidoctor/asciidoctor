@@ -1155,7 +1155,7 @@ class PreprocessorReader < Reader
                     active_tag, select = tag_stack.empty? ? [nil, base_select] : tag_stack[-1]
                   elsif inc_tags.key? this_tag
                     include_cursor = create_include_cursor inc_path, expanded_target, inc_lineno
-                    if (idx = tag_stack.rindex {|key, _| key == this_tag })
+                    if (idx = tag_stack.rindex {|key,| key == this_tag })
                       idx == 0 ? tag_stack.shift : (tag_stack.delete_at idx)
                       logger.warn message_with_context %(mismatched end tag (expected '#{active_tag}' but found '#{this_tag}') at line #{inc_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: include_cursor
                     else
