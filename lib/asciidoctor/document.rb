@@ -339,24 +339,24 @@ class Document < AbstractBlock
     (@options = options).freeze
 
     attrs = @attributes
+    attrs['attribute-undefined'] = Compliance.attribute_undefined
+    attrs['attribute-missing'] = Compliance.attribute_missing
     #attrs['encoding'] = 'UTF-8'
     attrs['sectids'] = ''
     attrs['toc-placement'] = 'auto'
+    attrs['prewrap'] = ''
     if standalone
-      attrs['copycss'] = ''
       # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = nil
+      attrs['copycss'] = ''
+      attrs['iconfont-remote'] = ''
+      attrs['stylesheet'] = ''
+      attrs['webfonts'] = ''
     else
-      attrs['notitle'] = ''
       # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = ''
+      attrs['notitle'] = ''
     end
-    attrs['stylesheet'] = ''
-    attrs['webfonts'] = ''
-    attrs['prewrap'] = ''
-    attrs['attribute-undefined'] = Compliance.attribute_undefined
-    attrs['attribute-missing'] = Compliance.attribute_missing
-    attrs['iconfont-remote'] = ''
 
     # language strings
     # TODO load these based on language settings

@@ -47,6 +47,7 @@ Improvements::
   * Allow encoding of include file to be specified using encoding attribute (#3248)
   * Allow template to be used to override outline by only specifying the outline template (#3491)
   * Upgrade MathJax from 2.7.5 to 2.7.6
+  * Skip unused default attribute assigments for embedded document
 
 Build / Infrastructure::
 
