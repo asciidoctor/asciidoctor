@@ -383,7 +383,7 @@ class Document < AbstractBlock
     attr_overrides['asciidoctor-version'] = ::Asciidoctor::VERSION
 
     attr_overrides['safe-mode-name'] = (safe_mode_name = SafeMode.name_for_value @safe)
-    attr_overrides["safe-mode-#{safe_mode_name}"] = ''
+    attr_overrides[%(safe-mode-#{safe_mode_name})] = ''
     attr_overrides['safe-mode-level'] = @safe
 
     # the only way to set the max-include-depth attribute is via the API; default to 64 like AsciiDoc Python
