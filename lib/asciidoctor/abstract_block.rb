@@ -347,13 +347,13 @@ class AbstractBlock < AbstractNode
       case xrefstyle
       when 'full'
         quoted_title = sub_placeholder (sub_quotes @document.compat_mode ? %q(``%s'') : '"`%s`"'), title
-        if @numeral && (caption_attr_name = CAPTION_ATTR_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
+        if @numeral && (caption_attr_name = CAPTION_ATTRIBUTE_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
           %(#{prefix} #{@numeral}, #{quoted_title})
         else
           %(#{@caption.chomp '. '}, #{quoted_title})
         end
       when 'short'
-        if @numeral && (caption_attr_name = CAPTION_ATTR_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
+        if @numeral && (caption_attr_name = CAPTION_ATTRIBUTE_NAMES[@context]) && (prefix = @document.attributes[caption_attr_name])
           %(#{prefix} #{@numeral})
         else
           @caption.chomp '. '
@@ -385,7 +385,7 @@ class AbstractBlock < AbstractNode
   # Returns nothing.
   def assign_caption value, caption_context = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption'])
-      if (attr_name = CAPTION_ATTR_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
+      if (attr_name = CAPTION_ATTRIBUTE_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
         @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
         nil
       end
