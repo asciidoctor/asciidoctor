@@ -602,6 +602,24 @@ context 'API' do
       assert_equal 0, result.size
     end
 
+    test 'should only return matched node when return value of block argument is :prune' do
+      input = <<~'EOS'
+      * foo
+       ** yin
+        *** zen
+       ** yang
+      * bar
+      * baz
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by context: :list_item do |it|
+        it.text == 'yin' ? :prune : false
+      end
+      assert_equal 1, result.size
+      assert_equal 'yin', result[0].text
+    end
+
     test 'find_by should discover blocks inside AsciiDoc table cells if traverse_documents selector option is true' do
       input = <<~'EOS'
       paragraph in parent document (before)
