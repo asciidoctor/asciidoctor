@@ -361,6 +361,32 @@ module Asciidoctor
 
   MATHJAX_VERSION = '2.7.6'
 
+  DEFAULT_ATTRIBUTES = {
+    'appendix-caption' => 'Appendix',
+    'appendix-refsig' => 'Appendix',
+    'caution-caption' => 'Caution',
+    'chapter-refsig' => 'Chapter',
+    #'encoding' => 'UTF-8',
+    'example-caption' => 'Example',
+    'figure-caption' => 'Figure',
+    'important-caption' => 'Important',
+    'last-update-label' => 'Last updated',
+    #'listing-caption' => 'Listing',
+    'note-caption' => 'Note',
+    'part-refsig' => 'Part',
+    #'preface-title' => 'Preface',
+    'prewrap' => '',
+    'sectids' => '',
+    'section-refsig' => 'Section',
+    'table-caption' => 'Table',
+    'tip-caption' => 'Tip',
+    'toc-placement' => 'auto',
+    'toc-title' => 'Table of Contents',
+    'untitled-label' => 'Untitled',
+    'version-label' => 'Version',
+    'warning-caption' => 'Warning',
+  }
+
   # attributes which be changed throughout the flow of the document (e.g., sectnums)
   FLEXIBLE_ATTRIBUTES = ['sectnums']
 

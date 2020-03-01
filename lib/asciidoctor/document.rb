@@ -341,10 +341,10 @@ class Document < AbstractBlock
     attrs = @attributes
     attrs['attribute-undefined'] = Compliance.attribute_undefined
     attrs['attribute-missing'] = Compliance.attribute_missing
-    #attrs['encoding'] = 'UTF-8'
-    attrs['sectids'] = ''
-    attrs['toc-placement'] = 'auto'
-    attrs['prewrap'] = ''
+    attrs.update DEFAULT_ATTRIBUTES
+    # TODO if lang attribute is set, @safe mode < SafeMode::SERVER, and !parent_doc,
+    # load attributes from data/locale/attributes-<lang>.adoc
+
     if standalone
       # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = nil
@@ -357,27 +357,6 @@ class Document < AbstractBlock
       attr_overrides['embedded'] = ''
       attrs['notitle'] = ''
     end
-
-    # language strings
-    # TODO load these based on language settings
-    attrs['caution-caption'] = 'Caution'
-    attrs['important-caption'] = 'Important'
-    attrs['note-caption'] = 'Note'
-    attrs['tip-caption'] = 'Tip'
-    attrs['warning-caption'] = 'Warning'
-    attrs['example-caption'] = 'Example'
-    attrs['figure-caption'] = 'Figure'
-    #attrs['listing-caption'] = 'Listing'
-    attrs['table-caption'] = 'Table'
-    attrs['toc-title'] = 'Table of Contents'
-    #attrs['preface-title'] = 'Preface'
-    attrs['section-refsig'] = 'Section'
-    attrs['part-refsig'] = 'Part'
-    attrs['chapter-refsig'] = 'Chapter'
-    attrs['appendix-caption'] = attrs['appendix-refsig'] = 'Appendix'
-    attrs['untitled-label'] = 'Untitled'
-    attrs['version-label'] = 'Version'
-    attrs['last-update-label'] = 'Last updated'
 
     attr_overrides['asciidoctor'] = ''
     attr_overrides['asciidoctor-version'] = ::Asciidoctor::VERSION
