@@ -1955,15 +1955,7 @@ context 'Substitutions' do
       end
 
       test 'should passthrough math macro inside another passthrough' do
-        input = 'the text `asciimath:[x = y]` should be passed through as +literal+ text'
-        para = block_from_string input, attributes: { 'compat-mode' => '' }
-        assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
-
-        input = 'the text [x-]`asciimath:[x = y]` should be passed through as `literal` text'
-        para = block_from_string input
-        assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
-
-        input = 'the text `+asciimath:[x = y]+` should be passed through as `literal` text'
+        input = 'the text `++asciimath:[x = y]++` should be passed through as `literal` text'
         para = block_from_string input
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end

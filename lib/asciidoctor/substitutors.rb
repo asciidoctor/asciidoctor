@@ -1053,6 +1053,22 @@ module Substitutors
       %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
+    text = text.gsub InlineStemMacroRx do
+      # honor the escape
+      next $&.slice 1, $&.length if $&.start_with? RS
+
+      if (type = $1.to_sym) == :stem
+        type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
+      end
+      subs = $2
+      content = normalize_text $3, nil, true
+      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
+      content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
+      subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
+      %(#{PASS_START}#{passthru_key}#{PASS_END})
+    end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
+
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub pass_inline_rx do
       preceding = $1
@@ -1101,23 +1117,6 @@ module Substitutors
 
       %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? pass_inline_char1) || (pass_inline_char2 && (text.include? pass_inline_char2))
-
-    # NOTE we need to do the stem in a subsequent step to allow it to be escaped by the former
-    text = text.gsub InlineStemMacroRx do
-      # honor the escape
-      next $&.slice 1, $&.length if $&.start_with? RS
-
-      if (type = $1.to_sym) == :stem
-        type = STEM_TYPE_ALIASES[@document.attributes['stem']].to_sym
-      end
-      subs = $2
-      content = normalize_text $3, nil, true
-      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
-      content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
-      subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
-      passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
-      %(#{PASS_START}#{passthru_key}#{PASS_END})
-    end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
 
     text
   end
