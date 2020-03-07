@@ -64,6 +64,13 @@ class Section < AbstractBlock
     Section.generate_id title, @document
   end
 
+  # Public: Check whether this Section has any child Section objects.
+  #
+  # Returns A [Boolean] to indicate whether this Section has child Section objects
+  def sections?
+    @next_section_index > 0
+  end
+
   # Public: Get the section number for the current Section
   #
   # The section number is a dot-separated String that uniquely describes the position of this
