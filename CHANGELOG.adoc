@@ -43,6 +43,7 @@ Compliance::
 Improvements::
 
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
+  * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
   * Allow encoding of include file to be specified using encoding attribute (#3248)
   * Allow template to be used to override outline by only specifying the outline template (#3491)
