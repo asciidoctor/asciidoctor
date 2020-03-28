@@ -3,6 +3,7 @@ module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # consistent with the html5 backend from AsciiDoc Python.
 class Converter::Html5Converter < Converter::Base
+  include Media
   register_for 'html5'
 
   (QUOTE_TAGS = {
@@ -1026,75 +1027,31 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
+    video_uri = video_uri node
     case node.attr 'poster'
     when 'vimeo'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
-        asset_uri_scheme = %(#{asset_uri_scheme}:)
-      end
-      start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
-      delimiter = ['?']
-      autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoplay=1) : ''
-      loop_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}loop=1) : ''
-      muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{video_uri}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     when 'youtube'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
-        asset_uri_scheme = %(#{asset_uri_scheme}:)
-      end
-      rel_param_val = (node.option? 'related') ? 1 : 0
-      # NOTE start and end must be seconds (t parameter allows XmYs where X is minutes and Y is seconds)
-      start_param = (node.attr? 'start') ? %(&amp;start=#{node.attr 'start'}) : ''
-      end_param = (node.attr? 'end') ? %(&amp;end=#{node.attr 'end'}) : ''
-      autoplay_param = (node.option? 'autoplay') ? '&amp;autoplay=1' : ''
-      loop_param = (has_loop_param = node.option? 'loop') ? '&amp;loop=1' : ''
-      mute_param = (node.option? 'muted') ? '&amp;mute=1' : ''
-      controls_param = (node.option? 'nocontrols') ? '&amp;controls=0' : ''
-      # cover both ways of controlling fullscreen option
       if node.option? 'nofullscreen'
-        fs_param = '&amp;fs=0'
         fs_attribute = ''
       else
-        fs_param = ''
         fs_attribute = append_boolean_attribute 'allowfullscreen', xml
       end
-      modest_param = (node.option? 'modest') ? '&amp;modestbranding=1' : ''
-      theme_param = (node.attr? 'theme') ? %(&amp;theme=#{node.attr 'theme'}) : ''
-      hl_param = (node.attr? 'lang') ? %(&amp;hl=#{node.attr 'lang'}) : ''
-
-      # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
-      target, list = (node.attr 'target').split '/', 2
-      if (list ||= (node.attr 'list'))
-        list_param = %(&amp;list=#{list})
-      else
-        # parse dynamic playlist syntax: video_id1,video_id2,...
-        target, playlist = target.split ',', 2
-        if (playlist ||= (node.attr 'playlist'))
-          # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
-          list_param = %(&amp;playlist=#{playlist})
-        else
-          # NOTE for loop to work, playlist must be specified; use VIDEO_ID if there's no explicit playlist
-          list_param = has_loop_param ? %(&amp;playlist=#{target}) : ''
-        end
-      end
-
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{video_uri}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
     else
       poster_attribute = (val = node.attr 'poster').nil_or_empty? ? '' : %( poster="#{node.media_uri val}")
       preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
-      start_t = node.attr 'start'
-      end_t = node.attr 'end'
-      time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{video_uri}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>

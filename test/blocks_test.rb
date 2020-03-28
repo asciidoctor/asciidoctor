@@ -2738,6 +2738,12 @@ context 'Blocks' do
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
     end
 
+    test 'should detect and convert video macro for docbook backend' do
+      input = 'video::cats-vs-dogs.avi[]'
+      output = convert_string_to_embedded input, backend: 'docbook5'
+      assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
+    end
+
     test 'should detect and convert video macro with positional attributes for poster and dimensions' do
       input = 'video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]'
       output = convert_string_to_embedded input
