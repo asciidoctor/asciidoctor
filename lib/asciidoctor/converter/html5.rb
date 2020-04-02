@@ -635,9 +635,7 @@ Your browser does not support the audio tag.
       end
     end
     img ||= %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
-    if node.attr? 'link'
-      img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
-    end
+    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
     id_attr = node.id ? %( id="#{node.id}") : ''
     classes = ['imageblock']
     classes << (node.attr 'float') if node.attr? 'float'
@@ -1195,9 +1193,7 @@ Your browser does not support the video tag.
       end
       img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
     end
-    if node.attr? 'link'
-      img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
-    end
+    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
     if (role = node.role)
       if node.attr? 'float'
         class_attr_val = %(#{type} #{node.attr 'float'} #{role})
