@@ -232,7 +232,7 @@ class Table::Cell < AbstractBlock
   # Public: An alias to the parent block (which is always a Column)
   alias column parent
 
-  # Internal: Returns the nested Document in an AsciiDoc table cell (only set when style is :asciidoc)
+  # Public: Returns the nested Document in an AsciiDoc table cell (only set when style is :asciidoc)
   attr_reader :inner_document
 
   def initialize column, cell_text, attributes = {}, opts = {}
