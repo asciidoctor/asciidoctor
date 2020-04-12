@@ -37,6 +37,7 @@ An ideal bug report would include a pull request with failing specs.
 . {uri-fork-help}[Fork the repository].
 . Run `NOKOGIRI_USE_SYSTEM_LIBRARIES=1 bundle` to install development dependencies.
   - If the `bundle` command is not available, run `gem install bundler` to install it.
+  - If "An error occurred while installing nokogiri (1.10.9)" make sure you have the libxml2 and libxslt development packages installed (e.g. on Ubuntu: `sudo apt install libxml2-dev libxslt-dev`).
 . {uri-branch-help}[Create a topic branch] (preferably using the pattern `issue-XYZ`, where `XYZ` is the issue number).
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run `bundle exec rake` to run the tests.
