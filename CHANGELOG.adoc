@@ -465,6 +465,7 @@ Enhancements::
   * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen, dot, and space) when auto-generating section IDs (#794)
    ** hyphen, dot, and space are replaced with value of idseparator, if set; otherwise, spaces are dropped
   * BREAKING: disable interdocument xrefs in compat mode (#2740)
+  * BREAKING: automatically parse attributes in link macro if equals is present, ignoring linkattrs (except in compat mode) (#2059)
   * pass non-AsciiDoc file extensions in target of xref through unprocessed (#2740)
   * process any known AsciiDoc file extension in target of shorthand interdocument xref if hash is also present (e.g., `<<target.asciidoc#,text>>`) (#2740)
   * only allow .adoc to be used in target of formal xref macro to create an interdocument xref (with or without a hash) (#2740)
@@ -587,7 +588,6 @@ Improvements / Refactoring::
   * move callouts into document catalog (PR #2394)
   * document ID defined in block attribute line takes precedence over ID defined inside document title line
   * don't look for link and window attributes on document when resolving these attributes for an image
-  * when linkattrs is set, only parse attributes in link macro if equals is present
   * skip line comments in name section of manpage (#2584, PR #2585)
   * always activate extension registry passed to processor (PR #2379)
   * skip extension registry activation if no groups are registered (PR #2373)
