@@ -12,13 +12,13 @@ namespace :build do
       commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
     end
 
-    # NOTE The TRAVIS_TOKEN env var must be defined in Travis interface.
+    # NOTE The TRAVIS_TOKEN env var must be defined in the Travis interface.
     # Retrieve this token using the `travis token` command.
     # The GitHub user corresponding to the Travis user must have write access to the repository.
     # After granting permission, sign into Travis and resync the repositories.
     travis_token = ENV['TRAVIS_TOKEN']
 
-    # NOTE The GITHUB_TOKEN env var must be defined in GitHub Actions interface.
+    # NOTE The GITHUB_TOKEN env var must be defined in the Travis interface.
     # Retrieve this token using the settings of the account/org -> Developer Settings -> Personal Access Tokens
     # and generate a new "Personal Access Token" with the "repo" scope
     github_token = ENV['GITHUB_TOKEN']
