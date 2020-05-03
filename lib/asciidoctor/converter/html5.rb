@@ -96,12 +96,15 @@ class Converter::Html5Converter < Converter::Base
     end
     cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
     linkcss = node.attr? 'linkcss'
-    result = ['<!DOCTYPE html>']
+    result = @xml_mode ? ['<?xml version="1.0" encoding="utf-8"?>'] : ['<!DOCTYPE html>']
     lang_attribute = (node.attr? 'nolang') ? '' : %( lang="#{node.attr 'lang', 'en'}")
     result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : ''}#{lang_attribute}>)
-    result << %(<head>
-<meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
+    result << %(<head>)
+    unless @xml_mode
+      # Meta element does not affect encoding of XML files.
+      result << %(<meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>)
+    end
+    result << %(<meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
 <meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
     result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
