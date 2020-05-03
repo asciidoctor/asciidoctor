@@ -40,7 +40,7 @@ namespace :build do
         'Travis-API-Version' => '3',
         'Authorization' => %(token #{travis_token})
       }
-      config = YAML.load open(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml)) {|fd| fd.read } rescue {}
+      config = YAML.load OpenURI.open_uri(%(https://raw.githubusercontent.com/#{project}/.travis-upstream-only.yml)) {|fd| fd.read } rescue {}
       payload = {
         'request' => {
           'branch' => branch,
