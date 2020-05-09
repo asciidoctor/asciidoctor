@@ -216,6 +216,34 @@ context 'Manpage' do
       assert_equal '\&.if 1 .nx', output.lines[-2].chomp
     end
 
+    test 'should escape ellipsis at start of line' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      -x::
+	Ao gravar o commit, acrescente uma linha que diz "(cherry picked from commit
+	...)" à mensagem de commit original para indicar qual commit esta mudança
+	foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
+	EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\&...', output.lines[-3][0..4].chomp
+    end
+
+    test 'should not escape ellipsis in the middle of a line' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      -x::
+	Ao gravar o commit, acrescente uma linha que diz
+	"(cherry picked from commit...)" à mensagem de commit
+	 original para indicar qual commit esta mudança
+	foi escolhida. Isso é feito apenas para picaretas
+	de cereja sem conflitos.
+	EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert(output.lines[-5].include? 'commit...')
+    end
+
     test 'should normalize whitespace in a paragraph' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}

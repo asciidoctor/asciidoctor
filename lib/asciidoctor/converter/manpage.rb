@@ -704,6 +704,7 @@ allbox tab(:);'
     end
     str = str.
       gsub(LiteralBackslashRx) { %[#{$1}#{'\\(rs' * $2.length}] }. # literal backslash (not a troff escape sequence)
+      gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
       gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
       # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
       gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.
@@ -721,7 +722,6 @@ allbox tab(:);'
       gsub('&#8217;', '\(cq').  # right single quotation mark
       gsub('&#8220;', '\(lq').  # left double quotation mark
       gsub('&#8221;', '\(rq').  # right double quotation mark
-      gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
       gsub('&#8592;', '\(<-').  # leftwards arrow
       gsub('&#8594;', '\(->').  # rightwards arrow
       gsub('&#8656;', '\(lA').  # leftwards double arrow
