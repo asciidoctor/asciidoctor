@@ -34,6 +34,7 @@ Bug Fixes::
   * Removing leading and trailing blank lines in AsciiDoc include file to match assumption of parser (#3470)
   * Activate extensions when :extensions option is set even if Extensions API is not yet loaded (#3570)
   * Don't activate global extensions if :extensions option is false (#3570)
+  * In manpages backend, escape ellipsis at start of line
 
 Compliance::
 
