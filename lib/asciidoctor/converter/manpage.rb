@@ -727,7 +727,7 @@ allbox tab(:);'
       gsub('&#8656;', '\(lA').  # leftwards double arrow
       gsub('&#8658;', '\(rA').  # rightwards double arrow
       gsub('&#8203;', '\:').    # zero width space
-      gsub('&amp;','&').        # literal ampersand (NOTE must take place after any other replacement that includes &)
+      gsub('&amp;', '&').       # literal ampersand (NOTE must take place after any other replacement that includes &)
       gsub('\'', '\(aq').       # apostrophe-quote
       gsub(MockBoundaryRx, ''). # mock boundary
       gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
