@@ -8,7 +8,7 @@
 :figure-caption: Rysunek
 :important-caption: Ważne
 :last-update-label: Ostatnio zmodyfikowany
-ifdef::listing-caption[:listing-caption: Spis]
+ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Nazwa]
 :note-caption: Notka
 :part-refsig: Część
