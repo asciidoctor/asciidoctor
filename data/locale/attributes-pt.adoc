@@ -1,9 +1,9 @@
-// Portuguese translation, courtesy of Roberto Cortez <radcortez@yahoo.com>
+// Portuguese translation, courtesy of Roberto Cortez <radcortez@yahoo.com> with updates from Andrew Rodrigues <arodrigues@gbif.org>
 :appendix-caption: Apêndice
 :appendix-refsig: {appendix-caption}
 :caution-caption: Atenção
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+:chapter-label: Capítulo
+:chapter-refsig: {chapter-label}
 :example-caption: Exemplo
 :figure-caption: Figura
 :important-caption: Importante
@@ -11,9 +11,9 @@
 ifdef::listing-caption[:listing-caption: Listagem]
 ifdef::manname-title[:manname-title: Nome]
 :note-caption: Nota
-//:part-refsig: ???
+:part-refsig: Parte
 ifdef::preface-title[:preface-title: Prefácio]
-//:section-refsig: ???
+:section-refsig: Secção
 :table-caption: Tabela
 :tip-caption: Sugestão
 :toc-title: Índice
