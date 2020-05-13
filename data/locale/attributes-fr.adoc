@@ -1,4 +1,4 @@
-// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com>
+// French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com> with updates from Maheva Bagard Laursen <mblaursen@gbif.org>
 :appendix-caption: Annexe
 :appendix-refsig: {appendix-caption}
 :caution-caption: Avertissement
@@ -11,9 +11,9 @@
 ifdef::listing-caption[:listing-caption: Liste]
 ifdef::manname-title[:manname-title: Nom]
 :note-caption: Note
-//:part-refsig: ???
+:part-refsig: Partie
 ifdef::preface-title[:preface-title: Préface]
-//:section-refsig: ???
+:section-refsig: Section
 :table-caption: Tableau
 :tip-caption: Astuce
 :toc-title: Table des matières
