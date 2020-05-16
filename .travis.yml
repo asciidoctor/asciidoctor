@@ -19,7 +19,7 @@ matrix:
     env: ROUGE_VERSION='~> 2.0.0'
   - rvm: truffleruby-20.0.0
     # run against TruffleRuby nightly or if truffleruby is mentioned in commit message
-    if: type = cron OR commit_message =~ /truffleruby/
+    if: type = cron OR commit_message =~ /truffleruby/i
     env:
     # use 3g to avoid OutOfMemoryError when running the tests suite against TruffleRuby
     - TRUFFLERUBYOPT="--vm.Xmx3g"
