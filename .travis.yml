@@ -17,7 +17,7 @@ matrix:
     env: JRUBY_OPTS='--dev'
   - rvm: *oldest_ruby
     env: ROUGE_VERSION='~> 2.0.0'
-  - rvm: truffleruby-19.3.0
+  - rvm: truffleruby-20.0.0
     # run against TruffleRuby nightly or if truffleruby is mentioned in commit message
     if: type = cron OR commit_message =~ /truffleruby/
     env:

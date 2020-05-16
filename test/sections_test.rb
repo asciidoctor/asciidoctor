@@ -685,8 +685,6 @@ context 'Sections' do
 
         content
         EOS
-        # see https://github.com/oracle/truffleruby/issues/1563
-        input = String.new input, encoding: ::Encoding::UTF_8 if RUBY_ENGINE == 'truffleruby'
         output = convert_string_to_embedded input
         assert_xpath '//h2[@id="_视图"][text()="视图"]', output
         assert_xpath '//h2[@id="_连接器"][text()="连接器"]', output
