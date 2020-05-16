@@ -309,6 +309,9 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
+    if target_image.start_with? 'data:'
+      return target_image
+    end
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
           (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&

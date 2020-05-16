@@ -2663,6 +2663,14 @@ context 'Blocks' do
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
+    test 'should use the target as-is if the target is already a data uri when data-uri attribute is set' do
+      doc = Asciidoctor::Document.new '', { :safe => 'safe', :attributes => { 'data-uri' => true, 'allow-uri-read' => true } }
+      image = Asciidoctor::Block.new doc, :image, { source: nil, attributes: {} }
+      doc << image
+      image_uri = image.image_uri 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGJhc2VQcm9maWxlPSJmdWxsIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjgwIiBmaWxsPSIjZTkxZTYzIiAvPjwvc3ZnPg=='
+      assert_equal image_uri, 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGJhc2VQcm9maWxlPSJmdWxsIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjgwIiBmaWxsPSIjZTkxZTYzIiAvPjwvc3ZnPg=='
+    end
+
     test 'can handle embedded data uri images' do
       input = 'image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]'
       output = convert_string_to_embedded input

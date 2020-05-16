@@ -43,6 +43,7 @@ Compliance::
 
 Improvements::
 
+  * AbstractNode#media_uri now eagerly return a data URI as-is without doing any additional processing (#3658) (*@mogztter*)
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
