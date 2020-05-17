@@ -3138,6 +3138,24 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
       assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
+
+    test 'should use the imagesdir attribute set on the node when resolving the image path' do
+      image = block_from_string 'image::rainbow.png[]', attributes: { 'imagesdir' => 'images' }
+      image.set_attr 'imagesdir', 'chapter-1/images'
+      image_uri = image.image_uri image.attr 'target'
+      assert_equal 'chapter-1/images/rainbow.png', image_uri
+    end
+
+    test 'should use the imagesdir attribute defined on image macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      image::rainbow.png[imagesdir=chapter-1/images]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="chapter-1/images/rainbow.png"'
+    end
   end
 
   context 'Media' do
@@ -3350,6 +3368,24 @@ context 'Blocks' do
       assert_css 'audio[controls]', output, 1
       assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
     end
+
+    test 'should use the imagesdir attribute on the node when resolving the video path' do
+      video = block_from_string 'video::promo.mp4[]', attributes: { 'imagesdir' => 'images' }
+      video.set_attr 'imagesdir', 'chapter-1/videos'
+      video_uri = video.media_uri video.attr 'target'
+      assert_equal 'chapter-1/videos/promo.mp4', video_uri
+    end
+
+    test 'should use the imagesdir attribute defined on video macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      video::promo.mp4[imagesdir=chapter-1/videos]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="chapter-1/videos/promo.mp4"'
+    end
   end
 
   context 'Admonition icons' do
@@ -3371,6 +3407,18 @@ context 'Blocks' do
       :iconsdir: icons
 
       [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
+    end
+
+    test 'should use iconsdir attribute set on admonition block in document to resolve icon path' do
+      input = <<~'EOS'
+      :icons:
+
+      [TIP,iconsdir=icons]
       You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
