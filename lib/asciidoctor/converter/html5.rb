@@ -352,14 +352,14 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
           if section.sectname == 'chapter'
-            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
+            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum}&nbsp;#{section.title})
           elsif section.sectname == 'part'
-            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
+            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'}&nbsp;#{section.title})
           else
-            stitle = %(#{section.sectnum} #{section.title})
+            stitle = %(#{section.sectnum}&nbsp;#{section.title})
           end
         else
-          stitle = %(#{section.sectnum} #{section.title})
+          stitle = %(#{section.sectnum}&nbsp;#{section.title})
         end
       else
         stitle = section.title
