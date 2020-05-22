@@ -109,7 +109,9 @@ class Converter::Html5Converter < Converter::Base
     result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
     result << %(<meta name="author" content="#{((authors = node.sub_replacements node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
     result << %(<meta name="copyright" content="#{node.attr 'copyright'}"#{slash}>) if node.attr? 'copyright'
-    # Open Graph tags - Basic and Optional Metadata - https://ogp.me/
+    # See: Canonical URL tag - https://support.google.com/webmasters/answer/139066?hl=en
+    result << %(<link rel="canonical" href="#{node.attr 'canonical-url'}"#{slash}>) if node.attr? 'canonical-url'
+    # See: Open Graph tags - Basic and Optional Metadata - https://ogp.me/
     result << %(<meta property="og:title" content="#{node.attr 'social-title'}"#{slash}>) if node.attr? 'social-title'
     result << %(<meta property="og:type" content="#{node.attr 'social-type'}"#{slash}>) if node.attr? 'social-type'
     result << %(<meta property="og:url" content="#{node.attr 'social-url'}"#{slash}>) if node.attr? 'social-url'
@@ -119,7 +121,7 @@ class Converter::Html5Converter < Converter::Base
     result << %(<meta property="og:site_name" content="#{node.attr 'social-site-name'}"#{slash}>) if node.attr? 'social-site-name'
     result << %(<meta property="og:description" content="#{node.attr 'social-description'}"#{slash}>) if node.attr? 'social-description'
     result << %(<meta property="og:locale" content="#{node.attr 'social-locale'}"#{slash}>) if node.attr? 'social-locale'
-    # Twitter tags - https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/summary
+    # See: Twitter tags - https://developer.twitter.com/en/docs/tweets/optimize-with-cards/overview/summary
     result << %(<meta name="twitter:card" content="#{node.attr 'social-twitter-card'}"#{slash}>) if node.attr? 'social-twitter-card'
     result << %(<meta name="twitter:site" content="#{node.attr 'social-twitter-site'}"#{slash}>) if node.attr? 'social-twitter-site'
     result << %(<meta name="twitter:title" content="#{node.attr 'social-title'}"#{slash}>) if node.attr? 'social-title'
