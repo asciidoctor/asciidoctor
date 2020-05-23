@@ -2790,13 +2790,13 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul[@class="sectlevel1"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 5
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="Section One"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul[@class="sectlevel2"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should output numbered table of contents in header if toc and numbered attributes are set' do
@@ -2826,11 +2826,11 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 5
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
     end
 
     test 'should output a table of contents that honors numbered setting at position of section in document' do
@@ -2862,9 +2862,9 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 5
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should not number parts in table of contents for book doctype when numbered attribute is set' do
@@ -2895,13 +2895,13 @@ context 'Sections' do
       assert_xpath '//*[@id="toc"]', output, 1
       assert_xpath '//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]', output, 1
-      assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]/li', output, 2
+      assert_xpath '//*[@id="toc"]/ul[@class="sectlevel0"]/li', output, 4
       assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/a[text()="Part 1"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/a[text()="Part 2"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul[@class="sectlevel1"]', output, 1
-      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul/li', output, 2
-      assert_xpath '((//*[@id="toc"]/ul[@class="sectlevel0"]/li)[1]/ul/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[3]/a[text()="Part 2"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul[@class="sectlevel1"]', output, 1
+      assert_xpath '(//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul/li', output, 2
+      assert_xpath '((//*[@id="toc"]/ul[@class="sectlevel0"]/li)[2]/ul/li)[1]/a[text()="1. First Section of Part 1"]', output, 1
     end
 
     test 'should output table of contents in header if toc2 attribute is set' do
@@ -3312,12 +3312,12 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
-      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
+      assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 5
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[2]/a[@href="#_section_two"][text()="Section Two"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[2]/ul/li', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[3]/ul/li', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="Section Three"]', output, 1
+      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[4]/a[@href="#_section_three"][text()="Section Three"]', output, 1
     end
 
     test 'should not display a table of contents if document has no sections' do

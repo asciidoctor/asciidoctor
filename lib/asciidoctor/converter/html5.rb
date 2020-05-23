@@ -365,12 +365,11 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         stitle = section.title
       end
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
+      result << %(<li class="toc-entry"><a href="##{section.id}">#{stitle}</a></li>)
       if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
-        result << %(<li><a href="##{section.id}">#{stitle}</a>)
+        result << '<li class="toc-sublist">'
         result << child_toc_level
         result << '</li>'
-      else
-        result << %(<li><a href="##{section.id}">#{stitle}</a></li>)
       end
     end
     result << '</ul>'
