@@ -1,4 +1,4 @@
-// Polish translation, courtesy of Łukasz Dziedziul <l.dziedziul@gmail.com>
+// Polish translation, courtesy of Łukasz Dziedziul <l.dziedziul@gmail.com> with updates via Matthew Blissett <mblissett@gbif.org>
 :appendix-caption: Dodatek
 :appendix-refsig: {appendix-caption}
 :caution-caption: Uwaga
@@ -8,12 +8,12 @@
 :figure-caption: Rysunek
 :important-caption: Ważne
 :last-update-label: Ostatnio zmodyfikowany
-//ifdef::listing-caption[:listing-caption: ???]
+ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Nazwa]
 :note-caption: Notka
-//:part-refsig: ???
-//ifdef::preface-title[:preface-title: ???]
-//:section-refsig: ???
+:part-refsig: Część
+ifdef::preface-title[:preface-title: Wstęp]
+:section-refsig: Sekcja
 :table-caption: Tabela
 :tip-caption: Sugestia
 :toc-title: Spis treści

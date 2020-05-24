@@ -1,9 +1,9 @@
-// Spanish translation, courtesy of Eddú Meléndez <eddu.melendez@gmail.com>
+// Spanish translation, courtesy of Eddú Meléndez <eddu.melendez@gmail.com> with updates from Fede Mendez <federicomh@gmail.com>
 :appendix-caption: Apéndice
 :appendix-refsig: {appendix-caption}
 :caution-caption: Precaución
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+:chapter-label: Capítulo
+:chapter-refsig: {chapter-label}
 :example-caption: Ejemplo
 :figure-caption: Figura
 :important-caption: Importante
@@ -11,9 +11,9 @@
 ifdef::listing-caption[:listing-caption: Lista]
 ifdef::manname-title[:manname-title: Nombre]
 :note-caption: Nota
-//:part-refsig: ???
+:part-refsig: Parte
 ifdef::preface-title[:preface-title: Prefacio]
-//:section-refsig: ???
+:section-refsig: Sección
 :table-caption: Tabla
 :tip-caption: Sugerencia
 :toc-title: Tabla de Contenido
