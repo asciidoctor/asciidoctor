@@ -1,9 +1,9 @@
 // Catalan translation, courtesy of Abel Salgado Romero <abelromero@gmail.com> and Alex Soto
-:appendix-caption: Apendix
+:appendix-caption: Apèndix
 :appendix-refsig: {appendix-caption}
 :caution-caption: Atenció
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+:chapter-label: Capítol
+:chapter-refsig: {chapter-label}
 :example-caption: Exemple
 :figure-caption: Figura
 :important-caption: Important
@@ -11,9 +11,9 @@
 ifdef::listing-caption[:listing-caption: Llista]
 ifdef::manname-title[:manname-title: Nom]
 :note-caption: Nota
-//:part-refsig: ???
+:part-refsig: Part
 ifdef::preface-title[:preface-title: Prefaci]
-//:section-refsig: ???
+:section-refsig: Secció
 :table-caption: Taula
 :tip-caption: Suggeriment
 :toc-title: Índex
