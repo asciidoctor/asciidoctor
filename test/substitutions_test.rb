@@ -992,7 +992,7 @@ context 'Substitutions' do
       assert_equal %(text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>), para.sub_macros(para.source)
       assert_equal 1, para.document.catalog[:footnotes].size
       footnote1 = para.document.catalog[:footnotes][0]
-      assert_equal 'a <a id="b"></a> [[c]] d', footnote1.text
+      assert_equal 'a <span id="b"></span> [[c]] d', footnote1.text
     end
 
     test 'subsequent footnote macros with escaped URLs should be restored in DocBook' do
