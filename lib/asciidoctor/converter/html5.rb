@@ -194,6 +194,13 @@ class Converter::Html5Converter < Converter::Base
       result << docinfo_content
     end
 
+    # Custom Masthead Image (above the page header)
+    if node.attr? 'masthead-image-src'
+      result << '<div id="masthead">'
+      result << %(<img src="#{node.attr 'masthead-image-src'}">)
+      result << '</div>'
+    end
+
     unless node.noheader
       result << '<div id="header">'
       if node.doctype == 'manpage'
@@ -254,6 +261,25 @@ class Converter::Html5Converter < Converter::Base
 </div>)
       end
       result << '</div>'
+    end
+
+    # Custom Navigation Links (Previous, Next)
+    #
+    # The idea is, if either of the link attributes are set, we have to do the DIVs for both,
+    # so that we can then use flexbox layout on them.
+    if ((node.attr? 'prev-text') || (node.attr? 'next-text'))
+      result << '<nav>'
+      result << '<div class="go-previous-chapter">'
+      if node.attr? 'prev-text'
+        result << %(<a href="#{node.attr 'prev-link'}">#{node.attr 'prev-text'}</a>)
+      end
+      result << '</div>'
+      result << '<div class="go-next-chapter">'
+      if node.attr? 'next-text'
+        result << %(<a href="#{node.attr 'next-link'}">#{node.attr 'next-text'}</a>)
+      end
+      result << '</div>'
+      result << '</nav>'
     end
 
     unless node.nofooter
