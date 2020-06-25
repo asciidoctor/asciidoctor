@@ -1092,6 +1092,20 @@ context 'Substitutions' do
       assert_css '#footnotes .footnote', output, 1
     end
 
+    test 'should not register footnote with id and text if id already registered' do
+      input = <<~'EOS'
+      :fn-notable-text: footnote:id[about this text]
+
+      notable text.{fn-notable-text}
+
+      more notable text.{fn-notable-text}
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '(//p)[1]/sup[@class="footnote"]', output, 1
+      assert_xpath '(//p)[2]/sup[@class="footnoteref"]', output, 1
+      assert_css '#footnotes .footnote', output, 1
+    end
+
     test 'should not resolve an inline footnote macro missing both id and text' do
       input = <<~'EOS'
       The footnote:[] macro can be used for defining and referencing footnotes.
