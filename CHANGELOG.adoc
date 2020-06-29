@@ -35,6 +35,7 @@ Bug Fixes::
   * Activate extensions when :extensions option is set even if Extensions API is not yet loaded (#3570)
   * Don't activate global extensions if :extensions option is false (#3570)
   * Escape ellipsis at start of line in manpage output (#3645) (*@jnavila*)
+  * Don't register footnote with ID if a footnote is already registered with that ID (#3690)
 
 Compliance::
 

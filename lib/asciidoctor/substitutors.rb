@@ -846,19 +846,17 @@ module Substitutors
         end
 
         if id
-          if text
+          if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
+            index, text = footnote.index, footnote.text
+            type, target, id = :xref, id, nil
+          elsif text
             text = restore_passthroughs(normalize_text text, true, true)
             index = doc.counter('footnote-number')
             doc.register(:footnotes, Document::Footnote.new(index, id, text))
             type, target = :ref, nil
           else
-            if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
-              index, text = footnote.index, footnote.text
-            else
-              logger.warn %(invalid footnote reference: #{id})
-              index, text = nil, id
-            end
-            type, target, id = :xref, id, nil
+            logger.warn %(invalid footnote reference: #{id})
+            index, text = nil, id
           end
         elsif text
           text = restore_passthroughs(normalize_text text, true, true)
