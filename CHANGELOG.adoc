@@ -39,6 +39,7 @@ Bug Fixes::
   * Don't register footnote with ID if a footnote is already registered with that ID (#3690)
   * Honor start attribute on ordered list in manpage output (#3714)
   * Warn instead of crashing if SVG to inline is empty (#3638) (*@mogztter*)
+  * Compute highlight line ranges on source block relative to value of start attribute (#3519) (*@mogztter*)
 
 Compliance::
 

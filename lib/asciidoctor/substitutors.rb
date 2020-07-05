@@ -946,7 +946,7 @@ module Substitutors
     if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil)
       start_line_number = 1 if (start_line_number = (attr 'start', 1).to_i) < 1
     end
-    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight') if attr? 'highlight'
+    highlight_lines = resolve_lines_to_highlight source, (attr 'highlight'), start_line_number if attr? 'highlight'
 
     highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language'),
       callouts: callout_marks,
@@ -969,9 +969,10 @@ module Substitutors
   #
   # source - The String source.
   # spec   - The lines specifier (e.g., "1-5, !2, 10" or "1..5;!2;10")
+  # start  - The line number of the first line (optional, default: false)
   #
   # Returns an [Array] of unique, sorted line numbers.
-  def resolve_lines_to_highlight source, spec
+  def resolve_lines_to_highlight source, spec, start = nil
     lines = []
     spec = spec.delete ' ' if spec.include? ' '
     ((spec.include? ',') ? (spec.split ',') : (spec.split ';')).map do |entry|
@@ -992,6 +993,10 @@ module Substitutors
       elsif !lines.include?(line = entry.to_i)
         lines << line
       end
+    end
+    # If the start attribute is defined, then the lines to highlight specified by the provided spec should be relative to the start value.
+    unless (shift = start ? start - 1 : 0) == 0
+      lines = lines.map {|it| it - shift }
     end
     lines.sort
   end
