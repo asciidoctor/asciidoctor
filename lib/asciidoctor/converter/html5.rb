@@ -1262,13 +1262,17 @@ Your browser does not support the video tag.
 
   # NOTE expose read_svg_contents for Bespoke converter
   def read_svg_contents node, target
-    if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG')
+    if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true)
+      return if svg.empty?
       svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
-      old_start_tag = new_start_tag = nil
+      old_start_tag = new_start_tag = start_tag_match = nil
       # NOTE width, height and style attributes are removed if either width or height is specified
       ['width', 'height'].each do |dim|
         if node.attr? dim
-          new_start_tag = (old_start_tag = (svg.match SvgStartTagRx)[0]).gsub DimensionAttributeRx, '' unless new_start_tag
+          unless new_start_tag
+            next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match
+            new_start_tag = (old_start_tag = start_tag_match[0]).gsub DimensionAttributeRx, ''
+          end
           unless (dim_val = node.attr dim).end_with? '%'
             # QUESTION should we add px since it's already the default?
             dim_val += 'px'
