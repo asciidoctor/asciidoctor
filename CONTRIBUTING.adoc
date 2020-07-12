@@ -24,13 +24,31 @@ You also assert that you are the original author of the work that you are contri
 
 == Submitting an Issue
 
-We use the {uri-issues}[issue tracker on GitHub] associated with this project to track bugs and features.
-Before submitting a bug report or feature request, check to make sure it hasn't already been submitted.
-When submitting a bug report, please include a {uri-gist}[Gist] that includes any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
+We use the {uri-issues}[issue tracker on GitHub] associated with this project to track bugs and features (i.e., issues).
+We very much appreciate the time and effort you take to report an issue.
 
-Most importantly, since Asciidoctor is a text processor, reproducing most bugs requires that we have some snippet of text on which Asciidoctor exhibits the bad behavior.
+Before submitting an issue, make sure it hasn't already been submitted by using the {uri-issues}[search feature].
+Please be sure to check closed issues as well as the issue may have been recently fixed.
 
-An ideal bug report would include a pull request with failing specs.
+If you've determined that your issue has not already been reported, please follow these guidelines when submitting an issue:
+
+. Use an actionable title that identifies the behavior you want, such as "`Allow attributes to be defined per list item`".
+. Add a description that explains your use case and why this behavior will help you achieve your goal.
+. If your change involves AsciiDoc syntax, please provide a sample AsciiDoc document that can be used to better understand the scenario and for use in testing.
+Also include any details that may help reproduce the bug, including your gem version, Ruby version, and operating system.
++
+Since Asciidoctor is a text processor, it's really important that you submit a sample document so we can reproduce the scenario.
+If the sample document or code sample is very long, you can put it in a {uri-gist}[Gist] and link to it.
+. An ideal bug report would also include a pull request with at least one failing spec.
+However, we recognize that not everyone who uses Asciidctor is a Ruby programmer, or even a programmer.
+So we do not expect you to include a pull request with your issue.
+
+Condescending or disparaging remarks have no place in this issue tracker and will result in your issue being rejected.
+You can be critical, but keep it positive and constructive.
+Stick with actionable language that describes what you would like the software to do.
+
+Be mindful of the fact that this project is maintained by volunteers and built on a foundation of trust.
+Please respect the work of those who have volunteered their time and effort to develop this project, and we will respect the time and effort you have taken to file an issue.
 
 == Submitting a Pull Request
 
