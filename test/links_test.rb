@@ -168,6 +168,16 @@ context 'Links' do
     assert_match(/l&#8217;<a href=/, output)
   end
 
+  test 'should convert qualified url as macro enclosed in double quotes' do
+    output = convert_string_to_embedded('"https://asciidoctor.org[]"')
+    assert_include '"<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>"', output
+  end
+
+  test 'should convert qualified url as macro enclosed in single quotes' do
+    output = convert_string_to_embedded('\'https://asciidoctor.org[]\'')
+    assert_include '\'<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>\'', output
+  end
+
   test 'qualified url using invalid link macro should not create link' do
     assert_xpath '//a', convert_string('link:http://asciidoc.org is the project page for AsciiDoc.'), 0
   end
