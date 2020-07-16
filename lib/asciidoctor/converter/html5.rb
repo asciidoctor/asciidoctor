@@ -21,7 +21,7 @@ class Converter::Html5Converter < Converter::Base
     #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
-  DropAnchorRx = /<(?:a[^>]+|\/a)>/
+  DropAnchorRx = /<(?:a\b[^>]*|\/a)>/
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
