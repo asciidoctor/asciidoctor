@@ -288,15 +288,16 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.title}
 .br) if node.title?
 
+    start = (node.attr 'start', 1).to_i
     node.items.each_with_index do |item, idx|
       result << %(.sp
 .RS 4
 .ie n \\{\\
-\\h'-04' #{idx + 1}.\\h'+01'\\c
+\\h'-04' #{numeral = idx + start}.\\h'+01'\\c
 .\\}
 .el \\{\\
 .  sp -1
-.  IP " #{idx + 1}." 4.2
+.  IP " #{numeral}." 4.2
 .\\}
 #{manify item.text, whitespace: :normalize})
       result << item.content if item.blocks?

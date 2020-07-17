@@ -272,6 +272,20 @@ context 'Manpage' do
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
+    test 'should honor start attribute on ordered list' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      [start=5]
+      . five
+      . six
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_match %r/IP " 5\.".*five/m, output
+      assert_match %r/IP " 6\.".*six/m, output
+    end
+
     test 'should collapse whitespace in the man manual and man source' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
