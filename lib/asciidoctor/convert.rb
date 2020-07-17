@@ -128,11 +128,14 @@ module Asciidoctor
       if !stream_output && doc.safe < SafeMode::SECURE && (doc.attr? 'linkcss') && (doc.attr? 'copycss') &&
           (doc.basebackend? 'html') && !((stylesdir = (doc.attr 'stylesdir')) && (Helpers.uriish? stylesdir))
         if (stylesheet = doc.attr 'stylesheet')
-          if DEFAULT_STYLESHEET_KEYS.include? stylesheet
-            copy_asciidoctor_stylesheet = true
-          elsif !(Helpers.uriish? stylesheet)
-            copy_user_stylesheet = true
-          end
+          stylesheets = if stylesheet.include? ';'
+                          (stylesheet.split ';').map {|v| v.strip }.reject {|v| v.empty? }
+                        else
+                          [stylesheet]
+                        end
+          copy_asciidoctor_stylesheet = !(DEFAULT_STYLESHEET_KEYS & stylesheets).empty?
+          user_stylesheets = stylesheets.reject {|v| (DEFAULT_STYLESHEET_KEYS.include? v) || (Helpers.uriish? v) }
+          copy_user_stylesheet = !user_stylesheets.empty?
         end
         copy_syntax_hl_stylesheet = (syntax_hl = doc.syntax_highlighter) && (syntax_hl.write_stylesheet? doc)
         if copy_asciidoctor_stylesheet || copy_user_stylesheet || copy_syntax_hl_stylesheet
@@ -147,17 +150,19 @@ module Asciidoctor
             Stylesheets.instance.write_primary_stylesheet stylesoutdir
           # FIXME should Stylesheets also handle the user stylesheet?
           elsif copy_user_stylesheet
-            if (stylesheet_src = doc.attr 'copycss').empty?
-              stylesheet_src = doc.normalize_system_path stylesheet
-            else
-              # NOTE in this case, copycss is a source location (but cannot be a URI)
-              stylesheet_src = doc.normalize_system_path stylesheet_src
-            end
-            stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
-            # NOTE don't warn if src can't be read and dest already exists (see #2323)
-            if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
-                warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
-              ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
+            user_stylesheets.each do |user_stylesheet|
+              if (stylesheet_src = doc.attr 'copycss').empty?
+                stylesheet_src = doc.normalize_system_path user_stylesheet
+              else
+                # NOTE in this case, copycss is a source location (but cannot be a URI)
+                stylesheet_src = doc.normalize_system_path stylesheet_src
+              end
+              stylesheet_dest = doc.normalize_system_path user_stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
+              # NOTE don't warn if src can't be read and dest already exists (see #2323)
+              if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
+                  warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
+                ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
+              end
             end
           end
           syntax_hl.write_stylesheet doc, stylesoutdir if copy_syntax_hl_stylesheet
