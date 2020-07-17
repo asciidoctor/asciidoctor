@@ -38,6 +38,7 @@ Bug Fixes::
   * Escape ellipsis at start of line in manpage output (#3645) (*@jnavila*)
   * Don't register footnote with ID if a footnote is already registered with that ID (#3690)
   * Honor start attribute on ordered list in manpage output (#3714)
+  * Warn instead of crashing if SVG to inline is empty (#3638) (*@mogztter*)
 
 Compliance::
 

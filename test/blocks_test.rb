@@ -2214,6 +2214,21 @@ context 'Blocks' do
       assert_match(/<svg\s[^>]*width="100px">/, output, 1)
     end
 
+    test 'should not throw exception if SVG to inline is empty' do
+      input = 'image::empty.svg[nada,opts=inline]'
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'docdir' => testdir, 'imagesdir' => 'fixtures' }
+      assert_xpath '//svg', output, 0
+      assert_xpath '//span[@class="alt"][text()="nada"]', output, 1
+      assert_message @logger, :WARN, '~contents of SVG is empty:'
+    end
+
+    test 'should not throw exception if SVG to inline contains an incomplete start tag and explicit width is specified' do
+      input = 'image::incomplete.svg[,200,opts=inline]'
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'docdir' => testdir, 'imagesdir' => 'fixtures' }
+      assert_xpath '//svg', output, 1
+      assert_xpath '//span[@class="alt"]', output, 0
+    end
+
     test 'embeds remote inline SVG when allow-uri-read is set' do
       input = %(image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=inline])
       output = using_test_webserver do
