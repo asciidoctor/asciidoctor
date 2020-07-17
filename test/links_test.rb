@@ -940,9 +940,36 @@ context 'Links' do
     == <<s1>>
     EOS
 
-    # NOTE this output is nonsensical, but we still need to verify the scenario
     output = convert_string_to_embedded input
-    assert_xpath '//a[@href="#DNE"][text()="[DNE]"]', output, 2
+    assert_xpath '//h2[@id="s1"]/a[@href="#DNE"][text()="[DNE]"]', output, 1
+    assert_xpath '//h2/a[@href="#s1"][text()="[DNE]"]', output, 1
+  end
+
+  test 'should break circular xref reference in section title' do
+    input = <<~'EOS'
+    [#a]
+    == A <<b>>
+
+    [#b]
+    == B <<a>>
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_includes output, '<h2 id="a">A <a href="#b">B [a]</a></h2>'
+    assert_includes output, '<h2 id="b">B <a href="#a">[a]</a></h2>'
+  end
+
+  test 'should drop nested anchor in xreftext' do
+    input = <<~'EOS'
+    [#a]
+    == See <<b>>
+
+    [#b]
+    == Consult https://google.com[Google]
+    EOS
+
+    output = convert_string_to_embedded input
+    assert_includes output, '<h2 id="a">See <a href="#b">Consult Google</a></h2>'
   end
 
   test 'should not resolve forward xref evaluated during parsing' do
