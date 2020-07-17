@@ -542,14 +542,17 @@ module Substitutors
         end
 
         prefix, suffix = $1, ''
-        # NOTE if $4 is set, then we're looking at a formal macro
+        # NOTE if $4 is set, we're looking at a formal macro (e.g., https://example.org[])
         if $4
           prefix = '' if prefix == 'link:'
           text = $4
         else
-          # invalid macro syntax (link: prefix w/o trailing square brackets)
-          # FIXME we probably shouldn't even get here...our regex is doing too much
-          next $& if prefix == 'link:'
+          # invalid macro syntax (link: prefix w/o trailing square brackets or enclosed in double quotes)
+          # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
+          case prefix
+          when 'link:', ?", ?'
+            next $&
+          end
           text = ''
           case $3
           when ')'

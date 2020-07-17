@@ -57,6 +57,7 @@ Improvements::
   * Allow template to be used to override outline by only specifying the outline template (#3491)
   * Upgrade MathJax from 2.7.5 to 2.7.6
   * Skip unused default attribute assigments for embedded document
+  * Allow a URL macro to have a preceding single or double quote (#3376)
 
 Build / Infrastructure::
 
