@@ -140,6 +140,22 @@ context 'Manpage' do
       end
     end
 
+    test 'should break circular reference in section title' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      [#a]
+      == A <<b>>
+
+      [#b]
+      == B <<a>>
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_match %r/^\.SH "A B \[A\]"$/, output
+      assert_match %r/^\.SH "B \[A\]"$/, output
+    end
+
     test 'should define default linkstyle' do
       input = SAMPLE_MANPAGE_HEADER
       output = Asciidoctor.convert input, backend: :manpage, standalone: true
