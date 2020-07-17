@@ -45,6 +45,7 @@ Compliance::
 
   * Add support for muted option to self-hosted video (#3408)
   * Move style tag for convert-time syntax highlighters (coderay, rouge, pygments) into head (#3462)
+  * Move style tag for client-side syntax highlighers (highlight.js, prettify) into head (#3503)
   * Define entry point API methods (load, convert, load_file, convert_file) as class methods instead of module_function to avoid conflict with Kernel.load (#3625)
 
 Improvements::

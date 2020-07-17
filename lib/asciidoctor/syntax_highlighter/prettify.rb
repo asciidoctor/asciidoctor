@@ -14,14 +14,17 @@ class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
   end
 
   def docinfo? location
-    location == :footer
+    true
   end
 
   def docinfo location, doc, opts
     base_url = doc.attr 'prettifydir', %(#{opts[:cdn_base_url]}/prettify/r298)
-    prettify_theme_url = ((prettify_theme = doc.attr 'prettify-theme', 'prettify').start_with? 'http://', 'https://') ? prettify_theme : %(#{base_url}/#{prettify_theme}.min.css)
-    %(<link rel="stylesheet" href="#{prettify_theme_url}"#{opts[:self_closing_tag_slash]}>
-<script src="#{base_url}/run_prettify.min.js"></script>)
+    if location == :head
+      prettify_theme_url = ((prettify_theme = doc.attr 'prettify-theme', 'prettify').start_with? 'http://', 'https://') ? prettify_theme : %(#{base_url}/#{prettify_theme}.min.css)
+      %(<link rel="stylesheet" href="#{prettify_theme_url}"#{opts[:self_closing_tag_slash]}>)
+    else # :footer
+      %(<script src="#{base_url}/run_prettify.min.js"></script>)
+    end
   end
 end
 end
