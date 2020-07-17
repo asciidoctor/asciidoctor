@@ -577,7 +577,7 @@ context 'Syntax Highlighter' do
       assert_css 'pre.highlightjs.highlight', output, 1
       assert_css 'pre.highlightjs.highlight > code.language-html.hljs[data-lang="html"]', output, 1
       assert_includes output, '&lt;p&gt;Highlight me!&lt;/p&gt;'
-      assert_css '#footer ~ link[href*="highlight.js"]', output, 1
+      assert_css 'head > link[href*="highlight.js"]', output, 1
       assert_css '#footer ~ script[src*="highlight.min.js"]', output, 1
       assert_xpath '//script[text()="hljs.initHighlighting()"]', output, 1
     end
