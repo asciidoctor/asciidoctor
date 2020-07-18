@@ -479,7 +479,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
     autoplay_attribute = (node.option? 'autoplay') ?%( autoplay="true") : ''
-    media_uri = node.video_uri(node.attr 'target')
+    media_uri = node.video_uri(node.attr('target'), true)
     mediaobject = %(<mediaobject>
 <videoobject>
 <videodata fileref="#{media_uri}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}#{autoplay_attribute}/>

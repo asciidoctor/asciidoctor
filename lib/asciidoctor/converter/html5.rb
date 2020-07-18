@@ -1026,7 +1026,7 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    video_uri = node.video_uri(node.attr 'target')
+    video_uri = node.video_uri(node.attr('target'), true)
     case node.attr 'poster'
     when 'vimeo'
       %(<div#{id_attribute}#{class_attribute}>#{title_element}

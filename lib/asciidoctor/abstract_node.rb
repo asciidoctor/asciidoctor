@@ -324,10 +324,11 @@ class AbstractNode
 
   # Public: Construct a URI reference to the video media.
   #
-  # target - A String reference to the target media
+  # target     - A String reference to the target media
+  # encode_uri - A Boolean that indicates whether we should encode entities (i.e. replace "&" by "&amp;") (default: false)
   #
   # Returns A String reference for the video media
-  def video_uri target
+  def video_uri target, entity_encode = false
     case attr 'poster'
     when 'vimeo'
       unless (asset_uri_scheme = (@document.attr 'asset-uri-scheme', 'https')).empty?
@@ -335,45 +336,47 @@ class AbstractNode
       end
       start_anchor = (attr? 'start') ? %(#at=#{attr 'start'}) : ''
       delimiter = ['?']
-      autoplay_param = (option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoplay=1) : ''
-      loop_param = (option? 'loop') ? %(#{delimiter.pop || '&amp;'}loop=1) : ''
-      muted_param = (option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
+      query_string_delimiter = entity_encode ? '&amp;' : '&'
+      autoplay_param = (option? 'autoplay') ? %(#{delimiter.pop || query_string_delimiter}autoplay=1) : ''
+      loop_param = (option? 'loop') ? %(#{delimiter.pop || query_string_delimiter}loop=1) : ''
+      muted_param = (option? 'muted') ? %(#{delimiter.pop || query_string_delimiter}muted=1) : ''
       "#{asset_uri_scheme}//player.vimeo.com/video/#{target}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}"
     when 'youtube'
       unless (asset_uri_scheme = (@document.attr 'asset-uri-scheme', 'https')).empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
+      query_string_delimiter = entity_encode ? '&amp;' : '&'
       rel_param_val = (option? 'related') ? 1 : 0
       # NOTE start and end must be seconds (t parameter allows XmYs where X is minutes and Y is seconds)
-      start_param = (attr? 'start') ? %(&amp;start=#{attr 'start'}) : ''
-      end_param = (attr? 'end') ? %(&amp;end=#{attr 'end'}) : ''
-      autoplay_param = (option? 'autoplay') ? '&amp;autoplay=1' : ''
-      loop_param = (has_loop_param = option? 'loop') ? '&amp;loop=1' : ''
-      mute_param = (option? 'muted') ? '&amp;mute=1' : ''
-      controls_param = (option? 'nocontrols') ? '&amp;controls=0' : ''
+      start_param = (attr? 'start') ? %(#{query_string_delimiter}start=#{attr 'start'}) : ''
+      end_param = (attr? 'end') ? %(#{query_string_delimiter}end=#{attr 'end'}) : ''
+      autoplay_param = (option? 'autoplay') ? %(#{query_string_delimiter}autoplay=1) : ''
+      loop_param = (has_loop_param = option? 'loop') ? %(#{query_string_delimiter}loop=1) : ''
+      mute_param = (option? 'muted') ? %(#{query_string_delimiter}mute=1) : ''
+      controls_param = (option? 'nocontrols') ? %(#{query_string_delimiter}controls=0) : ''
       # cover both ways of controlling fullscreen option
       if option? 'nofullscreen'
-        fs_param = '&amp;fs=0'
+        fs_param = %(#{query_string_delimiter}fs=0)
       else
         fs_param = ''
       end
-      modest_param = (option? 'modest') ? '&amp;modestbranding=1' : ''
-      theme_param = (attr? 'theme') ? %(&amp;theme=#{attr 'theme'}) : ''
-      hl_param = (attr? 'lang') ? %(&amp;hl=#{attr 'lang'}) : ''
+      modest_param = (option? 'modest') ? %(#{query_string_delimiter}modestbranding=1) : ''
+      theme_param = (attr? 'theme') ? %(#{query_string_delimiter}theme=#{attr 'theme'}) : ''
+      hl_param = (attr? 'lang') ? %(#{query_string_delimiter}hl=#{attr 'lang'}) : ''
 
       # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
       target, list = target.split '/', 2
       if (list ||= (attr 'list'))
-        list_param = %(&amp;list=#{list})
+        list_param = %(#{query_string_delimiter}list=#{list})
       else
         # parse dynamic playlist syntax: video_id1,video_id2,...
         target, playlist = target.split ',', 2
         if (playlist ||= (attr 'playlist'))
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
-          list_param = %(&amp;playlist=#{playlist})
+          list_param = %(#{query_string_delimiter}playlist=#{playlist})
         else
           # NOTE for loop to work, playlist must be specified; use VIDEO_ID if there's no explicit playlist
-          list_param = has_loop_param ? %(&amp;playlist=#{target}) : ''
+          list_param = has_loop_param ? %(#{query_string_delimiter}playlist=#{target}) : ''
         end
       end
       "#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}"
