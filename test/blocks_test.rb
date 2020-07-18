@@ -890,7 +890,7 @@ context 'Blocks' do
       input = <<~'EOS'
       [%collapsible]
       ====
-      This content is revealed when the user clicks the words "Toggle Me".
+      This content is revealed when the user clicks the words "Details".
       ====
       EOS
 
@@ -898,6 +898,33 @@ context 'Blocks' do
       assert_css 'details', output, 1
       assert_css 'details > summary.title', output, 1
       assert_xpath '//details/summary[text()="Details"]', output, 1
+    end
+
+    test 'should not allow collapsible block to increment example number' do
+      input = <<~'EOS'
+      .Before
+      ====
+      before
+      ====
+
+      .Show Me The Goods
+      [%collapsible]
+      ====
+      This content is revealed when the user clicks the words "Show Me The Goods".
+      ====
+
+      .After
+      ====
+      after
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//*[@class="title"][text()="Example 1. Before"]', output, 1
+      assert_xpath '//*[@class="title"][text()="Example 2. After"]', output, 1
+      assert_css 'details', output, 1
+      assert_css 'details > summary.title', output, 1
+      assert_xpath '//details/summary[text()="Show Me The Goods"]', output, 1
     end
 
     test 'should warn if example block is not terminated' do
