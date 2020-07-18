@@ -3,7 +3,6 @@ module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # consistent with the html5 backend from AsciiDoc Python.
 class Converter::Html5Converter < Converter::Base
-  include Media
   register_for 'html5'
 
   (QUOTE_TAGS = {
@@ -1027,7 +1026,7 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    video_uri = video_uri node
+    video_uri = node.video_uri(node.attr 'target')
     case node.attr 'poster'
     when 'vimeo'
       %(<div#{id_attribute}#{class_attribute}>#{title_element}

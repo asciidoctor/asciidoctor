@@ -548,7 +548,6 @@ require_relative 'asciidoctor/core_ext'
 # modules and helpers
 require_relative 'asciidoctor/helpers'
 require_relative 'asciidoctor/logging'
-require_relative 'asciidoctor/media'
 require_relative 'asciidoctor/rx'
 require_relative 'asciidoctor/substitutors'
 require_relative 'asciidoctor/version'

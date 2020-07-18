@@ -3,7 +3,6 @@ module Asciidoctor
 # A built-in {Converter} implementation that generates DocBook 5 output. The output is inspired by the output produced
 # by the docbook45 backend from AsciiDoc Python, except it has been migrated to the DocBook 5 specification.
 class Converter::DocBook5Converter < Converter::Base
-  include Media
   register_for 'docbook5'
 
   # default represents variablelist
@@ -480,7 +479,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
     autoplay_attribute = (node.option? 'autoplay') ?%( autoplay="true") : ''
-    media_uri = video_uri node
+    media_uri = node.video_uri(node.attr 'target')
     mediaobject = %(<mediaobject>
 <videoobject>
 <videodata fileref="#{media_uri}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}#{autoplay_attribute}/>
