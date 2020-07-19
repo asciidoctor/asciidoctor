@@ -858,6 +858,7 @@ class Parser
       when :literal
         block = build_block(block_context, :verbatim, terminator, parent, reader, attributes)
       when :example
+        attributes['caption'] = '' if attributes['collapsible-option']
         block = build_block(block_context, :compound, terminator, parent, reader, attributes)
       when :quote, :verse
         AttributeList.rekey(attributes, [nil, 'attribution', 'citetitle'])

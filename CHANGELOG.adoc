@@ -40,6 +40,7 @@ Bug Fixes::
   * Honor start attribute on ordered list in manpage output (#3714)
   * Warn instead of crashing if SVG to inline is empty (#3638) (*@mogztter*)
   * Compute highlight line ranges on source block relative to value of start attribute (#3519) (*@mogztter*)
+  * Prevent collapsible block from incrementing example number by assigning an empty caption (#3639)
 
 Compliance::
 
