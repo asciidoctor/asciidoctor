@@ -457,7 +457,7 @@ Source repository (git):: {uri-repo}
 Issue tracker:: {uri-issues}
 Asciidoctor organization on GitHub:: {uri-org}
 
-== License
+== Copyright and License
 
 Copyright (C) 2012-2020 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 Use of this software is granted under the terms of the MIT License.
@@ -470,6 +470,10 @@ See the {uri-license}[LICENSE] for the full license text.
 The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and based on {uri-prototype}[a prototype] written by https://github.com/nickh[Nick Hengeveld].
 
 *AsciiDoc* was started and maintained by Stuart Rackham from https://github.com/asciidoc/asciidoc/blob/master/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc/asciidoc/graphs/contributors[AsciiDoc community].
+
+== Trademarks
+
+AsciiDoc is a Trademark of the Eclipse Foundation, Inc.
 
 ifndef::env-site[]
 == Changelog
