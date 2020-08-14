@@ -1873,9 +1873,12 @@ context 'Substitutions' do
 
     context 'Math macros' do
       test 'should passthrough text in asciimath macro and surround with AsciiMath delimiters' do
-        input = 'asciimath:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
-        para = block_from_string input
-        assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+        using_memory_logger do |logger|
+          input = 'asciimath:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+          para = block_from_string input, attributes: { 'attribute-missing' => 'warn' }
+          assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+          assert logger.empty?
+        end
       end
 
       test 'should not recognize asciimath macro with no content' do
@@ -2019,9 +2022,12 @@ context 'Substitutions' do
           { 'stem' => 'asciimath' },
           { 'stem' => 'bogus' },
         ].each do |attributes|
-          input = 'stem:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
-          para = block_from_string input, attributes: attributes
-          assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+          using_memory_logger do |logger|
+            input = 'stem:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
+            para = block_from_string input, attributes: (attributes.merge 'attribute-missing' => 'warn')
+            assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
+            assert logger.empty?
+          end
         end
       end
 
