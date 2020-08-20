@@ -1174,9 +1174,15 @@ Your browser does not support the video tag.
     end
   end
 
+  # Convert {AbstractNode}s with the {AbstractNode.node_name} +"inline_image"+ to their associated _HTML_ markup
+  #
+  # node  - the {AbstractNode} to convert
+  #
+  # Returns (String) stringified _HTML_ markup representing the inline image node
   def convert_inline_image node
     if (type = node.type || 'image') == 'icon' && (node.document.attr? 'icons', 'font')
-      class_attr_val = %(fa fa-#{node.target})
+      icon_style = node.attr('style', node.document.attr('icon_style',''))[0]
+      class_attr_val = %(fa#{icon_style} fa-#{node.target})
       { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
         class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
       end

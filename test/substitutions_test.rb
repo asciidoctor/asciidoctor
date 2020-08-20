@@ -863,34 +863,63 @@ context 'Substitutions' do
       end
     end
 
-    test 'an icon macro should be interpreted as an icon if icons are enabled' do
-      para = block_from_string 'icon:github[]', attributes: { 'icons' => '' }
-      assert_equal %{<span class="icon"><img src="./images/icons/github.png" alt="github"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+    context 'icon macro' do
+      test 'an icon macro should be interpreted as an icon if icons are enabled' do
+        para = block_from_string 'icon:github[]', attributes: { 'icons' => '' }
+        assert_equal %{<span class="icon"><img src="./images/icons/github.png" alt="github"></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro should be interpreted as alt text if icons are disabled' do
-      para = block_from_string 'icon:github[]'
-      assert_equal %{<span class="icon">[github]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      test 'an icon macro should be interpreted as alt text if icons are disabled' do
+        para = block_from_string 'icon:github[]'
+        assert_equal %{<span class="icon">[github]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro should output alt text if icons are disabled and alt is given' do
-      para = block_from_string 'icon:github[alt="GitHub"]'
-      assert_equal %{<span class="icon">[GitHub]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      test 'an icon macro should output alt text if icons are disabled and alt is given' do
+        para = block_from_string 'icon:github[alt="GitHub"]'
+        assert_equal %{<span class="icon">[GitHub]</span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro should be interpreted as a font-based icon when icons=font' do
-      para = block_from_string 'icon:github[]', attributes: { 'icons' => 'font' }
-      assert_equal %{<span class="icon"><i class="fa fa-github"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      context 'font-based icon' do
+        test 'an icon macro should be interpreted as a font-based icon when icons=font' do
+          para = block_from_string 'icon:github[]', attributes: { 'icons' => 'font' }
+          assert_equal %{<span class="icon"><i class="fa fa-github"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
 
-    test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
-      para = block_from_string 'icon:github[4x]', attributes: { 'icons' => 'font' }
-      assert_equal %{<span class="icon"><i class="fa fa-github fa-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+        test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
+          para = block_from_string 'icon:github[4x]', attributes: { 'icons' => 'font' }
+          assert_equal %{<span class="icon"><i class="fa fa-github fa-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
 
-    test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
-      para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
-      assert_equal %{<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
+          para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
+          assert_equal %{<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+
+        test 'an icon macro interpreted as a font-based icon should have an icon style based on the abreviated icon_style document attribute value' do
+          para = block_from_string 'icon:sass[]', attributes: { 'icons' => 'font', 'icon_style' => 'b' }
+          assert_equal %{<span class="icon"><i class="fab fa-sass"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+
+        test 'an icon macro interpreted as a font-based icon should have an icon style based on the icon_style document attribute value' do
+          para = block_from_string 'icon:sass[]', attributes: { 'icons' => 'font', 'icon_style' => 'brand' }
+          assert_equal %{<span class="icon"><i class="fab fa-sass"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+
+        test 'an icon macro interpreted as a font-based icon should have an icon style based on the abreviated style macro attribute value' do
+          para = block_from_string 'icon:sass[style="b"]', attributes: { 'icons' => 'font' }
+          assert_equal %{<span class="icon"><i class="fab fa-sass"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+
+        test 'an icon macro interpreted as a font-based icon should have an icon style based on the style macro attribute value' do
+          para = block_from_string 'icon:sass[style="brand"]', attributes: { 'icons' => 'font' }
+          assert_equal %{<span class="icon"><i class="fab fa-sass"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+
+        test 'an icon macro interpreted as a font-based icon should prioratiset the icon style macro attribute value over the icon_style document attribute value' do
+          para = block_from_string 'icon:sass[style="brand"]', attributes: { 'icons' => 'font', 'icon_style' => 'light' }
+          assert_equal %{<span class="icon"><i class="fab fa-sass"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
+        end
+      end
     end
 
     test 'a single-line footnote macro should be registered and output as a footnote' do
