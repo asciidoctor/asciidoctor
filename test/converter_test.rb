@@ -241,7 +241,7 @@ context 'Converter' do
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
         assert_kind_of Tilt::ERBTemplate, template
-        refute_kind_of Tilt::ErubisTemplate, template
+        refute_kind_of Tilt::ErubiTemplate, template
         assert_kind_of ::ERB, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
@@ -258,16 +258,15 @@ context 'Converter' do
       assert_equal expected_output, doc.convert
     end
 
-    test 'should load ERB templates using ErubisTemplate if eruby is set to erubis' do
-      doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/erb'), template_cache: false, eruby: 'erubis'
+    test 'should load ERB templates using ErubiTemplate if eruby is set to erubi' do
+      doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/erb'), template_cache: false, eruby: 'erubi'
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
-        assert_kind_of Tilt::ERBTemplate, template
-        assert_kind_of Tilt::ErubisTemplate, template
-        assert_kind_of ::Erubis::FastEruby, template.instance_variable_get('@engine')
+        assert_kind_of Tilt::ErubiTemplate, template
+        assert_kind_of ::Erubi::Engine, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
     end

@@ -673,9 +673,9 @@ context 'Invoker' do
   end
 
   test 'should set eRuby impl if specified' do
-    invoker = invoke_cli_to_buffer %w(--eruby erubis -o /dev/null)
+    invoker = invoke_cli_to_buffer %w(--eruby erubi -o /dev/null)
     doc = invoker.document
-    assert_equal 'erubis', doc.instance_variable_get('@options')[:eruby]
+    assert_equal 'erubi', doc.instance_variable_get('@options')[:eruby]
   end
 
   test 'should force default external encoding to UTF-8' do

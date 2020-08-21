@@ -257,6 +257,9 @@ class Converter::TemplateConverter < Converter::Base
     if !name || name == 'erb'
       require 'erb' unless defined? ::ERB.version
       [::Tilt::ERBTemplate, {}]
+    elsif name == 'erubi'
+      Helpers.require_library 'erubi' unless defined? ::Erubis::Engine
+      [::Tilt::ErubiTemplate, {}]
     elsif name == 'erubis'
       Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby
       [::Tilt::ErubisTemplate, { engine_class: ::Erubis::FastEruby }]
