@@ -20,9 +20,6 @@ matrix:
   - rvm: truffleruby-head
     # run against TruffleRuby nightly or if TruffleRuby is mentioned in commit message
     if: type = cron OR commit_message =~ /TruffleRuby/ OR commit_message =~ /truffleruby/
-    env:
-    # use 3g to avoid OutOfMemoryError when running the tests suite against TruffleRuby
-    - TRUFFLERUBYOPT="--vm.Xmx3g"
 env:
   global:
   # use system libraries to speed up installation of nokogiri
