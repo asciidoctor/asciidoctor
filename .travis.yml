@@ -3,6 +3,7 @@ git:
   # use depth 2 just in case two refs get pushed at once (like a tag)
   depth: 2
 language: ruby
+# always specify exact versions so we know which version we are testing
 rvm:
 - 2.7.0
 - &release_ruby 2.6.5
