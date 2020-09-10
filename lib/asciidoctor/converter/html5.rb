@@ -25,11 +25,11 @@ class Converter::Html5Converter < Converter::Base
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
-    SvgPreambleRx = /^#{CC_ALL}*?(?=<svg\b)/
-    SvgStartTagRx = /^<svg[^>]*>/
+    SvgPreambleRx = /^#{CC_ALL}*?(?=<svg[\s>])/
+    SvgStartTagRx = /^<svg(?:\s[^>]*)?>/
   else
-    SvgPreambleRx = /\A.*?(?=<svg\b)/m
-    SvgStartTagRx = /\A<svg[^>]*>/
+    SvgPreambleRx = /\A.*?(?=<svg[\s>])/m
+    SvgStartTagRx = /\A<svg(?:\s[^>]*)?>/
   end
   DimensionAttributeRx = /\s(?:width|height|style)=(["'])#{CC_ANY}*?\1/
 
