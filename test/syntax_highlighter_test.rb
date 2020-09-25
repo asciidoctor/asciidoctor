@@ -579,7 +579,7 @@ context 'Syntax Highlighter' do
       assert_includes output, '&lt;p&gt;Highlight me!&lt;/p&gt;'
       assert_css 'head > link[href*="highlight.js"]', output, 1
       assert_css '#footer ~ script[src*="highlight.min.js"]', output, 1
-      assert_xpath '//script[text()="hljs.initHighlighting()"]', output, 1
+      assert_xpath '//script[contains(text(), "hljs.highlightBlock(el)")]', output, 1
     end
 
     test 'should add language-none class to source block when source-highlighter is highlight.js and language is not set' do
