@@ -564,6 +564,19 @@ context 'Syntax Highlighter' do
   end
 
   context 'Highlight.js' do
+    test 'should add data-lang as last attribute on code tag when source-highlighter is highlight.js' do
+      input = <<~'EOS'
+      :source-highlighter: highlight.js
+
+      [source,ruby]
+      ----
+      puts 'Hello, World!'
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe
+      assert_includes output, '<code class="language-ruby hljs" data-lang="ruby">'
+    end
+
     test 'should include remote highlight.js assets if source-highlighter attribute is highlight.js' do
       input = <<~'EOS'
       :source-highlighter: highlight.js
