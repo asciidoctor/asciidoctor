@@ -368,6 +368,19 @@ context 'Tables' do
       assert_css 'table colgroup col[style]', output, 0
     end
 
+    test 'can assign docbook table a width' do
+      input = <<~'EOS'
+      [cols="4*~",width=50%]
+      |=======
+      |A |B |C |D
+      |a |b |c |d
+      |1 |2 |3 |4
+      |=======
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook5'
+      assert_xpath '/informaltable[@width="50%"]', output, 1
+    end
+
     test 'equally distributes remaining column width to autowidth columns in DocBook output' do
       input = <<~'EOS'
       [cols="15%,3*~"]
