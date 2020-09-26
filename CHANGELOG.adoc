@@ -41,6 +41,7 @@ Bug Fixes::
   * Warn instead of crashing if SVG to inline is empty (#3638) (*@mogztter*)
   * Compute highlight line ranges on source block relative to value of start attribute (#3519) (*@mogztter*)
   * Prevent collapsible block from incrementing example number by assigning an empty caption (#3639)
+  * Use custom init function for highlight.js to select the correct `code` elements (#3761)
 
 Compliance::
 
