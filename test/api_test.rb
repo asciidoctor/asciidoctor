@@ -1153,6 +1153,23 @@ context 'API' do
       refute_empty styles.strip
     end
 
+    test 'should embed remote stylesheet by default if SafeMode is less than SECURE and allow-uri-read is set' do
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = using_test_webserver do
+        Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, standalone: true, attributes: { 'allow-uri-read' => '', 'stylesheet' => %(http://#{resolve_localhost}:9876/fixtures/custom.css) }
+      end
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.content
+      refute_nil styles
+      refute_empty styles.strip
+      assert_include 'color: green', styles
+    end
+
     test 'should not allow linkcss be unset from document if SafeMode is SECURE or greater' do
       input = <<~'EOS'
       = Document Title
@@ -1242,6 +1259,40 @@ context 'API' do
       styles = stylenode.content
       refute_nil styles
       refute_empty styles.strip
+    end
+
+    test 'should embed custom remote stylesheet if SafeMode is less than SECURE and allow-uri-read is set' do
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = using_test_webserver do
+        Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, standalone: true, attributes: { 'allow-uri-read' => '', 'stylesheet' => %(http://#{resolve_localhost}:9876/fixtures/custom.css) }
+      end
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.content
+      refute_nil styles
+      refute_empty styles.strip
+      assert_include 'color: green', styles
+    end
+
+    test 'should embed custom stylesheet in remote stylesdir if SafeMode is less than SECURE and allow-uri-read is set' do
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = using_test_webserver do
+        Asciidoctor.convert input, safe: Asciidoctor::SafeMode::SERVER, standalone: true, attributes: { 'allow-uri-read' => '', 'stylesdir' => %(http://#{resolve_localhost}:9876/fixtures), 'stylesheet' => 'custom.css' }
+      end
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.content
+      refute_nil styles
+      refute_empty styles.strip
+      assert_include 'color: green', styles
     end
 
     test 'should convert source file and write result to adjacent file by default' do
