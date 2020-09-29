@@ -23,8 +23,6 @@ matrix:
     if: type = cron OR commit_message =~ /TruffleRuby/ OR commit_message =~ /truffleruby/
 env:
   global:
-  # use system libraries to speed up installation of nokogiri
-  - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
   - PYGMENTS_VERSION='~> 1.2.0'
   - SOURCE_DATE_EPOCH=1521504000
 script: bundle exec rake coverage test:all
