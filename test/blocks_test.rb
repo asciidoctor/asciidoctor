@@ -2755,6 +2755,40 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
       assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
+
+    test 'uses the attribute imagesdir on the node when resolving the image path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'imagesdir' => 'assets/img' }
+      image = Asciidoctor::Block.new doc, :image, source: nil, attributes: { 'imagesdir' => 'chapter-1/img' }
+      doc << image
+      image_uri = image.image_uri 'rainbow.png'
+      assert_equal image_uri, 'chapter-1/img/rainbow.png'
+    end
+
+    test 'uses the attribute imagesdir on the document (if this attribute is undefined on the node) when resolving the image path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'imagesdir' => 'assets/img' }
+      image = Asciidoctor::Block.new doc, :image, source: nil, attributes: {}
+      doc << image
+      image_uri = image.image_uri 'rainbow.png'
+      assert_equal image_uri, 'assets/img/rainbow.png'
+    end
+  end
+
+  context 'Icons' do
+    test 'uses the attribute iconsdir on the node when resolving the icon path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'iconsdir' => 'assets/icons' }
+      icon = Asciidoctor::Inline.new doc, :image, nil, type: 'icon', attributes: { 'iconsdir' => 'chapter-1/icons' }
+      doc << icon
+      icon_uri = icon.icon_uri 'wave'
+      assert_equal icon_uri, 'chapter-1/icons/wave.png'
+    end
+
+    test 'uses the attribute iconsdir on the document (if this attribute is undefined on the node) when resolving the icon path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'iconsdir' => 'assets/icons' }
+      icon = Asciidoctor::Inline.new doc, :image, nil, type: 'icon', attributes: {}
+      doc << icon
+      icon_uri = icon.icon_uri 'wave'
+      assert_equal icon_uri, 'assets/icons/wave.png'
+    end
   end
 
   context 'Media' do
@@ -2926,6 +2960,22 @@ context 'Blocks' do
       assert_css 'audio', output, 1
       assert_css 'audio[controls]', output, 1
       assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
+    end
+
+    test 'uses the attribute imagesdir on the node when resolving the video path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'imagesdir' => 'assets/media' }
+      video = Asciidoctor::Block.new doc, :video, source: nil, attributes: { 'imagesdir' => 'chapter-1/media' }
+      doc << video
+      video_uri = video.media_uri 'bear.mp4'
+      assert_equal video_uri, 'chapter-1/media/bear.mp4'
+    end
+
+    test 'uses the attribute imagesdir on the document (if this attribute is undefined on the node) when resolving the audio path from the target' do
+      doc = Asciidoctor::Document.new '', safe: Asciidoctor::SafeMode::SAFE, attributes: { 'imagesdir' => 'assets/mp3' }
+      audio = Asciidoctor::Block.new doc, :audio, source: nil, attributes: {}
+      doc << audio
+      audio_uri = audio.media_uri 'penguin.mp3'
+      assert_equal audio_uri, 'assets/mp3/penguin.mp3'
     end
   end
 

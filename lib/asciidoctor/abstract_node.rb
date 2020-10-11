@@ -309,16 +309,17 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri(target_image, asset_dir_key = 'imagesdir')
+    images_base = asset_dir_key ? (attr asset_dir_key, nil, true) : nil
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
-          (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
+          (images_base && (Helpers.uriish? images_base) &&
           (target_image = normalize_web_path target_image, images_base, false))
         (doc.attr? 'allow-uri-read') ? (generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')) : target_image
       else
         generate_data_uri target_image, asset_dir_key
       end
     else
-      normalize_web_path target_image, (asset_dir_key ? (doc.attr asset_dir_key) : nil)
+      normalize_web_path target_image, images_base
     end
   end
 
@@ -337,7 +338,7 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri(target, asset_dir_key = 'imagesdir')
-    normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
+    normalize_web_path target, (asset_dir_key ? (attr asset_dir_key, nil, true) : nil)
   end
 
   # Public: Generate a data URI that can be used to embed an image in the output document
@@ -360,7 +361,7 @@ class AbstractNode
     end
 
     if asset_dir_key
-      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
+      image_path = normalize_system_path(target_image, (attr asset_dir_key, nil, true), nil, target_name: 'image')
     else
       image_path = normalize_system_path(target_image)
     end

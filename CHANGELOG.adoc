@@ -52,6 +52,7 @@ Compliance::
 
 Improvements::
 
+  * Use the asset directory attribute (ie. `imagesdir` or `iconsdir`) on the node to resolve the asset path from the target (#3661) (*@mogztter*)
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
