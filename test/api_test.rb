@@ -39,6 +39,18 @@ context 'API' do
       assert_equal '.asciidoc', doc.attr('docfilesuffix')
     end
 
+    test 'wip should resolve :to_dir from path of output file on Windows' do
+      ['C:\\Windows\\Temp', 'C://Windows/Temp'].each do |to_dir|
+        sample_input_path = fixture_path 'sample.adoc'
+        sep = to_dir[2]
+        to_file = to_dir + sep + 'out.html'
+        #doc = Asciidoctor.convert_file sample_input_path, to_file: to_file, to_dir: to_dir, safe: :unsafe
+        doc = Asciidoctor.convert_file sample_input_path, to_file: to_file, safe: :unsafe
+        p [to_dir, to_file]
+        p doc.options
+      end
+    end
+
     test 'should coerce encoding of file to UTF-8' do
       old_external = Encoding.default_external
       old_internal = Encoding.default_internal

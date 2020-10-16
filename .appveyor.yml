@@ -9,11 +9,11 @@ environment:
   matrix:
   # see https://www.appveyor.com/docs/windows-images-software/#ruby for list of installed Ruby runtimes
   - RUBY_VERSION: '27'
-  - RUBY_VERSION: '27-x64'
-  - RUBY_VERSION: '26'
-  - RUBY_VERSION: '25'
-  - RUBY_VERSION: '24'
-  - RUBY_VERSION: '23'
+  #- RUBY_VERSION: '27-x64'
+  #- RUBY_VERSION: '26'
+  #- RUBY_VERSION: '25'
+  #- RUBY_VERSION: '24'
+  #- RUBY_VERSION: '23'
 init:
 # Prepend Ruby path from matrix while removing original Ruby entry (C:\Ruby193\bin)
 - set PATH=C:\Ruby%ruby_version%\bin;%PATH:C:\Ruby193\bin;=%
@@ -26,6 +26,7 @@ install:
 build_script:
 - bundle exec rake build
 test_script:
-- bundle exec rake test:all
+#- bundle exec rake test:all
+- bundle exec ruby test/api_test.rb -n /wip/
 #artifacts:
 #- path: pkg\*.gem
