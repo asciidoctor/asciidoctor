@@ -1320,6 +1320,22 @@ context 'API' do
       end
     end
 
+    test 'should resolve :to_dir option correctly when both :to_dir and :to_file options are set to an absolute path' do
+      begin
+        sample_input_path = fixture_path 'sample.adoc' 
+        sample_output_file = Tempfile.new %w(out- .html)
+        sample_output_path = sample_output_file.path
+        sample_output_dir = File.dirname sample_output_path
+        sample_output_file.close
+        doc = Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, to_dir: sample_output_dir, safe: :unsafe
+        assert File.exist? sample_output_path
+        assert_equal sample_output_path, doc.options[:to_file]
+        assert_equal sample_output_dir, doc.options[:to_dir]
+      ensure
+        sample_output_file.close!
+      end
+    end
+
     test 'in_place option is ignored when to_file is specified' do
       sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('result.html')
