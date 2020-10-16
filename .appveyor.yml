@@ -3,10 +3,11 @@ version: '{build}'
 skip_tags: true
 clone_depth: 2
 environment:
+  APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
   PYGMENTS_VERSION: '~> 1.2.0'
   SOURCE_DATE_EPOCH: '1521504000'
   matrix:
-  # see https://www.appveyor.com/docs/linux-images-software/#ruby for list of installed Ruby runtimes
+  # see https://www.appveyor.com/docs/windows-images-software/#ruby for list of installed Ruby runtimes
   - RUBY_VERSION: '27'
   - RUBY_VERSION: '27-x64'
   - RUBY_VERSION: '26'
