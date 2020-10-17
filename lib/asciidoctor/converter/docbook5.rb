@@ -485,7 +485,7 @@ class Converter::DocBook5Converter < Converter::Base
     when :link
       %(<link xl:href="#{node.target}">#{node.text}</link>)
     when :bibref
-      %(<anchor#{common_attributes node.id, nil, "[#{node.reftext || node.id}]"}/>#{text})
+      %(<anchor#{common_attributes node.id, nil, (text = "[#{node.reftext || node.id}]")}/>#{text})
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil

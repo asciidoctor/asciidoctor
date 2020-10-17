@@ -3354,8 +3354,10 @@ context "Description lists (:dlist)" do
       assert_css 'bibliodiv > bibliomixed > bibliomisc', output, 2
       assert_css 'bibliodiv > bibliomixed:nth-child(1) > bibliomisc > anchor', output, 1
       assert_css 'bibliodiv > bibliomixed:nth-child(1) > bibliomisc > anchor[xreflabel="[taoup]"]', output, 1
+      assert_xpath '(//bibliomixed)[1]/bibliomisc/anchor[starts-with(following-sibling::text(), "[taoup] Eric")]', output, 1
       assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor', output, 1
       assert_css 'bibliodiv > bibliomixed:nth-child(2) > bibliomisc > anchor[xreflabel="[walsh-muellner]"]', output, 1
+      assert_xpath '(//bibliomixed)[2]/bibliomisc/anchor[starts-with(following-sibling::text(), "[walsh-muellner] Norman")]', output, 1
     end
 
     test 'should warn if a bibliography ID is already in use' do
@@ -3478,7 +3480,7 @@ context "Description lists (:dlist)" do
       EOS
 
       result = convert_string_to_embedded input, backend: :docbook
-      assert_includes result, '<anchor xml:id="Fowler_1997" xreflabel="[1]"/>'
+      assert_includes result, '<anchor xml:id="Fowler_1997" xreflabel="[1]"/>[1] Fowler'
     end
   end
 end
