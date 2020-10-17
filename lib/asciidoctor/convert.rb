@@ -63,7 +63,7 @@ module Asciidoctor
       elsif write_to_target
         if to_dir
           if to_file
-            options[:to_dir] = ::File.dirname ::File.expand_path ::File.join to_dir, to_file
+            options[:to_dir] = ::File.dirname ::File.expand_path to_file, to_dir
           else
             options[:to_dir] = ::File.expand_path to_dir
           end

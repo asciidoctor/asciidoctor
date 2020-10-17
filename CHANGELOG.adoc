@@ -42,6 +42,7 @@ Bug Fixes::
   * Compute highlight line ranges on source block relative to value of start attribute (#3519) (*@mogztter*)
   * Prevent collapsible block from incrementing example number by assigning an empty caption (#3639)
   * Use custom init function for highlight.js to select the correct `code` elements (#3761)
+  * Fix resolved value of :to_dir when both :to_file and :to_dir options are set to absolute paths (#3778)
 
 Compliance::
 
