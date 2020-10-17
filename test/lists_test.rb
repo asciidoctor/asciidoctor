@@ -3321,10 +3321,10 @@ context "Description lists (:dlist)" do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [bibliography]
-      - [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
-        Programming'. Addison-Wesley. ISBN 0-13-142901-9.
+      - [[[taoup]]] Eric Steven Raymond. _The Art of Unix
+        Programming_. Addison-Wesley. ISBN 0-13-142901-9.
       - [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
-        'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+        _DocBook - The Definitive Guide_. O'Reilly & Associates. 1999.
         ISBN 1-56592-580-7.
       EOS
       output = convert_string_to_embedded input
@@ -3334,18 +3334,17 @@ context "Description lists (:dlist)" do
       assert_css '.ulist.bibliography ul li p', output, 2
       assert_css '.ulist.bibliography ul li:nth-child(1) p a#taoup', output, 1
       assert_xpath '//a/*', output, 0
-      text = xmlnodes_at_xpath '(//a)[1]/following-sibling::text()', output, 1
-      assert text.text.start_with?('[taoup] ')
+      assert_xpath '(//a)[1][starts-with(following-sibling::text(), "[taoup] ")]', output, 1
     end
 
     test 'should convert bibliography list with proper semantics to DocBook' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       [bibliography]
-      - [[[taoup]]] Eric Steven Raymond. 'The Art of Unix
-        Programming'. Addison-Wesley. ISBN 0-13-142901-9.
+      - [[[taoup]]] Eric Steven Raymond. _The Art of Unix
+        Programming_. Addison-Wesley. ISBN 0-13-142901-9.
       - [[[walsh-muellner]]] Norman Walsh & Leonard Muellner.
-        'DocBook - The Definitive Guide'. O'Reilly & Associates. 1999.
+        _DocBook - The Definitive Guide_. O'Reilly & Associates. 1999.
         ISBN 1-56592-580-7.
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
@@ -3403,7 +3402,7 @@ context "Description lists (:dlist)" do
     test 'should not recognize bibliography anchor that begins with a digit' do
       input = <<~'EOS'
       [bibliography]
-      - [[[1984]]] George Orwell. '1984'. New American Library. 1950.
+      - [[[1984]]] George Orwell. _1984_. New American Library. 1950.
       EOS
 
       output = convert_string_to_embedded input
@@ -3414,7 +3413,7 @@ context "Description lists (:dlist)" do
     test 'should recognize bibliography anchor that contains a digit but does not start with one' do
       input = <<~'EOS'
       [bibliography]
-      - [[[_1984]]] George Orwell. '1984'. New American Library. 1950.
+      - [[[_1984]]] George Orwell. _1984_. New American Library. 1950.
       EOS
 
       output = convert_string_to_embedded input
@@ -3464,13 +3463,11 @@ context "Description lists (:dlist)" do
       assert_xpath '//a[@href="#Fowler_1997"]', result, 1
       assert_xpath '//a[@href="#Fowler_1997"][text()="[1]"]', result, 1
       assert_xpath '//a[@id="Fowler_1997"]', result, 1
-      fowler_1997_text = (xmlnodes_at_xpath '(//a[@id="Fowler_1997"])[1]/following-sibling::text()', result, 1).text
-      assert fowler_1997_text.start_with?('[1] ')
+      assert_xpath '(//a[@id="Fowler_1997"])[1][starts-with(following-sibling::text(), "[1] ")]', result, 1
       assert_xpath '//a[@href="#TMMM"]', result, 1
       assert_xpath '//a[@href="#TMMM"][text()="[TMMM]"]', result, 1
       assert_xpath '//a[@id="TMMM"]', result, 1
-      tmmm_text = (xmlnodes_at_xpath '(//a[@id="TMMM"])[1]/following-sibling::text()', result, 1).text
-      assert tmmm_text.start_with?('[TMMM] ')
+      assert_xpath '(//a[@id="TMMM"])[1][starts-with(following-sibling::text(), "[TMMM] ")]', result, 1
     end
 
     test 'should assign reftext of bibliography anchor to xreflabel in DocBook backend' do
