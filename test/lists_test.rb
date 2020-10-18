@@ -3413,7 +3413,7 @@ context "Description lists (:dlist)" do
     test 'should recognize bibliography anchor that contains a digit but does not start with one' do
       input = <<~'EOS'
       [bibliography]
-      - [[[_1984]]] George Orwell. _1984_. New American Library. 1950.
+      - [[[_1984]]] George Orwell. __1984__. New American Library. 1950.
       EOS
 
       output = convert_string_to_embedded input
