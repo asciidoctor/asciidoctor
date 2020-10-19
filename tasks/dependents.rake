@@ -2,11 +2,9 @@
 namespace :build do
   desc 'Trigger builds for all dependent projects on Travis CI and Github Actions'
   task :dependents do
-    if ENV['TRAVIS'].to_s == 'true'
-      next unless ENV['TRAVIS_PULL_REQUEST'].to_s == 'false' &&
-        ENV['TRAVIS_TAG'].to_s.empty? &&
-        (ENV['TRAVIS_JOB_NUMBER'].to_s.end_with? '.1')
-    end
+    next unless ENV['TRAVIS'].to_s == 'true' &&
+      ENV['TRAVIS_PULL_REQUEST'].to_s == 'false' &&
+      ENV['TRAVIS_TAG'].to_s.empty?
 
     if (commit_hash = ENV['TRAVIS_COMMIT'])
       commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
