@@ -12,10 +12,8 @@ rvm:
 matrix:
   include:
   - rvm: jruby-9.2.10.0
-    env: JRUBY_OPTS='--dev'
   - rvm: jruby-9.1.17.0
     dist: trusty
-    env: JRUBY_OPTS='--dev'
   - rvm: *oldest_ruby
     env: ROUGE_VERSION='~> 2.0.0'
   - rvm: truffleruby-20.2.0
