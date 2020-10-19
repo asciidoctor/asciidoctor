@@ -1,7 +1,6 @@
 dist: trusty
 git:
-  # use depth 2 just in case two refs get pushed at once (like a tag)
-  depth: 2
+  depth: 5 # use depth 5 to leave enough room for concurrent builds
 language: ruby
 # always specify exact versions so we know which version we are testing
 rvm:
