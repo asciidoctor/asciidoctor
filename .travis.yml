@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 git:
   depth: 5 # use depth 5 to leave enough room for concurrent builds
 language: ruby
