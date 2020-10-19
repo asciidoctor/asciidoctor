@@ -4,8 +4,8 @@ git:
 language: ruby
 # always specify exact versions so we know which version we are testing
 rvm:
-- 2.7.0
-- &release_ruby 2.6.5
+- &release_ruby 2.7.0
+- 2.6.5
 - 2.5.7
 - 2.4.9
 - &oldest_ruby 2.3.8
