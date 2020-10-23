@@ -58,7 +58,7 @@ class Table < AbstractBlock
     @rows = Rows.new
     @columns = []
 
-    @has_header_option = attributes['header-option'] ? true : false
+    @has_header_option = false
 
     # smells like we need a utility method here
     # to resolve an integer width from potential bogus input

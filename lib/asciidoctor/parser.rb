@@ -2274,9 +2274,13 @@ class Parser
     end
 
     skipped = table_reader.skip_blank_lines || 0
+    if attributes['header-option']
+      table.has_header_option = true
+    elsif skipped == 0 && !attributes['noheader-option']
+      implicit_header = true
+    end
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
-    implicit_header = true unless skipped > 0 || attributes['header-option'] || attributes['noheader-option']
 
     while (line = table_reader.read_line)
       if (beyond_first = (loop_idx += 1) > 0) && line.empty?
