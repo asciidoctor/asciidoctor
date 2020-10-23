@@ -2281,7 +2281,8 @@ class Parser
     if attributes['header-option']
       table.has_header_option = true
     elsif skipped == 0 && !attributes['noheader-option']
-      implicit_header = true
+      # NOTE: assume table has header until we know otherwise; if it doesn't (nil), cells in first row get reprocessed
+      table.has_header_option = implicit_header = true
     end
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
@@ -2304,7 +2305,7 @@ class Parser
             implicit_header_boundary = nil if implicit_header_boundary
           # otherwise, the cell continues from previous line
           elsif implicit_header_boundary && implicit_header_boundary == loop_idx
-            implicit_header, implicit_header_boundary = false, nil
+            table.has_header_option = implicit_header = implicit_header_boundary = nil
           end
         end
       end
@@ -2316,7 +2317,7 @@ class Parser
           if table_reader.has_more_lines? && table_reader.peek_line.empty?
             implicit_header_boundary = 1
           else
-            implicit_header = false
+            table.has_header_option = implicit_header = nil
           end
         end
       end
@@ -2367,7 +2368,7 @@ class Parser
           case format
           when 'csv'
             if parser_ctx.buffer_has_unclosed_quotes?
-              implicit_header, implicit_header_boundary = false, nil if implicit_header_boundary && loop_idx == 0
+              table.has_header_option = implicit_header = implicit_header_boundary = nil if implicit_header_boundary && loop_idx == 0
               parser_ctx.keep_cell_open
             else
               parser_ctx.close_cell true
@@ -2389,15 +2390,8 @@ class Parser
       end
     end
 
-    unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
-      table.assign_column_widths
-    end
-
-    if implicit_header
-      table.has_header_option = true
-      attributes['header-option'] = ''
-    end
-
+    table.assign_column_widths unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
+    attributes['header-option'] = '' if implicit_header
     table.partition_header_footer attributes
 
     table
