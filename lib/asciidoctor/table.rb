@@ -154,21 +154,17 @@ class Table < AbstractBlock
   # returns nothing
   def partition_header_footer(attrs)
     # set rowcount before splitting up body rows
-    @attributes['rowcount'] = @rows.body.size
+    num_body_rows = @attributes['rowcount'] = (body = @rows.body).size
 
-    num_body_rows = @rows.body.size
     if num_body_rows > 0 && @has_header_option
-      head = @rows.body.shift
-      num_body_rows -= 1
+      @rows.head = [(head = body.shift)]
       # styles aren't applied to header row
       head.each {|c| c.style = nil }
-      # QUESTION why does AsciiDoc use an array for head? is it
-      # possible to have more than one based on the syntax?
-      @rows.head = [head]
+      num_body_rows -= 1
     end
 
     if num_body_rows > 0 && attrs['footer-option']
-      @rows.foot = [@rows.body.pop]
+      @rows.foot = [body.pop]
     end
 
     nil
