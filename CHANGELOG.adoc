@@ -63,6 +63,7 @@ Improvements::
   * Skip unused default attribute assigments for embedded document
   * Allow a URL macro to have a preceding single or double quote (#3376)
   * Add support for erubi template engine; use it in place of erubis in test suite; note the use of erubis is deprecated (#3737)
+  * Download and embed remote custom stylesheet if allow-uri-read is set (#3765)
 
 Build / Infrastructure::
 
