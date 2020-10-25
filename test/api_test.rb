@@ -1652,7 +1652,7 @@ context 'API' do
       |===
       EOS
       table = (document_from_string input).blocks[0]
-      cell = Asciidoctor::Table::Cell.new table.rows.body[0][0].column, nil, {}
+      cell = Asciidoctor::Table::Cell.new table.rows.body[0][0].column, nil
       refute cell.style
       assert_same Asciidoctor::AbstractNode::NORMAL_SUBS, cell.subs
       assert_equal '', cell.text
