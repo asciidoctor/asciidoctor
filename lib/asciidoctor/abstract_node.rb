@@ -520,7 +520,7 @@ class AbstractNode
   # TODO refactor other methods in this class to use this method were possible (repurposing if necessary)
   def read_contents target, opts = {}
     doc = @document
-    contents = if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
+    if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
         (target = doc.path_resolver.web_path target, start))
       if doc.attr? 'allow-uri-read'
         Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
