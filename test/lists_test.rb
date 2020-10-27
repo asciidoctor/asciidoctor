@@ -839,6 +839,24 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
     end
 
+    test 'should allow closing square bracket in anchor at start of unordered list item text to be escaped' do
+      input = <<~'EOS'
+      The highest peak in the Front Range is <<grays-peak>>, which tops <<mount-evans>> by just a few feet.
+
+      * [[mount-evans,[Mount\] Evans]]At 14,271 feet, Mount Evans is the highest summit of the Chicago Peaks in the Front Range of the Rocky Mountains.
+      * [[grays-peak,Grays [Peak\]]]
+      Grays Peak rises to 14,278 feet, making it the highest summit in the Front Range of the Rocky Mountains.
+      EOS
+
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('mount-evans')
+      assert refs.key?('grays-peak')
+      output = doc.convert standalone: false
+      assert_xpath '(//p)[1]/a[@href="#grays-peak"][text()="Grays [Peak]"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="[Mount] Evans"]', output, 1
+    end
+
     test 'should discover anchor at start of ordered list item text and register it as a reference' do
       input = <<~'EOS'
       This is a cross-reference to <<step-2>>.
@@ -857,6 +875,26 @@ context "Bulleted lists (:ulist)" do
       output = doc.convert standalone: false
       assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step 2"]', output, 1
       assert_xpath '(//p)[1]/a[@href="#step-4"][text()="Step 4"]', output, 1
+    end
+
+    test 'should allow closing square bracket in anchor at start of ordered list item text to be escaped' do
+      input = <<~'EOS'
+      This is a cross-reference to <<step-2>>.
+      This is a cross-reference to <<step-3b>>.
+
+      . Ordered list, item 1, without anchor
+      . [[step-2,Step [2\]]]Ordered list, item 2, with anchor
+      . Ordered list, item 3, without anchor
+       .. [[step-3b,Step [3\]b]]Ordered list, item 3b, with anchor
+      EOS
+
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('step-2')
+      assert refs.key?('step-3b')
+      output = doc.convert standalone: false
+      assert_xpath '(//p)[1]/a[@href="#step-2"][text()="Step [2]"]', output, 1
+      assert_xpath '(//p)[1]/a[@href="#step-3b"][text()="Step [3]b"]', output, 1
     end
 
     test 'should discover anchor at start of callout list item text and register it as a reference' do

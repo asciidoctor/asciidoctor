@@ -396,20 +396,36 @@ context 'Links' do
     end
   end
 
-  test 'unescapes square bracket in reftext of anchor macro' do
-    input = <<~'EOS'
-    see <<foo>>
+  test 'unescapes square bracket at end of reftext in inline anchor' do
+    %w([[foo,ba[r\]]] anchor:foo[ba[r\]]).each do |variation|
+      input = <<~EOS
+      see <<foo>>
 
-    anchor:foo[b[a\]r]tex
-    EOS
-    result = convert_string_to_embedded input
-    assert_includes result, 'see <a href="#foo">b[a]r</a>'
+      #{variation}content
+      EOS
+      result = convert_string_to_embedded input
+      assert_includes result, 'see <a href="#foo">ba[r]</a>'
+    end
   end
 
-  test 'unescapes square bracket in reftext of anchor macro in DocBook output' do
-    input = 'anchor:foo[b[a\]r]'
-    result = convert_inline_string input, backend: :docbook
-    assert_equal '<anchor xml:id="foo" xreflabel="b[a]r"/>', result
+  test 'unescapes square bracket in middle of reftext in inline anchor' do
+    %w([[foo,b[a\]r]] anchor:foo[b[a\]r]).each do |variation|
+      input = <<~EOS
+      see <<foo>>
+
+      #{variation}content
+      EOS
+      result = convert_string_to_embedded input
+      assert_includes result, 'see <a href="#foo">b[a]r</a>'
+    end
+  end
+
+  test 'unescapes square bracket in reftext of inline anchor in DocBook output' do
+    %w([[foo,b[a\]r]] anchor:foo[b[a\]r]).each do |variation|
+      input = %(#{variation}text)
+      result = convert_inline_string input, backend: :docbook
+      assert_equal '<anchor xml:id="foo" xreflabel="b[a]r"/>text', result
+    end
   end
 
   test 'xref using angled bracket syntax' do

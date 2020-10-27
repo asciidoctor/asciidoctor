@@ -1131,7 +1131,10 @@ class Parser
   #
   # Returns nothing
   def self.catalog_inline_anchor id, reftext, node, location, doc = node.document
-    reftext = doc.sub_attributes reftext if reftext && (reftext.include? ATTR_REF_HEAD)
+    if reftext
+      reftext = reftext.gsub '\]', ']' if reftext.include? ']'
+      reftext = doc.sub_attributes reftext if reftext.include? ATTR_REF_HEAD
+    end
     unless doc.register :refs, [id, (Inline.new node, :anchor, reftext, type: :ref, id: id)]
       location = location.cursor if Reader === location
       logger.warn message_with_context %(id assigned to anchor already in use: #{id}), source_location: location
@@ -1150,6 +1153,7 @@ class Parser
     text.scan InlineAnchorScanRx do
       if (id = $1)
         if (reftext = $2)
+          reftext = reftext.gsub '\]', ']' if reftext.include? ']'
           next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
         end
       else

@@ -719,7 +719,9 @@ module Substitutors
 
         # NOTE reftext is only relevant for DocBook output; used as value of xreflabel attribute
         if (id = $2)
-          reftext = $3
+          if (reftext = $3) && (reftext.include? R_SB)
+            reftext = reftext.gsub ESC_R_SB, R_SB
+          end
         else
           id = $4
           if (reftext = $5) && (reftext.include? R_SB)
