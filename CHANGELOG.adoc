@@ -46,6 +46,7 @@ Bug Fixes::
   * Restore label in front of each bibliography entry in DocBook output that was dropped by fix for #3085 (#3782)
   * Don't apply border-collapse: separate to HTML for table blocks; fixes double border at boundary of colspan/rowspan (#3793) (*@ahus1*)
   * Don't remove right border on last table cell in row (#2563)
+  * Rework table borders to leverage border collapsing (apply frame border to table, grid border to cells, and selectively override border on cells to accommodate frame) (#3387)
 
 Compliance::
 
