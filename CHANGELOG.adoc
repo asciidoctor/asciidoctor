@@ -44,6 +44,7 @@ Bug Fixes::
   * Use custom init function for highlight.js to select the correct `code` elements (#3761)
   * Fix resolved value of :to_dir when both :to_file and :to_dir options are set to absolute paths (#3778)
   * Restore label in front of each bibliography entry in DocBook output that was dropped by fix for #3085 (#3782)
+  * Allow closing square bracket in reftext of inline anchor shorthand to be escaped (#3788)
 
 Compliance::
 
