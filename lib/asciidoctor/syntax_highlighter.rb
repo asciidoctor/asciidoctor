@@ -236,9 +236,11 @@ module SyntaxHighlighter
     def format node, lang, opts
       class_attr_val = opts[:nowrap] ? %(#{@pre_class} highlight nowrap) : %(#{@pre_class} highlight)
       if (transform = opts[:transform])
-        pre = { 'class' => class_attr_val }
-        code = lang ? { 'data-lang' => lang } : {}
-        transform[pre, code]
+        transform[(pre = { 'class' => class_attr_val }), (code = lang ? { 'data-lang' => lang } : {})]
+        # NOTE: make sure data-lang is the last attribute on the code tag to remain consistent with 1.5.x
+        if (lang = code.delete 'data-lang')
+          code['data-lang'] = lang
+        end
         %(<pre#{pre.map {|k, v| %[ #{k}="#{v}"] }.join}><code#{code.map {|k, v| %[ #{k}="#{v}"] }.join}>#{node.content}</code></pre>)
       else
         %(<pre class="#{class_attr_val}"><code#{lang ? %[ data-lang="#{lang}"] : ''}>#{node.content}</code></pre>)
