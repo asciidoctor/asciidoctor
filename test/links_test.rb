@@ -400,7 +400,7 @@ context 'Links' do
     input = <<~'EOS'
     see <<foo>>
 
-    anchor:foo[b[a\]r]tex'
+    anchor:foo[b[a\]r]tex
     EOS
     result = convert_string_to_embedded input
     assert_includes result, 'see <a href="#foo">b[a]r</a>'
