@@ -163,9 +163,7 @@ class Table < AbstractBlock
       num_body_rows -= 1
     end
 
-    if num_body_rows > 0 && attrs['footer-option']
-      @rows.foot = [body.pop]
-    end
+    @rows.foot = [body.pop] if num_body_rows > 0 && attrs['footer-option']
 
     nil
   end
