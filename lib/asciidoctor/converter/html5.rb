@@ -853,7 +853,8 @@ Your browser does not support the audio tag.
   def convert_table node
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
-    classes = ['tableblock', %(frame-#{node.attr 'frame', 'all', 'table-frame'}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
+    frame = 'ends' if (frame = node.attr 'frame', 'all', 'table-frame') == 'topbot'
+    classes = ['tableblock', %(frame-#{frame}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
     if (stripes = node.attr 'stripes', nil, 'table-stripes')
       classes << %(stripes-#{stripes})
     end
