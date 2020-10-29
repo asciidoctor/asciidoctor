@@ -21,6 +21,7 @@ Bug Fixes::
   * Fix infinite loop when xreftext contains a circular reference path in HTML and manpage converters (#3543)
   * Fix errant reference warning for valid reference when running in compat mode (#3555)
   * Initialize backend traits for converter (if not previously initialized) using assigned basebackend; mimics Asciidoctor < 2 behavior (#3341)
+  * Set source_location on preamble block when sourcemap option is enabled (#3799)
   * Pass options to constructor of Rouge lexer instead of #lex method; restores compatibility with Rouge >= 3.4 (#3336)
   * Don't clobber cgi-style options on language when enabling start_inline option on the Rouge PHP lexer (#3336)
   * Fix parsing of wrapped link and xref text, including when an attrlist signature is detected (#3331)

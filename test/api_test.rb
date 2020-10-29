@@ -344,6 +344,11 @@ context 'API' do
       assert_equal 'sample.adoc', doc.file
       assert_equal 1, doc.lineno
 
+      preamble = doc.blocks[0]
+      refute_nil preamble.source_location
+      assert_equal 'sample.adoc', preamble.file
+      assert_equal 6, preamble.lineno
+
       section_1 = doc.sections[0]
       assert_equal 'Section A', section_1.title
       refute_nil section_1.source_location
