@@ -554,7 +554,7 @@ context 'Tables' do
 
     test 'table with header and footer' do
       input = <<~'EOS'
-      [frame="topbot",options="header,footer"]
+      [options="header,footer"]
       |===
       |Item       |Quantity
       |Item 1     |1
@@ -581,7 +581,7 @@ context 'Tables' do
     test 'table with header and footer docbook' do
       input = <<~'EOS'
       .Table with header, body and footer
-      [frame="topbot",options="header,footer"]
+      [options="header,footer"]
       |===
       |Item       |Quantity
       |Item 1     |1
@@ -592,7 +592,6 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
       assert_css 'table', output, 1
-      assert_css 'table[frame="topbot"]', output, 1
       assert_css 'table > title', output, 1
       assert_css 'table > tgroup', output, 1
       assert_css 'table > tgroup[cols="2"]', output, 1
@@ -633,7 +632,40 @@ context 'Tables' do
       assert_css 'informaltable tbody > row > entry[align="right"][valign="top"]', output, 1
     end
 
-    test 'should recognize ends as an alias to topbot for frame when converting to DocBook' do
+    test 'should preserve frame value ends when converting to HTML' do
+      input = <<~'EOS'
+      [frame=ends]
+      |===
+      |A |B |C
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table.frame-ends', output, 1
+    end
+
+    test 'should normalize frame value topbot as ends when converting to HTML' do
+      input = <<~'EOS'
+      [frame=topbot]
+      |===
+      |A |B |C
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table.frame-ends', output, 1
+    end
+
+    test 'should preserve frame value topbot when converting to DocBook' do
+      input = <<~'EOS'
+      [frame=topbot]
+      |===
+      |A |B |C
+      |===
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_css 'informaltable[frame="topbot"]', output, 1
+    end
+
+    test 'should convert frame value ends to topbot when converting to DocBook' do
       input = <<~'EOS'
       [frame=ends]
       |===
@@ -1270,7 +1302,7 @@ context 'Tables' do
 
     test 'AsciiDoc content' do
       input = <<~'EOS'
-      [cols="1e,1,5a",frame="topbot",options="header"]
+      [cols="1e,1,5a"]
       |===
       |Name |Backends |Description
 
