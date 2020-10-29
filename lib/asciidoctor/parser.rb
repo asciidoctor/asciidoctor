@@ -1149,14 +1149,16 @@ class Parser
   def self.catalog_inline_anchors text, block, document, reader
     text.scan InlineAnchorScanRx do
       if (id = $1)
-        if (reftext = $2)
-          next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
-        end
+        next if (reftext = $2) && (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
       else
         id = $3
         if (reftext = $4)
-          reftext = reftext.gsub '\]', ']' if reftext.include? ']'
-          next if (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
+          if reftext.include? ']'
+            reftext = reftext.gsub '\]', ']'
+            reftext = document.sub_attributes reftext if reftext.include? ATTR_REF_HEAD
+          elsif (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
+            next
+          end
         end
       end
       unless document.register :refs, [id, (Inline.new block, :anchor, reftext, type: :ref, id: id)]
