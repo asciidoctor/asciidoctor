@@ -96,6 +96,7 @@ class Converter::Html5Converter < Converter::Base
     end
     cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
     linkcss = node.attr? 'linkcss'
+    max_width_attr = (node.attr? 'max-width') ? %( style="max-width: #{node.attr 'max-width'};") : ''
     result = ['<!DOCTYPE html>']
     lang_attribute = (node.attr? 'nolang') ? '' : %( lang="#{node.attr 'lang', 'en'}")
     result << %(<html#{@xml_mode ? ' xmlns="http://www.w3.org/1999/xhtml"' : ''}#{lang_attribute}>)
@@ -161,23 +162,21 @@ class Converter::Html5Converter < Converter::Base
     end
 
     result << '</head>'
-    body_attrs = node.id ? [%(id="#{node.id}")] : []
+    id_attr = node.id ? %( id="#{node.id}") : ''
     if (sectioned = node.sections?) && (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
       classes = [node.doctype, (node.attr 'toc-class'), %(toc-#{node.attr 'toc-position', 'header'})]
     else
       classes = [node.doctype]
     end
     classes << node.role if node.role?
-    body_attrs << %(class="#{classes.join ' '}")
-    body_attrs << %(style="max-width: #{node.attr 'max-width'};") if node.attr? 'max-width'
-    result << %(<body #{body_attrs.join ' '}>)
+    result << %(<body#{id_attr} class="#{classes.join ' '}">)
 
     unless (docinfo_content = node.docinfo :header).empty?
       result << docinfo_content
     end
 
     unless node.noheader
-      result << '<div id="header">'
+      result << %(<div id="header"#{max_width_attr}>)
       if node.doctype == 'manpage'
         result << %(<h1>#{node.doctitle} Manual Page</h1>)
         if sectioned && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
@@ -223,12 +222,12 @@ class Converter::Html5Converter < Converter::Base
       result << '</div>'
     end
 
-    result << %(<div id="content">
+    result << %(<div id="content"#{max_width_attr}>
 #{node.content}
 </div>)
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
-      result << %(<div id="footnotes">
+      result << %(<div id="footnotes"#{max_width_attr}>
 <hr#{slash}>)
       node.footnotes.each do |footnote|
         result << %(<div class="footnote" id="_footnotedef_#{footnote.index}">
@@ -239,7 +238,7 @@ class Converter::Html5Converter < Converter::Base
     end
 
     unless node.nofooter
-      result << '<div id="footer">'
+      result << %(<div id="footer"#{max_width_attr}>)
       result << '<div id="footer-text">'
       result << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br}) if node.attr? 'revnumber'
       result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if (node.attr? 'last-update-label') && !(node.attr? 'reproducible')

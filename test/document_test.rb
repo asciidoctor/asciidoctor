@@ -490,6 +490,21 @@ context 'Document' do
       assert_xpath '//code[text()="content"]', result, 0
     end
 
+    test 'should apply max-width to each top-level container' do
+      input = <<~'EOS'
+      = Document Title
+
+      contentfootnote:[placeholder]
+      EOS
+
+      output = convert_string input, attributes: { 'max-width' => '70em' }
+      assert_css 'body[style]', output, 0
+      assert_css '#header[style="max-width: 70em;"]', output, 1
+      assert_css '#content[style="max-width: 70em;"]', output, 1
+      assert_css '#footnotes[style="max-width: 70em;"]', output, 1
+      assert_css '#footer[style="max-width: 70em;"]', output, 1
+    end
+
     test 'title partition API with default separator' do
       title = Asciidoctor::Document::Title.new 'Main Title: And More: Subtitle'
       assert_equal 'Main Title: And More', title.main
