@@ -355,7 +355,13 @@ class Document < AbstractBlock
     else
       # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = ''
-      attrs['notitle'] = ''
+      if (attr_overrides.key? 'showtitle') && (attr_overrides.keys & %w(notitle showtitle))[-1] == 'showtitle'
+        attr_overrides['notitle'] = { nil => '', false => '@', '@' => false}[attr_overrides['showtitle']]
+      elsif attr_overrides.key? 'notitle'
+        attr_overrides['showtitle'] = { nil => '', false => '@', '@' => false}[attr_overrides['notitle']]
+      else
+        attrs['notitle'] = ''
+      end
     end
 
     attr_overrides['asciidoctor'] = ''
@@ -751,7 +757,7 @@ class Document < AbstractBlock
   end
 
   def notitle
-    !@attributes.key?('showtitle') && @attributes.key?('notitle')
+    @attributes.key? 'notitle'
   end
 
   def noheader

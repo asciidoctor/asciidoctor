@@ -2124,6 +2124,8 @@ class Parser
       name = 'sectnums'
     elsif name == 'hardbreaks'
       name = 'hardbreaks-option'
+    elsif name == 'showtitle'
+      store_attribute 'notitle', (value ? nil : ''), doc, attrs
     end
 
     if doc
