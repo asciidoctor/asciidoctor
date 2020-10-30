@@ -233,7 +233,7 @@ class Table::Cell < AbstractBlock
     super column, :table_cell
     @source_location = opts[:cursor].dup if @document.sourcemap
     if column
-      cell_style = column.attributes['style'] unless (in_header_row = column.table.header_row?)
+      cell_style = column.style unless (in_header_row = column.table.header_row?)
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
     end
