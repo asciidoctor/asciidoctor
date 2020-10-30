@@ -433,8 +433,10 @@ class Parser
     # is treated like an untitled section
     elsif preamble # implies parent == document
       if preamble.blocks?
+        if book || document.blocks[1] || !Compliance.unwrap_standalone_preamble
+          preamble.source_location = preamble.blocks[0].source_location if document.sourcemap
         # unwrap standalone preamble (i.e., document has no sections) except for books, if permissible
-        unless book || document.blocks[1] || !Compliance.unwrap_standalone_preamble
+        else
           document.blocks.shift
           while (child_block = preamble.blocks.shift)
             document << child_block
