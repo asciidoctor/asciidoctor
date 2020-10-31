@@ -396,7 +396,7 @@ context 'Document' do
   end
 
   context 'Converter' do
-    test 'convert methos on built-in converter are registered by default' do
+    test 'convert methods on built-in converter are registered by default' do
       doc = document_from_string ''
       assert_equal 'html5', doc.attributes['backend']
       assert doc.attributes.has_key? 'backend-html5'
