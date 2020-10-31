@@ -71,6 +71,7 @@ Improvements::
   * Add support for erubi template engine; use it in place of erubis in test suite; note the use of erubis is deprecated (#3737)
   * Download and embed remote custom stylesheet if allow-uri-read is set (#3765)
   * Remove direction property from default stylesheet (#3753) (*@abdnh*)
+  * remove max width setting on content column for print media in default stylesheet (#3802)
   * Normalize frame value "topbot" to "ends" in HTML output (consistently use frame-ends class) (#3797)
 
 Build / Infrastructure::
