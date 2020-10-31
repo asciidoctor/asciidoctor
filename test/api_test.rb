@@ -1195,8 +1195,7 @@ context 'API' do
       text
       EOS
 
-      #[{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
-      [{ 'linkcss!' => '' }, { 'linkcss' => nil }].each do |attrs|
+      [{ 'linkcss!' => '' }, { 'linkcss' => nil }, { 'linkcss' => false }].each do |attrs|
         output = Asciidoctor.convert input, standalone: true, attributes: attrs
         assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
         assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 0
