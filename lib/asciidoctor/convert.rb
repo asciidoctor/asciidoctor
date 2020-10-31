@@ -146,11 +146,11 @@ module Asciidoctor
               Stylesheets.instance.write_primary_stylesheet stylesoutdir
             # FIXME should Stylesheets also handle the user stylesheet?
             elsif copy_user_stylesheet
-              if (stylesheet_src = doc.attr 'copycss').empty?
+              if (stylesheet_src = doc.attr 'copycss') == '' || stylesheet_src == true
                 stylesheet_src = doc.normalize_system_path stylesheet
               else
                 # NOTE in this case, copycss is a source location (but cannot be a URI)
-                stylesheet_src = doc.normalize_system_path stylesheet_src
+                stylesheet_src = doc.normalize_system_path stylesheet_src.to_s
               end
               stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
               # NOTE don't warn if src can't be read and dest already exists (see #2323)

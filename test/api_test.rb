@@ -1317,6 +1317,24 @@ context 'API' do
       end
     end
 
+    test 'should copy custom stylesheet to destination dir if copycss is true' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_output_path = File.join output_dir, 'custom.css'
+        Asciidoctor.convert_file sample_input_path, safe: :safe, to_dir: output_dir, mkdirs: true,
+            attributes: { 'stylesheet' => 'custom.css', 'linkcss' => true, 'copycss' => true }
+        assert File.exist? sample_output_path
+        assert File.exist? custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./custom.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
     test 'should convert source file and write result to adjacent file by default' do
       sample_input_path = fixture_path('sample.adoc')
       sample_output_path = fixture_path('sample.html')
