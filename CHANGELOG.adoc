@@ -58,6 +58,7 @@ Compliance::
   * Move style tag for client-side syntax highlighers (highlight.js, prettify) into head (#3503)
   * Define entry point API methods (load, convert, load_file, convert_file) as class methods instead of module_function to avoid conflict with Kernel.load (#3625)
   * Retain attribute order on HTML code tag for source block to remain consistent with output from 1.5.x (#3786)
+  * Correct language code for Korean language file from kr to ko (#3807) (*@jnavila*)
 
 Improvements::
 
