@@ -1158,21 +1158,68 @@ context 'Document' do
       assert_xpath '(/*)[2]/self::*[@class="paragraph"]', result, 1
     end
 
-    test 'enable title in embedded document by assigning showtitle attribute' do
-      input = <<~'EOS'
-      = Document Title
+    test 'should be able to enable doctitle for embedded document' do
+      [
+        [{ 'notitle' => nil }, nil],
+        [{ 'notitle' => nil }, [':!showtitle:']],
+        [{ 'notitle' => false }, nil],
+        [{ 'notitle' => '@' }, [':!notitle:']],
+        [{ 'notitle' => '@' }, [':showtitle:']],
+        [{ 'showtitle' => '' }, [':notitle:']],
+        [{ 'showtitle' => '@' }, nil],
+        [{ 'showtitle' => false }, [':!notitle:']],
+        [{}, [':!notitle:']],
+        [{}, [':notitle:', ':showtitle:']],
+        [{}, [':showtitle:']],
+        [{}, [':!showtitle:', ':!notitle:']],
+      ].each do |api_attrs, attr_entries|
+        input = <<~EOS
+        = Document Title#{attr_entries ? ?\n + (attr_entries.join ?\n) : ''}
 
-      content
-      EOS
+        ifdef::showtitle[showtitle: set]
+        ifndef::showtitle[showtitle: not set]
+        ifdef::notitle[notitle: set]
+        ifndef::notitle[notitle: not set]
+        EOS
 
-      result = convert_string_to_embedded input, attributes: { 'showtitle' => '' }
-      assert_xpath '/html', result, 0
-      assert_xpath '/h1', result, 1
-      assert_xpath '/*[@id="header"]', result, 0
-      assert_xpath '/*[@id="footer"]', result, 0
-      assert_xpath '/*[@class="paragraph"]', result, 1
-      assert_xpath '(/*)[1]/self::h1', result, 1
-      assert_xpath '(/*)[2]/self::*[@class="paragraph"]', result, 1
+        result = convert_string_to_embedded input, attributes: api_attrs
+        assert_xpath '/html', result, 0
+        assert_xpath '/h1', result, 1
+        assert_xpath '(/*)[1]/self::h1', result, 1
+        assert_xpath '(/*)[2]/self::*[@class="paragraph"]', result, 1
+        # NOTE showtitle may not match notitle if never used
+        assert_includes result, 'notitle: not set'
+      end
+    end
+
+    test 'should be able to explicitly disable doctitle for embedded document' do
+      [
+        [{ 'notitle' => '' }, nil],
+        [{ 'notitle' => '@' }, nil],
+        [{ 'notitle' => '@' }, [':!showtitle:']],
+        [{ 'showtitle' => nil }, nil],
+        [{ 'showtitle' => false }, nil],
+        [{ 'showtitle' => '@' }, [':notitle:']],
+        [{}, [':notitle:']],
+        [{}, [':!showtitle:']],
+        [{}, [':!showtitle:', ':notitle:']],
+      ].each do |api_attrs, attr_entries|
+        input = <<~EOS
+        = Document Title#{attr_entries ? ?\n + (attr_entries.join ?\n) : ''}
+
+        ifdef::showtitle[showtitle: set]
+        ifndef::showtitle[showtitle: not set]
+        ifdef::notitle[notitle: set]
+        ifndef::notitle[notitle: not set]
+        EOS
+
+        result = convert_string_to_embedded input, attributes: api_attrs
+        assert_xpath '/html', result, 0
+        assert_xpath '/h1', result, 0
+        assert_xpath '/*[@class="paragraph"]', result, 1
+        # NOTE showtitle may not match notitle if never used
+        assert_includes result, 'notitle: set'
+      end
     end
 
     test 'parse header only' do
