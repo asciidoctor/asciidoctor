@@ -343,7 +343,7 @@ class AbstractBlock < AbstractNode
     if (val = reftext) && !val.empty?
       val
     # NOTE xrefstyle only applies to blocks with a title and a caption or number
-    elsif xrefstyle && @title && @caption
+    elsif xrefstyle && @title && !@caption.nil_or_empty?
       case xrefstyle
       when 'full'
         quoted_title = sub_placeholder (sub_quotes @document.compat_mode ? %q(``%s'') : '"`%s`"'), title
