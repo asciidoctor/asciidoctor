@@ -27,6 +27,7 @@ Bug Fixes::
   * Don't clobber cgi-style options on language when enabling start_inline option on the Rouge PHP lexer (#3336)
   * Fix parsing of wrapped link and xref text, including when an attrlist signature is detected (#3331)
   * Restore deprecated writable number property on AbstractBlock
+  * Always use title as xreftext if target block has an empty caption, regardless of xrefstyle value (#3745)
   * Allow a bibliography reference to be used inside a footnote (#3325)
   * Fix bottom margin collapsing on AsciiDoc table cell (#3370)
   * Remove excess hard line break in multi-line AsciiMath blocks (#3407)

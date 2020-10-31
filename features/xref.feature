@@ -630,6 +630,32 @@ Feature: Cross References
       .title Diagram 2. Managing Inventory
     """
 
+  Scenario: Create a full cross reference to a block with an empty caption
+  Given the AsciiDoc source
+    """
+    :xrefstyle: full
+
+    See <<ex1>>.
+
+    .Title
+    [#ex1,caption=]
+    ====
+    content
+    ====
+    """
+  When it is converted to html
+  Then the result should match the HTML structure
+    """
+    .paragraph: p
+      |See
+      a< href='#ex1' Title
+      |.
+    #ex1.exampleblock
+      .title Title
+      .content: .paragraph: p
+        |content
+    """
+
   Scenario: Create a short cross reference to a block with an explicit caption
   Given the AsciiDoc source
     """
@@ -660,6 +686,32 @@ Feature: Cross References
     #diagram-2.imageblock
       .content: img src='managing-inventory.png' alt='Managing Inventory'
       .title Diagram 2. Managing Inventory
+    """
+
+  Scenario: Create a short cross reference to a block with an empty caption
+  Given the AsciiDoc source
+    """
+    :xrefstyle: short
+
+    See <<ex1>>.
+
+    .Title
+    [#ex1,caption=]
+    ====
+    content
+    ====
+    """
+  When it is converted to html
+  Then the result should match the HTML structure
+    """
+    .paragraph: p
+      |See
+      a< href='#ex1' Title
+      |.
+    #ex1.exampleblock
+      .title Title
+      .content: .paragraph: p
+        |content
     """
 
   Scenario: Create a basic cross reference to an unnumbered formal block
