@@ -65,7 +65,7 @@ class AbstractNode
   #
   # parent - The Block to set as the parent of this Block
   #
-  # Returns the new parent Block associated with this Block
+  # Returns the value of the parent argument
   def parent= parent
     @parent, @document = parent, parent.document
   end
@@ -214,6 +214,15 @@ class AbstractNode
   def has_role? name
     # NOTE center + include? is faster than split + include?
     (val = @attributes['role']) ? (%( #{val} ).include? %( #{name} )) : false
+  end
+
+  # Public: Sets the value of the role attribute on this ndoe.
+  #
+  # names - A single role name, a space-separated String of role names, or an Array of role names
+  #
+  # Returns the value of the names argument
+  def role= names
+    @attributes['role'] = (::Array === names) ? (names.join ' ') : names
   end
 
   # Public: Adds the given role directly to this node.
