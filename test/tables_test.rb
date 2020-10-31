@@ -791,6 +791,63 @@ context 'Tables' do
       assert_xpath '(//td)[1]/p', output, 2
     end
 
+    test 'should format first cell as literal if there is no implicit header row and column has l style' do
+      input = <<~'EOS'
+      [cols="1l,1"]
+      |===
+      |literal
+      |normal
+      |===
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'tbody pre', output, 1
+      assert_css 'tbody p.tableblock', output, 1
+    end
+
+    test 'wip should format first cell as AsciiDoc if there is no implicit header row and column has a style' do
+      input = <<~'EOS'
+      [cols="1a,1"]
+      |===
+      | * list
+      | normal
+      |===
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'tbody .ulist', output, 1
+      assert_css 'tbody p.tableblock', output, 1
+    end
+
+    test 'should interpret leading indent if first cell is AsciiDoc and there is no implicit header row' do
+      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+      input = <<~EOS
+      [cols="1a,1"]
+      |===
+      |
+        literal
+      | normal
+      |===
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'tbody pre', output, 1
+      assert_css 'tbody p.tableblock', output, 1
+    end
+
+    test 'should format first cell as AsciiDoc if there is no implicit header row and cell has a style' do
+      input = <<~'EOS'
+      |===
+      a| * list
+      | normal
+      |===
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'tbody .ulist', output, 1
+      assert_css 'tbody p.tableblock', output, 1
+    end
+
     test 'no implicit header row if AsciiDoc cell in first line spans multiple lines' do
       input = <<~'EOS'
       [cols=2*]
@@ -883,6 +940,39 @@ context 'Tables' do
       assert_css 'table > tbody > tr > td > p.header', output, 0
       assert_css 'table > tbody > tr > td > p > strong', output, 1
       assert_css 'table > tbody > tr > td > p > em > a', output, 1
+    end
+
+    test 'should apply text formatting to cells in implicit header row when column has a style' do
+      input = <<~'EOS'
+      [cols="2*a"]
+      |===
+      | _foo_ | *bar*
+
+      | * list item
+      | paragraph
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '(//thead/tr/th)[1]/em[text()="foo"]', output, 1
+      assert_xpath '(//thead/tr/th)[2]/strong[text()="bar"]', output, 1
+      assert_css 'tbody .ulist', output, 1
+      assert_css 'tbody .paragraph', output, 1
+    end
+
+    test 'should apply style and text formatting to cells in first row if no implicit header' do
+      input = <<~'EOS'
+      [cols="s,e"]
+      |===
+      | _strong_ | *emphasis*
+      | strong
+      | emphasis
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '((//tbody/tr)[1]/td)[1]//strong/em[text()="strong"]', output, 1
+      assert_xpath '((//tbody/tr)[1]/td)[2]//em/strong[text()="emphasis"]', output, 1
+      assert_xpath '((//tbody/tr)[2]/td)[1]//strong[text()="strong"]', output, 1
+      assert_xpath '((//tbody/tr)[2]/td)[2]//em[text()="emphasis"]', output, 1
     end
 
     test 'vertical table headers use th element instead of header class' do
@@ -1428,6 +1518,45 @@ context 'Tables' do
       assert_xpath '(//p)[1]/a[@href="#mount-evans"][text()="Mount Evans"]', output, 1
       assert_xpath '(//table/tbody/tr)[1]//td//a[@id="mount-evans"]', output, 1
       assert_xpath '(//table/tbody/tr)[2]//th//a[@id="grays-peak"]', output, 1
+    end
+
+    test 'should catalog anchor at start of cell in implicit header row when column has a style' do
+      input = <<~'EOS'
+      [cols=1a]
+      |===
+      |[[foo,Foo]]* not AsciiDoc
+
+      | AsciiDoc
+      |===
+      EOS
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('foo')
+    end
+
+    test 'should catalog anchor at start of cell in explicit header row when column has a style' do
+      input = <<~'EOS'
+      [%header,cols=1a]
+      |===
+      |[[foo,Foo]]* not AsciiDoc
+      | AsciiDoc
+      |===
+      EOS
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('foo')
+    end
+
+    test 'should catalog anchor at start of cell in first row' do
+      input = <<~'EOS'
+      |===
+      |[[foo,Foo]]foo
+      | bar
+      |===
+      EOS
+      doc = document_from_string input
+      refs = doc.catalog[:refs]
+      assert refs.key?('foo')
     end
 
     test 'footnotes should not be shared between an AsciiDoc table cell and the main document' do

@@ -156,11 +156,14 @@ class Table < AbstractBlock
     # set rowcount before splitting up body rows
     num_body_rows = @attributes['rowcount'] = (body = @rows.body).size
 
-    if num_body_rows > 0 && @has_header_option
-      @rows.head = [(head = body.shift)]
-      # styles aren't applied to header row
-      head.each {|c| c.style = nil }
-      num_body_rows -= 1
+    if num_body_rows > 0
+      if @has_header_option
+        @rows.head = [body.shift.map {|cell| cell.reinitialize true }]
+        num_body_rows -= 1
+      elsif @has_header_option.nil?
+        @has_header_option = false
+        body.unshift(body.shift.map {|cell| cell.reinitialize false })
+      end
     end
 
     @rows.foot = [body.pop] if num_body_rows > 0 && attrs['footer-option']
@@ -231,9 +234,18 @@ class Table::Cell < AbstractBlock
 
   def initialize column, cell_text, attributes = {}, opts = {}
     super column, :table_cell
+    @cursor = @reinitialize_args = nil
     @source_location = opts[:cursor].dup if @document.sourcemap
+    # NOTE: column is always set when parsing; may not be set when building table from the API
     if column
-      cell_style = column.style unless (in_header_row = column.table.header_row?)
+      if (in_header_row = column.table.header_row?)
+        if (cell_style = column.style || attributes&.[]('style')) == :asciidoc || cell_style == :literal
+          @reinitialize_args = [column, cell_text, attributes&.merge, opts]
+        end
+        cell_style = nil
+      else
+        cell_style = column.style
+      end
       # REVIEW feels hacky to inherit all attributes from column
       update_attributes column.attributes
     end
@@ -300,14 +312,37 @@ class Table::Cell < AbstractBlock
       @content_model = :verbatim
       @subs = BASIC_SUBS
     else
-      if normal_psv && (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
-        Parser.catalog_inline_anchor $1, $2, self, opts[:cursor], @document
+      if normal_psv
+        if in_header_row
+          @cursor = opts[:cursor] # used in deferred catalog_inline_anchor call
+        else
+          catalog_inline_anchor cell_text, opts[:cursor]
+        end
       end
       @content_model = :simple
       @subs = NORMAL_SUBS
     end
     @text = cell_text
     @style = cell_style
+  end
+
+  def reinitialize has_header
+    if has_header
+      @reinitialize_args = nil
+    elsif @reinitialize_args
+      return Table::Cell.new(*@reinitialize_args)
+    else
+      @style = @attributes['style']
+    end
+    catalog_inline_anchor if @cursor
+    self
+  end
+
+  def catalog_inline_anchor cell_text = @text, cursor = nil
+    cursor, @cursor = @cursor, nil unless cursor
+    if (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
+      Parser.catalog_inline_anchor $1, $2, self, cursor, @document
+    end
   end
 
   # Public: Get the String text of this cell with substitutions applied.

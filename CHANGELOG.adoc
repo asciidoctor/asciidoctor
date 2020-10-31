@@ -19,6 +19,7 @@ Bug Fixes::
 
   * Fix infinite loop when callout list with obsolete syntax is found inside list item (#3472)
   * Fix infinite loop when xreftext contains a circular reference path in HTML and manpage converters (#3543)
+  * Apply text formatting to table cells in implicit header row when column has the "a" or "l" style (#3760)
   * Fix errant reference warning for valid reference when running in compat mode (#3555)
   * Initialize backend traits for converter (if not previously initialized) using assigned basebackend; mimics Asciidoctor < 2 behavior (#3341)
   * Set source_location on preamble block when sourcemap option is enabled (#3799)
