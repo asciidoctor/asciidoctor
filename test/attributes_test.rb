@@ -1358,6 +1358,20 @@ context 'Attributes' do
       assert_equal [], p.roles
     end
 
+    test 'roles= sets the role attribute on the node' do
+      doc = document_from_string 'a paragraph'
+      p = doc.blocks.first
+      p.role = 'foobar'
+      assert_equal 'foobar', (p.attr 'role')
+    end
+
+    test 'roles= coerces array value to a space-separated string' do
+      doc = document_from_string 'a paragraph'
+      p = doc.blocks.first
+      p.role = %w(foo bar)
+      assert_equal 'foo bar', (p.attr 'role')
+    end
+
     test "Attribute substitutions are performed on attribute list before parsing attributes" do
       input = <<~'EOS'
       :lead: role="lead"
