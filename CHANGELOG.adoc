@@ -68,6 +68,7 @@ Improvements::
 
   * Apply word wrap (i.e., `word-wrap: anywhere`) by default in default stylesheet (#3544)
   * Allow `nobreak` and `nowrap` roles to be used on any inline element (#3544)
+  * Add CSS class to support pre-wrap role to preserve leading, trailing, and repeating spaces in phrase (#3815)
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
