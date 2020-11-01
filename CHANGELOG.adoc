@@ -66,6 +66,8 @@ Compliance::
 
 Improvements::
 
+  * Apply word wrap (i.e., `word-wrap: anywhere`) by default in default stylesheet (#3544)
+  * Allow `nobreak` and `nowrap` roles to be used on any inline element (#3544)
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
   * Remove redundant test for halign and valign attributes on table cell in DocBook converter
@@ -996,7 +998,7 @@ Enhancements::
   * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (#1721) (*@JojoBoulix*)
   * Add reversed attribute to ordered list if reversed option is enabled (#1830)
   * Add support for additional docinfo locations (e.g., :header)
-  * Configure default stylesheet to break monospace word if exceeds length of line; add roles to prevent breaks (#1814)
+  * Configure default stylesheet to break monospace word if exceeds length of line using `word-wrap: break-word`; add `nobreak` and `nowrap` roles to prevent breaks (#1814)
   * Introduce translation file for built-in labels (*@ciampix*)
   * Provide translations for built-in labels (*@JmyL* - kr, *@ciampix* - it, *@ivannov* - bg, *@maxandersen* - da, *@radcortez* - pt, *@eddumelendez* - es, *@leathersole* - jp, *@aslakknutsen* - no, *@shahryareiv* - fa, *@AlexanderZobkov* - ru, *@dongwq* - zh, *@rmpestano* - pt_BR, *@ncomet* - fr, *@lgvz* - fi, *@patoi* - hu, *@BojanStipic* - sr, *@fwilhe* - de, *@rahmanusta* - tr, *@abelsromero* - ca, *@aboullaite* - ar, *@roelvs* - nl)
   * Translate README to Chinese (*@diguage*)
