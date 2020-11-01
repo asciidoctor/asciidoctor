@@ -129,9 +129,9 @@ class AttributeList
         value = nil
       else
         skip_blank
-        if @scanner.peek(1)
+        if (c = @scanner.get_byte)
           # example: foo="bar" || foo="ba\"zaar"
-          if (c = @scanner.get_byte) == '"'
+          if c == '"'
             value = parse_attribute_value c
           # example: foo='bar' || foo='ba\'zaar' || foo='ba"zaar'
           elsif c == APOS
@@ -145,6 +145,8 @@ class AttributeList
             value = %(#{c}#{scan_to_delimiter})
             return true if value == 'None'
           end
+        else
+          value = ''
         end
       end
     end
