@@ -82,6 +82,7 @@ Improvements::
   * remove max width setting on content column for print media in default stylesheet (#3802)
   * Normalize frame value "topbot" to "ends" in HTML output (consistently use frame-ends class) (#3797)
   * Add role setter method on AbstractNode (#3614)
+  * Map chapter-signifier and part-signifier attributes in locale attribute files to replace chapter-label and part-label (#3817)
 
 Build / Infrastructure::
 
