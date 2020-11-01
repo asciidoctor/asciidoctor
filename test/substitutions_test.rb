@@ -2050,6 +2050,27 @@ context 'Substitutions' do
         end
       end
 
+      test 'should replace passthroughs inside stem expression' do
+        [
+          ['stem:[+1+]', '\$1\$'],
+          ['stem:[+\infty-(+\infty)]', '\$\infty-(\infty)\$'],
+          ['stem:[+++\infty-(+\infty)++]', '\$+\infty-(+\infty)\$'],
+        ].each do |input, expected|
+          para = block_from_string input, attributes: { 'stem' => '', }
+          assert_equal expected, para.content
+        end
+      end
+
+      test 'should allow passthrough inside stem expression to be escaped' do
+        input = [
+          ['stem:[\+] and stem:[+]', '\$+\$ and \$+\$'],
+          ['stem:[\+1+]', '\$+1+\$'],
+        ].each do |input, expected|
+          para = block_from_string input, attributes: { 'stem' => '', }
+          assert_equal expected, para.content
+        end
+      end
+
       test 'should not recognize stem macro with invalid substitution list' do
         [',', '42', 'a,'].each do |subs|
           input = %(stem:#{subs}[x^2])
