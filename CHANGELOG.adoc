@@ -66,7 +66,7 @@ Compliance::
 
 Improvements::
 
-  * Apply word wrap (i.e., `word-wrap: anywhere`) by default in default stylesheet (#3544)
+  * Apply word wrap (i.e., `word-wrap: anywhere`) to body in default stylesheet (#3544)
   * Allow `nobreak` and `nowrap` roles to be used on any inline element (#3544)
   * Preserve guard around XML-style callout when icons are not enabled (#3319)
   * Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
