@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Nazwa]
 :note-caption: Notka
-:part-refsig: Część
+:part-signifier: Część
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Wstęp]
 :section-refsig: Sekcja
 :table-caption: Tabela
