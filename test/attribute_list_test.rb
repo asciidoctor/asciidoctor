@@ -126,6 +126,14 @@ context 'AttributeList' do
     assert_equal expected, attributes
   end
 
+  test 'collect unnamed attribute enclosed in equal signs' do
+    attributes = {}
+    line = '=foo='
+    expected = { 1 => '=foo=' }
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
   test 'collect named attribute' do
     attributes = {}
     line = 'foo=bar'
