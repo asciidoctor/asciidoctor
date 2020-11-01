@@ -2,8 +2,8 @@
 :appendix-caption: Vedlegg
 :appendix-refsig: {appendix-caption}
 :caution-caption: OBS
-:chapter-label: Kapittel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapittel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Eksempel
 :figure-caption: Figur
 :important-caption: Viktig

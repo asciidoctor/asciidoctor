@@ -2,8 +2,8 @@
 :appendix-caption: Příloha
 :appendix-refsig: {appendix-caption}
 :caution-caption: Upozornění
-:chapter-label: Kapitola
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitola
+:chapter-refsig: {chapter-signifier}
 :example-caption: Příklad
 :figure-caption: Obrázek
 :important-caption: Důležité

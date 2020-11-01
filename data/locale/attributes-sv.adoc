@@ -2,8 +2,8 @@
 :appendix-caption: Bilaga
 :appendix-refsig: {appendix-caption}
 :caution-caption: Var uppmärksam
-:chapter-label: Kapitel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Exempel
 :figure-caption: Figur
 :important-caption: Viktigt

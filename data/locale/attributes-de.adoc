@@ -2,8 +2,8 @@
 :appendix-caption: Anhang
 :appendix-refsig: {appendix-caption}
 :caution-caption: Achtung
-:chapter-label: Kapitel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Beispiel
 :figure-caption: Abbildung
 :important-caption: Wichtig

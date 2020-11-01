@@ -2,8 +2,8 @@
 :appendix-caption: Додаток
 :appendix-refsig: {appendix-caption}
 :caution-caption: Обережно
-:chapter-label: Розділ
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Розділ
+:chapter-refsig: {chapter-signifier}
 :example-caption: Приклад
 :figure-caption: Рисунок
 :important-caption: Важливо

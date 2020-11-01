@@ -2,8 +2,8 @@
 :appendix-caption: 附錄
 :appendix-refsig: {appendix-caption}
 :caution-caption: 注意
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: 示例
 :figure-caption: 圖表
 :important-caption: 重要

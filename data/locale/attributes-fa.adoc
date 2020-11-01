@@ -2,8 +2,8 @@
 :appendix-caption: پیوست
 :appendix-refsig: {appendix-caption}
 :caution-caption: گوشزد
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: نمونه
 :figure-caption: نمودار
 :important-caption: مهم

@@ -2,8 +2,8 @@
 :appendix-caption: Lampiran
 :appendix-refsig: {appendix-caption}
 :caution-caption: Perhatian
-:chapter-label: Bab
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Bab
+:chapter-refsig: {chapter-signifier}
 :example-caption: Contoh
 :figure-caption: Gambar
 :important-caption: Penting

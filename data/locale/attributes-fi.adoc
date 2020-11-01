@@ -2,8 +2,8 @@
 :appendix-caption: Liitteet
 :appendix-refsig: {appendix-caption}
 :caution-caption: Huom
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: Esimerkki
 :figure-caption: Kuvio
 :important-caption: Tärkeää

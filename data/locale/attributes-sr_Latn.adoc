@@ -2,8 +2,8 @@
 :appendix-caption: Dodatak
 :appendix-refsig: {appendix-caption}
 :caution-caption: Oprez
-:chapter-label: Poglavlje
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Poglavlje
+:chapter-refsig: {chapter-signifier}
 :example-caption: Primer
 :figure-caption: Slika
 :important-caption: Važno

@@ -2,8 +2,8 @@
 :appendix-caption: Apendix
 :appendix-refsig: {appendix-caption}
 :caution-caption: Precauție
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: Exemplu
 :figure-caption: Figură
 :important-caption: Important

@@ -2,8 +2,8 @@
 :appendix-caption: Додатак
 :appendix-refsig: {appendix-caption}
 :caution-caption: Опрез
-:chapter-label: Поглавље
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Поглавље
+:chapter-refsig: {chapter-signifier}
 :example-caption: Пример
 :figure-caption: Слика
 :important-caption: Важно

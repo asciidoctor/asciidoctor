@@ -2,8 +2,8 @@
 :appendix-caption: Bijlage
 :appendix-refsig: {appendix-caption}
 :caution-caption: Opgelet
-//:chapter-label: Hoofdstuk
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: Hoofdstuk
+//:chapter-refsig: {chapter-signifier}
 :example-caption: Voorbeeld
 :figure-caption: Figuur
 :important-caption: Belangrijk
