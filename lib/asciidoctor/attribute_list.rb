@@ -97,6 +97,7 @@ class AttributeList
   private
 
   def parse_attribute index = 0, positional_attrs = []
+    continue = true
     single_quoted_value = false
     skip_blank
     # example: "quote"
@@ -114,15 +115,19 @@ class AttributeList
       skipped = 0
       c = nil
       if @scanner.eos?
-        return false unless name
+        return false unless name || (@scanner.string.rstrip.end_with? @delimiter)
+        continue = false
       else
         skipped = skip_blank || 0
         c = @scanner.get_byte
       end
 
       # example: quote
-      if !c || c == @delimiter
+      if !c
         value = nil
+      elsif c == @delimiter
+        value = nil
+        @scanner.unscan
       # example: Sherlock Holmes || =foo=
       elsif c != '=' || !name
         name = %(#{name}#{' ' * skipped}#{c}#{scan_to_delimiter})
@@ -140,6 +145,7 @@ class AttributeList
           # example: foo=,
           elsif c == @delimiter
             value = ''
+            @scanner.unscan
           # example: foo=bar (all spaces ignored)
           else
             value = %(#{c}#{scan_to_delimiter})
@@ -179,13 +185,11 @@ class AttributeList
       if (positional_attr_name = positional_attrs[index])
         @attributes[positional_attr_name] = resolved_name
       end
-      # QUESTION should we always assign the positional key?
+      # QUESTION should we assign the positional key even when it's claimed by a positional attribute?
       @attributes[index + 1] = resolved_name
-      # QUESTION should we assign the resolved name as an attribute?
-      #@attributes[resolved_name] = nil
     end
 
-    true
+    continue
   end
 
   def parse_attribute_value quote
