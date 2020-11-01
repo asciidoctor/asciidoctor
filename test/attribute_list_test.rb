@@ -97,7 +97,7 @@ context 'AttributeList' do
   test 'collect unnamed attribute with dangling delimiter' do
     attributes = {}
     line = 'quote , '
-    expected = { 1 => 'quote' }
+    expected = { 1 => 'quote', 2 => nil }
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end
@@ -114,6 +114,14 @@ context 'AttributeList' do
     attributes = {}
     line = 'first, second one, third'
     expected = { 1 => 'first', 2 => 'second one', 3 => 'third' }
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'collect blank unnamed attributes' do
+    attributes = {}
+    line = 'first,,third,'
+    expected = { 1 => 'first', 2 => nil, 3 => 'third', 4 => nil }
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end
@@ -202,6 +210,14 @@ context 'AttributeList' do
     attributes = {}
     line = %(first, second="value two", third=three, Sherlock Holmes)
     expected = { 1 => 'first', 'second' => 'value two', 'third' => 'three', 4 => 'Sherlock Holmes' }
+    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    assert_equal expected, attributes
+  end
+
+  test 'collect mixed empty named and blank unnamed attributes' do
+    attributes = {}
+    line = 'first,,third=,,fifth=five'
+    expected = { 1 => 'first', 2 => nil, 'third' => '', 4 => nil, 'fifth' => 'five' }
     Asciidoctor::AttributeList.new(line).parse_into(attributes)
     assert_equal expected, attributes
   end
