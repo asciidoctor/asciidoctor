@@ -2062,7 +2062,7 @@ context 'Substitutions' do
       end
 
       test 'should allow passthrough inside stem expression to be escaped' do
-        input = [
+        [
           ['stem:[\+] and stem:[+]', '\$+\$ and \$+\$'],
           ['stem:[\+1+]', '\$+1+\$'],
         ].each do |input, expected|
