@@ -359,7 +359,7 @@ module Asciidoctor
 
   HIGHLIGHT_JS_VERSION = '9.15.10'
 
-  MATHJAX_VERSION = '2.7.6'
+  MATHJAX_VERSION = '2.7.9'
 
   DEFAULT_ATTRIBUTES = {
     'appendix-caption' => 'Appendix',
