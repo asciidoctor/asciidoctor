@@ -2,8 +2,8 @@
 :appendix-caption: پیوست
 :appendix-refsig: {appendix-caption}
 :caution-caption: گوشزد
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: نمونه
 :figure-caption: نمودار
 :important-caption: مهم
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: فهرست]
 ifdef::manname-title[:manname-title: نام]
 :note-caption: یادداشت
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: پیشگفتار]
 //:section-refsig: ???
 :table-caption: جدول

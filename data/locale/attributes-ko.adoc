@@ -2,8 +2,8 @@
 :appendix-caption: 부록
 :appendix-refsig: {appendix-caption}
 :caution-caption: 주의
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: 예시
 :figure-caption: 그림
 :important-caption: 중요
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: 목록]
 ifdef::manname-title[:manname-title: 이름]
 :note-caption: 노트
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: 머리말]
 //:section-refsig: ???
 :table-caption: 표

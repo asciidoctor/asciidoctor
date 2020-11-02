@@ -2,8 +2,8 @@
 :appendix-caption: Příloha
 :appendix-refsig: {appendix-caption}
 :caution-caption: Upozornění
-:chapter-label: Kapitola
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitola
+:chapter-refsig: {chapter-signifier}
 :example-caption: Příklad
 :figure-caption: Obrázek
 :important-caption: Důležité
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: Seznam]
 ifdef::manname-title[:manname-title: Název]
 :note-caption: Poznámka
-:part-refsig: Část
+:part-signifier: Část
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Úvod]
 :section-refsig: Oddíl
 :table-caption: Tabulka

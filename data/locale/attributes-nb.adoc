@@ -2,8 +2,8 @@
 :appendix-caption: Vedlegg
 :appendix-refsig: {appendix-caption}
 :caution-caption: OBS
-:chapter-label: Kapittel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapittel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Eksempel
 :figure-caption: Figur
 :important-caption: Viktig
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: Programkode]
 ifdef::manname-title[:manname-title: Navn]
 :note-caption: Merk
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Forord]
 //:section-refsig: ???
 :table-caption: Tabell

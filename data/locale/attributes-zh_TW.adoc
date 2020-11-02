@@ -2,8 +2,8 @@
 :appendix-caption: 附錄
 :appendix-refsig: {appendix-caption}
 :caution-caption: 注意
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: 示例
 :figure-caption: 圖表
 :important-caption: 重要
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: 列表]
 ifdef::manname-title[:manname-title: 名稱]
 :note-caption: 筆記
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: 序言]
 //:section-refsig: ???
 :table-caption: 表格

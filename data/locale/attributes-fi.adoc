@@ -2,8 +2,8 @@
 :appendix-caption: Liitteet
 :appendix-refsig: {appendix-caption}
 :caution-caption: Huom
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: Esimerkki
 :figure-caption: Kuvio
 :important-caption: Tärkeää
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: Listaus]
 ifdef::manname-title[:manname-title: Nimi]
 :note-caption: Huomio
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Esipuhe]
 //:section-refsig: ???
 :table-caption: Taulukko

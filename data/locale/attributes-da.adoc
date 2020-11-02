@@ -2,8 +2,8 @@
 :appendix-caption: Appendix
 :appendix-refsig: {appendix-caption}
 :caution-caption: Forsigtig
-:chapter-label: Kapitel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Eksempel
 :figure-caption: Figur
 :important-caption: Vigtig
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: List]
 ifdef::manname-title[:manname-title: Navn]
 :note-caption: Notat
-:part-refsig: Del
+:part-signifier: Del
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Forord]
 :section-refsig: Sektion
 :table-caption: Tabel

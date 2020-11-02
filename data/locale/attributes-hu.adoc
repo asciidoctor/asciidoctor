@@ -2,8 +2,8 @@
 :appendix-caption: függelék
 :appendix-refsig: {appendix-caption}
 :caution-caption: Figyelmeztetés
-//:chapter-label: ???
-//:chapter-refsig: {chapter-label}
+//:chapter-signifier: ???
+//:chapter-refsig: {chapter-signifier}
 :example-caption: Példa
 :figure-caption: Ábra
 :important-caption: Fontos
@@ -11,7 +11,8 @@
 ifdef::listing-caption[:listing-caption: Lista]
 ifdef::manname-title[:manname-title: Név]
 :note-caption: Megjegyzés
-//:part-refsig: ???
+//:part-signifier: ???
+//:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Előszó]
 //:section-refsig: ???
 :table-caption: Táblázat

@@ -2,8 +2,8 @@
 :appendix-caption: Додаток
 :appendix-refsig: {appendix-caption}
 :caution-caption: Обережно
-:chapter-label: Розділ
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Розділ
+:chapter-refsig: {chapter-signifier}
 :example-caption: Приклад
 :figure-caption: Рисунок
 :important-caption: Важливо
@@ -11,8 +11,8 @@
 ifdef::listing-caption[:listing-caption: Лістинг]
 ifdef::manname-title[:manname-title: Назва]
 :note-caption: Зауваження
-:part-label: Частина
-:part-refsig: {part-label}
+:part-signifier: Частина
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Передмова]
 :section-refsig: Підрозділ
 :table-caption: Таблиця

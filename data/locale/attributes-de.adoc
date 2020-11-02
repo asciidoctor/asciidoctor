@@ -2,8 +2,8 @@
 :appendix-caption: Anhang
 :appendix-refsig: {appendix-caption}
 :caution-caption: Achtung
-:chapter-label: Kapitel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Beispiel
 :figure-caption: Abbildung
 :important-caption: Wichtig
@@ -11,8 +11,8 @@
 ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Bezeichnung]
 :note-caption: Anmerkung
-:part-label: Teil
-:part-refsig: {part-label}
+:part-signifier: Teil
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Vorwort]
 :section-refsig: Abschnitt
 :table-caption: Tabelle

@@ -2,8 +2,8 @@
 :appendix-caption: Bilaga
 :appendix-refsig: {appendix-caption}
 :caution-caption: Var uppmärksam
-:chapter-label: Kapitel
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Kapitel
+:chapter-refsig: {chapter-signifier}
 :example-caption: Exempel
 :figure-caption: Figur
 :important-caption: Viktigt
@@ -11,8 +11,8 @@
 ifdef::listing-caption[:listing-caption: Lista]
 ifdef::manname-title[:manname-title: Namn]
 :note-caption: Notera
-:part-label: Del
-:part-refsig: {part-label}
+:part-signifier: Del
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Förord]
 :section-refsig: Avsnitt
 :table-caption: Tabell

@@ -2,8 +2,8 @@
 :appendix-caption: Appendix
 :appendix-refsig: {appendix-caption}
 :caution-caption: Caution
-:chapter-label: Chapter
-:chapter-refsig: {chapter-label}
+:chapter-signifier: Chapter
+:chapter-refsig: {chapter-signifier}
 :example-caption: Example
 :figure-caption: Figure
 :important-caption: Important
@@ -11,8 +11,8 @@
 ifdef::listing-caption[:listing-caption: Listing]
 ifdef::manname-title[:manname-title: Name]
 :note-caption: Note
-:part-label: Part
-:part-refsig: {part-label}
+:part-signifier: Part
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Preface]
 :section-refsig: Section
 :table-caption: Table
