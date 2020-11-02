@@ -22,19 +22,20 @@ module Asciidoctor
 #    => { 'style' => 'quote', 'attribution' => 'Famous Person', 'citetitle' => 'Famous Book (2001)' }
 #
 class AttributeList
-  BACKSLASH = '\\'
   APOS = '\''
+  BACKSLASH = '\\'
+  QUOT = '"'
 
   # Public: Regular expressions for detecting the boundary of a value
   BoundaryRxs = {
-    '"' => /.*?[^\\](?=")/,
+    QUOT => /.*?[^\\](?=")/,
     APOS => /.*?[^\\](?=')/,
     ',' => /.*?(?=[ \t]*(,|$))/
   }
 
   # Public: Regular expressions for unescaping quoted characters
   EscapedQuotes = {
-    '"' => '\\"',
+    QUOT => '\\"',
     APOS => '\\\''
   }
 
@@ -45,7 +46,9 @@ class AttributeList
   BlankRx = /[ \t]+/
 
   # Public: Regular expressions for skipping delimiters
-  SkipRxs = { ',' => /[ \t]*(,|$)/ }
+  SkipRxs = {
+    ',' => /[ \t]*(,|$)/
+  }
 
   def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source
@@ -65,8 +68,6 @@ class AttributeList
     return @attributes if @attributes
 
     @attributes = {}
-    # QUESTION do we want to store the attribute list as the zero-index attribute?
-    #attributes[0] = @scanner.string
     index = 0
 
     while parse_attribute index, positional_attrs
@@ -83,83 +84,73 @@ class AttributeList
   end
 
   def self.rekey attributes, positional_attrs
-    index = 0
-    positional_attrs.each do |key|
-      index += 1
-      if (val = attributes[index])
+    positional_attrs.each_with_index do |key, index|
+      if key && (val = attributes[index + 1])
         # QUESTION should we delete the positional key?
         attributes[key] = val
-      end if key
+      end
     end
     attributes
   end
 
   private
 
-  def parse_attribute index = 0, positional_attrs = []
+  def parse_attribute index, positional_attrs
     continue = true
-    single_quoted_value = false
     skip_blank
-    # example: "quote"
-    if (first = @scanner.peek(1)) == '"'
+    case @scanner.peek 1
+    # example: "quote" || "foo
+    when QUOT
       name = parse_attribute_value @scanner.get_byte
-      value = nil
-    # example: 'quote'
-    elsif first == APOS
+    # example: 'quote' || 'foo
+    when APOS
       name = parse_attribute_value @scanner.get_byte
-      value = nil
-      single_quoted_value = true unless name.start_with? APOS
+      single_quoted = true unless name.start_with? APOS
     else
-      name = scan_name
-
-      skipped = 0
-      c = nil
+      skipped = ((name = scan_name) && skip_blank) || 0
       if @scanner.eos?
-        return false unless name || (@scanner.string.rstrip.end_with? @delimiter)
-        continue = false
-      else
-        skipped = skip_blank || 0
-        c = @scanner.get_byte
-      end
-
-      # example: quote
-      if !c
-        value = nil
-      elsif c == @delimiter
-        value = nil
+        return unless name || (@scanner.string.rstrip.end_with? @delimiter)
+        # example: quote (at eos)
+        continue = nil
+      # example: quote,
+      elsif (c = @scanner.get_byte) == @delimiter
         @scanner.unscan
-      # example: Sherlock Holmes || =foo=
-      elsif c != '=' || !name
-        name = %(#{name}#{' ' * skipped}#{c}#{scan_to_delimiter})
-        value = nil
-      else
-        skip_blank
-        if (c = @scanner.get_byte)
-          # example: foo="bar" || foo="ba\"zaar"
-          if c == '"'
+      elsif name
+        # example: foo=...
+        if c == '='
+          skip_blank
+          case (c = @scanner.get_byte)
+          # example: foo="bar" || foo="ba\"zaar" || foo="bar
+          when QUOT
             value = parse_attribute_value c
-          # example: foo='bar' || foo='ba\'zaar' || foo='ba"zaar'
-          elsif c == APOS
+          # example: foo='bar' || foo='ba\'zaar' || foo='ba"zaar' || foo='bar
+          when APOS
             value = parse_attribute_value c
-            single_quoted_value = true unless value.start_with? APOS
+            single_quoted = true unless value.start_with? APOS
           # example: foo=,
-          elsif c == @delimiter
+          when @delimiter
             value = ''
             @scanner.unscan
-          # example: foo=bar (all spaces ignored)
+          # example: foo= (at eos)
+          when nil
+            value = ''
+          # example: foo=bar || foo=None
           else
             value = %(#{c}#{scan_to_delimiter})
             return true if value == 'None'
           end
+        # example: foo bar
         else
-          value = ''
+          name = %(#{name}#{' ' * skipped}#{c}#{scan_to_delimiter})
         end
+      # example: =foo= || !foo
+      else
+        name = %(#{c}#{scan_to_delimiter})
       end
     end
 
     if value
-      # example: options="opt1,opt2,opt3"
-      # opts is an alias for options
+      # example: options="opt1,opt2,opt3" || opts="opts1,opt2,opt3"
       case name
       when 'options', 'opts'
         if value.include? ','
@@ -169,7 +160,7 @@ class AttributeList
           @attributes[%(#{value}-option)] = '' unless value.empty?
         end
       else
-        if single_quoted_value && @block
+        if single_quoted && @block
           case name
           when 'title', 'reftext'
             @attributes[name] = value
@@ -181,12 +172,12 @@ class AttributeList
         end
       end
     else
-      resolved_name = single_quoted_value && @block ? (@block.apply_subs name) : name
+      name = @block.apply_subs name if single_quoted && @block
       if (positional_attr_name = positional_attrs[index])
-        @attributes[positional_attr_name] = resolved_name
+        @attributes[positional_attr_name] = name
       end
       # QUESTION should we assign the positional key even when it's claimed by a positional attribute?
-      @attributes[index + 1] = resolved_name
+      @attributes[index + 1] = name
     end
 
     continue
@@ -194,18 +185,13 @@ class AttributeList
 
   def parse_attribute_value quote
     # empty quoted value
-    if @scanner.peek(1) == quote
+    if (@scanner.peek 1) == quote
       @scanner.get_byte
-      return ''
-    end
-
-    if (value = scan_to_quote quote)
+      ''
+    elsif (value = scan_to_quote quote)
       @scanner.get_byte
-      if value.include? BACKSLASH
-        value.gsub EscapedQuotes[quote], quote
-      else
-        value
-      end
+      (value.include? BACKSLASH) ? (value.gsub EscapedQuotes[quote], quote) : value
+    # leading quote only
     else
       %(#{quote}#{scan_to_delimiter})
     end
