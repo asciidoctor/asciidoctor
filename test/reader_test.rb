@@ -855,6 +855,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'unreadable file referenced by include directive is replaced by warning' do
+        next if windows? # JRuby on Windows runs this even with the conditional on the block
         include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
         FileUtils.chmod 0000, include_file
         input = <<~'EOS'

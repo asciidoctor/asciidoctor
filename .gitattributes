@@ -1,0 +1,16 @@
+/*file eol=lf
+/bin/* eol=lf
+*.adoc eol=lf
+*.asciidoc eol=lf
+*.css eol=lf
+*.erb eol=lf
+*.haml eol=lf
+*.jsx eol=lf
+*.ml eol=lf
+*.pdf -text
+*.rb eol=lf diff=ruby
+*.slim eol=lf
+*.svg eol=lf
+*.tsv eol=lf
+*.txt eol=lf
+*.xml eol=lf

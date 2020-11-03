@@ -1,0 +1,49 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    if: "! endsWith(github.event.head_commit.message, '[skip ci]')"
+    steps:
+    - run: echo ok go
+  build:
+    needs: activate
+    strategy:
+      matrix:
+        os: [windows-latest]
+        #ruby: ['2.7', '2.6', '2.5', '2.4', '2.3']
+        ruby: ['2.7']
+        pygments: [true]
+        include:
+        - os: windows-latest
+          ruby: jruby-9.2.13.0
+          pygments: false
+        - os: windows-latest
+          ruby: jruby-9.1.17.0
+          pygments: false
+    runs-on: ${{ matrix.os }}
+    env:
+      SOURCE_DATE_EPOCH: '1521504000'
+    steps:
+    - name: Enable Pygments
+      if: ${{ matrix.pygments }}
+      run: |
+        echo "PYGMENTS_VERSION='~> 1.2.0'" >> $GITHUB_ENV
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 5
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+    - name: Configure Bundler
+      run: |
+        bundle config --local path .bundle/gems
+        bundle config --local without docs lint coverage
+    - name: Install dependencies
+      run: |
+        bundle --jobs 3 --retry 3
+    - name: Test
+      run: |
+        bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all

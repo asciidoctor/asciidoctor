@@ -113,6 +113,7 @@ context 'Invoker' do
   end
 
   test 'should accept input from named pipe and output to stdout' do
+    next if windows? # JRuby on Windows runs this even with the conditional on the block
     sample_inpath = fixture_path 'sample-pipe.adoc'
     begin
       %x(mkfifo #{sample_inpath})

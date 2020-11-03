@@ -85,6 +85,7 @@ context 'API' do
     end
 
     test 'should convert filename that contains non-ASCII characters independent of default encodings' do
+      next if windows? && jruby? # JRuby on Windows runs this even with the conditional on the block
       old_external = Encoding.default_external
       old_internal = Encoding.default_internal
       old_verbose = $VERBOSE
@@ -110,7 +111,7 @@ context 'API' do
         Encoding.default_internal = old_internal
         $VERBOSE = old_verbose
       end
-    end
+    end unless windows? && jruby?
 
     test 'should load input IO' do
       input = StringIO.new <<~'EOS'

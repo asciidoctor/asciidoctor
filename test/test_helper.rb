@@ -344,6 +344,7 @@ class Minitest::Test
           old_env, env = ENV, (ENV.merge env)
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
           ENV.replace env
+          p [cmd, *args, opts]
           IO.popen [cmd, *args, opts], &block
         ensure
           ENV.replace old_env
