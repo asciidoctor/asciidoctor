@@ -35,7 +35,7 @@ class Minitest::Test
   end
 
   def windows?
-    RbConfig::CONFIG['host_os'] =~ /win|ming/
+    /win|ming/.match? RbConfig::CONFIG['host_os']
   end
 
   def disk_root
@@ -178,11 +178,11 @@ class Minitest::Test
   end
 
   def xmldoc_from_string content
-    if (content.start_with? '<?xml ') || RE_XMLNS_ATTRIBUTE =~ content
+    if (content.start_with? '<?xml ') || (RE_XMLNS_ATTRIBUTE.match? content)
       Nokogiri::XML::Document.parse content
-    elsif !(doctype_match = content.match RE_DOCTYPE)
+    elsif !(RE_DOCTYPE =~ content)
       Nokogiri::HTML::DocumentFragment.parse content
-    elsif doctype_match[1].start_with? 'html'
+    elsif $1.start_with? 'html'
       Nokogiri::HTML::Document.parse content
     else
       Nokogiri::XML::Document.parse content
