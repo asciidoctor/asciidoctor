@@ -9,7 +9,7 @@ group :development do
   gem 'haml', '~> 4.0' if RUBY_ENGINE == 'truffleruby'
 end
 
-group :doc do
+group :docs do
   gem 'yard'
   gem 'yard-tomdoc'
 end
