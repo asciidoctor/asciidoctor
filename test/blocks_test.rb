@@ -1774,6 +1774,67 @@ context 'Blocks' do
       assert_equal expect.strip, output.strip
     end
 
+    test 'should set autoNumber option for latexmath to none by default' do
+      input = <<~'EOS'
+      :stem: latexmath
+
+      [stem]
+      ++++
+      y = x^2
+      ++++
+      EOS
+
+      output = convert_string input
+      assert_includes output, 'TeX: { equationNumbers: { autoNumber: "none" } }'
+    end
+
+    test 'should set autoNumber option for latexmath to none if eqnums is set to none' do
+      input = <<~'EOS'
+      :stem: latexmath
+      :eqnums: none
+
+      [stem]
+      ++++
+      y = x^2
+      ++++
+      EOS
+
+      output = convert_string input
+      assert_includes output, 'TeX: { equationNumbers: { autoNumber: "none" } }'
+    end
+
+    test 'should set autoNumber option for latexmath to AMS if eqnums is set' do
+      input = <<~'EOS'
+      :stem: latexmath
+      :eqnums:
+
+      [stem]
+      ++++
+      \begin{equation}
+      y = x^2
+      \end{equation}
+      ++++
+      EOS
+
+      output = convert_string input
+      assert_includes output, 'TeX: { equationNumbers: { autoNumber: "AMS" } }'
+    end
+
+    test 'should set autoNumber option for latexmath to all if eqnums is set to all' do
+      input = <<~'EOS'
+      :stem: latexmath
+      :eqnums: all
+
+      [stem]
+      ++++
+      y = x^2
+      ++++
+      EOS
+
+      output = convert_string input
+      assert_includes output, 'TeX: { equationNumbers: { autoNumber: "all" } }'
+    end
+
     test 'should not split equation in AsciiMath block at single newline' do
       input = <<~'EOS'
       [asciimath]
