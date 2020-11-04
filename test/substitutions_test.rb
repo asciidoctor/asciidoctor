@@ -1046,11 +1046,12 @@ context 'Substitutions' do
       assert_equal 'An example footnote.', footnote.text
     end
 
-    test 'an unresolved footnote reference should produce a warning message' do
+    test 'an unresolved footnote reference should produce a warning message and output fallback text in red' do
       input = 'Sentence text.footnote:ex1[]'
       using_memory_logger do |logger|
         para = block_from_string input
-        para.sub_macros para.source
+        output = para.sub_macros para.source
+        assert_equal 'Sentence text.<sup class="footnoteref red" title="Unresolved footnote reference.">[ex1]</sup>', output
         assert_message logger, :WARN, 'invalid footnote reference: ex1'
       end
     end

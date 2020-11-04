@@ -859,7 +859,7 @@ module Substitutors
             type, target = :ref, nil
           else
             logger.warn %(invalid footnote reference: #{id})
-            index, text = nil, id
+            type, target, text, id = :xref, id, id, nil
           end
         elsif text
           text = restore_passthroughs(normalize_text text, true, true)
