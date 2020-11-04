@@ -325,7 +325,7 @@ WARNING: 当你通过 API 使用 Asciidoctor 时，默认的安全模式是 `:se
 在 secure 模式下，很多核心特性将不可用，包括 `include` 特性。
 如果你想启用这些特性，你需要明确设置安全模式为 `:server` （推荐）或 `:safe`。
 
-你也可以将 AsciiDoc 字符串转化我内嵌的 HTML （为了插入到一个 HTML 页面），用法如下：
+你也可以将 AsciiDoc 字符串转化为可内嵌的 HTML （为了插入到一个 HTML 页面），用法如下：
 
 [source]
 ----
