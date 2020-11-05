@@ -78,10 +78,10 @@ class Table < AbstractBlock
     @attributes['orientation'] = 'landscape' if attributes['rotate-option']
   end
 
-  # Internal: Returns whether the current row being processed is
-  # the header row
+  # Internal: Returns the current state of the header option (true or :implicit) if
+  # the row being processed is (or is assumed to be) the header row, otherwise nil
   def header_row?
-    @has_header_option && @rows.body.empty?
+    (val = @has_header_option) && @rows.body.empty? ? val : nil
   end
 
   # Internal: Creates the Column objects from the column spec
@@ -239,10 +239,10 @@ class Table::Cell < AbstractBlock
     # NOTE: column is always set when parsing; may not be set when building table from the API
     if column
       if (in_header_row = column.table.header_row?)
-        if (cell_style = column.style || attributes&.[]('style')) == :asciidoc || cell_style == :literal
-          @reinitialize_args = [column, cell_text, attributes&.merge, opts]
+        if in_header_row == :implicit && (cell_style = column.style || (attributes && attributes['style']))
+          @reinitialize_args = [column, cell_text, attributes && attributes.merge, opts] if cell_style == :asciidoc || cell_style == :literal
+          cell_style = nil
         end
-        cell_style = nil
       else
         cell_style = column.style
       end
