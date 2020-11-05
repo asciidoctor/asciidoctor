@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
+
 // tag::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
 
