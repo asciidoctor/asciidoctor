@@ -2284,7 +2284,8 @@ class Parser
       table.has_header_option = true
     elsif skipped == 0 && !attributes['noheader-option']
       # NOTE: assume table has header until we know otherwise; if it doesn't (nil), cells in first row get reprocessed
-      table.has_header_option = implicit_header = true
+      table.has_header_option = :implicit
+      implicit_header = true
     end
     parser_ctx = Table::ParserContext.new table_reader, table, attributes
     format, loop_idx, implicit_header_boundary = parser_ctx.format, -1, nil
@@ -2393,7 +2394,7 @@ class Parser
     end
 
     table.assign_column_widths unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
-    attributes['header-option'] = '' if implicit_header
+    table.has_header_option = true if implicit_header
     table.partition_header_footer attributes
 
     table
