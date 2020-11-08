@@ -19,6 +19,7 @@ Bug Fixes::
 
   * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
   * Fix crash when inlining an SVG if the explicit width or height value on the image node is not a string (#3829)
+  * Reset word wrap behavior to normal on tables, then reenable again for admonition content, horizontal dlist description, and AsciiDoc table cells (#3833)
 
 Compliance::
 
