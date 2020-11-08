@@ -513,7 +513,7 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_inline_image node
     width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
     depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
-    %(<inlinemediaobject>
+    %(<inlinemediaobject#{common_attributes nil, node.role}>
 <imageobject>
 <imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
 </imageobject>

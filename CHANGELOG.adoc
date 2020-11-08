@@ -19,6 +19,10 @@ Bug Fixes::
 
   * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
 
+Improvements::
+
+  * Pass through role to DocBook output for inline image (#3832)
+
 Compliance::
 
   * Defer use of Ruby >= 2.3 constructs to restore compatibility with Ruby 2.0 until at least next minor release (#3827)
