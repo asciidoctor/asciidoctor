@@ -761,6 +761,12 @@ context 'Substitutions' do
           para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should pass through role on image macro to DocBook output' do
+      para = block_from_string 'image:tiger.png[Tiger,200,role=animal]', backend: 'docbook'
+      result = para.sub_macros(para.source)
+      assert_includes result, '<inlinemediaobject role="animal">'
+    end
+
     test 'a single-line image macro with text and link should be interpreted as a linked image with alt text' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal %{<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>},

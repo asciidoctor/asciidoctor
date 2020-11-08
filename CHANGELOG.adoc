@@ -20,6 +20,10 @@ Bug Fixes::
   * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
   * Fix crash when inlining an SVG if the explicit width or height value on the image node is not a string (#3829)
 
+Improvements::
+
+  * Pass through role to DocBook output for inline image (#3832)
+
 Compliance::
 
   * Defer use of Ruby >= 2.3 constructs to restore compatibility with Ruby 2.0 until at least next minor release (#3827)
