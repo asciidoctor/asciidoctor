@@ -2263,7 +2263,7 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//object[@type="image/svg+xml"][@data="http://example.org/tiger-svg"][@width="100"]/span[@class="alt"][text()="Tiger"]', output, 1
     end
 
-    test 'converts inline SVG image using svg element' do
+    test 'converts to inline SVG image when inline option is set on block' do
       input = <<~'EOS'
       :imagesdir: fixtures
 
@@ -2272,13 +2272,13 @@ context 'Blocks' do
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
-      assert_match(/<svg\s[^>]*width="100px"[^>]*>/, output, 1)
-      refute_match(/<svg\s[^>]*width="500px"[^>]*>/, output)
-      refute_match(/<svg\s[^>]*height="500px"[^>]*>/, output)
-      refute_match(/<svg\s[^>]*style="width:500px;height:500px"[^>]*>/, output)
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output, 1)
+      refute_match(/<svg\s[^>]*width="500"[^>]*>/, output)
+      refute_match(/<svg\s[^>]*height="500"[^>]*>/, output)
+      refute_match(/<svg\s[^>]*style="[^>]*>/, output)
     end
 
-    test 'should honor percentage width for inline SVG' do
+    test 'should honor percentage width for SVG image with inline option' do
       input = <<~'EOS'
       :imagesdir: fixtures
 
@@ -2289,7 +2289,20 @@ context 'Blocks' do
       assert_match(/<svg\s[^>]*width="50%"[^>]*>/, output, 1)
     end
 
-    test 'converts inline SVG image using svg element even when data-uri is set' do
+    test 'should not crash if explicit width on SVG image block is an integer' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      image::circle.svg[Circle,opts=inline]
+      EOS
+
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      doc.blocks[0].set_attr 'width', 50
+      output = doc.convert
+      assert_match %r/<svg\s[^>]*width="50"[^>]*>/, output, 1
+    end
+
+    test 'converts to inline SVG image when inline option is set on block and data-uri is set on document' do
       input = <<~'EOS'
       :imagesdir: fixtures
       :data-uri:
@@ -2299,7 +2312,7 @@ context 'Blocks' do
       EOS
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
-      assert_match(/<svg\s[^>]*width="100px">/, output, 1)
+      assert_match(/<svg\s[^>]*width="100">/, output, 1)
     end
 
     test 'should not throw exception if SVG to inline is empty' do
@@ -2317,7 +2330,7 @@ context 'Blocks' do
       assert_xpath '//span[@class="alt"]', output, 0
     end
 
-    test 'embeds remote inline SVG when allow-uri-read is set' do
+    test 'embeds remote SVG to inline when inline option is set on block and allow-uri-read is set on document' do
       input = %(image::http://#{resolve_localhost}:9876/fixtures/circle.svg[Circle,100,100,opts=inline])
       output = using_test_webserver do
         convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
@@ -2325,12 +2338,12 @@ context 'Blocks' do
 
       assert_css 'svg', output, 1
       assert_css 'svg[style]', output, 0
-      assert_css 'svg[width="100px"]', output, 1
-      assert_css 'svg[height="100px"]', output, 1
+      assert_css 'svg[width="100"]', output, 1
+      assert_css 'svg[height="100"]', output, 1
       assert_css 'svg circle', output, 1
     end
 
-    test 'converts alt text for inline svg element if svg cannot be read' do
+    test 'converts to alt text for SVG with inline option set if SVG cannot be read' do
       input = <<~'EOS'
       [%inline]
       image::no-such-image.svg[Alt Text]

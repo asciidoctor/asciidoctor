@@ -18,10 +18,12 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
+  * Fix crash when inlining an SVG if the explicit width or height value on the image node is not a string (#3829)
 
 Compliance::
 
   * Defer use of Ruby >= 2.3 constructs to restore compatibility with Ruby 2.0 until at least next minor release (#3827)
+  * Don't append the default px unit identifier to the explicit width or height value when inlining an SVG (#3829)
 
 // tag::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
