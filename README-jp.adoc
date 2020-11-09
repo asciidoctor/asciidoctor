@@ -94,11 +94,6 @@ endif::[]
 スポンサーのみなさま, ありがとうございます！
 みなさまの多くのサポートなくしてAsciidoctorは実現不可能です.
 
-ifndef::env-site,env-yard[]
-Asciidoctorの主な資金的サポートは, *Change Maker* である https://opendevise.com[OpenDevise], *Strategy Sponsors* である https://www.khronos.org/[Khronos Group] とLinda Roberts, そして *Pull Request Backers* である Brian Dominick, Guillaume Grossetie, Abel Salgado Romero によって提供されています.
-さらに, {uri-project}/supporters[Community Backers] のページに掲載されているサポーターによって追加的な資金が提供されています.
-endif::[]
-
 https://opencollective.com/asciidoctor[OpenCollective] を通じてスポンサーになることにより, このプロジェクトを支援することができます.
 
 == 全体像

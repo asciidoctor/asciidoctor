@@ -105,11 +105,6 @@ We want to recognize our {uri-project}/supporters[sponsors] for their commitment
 Thank you sponsors!
 Without your generous support, Asciidoctor would not be possible.
 
-ifndef::env-site,env-yard[]
-Major funding for Asciidoctor is provided by our *Change Maker*, https://opendevise.com[OpenDevise], our *Strategy Sponsors*, https://www.khronos.org/[Khronos Group] and Linda Roberts, and our *Pull Request Backers*, Brian Dominick, Guillaume Grossetie, and Abel Salgado Romero.
-Additional funding is provided by the supporters listed on our {uri-project}/supporters[Community Backers] page.
-endif::[]
-
 You can support this project by becoming a sponsor through https://opencollective.com/asciidoctor[OpenCollective].
 
 == The Big Picture
