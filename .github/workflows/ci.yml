@@ -7,10 +7,10 @@ on:
 jobs:
   activate:
     runs-on: ubuntu-latest
-    if: |
-      !endsWith(github.event.head_commit.message, '[skip ci]')
+    if: "!endsWith(github.event.head_commit.message, '[skip ci]')"
     steps:
-    - run: echo ok go
+    - name: Proceed
+      run: echo ok go
   build:
     needs: activate
     strategy:
@@ -55,30 +55,20 @@ jobs:
         bundle config --local without docs
     - name: Set Rouge version
       if: matrix.rouge-version
-      run: |
-        echo "ROUGE_VERSION=${{ matrix.rouge-version }}" >> $GITHUB_ENV
+      run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
     - name: Set JRUBY_OPTS
       if: matrix.jruby-opts
-      run: |
-        echo "JRUBY_OPTS=${{ matrix.jruby-opts }}" >> $GITHUB_ENV
+      run: echo 'JRUBY_OPTS=${{ matrix.jruby-opts }}' >> $GITHUB_ENV
     - name: Install Nokogiri build dependencies
       if: contains(matrix.ruby, 'truffleruby')
-      run: |
-        sudo apt-get install libxslt1-dev
+      run: sudo apt-get install libxslt1-dev
     - name: Install dependencies
-      run: |
-        bundle --jobs 3 --retry 3
+      run: bundle --jobs 3 --retry 3
     - name: Run tests
-      run: |
-        bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
+      run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Build dependents
-      if: |
-        matrix.primary &&
-        github.event_name != 'schedule' &&
-        github.repository == 'asciidoctor/asciidoctor' &&
-        !github.base_ref
+      if: matrix.primary && github.event_name != 'schedule' && github.repository == 'asciidoctor/asciidoctor' && !github.base_ref
       env:
         GITHUB_API_TOKEN: ${{ secrets._GITHUB_API_TOKEN }}
         TRAVIS_API_TOKEN: ${{ secrets.TRAVIS_API_TOKEN }}
-      run: |
-        bundle exec rake build:dependents
+      run: bundle exec rake build:dependents
