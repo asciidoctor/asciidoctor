@@ -15,22 +15,29 @@ jobs:
     needs: activate
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        ruby: [truffleruby-20.2.0, 2.3.8, 2.4.10, 2.5.8, 2.6.6, jruby-9.1.17.0]
+        os: [ubuntu-latest, windows-latest]
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7']
         rouge-version: [~]
+        exclude:
+        - os: ubuntu-latest
+          ruby: '2.7'
         include:
         - os: ubuntu-latest
+          ruby: truffleruby-20.2.0
+        - os: ubuntu-latest
+          ruby: jruby-9.1.17.0
+        - os: ubuntu-latest
           ruby: jruby-9.2.13.0
-          jruby-opts: '-J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-Xss2m -Xcompile.invokedynamic=false'
         - os: ubuntu-latest
           ruby: 2.3.8
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
-          ruby: 2.7.2
+          ruby: '2.7'
           primary: true
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
+      JRUBY_OPTS: '-J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-Xss2m -Xcompile.invokedynamic=false'
       PYGMENTS_VERSION: '~> 1.2.0'
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
