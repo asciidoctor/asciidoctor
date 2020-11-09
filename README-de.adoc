@@ -7,7 +7,6 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 :language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
-:status:
 :outfilesuffix: .adoc
 :caution-caption: :fire:
 :important-caption: :exclamation:
@@ -82,15 +81,6 @@ endif::[]
 * {uri-docs}/asciidoc-writers-guide[Asciidoctor Benutzerhandbuch]
 * {uri-docs}/user-manual[Asciidoctor Gebrauchshandbuch]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax-Referenz]
-
-ifdef::status[]
-.*Projekt Status*
-image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
-image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
-//image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
-//image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
-image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
-endif::[]
 
 == Sponsoren
 

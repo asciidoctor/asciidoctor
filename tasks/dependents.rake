@@ -2,24 +2,22 @@
 namespace :build do
   desc 'Trigger builds for all dependent projects on Travis CI and Github Actions'
   task :dependents do
-    next unless ENV['TRAVIS'].to_s == 'true' &&
-      ENV['TRAVIS_PULL_REQUEST'].to_s == 'false' &&
-      ENV['TRAVIS_TAG'].to_s.empty?
+    next unless ENV['GITHUB_ACTIONS'].to_s == 'true' && ENV['GITHUB_EVENT_NAME'].to_s != 'pull_request' && !(ENV['GITHUB_REF'].to_s.start_with? 'refs/tags/')
 
-    if (commit_hash = ENV['TRAVIS_COMMIT'])
-      commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['TRAVIS_REPO_SLUG'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
+    if (commit_hash = ENV['GITHUB_SHA'])
+      commit_memo = %( (#{commit_hash.slice 0, 8})\n\nhttps://github.com/#{ENV['GITHUB_REPOSITORY'] || 'asciidoctor/asciidoctor'}/commit/#{commit_hash})
     end
 
-    # NOTE The TRAVIS_TOKEN env var must be defined in the Travis interface.
+    # NOTE The TRAVIS_TOKEN env var must be defined in the CI interface.
     # Retrieve this token using the `travis token` command.
     # The GitHub user corresponding to the Travis user must have write access to the repository.
     # After granting permission, sign into Travis and resync the repositories.
-    travis_token = ENV['TRAVIS_TOKEN']
+    travis_token = ENV['TRAVIS_API_TOKEN']
 
-    # NOTE The GITHUB_TOKEN env var must be defined in the Travis interface.
+    # NOTE The GITHUB_TOKEN env var must be defined in the CI interface.
     # Retrieve this token using the settings of the account/org -> Developer Settings -> Personal Access Tokens
     # and generate a new "Personal Access Token" with the "repo" scope
-    github_token = ENV['GITHUB_TOKEN']
+    github_token = ENV['GITHUB_API_TOKEN']
 
     require 'json'
     require 'net/http'
