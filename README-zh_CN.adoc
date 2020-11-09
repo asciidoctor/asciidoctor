@@ -8,7 +8,6 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 :language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
-:status:
 :outfilesuffix: .adoc
 :caution-caption: :fire:
 :important-caption: :exclamation:
@@ -87,15 +86,6 @@ Asciidoctor 也可以运行在 JavaScript 上。
 我们可以使用 http://opalrb.org[Opal] 将 Ruby 源码编译成 JavaScript 生成 {uri-asciidoctorjs}[Asciidoctor.js] 文件，这是一个全功能版的 Asciidoctor，可以运行在任意的 JavaScript 环境中，比如 Web 浏览器 或 Node.js。
 Asciidoctor.js 被用于预览 AsciiDoc，支持 Chrome 扩展，Atom，Brackets 或其他基于 Web 的工具。
 ****
-
-ifdef::status[]
-.*Project health*
-image:https://img.shields.io/travis/asciidoctor/asciidoctor/master.svg[Build Status (Travis CI), link=https://travis-ci.org/asciidoctor/asciidoctor]
-image:https://ci.appveyor.com/api/projects/status/ifplu67oxvgn6ceq/branch/master?svg=true&amp;passingText=green%20bar&amp;failingText=%23fail&amp;pendingText=building%2E%2E%2E[Build Status (AppVeyor), link=https://ci.appveyor.com/project/asciidoctor/asciidoctor]
-//image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status, link=https://coveralls.io/r/asciidoctor/asciidoctor]
-//image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate, link="https://codeclimate.com/github/asciidoctor/asciidoctor"]
-image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs, link="https://inch-ci.org/github/asciidoctor/asciidoctor"]
-endif::[]
 
 [#the-big-picture]
 == 整体概况
