@@ -1,0 +1,36 @@
+name: Release
+on:
+  push:
+    tags:
+    - 'v*'
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    if: |
+      github.repository == 'asciidoctor/asciidoctor'
+    steps:
+    - run: echo ok go
+  build:
+    needs: activate
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7.2
+    - name: Configure Bundler
+      run: |
+        bundle config --local path .bundle/gems
+        bundle config --local without coverage docs
+    - name: Install dependencies
+      run: |
+        bundle --jobs 3 --retry 3
+    - name: Run tests
+      run: |
+        bundle exec rake test:all
+    - name: Publish gem
+      uses: dawidd6/action-publish-gem@v1
+      with:
+        api_key: ${{ secrets.RUBYGEMS_API_KEY }}

@@ -30,6 +30,10 @@ Compliance::
   * Defer use of Ruby >= 2.3 constructs to restore compatibility with Ruby 2.0 until at least next minor release (#3827)
   * Don't append the default px unit identifier to the explicit width or height value when inlining an SVG (#3829)
 
+Build / Infrastructure::
+
+  * Migrate Linux-based CI jobs to GitHub Actions (#3837)
+
 // tag::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
 
