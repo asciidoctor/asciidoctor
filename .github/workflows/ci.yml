@@ -1,5 +1,9 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: '0 2 * * *'
 jobs:
   activate:
     runs-on: ubuntu-latest
@@ -63,6 +67,7 @@ jobs:
     - name: Build dependents
       if: |
         matrix.primary &&
+        github.event_name != 'schedule' &&
         github.repository == 'asciidoctor/asciidoctor' &&
         !github.base_ref
       env:
