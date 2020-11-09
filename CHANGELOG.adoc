@@ -32,7 +32,8 @@ Compliance::
 
 Build / Infrastructure::
 
-  * Migrate Linux-based CI jobs to GitHub Actions (#3837)
+  * Migrate Linux CI jobs to GitHub Actions (#3837)
+  * Migrate Windows CI jobs to GitHub Actions (#3839)
 
 // tag::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
