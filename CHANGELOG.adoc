@@ -13,7 +13,8 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+// tag::compact[]
+== 2.0.12.rc.1 (2020-11-10) - @mojavelinux
 
 Bug Fixes::
 
@@ -36,7 +37,7 @@ Build / Infrastructure::
   * Migrate Windows CI jobs to GitHub Actions (#3839)
   * Run CI job on macOS (#3842)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
 
 Bug Fixes::
@@ -116,7 +117,6 @@ Build / Infrastructure::
   * Upgrade TruffleRuby to 20.0.0 (*@mogztter*)
   * Trigger upstream builds for AsciidoctorJ on Github Actions (*@robertpanzer*)
 
-// end::compact[]
 == 2.0.10 (2019-05-31) - @mojavelinux
 
 Bug Fixes::
