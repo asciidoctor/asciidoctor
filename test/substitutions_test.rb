@@ -2225,7 +2225,7 @@ context 'Substitutions' do
       assert_equal [:highlight], block.subs
     end
 
-    test 'should resolve specialcharacters sub as highlight for source block when source highlighter is pygments' do
+    test 'should resolve specialcharacters sub as highlight for source block when source highlighter is pygments', if: ENV['PYGMENTS_VERSION'] do
       doc = empty_document attributes: { 'source-highlighter' => 'pygments' }, parse: true
       block = Asciidoctor::Block.new doc, :listing, content_model: :verbatim
       block.style = 'source'
@@ -2233,7 +2233,7 @@ context 'Substitutions' do
       block.attributes['language'] = 'ruby'
       block.commit_subs
       assert_equal [:highlight], block.subs
-    end if ENV['PYGMENTS_VERSION']
+    end
 
     test 'should not replace specialcharacters sub with highlight for source block when source highlighter is not set' do
       doc = empty_document parse: true
