@@ -34,8 +34,12 @@ class Minitest::Test
     RUBY_ENGINE == 'jruby'
   end
 
+  def self.windows?
+    /mswin|msys|mingw/.match? RbConfig::CONFIG['host_os']
+  end
+
   def windows?
-    /win|ming/.match? RbConfig::CONFIG['host_os']
+    Minitest::Test.windows?
   end
 
   def disk_root
@@ -437,14 +441,24 @@ class Minitest::Test
       end
     end
 
-    def context *name, &block
+    def context name, opts = {}, &block
+      if opts.key? :if
+        return unless opts[:if]
+      elsif opts.key? :unless
+        return if opts[:unless]
+      end
       subclass = Class.new self
       remove_tests subclass
       subclass.class_eval(&block) if block_given?
-      const_set (context_name name.join(' ')), subclass
+      const_set (context_name name), subclass
     end
 
-    def test name, &block
+    def test name, opts = {}, &block
+      if opts.key? :if
+        return unless opts[:if]
+      elsif opts.key? :unless
+        return if opts[:unless]
+      end
       define_method (test_name name), &block
     end
 
@@ -473,6 +487,6 @@ class Minitest::Test
   end
 end
 
-def context *name, &block
+def context name, &block
   Minitest::Test.context name, &block
 end

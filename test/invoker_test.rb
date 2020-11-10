@@ -112,7 +112,7 @@ context 'Invoker' do
     assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
-  test 'should accept input from named pipe and output to stdout' do
+  test 'should accept input from named pipe and output to stdout', unless: windows? do
     sample_inpath = fixture_path 'sample-pipe.adoc'
     begin
       %x(mkfifo #{sample_inpath})
@@ -126,7 +126,7 @@ context 'Invoker' do
     ensure
       FileUtils.rm_f sample_inpath
     end
-  end unless windows?
+  end
 
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = fixturedir

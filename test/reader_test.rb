@@ -854,7 +854,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'unreadable file referenced by include directive is replaced by warning' do
+      test 'unreadable file referenced by include directive is replaced by warning', unless: windows? do
         include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
         FileUtils.chmod 0000, include_file
         input = <<~'EOS'
@@ -876,7 +876,7 @@ class ReaderTest < Minitest::Test
         ensure
           FileUtils.chmod 0644, include_file
         end
-      end unless windows?
+      end
 
       # IMPORTANT this test needs to be run on Windows to verify proper behavior in Windows
       test 'can resolve include directive with absolute path' do

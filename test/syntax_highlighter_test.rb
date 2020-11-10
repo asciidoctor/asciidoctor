@@ -748,7 +748,7 @@ context 'Syntax Highlighter' do
       assert_include '<span class="cp">&lt;?php</span>', output
     end
 
-    test 'should preserve cgi-style options on language when setting start_inline option for PHP' do
+    test 'should preserve cgi-style options on language when setting start_inline option for PHP', if: (Rouge.version >= '2.1.0') do
       input = <<~'EOS'
       [,php?funcnamehighlighting=0]
       ----
@@ -760,7 +760,7 @@ context 'Syntax Highlighter' do
       # if class is "nb", then the funcnamehighlighting option is not honored
       assert_include '<span class="nx">cal_days_in_month</span>', output
       assert_include '<span class="mi">2019</span>', output
-    end if Rouge.version >= '2.1.0'
+    end
 
     test 'should not crash if source-highlighter attribute is set and source block does not define a language' do
       input = <<~'EOS'
@@ -794,7 +794,7 @@ context 'Syntax Highlighter' do
       assert_xpath %(//code[text()='CAN HAS STDIO?\nPLZ OPEN FILE "LOLCATS.TXT"?\nKTHXBYE']), output, 1
     end
 
-    test 'should honor cgi-style options on language' do
+    test 'should honor cgi-style options on language', if: (Rouge.version >= '2.1.0') do
       input = <<~'EOS'
       :source-highlighter: rouge
 
@@ -806,7 +806,7 @@ context 'Syntax Highlighter' do
       output = convert_string_to_embedded input, safe: :safe
       assert_css 'code[data-lang=console]', output, 1
       assert_css 'code span.gp', output, 1
-    end if Rouge.version >= '2.1.0'
+    end
 
     test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
       input = <<~'EOS'
@@ -1101,8 +1101,8 @@ context 'Syntax Highlighter' do
     end
   end
 
-  context 'Pygments' do
-    test 'should syntax highlight source if source-highlighter attribute is set' do
+  context 'Pygments', if: ENV['PYGMENTS_VERSION'] do
+    test 'wip should syntax highlight source if source-highlighter attribute is set' do
       input = <<~'EOS'
       :source-highlighter: pygments
       :pygments-style: monokai
@@ -1275,5 +1275,5 @@ context 'Syntax Highlighter' do
       output = convert_string_to_embedded input, safe: :safe
       assert_includes output, expected
     end
-  end if ENV['PYGMENTS_VERSION']
+  end
 end
