@@ -28,6 +28,8 @@ jobs:
           ruby: jruby-9.1.17.0
         - os: ubuntu-latest
           ruby: jruby-9.2.13.0
+        - os: macos-latest
+          ruby: '2.7'
         - os: ubuntu-latest
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
