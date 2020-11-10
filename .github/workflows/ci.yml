@@ -19,27 +19,29 @@ jobs:
     needs: activate
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7']
-        rouge-version: [~]
-        exclude:
-        - os: ubuntu-latest
-          ruby: '2.7'
-        include:
-        - os: ubuntu-latest
-          ruby: truffleruby-20.2.0
-        - os: ubuntu-latest
-          ruby: jruby-9.1.17.0
-        - os: ubuntu-latest
-          ruby: jruby-9.2.13.0
-        - os: macos-latest
-          ruby: '2.7'
-        - os: ubuntu-latest
-          ruby: '2.3'
-          rouge-version: '~> 2.0.0'
-        - os: ubuntu-latest
-          ruby: '2.7'
-          primary: true
+        os: [ubuntu-latest]
+        ruby: ['2.7']
+        #os: [ubuntu-latest, windows-latest]
+        #ruby: ['2.3', '2.4', '2.5', '2.6', '2.7']
+        #rouge-version: [~]
+        #exclude:
+        #- os: ubuntu-latest
+        #  ruby: '2.7'
+        #include:
+        #- os: ubuntu-latest
+        #  ruby: truffleruby-20.2.0
+        #- os: ubuntu-latest
+        #  ruby: jruby-9.1.17.0
+        #- os: ubuntu-latest
+        #  ruby: jruby-9.2.13.0
+        #- os: macos-latest
+        #  ruby: '2.7'
+        #- os: ubuntu-latest
+        #  ruby: '2.3'
+        #  rouge-version: '~> 2.0.0'
+        #- os: ubuntu-latest
+        #  ruby: '2.7'
+        #  primary: true
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
@@ -72,6 +74,12 @@ jobs:
       run: bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
+    - name: Debug
+      run: |
+        echo ${{ matrix.primary }}
+        echo ${{ github.event_name }}
+        echo ${{ github.repository }}
+        echo ${{ github.base_ref }}
     - name: Build dependents
       if: matrix.primary && github.event_name != 'schedule' && github.repository == 'asciidoctor/asciidoctor' && !github.base_ref
       env:
