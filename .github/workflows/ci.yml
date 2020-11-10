@@ -73,7 +73,7 @@ jobs:
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Build dependents
-      if: matrix.primary && github.event_name != 'schedule' && github.repository == 'asciidoctor/asciidoctor' && !github.base_ref
+      if: matrix.primary && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
       env:
         GITHUB_API_TOKEN: ${{ secrets._GITHUB_API_TOKEN }}
         TRAVIS_API_TOKEN: ${{ secrets.TRAVIS_API_TOKEN }}
