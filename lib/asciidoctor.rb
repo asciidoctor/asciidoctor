@@ -136,8 +136,8 @@ module Asciidoctor
     # Compliance value: true
     define :underline_style_section_titles, true
 
-    # Asciidoctor will unwrap the content in a preamble
-    # if the document has a title and no sections.
+    # Asciidoctor will unwrap the content in a preamble if the document has a
+    # title and no sections, then discard the empty preamble.
     # Compliance value: false
     define :unwrap_standalone_preamble, true
 
