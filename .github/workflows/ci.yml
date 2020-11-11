@@ -10,8 +10,8 @@ on:
   - cron: '0 2 * * *'
 jobs:
   activate:
-    runs-on: ubuntu-latest
     if: "!endsWith(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
     steps:
     - name: Proceed
       run: echo ok go

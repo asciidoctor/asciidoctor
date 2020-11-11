@@ -5,9 +5,8 @@ on:
     - 'v*'
 jobs:
   activate:
+    if: github.repository == 'asciidoctor/asciidoctor'
     runs-on: ubuntu-latest
-    if: |
-      github.repository == 'asciidoctor/asciidoctor'
     steps:
     - run: echo ok go
   build:
@@ -16,20 +15,20 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 5
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7.2
+        ruby-version: '2.7'
     - name: Configure Bundler
       run: |
         bundle config --local path .bundle/gems
         bundle config --local without coverage docs
     - name: Install dependencies
-      run: |
-        bundle --jobs 3 --retry 3
+      run: bundle --jobs 3 --retry 3
     - name: Run tests
-      run: |
-        bundle exec rake test:all
+      run: bundle exec rake test:all
     - name: Publish gem
       uses: dawidd6/action-publish-gem@v1
       with:
