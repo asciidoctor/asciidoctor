@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
+
 == 2.0.12 (2020-11-10) - @mojavelinux
 
 Bug Fixes::
