@@ -263,6 +263,11 @@ context 'Links' do
     assert_xpath %(//a[@href="#{url}"][text()="Roboto,400"]), convert_string_to_embedded(%(link:#{url}[Roboto,400])), 1
   end
 
+  test 'link macro should support id and role attributes' do
+    url = 'https://fonts.googleapis.com/css?family=Roboto:400'
+    assert_xpath %(//a[@href="#{url}"][@id="roboto-regular"][@class="bare font"][text()="#{url}"]), convert_string_to_embedded(%(link:#{url}[,id=roboto-regular,role=font])), 1
+  end
+
   test 'link text that ends in ^ should set link window to _blank' do
     assert_xpath '//a[@href="http://google.com"][@target="_blank"]', convert_string_to_embedded('http://google.com[Google^]'), 1
   end

@@ -614,6 +614,11 @@ context 'Substitutions' do
       assert_equal %q{<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
     end
 
+    test 'a mailto macro supports id and role attributes' do
+      para = block_from_string('mailto:doc.writer@asciidoc.org[,id=contact,role=icon]')
+      assert_equal %q{<a href="mailto:doc.writer@asciidoc.org" id="contact" class="icon">doc.writer@asciidoc.org</a>}, para.sub_macros(para.source)
+    end
+
     test 'should recognize inline email addresses' do
       %w(
         doc.writer@asciidoc.org
