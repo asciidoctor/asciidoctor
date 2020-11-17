@@ -1,0 +1,39 @@
+= AsciiMath RubyGem
+:url-asciimath-repo: https://github.com/asciidoctor/AsciiMath
+
+Asciidoctor's built-in DocBook backend and MathJax aren't compatible, so Asciidoctor must explicitly convert xref:asciidoc:stem:stem.adoc[stem expressions] into something the DocBook toolchain can understand.
+Enter the {url-rubygem}/asciimath[AsciiMath RubyGem^].
+AsciiMath converts AsciiMath stem expressions in an AsciiDoc document to MathML and outputs them in a format that DocBook accepts.
+
+TIP: For more information, see the {url-asciimath-repo}[AsciiMath RubyGem repository^].
+
+== Install asciimath gem
+
+To enable AsciiMath support when converting to DocBook, you need to install the asciimath gem:
+
+ $ gem install asciimath
+
+== Activate asciimath stem expressions
+
+To activate AsciiMath, set the `stem` attribute in the document's header and assign it the value `asciimath`. (or by passing the attribute to the command line or API).
+
+.Set the stem attribute
+[source,asciidoc]
+----
+= Document Title
+:stem: asciimath
+----
+
+To learn how to create inline and block AsciiMath equations, see xref:asciidoc:stem:stem.adoc[].
+
+=== Using AsciiMath with the DocBook toolchain
+
+If you're generating a PDF from the DocBook output, the MathML produced by the asciimath gem needs to be interpreted and drawn into the PDF.
+In the DocBook toolchain, this is handled by JEuclid.
+
+Fortunately, the toolchain is already configured to use the JEuclid integration.
+When the DocBook toolchain generates the PDF, the JEuclid FOP plugin processes any MathML found in the DocBook file, including the expressions transformed from AsciiMath to MathML by the asciimath gem.
+As a result, AsciiMath stem expressions in the AsciiDoc file will render as expected in the generated PDF.
+
+There's no equivalent gem for converting STEM expressions written in LaTeX to MathML.
+Instead, you can convert the DocBook to PDF using the dblatex pipeline, which supports LaTeX expressions.

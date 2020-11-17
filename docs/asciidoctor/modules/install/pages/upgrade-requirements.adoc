@@ -1,0 +1,171 @@
+= Before You Upgrade
+//Syntax, Attributes, and Commands: What's Changed?
+
+IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
+If your migrating from AsciiDoc Python, see xref:migrate:asciidoc-python.adoc[].
+
+When you upgrade Asciidoctor you may also need to update some of the syntax and attributes in your AsciiDoc documents.
+Major version releases can include new AsciiDoc syntax capabilities as well as syntax changes that make it more consistent.
+
+== Updated and deprecated features
+
+The syntax, attributes, and commands listed below have been updated or deprecated.
+In most cases, they've been replaced with a new feature that provides improved functionality.
+
+=== Inline formatting
+
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|_italic text_
+|pass:['italic text']
+|pass:[_italic text_]
+|1.5.0
+|Allowed with `compat-mode`
+
+|`monospace text`
+|pass:[+monospace text+]
+|pass:[`monospace text`]
+|1.5.0
+|Allowed with `compat-mode`
+
+|`+literal monospace text+`
+|pass:[`literal monospace text`]
+|pass:[`+literal monospace text+`]
+|1.5.0
+|Allowed with `compat-mode`
+
+|Curved "`double quotes`"
+|pass:[``double quotes'']
+|pass:["`double quotes`"], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8220;)
+|1.5.0
+|
+
+|Curved '`single quotes`'
+|pass:[`single quotes']
+|pass:['`single quotes`'], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8217;)
+|1.5.0
+|
+|===
+
+=== Table of contents
+
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Scrollable, left margin TOC
+|`toc2`
+|`+:toc: left+`
+|1.5.0
+|
+
+|TOC location
+|`toc-placement` and `toc-position`
+|`+:toc: <value>+`
+|1.5.0
+|
+
+|User-specified TOC location
+|`+:toc-placement: manual+`
+|`+:toc: macro+`
+|1.5.0
+|
+
+|===
+
+=== Document header
+
+[cols="15,20,15,5,25"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Setext (i.e., two-line style) document title
+l|Title
+=====
+l|= Title
+|
+|Asciidoctor accepts the two-line heading style to set the document title.
+However, by using it, you implicitly set `compat-mode`.
+If you want to use the new Asciidoctor syntax, make sure to use `= Title` or explicitly unset the `compat-mode` attribute.
+|===
+
+=== API
+
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|render class method
+|+.render(input, options = {}) ⇒ Object+
+|+.convert(input, options = {}) ⇒ Object+
+|1.5.7
+|
+|===
+
+== New features
+
+Visit xref:ROOT:whats-new.adoc[] for a complete list of new Asciidoctor and AsciiDoc features.
+
+////
+== Proposed changes for future versions
+
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Delimited open block
+|pass:[--] +
+open block content +
+pass:[--]
+|New syntax will allow for nested delimited open blocks
+|2.0
+|
+
+|Set backend
+|Set the backend from a document
+|Backends can only be set in the CLI, environment, and API
+|2.0
+|
+
+|Link attributes
+|Set `linkattrs` to use link attribute syntax
+|`linkattrs` is set implicitly so link attributes are available automatically
+|2.0
+|
+
+|UI macros
+|Set `experimental` to use the UI macros
+|UI macros are available automatically
+|2.0
+|
+
+|Document roles
+|Roles are inherited; roles don't wrap the document
+|Roles aren't inherited; roles wrap the document
+|2.0
+|
+|===
+////
+
+////
+== Compatibility mode
+
+When it isn't feasibly to update your documents prior to upgrading Asciidoctor, you can run Asciidoctor in compatibility mode.
+Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
+However, *not all deprecated syntax or behavior is available under the compatibility mode*.
+////
+
+////
+== Next
+
+xref:upgrade.adoc#upgrade-on-linux[Upgrade on Linux]::
+Upgrade Asciidoctor using the package manager on many Linux distributions including Fedora, RHEL, Debian, Ubuntu, and Alpine Linux.
+
+xref:upgrade.adoc#upgrade-on-macos[Upgrade on macOS]::
+Upgrade Asciidoctor using Homebrew on macOS.
+
+xref:upgrade.adoc#gem-update[Upgrade using gem update]::
+Upgrade Asciidoctor using the `gem update` command.
+////

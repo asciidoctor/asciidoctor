@@ -1,0 +1,57 @@
+= Install Using a Linux Package Manager
+:url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
+:url-arch: https://www.archlinux.org/packages/?name=asciidoctor
+:url-debian: https://packages.debian.org/sid/asciidoctor
+:url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
+:url-suse: https://software.opensuse.org/package/rubygem-asciidoctor
+:url-ubuntu: https://packages.ubuntu.com/search?keywords=asciidoctor
+
+The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+
+== Linux packages
+
+The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
+Consult the package repository for your distribution to find out which version is packaged per distribution release.
+
+* {url-alpine}[Alpine Linux (asciidoctor)]
+* {url-arch}[Arch Linux (asciidoctor)]
+* {url-debian}[Debian (asciidoctor)]
+* {url-fedora}[Fedora (asciidoctor)]
+* {url-suse}[OpenSUSE (rubygem-asciidoctor)]
+* {url-ubuntu}[Ubuntu (asciidoctor)]
+
+If you want to use a version of Asciidoctor that is newer than what is available via your package manager, see xref:gem.adoc[].
+
+== APT
+
+On Debian and Debian-based distributions such as Ubuntu, use APT to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo apt-get install -y asciidoctor
+
+include::partial$success.adoc[]
+
+== DNF
+
+On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo dnf install -y asciidoctor
+
+include::partial$success.adoc[]
+
+== apk (Alpine Linux)
+
+To install the gem on Alpine Linux, open a terminal and type:
+
+ $ sudo apk add asciidoctor
+
+include::partial$success.adoc[]
+
+== pacman (Arch Linux)
+
+To install the gem on Arch-based distributions, open a terminal and type:
+
+ $ sudo pacman -S asciidoctor
+
+include::partial$success.adoc[]

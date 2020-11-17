@@ -1,0 +1,97 @@
+= Apply a Custom Stylesheet
+////
+apply-theme.adoc, included in:
+- user-manual
+- produce-custom-themes-using-asciidoctor-stylesheet-factory
+////
+
+A custom stylesheet can be stored in the same directory as your document or in a separate directory.
+Like the default stylesheet, you can have the output document link to your custom stylesheet or embed it.
+
+If the stylesheet is in the same directory as your document, you can apply it when converting your document to HTML from the CLI.
+
+ $ asciidoctor -a stylesheet=my-styles.css my-sample.adoc
+
+. Save your custom stylesheet in the same directory as [.path]_my-sample.adoc_
+. Call the `asciidoctor` processor
+. Set `-a` (`--attribute`) and `stylesheet`
+. Assign the stylesheet file's name to the `stylesheet` attribute
+. Enter your document file's name.
+
+Alternatively, let's set the `stylesheet` attribute in the header of [.path]_my-sample.adoc_.
+
+[source,asciidoc]
+----
+include::example$mysample-stylesheet.adoc[]
+----
+
+====
+#fix ex#
+//image::mysample-stylesheet.png[]
+====
+
+When your document and the stylesheet are stored in different directories, you need to tell Asciidoctor where to look for the stylesheet in relation to your document.
+Asciidoctor uses the relative or absolute path you assign to the `stylesdir` attribute to find the stylesheet.
+Let's move [.path]_my-styles.css_ into [.path]_my-documents/my-stylesheets_.
+Our AsciiDoc document, [.path]_my-sample.adoc_, is saved in the [.path]_my-documents_ directory.
+
+[source,asciidoc]
+----
+include::example$mysample-stylesdir.adoc[]
+----
+
+After processing [.path]_my-sample.adoc_, its HTML output ([.path]_my-sample.html_), which includes the embedded [.path]_my-styles.css_ stylesheet, is created in the [.path]_my-documents_ directory.
+
+====
+#fix ex#
+//image::mysample-stylesdir-dir.png[]
+====
+
+You can also set `stylesdir` in the CLI.
+
+ $ asciidoctor -a stylesdir=my-stylesheets/ -a stylesheet=my-styles.css my-sample.adoc
+
+If you don't want to embed the [.path]_my-styles.css_ stylesheet into your HTML output, make sure to set `linkcss`.
+
+[source,asciidoc]
+----
+include::example$mysample-stylesdir-link.adoc[]
+----
+
+After your document is converted, notice that a copy of [.path]_my-styles.css_ was not created in the [.path]_my-documents_ directory.
+Unlike when you link to the default Asciidoctor stylesheet, any custom stylesheets you link to are not copied to the directory where your output is saved.
+
+[#style-nested]
+.Stylesheets and processing multiple nested documents
+****
+When you are xref:cli:process-multiple-files.adoc[running Asciidoctor once across a nested set of documents], it's currently not possible to specify a single relative path for the `stylesdir` attribute that would work for all of the documents.
+This is because the relative depth of the stylesheet's location differs for the documents in the subdirectories.
+One way to solve this problem is to maintain the path to `stylesdir` in each document.
+
+Let's say you have three AsciiDoc documents saved in the following directory structure:
+
+....
+/my-documents
+  a.adoc
+  b.adoc
+  /my-nested-documents
+    c.adoc
+  /my-stylesheets
+....
+
+For [.path]_a.adoc_ and [.path]_b.adoc_, set `stylesdir` to:
+
+[source,asciidoc]
+----
+:stylesdir: my-stylesheets
+----
+
+For [.path]_c.adoc_, set `stylesdir` to:
+
+[source,asciidoc]
+----
+:stylesdir: ../my-stylesheets
+----
+
+If you're serving your documents from a webserver, you can solve this problem by providing an absolute path to the stylesheet.
+****

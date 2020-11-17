@@ -1,0 +1,70 @@
+= Rouge
+:url-rouge: http://rouge.jneen.net
+:url-rouge-gem: https://rubygems.org/gems/rouge
+:url-rouge-repo: https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/themes
+
+{url-rouge}[Rouge^] is an extendable code highlighter written in Ruby that supports a vast array of languages.
+
+== Install Rouge
+
+To use Rouge with Asciidoctor, you need the {url-rouge-gem}[rouge RubyGem^].
+You can use one of the following methods to install Rouge.
+
+Install using `gem` (all systems)::
++
+ $ gem install rouge
+
+Install using `apt-get` (Debian-based systems)::
++
+ $ sudo apt-get install rouge
+
+Install using `dnf` (Fedora-based systems)::
++
+ $ sudo dnf install rubygem-rouge
+
+== Assign rouge to source-highlighter
+
+Once you've installed the RubyGem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
+
+[source]
+----
+:source-highlighter: rouge
+----
+
+== Rouge attributes
+
+You can further customize the source block output with additional Rouge attributes.
+
+rouge-css::
+Controls what method is used for applying CSS to the tokens.
+Can be `class` or `style`.
+Default: `class`.
+
+[.line-through]#rouge-linenums-mode# (not currently implemented)::
+Controls how line numbers are laid out.
+Can be `table` or `inline`.
+If line wrapping is enabled on preformatted blocks (i.e., `prewrap`), and you want to use line numbering on source blocks, you must set the value of this attribute to `inline` in order for the numbers to line up properly with their target lines.
+Default: `table`.
+
+rouge-style::
+Controls the color theme used to for highlighting.
+You can find the list of themes in the {url-rouge-repo}[Rouge code repository^].
+
+.Customizing a source block with Rouge line numbers
+[source]
+....
+:source-highlighter: rouge
+
+[source,ruby,linenums]
+----
+ORDERED_LIST_KEYWORDS = {
+  'loweralpha' => 'a',
+  'lowerroman' => 'i',
+  'upperalpha' => 'A',
+  'upperroman' => 'I'
+   #'lowergreek' => 'a'
+   #'arabic'     => '1'
+   #'decimal'    => '1'
+}
+----
+....

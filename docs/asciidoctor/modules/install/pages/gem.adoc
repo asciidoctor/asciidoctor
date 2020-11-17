@@ -1,0 +1,42 @@
+= Install Using Ruby Tools
+
+[#gem-install]
+== gem install
+
+Before installing Asciidoctor using `gem install`, you should set up {url-rvm}[RVM^] to install Ruby in your home directory (i.e., user space).
+Then, you can safely use the `gem` command to install or update the Asciidoctor gem, or any other gem for that matter.
+When using RVM, gems are installed in a location isolated from the system.
+
+Once you've installed Ruby using RVM, and you have activated it using `rvm use {ruby-short}`, open a terminal and type:
+
+ $ gem install asciidoctor
+
+include::partial$success.adoc[]
+
+[#pre-release]
+=== Install a pre-release version
+
+To install a pre-release version of Asciidoctor (e.g., a release candidate), open a terminal and type:
+
+ $ gem install asciidoctor --pre
+
+== Bundler
+
+. Create a Gemfile in the root folder of your project (or the current directory)
+. Add the `asciidoctor` gem to your Gemfile as follows:
++
+[source,subs=attributes+]
+----
+source 'https://rubygems.org'
+gem 'asciidoctor'
+# or specify the version explicitly
+# gem 'asciidoctor', '{release-version}'
+----
+
+. Save the Gemfile
+. Open a terminal and install the gem using:
+
+ $ bundle
+
+To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
+Using `bundle update` (without specifying a gem) is *not* recommended as it will also update other gems, which may not be the desired result.

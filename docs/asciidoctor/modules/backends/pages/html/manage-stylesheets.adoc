@@ -1,0 +1,42 @@
+= Manage Stylesheets
+
+Asciidoctor comes bundled with a stylesheet, named [.path]_asciidoctor.css_.
+It uses this stylesheet for HTML document styling and JavaScript for generating document attributes such as a table of contents and footnotes.
+
+== Embed a stylesheet
+
+When you generate a document with the `html5` backend, the [.path]_asciidoctor.css_ stylesheet is embedded into the HTML output by default when the safe mode is less than `SECURE`.
+If your stylesheet is being linked to when you expect it to be embedded, lower the safe mode (`safe` is the recommend value).
+
+== Link to a stylesheet
+
+You can link to the stylesheet instead of embedding it.
+This is the mandatory behavior when the safe mode is `SECURE`.
+
+To have your document link to the stylesheet, set the `linkcss` attribute in the document's header.
+
+[source,asciidoc]
+----
+include::example$mysample-link.adoc[]
+----
+
+You can also set `linkcss` with the CLI.
+
+ $ asciidoctor -a linkcss my-sample.adoc
+
+Now, when you view the directory, you should see the file [.path]_asciidoctor.css_ in addition to [.path]_my-sample.adoc_ and [.path]_my-sample.html_.
+The `linkcss` attribute automatically copies [.path]_asciidoctor.css_ to the output directory.
+Additionally, you can inspect [.path]_my-sample.html_ in your browser and see `<link rel="stylesheet" href="./asciidoctor.css">` inside the `<head>` tags.
+
+====
+#fix ex#
+//image::mysample-link.png[]
+====
+
+== Don't apply a stylesheet
+
+If you don't want any styles applied to the HTML output of your document, unset the `stylesheet` attribute.
+
+ $ asciidoctor -a stylesheet! my-sample.adoc
+
+One of Asciidoctor's strengths is the ease in which you can swap the default stylesheet for your own xref:html/apply-stylesheet.adoc[custom stylesheet].

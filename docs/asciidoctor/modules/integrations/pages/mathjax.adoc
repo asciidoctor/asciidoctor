@@ -1,0 +1,7 @@
+= MathJax
+:url-mathjax: https://www.mathjax.org
+:url-asciimath: https://docs.mathjax.org/en/latest/input/asciimath.html
+:url-latexmath: https://docs.mathjax.org/en/latest/input/tex/index.html
+
+{url-mathjax}[MathJax^] is a JavaScript library for displaying Science, Technology, Engineering and Math (STEM) expressions in the browser.
+The Asciidoctor HTML backend relies on MathJax to parse and render {url-asciimath}[AsciiMath^] and {url-latexmath}[TeX and LaTeX^] math notation.

@@ -1,0 +1,26 @@
+= Supported Syntax Highlighters
+
+[%autowidth]
+|===
+|Feature |Supported Integration |Supported Versions
+
+|Client-side syntax highlighting for source code blocks
+|Highlight.js
+|9.18.3
+
+.3+|Server-side syntax highlighting for source code blocks
+|CodeRay
+|1.1.2
+
+|Pygments
+|2.2.0
+
+|Rouge
+|3.1.1
+|===
+
+////
+|Inline, admonition or callout font-based icons
+|Font Awesome
+|4.7
+////

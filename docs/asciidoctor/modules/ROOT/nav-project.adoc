@@ -1,0 +1,4 @@
+* About Asciidoctor
+//.Asciidoctor Project and Community
+** xref:project/release-schedule.adoc[]
+** xref:project/license-and-authors.adoc[]

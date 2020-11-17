@@ -1,0 +1,4 @@
+To upgrade the gem, open a terminal and type:
+
+ $ brew update
+ $ brew upgrade asciidoctor

@@ -1,0 +1,262 @@
+= Errors and Warnings
+
+////
+um anchor: appendix#app-messages
+
+Only includes the CLI. asciidoctorj and the asciidoctor API are not included.
+When there are enough documented, maybe add another table for them. Although these users are programmers-wouldn't they just run it in the debugger?
+
+Testing was carried out with
+Asciidoctor 1.5.5 [https://asciidoctor.org]
+Runtime Environment (ruby 2.3.1p112 (2016-04-26) [i386-linux-gnu]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+////
+
+All warning, error, and failure messages emitted by the Asciidoctor CLI are written to the console via stderr (i.e., standard error).
+Most messages also apply to the API, but they're written directly to stderr.
+
+== Notification types
+
+<<warning,WARNING>>::
+Warnings do not stop conversion, but they indicate possible problems, and the output may not be what you were expecting.
+
+<<error,ERROR>>::
+Errors do not stop conversion, but the output document will almost certainly be wrong.
+
+<<fail,FAILED>>::
+Failures are fatal; no output document will be produced.
+
+The messages listed in the following sections may contain some of the following representative placeholders:
+
+<docname>::
+Represents the basename of the source file being processed (e.g., `sample.adoc`).
+
+<file>::
+Represents a path to the input file or other referenced file.
+
+<uri>::
+Represents a URI being referenced.
+
+<x> or <y>::
+Placeholders for other contextual information in the message.
+
+[#warning]
+== Warning messages
+
+[options="header,breakable",cols="<60,<50,<30"]
+|===
+|Message |Troubleshooting |Also see
+
+|abstract block cannot be used in a document without a title when doctype is book. Excluding block content.
+|Invalid book document structure.
+|#user-abstract#
+
+|cannot retrieve contents of <x> at URI: <uri> (allow-uri-read attribute not enabled)
+|Reading from a URI is only allowed in certain safe modes and the allow-uri-read attribute must be passed to the application.
+|#include-uri#
+
+|could not retrieve contents of <x> at URI: <uri>
+|Web address not found.
+|
+
+|could not retrieve image data from URI: <uri>
+|Web address not found. Only occurs with `allow-uri-read` and `data-uri`. Check the URI.
+|#include-images-by-full-url#
+
+|dropping line containing reference to missing attribute: <x>
+|An attribute cannot be resolved and the `attribute-missing` attribute is set to `drop-line`.
+|#catch-a-missing-or-undefined-attribute#
+
+|file does not exist or cannot be read: <file>
+|You specified a stylesheet (`-a stylesheet=<file>`) but <file> does not exist or is not readable.
+|
+
+|gem 'thread_safe' is not installed. This gem is recommended when registering custom converters.
+|You have registered a custom converter, and you have not installed the thread_safe gem.
+|
+
+|gem 'thread_safe' is not installed. This gem is recommended when using custom backend templates.
+|You are using custom templates (`-T <template_dir>`), but you have not installed the thread_safe gem.
+|
+
+|image to embed not found or not readable: <file>
+|You used `:data-uri:` but the file could not be found.
+|#managing-images#
+
+|include file not readable: <file>
+|You do not have permission to access the file.
+|#include-nonasciidoc#
+
+|input path <file> is a <x>, not a file
+|The path is not a file (perhaps it is a socket or a block device).
+|#include-nonasciidoc#
+
+|optional gem 'asciimath' is not installed. Functionality disabled.
+|asciimath is one of the libraries used for equations.
+|#stem#
+
+|optional gem 'coderay' is not installed. Functionality disabled.
+|CodeRay is used for source code highlighting.
+|#coderay#
+
+|skipping reference to missing attribute: <x>
+|An attribute cannot be resolved and the `attribute-missing` attribute is set to `skip`.
+|#catch-a-missing-or-undefined-attribute#
+
+|tables must have at least one body row
+|
+|#tables#
+
+|tag '<x>' not found in include file: <file>
+|You tried to include by tagged region, but the included document does not have that tag.
+|#include-partial#
+
+|<docname>: id assigned to <type> already in use: <id>
+|<id> is a duplicate ID, meaning it has already been assigned to a node of <type> (e.g., section, block, anchor).
+If you don't see the problem in <docname>, check that the duplicate ID isn't coming from a file which is being included.
+|
+
+|<docname> callout list item index: expected <x> got <y>
+|Callouts are expected to be in numerical order, just like any ordered list.
+|#callouts#
+
+|<docname> include <x> not readable: <y>
+|If <y> is a file, do you have read permissions for it?
+If it is a URI and `-a allow-uri-read` is set, does it exist?
+|
+
+|<docname> include file not found: <file>
+|Probably a typo or missing file. If not, make sure you understand the search process.
+|#include-directive#, #include-resolution#
+
+|<docname> invalid empty <x> detected in style attribute
+|The first positional attribute in the block attributes could not be parsed.
+|#options#
+
+|<docname> invalid style for <x> block: <y>
+|You have added a custom style to a block, but you haven't registered a custom block extension to handle it.
+|
+
+|<docname> invalid style for paragraph: <x>
+|You have a line `[<name-of-style>]` before a paragraph, but `name-of-style` isn't a recognized built-in style.
+|#style#
+
+|<docname> list item index: expected <x>, got <y>
+|You gave explicit numbers on an ordered list, but they were not sequential. Asciidoctor renumbers them for you, and gives this warning.
+|#ordered-lists#
+
+|<docname> multiple ids detected in style attribute
+|Multiple IDs cannot be specified in the block style (e.g., `[#cat#dog]`).
+// But [#wibble,id="wobble"] does not generate an error
+|#id#
+
+|<docname> no callouts refer to list item <x>
+|The callout is missing or not recognized.
+In source listings, is the callout the last thing on the line?
+|#callouts#
+
+|<docname> section title out of sequence
+|Invalid document structure. Check section levels.
+|#sections#
+|===
+
+[#error]
+== Error messages
+
+[options="header,breakable",cols="<60,<50,<30"]
+|===
+|Message |Troubleshooting |Also see
+
+|input file <file> missing or cannot be read
+|Check that the file exists and that the filename is not misspelled.
+|#using-the-command-line-interface#
+
+|include file has illegal reference to ancestor of jail, auto-recovering
+|The safe mode is restricting access to an include file outside of the base directory.
+|#running-asciidoctor-securely#
+
+|input file and output file cannot be the same: <file>
+|Choose a different output directory or filename.
+|
+
+|partintro block can only be used when doctype is book and it\'s a child of a part section. Excluding block content.
+|Invalid book document structure.
+|#book-parts-and-chapters#
+
+|unmatched macro: endif::<x>[]
+|`endif::[]` with no unclosed preceding `ifdef::<x>[]`.
+|#ifdef-directive#
+
+|<docname> dropping cell because it exceeds specified number of columns
+// The extra cells are dropped, but this message is not produced ???
+|
+|#tables#
+
+|<docname> illegal block content outside of partintro block
+|Invalid book document structure.
+|#book-parts-and-chapters#
+
+|<docname> invalid part, must have at least one section (e.g., chapter, appendix, etc.)
+|Invalid book document structure.
+|#book-parts-and-chapters#
+
+|<docname> malformed manpage title
+|Invalid manpage document structure.
+|#man-pages#
+
+|<docname> malformed name section body
+|Invalid manpage document structure.
+|#man-pages#
+
+|<docname> maximum include depth of 64 exceeded
+|Does your file include itself, directly or indirectly?
+|
+
+|<docname> mismatched macro: endif::<x>[], expected endif::<y>[]
+|ifdef/endif blocks must be strictly nested.
+|#ifdef-directive#
+
+|<docname> name section expected
+|Invalid manpage document structure.
+|#man-pages#
+
+|<docname> name section title must be at level 1
+|Invalid manpage document structure.
+|#man-pages#
+
+|<docname> only book doctypes can contain level 0 sections
+|Illegal use of a level-0 section when doctype is not book.
+|#sections#
+
+|<docname> table missing leading separator, recovering automatically
+|Check for missing cell separator characters at the start of the line.
+|#tables#
+|===
+
+[#fail]
+== Failure messages
+
+[options="header,breakable",cols="<60,<50,<30"]
+|===
+|Message |Troubleshooting |Also see
+
+|missing converter for backend '<x>'. Processing aborted. (RuntimeError)
+|You used -b with an invalid or missing backend.
+|
+
+//|Failed to load AsciiDoc document - undefined method `convert' for nil:NilClass
+//|
+//|#cli-options#
+
+|'tilt' could not be loaded
+|You must have the tilt gem installed (`gem install tilt`) to use custom backend templates
+|
+|===
+
+////
+API only
+
+|ERROR
+|IOError, %(target directory does not exist: #{to_dir})
+|API, the mkdirs option is not set, and the target directory does not already exist.
+|
+////

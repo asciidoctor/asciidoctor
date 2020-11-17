@@ -1,0 +1,15 @@
+= Supported STEM Libraries
+// Stem equations and formulas
+
+[%autowidth]
+|===
+|Integration |Supported Versions |Backends
+
+|MathJax
+|2.7.9
+|HTML
+
+|AsciiMath
+|2.0.x
+|Docbook
+|===

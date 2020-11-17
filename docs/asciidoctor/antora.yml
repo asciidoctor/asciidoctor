@@ -1,0 +1,34 @@
+name: asciidoctor
+title: Asciidoctor
+version: '2.0'
+asciidoc:
+  attributes:
+    xrefstyle: short@
+    listing-caption: Example@
+    release-version: '2.0.12'
+    ruby-description: 'ruby 2.7.0p0 [x86_64-linux]'
+    ruby-short: '2.7'
+    url-ruby: https://www.ruby-lang.org
+    url-rubygem: https://rubygems.org/gems
+    url-rvm: https://rvm.io
+    url-foundation: https://foundation.zurb.com
+    url-jruby: https://jruby.org
+    url-asciidoctorj: https://github.com/asciidoctor/asciidoctorj
+    url-gradle-plugin: https://github.com/asciidoctor/asciidoctor-gradle-plugin
+    url-maven-plugin: https://github.com/asciidoctor/asciidoctor-maven-plugin
+nav:
+- modules/ROOT/nav-top.adoc
+- modules/install/nav.adoc
+- modules/ROOT/nav-get-started.adoc
+- modules/backends/nav.adoc
+- modules/cli/nav.adoc
+- modules/api/nav.adoc
+- modules/ROOT/nav-safe-modes.adoc
+- modules/ROOT/nav-docinfo.adoc
+- modules/tooling/nav.adoc
+- modules/integrations/nav.adoc
+- modules/extensions/nav.adoc
+- modules/ROOT/nav-lang.adoc
+- modules/ROOT/nav-errors.adoc
+- modules/migrate/nav.adoc
+- modules/ROOT/nav-project.adoc

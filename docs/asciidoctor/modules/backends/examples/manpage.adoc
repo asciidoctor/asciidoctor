@@ -1,0 +1,42 @@
+= eve(1)
+Andrew Stanton
+v1.0.0
+:doctype: manpage
+:manmanual: EVE
+:mansource: EVE
+:man-linkstyle: pass:[blue R < >]
+
+== Name
+
+eve - analyzes an image to determine if it's a picture of a life form
+
+== Synopsis
+
+*eve* [_OPTION_]... _FILE_...
+
+== Options
+
+*-o, --out-file*=_OUT_FILE_::
+  Write result to file _OUT_FILE_.
+
+*-c, --capture*::
+  Capture specimen if it's a picture of a life form.
+
+== Exit status
+
+*0*::
+  Success.
+  Image is a picture of a life form.
+
+*1*::
+  Failure.
+  Image is not a picture of a life form.
+
+== Resources
+
+*Project web site:* https://eve.example.org
+
+== Copying
+
+Copyright (C) 2008 {author}. +
+Free use of this software is granted under the terms of the MIT License.
