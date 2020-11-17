@@ -9,6 +9,7 @@
 == Install Pygments
 
 In order to use Pygments with Asciidoctor, you need {url-python}[Python 2^] and the {url-pygments-gem}[pygments.rb gem^].
+The pygments.rb gem manages calls to Pygments, which is an external program that runs using Python.
 
 TIP: You do not need to install Pygments itself.
 It comes bundled with the pygments.rb gem.
@@ -94,6 +95,16 @@ To list the available Pygments styles, run the following command in a terminal:
 
 The pygments.rb gem uses a bundled version of Pygments (often ahead of the latest release).
 This command ensures that you are invoking the `pygmentize` command from the Pygments used by that gem.
+
+== Pygments timeout
+
+Since Pygments is an external program, the call to that command is managed by a timeout to safe-guard against a hanging process.
+By default, this timeout is 8 seconds.
+If you discover that the call is failing to complete within this timeout period, you can increase the timeout (in seconds) by setting the `MENTOS_TIMEOUT` environment variable.
+
+ export MENTOS_TIMEOUT=30
+
+Now the call to Pygments will be allocated up to 30 seconds to complete.
 
 == Using a custom Pygments installation
 
