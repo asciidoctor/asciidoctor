@@ -1,10 +1,8 @@
 name: CI
 on:
   push:
-    branches:
-    - '**'
-    tags-ignore:
-    - '**'
+    branches: ['**']
+    tags-ignore: ['**']
   pull_request:
   schedule:
   - cron: '0 2 * * *'
@@ -57,15 +55,20 @@ jobs:
       run: |
         bundle config --local path .bundle/gems
         bundle config --local without docs
+    - name: Configure Nokogiri installation (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        bundle config --local build__nokogiri --use-system-libraries
+        sudo apt-get install libxslt1-dev
+    - name: Configure Nokogiri installation (macOS)
+      if: matrix.os == 'macos-latest'
+      run: bundle config --local build__nokogiri --use-system-libraries
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
     - name: Set JRUBY_OPTS
       if: matrix.jruby-opts
       run: echo 'JRUBY_OPTS=${{ matrix.jruby-opts }}' >> $GITHUB_ENV
-    - name: Install Nokogiri build dependencies
-      if: contains(matrix.ruby, 'truffleruby')
-      run: sudo apt-get install libxslt1-dev
     - name: Install dependencies
       run: bundle --jobs 3 --retry 3
     - name: Run tests
