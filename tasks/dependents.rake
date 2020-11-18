@@ -50,6 +50,7 @@ namespace :build do
     %w(
       asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
+      asciidoctor/asciidoctor-pdf
     ).each do |project|
       org, name, branch = parse_project project
       project = [org, name, branch] * '/'
