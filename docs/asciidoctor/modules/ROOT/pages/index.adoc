@@ -1,46 +1,97 @@
 = Asciidoctor Documentation
+:navtitle: Introduction
 
-[caption="Migration in Progress"]
+[caption=Migration in Progress]
 CAUTION: This documentation is in migration.
-If you're looking for the current Asciidoctor and AsciiDoc documentation, visit https://asciidoctor.org/docs.
+If you're looking for the current Asciidoctor documentation, visit https://asciidoctor.org/docs.
 
-{url-project}[Asciidoctor^] is a fast text processor and publishing toolchain for converting AsciiDoc content to HTML, DocBook, and other formats.
-Asciidoctor is packaged as a RubyGem and published to {url-rubygem}/asciidoctor[RubyGems.org^].
-The gem is also included in several Linux distributions, including Fedora, Debian, Ubuntu, and Alpine.
-Asciidoctor is open source, {url-org}/asciidoctor[hosted on GitHub^] and released under the MIT license.
+This section of the website contains the documentation for {url-project}[Asciidoctor^], a Ruby-based AsciiDoc processor.
+Asciidoctor also serves as the reference implementation for how the AsciiDoc language is interpreted.
+If you're looking for the documentation for the AsciiDoc language itself, refer to the xref:asciidoc::index.adoc[AsciiDoc section] of this website.
+//You can also find the documentation for AsciidoctorJ, Asciidoctor.js, and various extensions and integrations in other areas of this website.
 
-== The Big Picture
+== What is Asciidoctor?
 
-Asciidoctor reads content written in plain text, as shown in the panel on the left in the image below, and converts it to HTML5, as shown rendered in the right panel.
-Asciidoctor adds a default stylesheet to the HTML5 document, as shown, to provide a pleasant out-of-the-box experience.
+Asciidoctor is a fast, open source text processor for parsing AsciiDoc into a document model and converting to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, PDF, and [.nowrap]#EPUB 3#.
 
-//image::zen-screenshot.png[Preview of AsciiDoc source and corresponding HTML]
+To simplify installation, Asciidoctor is packaged and distributed as a RubyGem (aka gem) named https://rubygems.org/gem/asciidoctor[asciidoctor] to {url-rubygem}[RubyGems.org^].
+The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools.
+Asciidoctor is also distributed as a package for numerous Linux distributions as well as macOS.
 
-== AsciiDoc Syntax Processing
-// directly from user-manual
+The Asciidoctor software is open source under the terms of the MIT license and {url-org}[hosted on GitHub^].
 
-Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML, PDF, DocBook, man page, and other output formats.
-You have the option of writing your own converter or loading Tilt-supported templates to customize the generated output or produce alternative formats.
-Asciidoctor also offers a responsive theme based on {url-foundation}[Foundation^] to style the HTML5 output.
+== Basic usage
 
-////
-The Asciidoctor test suite has > 2,000 tests to ensure compatibility with the AsciiDoc syntax.
-////
+Asciidoctor provides two primary interfaces for processing AsciiDoc documents:
 
-== The JVM and JavaScript
+[cols=2*]
+|===
+| CLI | API
 
-You can run Asciidoctor on the JVM using JRuby.
-To invoke the Asciidoctor API directly from Java and other JVM languages, use {url-asciidoctorj}[AsciidoctorJ].
-There are plugins available that integrate Asciidoctor into Apache Maven, Gradle, or Javadoc builds.
+a|
+ $ asciidoctor document.adoc
 
-Asciidoctor also runs in JavaScript.
-We use Opal to transcompile the Ruby source to JavaScript to produce xref:asciidoctor.js::index.adoc[Asciidoctor.js], a fully-functional version of Asciidoctor that works in any JavaScript environment, such as a web browser or Node.js.
-Asciidoctor.js is used to power the AsciiDoc preview extensions for Chrome, Atom, Brackets and other web-based tooling.
 
-////
-From preamble of user-manual.adoc
+a|
+[source,ruby]
+----
+require 'asciidoctor'
+Asciidoctor.convert_file \
+  'document.adoc', safe: :safe
+----
 
-This manual assumes you are using Asciidoctor to produce and convert your document.
-Asciidoctor implements more syntax, attributes and functions than the legacy AsciiDoc.py processor.
-<<migrating-from-asciidoc-python>> lists which features are available to the Asciidoctor and AsciiDoc processors.
-////
+|See xref:cli:cli.adoc[] to learn more about this interface.
+|See xref:api:overview.adoc[] to learn more about this interface.
+|===
+
+== Relationship to AsciiDoc
+
+AsciiDoc is the language. +
+Asciidoctor is the processor.
+
+You compose documents using the xref:asciidoc::index.adoc[AsciiDoc language], which is a text-based writing format.
+The AsciiDoc language was designed to be unobtrusive and concise to simplify writing and make it more pleasant.
+But AsciiDoc itself is not a publishing format.
+It's more like a shorthand.
+That's where an AsciiDoc processor comes in.
+
+//Asciidoctor reads and parses text written in the AsciiDoc syntax, then feeds the parse tree into a set of built-in templates to produce HTML, PDF, DocBook, man page, and other output formats.
+//You have the option of writing your own converter or loading Tilt-supported templates to customize the generated output or produce alternative formats.
+//Asciidoctor also offers a responsive theme based on Foundation to style the HTML5 output.
+
+An AsciiDoc processor, such as Asciidoctor, reads the AsciiDoc source and converts it to publishable formats such as HTML 5 or PDF.
+It can also convert it to formats which themselves can be processed by a publishing toolchain, such as DocBook.
+
+Since AsciiDoc is not published as is, the processing step provides an opportunity to augment the document by expanding shorthand codes, layering in integrations, and applying a pleasant visual style.
+That augmentation is a large part of what Asciidoctor does.
+
+In brief, you give AsciiDoc source to Asciidoctor and it gives you a result you can publish.
+
+== Ecosystem
+
+When we talk about Asciidoctor in this section, we are talking about the core processor and built-in converters.
+Asciidoctor also has an ecosystem of extensions, converters, build plugins, and tools to help you author and publish AsciiDoc.
+You can find the documentation for these projects elsewhere on this site or in the Asciidoctor organization on GitHub.
+
+== Beyond Ruby
+
+Although Asciidoctor is written in Ruby, it does not mean you are stuck using Ruby.
+You can also run Asciidoctor using a JVM or JavaScript.
+
+=== Java / JVM
+
+Thanks to https://github.com/asciidoctor/asciidoctorj[AsciidoctorJ^], Asciidoctor can be used in any program that runs on a Java Virtual Machine (JVM).
+Under the covers, AsciidoctorJ uses JRuby to run Asciidoctor, but this is hidden behind a Java API.
+AsciidoctorJ even provides an alternate CLI, which means you can get the full Asciidoctor experience with only a Java runtime.
+Building atop AsciidoctorJ, there are also plugins that integrate Asciidoctor into Apache Maven, Gradle, or Javadoc builds.
+
+=== JavaScript
+
+Thanks to xref:asciidoctorjs::index.adoc[Asciidoctor.js], Asciidoctor can also be used in JavaScript.
+The Asciidoctor.js project uses Opal to transpile the Ruby source in Asciidoctor to JavaScript.
+The result is a fully-functional version of Asciidoctor that works on any JavaScript runtime, such as a modern browser or Node.js.
+Asciidoctor.js even provides an alternate CLI, which means you can get the full Asciidoctor experience with only a JavaScript runtime.
+Asciidoctor.js is used to power the AsciiDoc language preview extensions for Chrome, Atom, Brackets, and other web-based tooling.
+
+To be accurate, you can run Asciidoctor using Ruby, a JVM, or JavaScript.
+This documentation focuses on the Ruby version of Asciidoctor.
