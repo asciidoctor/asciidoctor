@@ -1,0 +1,51 @@
+= Extensions
+:url-exten-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
+
+Extensions are central to the success of AsciiDoc because they open up the language to new use cases.
+Asciidoctor provides an extension API that offers a superset of extension points.
+As a result, extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
+
+Asciidoctor also allows extensions to be written using the full power of a programming language (whether it be Ruby, Java, Groovy or JavaScript).
+You don't have to shave yaks to get the functionality you want, and you can distribute the extension using defacto-standard packaging mechanisms like RubyGems or JARs.
+
+== Available extension points
+
+Asciidoctor provides the following extension points:
+
+Preprocessor::
+Processes the raw source lines before they are passed to the parser.
+See xref:preprocessor.adoc[].
+
+Tree processor::
+Processes the [.class]#Asciidoctor::Document# (AST) once parsing is complete.
+See xref:tree-processor.adoc[].
+
+Postprocessor::
+Processes the output after the document has been converted, but before it's written to disk.
+See xref:postprocessor.adoc[].
+
+Docinfo Processor::
+Adds additional content to the header or footer regions of the generated document.
+See xref:docinfo-processor.adoc[].
+
+Block processor::
+Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
+See xref:block-processor.adoc[].
+
+Compound block processor::
+Register a custom block named `collapsible` that transforms a listing block into a compound block.
+See xref:compound-block-processor.adoc[].
+
+Block macro processor::
+Registers a custom block macro and processes it (e.g., `gist::12345[]`).
+See xref:block-macro-processor.adoc[].
+
+Inline macro processor::
+Registers a custom inline macro and processes it (e.g., `btn:[Save]`).
+See xref:inline-macro-processor.adoc[].
+
+Include processor::
+Processes the `include::<filename>[]` directive.
+See xref:include-processor.adoc[].
+
+There are additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].

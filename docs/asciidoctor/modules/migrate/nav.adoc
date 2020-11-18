@@ -1,6 +1,0 @@
-* Migration Guides
-** xref:asciidoc-python.adoc[]
-** xref:docbook-xml.adoc[]
-** xref:markdown.adoc[]
-** xref:confluence-xhtml.adoc[]
-** xref:ms-word.adoc[]

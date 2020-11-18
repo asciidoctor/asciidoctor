@@ -1,0 +1,6 @@
+* xref:index.adoc[]
+** xref:output-file.adoc[]
+** xref:process-multiple-files.adoc[]
+** xref:io-piping.adoc[]
+** xref:set-safe-mode.adoc[]
+** xref:options.adoc[]

@@ -1,4 +1,0 @@
-* Get Started with Asciidoctor
-** xref:convert-asciidoc-file.adoc[]
-** xref:core-concepts.adoc[]
-** xref:converters.adoc[]

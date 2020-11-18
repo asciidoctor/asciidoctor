@@ -1,8 +1,0 @@
-* xref:install.adoc[]
-** xref:supported-platforms.adoc[]
-** xref:gem.adoc[]
-** xref:linux.adoc[]
-** xref:macos.adoc[]
-** xref:windows.adoc[]
-** xref:upgrade-requirements.adoc[]
-** xref:upgrade.adoc[]

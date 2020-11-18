@@ -1,0 +1,45 @@
+= Pipe Content Through the CLI
+
+In addition to converting files, the Asciidoctor CLI can read content from standard input (STDIN) and/or write content to standard output (STDOUT).
+This feature is called piping.
+
+Using the `-` flag, you can pipe content to the `asciidoctor` command.
+This flag tells Asciidoctor read the source from standard input (STDIN).
+For example:
+
+ $ echo 'content' | asciidoctor -
+
+NOTE: Any variation of STDIN will work.
+
+This command is effectively the same as:
+
+ $ echo 'content' | asciidoctor -o - -
+
+When reading source from STDIN, Asciidoctor doesn't have a reference to an input file.
+Therefore, it sends the converted text to standard output (STDOUT) by default.
+
+If, instead, you want to write the full document to an output file, you specify it using the `-o` flag.
+For example, the following command writes a standalone HTML document to [.path]_output.html_ instead of STDOUT:
+
+ $ echo 'content' | asciidoctor -o output.html -
+
+When you pipe content to the `asciidoctor` command, it no longer has a concept of where the document is located.
+Therefore, relative references such as includes may not work as expected.
+To resolve this problem, you should specify an absolute base directory using the `-B` option:
+
+ $ echo 'content' | asciidoctor -B /path/to/basedir -o output.html -
+
+Alternately, you can set an artificial document directory by passing an absolute path to the `docdir` attribute:
+
+ $ echo 'content' | asciidoctor -a docdir=/path/to/docdir -o output.html -
+
+Try both approaches to determine which one suits your needs better.
+
+When piping source from STDIN to STDOUT through the `asciidoctor` command, you often just want the converted body (i.e., embeddable HTML).
+To produce that variant, add the `-s` flag:
+
+ $ echo 'content' | asciidoctor -s -
+
+Or perhaps you want to include the doctitle as well:
+
+ $ echo -e '= Document Title\n\ncontent' | asciidoctor -s -a showtitle -

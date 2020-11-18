@@ -1,0 +1,30 @@
+= Skip Front Matter
+
+== Front matter for static site generators
+
+Many static site generators (i.e., Jekyll, Middleman) rely on [.term]*front matter* added to the top of the document to determine how to convert the content.
+Front matter typically starts on the first line of a file and is bounded by block delimiters (e.g., `+---+`).
+
+Here's an example of a document that contains front matter:
+
+[source,asciidoc]
+----
+---  <.>
+layout: default <.>
+---  <.>
+= Document Title
+
+content
+----
+<.> Front matter opening delimiter
+<.> Front matter data
+<.> Front matter closing delimiter
+
+The static site generator removes these lines before passing the document to the AsciiDoc processor to be converted.
+Outside of the tool, however, these extra lines can throw off the processor.
+
+== skip-front-matter option
+
+If the `skip-front-matter` option is set via the API or CLI (e.g., `-a skip-front-matter`), Asciidoctor will recognize the front matter and consume it before parsing the document.
+Asciidoctor stores the content it removes in the `front-matter` attribute to make it available for integrations.
+Asciidoctor also removes front matter when reading xref:asciidoc:directives:include.adoc[include files].
