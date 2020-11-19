@@ -15,7 +15,7 @@ If you're looking for the documentation for the AsciiDoc language itself, refer 
 Asciidoctor is a fast, open source text processor for parsing AsciiDoc into a document model and converting to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, PDF, and [.nowrap]#EPUB 3#.
 
 To simplify installation, Asciidoctor is packaged and distributed as a RubyGem (aka gem) named https://rubygems.org/gem/asciidoctor[asciidoctor] to {url-rubygem}[RubyGems.org^].
-The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools.
+The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
 Asciidoctor is also distributed as a package for numerous Linux distributions as well as macOS.
 
 The Asciidoctor software is open source under the terms of the MIT license and {url-org}[hosted on GitHub^].
@@ -80,7 +80,7 @@ You can also run Asciidoctor using a JVM or JavaScript.
 
 === Java / JVM
 
-Thanks to https://github.com/asciidoctor/asciidoctorj[AsciidoctorJ^], Asciidoctor can be used in any program that runs on a Java Virtual Machine (JVM).
+Thanks to {url-asciidoctorj}[AsciidoctorJ^], Asciidoctor can be used in any program that runs on a Java Virtual Machine (JVM).
 Under the covers, AsciidoctorJ uses JRuby to run Asciidoctor, but this is hidden behind a Java API.
 AsciidoctorJ even provides an alternate CLI, which means you can get the full Asciidoctor experience with only a Java runtime.
 Building atop AsciidoctorJ, there are also plugins that integrate Asciidoctor into Apache Maven, Gradle, or Javadoc builds.

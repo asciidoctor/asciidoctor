@@ -1,67 +1,145 @@
-= Asciidoctor's Features and Benefits
-:navtitle: Features and Benefits
-:url-rewrite: https://github.com/ocpsoft/rewrite/tree/master/transform-markup
-:url-manpage: {url-project}/man/asciidoctor
-// user-manual: Asciidoctor's most notable benefits
-// The primary benefits and supporting features of the application.
+= Features
 
-While Asciidoctor aims to offer full compliance with the AsciiDoc syntax, it's more than just a clone.
+This page covers the features of Asciidoctor that make it a great choice for processing and publishing your AsciiDoc content.
 
-.Built-in and custom templates
-Asciidoctor uses a set of built-in ERB templates to generate HTML 5 and DocBook output that is structurally equivalent to what AsciiDoc produces.
-Any of these templates can be replaced by a custom template written in any template language available in the Ruby ecosystem.
-Custom template rendering is handled by the Tilt template abstraction library.
-Tilt is one of the most popular gems in the Ruby ecosystem.
+== Readily available with no dependencies
 
-.Parser and object model
-Leveraging the Ruby stack isn't the only benefit of Asciidoctor.
-Unlike the AsciiDoc Python implementation, Asciidoctor parses and converts the source document in discrete steps.
-This makes conversion optional and gives Ruby programs the opportunity to extract, add or replace information in the document by interacting with the document object model Asciidoctor assembles.
-Developers can use the full power of the Ruby programming language to play with the content in the document.
+Asciidoctor is written in Ruby, which means it must be run on a Ruby language runtime (including JRuby).
+But that's its only requirement.
+Asciidoctor is packaged and distributed as a RubyGem (aka gem) to the main package repository at https://rubygems.org[RubyGems.org^].
+What that means is that the gem can be installed on *any operating system* Ruby supports using Ruby's package management tools (gem or bundle).
+Asciidoctor itself has no dependencies.
 
-.Performance and security
-No coverage of Asciidoctor would be complete without mention of its _speed_.
-Despite not being an original goal of the project, Asciidoctor has proven startlingly fast.
-It loads, parses, and converts documents a *100 times as fast* as the Python implementation.
-That's good news for developer productivity and good news for GitHub or any server-side application that needs to render AsciiDoc markup.
-Asciidoctor also offers several levels of security, further justifying its suitability for server-side deployments.
+But what if you aren't familiar with Ruby or, for whatever reason, prefer not to install it?
+No problem!
+Thanks to {url-asciidoctorj}[AsciidoctorJ^] and xref:asciidoctor.js::index.adoc[Asciidoctor.js], you can run the same exact version of Asciidoctor on a Java Virtual Machine (JVM) or JavaScript runtime, respectively.
+That means you _don't_ need a Ruby runtime installed on your machine after all.
+(AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript).
 
-.Beyond Ruby
-Asciidoctor's usage is not limited to the Ruby community.
-Thanks to {url-jruby}[JRuby^], a port of Ruby to the JVM, Asciidoctor can be used inside Java applications as well.
-Plugins are available for #asciidoctor-maven-plugin Apache Maven#, #asciidoctor-gradle-plugin Gradle#, and {url-rewrite}[Rewrite^].
-These plugins are based on the #AsciidoctorJ# for Asciidoctor.
+Whether your working in Ruby, Java, or JavaScript, Asciidoctor is readily available for you to start using.
+(Only when you get into extended converters and extensions do you need to install dependencies).
 
-Asciidoctor also ships with a command line interface (CLI).
-The Asciidoctor CLI, {url-manpage}[asciidoctor^], is a drop-in replacement for the `asciidoc.py` script from the AsciiDoc Python distribution.
+== Quick wins
 
-////
+Asciidoctor provides a really nice out-of-the-box xref:html-backend:index.adoc[HTML experience], complete with a default stylesheet and built-in integrations like Font Awesome (for icons), Highlight.js (for source highlighting), and MathJax (for STEM processing).
+When you're just getting into using AsciiDoc for writing, Asciidoctor's HTML output should be sufficient for all of your publishing needs.
 
-AsciiDoc is about being able to focus on expressing your ideas, writing with ease and passing on knowledge without the distraction of complex applications or angle brackets.
-In other words, it's about discovering _writing zen_.
+The following before and after picture should give you an idea of what to expect:
 
-AsciiDoc works because:
+image::source-vs-output.png[AsciiDoc source vs HTML output]
 
-- It's readable
-- It's concise
-- It's comprehensive
-- It's extensible
-- It produces beautiful output (HTML, DocBook, PDF, ePub and more)
+If you're looking for more advanced output, or you have an existing DocBook toolchain in place, you can instead xref:docbook-backend:index.adoc[convert to DocBook] and feed the result into that pipeline.
+Once you get more familiar with AsciiDoc and Asciidoctor, you can explore customizing the built-in converter using templates or using extended converters to produce other output formats such as PDF and EPUB 3.
+So there is plenty of room to grow.
 
-AsciiDoc is both easy to write and easy to read (in raw form).
-It's also easy to proof and edit.
-After all, it's plain text, just like that familiar e-mail.
+== Built-in and extended converters
 
-The AsciiDoc syntax is intuitive because it recognizes time-tested, plain text conventions for marking up or structuring the text.
-The punctuation was carefully chosen to look like what it means.
-A user unfamiliar with AsciiDoc can figure out the structure and semantics (i.e., what you mean) just by looking at it.
-Best of all, *it only requires a text editor to read or write*.
+Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[manpage] (manual page).
+These converters are designed to cover a majority of users`' needs for basic preview and publishing.
 
-AsciiDoc allows you to focus on the actual writing and only worry about tweaking the output when you are ready to render the document.
-The plain-text of an AsciiDoc document is easily converted into a variety of output formats, beautifully formatted, without having to rewrite the content.
+The *HTML* converter gives you a result you can publish the web straight away without any tweaking.
+The *DocBook* converter allows you to either leverage an existing publishing toolchain or migrate the content to a different authoring format (without the tool needing to know how to parse AsciiDoc).
+The *manpage* converter drastically lowers the barrier to making system help files.
 
-Copy text from an e-mail into a document and see how quickly you can turn it into documentation.
-Almost immediately, you'll find your writing zen and enjoy the rewarding experience of sharing knowledge.
+But it doesn't end there.
+The converter interface in Asciidoctor is an extension point.
+That means it can be used to create converters for any output format imaginable.
+And there's an ecosystem of additional converters already available in the Asciidoctor project.
+You can find converters for creating *PDF*, *EPUB 3*, *Reveal.js slides*, and more from AsciiDoc.
+Asciidoctor also provides advanced docinfo support for injecting colophon (such as content scripts) into the header and footer of the output file.
 
-Live or die by documentation? Live.
-////
+A single input format, AsciiDoc, gains you a plethora of output formats.
+
+== Custom converter or templates
+
+While Asciidoctor provides a built-in converter for producing publish-ready HTML, *all the HTML that Asciidoctor generates can be changed.*
+There are two ways to modify the HTML that Asciidoctor produces: a custom converter or converter templates.
+
+If you're an experienced programmer, you may lean towards the *custom converter*.
+You can extend the built-in HTML converter and override the methods for that handles the conversion for any node in the document tree.
+
+If you're expertise is more on the technical writing side, you may find the *converter templates* to be more approachable.
+The templates can be written in any template language supported by the Tilt template abstraction library, such as ERB, Haml, or Slim.
+These templates augment the built-in converter by replacing the processing for a node in the document.
+You introduce one template for each type of node for which you want to control conversion.
+Templates allow you to apply logic around chunks of HTML (or HTML-like) markup.
+
+Just know that if the HTML that Asciidoctor produces isn't working for you, you can change it.
+
+== Syntax highlighting
+
+If you're writing technical documentation that presents snippets of source code or configuration, you can enhance the display of those source blocks using syntax highlighting (aka source highlighting).
+Syntax highlighting is the practice of colorizing (or otherwise emphasizing) keywords and syntax elements in a structured programming or configuration language.
+Here's an example to give you an idea:
+
+[source,ruby]
+----
+phrase = "I love AsciiDoc"
+puts phrase
+
+# now say it like you mean it
+5.times { puts %(#{phrase}!) }
+----
+
+Asciidoctor provides adapters for several popular syntax highlighters, including Rouge and Highlight.js.
+Aside from installing the library (if necessary), all you need to do is set an document attribute on your document and Asciidoctor will handle the rest.
+From there, you can configure the behavior of the syntax highlighter, such as changing the style/theme, enabling line numbers, and block highlighting select lines.
+
+== Multiple interfaces: CLI and API
+
+Asciidoctor offers two interfaces for processing AsciiDoc content: a commandline interface (CLI) and an application programming interface (API).
+
+The *CLI* is designed as a simple tool for non-programmers who want to convert AsciiDoc without having to write a program or for converting content in an automated environment such as CI.
+Many of the processing options are accessible from the CLI using option flags.
+When you're first starting out with Asciidoctor, you'll mostly likely interact with it via the CLI.
+Although the CLI itself does not require any programming, it can still load extension code that auguments processing.
+
+NOTE: If you're migrating from AsciiDoc.py, the `asciidoctor` CLI is a drop-in replacement for the `asciidoc` CLI.
+
+The *API* is designed for programmers who want to take their AsciiDoc processing further.
+Like with the CLI, you can use the API to convert documents.
+But it's not all about conversion to an output format.
+//Alternately, you can load the document just to inspect its contents.
+Asciidoctor parses and converts the source document in discrete steps.
+This makes conversion optional and gives programs the opportunity to extract, add, or replace content in the document by interacting with the document object model.
+//Developers can use the full power of the Ruby programming language to play with the content in the document.
+Or you may want to leverage the ability to convert to an embedded document for integrating with other applications, such as a static site generator.
+The API also provides an extension SPI that you can use to augment the processor, such as to introduce new syntax, mutate the parsed document before conversion, or tweak the output after conversion.
+
+TIP: The API is written in Ruby, but also accessible from JVM languages or JavaScript when using AsciidoctorJ or Asciidoctor.js, respectively.
+
+Both the CLI and API have the ability to process both AsciiDoc files and AsciiDoc source passed in as a string.
+
+== Impressive performance and strong security
+
+No coverage of Asciidoctor would be complete without mention of its speed.
+Asciidoctor is about as fast as any program that runs in Ruby can be.
+It can load, parse, and convert a 100K AsciiDoc document in about a tenth of a second (~ 1MB/s).
+That's more than 100x as fast as AsciiDoc.py, the original AsciiDoc implementation.
+
+Asciidoctor's speed is good news for developer productivity and good news for server-side applications that need to convert AsciiDoc markup.
+It also means that preview tools like the browser extension can present a preview of the AsciiDoc content in HTML in near real time.
+
+Asciidoctor also has the ability to run securely by offering several xref:safe-modes.adoc[security (aka safe) modes].
+By using one of these safe modes, you don't have to worry about the processor accessing sensitive files or even the file system in highly secure environments.
+In addition to its performance, these security levels make Asciidoctor well-suited for server-side deployments.
+
+== Access to an ecosystem of extensions and tools
+
+Installating Asciidoctor is just the beginning of your publishing experience.
+Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools], ranging from converters, to extended syntax, to build plugins, to integrated writing and preview environments.
+
+One popular extension is {url-org}/asciidoctor-diagram[Asciidoctor Diagram].
+When loaded, Asciidoctor Diagram allows you to make diagrams from plain text (much like AsciiDoc does for writing).
+Asciidoctor Diagram does this by extending the syntax of AsciiDoc to recognize specially marked literal blocks.
+It takes the text inside those blocks, passes it through one of the diagramming tools it integrates with, and reinserts the image back into the document as it is being processed.
+The result is that the diagram source in the AsciiDoc document becomes an image in the generated output.
+
+One popular tool is the {url-org}/asciidoctor-browser-extension[browser extension].
+When this extension is installed, you can browse to an AsciiDoc file on your harddisk or on the web and the browser will show you the converted HTML *instead of* the AsciiDoc source.
+That means you can get the out-of-the-box HTML experience that Asciidoctor provides without even having to run a command or script.
+The extension running in the browser does everything for you.
+
+These are just two examples.
+There are plenty more possibilities to explore in the ever-growing Asciidoctor ecosystem.
+All the components of this ecosystem work together to achieve one goal, to make writing in AsciiDoc a rewording and productive experience.
