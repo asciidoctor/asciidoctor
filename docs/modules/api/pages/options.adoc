@@ -74,10 +74,13 @@ Instead of providing a Ruby block containing extensions to register, this option
 |`Extensions::Registry` instance
 |_n/a_
 
-|:header_footer
-|If true, add the document header and footer (i.e., framing) around the body content in the output.
-NOTE: The default value for this option is opposite of the default value for the CLI.
-|false
+|:standalone
+|If true, generate a standalone output document (which includes the shell around the body content, such as the header and footer).
+When converting to a file, the default value is `true`.
+Otherwise, the default value is `false`.
+The deprecated alias for this option is `:header_footer`.
+Note that the default value for this option is opposite of the default value for the CLI.
+|_contingent_
 |_boolean_
 |`-s`, `--no-header-footer`
 

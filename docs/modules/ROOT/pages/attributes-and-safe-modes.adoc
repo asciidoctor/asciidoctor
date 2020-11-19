@@ -36,11 +36,11 @@ Example:
 To be secure by default, the allow-uri-read attribute must be set in the API or CLI (not document) for this feature to be enabled. It's also completely disabled if the safe mode is SECURE or greater.
 Since this is a potentially dangerous feature, it’s disabled if the safe mode is SECURE or greater. Assuming the safe mode is less than SECURE, you must also set the allow-uri-read attribute to permit Asciidoctor to read content from a URI.
 
-I decided the following defaults for the header_footer option make the most sense:
+I decided the following defaults for the standalone option make the most sense:
 
 true if using the cli (use -s to disable, consistent with asciidoc)
 false if using the API, unless converting directly to a file, in which case true is the default
 The basic logic is that if you are writing to a file, you probably want to create a standalone document. If you are converting to a string, then you probably want an embedded document. Of course, you can always set it explicitly, this is just a default setting.
 
-The reason I think the header_footer default is important is because we don't want people switching from Markdown to AsciiDoc and be totally taken by surprise when they start getting a full HTML document. On the other hand, if you are converting to a file (or using the cli), then it makes a lot of sense to write a standalone document. To me, it just feels natural now.
+The reason I think the standalone default is important is because we don't want people switching from Markdown to AsciiDoc and be totally taken by surprise when they start getting a full HTML document. On the other hand, if you are converting to a file (or using the cli), then it makes a lot of sense to write a standalone document. To me, it just feels natural now.
 ////

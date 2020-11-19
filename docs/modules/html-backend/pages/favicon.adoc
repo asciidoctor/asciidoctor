@@ -1,6 +1,6 @@
 = Add a Favicon
 
-When using Asciidoctor to generate a standalone HTML document (i.e., the `header_footer` option is `true`), you can instruct the processor to include a link to a favicon by setting the favicon attribute in the document header.
+When using Asciidoctor to generate a standalone HTML document (i.e., the `standalone` option is `true`), you can instruct the processor to include a link to a favicon by setting the favicon attribute in the document header.
 
 [source,asciidoc]
 ----

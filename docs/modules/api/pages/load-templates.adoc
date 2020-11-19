@@ -8,8 +8,8 @@ It will fallback to its default templates for everything else.
 
 [source,ruby]
 ----
-puts Asciidoctor.convert '*This* is Asciidoctor.', :header_footer => true,
-  :template_dir => 'templates'
+puts Asciidoctor.convert '*This* is Asciidoctor.',
+  standalone: true, template_dir: 'templates'
 ----
 
 The Document and Section templates should begin with `document` and `section`, respectively.

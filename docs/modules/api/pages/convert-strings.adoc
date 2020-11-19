@@ -45,26 +45,26 @@ Here's what's included in an embedded document:
 == Standalone output
 
 You can still generate a standalone document when converting a string.
-To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `header_footer` option to `true`.
+To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `standalone` option to `true`.
 
 [source,ruby]
 ----
-puts Asciidoctor.convert '*This* is Asciidoctor.', header_footer: true
+puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
 ----
 
 Now you will see a full HTML file.
 
-When the input or output is a file, the `header_footer` option is enabled by default.
+When the input or output is a file, the `standalone` option is enabled by default.
 
 [source,ruby]
 ----
 Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
 ----
 
-If you want to generate embedded output when starting with a file, set the `header_footer` option to `false`.
+If you want to generate embedded output when starting with a file, set the `standalone` option to `false`.
 However, most of the time you'll want to generate a standalone document when converting a file (which is why it's default).
 
-When converting a string, the TOC is only included by default when using the `header_footer` option as shown above (whether it's enabled implicitly or explicitly).
+When converting a string, the TOC is only included by default when using the `standalone` option as shown above (whether it's enabled implicitly or explicitly).
 However, you can force it to be included without the header and footer by setting the `toc` attribute with a value of `macro` and using the `toc::[]` macro in the string itself.
 
 == Convert inline markup only
@@ -81,9 +81,9 @@ In this mode, Asciidoctor will only process the first block (e.g., paragraph) in
 == Convert to DocBook
 
 You can produce DocBook 5.0 by setting the `backend` option to `'docbook'`.
-Since embeddable DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `header_footer` option to `true`.
+Since embeddable DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `standalone` option to `true`.
 
 [source,ruby]
 ----
-puts Asciidoctor.convert '*This* is Asciidoctor.', header_footer: true, backend: 'docbook'
+puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true, backend: 'docbook'
 ----
