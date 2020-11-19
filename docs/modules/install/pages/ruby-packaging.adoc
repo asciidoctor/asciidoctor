@@ -1,4 +1,4 @@
-= Install Using Ruby Tools
+= Install Using Ruby Packaging
 
 [#gem-install]
 == gem install

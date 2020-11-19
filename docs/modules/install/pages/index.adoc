@@ -1,4 +1,4 @@
-= Install Asciidoctor
+= Install and Update
 
 To simplify installation, Asciidoctor is packaged and distributed as a RubyGem (aka gem) to {url-rubygem}/asciidoctor[RubyGems.org^].
 It's also distributed as a package for popular Linux distributions and macOS.
@@ -15,3 +15,5 @@ Asciidoctor can be installed using:
 * Bundler.
 
 The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+
+You should use the same method to update Asciidoctor as you use to install it.
