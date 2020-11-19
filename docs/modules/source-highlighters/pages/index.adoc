@@ -1,0 +1,32 @@
+= Source Highlighting
+
+[%autowidth]
+|===
+| |Syntax Highlighter |Supported Versions |Converters
+
+|Client-side highlighting for source code blocks
+
+|Highlight.js
+|9.18.3
+|HTML
+
+.3+|Server-side highlighting for source code blocks
+
+|CodeRay
+|1.1.2
+|HTML
+
+|Pygments
+|2.2.0
+|HTML
+
+|Rouge
+|3.1.1
+|HTML
+|===
+
+////
+|Inline, admonition or callout font-based icons
+|Font Awesome
+|4.7
+////

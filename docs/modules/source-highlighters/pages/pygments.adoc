@@ -49,7 +49,7 @@ Default: `pastie`.
 pygments-css::
 Controls what method is used for applying CSS to the tokens.
 Can be `class` (CSS classes) or `style` (inline styles).
-See the xref:html-backend:apply-code-stylesheets.adoc#pygments[Pygments stylesheet section] to learn more about how the value `class` is handled.
+See the xref:html-backend:source-highlighting-stylesheets.adoc#pygments[Pygments stylesheet section] to learn more about how the value `class` is handled.
 Default: `class`.
 
 pygments-linenums-mode::

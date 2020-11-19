@@ -45,4 +45,4 @@ Most shells do not honor this double glob pattern.
 
 In conclusion, when specifying a glob pattern, we always recommend enclosing the argument in quotes.
 
-CAUTION: To process multiple nested AsciiDoc files at once and apply a custom stylesheet, you'll need to xref:html-backend:apply-stylesheet.adoc#style-nested[manage the stylesheet's location].
+CAUTION: To process multiple nested AsciiDoc files at once and apply a custom stylesheet, you'll need to xref:html-backend:custom-stylesheets.adoc#style-nested[manage the stylesheet's location].

@@ -9,7 +9,7 @@ Asciidoctor's default output format is HTML.
 
 == Generate HTML using the html5 converter
 
-In this section, we'll create a sample document, then process and convert it with Asciidoctor's `html5` converter.
+In this section, we'll create a sample document, then process and convert it with Asciidoctor's built-in HTML converter.
 
 . Create an AsciiDoc file like the one below
 . Save the file as [.path]_my-sample.adoc_

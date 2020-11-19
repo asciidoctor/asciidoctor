@@ -29,7 +29,8 @@ nav:
 - modules/ROOT/nav-safe-modes.adoc
 - modules/ROOT/nav-docinfo.adoc
 - modules/tooling/nav.adoc
-- modules/integrations/nav.adoc
+- modules/source-highlighters/nav.adoc
+- modules/stem/nav.adoc
 - modules/extensions/nav.adoc
 - modules/ROOT/nav-lang.adoc
 - modules/ROOT/nav-errors.adoc

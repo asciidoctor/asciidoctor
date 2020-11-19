@@ -3,13 +3,12 @@
 == What is the default stylesheet?
 
 Asciidoctor comes bundled with a stylesheet, named [.path]_asciidoctor.css_.
-It uses this stylesheet for HTML document styling and JavaScript for generating document attributes such as a table of contents and footnotes.
-This stylesheet is applied by default unless you tell Asciidoctor to use another stylesheet.
-See xref:html-backend:apply-stylesheet.adoc[] to learn about the default and custom stylesheet options.
+The built-in HTML converter uses this stylesheet for HTML document styling and JavaScript for generating document attributes such as a table of contents and footnotes.
+Asciidoctor applies this stylesheet by default unless you tell Asciidoctor to use another stylesheet.
 
 == Embed a stylesheet
 
-When you generate a document with the `html5` backend, the [.path]_asciidoctor.css_ stylesheet is embedded into the HTML output by default when the safe mode is less than `SECURE`.
+When you generate a document using the built-in HTML converter, the [.path]_asciidoctor.css_ stylesheet is embedded into the HTML output by default when the xref:ROOT:safe-modes.adoc[safe mode] is less than `SECURE`.
 If your stylesheet is being linked to when you expect it to be embedded, lower the safe mode (`safe` is the recommend value).
 
 == Link to a stylesheet
@@ -37,10 +36,10 @@ Additionally, you can inspect [.path]_my-sample.html_ in your browser and see `<
 //image::mysample-link.png[]
 ====
 
-== Don't apply a stylesheet
+== Disable a stylesheet
 
 If you don't want any styles applied to the HTML output of your document, unset the `stylesheet` attribute.
 
  $ asciidoctor -a stylesheet! my-sample.adoc
 
-One of Asciidoctor's strengths is the ease in which you can swap the default stylesheet for your own xref:apply-stylesheet.adoc[custom stylesheet].
+One of Asciidoctor's strengths is the ease in which you can swap the default stylesheet for your own xref:custom-stylesheets.adoc[custom stylesheet].

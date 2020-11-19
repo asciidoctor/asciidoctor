@@ -1,7 +1,10 @@
 = Set the Safe Mode Using the CLI
-:navtitle: Set the Safe Mode
+:navtitle: Set Safe Mode
 
 When Asciidoctor is invoked via the CLI, the xref:ROOT:safe-modes.adoc[safe mode] is set to `UNSAFE` by default.
+
+== Assign safe mode level
+
 You can change the security level by executing one of the following commands:
 
 `-S`, `--safe-mode=SAFE_MODE`::
@@ -16,4 +19,4 @@ Provided for compatibility with the python AsciiDoc `safe` command.
 Base directory containing the document and resources. Defaults to the directory containing the source file, or the working directory if the source is read from a stream. Can be used as a way to chroot the execution of the program.
 ////
 
-You can also set the xref:api:set-safe-mode.adoc[safe mode from the API] and xref:ROOT:attributes-and-safe-modes.adoc[manage attributes by safe mode].
+You can also set the xref:api:set-safe-mode.adoc[safe mode from the API] and xref:ROOT:reference-safe-mode.adoc[enable or disable content based on the current safe mode].

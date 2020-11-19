@@ -294,7 +294,7 @@ a|
 === Custom extensions
 
 AsciiDoc.py custom extensions are Python commands, so they don't work with Asciidoctor.
-Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions:register.adoc[extensions in Ruby, Java, or JavaScript].
+Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions:index.adoc[extensions in Ruby, Java, or JavaScript].
 
 == Doctest
 

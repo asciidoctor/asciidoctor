@@ -39,85 +39,85 @@ If you're not using the DocBook toolchain for publishing, you must translate eac
 One way is to set the following attributes in the document header or by passing the attributes via the API or CLI:
 
 .Attributes that control built-in labels
-[%autowidth]
+[%autowidth,cols="m,,"]
 |===
-|Attribute name |Used for |Default
+|Attribute |Default English Value |Notes
 
 |appendix-caption
-|Appendix titles.
 |Appendix
+|
 
 |caution-caption
-|CAUTION admonitions (when icons are not in use).
 |Caution
+|
 
 |chapter-label
-|Prefix added to chapter titles (i.e., level-1 section titles when doctype is book). _(pdf converter only)_
 |Chapter
+|Applies only when `doctype` is `book`.
+PDF converter only.
 
 |example-caption
-|Example titles.
 |Example
+|
 
 |figure-caption
-|Automatically prefixed to figure titles.
 |Figure
+|
 
 |important-caption
-|IMPORTANT admonitions (when icons are not in use).
 |Important
+|
 
 |last-update-label
-|Label for when the document was last updated.
 |Last updated
+|
 
 |listing-caption
-|The label for listing blocks.
-By default, listing blocks do not have captions.
-If you specify `listing-caption`, then you also turn on captions for listing blocks.
 |_not set_
+|By default, listing blocks do not have captions.
+Specify `listing-caption` to turn on listing block captions.
 
 |manname-title
-|Label for the program name section in the man page.
 |NAME
+|Applies only when `doctype` is `manpage`.
 
 |note-caption
-|NOTE admonitions (when icons are not in use).
 |Note
+|
 
 |preface-title
-|Title text used for the anonymous preface (when the `doctype` is book).
 |_not set_
+|Applies only when `doctype` is `book`.
 
 |table-caption
-|Automatically prefixed to table titles.
 |Table
+|
 
 |tip-caption
-|TIP admonitions (when icons are not in use).
 |Tip
+|
 
 |toc-title
-|Title of the table of contents.
 |Table of Contents
+|
 
 |untitled-label
-|The document title, for documents that have only body content.
 |Untitled
+|
 
 |version-label
-|The label preceding the revnumber in the document's byline.
 |Version
+|
 
 |warning-caption
-|WARNING admonitions (when icons are not in use).
 |Warning
+|
 |===
 
-If you plan to support multiple languages, you'll want to define the attributes for each language inside a conditional preprocessor directive.
+If you plan to support multiple languages, you'll want to define the attributes for each language inside a xref:asciidoc:directives:conditionals.adoc[conditional preprocessor directive].
 For example:
 
-[source]
+[source,asciidoc]
 ----
 \ifeval::["{lang}" == "de"]
 :caution-caption: Achtung

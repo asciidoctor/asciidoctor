@@ -1,9 +1,0 @@
-* Integrations
-** xref:syntax-highlighters.adoc[]
-*** xref:rouge.adoc[]
-*** xref:coderay.adoc[]
-*** xref:highlightjs.adoc[]
-*** xref:pygments.adoc[]
-** xref:stem.adoc[]
-*** xref:mathjax.adoc[]
-*** xref:asciimath-gem.adoc[]

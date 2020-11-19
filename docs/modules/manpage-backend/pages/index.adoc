@@ -1,5 +1,5 @@
-= Generate Man Pages from AsciiDoc
-:navtitle: Generate Man Pages
+= Generate Manual Pages from AsciiDoc
+:navtitle: Generate Manual Pages
 :url-man7: https://man7.org/linux/man-pages/man7/roff.7.html
 :url-docbook-refmisc: https://tdg.docbook.org/tdg/5.0/refmiscinfo.html
 :url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
@@ -11,11 +11,11 @@ Asciidoctor's built-in man page converter generates {url-man7}[roff-formatted^] 
 == What is a manual page?
 
 A manual page, often abbreviated to man page, is a form of software documentation found on Unix-based operating systems.
-The formalized structure of its content allows the `man` command to present the man page as a formatted document in a terminal pager.
+The formalized structure of its content allows the `man` command to present the manual page as a formatted document in a terminal pager.
 
 == Generate a man page with the manpage converter
 
-Before running Asciidoctor, make sure your source document adheres to the <<man-page-doctype,manpage doctype structure>> and has the doctype attribute set to `manpage`.
+Before running Asciidoctor, make sure your source document adheres to the <<doctype,manpage doctype structure>> and the `doctype` attribute is assigned the value `manpage`.
 
 To generate a man page, run:
 
@@ -42,6 +42,7 @@ Here is an example man page composed in AsciiDoc for the `eve` command:
 include::example$manpage.adoc[]
 ----
 
+[#doctype]
 == Man page doctype
 
 The `manpage` doctype has the following required parts:
@@ -66,51 +67,51 @@ Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`B
 Several built-in document attributes only affect man pages.
 These attributes must be set in the document header.
 
-[cols="<15,<30,<30"]
-.Built-in document attributes specific to the manpage doctype
+.Built-in manpage document attributes
+[%autowidth]
 |===
-|Attribute name |Description |Value (as parsed from example above)
+|Attribute |Description |Value (as parsed from example above)
 
-|mantitle
+|`mantitle`
 |Alternative way to set the man page name.
 |ASCIIDOCTOR(1)
 
-|manvolnum
+|`manvolnum`
 |Manual section number.
 |1
 
-|manname
+|`manname`
 |Alternative way to set the command name.
 |asciidoctor
 
-|manpurpose
+|`manpurpose`
 |Alternative way to set the command purpose.
 |converts AsciiDoc source files
 
-|man-linkstyle
+|`man-linkstyle`
 |Style the links in the manpage output.
 A valid link format sequence.
 // Needs a reference to this.
 |blue R <>
 
-|mansource
+|`mansource`
 |The source to which the manpage pertains.
 When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 |Asciidoctor
 
-|manversion
+|`manversion`
 |The version of the man page.
 Defaults to revnumber if not specified.
 When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 Not used by Asciidoctor.
 |1.5.4
 
-|manmanual
+|`manmanual`
 |Manual name.
 When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 |Asciidoctor Manual
 |===
 
 Refer to {url-manpage-raw}[the AsciiDoc source of the Asciidoctor man page^] to see a complete example.
-The man page for Asciidoctor is produced using the `manpage` converter.
-The man pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.
+The manual page for Asciidoctor is produced using the `manpage` converter.
+The manual pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.

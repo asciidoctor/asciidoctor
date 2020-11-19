@@ -6,7 +6,7 @@ apply-theme.adoc, included in:
 ////
 
 A custom stylesheet can be stored in the same directory as your document or in a separate directory.
-Like the default stylesheet, you can have the output document link to your custom stylesheet or embed it.
+Like the xref:manage-stylesheets.adoc[default stylesheet], you can have the output document link to or embed your custom stylesheet.
 
 If the stylesheet is in the same directory as your document, you can apply it when converting your document to HTML from the CLI.
 
