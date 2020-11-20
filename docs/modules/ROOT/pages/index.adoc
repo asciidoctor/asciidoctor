@@ -6,19 +6,25 @@ CAUTION: This documentation is in migration.
 If you're looking for the current Asciidoctor documentation, visit https://asciidoctor.org/docs.
 
 This section of the website contains the documentation for {url-project}[Asciidoctor^], a Ruby-based AsciiDoc processor.
-Asciidoctor also serves as the reference implementation for how the AsciiDoc language is interpreted.
+Asciidoctor currently serves as the reference implementation for how to interpret the AsciiDoc language.
 If you're looking for the documentation for the AsciiDoc language itself, refer to the xref:asciidoc::index.adoc[AsciiDoc section] of this website.
 //You can also find the documentation for AsciidoctorJ, Asciidoctor.js, and various extensions and integrations in other areas of this website.
 
 == What is Asciidoctor?
 
-Asciidoctor is a fast, open source text processor for parsing AsciiDoc into a document model and converting to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, PDF, and [.nowrap]#EPUB 3#.
+Asciidoctor is a fast, open source, Ruby-based text processor for parsing AsciiDoc into a document model and converting to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, manpage, PDF, and [.nowrap]#EPUB 3#.
+This Ruby library is often referred to as Asciidoctor core.
+That's because Asciidoctor is also the name of the family of projects that contribute extensions and tools for Asciidoctor.
+When we say Asciidoctor in this section of the documentation, we're specifically referring to Asciidoctor core.
 
 To simplify installation, Asciidoctor is packaged and distributed as a RubyGem (aka gem) named https://rubygems.org/gem/asciidoctor[asciidoctor] to {url-rubygem}[RubyGems.org^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
 Asciidoctor is also distributed as a package for numerous Linux distributions as well as macOS.
 
-The Asciidoctor software is open source under the terms of the MIT license and {url-org}[hosted on GitHub^].
+Asciidoctor is open source software that is available under the terms of the MIT license and {url-org}[hosted on GitHub^].
+
+Asciidoctor is the successor to AsciiDoc Python (AsciiDoc.py).
+If you're still using AsciiDoc.py, follow xref:migrate:asciidoc-python.adoc[] to learn how to upgrade to Asciidoctor.
 
 == Basic usage
 
