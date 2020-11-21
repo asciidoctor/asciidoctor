@@ -216,7 +216,7 @@ class AbstractNode
     (val = @attributes['role']) ? (%( #{val} ).include? %( #{name} )) : false
   end
 
-  # Public: Sets the value of the role attribute on this ndoe.
+  # Public: Sets the value of the role attribute on this node.
   #
   # names - A single role name, a space-separated String of role names, or an Array of role names
   #
