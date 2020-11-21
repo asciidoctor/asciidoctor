@@ -1,4 +1,5 @@
 * xref:index.adoc[]
+** xref:default-stylesheet.adoc[]
 ** xref:manage-stylesheets.adoc[]
 ** xref:source-highlighting-stylesheets.adoc[]
 ** xref:custom-stylesheets.adoc[]

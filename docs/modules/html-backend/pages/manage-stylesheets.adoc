@@ -1,3 +1,6 @@
+// FIXME: This page needs to be revised now that there's a dedicated page for the default stylesheet.
+// We may want to merge it with the custom stylesheet page.
+// It also needs to cover copycss (disable or custom value)
 = Manage Stylesheets
 
 == What is the default stylesheet?
