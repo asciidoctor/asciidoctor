@@ -1,0 +1,134 @@
+= Stylesheet Modes
+
+//When applying a stylesheet to the generated HTML, you can configure the HTML converter to either embed the CSS directly into the HTML or link to the stylesheet file.
+The HTML converter can be configured to embed the CSS of the stylesheet directly into the HTML, link to the stylesheet file, or disable it entirely.
+These modes are available regardless of whether you're using the xref:default-stylesheet.adoc[default stylesheet] or a xref:custom-stylesheet.adoc[custom stylesheet].
+This page covers the document attributes that control how the stylesheet is applied.
+
+IMPORTANT: The HTML converter will only apply a stylesheet when generating a standalone HTML document.
+That's because the stylesheet goes in the HTML `<head>` and the converter only generates this tag for standalone output, not embedded output.
+
+[#embed]
+== Embed the stylesheet
+
+When the xref:ROOT:safe-modes.adoc[safe mode] is server or lower, the default behavior of the HTML converter is to read the the stylesheet file, enclose its contents in a `<style>` tag, and embed it directly into the `<head>` of the generated HTML.
+This default makes the HTML more portable since you don't lose the stylesheet if you move the file.
+
+However, if the safe mode is secure, the converter will <<link,link to the stylesheet file>> instead.
+If you see a link to the stylesheet file in the generated HTML where you expect the stylesheet to be embedded, check your safe mode setting.
+
+The same two rules apply regardless of whether you're using the default stylesheet or a custom stylesheet.
+
+[#link]
+== Link to the stylesheet
+
+You already know that the HTML converter will link to the stylesheet when the safe mode is secure.
+However, it's possible to enable this behavior independent of the safe mode.
+This can be beneficial if you're converting numerous AsciiDoc documents to HTML and want them all to share the same stylesheet.
+It can also make inspecting the HTML a little simpler.
+
+If the `linkcss` document attribute is set, the converter will take this hint to link to the stylesheet using a `<link rel="stylesheet">` tag point to a relative path reference instead of embedding it.
+
+The `linkcss` document attribute must be set by the end of the header to be effective.
+One way to do that is to set the attribute in the document header:
+
+[source]
+----
+= My First Experience with the Dangers of Documentation
+:linkcss:
+
+In my world, we don't have to worry about mutant, script-injecting warlocks.
+No.
+We have something far worse.
+We're plagued by Wolpertingers.
+----
+
+You can also set `linkcss` using the API or CLI (shown here):
+
+ $ asciidoctor -a linkcss document.adoc
+
+In either case, if you inspect the `<head>` tag in the output file [.path]_document.html_, you'll see that the HTML links to the stylesheet.
+
+[source,html]
+----
+<link rel="stylesheet" href="./asciidoctor.css">
+----
+
+Since we didn't specify a stylesheet, the converter links to the default stylesheet.
+But where is this stylesheet located?
+Let's find out.
+
+[#copy]
+== Copy the stylesheet to the output directory
+
+If you're linking to a stylesheet file, the stylesheet file has to be available at the referenced path so the browser can access it.
+For simple cases, Asciidoctor takes care of this for you.
+
+If the safe mode is server or lower, and the `linkcss` document attribute is set, Asciidoctor will copy the stylesheet to the output directory so the HTML can link to it.
+When using the default stylesheet, Asciidoctor writes the CSS to the file [.path]_asciidoctor.css_ in the output directory.
+If you specify a custom stylesheet, Asciidoctor will copy that file instead, retaining the name of the file.
+This utility works even if you specify an xref:cli:output-file.adoc[output file in a different directory] from the source file.
+
+.A shared responsiblity
+****
+While the converter handles the task of embedding or linking to the stylesheet file, it's the processor itself (not the converter) that handles copying the stylesheet.
+****
+
+If the safe mode is secure, Asciidoctor will not copy the stylesheet file and, thus, the link to it will be broken (unless, of course, you copy the file separately).
+
+Let's revisit the previous example:
+
+ $ asciidoctor -a linkcss document.adoc
+
+After running this command, you should see the stylesheet file [.path]_asciidoctor.css_ adjacent to the HTML file [.path]_document.html_.
+When you view the HTML file in your browser, you should observe that the default stylesheet is applied.
+
+=== To copy or not to copy
+
+Whether Asciidoctor copies the stylesheet to the output directory is controlled by the `copycss` document attribute.
+The `copycss` attribute is set by default unless the safe mode is secure.
+
+To prevent Asciidoctor from copying the stylesheet independent of safe mode, unset the `copycss` document attribute.
+
+The `copycss` document attribute must be unset by the end of the header to be effective.
+One way to do that is to unset the attribute in the document header:
+
+[source]
+----
+= My First Experience with the Dangers of Documentation
+:linkcss:
+:!copycss:
+
+In my world, we don't have to worry about mutant, script-injecting warlocks.
+No.
+We have something far worse.
+We're plagued by Wolpertingers.
+----
+
+You can also unset `copycss` using the API or CLI (shown here):
+
+ $ asciidoctor -a linkcss -a copycss! document.adoc
+
+In either case, if you inspect the output directory, you will see that the stylesheet file [.path]_asciidoctor.css_ is missing (unless it was already there).
+
+We'll see the `copycss` attribute come up again on the xref:custom-stylesheet.adoc[custom stylesheet page] as a means of xref:custom-stylesheet.adoc#copy-link-split[overriding the location of the stylesheet to copy].
+
+[#disable]
+== Disable the stylesheet
+
+The stylesheet is effectively disabled when generating embedded HTML, since the embedded HTML does not include the `<head>` tag.
+If you don't want the converter to include a stylesheet in the standalone HTML, unset the `stylesheet` document attribute:
+
+ $ asciidoctor -a stylesheet! document.adoc
+
+The reason you have to unset the `stylesheet` attribute is because it is set by default (to an empty value).
+When the `stylesheet` attribute is set, but empty, the HTML converter uses the default stylesheet.
+By unsetting this attribute, we're telling the converter not to use a stylesheet at all.
+
+When you view the generated HTML file, [.path]_document.html_, you'll see bare HTML without any styles applied, as shown here:
+
+image::no-stylesheet.png[]
+
+NOTE: When the `stylesheet` attribute is unset, the `linkcss` and `copycss` attributes are ignored.
+
+Now that you have a clean slate, let's learn how to apply a custom stylesheet of your very own.

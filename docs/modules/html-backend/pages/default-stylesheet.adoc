@@ -1,19 +1,15 @@
-////
-.TODO
-* add more xrefs
-* screenshot showing it in action (we need a good example document for when we need to make these screenshots)
-* link to themes based on the default stylesheet
-////
 = Default Stylesheet
 
-When you use the HTML converter to generate a standalone HTML document, Asciidoctor includes a default stylesheet to make the HTML it produces look great right out of the box.
+When you use the HTML converter to generate a standalone HTML document, Asciidoctor includes a default stylesheet to ensure the HTML it produces look great right out of the box.
 This, in turn, gets you up and running quickly by giving you a result to preview or publish without having to do any additional work.
-
-Keep in mind that the default stylesheet that Asciidoctor provides is just that, _a default_.
-If you don't like its appearance, you can customize it or replace it with a different once.
 
 This page covers why the default is necessary, how to apply it, and how to build on it so you don't have to create a stylesheet from scratch.
 
+NOTE: The default stylesheet that Asciidoctor provides is just that, _a default_.
+If you don't like its appearance, you can customize it or replace it with a different once.
+Though, it's important to understand what purpose the stylesheet serves when doing so.
+
+// TODO: we probably need a page to defines what styles any stylesheet must provide to be fully compatible with AsciiDoc
 == Why provide a default?
 
 As previously stated, a default stylesheet is included to provide a nice out-of-the-box experience.
@@ -69,7 +65,7 @@ When you view the generated HTML file, [.path]_document.html_, you'll see styled
 
 image::default-stylesheet.png[]
 
-When using the API, Asciidoctor links to the stylesheet by default instead of embedding it.
+When using the API, Asciidoctor links to the stylesheet by default instead of embedding it (due to the safe mode).
 Yet, it does not copy the stylesheet to the output directory (it needs to be placed there separately).
 If it's not already there, the browser will not be able to find the stylesheet.
 To solve this problem, set the safe mode to server or lower (e.g., server, safe, or unsafe) and Asciidoctor will embed the default stylesheet, like when using the `asciidoctor` command.
@@ -80,16 +76,6 @@ require 'asciidoctor'
 
 Asciidoctor.convert_file 'document.adoc', safe: :safe
 ----
-
-== Disable the default stylesheet
-
-If you don't want Asciidoctor to include the default stylesheet, unset the `stylesheet` attribute:
-
- $ asciidoctor -a stylesheet! document.adoc
-
-When you view the generated HTML file, [.path]_document.html_, you'll see bare HTML without any styles applied, as shown here:
-
-image::no-stylesheet.png[]
 
 == Disable or modify the web fonts
 
@@ -179,10 +165,12 @@ Now tell Asciidoctor to use your custom stylesheet instead of the default one:
 Asciidoctor will embed the contents of your custom stylesheet instead of the default one.
 However, it will not embed the contents of the default stylesheet, so the browser is still going to go out and fetch it.
 
+To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
+
 == Are there different themes?
 
 The default stylesheet does not provide different themes.
 However, you can find stylesheets with different themes in the https://github.com/darshandsoni/asciidoctor-skins[Asciidoctor Skins^] project.
 These stylesheets take the approach of loading the default stylesheet (from a CDN), then overlaying additional styles to create a variety of themes.
 
-To learn more about managing and applying stylesheets, see xref:manage-stylesheets.adoc[].
+To learn how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
