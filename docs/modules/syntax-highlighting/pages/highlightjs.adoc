@@ -19,13 +19,20 @@ The version of the highlight.js library Asciidoctor loads from the CDN only incl
 
 == Load support for additional languages
 
-To load additional languages supported by highlight.js, list them in the value of the `highlightjs-languages` document attribute (separated by commas):
+To load additional languages supported by highlight.js, list them in the value of the `highlightjs-languages` document attribute.
+Separate each language by a comma followed by an optional space.
+
+The common highlight.js bundle does not include support for Rust and Swift.
+Let's set the `highlightjs-languages` attribute so the HTML converter loads support for them into the HTML page.
 
 [source]
 ----
 :source-highlighter: highlight.js
 :highlightjs-languages: rust, swift
 ----
+
+The `highlightjs-languages` attribute only applies when generating a standalone HTML document (i.e., backend: html, standalone: true).
+It does not work when generating embedded HTML, which is used by site generator integrations such as Antora.
 
 == Using a custom highlight.js library
 
