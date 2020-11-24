@@ -1,4 +1,4 @@
-= Source Highlighting
+= Syntax Highlighting
 
 [%autowidth]
 |===
