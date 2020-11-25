@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>asciidoctor</id>
+    <version>2.0.12</version>
+    <packageSourceUrl>https://github.com/aciidoctor/asciidoctor/tree/master/.chocolatey</packageSourceUrl>
+    <owners>mojavelinux</owners>
+    <title>Asciidoctor</title>
+    <authors>Dan Allen, Sarah White, Ryan Waldron, Jason Porter, Nick Hengeveld, Jeremy McAnally</authors>
+    <projectUrl>https://asciidoctor.org</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/asciidoctor/brand/logo/logo-fill-color.svg</iconUrl>
+    <copyright>© 2012-2020 under the terms of the MIT License.</copyright>
+    <licenseUrl>https://github.com/asciidoctor/asciidoctor/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/asciidoctor/asciidoctor</projectSourceUrl>
+    <docsUrl>https://asciidoctor.org/docs</docsUrl>
+    <mailingListUrl>https://discuss.asciidoctor.org</mailingListUrl>
+    <bugTrackerUrl>https://github.com/asciidoctor/asciidoctor/issues</bugTrackerUrl>
+    <tags>asciidoctor asciidoc ruby rubygem html docbook manpage</tags>
+    <summary>Transform your AsciiDoc content into a publishable format.</summary>
+    <description>Asciidoctor is a fast, open source, Ruby-based text processor for parsing AsciiDoc into a document model and converting to output formats such as HTML 5, DocBook 5, manpage, PDF, and EPUB 3.</description>
+    <releaseNotes>https://github.com/asciidoctor/asciidoctor/releases</releaseNotes>
+    <dependencies>
+      <dependency id="ruby" version="2.7.2.1" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
