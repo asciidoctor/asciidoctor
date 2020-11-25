@@ -5,6 +5,9 @@
 :url-releases-asciidoctor: {url-org}/asciidoctor/releases
 :url-milestone: {url-org}/asciidoctor/milestone/33?closed=1:
 
+This page covers the changes introduced in each of the patch releases in the Asciidoctor {page-component-version} release line ({page-component-version}.0, {page-component-version}.1, ...).
+The releases are ordered from newest to oldest.
+
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
 
 = Asciidoctor 2.0.11
