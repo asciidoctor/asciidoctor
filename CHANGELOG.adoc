@@ -19,6 +19,7 @@ Bug Fixes::
 
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
 
+// tag::compact[]
 == 2.0.12 (2020-11-10) - @mojavelinux
 
 Bug Fixes::
@@ -42,6 +43,7 @@ Build / Infrastructure::
   * Migrate Windows CI jobs to GitHub Actions (#3839)
   * Run CI job on macOS (#3842)
 
+// end::compact[]
 == 2.0.11 (2020-11-02) - @mojavelinux
 
 Bug Fixes::
