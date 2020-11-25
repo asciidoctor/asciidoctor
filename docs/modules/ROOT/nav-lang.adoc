@@ -1,1 +1,1 @@
-* xref:language-support.adoc[]
+* xref:localization-support.adoc[]
