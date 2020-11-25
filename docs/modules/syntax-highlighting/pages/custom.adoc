@@ -1,0 +1,22 @@
+= Custom Syntax Highlighter Adapter
+:navtitle: Custom Adapter
+
+You can integrate additional syntax highlighters by implementing a syntax highlighter adapter.
+
+To implement an adapter, you must create a class that extends the `Asciidoctor::SyntaxHighlighter::Base` class, register the adapter for a value of the `source-highlighter` attribute, and implement the required methods depending on whether the highlight step runs in the converter or in the client (i.e., browser).
+
+Here's an example of how to write and register a syntax highlighter adapter for the Prism.js syntax highlighting library.
+This library runs in the browser, so the methods focus on loading the library.
+
+.Syntax highlighter adapter for Prism.js
+[source,ruby]
+----
+include::example$syntax-highlighter-prism.rb[]
+----
+
+Save this code to a file named [.path]_syntax-highlighter-prism.rb_.
+Then require this file when invoking Asciidoctor and set the source-highlighter to prism to activate it:
+
+ $ asciidoctor -r ./syntax-highlighter-prism -a source-highlighter=prism document.adoc
+
+You can also define an adapter for a syntax highlighter that runs during conversion.

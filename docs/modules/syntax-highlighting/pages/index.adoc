@@ -1,32 +1,88 @@
 = Syntax Highlighting
 
+AsciiDoc defines a style of listing block known as a source block for adding a source code listing to a document that's intended to be colorized by a syntax highlighter.
+Here's a simple example of a source block:
+
+[source]
+....
+[source,ruby]
+----
+puts "Hello, World!"
+----
+....
+
+Here's how we expect it to appear:
+
+[source,ruby]
+----
+puts "Hello, World!"
+----
+
+It's up to an AsciiDoc processor such as Asciidoctor to apply the syntax highlighting to this source block, a process referred to as *source highlighting*.
+Asciidoctor provides adapters that integrate with several popular syntax highlighter libraries to perform this task.
+It also provides an interface for implementing a custom syntax highlighter adapter.
+
+== Syntax highlighter types
+
+Asciidoctor supports two types of syntax highlighters: client-side and build-time.
+Let's explore each type and how they work.
+
+A *client-side* syntax highlighter performs syntax highlighting in the browser as the page is loading.
+Asciidoctor does not invoke the syntax highlighter itself.
+Instead, it focuses on adding the assets to the generated HTML so the browser can load the syntax highlighter and run it.
+For this type of syntax highlighter, Asciidoctor passes the contents of the source block through to the output as is.
+It also adds metadata to the element so that the syntax highlighter knows to highlight it and which language it is.
+Unfortunately, Asciidoctor does not process callout numbers in the source block in this case, so they may cause the syntax highlighter to get tripped up.
+
+A *build-time* syntax highlighter performs syntax highlighting during AsciiDoc conversion.
+Asciidoctor does invoke the syntax highlighter in this case.
+It also takes care of hiding the callout numbers from the syntax highlighter, ensuring they are put back in the proper place afterwards.
+What Asciidoctor emits into the output is the result produced by the syntax highlighter, which are the tokens wrapped in `<span>` tags to apply color and other formatting (either inline or via CSS classes).
+These syntax highlighters tend to support more features because Asciidoctor has greater control over the process.
+
+=== Client-side vs build-time
+
+There are benefits and drawbacks of each type.
+The benefit of a client-side syntax highlighter is that does not require installing any additional libraries.
+It also makes conversion faster and makes it produce smaller output since the syntax highlighting is deferred until page load.
+The main drawback is that callouts in the source block can be mangled by the syntax highlighter or confuse it.
+The benefits of a build-time syntax highlighter is that you have more control over syntax highlighting and can enable additional features such as line numbers and line highlighting.
+The main drawback is that it requires installing an extra library, it slows down conversion, and causes the output to be larger.
+
+You should try each syntax highlighter and find the one that works best for you.
+
+== Built-in syntax highlighter adapters
+
 [%autowidth]
 |===
-| |Syntax Highlighter |Supported Versions |Converters
+|Type |Syntax Highlighter |Required RubyGem |Compatible Converters
 
-|Client-side highlighting for source code blocks
+h|Client-side
 
 |Highlight.js
-|9.18.3
-|HTML
+|_n/a_
+|HTML, Reveal.js
 
-.3+|Server-side highlighting for source code blocks
+.3+h|Build-time
 
 |CodeRay
-|1.1.2
-|HTML
+|coderay (>= 1.1)
+|HTML, PDF, EPUB3, Reveal.js
 
 |Pygments
-|2.2.0
-|HTML
+|pygments.rb (>= 1.2)
+|HTML, PDF, EPUB3, Reveal.js
 
 |Rouge
-|3.1.1
-|HTML
+|rouge (>= 2)
+|HTML, PDF, EPUB3, Reveal.js
 |===
 
-////
-|Inline, admonition or callout font-based icons
-|Font Awesome
-|4.7
-////
+Asciidoctor does not apply syntax highlighting when generating DocBook.
+The assumption is that this is a task the DocBook toolchain can handle.
+The DocBook converter generates a `<programlisting>` tag for the source block and passes through the source language as specified in the AsciiDoc.
+It's then up to the DocBook toolchain to apply syntax highlighting to the contents of that tag.
+
+You can explore these integrations in depth on the xref:highlightjs.adoc[], xref:rouge.adoc[], xref:pygments.adoc[], and xref:coderay.adoc[] pages.
+
+You can also create your own integration by making a xref:custom.adoc[].

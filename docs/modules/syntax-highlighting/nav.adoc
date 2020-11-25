@@ -3,3 +3,4 @@
 ** xref:rouge.adoc[]
 ** xref:coderay.adoc[]
 ** xref:pygments.adoc[]
+** xref:custom.adoc[]
