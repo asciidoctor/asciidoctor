@@ -40,6 +40,7 @@ To install the package, open a terminal and type:
 
 include::partial$success.adoc[]
 
+[#apk]
 == apk (Alpine Linux)
 
 To install the gem on Alpine Linux, open a terminal and type:
@@ -48,6 +49,7 @@ To install the gem on Alpine Linux, open a terminal and type:
 
 include::partial$success.adoc[]
 
+[#pacman]
 == pacman (Arch Linux)
 
 To install the gem on Arch-based distributions, open a terminal and type:
@@ -65,18 +67,21 @@ If you need to upgrade to the latest version immediately, use xref:ruby-packagin
 TIP: Your Linux system may be configured to automatically update packages, in which case the latest Asciidoctor package will be installed as soon as it becomes available.
 No further action is required by you.
 
+[#upgrade-apt]
 === APT
 
 On Debian and Debian-based distributions, update the Asciidoctor package using:
 
  $ sudo apt-get upgrade -y asciidoctor
 
+[#upgrade-dnf]
 === DNF
 
 On Fedora and other RPM-based distributions, you can update the package using:
 
  $ sudo dnf update -y asciidoctor
 
+[#upgrade-apk]
 === apk (Alpine Linux)
 
 On Alpine Linux, update the Asciidoctor package using:

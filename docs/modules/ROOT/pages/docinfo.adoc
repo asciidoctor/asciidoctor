@@ -87,7 +87,7 @@ See <<name-docinfo>> for more details.
 
 To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file^].
 
-[#footer-docinfo]
+[#footer]
 == Footer docinfo files
 
 Footer docinfo files are differentiated from head docinfo files by the addition of `-footer` to the file name.
@@ -104,7 +104,7 @@ To disable the "Last updated" line in the footer, unassign the attribute `last-u
 To disable the footer completely, set the attribute `nofooter`. Then having a footer docinfo file effectively replaces the default footer with your custom footer.
 ////
 
-[#name-docinfo]
+[#naming]
 == Naming docinfo files
 
 The file that gets selected to provide the docinfo depends on which converter is in use (html, docbook, etc) and whether the docinfo scope is configured for a specific document ("`private`") or for all documents in the same directory ("`shared`").
@@ -134,7 +134,7 @@ The file extension of the docinfo file must match the file extension of the outp
 |`docinfo-footer<outfilesuffix>`
 |===
 
-[#enable-docinfo]
+[#enable]
 == Enabling docinfo
 
 To specify which file(s) you want to apply, set the `docinfo` attribute to any combination of these values:
@@ -186,6 +186,7 @@ You also want to include some additional content, but only to the head of [.path
 
 If other AsciiDoc files are added to the same folder, and `docinfo` is set to `shared` in those files, only the [.path]_docinfo.html_ file will be added when converting those files.
 
+[#resolving]
 == Locating docinfo files
 
 By default, docinfo files are searched for in the same folder as the document file.
@@ -198,6 +199,7 @@ If you want to keep them anywhere else, set the `docinfodir` attribute to their 
 
 Note that if you use this attribute, only the specified folder will be searched; docinfo files in the document folder will no longer be found.
 
+[#attribute-substitution]
 == Attribute substitution in docinfo files
 
 Docinfo files may include attribute references.
