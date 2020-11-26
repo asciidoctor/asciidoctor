@@ -15,6 +15,10 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 == Unreleased
 
+Improvements::
+
+  * set linenums option on source block when line numbering is enabled (#3313)
+
 Bug Fixes::
 
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
