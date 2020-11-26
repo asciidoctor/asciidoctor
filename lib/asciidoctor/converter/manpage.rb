@@ -201,6 +201,9 @@ r lw(\n(.lu*75u/100u).'
         result << %(.sp
 #{counter}. #{manify terms.map {|dt| dt.text }.join ' '}
 .RS 4)
+      when 'horizontal'
+        result << %(.TP
+#{manify terms.map {|dt| dt.text }.join(', '), whitespace: :normalize})
       else
         result << %(.sp
 #{manify terms.map {|dt| dt.text }.join(', '), whitespace: :normalize}
