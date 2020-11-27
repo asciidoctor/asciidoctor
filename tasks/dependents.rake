@@ -26,7 +26,6 @@ namespace :build do
 
     %w(
       asciidoctor/asciidoctor-diagram
-      asciidoctor/asciidoctor-reveal.js
     ).each do |project|
       org, name, branch = parse_project project
       project = [org, name, branch] * '/'
@@ -51,6 +50,7 @@ namespace :build do
       asciidoctor/asciidoctor.js
       asciidoctor/asciidoctorj
       asciidoctor/asciidoctor-pdf
+      asciidoctor/asciidoctor-reveal.js
     ).each do |project|
       org, name, branch = parse_project project
       project = [org, name, branch] * '/'
