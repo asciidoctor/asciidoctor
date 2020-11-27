@@ -8,7 +8,7 @@ on:
   - cron: '0 2 * * *'
 jobs:
   activate:
-    if: "!endsWith(github.event.head_commit.message, '[skip ci]')"
+    if: '!endsWith(github.event.head_commit.message, "[skip ci]")'
     runs-on: ubuntu-latest
     steps:
     - name: Proceed
@@ -20,6 +20,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         ruby: ['2.3', '2.4', '2.5', '2.6', '2.7']
         rouge-version: [~]
+        asciimath-version: [~]
         exclude:
         - os: ubuntu-latest
           ruby: '2.7'
@@ -32,6 +33,9 @@ jobs:
           ruby: jruby-9.2.13.0
         - os: macos-latest
           ruby: '2.7'
+        - os: ubuntu-latest
+          ruby: '2.3'
+          asciimath-version: '~> 1.0.0'
         - os: ubuntu-latest
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
@@ -63,6 +67,9 @@ jobs:
     - name: Configure Nokogiri installation (macOS)
       if: matrix.os == 'macos-latest'
       run: bundle config --local build__nokogiri --use-system-libraries
+    - name: Set AsciiMath version
+      if: matrix.asciimath-version
+      run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
