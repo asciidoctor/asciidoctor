@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   #s.test_files = files.grep %r/^(?:features|test)\/.+$/
 
   # asciimath is needed for testing AsciiMath in DocBook backend
-  s.add_development_dependency 'asciimath', '~> 1.0.0'
+  s.add_development_dependency 'asciimath', '~> 2.0.0'
   # coderay is needed for testing syntax highlighting
   s.add_development_dependency 'coderay', '~> 1.1.0'
   # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
