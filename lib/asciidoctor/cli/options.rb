@@ -41,6 +41,7 @@ module Asciidoctor
           Usage: asciidoctor [OPTION]... FILE...
           Convert the AsciiDoc input FILE(s) to the backend output format (e.g., HTML 5, DocBook 5, etc.)
           Unless specified otherwise, the output is written to a file whose name is derived from the input file.
+          Application log messages are printed to STDERR.
           Example: asciidoctor input.adoc
 
           EOS
@@ -128,7 +129,7 @@ module Asciidoctor
           opts.on('--trace', 'include backtrace information when reporting errors (default: false)') do |trace|
             self[:trace] = true
           end
-          opts.on('-v', '--verbose', 'enable verbose mode (default: false)') do |verbose|
+          opts.on('-v', '--verbose', 'directs application messages logged at DEBUG or INFO level to STDERR (default: false)') do |verbose|
             self[:verbose] = 2
           end
           opts.on('-w', '--warnings', 'turn on script warnings (default: false)') do |warnings|
