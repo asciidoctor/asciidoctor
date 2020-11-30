@@ -45,8 +45,8 @@ module Asciidoctor
 
           EOS
 
-          opts.on('-b', '--backend BACKEND', 'set output format backend: [html5, xhtml5, docbook5, manpage] (default: html5)',
-                  'additional backends are supported via extensions (e.g., pdf, latex)') do |backend|
+          opts.on('-b', '--backend BACKEND', 'set backend output format: [html5, xhtml5, docbook5, manpage] (default: html5)',
+                  'additional backends are supported via extended converters (e.g., pdf, epub3)') do |backend|
             self[:attributes]['backend'] = backend
           end
           opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
