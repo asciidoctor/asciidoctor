@@ -170,7 +170,7 @@ In source listings, is the callout the last thing on the line?
 |Check that the file exists and that the filename is not misspelled.
 |#using-the-command-line-interface#
 
-|include file has illegal reference to ancestor of jail, auto-recovering
+|include file has illegal reference to ancestor of jail; recovering automatically
 |The safe mode is restricting access to an include file outside of the base directory.
 |#running-asciidoctor-securely#
 
