@@ -44,5 +44,5 @@ Asciidoctor::Extensions.register do
   block ShoutBlock
 end
 
-Asciidoctor.convert_file 'sample-with-shout-block.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-shout-block.adoc', safe: :safe
 ----

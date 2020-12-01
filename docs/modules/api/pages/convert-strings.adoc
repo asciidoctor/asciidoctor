@@ -73,7 +73,7 @@ If you only want the inline markup to be returned, set the `:doctype` option to 
 
 [source,ruby]
 ----
-puts Asciidoctor.convert '*This* is Asciidoctor.', :doctype => 'inline'
+puts Asciidoctor.convert '*This* is Asciidoctor.', doctype: 'inline'
 ----
 
 In this mode, Asciidoctor will only process the first block (e.g., paragraph) in the document and ignore the rest.

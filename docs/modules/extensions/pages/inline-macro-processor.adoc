@@ -47,5 +47,5 @@ Asciidoctor::Extensions.register do
   inline_macro ManInlineMacro
 end
 
-Asciidoctor.convert_file 'sample-with-man-link.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-man-link.adoc', safe: :safe
 ----

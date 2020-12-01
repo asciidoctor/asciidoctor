@@ -31,5 +31,5 @@ Asciidoctor::Extensions.register do
   postprocessor CopyrightFooterPostprocessor
 end
 
-Asciidoctor.convert_file 'sample-with-copyright-footer.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-copyright-footer.adoc', safe: :safe
 ----

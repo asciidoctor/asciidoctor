@@ -65,7 +65,7 @@ Asciidoctor::Extensions.register do
   tree_processor ShellSessionTreeProcessor
 end
 
-Asciidoctor.convert_file 'sample-with-shell-session.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-shell-session.adoc', safe: :safe
 ----
 
 ////

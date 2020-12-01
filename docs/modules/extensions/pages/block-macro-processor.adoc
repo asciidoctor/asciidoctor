@@ -47,5 +47,5 @@ Asciidoctor::Extensions.register do
   block_macro GistBlockMacro if document.basebackend? 'html'
 end
 
-Asciidoctor.convert_file 'sample-with-gist.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-gist.adoc', safe: :safe
 ----

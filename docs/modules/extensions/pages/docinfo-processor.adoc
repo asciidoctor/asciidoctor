@@ -33,6 +33,5 @@ Asciidoctor::Extensions.register do
   docinfo_processor GoogleAnalyticsDocinfoProcessor
 end
 
-Asciidoctor.convert_file 'sample.adoc', :safe => :safe,
-    :attributes => 'UA-ABCXYZ123'
+Asciidoctor.convert_file 'sample.adoc', safe: :safe, attributes: 'UA-ABCXYZ123'
 ----

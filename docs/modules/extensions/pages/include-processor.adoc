@@ -48,5 +48,5 @@ Asciidoctor::Extensions.register do
   include_processor UriIncludeProcessor
 end
 
-Asciidoctor.convert_file 'sample-with-uri-include.adoc', :safe => :safe
+Asciidoctor.convert_file 'sample-with-uri-include.adoc', safe: :safe
 ----
