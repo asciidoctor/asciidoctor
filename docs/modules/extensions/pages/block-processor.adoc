@@ -6,14 +6,16 @@ Register a custom block style named `shout` that uppercases all the words and co
 
 == sample-with-shout-block.adoc
 
-```
+[source,asciidoc]
+----
 [shout]
 The time is now. Get a move on.
-```
+----
 
 == ShoutBlock
 
-```ruby
+[source,ruby]
+----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
@@ -32,14 +34,15 @@ class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
     create_paragraph parent, (reader.lines.map {|l| l.upcase.gsub PeriodRx, '!' * volume }), attrs
   end
 end
-```
+----
 
 == Usage
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   block ShoutBlock
 end
 
 Asciidoctor.convert_file 'sample-with-shout-block.adoc', :safe => :safe
-```
+----

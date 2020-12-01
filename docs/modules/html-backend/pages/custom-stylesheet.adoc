@@ -30,7 +30,7 @@ Now let's use the `stylesheet` attribute to apply it.
 The `stylesheet` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
-[source]
+[source,asciidoc]
 ----
 = My First Experience with the Dangers of Documentation
 :stylesheet: my-stylesheet.css
@@ -77,7 +77,7 @@ Now we need to tell Asciidoctor where it's located using `stylesdir`.
 The `stylesdir` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
-[source]
+[source,asciidoc]
 ----
 = My First Experience with the Dangers of Documentation
 :stylesheet: my-stylesheet.css
@@ -190,14 +190,14 @@ Let's say you have three AsciiDoc documents saved in the following directory str
 
 For [.path]_a.adoc_ and [.path]_b.adoc_, set `stylesdir` to:
 
-[source]
+[source,asciidoc]
 ----
 :stylesdir: my-styles
 ----
 
 For [.path]_c.adoc_, set `stylesdir` to:
 
-[source]
+[source,asciidoc]
 ----
 :stylesdir: ../my-styles
 ----

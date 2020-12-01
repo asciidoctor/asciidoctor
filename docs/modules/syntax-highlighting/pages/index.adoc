@@ -3,7 +3,7 @@
 AsciiDoc defines a style of listing block known as a source block for adding a source code listing to a document that's intended to be colorized by a syntax highlighter.
 Here's a simple example of a source block:
 
-[source]
+[source,asciidoc]
 ....
 [source,ruby]
 ----

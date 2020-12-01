@@ -9,7 +9,7 @@
 
 To activate highlight.js, add the following attribute entry to the header of your AsciiDoc file:
 
-[source]
+[source,asciidoc]
 ----
 :source-highlighter: highlight.js
 ----
@@ -25,7 +25,7 @@ Separate each language by a comma followed by an optional space.
 The common highlight.js bundle does not include support for Rust and Swift.
 Let's set the `highlightjs-languages` attribute so the HTML converter loads support for them into the HTML page.
 
-[source]
+[source,asciidoc]
 ----
 :source-highlighter: highlight.js
 :highlightjs-languages: rust, swift

@@ -30,7 +30,7 @@ include::example$wrap.adoc[tag=nowrap]
 To prevent lines from wrapping globally, unset the `prewrap` attribute on the document.
 
 .Disable prewrap globally (thus, enabling nowrap)
-[source]
+[source,asciidoc]
 ----
 :prewrap!:
 ----

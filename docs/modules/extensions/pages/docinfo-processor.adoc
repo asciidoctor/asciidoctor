@@ -6,7 +6,8 @@ Appends the Google Analytics tracking code to the bottom of an HTML document.
 
 == GoogleAnalyticsDocinfoProcessor
 
-```ruby
+[source,ruby]
+----
 class GoogleAnalyticsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
   use_dsl
   at_location :footer
@@ -22,15 +23,16 @@ ga('send','pageview');
 </script>)
   end
 end
-```
+----
 
 == Usage
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   docinfo_processor GoogleAnalyticsDocinfoProcessor
 end
 
 Asciidoctor.convert_file 'sample.adoc', :safe => :safe,
     :attributes => 'UA-ABCXYZ123'
-```
+----

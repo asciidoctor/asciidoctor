@@ -25,7 +25,7 @@ To install a pre-release version of Asciidoctor (e.g., a release candidate), ope
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
 +
-[source,subs=attributes+]
+[source,ruby,subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'

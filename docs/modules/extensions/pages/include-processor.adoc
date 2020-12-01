@@ -8,7 +8,8 @@ TIP: Asciidoctor supports including content from a URI out of the box if you set
 
 == sample-with-uri-include.adoc
 
-```
+[source,asciidoc]
+....
 :source-highlighter: coderay
 
 .Gemfile
@@ -16,11 +17,12 @@ TIP: Asciidoctor supports including content from a URI out of the box if you set
 ----
 \include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/Gemfile[]
 ----
-```
+....
 
 == UriIncludeProcessor
 
-```ruby
+[source,ruby]
+----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'open-uri'
@@ -36,14 +38,15 @@ class UriIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
     reader
   end
 end
-```
+----
 
 == Usage
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   include_processor UriIncludeProcessor
 end
 
 Asciidoctor.convert_file 'sample-with-uri-include.adoc', :safe => :safe
-```
+----

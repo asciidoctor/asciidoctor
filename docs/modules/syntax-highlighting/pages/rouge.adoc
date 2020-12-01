@@ -26,7 +26,7 @@ Install using `dnf` (Fedora-based systems)::
 
 Once you've installed the RubyGem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
 
-[source]
+[source,asciidoc]
 ----
 :source-highlighter: rouge
 ----
@@ -51,7 +51,7 @@ Controls the color theme used to for highlighting.
 You can find the list of themes in the {url-rouge-repo}[Rouge code repository^].
 
 .Customizing a source block with Rouge line numbers
-[source]
+[source,asciidoc]
 ....
 :source-highlighter: rouge
 

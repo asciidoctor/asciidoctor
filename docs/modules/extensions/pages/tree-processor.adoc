@@ -6,16 +6,18 @@ Detect literal blocks that contain shell commands, strip the prompt character an
 
 == sample-with-shell-session.adoc
 
-```
+[source,asciidoc]
+----
  $ echo "Hello, World!"
  > Hello, World!
 
  $ gem install asciidoctor
-```
+----
 
 == ShellSessionTreeProcessor
 
-```ruby
+[source,ruby]
+----
 class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   def process document
     return unless document.blocks?
@@ -53,17 +55,18 @@ class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
     create_listing_block block.document, lines * EOL, attrs, subs: nil
   end
 end
-```
+----
 
 == Usage
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   tree_processor ShellSessionTreeProcessor
 end
 
 Asciidoctor.convert_file 'sample-with-shell-session.adoc', :safe => :safe
-```
+----
 
 ////
 In the example below the TreeProcessor examines the block contents looking for the `// (*)` suffix and rewrites the line so that Asciidoctor formats it appropriately.

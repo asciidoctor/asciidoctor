@@ -6,7 +6,8 @@ Insert copyright text in the footer.
 
 == CopyrightFooterPostprocessor
 
-```ruby
+[source,ruby]
+----
 class CopyrightFooterPostprocessor < Asciidoctor::Extensions::Postprocessor
   def process document, output
     content = (document.attr 'copyright') || 'Copyright Acme, Inc.'
@@ -20,14 +21,15 @@ class CopyrightFooterPostprocessor < Asciidoctor::Extensions::Postprocessor
     output
   end
 end
-```
+----
 
 == Usage
 
-```
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   postprocessor CopyrightFooterPostprocessor
 end
 
 Asciidoctor.convert_file 'sample-with-copyright-footer.adoc', :safe => :safe
-```
+----

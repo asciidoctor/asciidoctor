@@ -60,7 +60,7 @@ Install using dnf (Fedora-based systems)::
 
 Once you've installed the RubyGem, assign the `coderay` value to the `source-highlighter` attribute in the document header to activate it.
 
-[source]
+[source,asciidoc]
 ----
 :source-highlighter: coderay
 ----
@@ -81,7 +81,7 @@ If line wrapping is enabled on preformatted blocks (i.e., `prewrap`), and you wa
 Default: `table`.
 
 .Customizing a source block with CodeRay line numbers
-[source]
+[source,asciidoc]
 ....
 :source-highlighter: coderay
 :coderay-linenums-mode: inline

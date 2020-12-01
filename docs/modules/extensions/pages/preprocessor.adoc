@@ -6,26 +6,27 @@ Skim off front matter from the top of the document that gets used by site genera
 
 == sample-with-front-matter.adoc
 
-```
----
+[source,asciidoc]
+----
 tags: [announcement, website]
 ---
 = Document Title
 
 content
 
-[subs="attributes,specialcharacters"]
+[subs=+attributes]
 .Captured front matter
 ....
 ---
 {front-matter}
 ---
 ....
-```
+----
 
 == FrontMatterPreprocessor
 
-```ruby
+[source,ruby]
+----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
@@ -53,14 +54,15 @@ class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
     reader
   end
 end
-```
+----
 
 == Usage
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor
 end
 
 Asciidoctor.convert_file 'sample-with-front-matter.adoc', :safe => :safe
-```
+----

@@ -139,7 +139,7 @@ To use this file to translate the built-in labels according the value of the `la
 . Put the file in the folder [.path]_locale_ relative to your document.
 . Add the following line to the header of your AsciiDoc document:
 +
-[source]
+[source,asciidoc]
 ----
 \include::locale/attributes.adoc[]
 ----

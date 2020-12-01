@@ -32,7 +32,7 @@ $ gem install pygments.rb # <.>
 
 Once you've installed these libraries, assign `pygments` to the `source-highlighter` attribute in your document's header.
 
-[source]
+[source,asciidoc]
 ----
 :source-highlighter: pygments
 ----
@@ -59,7 +59,7 @@ If line wrapping is enabled on preformatted blocks (i.e., `prewrap`), and you wa
 Default: `table`.
 
 .Customizing a source block with Pygments attributes
-[source]
+[source,asciidoc]
 ....
 :source-highlighter: pygments
 :pygments-style: manni

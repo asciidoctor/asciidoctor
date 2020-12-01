@@ -333,7 +333,7 @@ This content needs to be move to the specific subject docs pages if applicable
 Asciidoctor has shorthand for id, role, style and options.
 The following longhand syntax in AsciiDoc.py:
 
-[source]
+[source,asciidoc]
 ----
 [[id]]
 [style,role="role",options="option1,option2"]
@@ -341,7 +341,7 @@ The following longhand syntax in AsciiDoc.py:
 
 can be written using the shorthand supported by Asciidoctor:
 
-[source]
+[source,asciidoc]
 ----
 [style#id.role%option1%option2]
 ----

@@ -6,10 +6,7 @@ To install Asciidoctor on Windows, you can use Chocolatey or Rubyinstaller.
 
 When you already use https://chocolatey.org[chocolatey^] on your machine, you can use:
 
-[source]
-----
-choco install ruby
-----
+ C:\> choco install ruby
 
 Then follow the xref:ruby-packaging.adoc[gem installation instructions].
 

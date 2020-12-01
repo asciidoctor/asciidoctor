@@ -4,7 +4,8 @@
 
 These extensions are registered per document using a callback that feels like a DSL:
 
-```ruby
+[source,ruby]
+----
 Asciidoctor::Extensions.register do |document|
   preprocessor FrontMatterPreprocessor
   tree_processor ShellSessionTreeProcessor
@@ -15,7 +16,7 @@ Asciidoctor::Extensions.register do |document|
   inline_macro ManInlineMacro
   include_processor UriIncludeProcessor
 end
-```
+----
 
 CAUTION: Extension classes must be defined outside of the register block.
 Once an extension class is registered, it is frozen, preventing further modification.

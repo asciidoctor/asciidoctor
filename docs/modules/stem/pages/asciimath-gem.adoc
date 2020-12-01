@@ -41,7 +41,7 @@ First, activate STEM support in AsciiDoc by setting the `stem` document attribut
 This attribute must be set by the end of the document header.
 
 .Activate STEM support by setting the stem document attribute
-[source]
+[source,asciidoc]
 ----
 = Document Title
 :stem:

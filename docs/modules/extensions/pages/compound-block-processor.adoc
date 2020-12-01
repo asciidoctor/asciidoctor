@@ -9,7 +9,7 @@ Register a custom block named `collapsible` that transforms a listing block into
 * the listing block is promoted to a source block if a language is specified using the second positional attribute.
 
 .sample-with-collapsible-block.adoc
-[source]
+[source,asciidoc]
 ....
 .Show JSON
 [collapsible,json]

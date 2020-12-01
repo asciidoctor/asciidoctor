@@ -32,7 +32,7 @@ If the `linkcss` document attribute is set, the converter will take this hint to
 The `linkcss` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
-[source]
+[source,asciidoc]
 ----
 = My First Experience with the Dangers of Documentation
 :linkcss:
@@ -93,7 +93,7 @@ To prevent Asciidoctor from copying the stylesheet independent of safe mode, uns
 The `copycss` document attribute must be unset by the end of the header to be effective.
 One way to do that is to unset the attribute in the document header:
 
-[source]
+[source,asciidoc]
 ----
 = My First Experience with the Dangers of Documentation
 :linkcss:
