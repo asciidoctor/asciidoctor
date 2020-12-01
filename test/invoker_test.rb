@@ -163,6 +163,54 @@ context 'Invoker' do
     assert_match(/WARNING/, warnings)
   end
 
+  test 'should change level on logger when --log-level is specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level info), '-') { input }
+      output = err.string
+    end
+    assert_equal 'asciidoctor: INFO: possible invalid reference: install', output.chomp
+  end
+
+  test 'should not log when --log-level and -q are both specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level info -q), '-') { input }
+      output = err.string
+    end
+    assert_empty output
+  end
+
+  test 'should use specified log level when --log-level and -v are both specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level warn -v), '-') { input }
+      output = err.string
+    end
+    assert_empty output
+  end
+
   test 'should enable script warnings if -w flag is specified' do
     old_verbose, $VERBOSE = $VERBOSE, false
     begin
