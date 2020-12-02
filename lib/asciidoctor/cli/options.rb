@@ -39,9 +39,9 @@ module Asciidoctor
           # NOTE don't use squiggly heredoc to maintain compatibility with Ruby < 2.3
           opts.banner = <<-'EOS'.gsub '          ', ''
           Usage: asciidoctor [OPTION]... FILE...
-          Translate the AsciiDoc source FILE or FILE(s) into the backend output format (e.g., HTML 5, DocBook 5, etc.)
-          By default, the output is written to a file with the basename of the source file and the appropriate extension.
-          Example: asciidoctor -b html5 source.asciidoc
+          Convert the AsciiDoc input FILE(s) to the backend output format (e.g., HTML 5, DocBook 5, etc.)
+          Unless specified otherwise, the output is written to a file whose name is derived from the input file.
+          Example: asciidoctor input.adoc
 
           EOS
 
