@@ -3,42 +3,48 @@
 Asciidoctor provides security levels that control the read and write access of attributes, include directives, macros, and scripts while a document is processing.
 Each level includes the restrictions enabled in the prior security level.
 
-== Safe mode levels
+The safe mode can be set from the  xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
+You can also xref:reference-safe-mode.adoc[enable or disable content based on the current safe mode].
 
-`UNSAFE`::
-A safe mode level that disables any security features enforced by Asciidoctor.
+[#unsafe]
+== UNSAFE
+
+The `UNSAFE` safe mode level disables any security features enforced by Asciidoctor.
 Ruby is still subject to its own restrictions.
-+
+
 *This is the default safe mode for the CLI.*
 Its integer value is `0`.
 
-`SAFE`::
-This safe mode level prevents access to files which reside outside of the parent directory of the source file.
-The `include` directive is enabled, but paths to `include` files must be within the parent directory.
+[#safe]
+== SAFE
+
+The `SAFE` safe mode level prevents access to files which reside outside of the parent directory of the source file.
+Include directives (`+include::[]+`) are enabled, but paths to include files must be within the parent directory.
 This mode allows assets (such as the stylesheet) to be embedded in the document.
-+
+
 Its integer value is `1`.
 
-`SERVER`::
-A safe mode level that disallows the document from setting attributes that would affect conversion of the document.
+[#server]
+== SERVER
+
+The `SERVER` safe mode level disallows the document from setting attributes that would affect conversion of the document.
 This level trims `docfile` to its relative path and prevents the document from:
-+
---
+
 * setting `source-highlighter`, `doctype`, `docinfo` and `backend`
 * seeing `docdir` (as it can reveal information about the host filesystem)
 
 It allows `icons` and `linkcss`.
 
 Its integer value is `10`.
---
 
-`SECURE`::
-A safe mode level that disallows the document from attempting to read files from the file system and including their contents into the document.
+[#secure]
+== SECURE
+
+The `SECURE` safe mode level disallows the document from attempting to read files from the file system and including their contents into the document.
 Additionally, it:
-+
---
+
 * disables icons
-* disables the `include` directive
+* disables include directives (`+include::[]+`)
 * data can not be retrieved from URIs
 * prevents access to stylesheets and JavaScripts
 * sets the backend to `html5`
@@ -52,7 +58,8 @@ xref:extensions:index.adoc[Asciidoctor extensions] may still embed content into 
 
 *This is the default safe mode for the API.*
 Its integer value is `20`.
---
+
+TIP: GitHub processes AsciiDoc files using the `SECURE` mode.
 
 ////
 |===
@@ -75,9 +82,4 @@ Its integer value is `20`.
 |icons
 
 |===
-
-TIP: GitHub processes AsciiDoc files using the `SECURE` level.
 ////
-
-The safe mode can be set from the  xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
-You can also xref:reference-safe-mode.adoc[enable or disable content based on the current safe mode].

@@ -1,12 +1,12 @@
 = Safe Mode Specific Content
 // anchor: set-safe-attrs
 
-Asciidoctor provides access to the xref:safe-modes.adoc[current safe mode] through built-in attributes.
+Asciidoctor provides access to the current safe mode through built-in attributes.
 You can use these attributes to enable or disable content based on the current safe mode of the processor.
 
 == Referencing safe modes
 
-The safe mode can be referenced by one of the following attributes:
+The xref:safe-modes.adoc[safe mode] can be referenced by one of the following document attributes:
 
 * The value of the `safe-mode-name` attribute (e.g., unsafe, safe, etc.)
 * The value of the `safe-mode-level` attribute (e.g., 0, 10, etc.)
@@ -21,7 +21,7 @@ Link to chapters instead of including them.
 \endif::safe-mode-secure[]
 ----
 
-This feature is particularly handy for displaying content on GitHub, where the safe mode is set to its most restrictive setting, secure.
+This feature is particularly handy for displaying content on GitHub, where the safe mode is set to its most restrictive setting, xref:safe-modes.adoc#secure[SECURE].
 
 You can set the xref:cli:set-safe-mode.adoc[safe mode from the CLI] and the xref:api:set-safe-mode.adoc[API].
 
