@@ -47,4 +47,4 @@ The converted document should look like the example below.
 The document's text, titles, and link is styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
 As a result, you could save [.path]_my-sample.html_ to any computer and it will look the same.
 
-TIP: Most of the examples in the general documentation use the CLI, but there are usually corresponding API examples under Working with the API.
+TIP: Most of the examples in the general documentation use the CLI, but there are usually corresponding API examples under xref:api:index.adoc[].

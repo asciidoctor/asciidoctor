@@ -6,25 +6,25 @@ This page covers the features of Asciidoctor that make it a great choice for pro
 
 Asciidoctor is written in Ruby, which means it must be run on a Ruby language runtime (including JRuby).
 But that's its only requirement.
-Asciidoctor is packaged and distributed as a RubyGem (aka gem) to the main package repository at https://rubygems.org[RubyGems.org^].
-What that means is that the gem can be installed on *any operating system* Ruby supports using Ruby's package management tools (gem or bundle).
+Asciidoctor is packaged and distributed as a {url-rubygem}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
+The gem can be installed on *any operating system* Ruby supports using Ruby's package management tools (gem or bundle).
 Asciidoctor itself has no dependencies.
 
 But what if you aren't familiar with Ruby or, for whatever reason, prefer not to install it?
 No problem!
 Thanks to {url-asciidoctorj}[AsciidoctorJ^] and xref:asciidoctor.js::index.adoc[Asciidoctor.js], you can run the same exact version of Asciidoctor on a Java Virtual Machine (JVM) or JavaScript runtime, respectively.
-That means you _don't_ need a Ruby runtime installed on your machine after all.
-(AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript).
+That means you don't need a Ruby runtime installed on your machine after all.
+AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript.
 
 Whether your working in Ruby, Java, or JavaScript, Asciidoctor is readily available for you to start using.
-(Only when you get into extended converters and extensions do you need to install dependencies).
+Only when you get into extended converters and extensions do you need to install dependencies.
 
 == Quick wins
 
-Asciidoctor provides a really nice out-of-the-box xref:html-backend:index.adoc[HTML experience], complete with a default stylesheet and built-in integrations like Font Awesome (for icons), Highlight.js (for source highlighting), and MathJax (for STEM processing).
+Asciidoctor provides a nice out-of-the-box xref:html-backend:index.adoc[HTML experience], complete with a default stylesheet and built-in integrations like Font Awesome (for icons), Highlight.js (for source highlighting), and MathJax (for STEM processing).
 When you're just getting into using AsciiDoc for writing, Asciidoctor's HTML output should be sufficient for all of your publishing needs.
 
-The following before and after picture should give you an idea of what to expect:
+The following before and after picture gives you an idea of what to expect:
 
 image::source-vs-output.png[AsciiDoc source vs HTML output]
 
@@ -37,8 +37,8 @@ So there is plenty of room to grow.
 Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[manpage] (manual page).
 These converters are designed to cover a majority of users`' needs for basic preview and publishing.
 
-The *HTML* converter gives you a result you can publish the web straight away without any tweaking.
-The *DocBook* converter allows you to either leverage an existing publishing toolchain or migrate the content to a different authoring format (without the tool needing to know how to parse AsciiDoc).
+The *HTML* converter provides a result you can publish the web straight away without any tweaking.
+The *DocBook* converter allows you to leverage an existing publishing toolchain or migrate the content to a different authoring format (without the tool needing to know how to parse AsciiDoc).
 The *manpage* converter drastically lowers the barrier to making system help files.
 
 But it doesn't end there.
@@ -127,15 +127,15 @@ In addition to its performance, these security levels make Asciidoctor well-suit
 == Access to an ecosystem of extensions and tools
 
 Installating Asciidoctor is just the beginning of your publishing experience.
-Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools], ranging from converters, to extended syntax, to build plugins, to integrated writing and preview environments.
+Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools^], ranging from converters, to extended syntax, to build plugins, to integrated writing and preview environments.
 
-One popular extension is {url-org}/asciidoctor-diagram[Asciidoctor Diagram].
+One popular extension is {url-org}/asciidoctor-diagram[Asciidoctor Diagram^].
 When loaded, Asciidoctor Diagram allows you to make diagrams from plain text (much like AsciiDoc does for writing).
 Asciidoctor Diagram does this by extending the syntax of AsciiDoc to recognize specially marked literal blocks.
 It takes the text inside those blocks, passes it through one of the diagramming tools it integrates with, and reinserts the image back into the document as it is being processed.
 The result is that the diagram source in the AsciiDoc document becomes an image in the generated output.
 
-One popular tool is the {url-org}/asciidoctor-browser-extension[browser extension].
+Another popular tool is the {url-org}/asciidoctor-browser-extension[browser extension^].
 When this extension is installed, you can browse to an AsciiDoc file on your harddisk or on the web and the browser will show you the converted HTML *instead of* the AsciiDoc source.
 That means you can get the out-of-the-box HTML experience that Asciidoctor provides without even having to run a command or script.
 The extension running in the browser does everything for you.

@@ -42,4 +42,4 @@ Catalina
 Windows Server 2019
 |===
 
-Note that while the community tests Asciidoctor on a variety of Linux distributions, it's only officially tested on Ubuntu and Fedora.
+While the community tests Asciidoctor on a variety of Linux distributions, it's only officially tested on Ubuntu and Fedora.

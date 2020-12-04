@@ -1,6 +1,6 @@
 = Syntax Highlighting
 
-AsciiDoc defines a style of listing block known as a source block for adding a source code listing to a document that's intended to be colorized by a syntax highlighter.
+AsciiDoc defines a style of listing block known as a xref:asciidoc:verbatim:source-blocks.adoc[source block] for adding a source code snippets to a document that are intended to be colorized by a syntax highlighter.
 Here's a simple example of a source block:
 
 [source,asciidoc]
@@ -18,7 +18,7 @@ Here's how we expect it to appear:
 puts "Hello, World!"
 ----
 
-It's up to an AsciiDoc processor such as Asciidoctor to apply the syntax highlighting to this source block, a process referred to as *source highlighting*.
+It's up to an AsciiDoc processor such as Asciidoctor to apply the syntax highlighting to this source block, a process referred to as xref:asciidoc:verbatim:source-highlighter.adoc[source highlighting].
 Asciidoctor provides adapters that integrate with several popular syntax highlighter libraries to perform this task.
 It also provides an interface for implementing a custom syntax highlighter adapter.
 
@@ -27,14 +27,14 @@ It also provides an interface for implementing a custom syntax highlighter adapt
 Asciidoctor supports two types of syntax highlighters: client-side and build-time.
 Let's explore each type and how they work.
 
-A *client-side* syntax highlighter performs syntax highlighting in the browser as the page is loading.
+A [.term]*client-side syntax highlighter* performs syntax highlighting in the browser as the page is loading.
 Asciidoctor does not invoke the syntax highlighter itself.
 Instead, it focuses on adding the assets to the generated HTML so the browser can load the syntax highlighter and run it.
 For this type of syntax highlighter, Asciidoctor passes the contents of the source block through to the output as is.
 It also adds metadata to the element so that the syntax highlighter knows to highlight it and which language it is.
 Unfortunately, Asciidoctor does not process callout numbers in the source block in this case, so they may cause the syntax highlighter to get tripped up.
 
-A *build-time* syntax highlighter performs syntax highlighting during AsciiDoc conversion.
+A [.term]*build-time syntax highlighter* performs syntax highlighting during AsciiDoc conversion.
 Asciidoctor does invoke the syntax highlighter in this case.
 It also takes care of hiding the callout numbers from the syntax highlighter, ensuring they are put back in the proper place afterwards.
 What Asciidoctor emits into the output is the result produced by the syntax highlighter, which are the tokens wrapped in `<span>` tags to apply color and other formatting (either inline or via CSS classes).

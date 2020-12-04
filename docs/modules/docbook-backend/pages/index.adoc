@@ -8,6 +8,10 @@
 Asciidoctor can produce DocBook 5.0 XML output.
 There's a corresponding DocBook element for each AsciiDoc element.
 
+`docbook`::
+The DocBook 5.0 converter generates DocBook 5.0 XML.
+To use the DocBook converter, assign `docbook` or `docbook5` to the `backend` option.
+
 == Generate DocBook with the docbook converter
 
 To convert the [.path]_mysample.adoc_ document to DocBook 5.0 format, call the processor with the backend flag set to `docbook`.

@@ -8,6 +8,10 @@
 
 Asciidoctor's built-in man page converter generates {url-man7}[roff-formatted^] manual pages from AsciiDoc documents.
 
+`manpage`::
+The man page converter generates manual pages for software used on Unix and Unix-like operating systems.
+To use the man page converter, assign `manpage` to the `backend` option.
+
 == What is a manual page?
 
 A manual page, often abbreviated to man page, is a form of software documentation found on Unix-based operating systems.

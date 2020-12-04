@@ -18,7 +18,7 @@ Each converter is mapped to a name that you specify using the `-b` (`--backend`)
 
 These built-in converters are bundled with Asciidoctor.
 
-HTML::
+xref:html-backend:index.adoc[HTML]::
 The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
 This is the converter Asciidoctor uses by default.
 

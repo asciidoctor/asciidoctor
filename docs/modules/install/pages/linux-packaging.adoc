@@ -13,12 +13,12 @@ The benefit of using your operating system's package manager to install the gem 
 The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
 Consult the package repository for your distribution to find out which version is packaged per distribution release.
 
-* {url-alpine}[Alpine Linux (asciidoctor)]
-* {url-arch}[Arch Linux (asciidoctor)]
-* {url-debian}[Debian (asciidoctor)]
-* {url-fedora}[Fedora (asciidoctor)]
-* {url-suse}[OpenSUSE (rubygem-asciidoctor)]
-* {url-ubuntu}[Ubuntu (asciidoctor)]
+* {url-alpine}[Alpine Linux (asciidoctor)^]
+* {url-arch}[Arch Linux (asciidoctor)^]
+* {url-debian}[Debian (asciidoctor)^]
+* {url-fedora}[Fedora (asciidoctor)^]
+* {url-suse}[OpenSUSE (rubygem-asciidoctor)^]
+* {url-ubuntu}[Ubuntu (asciidoctor)^]
 
 If you want to use a version of Asciidoctor that is newer than what is available via your package manager, see xref:ruby-packaging.adoc[].
 

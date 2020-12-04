@@ -1,9 +1,8 @@
 = Localization Support
 :url-docbook-i8n: http://www.sagehill.net/docbookxsl/Localizations.html
 :url-lang-attributes: {url-org}/asciidoctor/blob/master/data/locale/attributes.adoc
-// um anchor: language-support
 
-However, Asciidoctor is not restricted to working with English-only content.
+Asciidoctor is not restricted to working with English-only content.
 Asciidoctor can process the full range of the UTF-8 character set.
 That means you can write your document in any language, save the file with UTF-8 encoding, and expect Asciidoctor to convert the text properly.
 
@@ -41,77 +40,77 @@ If you're not using the DocBook toolchain for publishing, you must translate eac
 One way is to set the following attributes in the document header or by passing the attributes via the API or CLI:
 
 .Attributes that control built-in labels
-[%autowidth,cols="m,,"]
+[cols="~,~,30%"]
 |===
 |Attribute |Default English Value |Notes
 
-|appendix-caption
+|`appendix-caption`
 |Appendix
 |
 
-|caution-caption
+|`caution-caption`
 |Caution
 |
 
-|chapter-label
+|`chapter-label`
 |Chapter
 |Applies only when `doctype` is `book`.
 PDF converter only.
 
-|example-caption
+|`example-caption`
 |Example
 |
 
-|figure-caption
+|`figure-caption`
 |Figure
 |
 
-|important-caption
+|`important-caption`
 |Important
 |
 
-|last-update-label
+|`last-update-label`
 |Last updated
 |
 
-|listing-caption
+|`listing-caption`
 |_not set_
 |By default, listing blocks do not have captions.
 Specify `listing-caption` to turn on listing block captions.
 
-|manname-title
+|`manname-title`
 |NAME
 |Applies only when `doctype` is `manpage`.
 
-|note-caption
+|`note-caption`
 |Note
 |
 
-|preface-title
+|`preface-title`
 |_not set_
 |Applies only when `doctype` is `book`.
 
-|table-caption
+|`table-caption`
 |Table
 |
 
-|tip-caption
+|`tip-caption`
 |Tip
 |
 
-|toc-title
+|`toc-title`
 |Table of Contents
 |
 
-|untitled-label
+|`untitled-label`
 |Untitled
 |
 
-|version-label
+|`version-label`
 |Version
 |
 
-|warning-caption
+|`warning-caption`
 |Warning
 |
 |===

@@ -1,11 +1,11 @@
 //= What's New (Asciidoctor {page-component-version})
-= What's New ({page-component-version})
+= What's New in {page-component-version}
 :doctype: book
 :page-toclevels: 0
 :url-releases-asciidoctor: {url-org}/asciidoctor/releases
 :url-milestone: {url-org}/asciidoctor/milestone/33?closed=1:
 
-This page covers the changes introduced in each of the patch releases in the Asciidoctor {page-component-version} release line ({page-component-version}.0, {page-component-version}.1, ...).
+This page lists the changes made in each of the patch releases in the Asciidoctor {page-component-version} release line.
 The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_

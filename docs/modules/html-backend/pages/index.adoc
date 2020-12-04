@@ -5,7 +5,7 @@
 
 Asciidoctor's default output format is HTML.
 
-`html5`:: HTML 5 markup styled with CSS3.
+`html`:: The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
 
 == Generate HTML using the html5 converter
 
@@ -53,9 +53,10 @@ As a result, you could save [.path]_my-sample.html_ to any computer and it will 
 [#xhtml]
 == Generate XHTML
 
-To convert AsciiDoc to XHTML, set the backend to `xhtml5`.
+`xhtml`:: The XHTML variant of the HTML 5 converter.
+To use the XHTML converter, assign `xhtml` or `xhtml5` to the `backend` option.
 
-.Produce XHTML using the built-in HTML converter
+.Produce XHTML using the xhtml5 backend option
 [source,console]
 ----
 asciidoctor -b xhtml5 document.adoc

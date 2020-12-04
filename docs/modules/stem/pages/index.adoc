@@ -12,7 +12,7 @@ On this page, we look at how STEM expressions are handled when converting AsciiD
 When a converter comes across a STEM node in an AsciiDoc document, it passes the source of the expression to a STEM processing library, such as MathJax.
 That library either displays the rendered expression itself (e.g., MathJax), turns it into an image the converter can link to or embed in the output file (e.g., Asciidoctor Mathematical), or translates it into another format that something further down the pipeline can process (e.g., AsciiMath).
 
-The STEM integrations are activated when the `stem` document attribute is set on the document and, if required, the relevant library is installed.
+The STEM integrations are activated when the xref:asciidoc:stem:stem.adoc[stem document attribute] is set on the document and, if required, the relevant library is installed.
 
 == STEM integrations
 
