@@ -58,122 +58,131 @@ There are similar attributes to control how additional resources are resolved.
 
 === Inline formatting
 
-[cols="15,20,30,15"]
+[cols="~,~,~,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
 |_italic text_
 |pass:['italic text']
 |pass:[_italic text_]
-|Allowed with `compat-mode`
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:italic.adoc[].
 
 |`monospace text`
 |pass:[+monospace text+]
 |pass:[`monospace text`]
-|Allowed with `compat-mode`
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:monospace.adoc[].
 
 |`+literal monospace text+`
 |pass:[`literal monospace text`]
 |pass:[`+literal monospace text+`]
-|Allowed with `compat-mode`
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:monospace.adoc#literal-monospace[Literal monospace].
 
 |Curved "`double quotes`"
 |pass:[``double quotes'']
-|pass:["`double quotes`"], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8220;)
-|
+|pass:["`double quotes`"], editor keybinding, or Unicode character in numeric character reference form
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
 
 |Curved '`single quotes`'
 |pass:[`single quotes']
-|pass:['`single quotes`'], editor keybinding, or the Unicode character in numeric character reference form (e.g., \&#8217;)
-|
+|pass:['`single quotes`'], editor keybinding, or Unicode character in numeric character reference form
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
 
-|Sizes, lines, and colors
-|`big`, `small`, `underline`, `overline`, `line-through`, colors
+|Sizes and overline
+|`big`, `small`, `overline`
 |user-specified `+[.<role-name>]+` and associated formatting in stylesheet
-|See xref:asciidoc:text:custom-inline-styles.adoc[custom text styles]
+|See xref:asciidoc:text:custom-inline-styles.adoc[].
+
+|Underline and line-through
+|`underline`, `line-through`
+|`+[.underline]+`, `+[.line-through]+`
+|See xref:asciidoc:text:custom-inline-styles.adoc[].
+
+|Colors
+|Name of color
+|user-specified `+[.<role-name>]+` and associated formatting in stylesheet
+|See xref:asciidoc:text:custom-inline-styles.adoc[].
 |===
 
 === Table of contents
 
-[cols="15,20,30,15"]
+[cols="~,~,~,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
-|Scrollable, left margin ToC
+|Scrollable, left margin TOC
 |`toc2`
 |`+:toc: left+`
-|
+|See xref:asciidoc:toc:position.adoc[].
 
-|ToC location
+|TOC location
 |`toc-placement` and `toc-position`
 |`+:toc: <value>+`
-|
+|See xref:asciidoc:toc:position.adoc[].
 
-|User-specified ToC location
+|User-specified TOC location
 |`+:toc-placement: manual+`
 |`+:toc: macro+`
-|
+|See xref:asciidoc:toc:position.adoc[].
 |===
 
-=== Document header
+=== Document and section titles
 
-[cols="15,20,15,35"]
+[cols="~,~,30%,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
 |Implicit document title attribute
 |First content line at document top is set as title
-|pass:[= Title]
-|Allowed with `compat-mode`
+|`= Title`
+|Allowed with `compat-mode`.
+See xref:asciidoc:document:title.adoc[].
 
-|Two-line style document title
-|pass:[= Title] +
-pass:[=====]
-|pass:[= Title]
+|Two-line style (setext) document title
+|`Title` +
+`+=====+`
+|`= Title`
 |Asciidoctor accepts the two-line heading style to set the document title.
-But by using it, you implicitly set `compat-mode`.
-If you want to use the new Asciidoctor syntax, make sure to use `= Title` or explicitly unset the `compat-mode` attribute.
-|===
+But, by using it, `compat-mode` is implicitly set.
+To use the new syntax, use `= Title` or explicitly unset `compat-mode`.
+See xref:asciidoc:document:title.adoc[].
 
-.Sections
-[cols="15,20,30,15"]
-|===
-|Feature |AsciiDoc.py |Asciidoctor |Notes
-
-|Underlined titles
+|Underlined section titles
 |Underline length must match title length +/- 2 characters.
-|pass:[== Level 1 section title] +
-pass:[=== Level 2 section title] +
-pass:[==== Level 3 section title] +
-pass:[===== Level 4 section title] +
-|See xref:asciidoc:sections:titles-and-levels.adoc[section levels and titles]
+|`== Level 1 title` +
+`=== Level 2 title` +
+`==== Level 3 title` +
+`===== Level 4 title`
+|See xref:asciidoc:sections:titles-and-levels.adoc[].
 
 |Section numbers
 |`numbered`
 |`sectnums`
-|
+|See xref:asciidoc:sections:numbers.adoc[].
 |===
 
 === Tables
 
-[cols="15,20,20,20"]
+[cols="~,~,~,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
-|AsciiDoc table cell
+|Table cell
 |`a{vbar}` or `asciidoc{vbar}`
 |`a{vbar}` only
-|
+|See xref:asciidoc:tables:add-cells-and-rows.adoc[].
 
 |Table cell separator
 |A Python regular expression.
-|One or more literal characters or \t for tab.
-|
+|One or more literal characters or `\t` for tab.
+|See xref:asciidoc:tables:add-cells-and-rows.adoc[], xref:asciidoc:tables:data-format.adoc[], and xref:asciidoc:tables:data-format.adoc#custom-delimiters[custom separators].
 
 |Horizontal and vertical alignment for tables cells
 |`halign`, `valign`
 |Column and cell specifiers
-|See xref:asciidoc:tables:align-by-column.adoc[align column content] or xref:asciidoc:tables:align-by-cell.adoc[cell content].
+|See xref:asciidoc:tables:align-by-column.adoc[] and xref:asciidoc:tables:align-by-cell.adoc[].
 
 |Make tables full page width in DocBook
 |`options="pgwide"`
@@ -183,25 +192,48 @@ pass:[===== Level 4 section title] +
 
 === Blocks
 
-[cols="15,20,30,15"]
+[cols="~,~,~,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
 |Block delimiters
 |Delimiter lines do not have to match in length.
 |The length of start and end delimiter lines must match exactly.
-|
+|See xref:asciidoc:blocks:build-basic-block.adoc#delimited-blocks[Delimited blocks].
 |===
 
-.General
-[cols="15,20,30,15"]
+=== Substitutions
+
+[cols="~,~,~,~"]
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
-|+ifeval::[ ]+
+|Substitute `+`
+|`replacements2`
+|`post_replacements`
+|See xref:asciidoc:subs:post-replacements.adoc[].
+
+|Suppress inline substitutions and retain block indents when importing large blocks of plain text
+|`plaintext`
+|_not implemented_
+|Close equivalent is a xref:asciidoc:pass:pass-block.adoc[passthrough block] or a listing block with xref:asciidoc:directives:include-with-indent.adoc#the-indent-attribute[the indent attribute].
+|===
+
+=== Mathematical expressions
+
+AsciiDoc.py and Asciidoctor can convert embedded LaTeX and AsciiMath expressions (e.g., `pass:[asciimath:[expression]]`, `pass:[latexmath:[expression]]`, etc.).
+In Asciidoctor, activate STEM support first using the xref:asciidoc:stem:stem.adoc[stem attribute].
+
+=== Miscellaneous
+
+[cols="~,~,~,30%"]
+|===
+|Feature |AsciiDoc.py |Asciidoctor |Notes
+
+|`+ifeval::[ ]+`
 |Evaluates any Python expression.
 |Evaluates simple logical expressions testing the value of attributes.
-|See xref:asciidoc:directives:ifeval.adoc[ifeval directive]
+|See xref:asciidoc:directives:ifeval.adoc[].
 
 |Provide name of current document
 |`infile`
@@ -213,21 +245,26 @@ pass:[===== Level 4 section title] +
 |_not implemented_
 |
 
-|Substitute (`+`)
-|`replacements2`
-|Renamed to `post_replacements`
-|See xref:asciidoc:subs:post-replacements.adoc[]
-
-|Suppress inline substitutions and retain block indents when importing large blocks of plain text
-|`plaintext`
+|Apply special formatting to named text
+|`specialwords`
 |_not implemented_
-|Closest Asciidoctor equivalent is a xref:asciidoc:pass:pass-block.adoc[passthrough block] or a listing block with an indent attribute.
+|
 
-|Turn single line comments into DocBook `<remark>` elements
-|`showcomments`
-|_not implemented_
-a|If you want to send remarks to the output, use an extension, or:
+|Replace tabs with spaces in all text, using a default tab size of 8
+|`tabsize` (in-document and include directive)
+|in-document only
+|Asciidoctor only replaces tabs with spaces in verbatim blocks, and the attribute has no default.
+In other words, tabs are not expanded in verbatim content blocks unless this attribute is set on the block or the document.
+For all other text, Asciidoctor tabs are fixed at 4 spaces by the CSS.
+See xref:asciidoc:directives:include-with-indent.adoc[normalize block indentation].
+|===
 
+=== showcomments
+
+In AsciiDoc.py, single line comments could be turned into DocBook `<remark>` elements using `showcomments`.
+This feature isn't implemented in Asciidoctor, but you can send remarks to the output, using an extension, or ifdef directives and passthrough blocks like the example shown below.
+
+[source,asciidoc]
 ----
  ifdef::showcomments+basebackend-docbook[]
  ++++
@@ -236,46 +273,27 @@ a|If you want to send remarks to the output, use an extension, or:
  endif::[]
 ----
 
-|Apply special formatting to named text.
-|`specialwords`
-|_not implemented_
-|
-
-|Replace tabs with spaces in all text, using a default tab size of 8
-|`tabsize` (in-document and include directive)
-|in-document only
-|Asciidoctor only replaces tabs with spaces in verbatim content blocks (listing, literal, etc.), and the attribute has no default.
-In other words, tabs are not expanded in verbatim content blocks unless this attribute is set on the block or the document.
-For all other text, Asciidoctor tabs are fixed at 4 spaces by the CSS.
-See xref:asciidoc:directives:include-with-indent.adoc[normalize block indentation] for more detail.
-|===
-
-== Mathematical expressions
-
-AsciiDoc.py and Asciidoctor can convert embedded LaTeX and AsciiMath expressions (e.g., `pass:[asciimath:[expression]]`, `pass:[latexmath:[expression]]`, etc.).
-In Asciidoctor, you'll need to activate STEM support first using the xref:asciidoc:stem:stem.adoc[stem attribute].
-
 == Configuration files
 
 Asciidoctor does not use [.path]_.conf_ files or filters, so `--conf-file`, `--dump-conf`, and `--filter` are not applicable.
 Instead, Asciidoctor provides an xref:extensions:register.adoc[extension API] that replaces the configuration-based extension and filter mechanisms in AsciiDoc.py.
 
-=== Internationalization
+=== Localization
 
 AsciiDoc.py had built-in [.path]_.conf_ files that translated built-in labels.
 In Asciidoctor, you must define the translations for these labels explicitly.
-See xref:ROOT:localization-support.adoc[language support] for details.
+See xref:ROOT:localization-support.adoc[] for details.
 
 [#migrate-extensions]
 == AsciiDoc.py extensions
 
-The extension mechanism is completely different in Asciidoctor, but the most of the standard extensions have been re-implemented, so they should work with minor changes.
+The extension mechanism is completely different in Asciidoctor, but most of the standard extensions have been re-implemented, so they should work with minor changes.
 
-[cols="<20,<80"]
+[cols="~,~"]
 |===
 |AsciiDoc.py |Asciidoctor
 
-|source
+|`source`
 a|
 * You can choose from a number of xref:asciidoc:verbatim:source-highlighter.adoc#built-in-values[source highlighters].
 * Source highlighter values are built-in.
@@ -287,7 +305,7 @@ a|
 |`[latex]` block macro
 |Use a xref:asciidoc:stem:stem.adoc#stem-bl[stem block].
 
-|graphviz
+|`graphviz`
 |Use {url-diagram}[Asciidoctor Diagram^].
 |===
 
@@ -302,7 +320,7 @@ AsciiDoc.py `--doctest` ran its unit tests.
 See the {url-tests}[test suite^] for how to run the Asciidoctor unit tests.
 Asciidoctor also has a {url-doctest}[doctest tool^] which you can use when creating custom HTML or XML-based converters.
 
-== Help Topics
+== Help topics
 
 In both AsciiDoc.py and Asciidoctor, the `--help` CLI option shows the command usage by default.
 It can also show a syntax crib sheet using `--help syntax` or the man page using `--help manpage`.
