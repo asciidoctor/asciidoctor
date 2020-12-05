@@ -17,7 +17,7 @@ Line breaks are not preserved.
 A blank line separates paragraphs.
 
 [%hardbreaks]
-This paragraph carries the `hardbreaks` option.
+This paragraph is marked with the `hardbreaks` option.
 Notice how line breaks are now preserved.
 
  An indented (literal) paragraph disables text formatting,
@@ -32,7 +32,7 @@ NOTE: An admonition paragraph, like this note, grabs the reader's attention.
 TIP: Convert this document using the `asciidoctor` command to see the output produced from it.
 
 == Text Formatting
-:hardbreaks:
+:hardbreaks-option:
 
 .Constrained (applied at word boundaries)
 *strong importance* (aka bold)
@@ -60,7 +60,7 @@ Since `pass:[++]` has strong priority in AsciiDoc, you can rewrite pass:c,a,r[C+
 // activate stem support by adding `:stem:` to the document header
 stem:[sqrt(4) = 2]
 
-:!hardbreaks:
+:!hardbreaks-option:
 == Attributes
 
  // define attributes in the document header; must be flush with left margin
