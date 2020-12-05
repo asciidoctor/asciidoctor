@@ -1,6 +1,6 @@
 = Migrate from MS Word to Asciidoctor
 :navtitle: Migrate from MS Word
-:description: This document presents various tools and strategies for migrating from MS Word to AsciiDoc.
+:description: This page presents various tools and strategies for migrating from MS Word to AsciiDoc.
 :url-pandoc: https://pandoc.org
 :url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
 :url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
@@ -54,9 +54,10 @@ Column widths are ignored.
 |Yes
 
 |URL links
-|No - see <<remove-refs,how to remove hyperlinks>> to fix it
+|No.
+See <<remove-refs,how to remove hyperlinks>> to fix it.
 
-|email links
+|Email links
 |Yes
 
 |Document automation (fields, auto-generated figure and table numbers)
@@ -121,7 +122,7 @@ If you have a lot to do, it's worth while cleaning the input document first, and
 ====
 If for some reason pandoc is not extracting images, you can always extract them by using unzip tool.
 Docx is just a zip file with a docx file extension.
-Embedded images are located in [.path}_word/media_ directory.
+Embedded images are located in [.path]_word/media_ directory.
 
  $ unzip input.docx -d input-docx
    ls input-docx/word/media/
@@ -140,7 +141,7 @@ Embedded images are located in [.path}_word/media_ directory.
 // can do this with a regexp, but is depends on exactly what format you used for them
 ** Replace the hard cross references with AsciiDoc references.
 // checked vertical merge, assume h merge same
-** Fix tables - merged cells will have unmerged, column widths need putting back.
+** Fix tables: merged cells will have unmerged, column widths need putting back.
 . Try to convert it, and fix any errors that come up.
 // pandoc supposedly only uses UTF-8, and the xml file is windows encoded, but I haven't found any problems so far.
 // You definitely do get encoding errors if you go via HTML.
@@ -172,7 +173,7 @@ It will get confused by abbreviations, but there is no way around that.
 == Google Docs
 
 Google Docs can already upload and edit MS Word docx files.
-Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/Mogztter[Guillaume Grossetie], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/Mogztter[Guillaume Grossetie^], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
 The source for the add-on can be found in {url-google-asciidoc-source}[its repository^].
 
@@ -180,9 +181,8 @@ The source for the add-on can be found in {url-google-asciidoc-source}[its repos
 
 This method is only useful for very small files or if the other methods are not available.
 
-It keeps the text, and _fixes_ fields like auto-numbered lists and cross references.
-
-It loses tables (converted to plain paragraphs), images, symbols, form fields, and textboxes.
+* It keeps the text, and _fixes_ fields like auto-numbered lists and cross references.
+* It loses tables (converted to plain paragraphs), images, symbols, form fields, and textboxes.
 
 In MS Word, use "Save as > Plain text", then when the File Conversion dialog appears, set:
 

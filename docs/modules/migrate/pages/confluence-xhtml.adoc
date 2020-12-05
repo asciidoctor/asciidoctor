@@ -14,8 +14,8 @@ If you have trouble running this script, you can use the Pandoc command referenc
 include::example$convert.groovy[]
 ----
 
-This script was created by Cédric Champeau (https://gist.github.com/melix[melix]).
-You can find the source of this script hosted at this https://gist.github.com/melix/6020336[gist].
+This script was created by Cédric Champeau (https://gist.github.com/melix[melix^]).
+You can find the source of this script hosted at this https://gist.github.com/melix/6020336[gist^].
 
 The script is designed to be run locally on HTML files or directories containing HTML files exported from Confluence.
 
