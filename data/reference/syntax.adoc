@@ -249,7 +249,7 @@ comment - content which is not included in the output document
 == Tables
 
 .Table Attributes
-[cols=>1h;2d,width=50%,frame=topbot]
+[cols=>1h;2d,width=50%,frame=ends]
 |===
 | Attribute Name | Values
 
@@ -263,7 +263,7 @@ comment - content which is not included in the output document
 | all \| cols \| rows \| none
 
 | frame
-| all \| sides \| topbot \| none
+| all \| sides \| ends \| none
 
 | stripes
 | all \| even \| odd \| none
