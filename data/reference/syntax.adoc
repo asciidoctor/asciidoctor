@@ -41,11 +41,13 @@ _stress emphasis_ (aka italic)
 "`double`" and '`single`' typographic quotes
 +passthrough text+ (substitutions disabled)
 `+literal text+` (monospaced with substitutions disabled)
+a #mark# to remember (highlighted for notation)
 
 .Unconstrained (applied anywhere)
-**C**reate+**R**ead+**U**pdate+**D**elete
+**C**reate, **R**ead, **U**pdate, and **D**elete (CRUD)
 fan__freakin__tastic
 ``mono``culture
+##mark##up your text
 
 .Replacements
 A long time ago in a galaxy far, far away...
