@@ -54,6 +54,11 @@ A long time ago in a galaxy far, far away...
 (C) 1976 Arty Artisan
 I believe I shall--no, actually I won't.
 
+.ID and roles for phrases
+[.line-through]#delete me#
+the [.path]_images_ directory
+a [#wibble.term]*wibble* does wobble
+
 .Macros
 // where c=specialchars, q=quotes, a=attributes, r=replacements, m=macros, p=post_replacements, etc.
 The European icon:flag[role=blue] is blue & contains pass:[************] arranged in a icon:circle-o[role=yellow].
