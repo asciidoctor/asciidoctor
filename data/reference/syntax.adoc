@@ -25,7 +25,7 @@ Notice how line breaks are now preserved.
  monospaced font.
 
 [sidebar#id.role]
-A style, ID, and/or role gives a paragraph (or block) special meaning, like this sidebar.
+Adding a style, ID, and/or role gives a paragraph (or block) special meaning, like this sidebar.
 
 NOTE: An admonition paragraph, like this note, grabs the reader's attention.
 
