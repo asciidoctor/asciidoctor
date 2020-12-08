@@ -30,29 +30,26 @@ Now let's use the `stylesheet` attribute to apply it.
 The `stylesheet` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
+.stylesheet attribute set in document header
 [source,asciidoc]
 ----
-= My First Experience with the Dangers of Documentation
+include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
-
-In my world, we don't have to worry about mutant, script-injecting warlocks.
-No.
-We have something far worse.
-We're plagued by Wolpertingers.
+include::example$my-document.adoc[tag=body]
 ----
 
 You can also set `stylesheet` using the API or CLI (shown here):
 
- $ asciidoctor -a stylesheet=my-stylesheet.css document.adoc
+ $ asciidoctor -a stylesheet=my-stylesheet.css my-document.adoc
 
-When you view the generated HTML file [.path]_document.html_ in your browser, you'll see that all the text is red.
+When you view the generated HTML file [.path]_my-document.html_ in your browser, you'll see that all the text is red.
 
 TIP: If you want to create a custom stylesheet by extending the default stylesheet, see xref:default-stylesheet.adoc#customize-extend[Extend the default stylesheet].
 
 As with the default stylesheet, you can set the `linkcss` document attribute and Asciidoctor will link to your stylesheet instead.
 (Note that it doesn't copy it in this case since it's already in the same folder as the output file).
 
- $ asciidoctor -a stylesheet=my-stylesheet.css -a linkcss document.adoc
+ $ asciidoctor -a stylesheet=my-stylesheet.css -a linkcss my-document.adoc
 
 You may not want to keep your stylesheet in the same directory as your AsciiDoc documents.
 Let's see how to tell Asciidoctor to look for it elsewhere.
@@ -77,27 +74,24 @@ Now we need to tell Asciidoctor where it's located using `stylesdir`.
 The `stylesdir` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
+.stylesdir attribute set in document header
 [source,asciidoc]
 ----
-= My First Experience with the Dangers of Documentation
+include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
 :stylesdir: my-styles
-
-In my world, we don't have to worry about mutant, script-injecting warlocks.
-No.
-We have something far worse.
-We're plagued by Wolpertingers.
+include::example$my-document.adoc[tag=body]
 ----
 
 You can also set `stylesdir` using the API or CLI (shown here):
 
- $ asciidoctor -a stylesdir=my-styles -a stylesheet=my-stylesheet.css document.adoc
+ $ asciidoctor -a stylesdir=my-styles -a stylesheet=my-stylesheet.css my-document.adoc
 
 Asciidoctor now looks for the stylesheet file [.path]_my-styles/my-stylesheet.css_ relative to the AsciiDoc document and embeds it into the HTML.
 
 You can achieve the same result by including the directory in the value of the `stylesheet` attribute:
 
- $ asciidoctor -a stylesheet=my-styles/my-stylesheet.css document.adoc
+ $ asciidoctor -a stylesheet=my-styles/my-stylesheet.css my-document.adoc
 
 If you set the value of `stylesdir` to an absolute directory, then Asciidoctor would still locate the stylesheet and embed it into the HTML.
 But this can create problems if you've configured the converter to link to the stylesheet instead.
@@ -115,7 +109,7 @@ First, it's important to understand that Asciidoctor mirrors the `stylesdir` pat
 Let's use the previous example to demonstrate.
 If you invoke Asciidoctor as follows:
 
- $ asciidoctor -a stylesdir=my-styles -a stylesheet=my-stylesheet.css -a linkcss document.adoc
+ $ asciidoctor -a stylesdir=my-styles -a stylesheet=my-stylesheet.css -a linkcss my-document.adoc
 
 Then when you inspect the HTML, you will see:
 
@@ -131,9 +125,9 @@ There are certain situations where this isn't going to work (at least not when p
 Let's consider one such case.
 We'll specify the location of `stylesdir` as an absolute path and generate the output file into a separate output directory.
 
- $ asciidoctor -a stylesdir=`pwd`/my-styles -a stylesheet=my-stylesheet.css -a linkcss -D public document.adoc
+ $ asciidoctor -a stylesdir=`pwd`/my-styles -a stylesheet=my-stylesheet.css -a linkcss -D public my-document.adoc
 
-Asciidoctor generates the HTML file into the [.path]_public_ folder, but it _does not_ copy the stylesheet.
+Asciidoctor generates the HTML file into the [.path]_public_ folder, but it does not copy the stylesheet.
 Furthermore, it uses an absolute path in the link to the stylesheet:
 
 [source,html]
@@ -165,7 +159,7 @@ That means we can use `stylesdir` and `stylesheet` to assemble the path relative
 Let's revisit the broken scenario from the previous section and use `copycss` to reconcile the problem:
 
  $ asciidoctor -a stylesdir=css -a stylesheet=default.css \
- -a copycss=`pwd`/my-styles/my-stylesheet.css -a linkcss -D public document.adoc
+ -a copycss=`pwd`/my-styles/my-stylesheet.css -a linkcss -D public my-document.adoc
 
 Asciidoctor copies the stylesheet from the absolute path specified by the `copycss` attribute to the path [.path]_public/css/default.css_ and links to it using the path [.path]_css/default.css_.
 Notice that we even changed the name of the folder and stylesheet file in the output.

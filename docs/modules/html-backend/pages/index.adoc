@@ -11,44 +11,52 @@ Asciidoctor's default output format is HTML.
 
 In this section, we'll create a sample document, then process and convert it with Asciidoctor's built-in HTML converter.
 
-. Create an AsciiDoc file like the one below
-. Save the file as [.path]_my-sample.adoc_
+=== Create and save an AsciiDoc document
 
-[source,asciidoc]
+. To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plaintext file.
++
+.my-document.adoc
+[source#ex-my-doc,asciidoc]
 ----
-include::example$mysample.adoc[]
+include::example$my-document.adoc[tags=title;body]
 ----
 
-To convert [.path]_my-sample.adoc_ to HTML from the command line:
+. Make sure to save the file with the _.adoc_ file extension.
 
-. Open a console
-. Switch to the directory that contains the [.path]_my-sample.adoc_ document
-. Call the Asciidoctor processor with the `asciidoctor` command, followed by the name of the document you want to convert
+=== Convert an AsciiDoc document to HTML
 
-//^
+To convert [.path]_my-document.adoc_ to HTML from the command line:
 
- $ asciidoctor my-sample.adoc
+. Open a terminal.
+. Switch to the directory that contains the [.path]_my-document.adoc_ document
+. Call the Asciidoctor processor with the `asciidoctor` command, followed by the name of the document.
++
+--
+ $ asciidoctor my-document.adoc
 
 Remember, Asciidoctor's default converter is html5, so it isn't necessary to specify it with the `-b` command.
+--
 
-You won't see any messages printed to the console.
-If you type `ls` or view the directory in a file manager, there is a new file named [.path]_my-sample.html_.
-
+. You won't see any messages printed to the console.
+Type `ls` to view the files in the directory or navigate to the directory in a file manager.
+You should see a new file named [.path]_my-document.html_.
++
+--
  $ ls
- my-sample.adoc  my-sample.html
+ my-document.adoc  my-document.html
 
 Asciidoctor derives the name of the output document from the name of the input document.
+--
 
-Open [.path]_my-sample.html_ in your web browser.
+. Open [.path]_my-document.html_ in your web browser.
 Your document should look like the image below.
++
+--
+image::my-document.png[]
 
-====
-#fix ex#
-//image::mysample.png[]
-====
-
-The document's text, titles, and link is styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
-As a result, you could save [.path]_my-sample.html_ to any computer and it will look the same.
+The document's text, titles, and link are styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
+As a result, you could save [.path]_my-document.html_ to any computer and it will look the same.
+--
 
 [#xhtml]
 == Generate XHTML
@@ -59,7 +67,7 @@ To use the XHTML converter, assign `xhtml` or `xhtml5` to the `backend` option.
 .Produce XHTML using the xhtml5 backend option
 [source,console]
 ----
-asciidoctor -b xhtml5 document.adoc
+$ asciidoctor -b xhtml5 my-document.adoc
 ----
 
 To produce XHTML instead of HTML when using converter templates, set the `htmlsyntax` attribute to `xml` in addition to the backend option:
@@ -67,7 +75,7 @@ To produce XHTML instead of HTML when using converter templates, set the `htmlsy
 .Produce XHTML using custom templates
 [source,console]
 ----
-asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml document.adoc
+$ asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml my-document.adoc
 ----
 
 .Black Box Decoded: XHTML and htmlsyntax

@@ -32,23 +32,21 @@ If the `linkcss` document attribute is set, the converter will take this hint to
 The `linkcss` document attribute must be set by the end of the header to be effective.
 One way to do that is to set the attribute in the document header:
 
+.linkcss attribute set in document header
 [source,asciidoc]
 ----
-= My First Experience with the Dangers of Documentation
+include::example$my-document.adoc[tag=title]
 :linkcss:
-
-In my world, we don't have to worry about mutant, script-injecting warlocks.
-No.
-We have something far worse.
-We're plagued by Wolpertingers.
+include::example$my-document.adoc[tag=body]
 ----
 
 You can also set `linkcss` using the API or CLI (shown here):
 
- $ asciidoctor -a linkcss document.adoc
+ $ asciidoctor -a linkcss my-document.adoc
 
-In either case, if you inspect the `<head>` tag in the output file [.path]_document.html_, you'll see that the HTML links to the stylesheet.
+In either case, if you inspect the `<head>` tag in the output file [.path]_my-document.html_, you'll see that the HTML links to the stylesheet.
 
+.my-document.html
 [source,html]
 ----
 <link rel="stylesheet" href="./asciidoctor.css">
@@ -69,7 +67,7 @@ When using the default stylesheet, Asciidoctor writes the CSS to the file [.path
 If you specify a custom stylesheet, Asciidoctor will copy that file instead, retaining the name of the file.
 This utility works even if you specify an xref:cli:output-file.adoc[output file in a different directory] from the source file.
 
-.A shared responsiblity
+.A shared responsibility
 ****
 While the converter handles the task of embedding or linking to the stylesheet file, it's the processor itself (not the converter) that handles copying the stylesheet.
 ****
@@ -78,9 +76,15 @@ If the safe mode is secure, Asciidoctor will not copy the stylesheet file and, t
 
 Let's revisit the previous example:
 
- $ asciidoctor -a linkcss document.adoc
+ $ asciidoctor -a linkcss my-document.adoc
 
-After running this command, you should see the stylesheet file [.path]_asciidoctor.css_ adjacent to the HTML file [.path]_document.html_.
+After running this command, the stylesheet file [.path]_asciidoctor.css_ is copied to the same directory as the generated HTML file [.path]_my-document.html_.
+Type `ls` to view the files in the directory.
+You should see a file named [.path]_asciidoctor.css_.
+
+ $ ls
+ asciidoctor.css  my-document.adoc  my-document.html
+
 When you view the HTML file in your browser, you should observe that the default stylesheet is applied.
 
 === To copy or not to copy
@@ -93,21 +97,18 @@ To prevent Asciidoctor from copying the stylesheet independent of safe mode, uns
 The `copycss` document attribute must be unset by the end of the header to be effective.
 One way to do that is to unset the attribute in the document header:
 
+.copycss attribute unset in document header
 [source,asciidoc]
 ----
-= My First Experience with the Dangers of Documentation
+include::example$my-document.adoc[tag=title]
 :linkcss:
 :!copycss:
-
-In my world, we don't have to worry about mutant, script-injecting warlocks.
-No.
-We have something far worse.
-We're plagued by Wolpertingers.
+include::example$my-document.adoc[tag=body]
 ----
 
 You can also unset `copycss` using the API or CLI (shown here):
 
- $ asciidoctor -a linkcss -a copycss! document.adoc
+ $ asciidoctor -a linkcss -a copycss! my-document.adoc
 
 In either case, if you inspect the output directory, you will see that the stylesheet file [.path]_asciidoctor.css_ is missing (unless it was already there).
 
@@ -117,15 +118,15 @@ We'll see the `copycss` attribute come up again on the xref:custom-stylesheet.ad
 == Disable the stylesheet
 
 The stylesheet is effectively disabled when generating embedded HTML, since the embedded HTML does not include the `<head>` tag.
-If you don't want the converter to include a stylesheet in the standalone HTML, unset the `stylesheet` document attribute:
+If you don't want the converter to include a stylesheet in the standalone HTML, unset the `stylesheet` attribute using the CLI.
 
- $ asciidoctor -a stylesheet! document.adoc
+ $ asciidoctor -a stylesheet! my-document.adoc
 
 The reason you have to unset the `stylesheet` attribute is because it is set by default (to an empty value).
 When the `stylesheet` attribute is set, but empty, the HTML converter uses the default stylesheet.
 By unsetting this attribute, we're telling the converter not to use a stylesheet at all.
 
-When you view the generated HTML file, [.path]_document.html_, you'll see bare HTML without any styles applied, as shown here:
+When you view the generated HTML file, [.path]_my-document.html_, you'll see bare HTML without any styles applied, as shown here:
 
 image::no-stylesheet.png[]
 
