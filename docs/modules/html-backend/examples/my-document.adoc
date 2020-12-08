@@ -1,0 +1,19 @@
+// tag::title[]
+= The Dangers of Wolpertingers
+:url-wolpertinger: https://en.wikipedia.org/wiki/Wolpertinger
+// end::title[]
+// tag::body[]
+
+Don't worry about gumberoos or splintercats.
+Something far more fearsome plagues the days, nights, and inbetweens.
+Wolpertingers.
+
+== Origins
+
+Wolpertingers are {url-wolpertinger}[ravenous beasts].
+// end::body[]
+// tag::image[]
+[.left.text-center]
+image:wolpertinger.jpg[Wolpertinger,100,,link="https://commons.wikimedia.org/wiki/File:Wolpertinger.jpg"]
+They may look cute and cuddly, but don't be fooled.
+// end::image[]
