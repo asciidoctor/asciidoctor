@@ -303,7 +303,7 @@ a|
 |Not implemented.
 
 |`[latex]` block macro
-|Use a xref:asciidoc:stem:stem.adoc#stem-bl[stem block].
+|Use a xref:asciidoc:stem:stem.adoc#block[stem block].
 
 |`graphviz`
 |Use {url-diagram}[Asciidoctor Diagram^].
