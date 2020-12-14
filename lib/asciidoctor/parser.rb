@@ -327,7 +327,7 @@ class Parser
       if current_level == 0
         part = book
       elsif current_level == 1 && section.special
-        # NOTE technically preface and abstract sections are only permitted in the book doctype
+        # NOTE technically preface sections are only permitted in the book doctype
         unless (sectname = section.sectname) == 'appendix' || sectname == 'preface' || sectname == 'abstract'
           expected_next_level = nil
         end
