@@ -123,6 +123,30 @@ class Converter::Html5Converter < Converter::Base
     end
     result << %(<title>#{node.doctitle sanitize: true, use_fallback: true}</title>)
 
+    # OGP (https://ogp.me)
+    result << %(<meta property="og:article:title" content="#{node.doctitle sanitize: true, use_fallback: true}"#{slash}>)
+    result << %(<meta property="og:article:type" content="article"#{slash}>)
+    result << %(<meta property="og:article:author" content="#{((authors = node.sub_replacements node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}"#{slash}>) if node.attr? 'authors'
+    result << %(<meta property="og:article:tag" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
+
+    # ldjson (https://jsonld.com/)
+    result << %(<script type="application/ld+json">)
+    result << %({ "@context": "https://schema.org", )
+    result << %(  "@type": "Article",)
+    result << %(  "headline": "#{node.doctitle sanitize: true, use_fallback: true}",)
+    result << %(  "author": {) if node.attr? 'authors'
+    result << %(    "@type": "Person",) if node.attr? 'authors'
+    result << %(    "name": "#{((authors = node.sub_replacements node.attr 'authors').include? '<') ? (authors.gsub XmlSanitizeRx, '') : authors}") if node.attr? 'authors'
+    result << %(   },) if node.attr? 'authors'
+    result << %(  "keywords": "#{node.attr 'keywords'}", ) if node.attr? 'keywords'
+    result << %(  "publisher": {)
+    result << %(    "@type": "Organization",)
+    result << %(    "name": "AsciiDoctor")
+    result << %(    },)
+    result << %(  "description": "#{node.attr 'description'}",)
+    result << %( })
+    result << %(</script>)
+
     if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
       if (webfonts = node.attr 'webfonts')
         result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
