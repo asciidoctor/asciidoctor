@@ -854,7 +854,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'unreadable file referenced by include directive is replaced by warning', unless: (windows? || 0 == Process.euid) do
+      test 'unreadable file referenced by include directive is replaced by warning', unless: (windows? || Process.euid == 0) do
         include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
         FileUtils.chmod 0000, include_file
         input = <<~'EOS'
