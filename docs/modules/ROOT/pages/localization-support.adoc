@@ -28,9 +28,7 @@ When converting to DocBook, you can rely on the DocBook toolchain to translate (
 To activate this feature, simply set the `lang` attribute to a valid country code (which defaults to `en` for English).
 For example:
 
-----
-$ asciidoctor -a lang=es -b docbook article.adoc
-----
+ $ asciidoctor -a lang=es -b docbook article.adoc
 
 The list of supported languages, as well as additional language considerations for DocBook, are described in {url-docbook-i8n}[DocBook XSL: The Complete Guide^].
 

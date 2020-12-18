@@ -65,18 +65,12 @@ As a result, you could save [.path]_my-document.html_ to any computer and it wil
 To use the XHTML converter, assign `xhtml` or `xhtml5` to the `backend` option.
 
 .Produce XHTML using the xhtml5 backend option
-[source,console]
-----
-$ asciidoctor -b xhtml5 my-document.adoc
-----
+ $ asciidoctor -b xhtml5 my-document.adoc
 
 To produce XHTML instead of HTML when using converter templates, set the `htmlsyntax` attribute to `xml` in addition to the backend option:
 
 .Produce XHTML using custom templates
-[source,console]
-----
-$ asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml my-document.adoc
-----
+ $ asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml my-document.adoc
 
 .Black Box Decoded: XHTML and htmlsyntax
 ****
