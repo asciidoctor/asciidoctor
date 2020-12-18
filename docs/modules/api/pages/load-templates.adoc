@@ -1,0 +1,24 @@
+= Load Custom Templates
+:url-tilt: https://github.com/rtomayko/tilt
+:url-tests: {url-org}/asciidoctor/tree/master/test
+
+Asciidoctor allows you to override the converter methods used to convert almost any individual AsciiDoc element.
+If you provide a directory of {url-tilt}[Tilt^]-compatible templates, named in such a way that Asciidoctor can figure out which template goes with which element, Asciidoctor will use the templates in this directory instead of its built-in templates for any elements for which it finds a matching template.
+It will fallback to its default templates for everything else.
+
+[source,ruby]
+----
+puts Asciidoctor.convert '*This* is Asciidoctor.',
+  standalone: true, template_dir: 'templates'
+----
+
+The Document and Section templates should begin with `document` and `section`, respectively.
+The file extension is used by Tilt to determine which view framework it will use to use to interpret the template.
+For instance, if you want to write the template in ERB, you'd name these two templates `document.html.erb` and `section.html.erb`.
+The first file extension, `.html`, maps to the converter and the second, `.erb` maps to the template engine.
+To use Haml as the template engine, you'd name the templates `document.html.haml` and `section.html.haml`.
+
+Templates for block elements, like a paragraph or sidebar, are named after the block they handle.
+For instance, to override the default paragraph template with an ERB template, put a file named `paragraph.html.erb` in the template directory you pass to the `Document` constructor using the `:template_dir` option.
+
+For more usage examples, see the {url-tests}[test suite^].

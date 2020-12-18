@@ -1,0 +1,33 @@
+= Generate an HTML TOC
+
+Asciidoctor's HTML 5 converter has built-in support for generating a TOC.
+This TOC generator can also be used as a general purpose API.
+This logic is available via the `outline` method on the HTML5 converter.
+
+The `outline` method excepts a Document object and an optional Hash of options, and returns an HTML string.
+It can be resolved and invoked from anywhere using the following:
+
+[source,ruby]
+----
+html_toc = (Asciidoctor::Converter.for 'html5').outline document
+----
+
+The method can also be executed from inside a converter template (e.g., Slim, Haml, or ERB).
+When using a composite converter, this call will be run through the converter chain.
+
+[source,ruby]
+----
+= converter.convert document, 'outline'
+----
+
+The method is also available through the Document API:
+
+[source,ruby]
+----
+html_doc = document.converter.convert document, 'outline'
+----
+
+The `outline` method accepts the following options:
+
+sectnumlevels:: the number of section levels to number (defaults to the value of the `sectnumlevels` attribute.
+toclevels:: the depth of the toc (defaults to the value of the `toclevels` attribute)

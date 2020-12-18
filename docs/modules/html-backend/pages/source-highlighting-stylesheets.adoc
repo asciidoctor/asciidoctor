@@ -1,0 +1,27 @@
+= Embed a CodeRay or Pygments Stylesheet
+// um anchor: hl-css
+// html-code-styles.adoc, included in convert-documents and the user-manual.
+
+Asciidoctor can embed the stylesheet for the CodeRay or Pygments syntax highlighters.
+
+== Requirements
+
+First, make sure the appropriate library is installed on your system.
+See xref:syntax-highlighting:rouge.adoc[], xref:syntax-highlighting:coderay.adoc[], or xref:syntax-highlighting:pygments.adoc[] for installation instructions.
+Next, set the xref:asciidoc:verbatim:source-highlighter.adoc[source-highlighter attribute] and assign it the value that corresponds to the library you installed.
+
+[#coderay]
+== CodeRay
+
+If the `source-highlighter` attribute is `coderay` and the `coderay-css` attribute is `class`, the CodeRay stylesheet is:
+
+* _embedded_ by default
+* _copied_ to the file [.path]_asciidoctor-coderay.css_ inside the `stylesdir` folder within the output directory if `linkcss` is set
+
+[#pygments]
+== Pygments
+
+If the `source-highlighter` attribute is `pygments` and the `pygments-css` attribute is `class`, the Pygments stylesheet is:
+
+* _embedded_ by default
+* _copied_ to the file [.path]_asciidoctor-pygments.css_ inside the `stylesdir` folder within the output directory if `linkcss` is set

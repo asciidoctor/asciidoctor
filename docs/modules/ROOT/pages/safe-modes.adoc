@@ -1,0 +1,85 @@
+= Safe Modes
+
+Asciidoctor provides security levels that control the read and write access of attributes, include directives, macros, and scripts while a document is processing.
+Each level includes the restrictions enabled in the prior security level.
+
+The safe mode can be set from the  xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
+You can also xref:reference-safe-mode.adoc[enable or disable content based on the current safe mode].
+
+[#unsafe]
+== UNSAFE
+
+The `UNSAFE` safe mode level disables any security features enforced by Asciidoctor.
+Ruby is still subject to its own restrictions.
+
+*This is the default safe mode for the CLI.*
+Its integer value is `0`.
+
+[#safe]
+== SAFE
+
+The `SAFE` safe mode level prevents access to files which reside outside of the parent directory of the source file.
+Include directives (`+include::[]+`) are enabled, but paths to include files must be within the parent directory.
+This mode allows assets (such as the stylesheet) to be embedded in the document.
+
+Its integer value is `1`.
+
+[#server]
+== SERVER
+
+The `SERVER` safe mode level disallows the document from setting attributes that would affect conversion of the document.
+This level trims `docfile` to its relative path and prevents the document from:
+
+* setting `source-highlighter`, `doctype`, `docinfo` and `backend`
+* seeing `docdir` (as it can reveal information about the host filesystem)
+
+It allows `icons` and `linkcss`.
+
+Its integer value is `10`.
+
+[#secure]
+== SECURE
+
+The `SECURE` safe mode level disallows the document from attempting to read files from the file system and including their contents into the document.
+Additionally, it:
+
+* disables icons
+* disables include directives (`+include::[]+`)
+* data can not be retrieved from URIs
+* prevents access to stylesheets and JavaScripts
+* sets the backend to `html5`
+* disables `docinfo` files
+* disables `data-uri`
+* disables interactive (`opts=interactive`) and inline (`opts=inline`) modes for SVGs
+* disables `docdir` and `docfile` (as these can reveal information about the host filesystem)
+* disables source highlighting
+
+xref:extensions:index.adoc[Asciidoctor extensions] may still embed content into the document depending whether they honor the safe mode setting.
+
+*This is the default safe mode for the API.*
+Its integer value is `20`.
+
+TIP: GitHub processes AsciiDoc files using the `SECURE` mode.
+
+////
+|===
+
+|{empty} |Unsafe |Safe |Server |Secure
+
+|URI access
+|system access
+|base directory access
+|docdir
+|docfile
+|docinfo
+|backend
+|doctype
+|source-highlighter
+|macros
+|include
+|data-uri
+|linkcss
+|icons
+
+|===
+////

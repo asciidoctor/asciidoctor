@@ -1,0 +1,28 @@
+= STEM Support in the DocBook Toolchain
+:url-jeuclid-fop: http://jeuclid.sourceforge.net/jeuclid-fop/index.html
+
+The DocBook toolchain has some support for STEM processing, though it varies depending on which DocBook pipeline you're using and which integrations you have enabled.
+Since the DocBook toolchain is most often used to generate PDF output, let's look at how STEM processing is supported in the two pipelines for PDF generation: dblatex and fop.
+
+dblatex::
+If you're using the dblatex pipeline to produce PDF, the DocBook toolchain provides built-in processing for LaTeX and MathML notation.
+If you write your STEM expressions using the latexmath notation, you're all set.
+But that only gets us half way.
+What if you write STEM expressions in AsciiMath?
+The pipeline does not understand AsciiMath, but it does understand MathML.
+And that's something the DocBook converter can produce.
+If you have the AsciiMath gem installed, the DocBook converter will translate AsciiMath to MathML.
+That means when you're using this pipeline, you can write STEM expressions in both the AsciiMath and LaTeX notations.
+
+fop::
+If you're using the fop pipeline, the STEM support provided by the DocBook toolchain is more spotty.
+This pipeline does not support LaTeX notation at all, and there's no library that integrations with Asciidoctor like AsciiMath to convert LaTeX notation to MathML.
+So you cannot write STEM expressions in LaTeX when using this pipeline.
+If that's important to you, consider using the dblatex pipeline instead.
+There's still a path for writing STEM expressions in AsciiMath.
+If you're running the DocBook toolchain using Java, you can configure the JEuclid integration (by activating the {url-jeuclid-fop}[JEuclid FOP plugin^]) to get MathML support.
+That means we can turn again to the AsciiMath gem when converting to DocBook.
+The DocBook converter integrates with the AsciiMath gem, if available, to convert the AsciiMath notation to MathML, which the fop pipeline can understand.
+
+While neither DocBook pipeline understands AsciiMath, we can leverage the AsciiMath gem to feed it something it does understand, MathML.
+Let's explore the xref:asciimath-gem.adoc[AsciiMath gem] in more detail.

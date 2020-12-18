@@ -1,0 +1,46 @@
+= Process Multiple Source Files
+
+The Asciidoctor CLI can convert multiple files in a single invocation.
+If you pass multiple source filenames or a filename pattern to the CLI, Asciidoctor will convert each file in turn.
+
+Let's assume there exist two AsciiDoc files in the current directory, [.path]_a.adoc_ and [.path]_b.adoc_.
+You can pass both files to Asciidoctor using a single command, as follows:
+
+ $ asciidoctor a.adoc b.adoc
+
+Asciidoctor will convert both files, transforming [.path]_a.adoc_ to [.path]_a.html_ and [.path]_b.adoc_ to [.path]_b.html_.
+
+To save some typing, you can use the glob operator (`+*+`) to match all AsciiDoc files in the current directory using a single argument:
+
+ $ asciidoctor *.adoc
+
+Your shell will automatically expand the pattern and interpret the command exactly as you had typed it above:
+
+ $ asciidoctor a.adoc b.adoc
+
+You can pass all AsciiDoc files inside direct subfolders using the glob operator (`+*+`) in place of the directory name:
+
+ $ asciidoctor */*.adoc
+
+To match all files in the current directory and direct subfolders, combine both glob patterns:
+
+ $ asciidoctor *.adoc */*.adoc
+
+Since the globs in this command rely on shell expansion, the command is not portable across platforms.
+To make it portable, you can allow the Asciidoctor CLI to expand the globs.
+To do so, instruct the shell to not expand the glob by quoting the pattern, as shown here:
+
+ $ asciidoctor '*.adoc' '*/*.adoc'
+
+This time, the arguments `+*.adoc+` and `+*/*.adoc+` are passed directly to Asciidoctor instead of being expanded.
+Asciidoctor handles the glob matching in a manner that is portable across platforms.
+
+But it gets better.
+The glob handling in Asciidoctor (which matches the rules of file globbing in Ruby) is likely more powerful than what your shell offers.
+For example, you can match AsciiDoc files in the current folder and in folders of any depth using the double glob operator (`+**+`).
+
+ $ asciidoctor '**/*.adoc'
+
+Most shells do not honor this double glob pattern.
+
+In conclusion, when specifying a glob pattern, we always recommend enclosing the argument in quotes.

@@ -1,0 +1,84 @@
+= Generate HTML from AsciiDoc
+:navtitle: Generate HTML
+
+== HTML 5 converter
+
+Asciidoctor's default output format is HTML.
+
+`html`:: The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
+
+== Generate HTML using the html5 converter
+
+In this section, we'll create a sample document, then process and convert it with Asciidoctor's built-in HTML converter.
+
+=== Create and save an AsciiDoc document
+
+. To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plaintext file.
++
+.my-document.adoc
+[source#ex-my-doc,asciidoc]
+----
+include::example$my-document.adoc[tags=title;body]
+----
+
+. Make sure to save the file with the _.adoc_ file extension.
+
+=== Convert an AsciiDoc document to HTML
+
+To convert [.path]_my-document.adoc_ to HTML from the command line:
+
+. Open a terminal.
+. Switch to the directory that contains the [.path]_my-document.adoc_ document
+. Call the Asciidoctor processor with the `asciidoctor` command, followed by the name of the document.
++
+--
+ $ asciidoctor my-document.adoc
+
+Remember, Asciidoctor's default converter is html5, so it isn't necessary to specify it with the `-b` command.
+--
+
+. You won't see any messages printed to the console.
+Type `ls` to view the files in the directory or navigate to the directory in a file manager.
+You should see a new file named [.path]_my-document.html_.
++
+--
+ $ ls
+ my-document.adoc  my-document.html
+
+Asciidoctor derives the name of the output document from the name of the input document.
+--
+
+. Open [.path]_my-document.html_ in your web browser.
+Your document should look like the image below.
++
+--
+image::my-document.png[]
+
+The document's text, titles, and link are styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
+As a result, you could save [.path]_my-document.html_ to any computer and it will look the same.
+--
+
+[#xhtml]
+== Generate XHTML
+
+`xhtml`:: The XHTML variant of the HTML 5 converter.
+To use the XHTML converter, assign `xhtml` or `xhtml5` to the `backend` option.
+
+.Produce XHTML using the xhtml5 backend option
+ $ asciidoctor -b xhtml5 my-document.adoc
+
+To produce XHTML instead of HTML when using converter templates, set the `htmlsyntax` attribute to `xml` in addition to the backend option:
+
+.Produce XHTML using custom templates
+ $ asciidoctor -T /path/to/templates -b slides -a htmlsyntax=xml my-document.adoc
+
+.Black Box Decoded: XHTML and htmlsyntax
+****
+XHTML output is a special mode of the built-in HTML5 converter.
+It is activated by prefixing the backend value with `x` (e.g., `xhtml` or `xhtml5`).
+This hint implicitly assigns the `htmlsyntax` attribute to the value `xml`, which normally has the value `html`.
+
+For all other converters, the `htmlsyntax` attribute is not set explicitly.
+If you want a converter template that's written in Slim or Haml to output XHTML instead of the default HTML, you simply need to set the `htmlsyntax` attribute to `xml` explicitly.
+Asciidoctor will pass on this preference to the Slim or Haml template engine by setting the `:format` option to `:html5`.
+****

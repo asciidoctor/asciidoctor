@@ -1,0 +1,89 @@
+= Load and Convert Strings Using the API
+:navtitle: Load and Convert Strings
+
+To parse an AsciiDoc-formatted string into a document object model, use:
+
+[source,ruby]
+----
+doc = Asciidoctor.load '*This* is Asciidoctor.'
+----
+
+To convert the AsciiDoc-formatted string directly to HTML, use:
+
+[source,ruby]
+----
+puts Asciidoctor.convert '*This* is Asciidoctor.'
+----
+
+Here's the output you will see:
+
+[source,html]
+----
+<div class="paragraph">
+<p><strong>This</strong> is Asciidoctor.</p>
+</div>
+----
+
+When converting a string, Asciidoctor does not output a standalone document by default.
+Instead, it generates embeddable output.
+Let's learn why that is and how to control it.
+
+== Embedded output
+
+When you pass a string to `Asciidoctor.convert` to convert it to a backend format, such as HTML, this method only returns the converted content for those blocks.
+It does not include the frame around that content (i.e., the header and footer) that is needed to make a standalone document.
+Instead, it makes an _embedded_ document.
+This default was chosen to make Asciidoctor consistent with other lightweight markup processors like Markdown.
+
+Here's what's included in an embedded document:
+
+* The document title, but only if the `showtitle` attribute is set (no attribution and revision information)
+* The table of contents if the `toc` attribute is enabled (and not macro or preamble)
+* The converted document body
+* The footnotes unless the `nofootnotes` attribute is set
+
+== Standalone output
+
+You can still generate a standalone document when converting a string.
+To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `standalone` option to `true`.
+
+[source,ruby]
+----
+puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
+----
+
+Now you will see a full HTML file.
+
+When the input or output is a file, the `standalone` option is enabled by default.
+
+[source,ruby]
+----
+Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
+----
+
+If you want to generate embedded output when starting with a file, set the `standalone` option to `false`.
+However, most of the time you'll want to generate a standalone document when converting a file (which is why it's default).
+
+When converting a string, the TOC is only included by default when using the `standalone` option as shown above (whether it's enabled implicitly or explicitly).
+However, you can force it to be included without the header and footer by setting the `toc` attribute with a value of `macro` and using the `toc::[]` macro in the string itself.
+
+== Convert inline markup only
+
+If you only want the inline markup to be returned, set the `:doctype` option to `'inline'`:
+
+[source,ruby]
+----
+puts Asciidoctor.convert '*This* is Asciidoctor.', doctype: 'inline'
+----
+
+In this mode, Asciidoctor will only process the first block (e.g., paragraph) in the document and ignore the rest.
+
+== Convert to DocBook
+
+You can produce DocBook 5.0 by setting the `backend` option to `'docbook'`.
+Since embeddable DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `standalone` option to `true`.
+
+[source,ruby]
+----
+puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true, backend: 'docbook'
+----

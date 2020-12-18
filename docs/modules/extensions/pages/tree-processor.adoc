@@ -1,0 +1,86 @@
+= Tree Processor Extension Example
+:navtitle: Tree Processor
+
+Purpose::
+Detect literal blocks that contain shell commands, strip the prompt character and style the command using CSS in such a way that the prompt character cannot be selected (as seen on help.github.com).
+
+== sample-with-shell-session.adoc
+
+[source,asciidoc]
+----
+ $ echo "Hello, World!"
+ > Hello, World!
+
+ $ gem install asciidoctor
+----
+
+== ShellSessionTreeProcessor
+
+[source,ruby]
+----
+class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
+  def process document
+    return unless document.blocks?
+    process_blocks document
+    nil
+  end
+
+  def process_blocks node
+    node.blocks.each_with_index do |block, i|
+      if block.context == :literal &&
+          (((first_line = block.lines.first).start_with? '$ ') ||
+            (first_line.start_with? '> '))
+        node.blocks[i] = convert_to_terminal_listing block
+      else
+        process_blocks block if block.blocks?
+      end
+    end
+  end
+
+  def convert_to_terminal_listing block
+    attrs = block.attributes
+    attrs['role'] = 'terminal'
+    prompt_attr = (attrs.has_key? 'prompt') ?
+        %( data-prompt="#{block.sub_specialchars attrs['prompt']}") : nil
+    lines = block.lines.map do |line|
+      line = block.sub_specialchars line.chomp
+      if line.start_with? '$ '
+        %(<span class="command"#{prompt_attr}>#{line[2..-1]}</span>)
+      elsif line.start_with? '&gt; '
+        %(<span class="output">#{line[5..-1]}</span>)
+      else
+        line
+      end
+    end
+    create_listing_block block.document, lines * EOL, attrs, subs: nil
+  end
+end
+----
+
+== Usage
+
+[source,ruby]
+----
+Asciidoctor::Extensions.register do
+  tree_processor ShellSessionTreeProcessor
+end
+
+Asciidoctor.convert_file 'sample-with-shell-session.adoc', safe: :safe
+----
+
+////
+In the example below the TreeProcessor examines the block contents looking for the `// (*)` suffix and rewrites the line so that Asciidoctor formats it appropriately.
+
+[source,java]
+----
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            .antMatchers("/resources/**").permitAll() // (*)
+            .anyRequest().authenticated()
+            .and()
+        .formLogin()
+            .loginPage("/login")
+            .permitAll();
+----
+////

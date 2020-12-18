@@ -1,0 +1,12 @@
+If the gem installed successfully, Asciidoctor's xref:cli:index.adoc[command line interface (CLI)] will be available on your PATH.
+To confirm that Asciidoctor is available, execute:
+
+ $ asciidoctor --version
+
+You should see information about the Asciidoctor version and your Ruby environment printed in the terminal.
+
+[.output,subs=attributes+]
+....
+Asciidoctor {release-version} [https://asciidoctor.org]
+Runtime Environment ({ruby-description}) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+....

@@ -1,0 +1,149 @@
+= Upgrade from Asciidoctor 1.5.x to 2.0
+
+IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
+If your migrating from AsciiDoc Python, see xref:asciidoc-python.adoc[].
+
+When you upgrade Asciidoctor you may also need to update some of the syntax and attributes in your AsciiDoc documents.
+Major version releases can include new AsciiDoc syntax capabilities as well as syntax changes that make it more consistent.
+
+== Updated and deprecated features
+
+The syntax, attributes, and commands listed below have been updated or deprecated.
+In most cases, they've been replaced with a new feature that provides improved functionality.
+
+=== Inline formatting
+
+[cols="~,~,~,~"]
+|===
+|Feature |Deprecated |New |Notes
+
+|_italic text_
+|pass:['italic text']
+|pass:[_italic text_]
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:italic.adoc[].
+
+|`monospace text`
+|pass:[+monospace text+]
+|pass:[`monospace text`]
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:monospace.adoc[].
+
+|`+literal monospace text+`
+|pass:[`literal monospace text`]
+|pass:[`+literal monospace text+`]
+|Allowed with `compat-mode`.
+See xref:asciidoc:text:monospace.adoc#literal-monospace[Literal monospace].
+
+|Curved "`double quotes`"
+|pass:[``double quotes'']
+|pass:["`double quotes`"], editor keybinding, or Unicode character in numeric character reference form
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
+
+|Curved '`single quotes`'
+|pass:[`single quotes']
+|pass:['`single quotes`'], editor keybinding, or Unicode character in numeric character reference form
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
+|===
+
+=== Table of contents
+
+[cols="~,~,~,~"]
+|===
+|Feature |Deprecated |New |Notes
+
+|Scrollable, left margin TOC
+|`toc2`
+|`+:toc: left+`
+|See xref:asciidoc:toc:position.adoc[].
+
+|TOC location
+|`toc-placement` and `toc-position`
+|`+:toc: <value>+`
+|See xref:asciidoc:toc:position.adoc[].
+
+|User-specified TOC location
+|`+:toc-placement: manual+`
+|`+:toc: macro+`
+|See xref:asciidoc:toc:position.adoc[].
+|===
+
+=== Document header
+
+[cols="~,~,~,~"]
+|===
+|Feature |Deprecated |New |Notes
+
+|Two-line style (setext) document title
+|`Title` +
+`+=====+`
+|`={nbsp}Title`
+|Asciidoctor accepts the two-line heading style to set the document title.
+But, by using it, `compat-mode` is implicitly set.
+To use the new syntax, use `= Title` or explicitly unset `compat-mode`.
+See xref:asciidoc:document:title.adoc[].
+|===
+
+=== API
+
+[cols="~,~,~"]
+|===
+|Feature |Deprecated |New
+
+|Render class method
+|`+.render(input, options = {}) ⇒ Object+`
+|`+.convert(input, options = {}) ⇒ Object+`
+|===
+
+== New features
+
+Visit xref:ROOT:whats-new.adoc[] for a complete list of new Asciidoctor features.
+
+////
+== Proposed changes for future versions
+
+[cols="15,20,20,5,20"]
+|===
+|Feature |Deprecated |New |As of Version |Notes
+
+|Delimited open block
+|pass:[--] +
+open block content +
+pass:[--]
+|New syntax will allow for nested delimited open blocks
+|2.0
+|
+
+|Set backend
+|Set the backend from a document
+|Backends can only be set in the CLI, environment, and API
+|2.0
+|
+
+|Link attributes
+|Set `linkattrs` to use link attribute syntax
+|`linkattrs` is set implicitly so link attributes are available automatically
+|2.0
+|
+
+|UI macros
+|Set `experimental` to use the UI macros
+|UI macros are available automatically
+|2.0
+|
+
+|Document roles
+|Roles are inherited; roles don't wrap the document
+|Roles aren't inherited; roles wrap the document
+|2.0
+|
+|===
+////
+
+////
+== Compatibility mode
+
+When it isn't feasibly to update your documents prior to upgrading Asciidoctor, you can run Asciidoctor in compatibility mode.
+Compatibility mode is activated by setting the `compat-mode` attribute and allows Asciidoctor to accept and apply the deprecated syntax and/or behavior.
+However, *not all deprecated syntax or behavior is available under the compatibility mode*.
+////

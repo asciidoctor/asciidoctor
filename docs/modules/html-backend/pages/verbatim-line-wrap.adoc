@@ -1,0 +1,40 @@
+= Verbatim Block Line Wrapping
+
+The default Asciidoctor stylesheet wraps long lines in verbatim blocks by applying the CSS `white-space: pre-wrap` and `word-wrap: break-word`.
+The lines are wrapped at word boundaries, similar to how most text editors wrap lines.
+This prevents horizontal scrolling which some users considered a greater readability problem than line wrapping.
+
+However, this behavior is configurable because there are times when you don't want the lines in listing and literal blocks to wrap.
+
+== Prevent line wrapping
+
+There are two ways to prevent lines from wrapping so that horizontal scrolling is used instead:
+
+* `nowrap` block option
+* unset the `prewrap` document attribute (on by default)
+
+You can use the `nowrap` option on literal or listing blocks to prevent lines from being wrapped in the HTML.
+
+// FIXME this section is creating broken AsciiDoc!!
+.Listing block with nowrap option syntax
+....
+include::example$wrap.adoc[tag=nowrap]
+....
+
+When the nowrap option is used, the `nowrap` class is added to the `<pre>` element.
+This class changes the CSS to `white-space: pre` and `word-wrap: normal`.
+
+.Result: Listing block with nowrap option applied
+include::example$wrap.adoc[tag=nowrap]
+
+To prevent lines from wrapping globally, unset the `prewrap` attribute on the document.
+
+.Disable prewrap globally (thus, enabling nowrap)
+[source,asciidoc]
+----
+:prewrap!:
+----
+
+When the prewrap attribute is unset, the `nowrap` class is added to any `<pre>` elements.
+
+Now, you can use the line wrapping strategy that works best for you and your readers.

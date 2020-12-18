@@ -1,0 +1,74 @@
+= AsciiDoc Tooling
+:url-chrome-extension: https://chrome.google.com/webstore/detail/asciidoctorjs-live-previe/iaalpfgpbocpdfblpnhhgllgbdbchmia
+:url-firefox-addon: https://addons.mozilla.org/en/firefox/addon/asciidoctorjs-live-preview
+:url-opera-extension: https://addons.opera.com/en/extensions/details/asciidoctorjs-live-preview/
+:url-asciidocfx: https://www.asciidocfx.com
+:url-asciidocfx-docs: https://www.asciidocfx.com/#truehow-to-install-asciidocfx
+:url-eclipse-marketplace: https://marketplace.eclipse.org/content/asciidoctor-editor
+:url-eclipse-plugin-github: https://github.com/de-jcup/eclipse-asciidoctor-editor
+:url-intellij-plugin: https://plugins.jetbrains.com/plugin/7391-asciidoc
+
+Since AsciiDoc syntax is just plain text, you can write an AsciiDoc document using any text editor.
+You don't need complex word processing programs like Microsoft Word or Google Docs.
+In fact, you shouldn't use these programs because they add cruft to your document that you can't see that makes conversion tedious.
+
+Here's an overview of the different ways to preview and edit your AsciiDoc documents.
+
+== Web browser add-ons (preview only)
+
+All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension^], the {url-firefox-addon}[Firefox add-on^] or the {url-opera-extension}[Opera extension^].
+Then you can see the AsciiDoc file rendered as HTML just by visiting it!
+
+== IDEs and text editors
+
+The following IDEs and text editors support the AsciiDoc syntax and provide document preview rendering with Asciidoctor.
+
+=== AsciiDocFX
+
+{url-asciidocfx}[AsciiDoc FX^] is an editor and terminal emulator written with JavaFX 8.
+See its documentation for {url-asciidocfx-docs}[download and installation instructions^].
+
+=== Atom
+
+Install https://atom.io/[Atom^].
+Then from the Atom editor menus, navigate to menu:Atom[Preferences].
+From there, open the menu:Packages[] tab and install:
+
+https://atom.io/packages/asciidoc-preview[AsciiDoc Preview^] :: enables live preview
+https://atom.io/packages/language-asciidoc[AsciiDoc Language^] :: enables syntax highlighting (AsciiDoc language support)
+https://atom.io/packages/asciidoc-image-helper[AsciiDoc Image Helper^] :: provides the ability to paste images from the clipboard
+https://atom.io/packages/autocomplete-asciidoc[AsciiDoc Autocomplete^] :: automatically completes AsciiDoc language items
+https://atom.io/packages/asciidoc-assistant[AsciiDoc Assistant^] :: Installs useful components to Atom for editing AsciiDoc files (including the above packages)
+
+=== Brackets
+
+Install http://brackets.io/[Brackets^].
+Then from the Brackets file menu, open the extension manager.
+Browse available extensions and install `AsciiDoc Preview`.
+
+More information:
+
+* https://github.com/asciidoctor/brackets-asciidoc-preview[AsciiDoc Preview for Brackets^]
+
+=== Eclipse
+
+Install the open source plugin `AsciiDoctor Editor` from the {url-eclipse-marketplace}[Eclipse Marketplace^] or visit the
+{url-eclipse-plugin-github}[project repository^].
+
+=== IntelliJ IDEA
+
+Install the community plugin {url-intellij-plugin}[AsciiDoc^].
+
+=== Visual Studio Code
+
+Visual Studio Code provides rich language support for AsciiDoc and a live preview as you type.
+
+. Install https://code.visualstudio.com/[Visual Studio Code^].
+. Launch Visual Studio Code and open the Quick Open dialog by pressing kbd:[Ctrl,P].
+. Type the following command to locate and install the AsciiDoc extension (by João Pinto):
++
+ ext install asciidoctor.asciidoctor-vscode
+
+More information:
+
+* https://marketplace.visualstudio.com/items?itemName=asciidoctor.asciidoctor-vscode[AsciiDoc extension for Visual Studio Code^]

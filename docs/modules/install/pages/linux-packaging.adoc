@@ -1,0 +1,89 @@
+= Install Using Linux Packaging
+:url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
+:url-arch: https://www.archlinux.org/packages/?name=asciidoctor
+:url-debian: https://packages.debian.org/sid/asciidoctor
+:url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
+:url-suse: https://software.opensuse.org/package/rubygem-asciidoctor
+:url-ubuntu: https://packages.ubuntu.com/search?keywords=asciidoctor
+
+The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+
+== Package versions
+
+The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
+Consult the package repository for your distribution to find out which version is packaged per distribution release.
+
+* {url-alpine}[Alpine Linux (asciidoctor)^]
+* {url-arch}[Arch Linux (asciidoctor)^]
+* {url-debian}[Debian (asciidoctor)^]
+* {url-fedora}[Fedora (asciidoctor)^]
+* {url-suse}[OpenSUSE (rubygem-asciidoctor)^]
+* {url-ubuntu}[Ubuntu (asciidoctor)^]
+
+If you want to use a version of Asciidoctor that is newer than what is available via your package manager, see xref:ruby-packaging.adoc[].
+
+== APT
+
+On Debian and Debian-based distributions such as Ubuntu, use APT to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo apt-get install -y asciidoctor
+
+include::partial$success.adoc[]
+
+== DNF
+
+On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
+To install the package, open a terminal and type:
+
+ $ sudo dnf install -y asciidoctor
+
+include::partial$success.adoc[]
+
+[#apk]
+== apk (Alpine Linux)
+
+To install the gem on Alpine Linux, open a terminal and type:
+
+ $ sudo apk add asciidoctor
+
+include::partial$success.adoc[]
+
+[#pacman]
+== pacman (Arch Linux)
+
+To install the gem on Arch-based distributions, open a terminal and type:
+
+ $ sudo pacman -S asciidoctor
+
+include::partial$success.adoc[]
+
+[#upgrade]
+== Upgrading on Linux
+
+Some Linux distributions may not have the latest stable version of Asciidoctor packaged immediately after a release of a new gem.
+If you need to upgrade to the latest version immediately, use xref:ruby-packaging.adoc[gem install] instead of the package manager.
+
+TIP: Your Linux system may be configured to automatically update packages, in which case the latest Asciidoctor package will be installed as soon as it becomes available.
+No further action is required by you.
+
+[#upgrade-apt]
+=== APT
+
+On Debian and Debian-based distributions, update the Asciidoctor package using:
+
+ $ sudo apt-get upgrade -y asciidoctor
+
+[#upgrade-dnf]
+=== DNF
+
+On Fedora and other RPM-based distributions, you can update the package using:
+
+ $ sudo dnf update -y asciidoctor
+
+[#upgrade-apk]
+=== apk (Alpine Linux)
+
+On Alpine Linux, update the Asciidoctor package using:
+
+ $ sudo apk add -u asciidoctor

@@ -1,0 +1,6 @@
+= Migrate from Markdown to Asciidoctor
+:navtitle: Migrate from Markdown
+
+Asciidoctor recognizes some Markdown syntax, thus allowing you to migrate from Markdown to AsciiDoc gradually.
+See xref:asciidoc::syntax-quick-reference.adoc#markdown-compatibility[Markdown compatibility] to learn what syntax is shared.
+The syntax you must change is listed in the table under the xref:asciidoc::asciidoc-vs-markdown.adoc#comparison-by-example[Comparison by example section].

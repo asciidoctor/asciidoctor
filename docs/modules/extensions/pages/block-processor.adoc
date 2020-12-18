@@ -1,0 +1,48 @@
+= Block Processor Extension Example
+:navtitle: Block Processor
+
+Purpose::
+Register a custom block style named `shout` that uppercases all the words and converts periods to exclamation points.
+
+== sample-with-shout-block.adoc
+
+[source,asciidoc]
+----
+[shout]
+The time is now. Get a move on.
+----
+
+== ShoutBlock
+
+[source,ruby]
+----
+require 'asciidoctor'
+require 'asciidoctor/extensions'
+
+class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
+  PeriodRx = /\.(?= |$)/
+
+  use_dsl
+
+  named :shout
+  on_context :paragraph
+  name_positional_attributes 'vol'
+  parse_content_as :simple
+
+  def process parent, reader, attrs
+    volume = ((attrs.delete 'vol') || 1).to_i
+    create_paragraph parent, (reader.lines.map {|l| l.upcase.gsub PeriodRx, '!' * volume }), attrs
+  end
+end
+----
+
+== Usage
+
+[source,ruby]
+----
+Asciidoctor::Extensions.register do
+  block ShoutBlock
+end
+
+Asciidoctor.convert_file 'sample-with-shout-block.adoc', safe: :safe
+----

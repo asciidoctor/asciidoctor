@@ -1,0 +1,6 @@
+* xref:index.adoc[]
+** xref:supported-platforms.adoc[]
+** xref:ruby-packaging.adoc[]
+** xref:linux-packaging.adoc[]
+** xref:macos.adoc[]
+** xref:windows.adoc[]

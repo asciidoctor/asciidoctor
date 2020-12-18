@@ -1,0 +1,39 @@
+= Specify an Output File
+// Included in user-manual: Specifying an output file
+
+By default, the Asciidoctor CLI writes the converted output file to the same directory as the input file.
+If an output file is not specified, the name of the output file is derived from the input file by replacing its file extension with the file extension that matches the output format (e.g., replacing .adoc with .html).
+
+You can instruct the Asciidoctor CLI to write content to a different output file (or directory).
+There are several circumstances when you'll want to specify a different output file:
+
+* You want to write the output file to a different name, perhaps to append a qualifier such as a version string.
+* You want to write the output file to a different directory.
+* You are piping content to the CLI, but want to write the output to a file (in this case, an output file is required).
+
+CAUTION: If you specify the output file as a relative path, it will be resolved relative to the current working directory instead of the directory of the input file (i.e., specifying the output file implicitly sets the output directory too).
+
+To specify the output file, you'll use the `-o` option.
+For example, let's say we want to convert [.path]_mydoc.adoc_ and write the output to a filename that includes the current date.
+You'd use:
+
+ $ asciidoctor -o mydoc-$(date +%Y-%m-%d).html mydoc.adoc
+
+We could write it to another folder as well by prefixing the output file with a folder name:
+
+ $ asciidoctor -o build/mydoc-$(date +%Y-%m-%d).html mydoc.adoc
+
+If you only want to specify the output directory, but let the filename be defaulted, use the `-D` option:
+
+ $ asciidoctor -D build mydoc.adoc
+
+The `-D` option can also be used when processing multiple input files:
+
+ $ asciidoctor -D build *.adoc
+
+If you are piping content to the CLI, the default is to write the output to STDOUT.
+If you want to write the output to a file in this case, you have to specify one:
+
+ $ cat mydoc.adoc | asciidoctor -o build/mydoc-$(date +%Y-%m-%d).html -
+
+See xref:io-piping.adoc[] to learn more.

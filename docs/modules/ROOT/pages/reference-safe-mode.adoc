@@ -1,0 +1,45 @@
+= Safe Mode Specific Content
+// anchor: set-safe-attrs
+
+Asciidoctor provides access to the current safe mode through built-in attributes.
+You can use these attributes to enable or disable content based on the current safe mode of the processor.
+
+== Referencing safe modes
+
+The xref:safe-modes.adoc[safe mode] can be referenced by one of the following document attributes:
+
+* The value of the `safe-mode-name` attribute (e.g., unsafe, safe, etc.)
+* The value of the `safe-mode-level` attribute (e.g., 0, 10, etc.)
+* The presence of the `safe-mode-<name>` attribute, where `<name>` is the safe mode name.
+
+The attributes in the next example define replacement text for features that are disabled in high security environments:
+
+[source,asciidoc]
+----
+\ifdef::safe-mode-secure[]
+Link to chapters instead of including them.
+\endif::safe-mode-secure[]
+----
+
+This feature is particularly handy for displaying content on GitHub, where the safe mode is set to its most restrictive setting, xref:safe-modes.adoc#secure[SECURE].
+
+You can set the xref:cli:set-safe-mode.adoc[safe mode from the CLI] and the xref:api:set-safe-mode.adoc[API].
+
+////
+Allow the include directive to import a file from a URI.
+
+Example:
+
+ include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/README.adoc[]
+
+To be secure by default, the allow-uri-read attribute must be set in the API or CLI (not document) for this feature to be enabled. It's also completely disabled if the safe mode is SECURE or greater.
+Since this is a potentially dangerous feature, it’s disabled if the safe mode is SECURE or greater. Assuming the safe mode is less than SECURE, you must also set the allow-uri-read attribute to permit Asciidoctor to read content from a URI.
+
+I decided the following defaults for the standalone option make the most sense:
+
+true if using the cli (use -s to disable, consistent with asciidoc)
+false if using the API, unless converting directly to a file, in which case true is the default
+The basic logic is that if you are writing to a file, you probably want to create a standalone document. If you are converting to a string, then you probably want an embedded document. Of course, you can always set it explicitly, this is just a default setting.
+
+The reason I think the standalone default is important is because we don't want people switching from Markdown to AsciiDoc and be totally taken by surprise when they start getting a full HTML document. On the other hand, if you are converting to a file (or using the cli), then it makes a lot of sense to write a standalone document. To me, it just feels natural now.
+////

@@ -1,0 +1,68 @@
+// add note about warning when asciimath gem is not available
+= AsciiMath Gem
+:url-asciimath-repo: https://github.com/asciidoctor/AsciiMath
+:stem:
+
+The DocBook toolchain has some support for STEM processing, though it varies depending on which DocBook pipeline you're using and which integrations you have enabled.
+But there's one thing we know for sure.
+The DocBook toolchain does not understand AsciiMath.
+That's where the {url-rubygem}/asciimath[AsciiMath gem^] comes in.
+
+== AsciiMath and DocBook
+
+The AsciiMath gem translates AsciiMath expressions to MathML, which is something the DocBook toolchain is capable of processing.
+When the AsciiMath gem is available, the DocBook converter uses it to convert STEM expressions written in AsciiMath notation to MathML and embeds the MathML into the generated DocBook.
+Processing the MathML into a displayable format is left up to the DocBook toolchain.
+
+[#install]
+== Install
+
+To enable AsciiMath to MathML translation when converting to DocBook, you first need to install the asciimath gem:
+
+ $ gem install asciimath
+
+== Usage
+
+It's not necessary to require the `asciimath` gem explicitly.
+As long as the AsciiMath gem is available, the DocBook converter will automatically load and use it to translate AsciiMath notation to MathML.
+
+If the gem is not available, and there's at least one AsciiMath expression in the document, you will see the following message when converting to DocBook:
+
+....
+asciidoctor: WARNING: optional gem 'asciimath' is not available. Functionality disabled.
+....
+
+The functionality referenced here is the translation from AsciiMath to MathML.
+If you see this message, refer back to <<Install>>.
+
+Assuming you have it installed, let's look at an example.
+
+First, activate STEM support in AsciiDoc by setting the `stem` document attribute.
+This attribute must be set by the end of the document header.
+
+.Activate STEM support by setting the stem document attribute
+[source,asciidoc]
+----
+= Document Title
+:stem:
+
+stem:[sqrt(4)] is the square root of 4, which is 2.
+----
+
+Now let's convert this document to DocBook using the DocBook converter:
+
+ $ asciidoctor -b docbook asciimath-sample.adoc
+
+The DocBook converter will emit the following XML into the generated document:
+
+[source,xml]
+----
+<inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msqrt><mml:mn>4</mml:mn></mml:msqrt></mml:math></inlineequation>
+----
+
+It's now up to the DocBook toolchain to convert the MathML embeded in the DocBook into a displayable format.
+Here's the result you should see:
+
+====
+stem:[sqrt(4)] is the square root of 4, which is 2.
+====

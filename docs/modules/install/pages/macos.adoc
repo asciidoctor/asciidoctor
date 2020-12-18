@@ -1,0 +1,23 @@
+= Install on macOS
+:url-homebrew: https://brew.sh/
+
+== Install with Homebrew
+
+You can use Homebrew, the macOS package manager, to install Asciidoctor.
+If you don't have Homebrew on your computer, complete the installation instructions at {url-homebrew}[brew.sh^] first.
+
+Once Homebrew is installed, you're ready to install the `asciidoctor` gem.
+Open a terminal and type:
+
+ $ brew install asciidoctor
+
+Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
+
+include::partial$success.adoc[]
+
+== Upgrade with Homebrew
+
+To upgrade the gem, open a terminal and type:
+
+ $ brew update
+ $ brew upgrade asciidoctor
