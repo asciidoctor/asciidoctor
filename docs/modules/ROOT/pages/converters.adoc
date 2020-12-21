@@ -88,7 +88,7 @@ The tool provides built-in theming via a YAML configuration file, which is docum
 TIP: Asciidoctor PDF is the preferred tool for converting to PDF and is fully supported by the Asciidoctor community.
 
 a2x::
-A DocBook toolchain frontend provided by that AsciiDoc Python project.
+A DocBook toolchain frontend provided by that AsciiDoc.py project.
 +
 To use this tool, you should first convert to DocBook using Asciidoctor, then convert the DocBook to PDF using a2x.
 a2x accepts a DocBook file as input and can convert it to a PDF using either Apache FOP or dblatex.

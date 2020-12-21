@@ -18,7 +18,7 @@ See {url-org}/asciidoctor/issues/1601[issue #1601^] for details.
 In the interim, you can leverage the DocBook toolchain to get right-to-left support.
 * Attributes that store dates and times (e.g., `docdatetime`) are always formatted like `2019-01-04 19:26:06 GMT+0000`.
 * Message (aka logging) strings are always in English.
-* Asciidoctor does not support the language conf files used by AsciiDoc Python.
+* Asciidoctor does not support the language conf files used by AsciiDoc.py.
 However, Asciidoctor does provide {url-lang-attributes}[a translation file^] that can be used for a similar purpose.
 
 [#customizing-labels]

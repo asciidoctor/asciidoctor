@@ -18,8 +18,8 @@ Asciidoctor is also distributed as a package for numerous Linux distributions as
 
 Asciidoctor is open source software that is available under the terms of the MIT license and {url-org}[hosted on GitHub^].
 
-Asciidoctor is the successor to AsciiDoc Python (AsciiDoc.py).
-If you're using AsciiDoc.py, follow xref:migrate:asciidoc-python.adoc[] to learn how to upgrade to Asciidoctor.
+Asciidoctor is the successor to AsciiDoc.py (aka AsciiDoc Python).
+If you're using AsciiDoc.py, follow xref:migrate:asciidoc-py.adoc[] to learn how to upgrade to Asciidoctor.
 
 == Basic usage
 

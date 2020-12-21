@@ -1,7 +1,7 @@
 = Upgrade from Asciidoctor 1.5.x to 2.0
 
 IMPORTANT: This page if for users upgrading from a previous version of Asciidoctor to the latest stable version of Asciidoctor.
-If your migrating from AsciiDoc Python, see xref:asciidoc-python.adoc[].
+If your migrating from AsciiDoc.py, see xref:asciidoc-py.adoc[].
 
 When you upgrade Asciidoctor you may also need to update some of the syntax and attributes in your AsciiDoc documents.
 Major version releases can include new AsciiDoc syntax capabilities as well as syntax changes that make it more consistent.

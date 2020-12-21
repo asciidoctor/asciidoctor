@@ -1,17 +1,16 @@
-= Migrate from AsciiDoc.py to Asciidoctor
-:navtitle: Migrate from AsciiDoc.py
+= Migrate from AsciiDoc.py
 :url-diagram: {url-org}/asciidoctor-diagram
 :url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-manpage: {url-project}/man/asciidoctor
 //:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
-// um anchor: migrating-from-asciidoc-python
 
-If you're currently using AsciiDoc.py (aka AsciiDoc Python) to convert your AsciiDoc documents and want to switch to Asciidoctor, you'll need to migrate your legacy AsciiDoc content to the official AsciiDoc syntax defined and supported by Asciidoctor.
+AsciiDoc.py (aka AsciiDoc Python) is the original AsciiDoc processor, which has now been superseded by Asciidoctor.
+If you're currently using AsciiDoc.py to convert your AsciiDoc documents and are ready to switch to Asciidoctor, you'll need to migrate your legacy AsciiDoc content to the official AsciiDoc syntax defined and supported by Asciidoctor.
 In doing so, you'll also benefit from the enhancements that have been added to the AsciiDoc language since Asciidoctor took over development of the language.
 This page covers those differences and how to migrate.
 
-NOTE: This documentation specifically covers migration from AsciiDoc.py 8 to the latest stable version of Asciidoctor.
+NOTE: This documentation specifically covers migration from AsciiDoc.py 8.6.
 
 == Processor call
 
