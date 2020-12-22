@@ -13,7 +13,6 @@ asciidoc:
     url-rvm: https://rvm.io
     url-foundation: https://foundation.zurb.com
     url-jruby: https://jruby.org
-    url-asciidoctorj: https://github.com/asciidoctor/asciidoctorj
     url-gradle-plugin: https://github.com/asciidoctor/asciidoctor-gradle-plugin
     url-maven-plugin: https://github.com/asciidoctor/asciidoctor-maven-plugin
 nav:
