@@ -12,7 +12,7 @@ Asciidoctor itself has no dependencies.
 
 But what if you aren't familiar with Ruby or, for whatever reason, prefer not to install it?
 No problem!
-Thanks to {url-asciidoctorj}[AsciidoctorJ^] and xref:asciidoctor.js::index.adoc[Asciidoctor.js], you can run the same exact version of Asciidoctor on a Java Virtual Machine (JVM) or JavaScript runtime, respectively.
+Thanks to xref:asciidoctorj::index.adoc[AsciidoctorJ] and xref:asciidoctor.js::index.adoc[Asciidoctor.js], you can run the same exact version of Asciidoctor on a Java Virtual Machine (JVM) or JavaScript runtime, respectively.
 That means you don't need a Ruby runtime installed on your machine after all.
 AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript.
 

@@ -80,7 +80,7 @@ You can also run Asciidoctor using a JVM or JavaScript.
 
 === Java / JVM
 
-Thanks to {url-asciidoctorj}[AsciidoctorJ^], Asciidoctor can be used in any program that runs on a Java Virtual Machine (JVM).
+Thanks to xref:asciidoctorj::index.adoc[AsciidoctorJ], Asciidoctor can be used in any program that runs on a Java Virtual Machine (JVM).
 Under the covers, AsciidoctorJ uses JRuby to run Asciidoctor, but this is hidden behind a Java API.
 AsciidoctorJ even provides an alternate CLI, which means you can get the full Asciidoctor experience with only a Java runtime.
 Building atop AsciidoctorJ, there are also plugins that integrate Asciidoctor into Apache Maven, Gradle, or Javadoc builds.

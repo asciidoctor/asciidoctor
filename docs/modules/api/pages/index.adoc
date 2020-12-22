@@ -11,7 +11,7 @@ The API is intended for integration with other software projects and is suitable
 
 Asciidoctor also has a Java API that mirrors the Ruby API.
 The Java API calls through to the Ruby API using an embedded JRuby runtime.
-See the AsciidoctorJ documentation for more information.
+See the xref:asciidoctorj::index.adoc[AsciidoctorJ documentation] for more information.
 
 == Load and convert a document using the API
 
