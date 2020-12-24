@@ -6,7 +6,7 @@
 :stem:
 
 {url-mathjax}[MathJax^] is a JavaScript library for displaying interactive LaTeX, AsciiMath, and MathML expressions in the browser.
-The Asciidoctor HTML converter integrates with MathJax to provide STEM processing for {url-asciimath}[AsciiMath^] and {url-latexmath}[TeX and LaTeX^] notation used in the AsciiDoc document.
+The Asciidoctor HTML converter integrates with MathJax to provide STEM processing for {url-asciimath}[AsciiMath^] and {url-latexmath}[TeX and LaTeX^] notation used in an AsciiDoc document.
 This integration offers simple, out-of-the-box support for STEM content when converting to HTML.
 
 == How it works

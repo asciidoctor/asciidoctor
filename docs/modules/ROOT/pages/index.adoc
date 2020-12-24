@@ -9,7 +9,7 @@ If you're looking for the documentation for the AsciiDoc language, see the xref:
 
 Asciidoctor is a fast, open source, Ruby-based text processor for parsing AsciiDoc into a document model and converting to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, manual pages, PDF, and [.nowrap]#EPUB 3#.
 This Ruby library is often referred to as Asciidoctor core.
-That's because Asciidoctor is also the name of the family of projects that contribute extensions and tools for Asciidoctor.
+That's because Asciidoctor is also the name of the family of projects that contribute extensions and tools for processing AsciiDoc.
 When we say Asciidoctor in this section of the documentation, we're specifically referring to Asciidoctor core.
 
 To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}/asciidoctor[RubyGem named asciidoctor^].
