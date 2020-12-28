@@ -469,7 +469,7 @@ module Asciidoctor
   #   footnoteref:[id,text] (legacy)
   #   footnoteref:[id] (legacy)
   #
-  InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([#{CC_WORD}-]+)?)\[(?:|(#{CC_ALL}*?[^\\]))\](?!<\/a>)/m
+  InlineFootnoteMacroRx = /\\?footnote(?:(ref):|:([#{CC_WORD}-]+)?)\[(?:|((([^\]]|\\\])*\g<0>)?#{CC_ALL}*?[^\\]))\](?!<\/a>)/m
 
   # Matches an image or icon inline macro.
   #

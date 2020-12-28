@@ -2298,5 +2298,35 @@ context 'Substitutions' do
       block.commit_subs
       assert_equal [:specialcharacters, :quotes, :attributes, :replacements, :macros, :post_replacements], block.subs
     end
+
+    test 'should parse footnote inside footnote' do
+      para = block_from_string('Sentence text footnote:[An examplefootnote:[Footnote to footnote.] footnote.].')
+      assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
+      assert_equal 2, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes][0]
+      assert_equal 1, footnote.index
+      assert_nil footnote.id
+      assert_equal 'An example<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> footnote.', footnote.text
+
+      footnote = para.document.catalog[:footnotes][1]
+      assert_equal 2, footnote.index
+      assert_nil footnote.id
+      assert_equal 'Footnote to footnote.', footnote.text
+    end
+
+    test 'should accept escaped square bracket before footnote inside footnote' do
+      para = block_from_string('Sentence text footnote:[An \] examplefootnote:[Footnote to footnote.] footnote.].')
+      assert_equal %(Sentence text <sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.), para.sub_macros(para.source)
+      assert_equal 2, para.document.catalog[:footnotes].size
+      footnote = para.document.catalog[:footnotes][0]
+      assert_equal 1, footnote.index
+      assert_nil footnote.id
+      assert_equal 'An ] example<sup class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnotedef_2" title="View footnote.">2</a>]</sup> footnote.', footnote.text
+
+      footnote = para.document.catalog[:footnotes][1]
+      assert_equal 2, footnote.index
+      assert_nil footnote.id
+      assert_equal 'Footnote to footnote.', footnote.text
+    end
   end
 end

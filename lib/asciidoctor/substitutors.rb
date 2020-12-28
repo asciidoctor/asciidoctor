@@ -286,6 +286,62 @@ module Substitutors
     text
   end
 
+  # Public: Substitute replacement footnote
+  #
+  # text - The String text to process with footnote
+  #
+  # returns the [String] text with footnote substituted
+  def sub_footnote text
+    doc = @document
+    text = text.gsub InlineFootnoteMacroRx do
+      # honor the escape
+      next $&.slice 1, $&.length if $&.start_with? RS
+
+      # footnoteref
+      if $1
+        if $3
+          id, text = $3.split ',', 2
+          logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
+        else
+          next $&
+        end
+      # footnote
+      else
+        id = $2
+        text = $3
+      end
+
+      fn = nil
+      if id
+        if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
+          index, text = footnote.index, footnote.text
+          type, target, id = :xref, id, nil
+        elsif text
+          text = restore_passthroughs(normalize_text text, true, true)
+          index = doc.counter('footnote-number')
+          fn = Document::Footnote.new(index, id, text)
+          doc.register(:footnotes, fn)
+          type, target = :ref, nil
+        else
+          logger.warn %(invalid footnote reference: #{id})
+          type, target, text, id = :xref, id, id, nil
+        end
+      elsif text
+        text = restore_passthroughs(normalize_text text, true, true)
+        index = doc.counter('footnote-number')
+        fn = Document::Footnote.new(index, id, text)
+        doc.register(:footnotes, fn)
+        type = target = nil
+      else
+        next $&
+      end
+      if fn
+          fn.text = sub_footnote fn.text
+      end
+      Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
+    end
+  end
+
   # Public: Substitute inline macros (e.g., links, images, etc)
   #
   # Replace inline macros, which may span multiple lines, in the provided text
@@ -830,47 +886,7 @@ module Substitutors
     end
 
     if found_macroish && (text.include? 'tnote')
-      text = text.gsub InlineFootnoteMacroRx do
-        # honor the escape
-        next $&.slice 1, $&.length if $&.start_with? RS
-
-        # footnoteref
-        if $1
-          if $3
-            id, text = $3.split ',', 2
-            logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
-          else
-            next $&
-          end
-        # footnote
-        else
-          id = $2
-          text = $3
-        end
-
-        if id
-          if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
-            index, text = footnote.index, footnote.text
-            type, target, id = :xref, id, nil
-          elsif text
-            text = restore_passthroughs(normalize_text text, true, true)
-            index = doc.counter('footnote-number')
-            doc.register(:footnotes, Document::Footnote.new(index, id, text))
-            type, target = :ref, nil
-          else
-            logger.warn %(invalid footnote reference: #{id})
-            type, target, text, id = :xref, id, id, nil
-          end
-        elsif text
-          text = restore_passthroughs(normalize_text text, true, true)
-          index = doc.counter('footnote-number')
-          doc.register(:footnotes, Document::Footnote.new(index, id, text))
-          type = target = nil
-        else
-          next $&
-        end
-        Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
-      end
+      text = sub_footnote text
     end
 
     text
