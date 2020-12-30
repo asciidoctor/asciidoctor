@@ -419,6 +419,23 @@ context 'Extensions' do
       end
 
     end
+
+    test 'should supply Registry instance to 1-parameter group block' do
+      begin
+        @registry
+        Asciidoctor::Extensions.register do |registry|
+          @registry = registry
+          registry.preprocessor SamplePreprocessor
+        end
+        doc = Asciidoctor::Document.new
+        assert doc.extensions?
+        assert_kind_of Asciidoctor::Extensions::Registry, doc.extensions
+        assert_equal doc.extensions @registry
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+
+    end
   end
 
   context 'Instantiate' do
