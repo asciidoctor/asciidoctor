@@ -1,6 +1,6 @@
 = Syntax Highlighting
 
-AsciiDoc defines a style of listing block known as a xref:asciidoc:verbatim:source-blocks.adoc[source block] for adding a source code snippets to a document that are intended to be colorized by a syntax highlighter.
+AsciiDoc defines a style of listing block known as a xref:asciidoc:verbatim:source-blocks.adoc[source block] for adding source code snippets intended to be colorized by a syntax highlighter to a document.
 Here's a simple example of a source block:
 
 [source,asciidoc]
