@@ -430,7 +430,7 @@ context 'Extensions' do
         doc = Asciidoctor::Document.new
         assert doc.extensions?
         assert_kind_of Asciidoctor::Extensions::Registry, doc.extensions
-        assert_equal doc.extensions @registry
+        assert_equal doc.extensions, @registry
       ensure
         Asciidoctor::Extensions.unregister_all
       end
