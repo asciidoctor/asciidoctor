@@ -18,6 +18,33 @@ module Asciidoctor; module RougeExt; module Formatters
     end
   end
 
+  class HTMLLineTable < ::Rouge::Formatter
+    def initialize delegate, opts
+      @delegate = delegate
+      @start_line = opts[:start_line] || 1
+    end
+
+    def stream tokens
+      lineno = @start_line - 1
+      buffer = [%(<table class="linenotable"><tbody>)]
+      token_lines(tokens) do |line_tokens|
+        lineno += 1
+        buffer << %(<tr id="#{sprintf 'line-%i', lineno}">)
+        buffer << %(<td class="linenos gl" )
+        # buffer << %(style="-moz-user-select: none;-ms-user-select: none;)
+        # buffer << %(-webkit-user-select: none;user-select: none;"
+        buffer << %(>)
+        buffer << %(<pre class="lineno">#{lineno}</pre></td>)
+        buffer << %(<td class="code"><pre>)
+        buffer << %(#{@delegate.format line_tokens})
+        buffer << %(</pre></td></tr>)
+      end
+      buffer << %(</tbody></table>)
+      yield buffer.join
+    end
+
+  end
+
   class HTMLLineHighlighter < ::Rouge::Formatter
     def initialize delegate, opts
       @delegate = delegate
@@ -29,6 +56,18 @@ module Asciidoctor; module RougeExt; module Formatters
       token_lines tokens do |tokens_in_line|
         yield (@lines.include? lineno += 1) ? %(<span class="hll">#{@delegate.format tokens_in_line}#{LF}</span>) : %(#{@delegate.format tokens_in_line}#{LF})
       end
+    end
+  end
+
+  class HTMLSingleLineHighlighter < ::Rouge::Formatter
+    def initialize delegate, opts
+      @delegate = delegate
+      @lines = opts[:lines] || []
+      @lineno = 0
+    end
+
+    def stream tokens
+      yield (@lines.include? @lineno += 1) ? %(<span class="hll">#{@delegate.format tokens}#{LF}</span>) : %(#{@delegate.format tokens}#{LF})
     end
   end
 

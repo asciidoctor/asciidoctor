@@ -1088,6 +1088,218 @@ context 'Syntax Highlighter' do
       assert_include ' &lt;!--<b class="conum">(2)</b>--&gt;', result
     end
 
+    context 'Rouge - linenums - inline' do
+      test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
+        input = <<~'EOS'
+        :source-highlighter: rouge
+        :rouge-linenums-mode: inline
+        [source%linenums,ruby]
+        ----
+        puts 'Hello, World!'
+        puts 'Goodbye, World!'
+        ----
+        EOS
+        output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
+        assert_css 'table.linenotable', output, 1
+        assert_css 'table.linenotable td.linenos', output, 2
+        assert_css 'table.linenotable td.linenos pre.lineno', output, 2
+        assert_css 'table.linenotable td.code', output, 2
+        assert_css 'table.linenotable td.code pre:not([class])', output, 2
+        assert_xpath %(//pre[@class="lineno"][text()="1"]), output, 1
+        assert_xpath %(//td[@class="code"]/pre//span[text()="puts"]), output, 2
+      end
+
+      test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
+        input = <<~'EOS'
+        :source-highlighter: rouge
+        :rouge-linenums-mode: inline
+        [source%linenums,ruby,start=9]
+        ----
+        puts 'Hello, World!'
+        puts 'Goodbye, World!'
+        ----
+        EOS
+        output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
+        assert_css 'table.linenotable', output, 1
+        assert_css 'table.linenotable td.linenos', output, 2
+        assert_css 'table.linenotable td.linenos pre.lineno', output, 2
+        assert_css 'table.linenotable td.code', output, 2
+        assert_css 'table.linenotable td.code pre:not([class])', output, 2
+        assert_xpath %(//pre[@class="lineno"][text()="9"]), output, 1
+        assert_xpath %(//td[@class="code"]/pre//span[text()="'Hello, World!\'"]), output, 1
+      end
+
+      test 'should restore callout marks to correct lines' do
+        ['', '%linenums'].each do |opts|
+          input = <<~EOS
+          :source-highlighter: rouge
+          :rouge-linenums-mode: inline
+
+          [source#{opts},ruby]
+          ----
+          require 'rouge' # <1>
+
+          html = Rouge::Formatters::HTML.format(Rouge::Lexers::Ruby.lex('puts "Hello, world!"')) # <2>
+          puts html # <3> <4>
+          exit 0 # <5><6>
+          ----
+          <1> Load library
+          <2> Highlight source
+          <3> Print to stdout
+          <4> Redirect to a file to capture output
+          <5> Exit program
+          <6> Reports success
+          EOS
+          output = convert_string_to_embedded input, safe: :safe
+          puts "OUTPUT: #{output}"
+          assert_match(/<span class="s1">'rouge'<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
+          assert_match(/<span class="s1">'puts "Hello, world!"'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
+          assert_match(/<span class="n">html<\/span>.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
+          # NOTE notice there's a newline before the closing </pre> tag when linenums are enabled
+          assert_match(/<span class="mi">0<\/span>.* # <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b>#{opts == '%linenums' ? ?\n : '</code>'}<\/pre>/, output)
+        end
+      end
+
+      test 'should line highlight specified lines when last line is not highlighted - no linenums' do
+        input = <<~EOS
+        :source-highlighter: rouge
+        :rouge-linenums-mode: inline
+
+        [source,ruby,highlight=1]
+        ----
+        puts 'Hello, world!'
+        puts 'Goodbye, world!'
+        ----
+        EOS
+        # NOTE notice the newline in inside the closing </span> of the highlight span
+        expected = <<~EOS.chop
+        <span class="hll"><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>\n</span>
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe
+        assert_includes output, expected
+      end
+
+      test 'should line highlight specified lines when last line is not highlighted - with linenums' do
+        input = <<~EOS
+        :source-highlighter: rouge
+        :rouge-linenums-mode: inline
+
+        [source%linenums,ruby,highlight=1]
+        ----
+        puts 'First line!'
+        puts 'Second line!'
+        ----
+        EOS
+        # NOTE notice the newline in inside the closing </span> of the highlight span
+        expected = <<~EOS.chop
+        <span class="hll"><span class="nb">puts</span> <span class="s1">'First line!'</span>\n</span>
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe
+        assert_includes output, expected
+      end
+
+      test 'should line highlight specified lines when last line is highlighted' do
+        ['', '%linenums'].each do |opts|
+          input = <<~EOS
+          :source-highlighter: rouge
+          :rouge-linenums-mode: inline
+
+          [source#{opts},ruby,highlight=2]
+          ----
+          puts 'First line'
+          puts 'Last line'
+          ----
+          EOS
+          # NOTE notice the newline in inside the closing </span> of the highlight span
+          expected = <<~EOS.chop
+          <span class="hll"><span class="nb">puts</span> <span class="s1">'Last line'</span>
+          </span>
+          EOS
+
+          output = convert_string_to_embedded input, safe: :safe
+          assert_includes output, expected
+        end
+      end
+
+      # test 'should restore callout marks to correct lines if line numbering and line highlighting are enabled' do
+      #   [1, 2].each do |highlight|
+      #     input = <<~EOS
+      #     :source-highlighter: rouge
+
+      #     [source%linenums,ruby,highlight=#{highlight}]
+      #     ----
+      #     require 'rouge' # <1>
+      #     exit 0 # <2>
+      #     ----
+      #     <1> Load library
+      #     <2> Exit program
+      #     EOS
+      #     output = convert_string_to_embedded input, safe: :safe
+      #     assert_match(/<span class="s1">'rouge'<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
+      #     # NOTE notice there's a newline before the closing </pre> tag
+      #     assert_match(/<span class="mi">0<\/span>.* # <b class="conum">\(2\)<\/b>\n#{highlight == 2 ? '</span>' : ''}<\/pre>/, output)
+      #   end
+      # end
+
+      # test 'should gracefully fallback to default style if specified style not recognized' do
+      #   input = <<~'EOS'
+      #   :source-highlighter: rouge
+      #   :rouge-style: unknown
+
+      #   [source,ruby]
+      #   ----
+      #   puts 'Hello, world!'
+      #   ----
+      #   EOS
+      #   output = convert_string input, safe: :safe, linkcss_default: true
+      #   assert_css 'pre.rouge', output, 1
+      #   assert_includes output, 'pre.rouge .no {'
+      #   assert_match %r/pre\.rouge \{\s*background-color: #f8f8f8;/m, output
+      # end
+
+      # test 'should restore isolated callout mark on last line of source' do
+      #   input = <<~'EOS'
+      #   :source-highlighter: rouge
+
+      #   [source%linenums,ruby]
+      #   ----
+      #   require 'app'
+
+      #   launch_app
+      #   # <1>
+      #   ----
+      #   <1> Profit.
+      #   EOS
+
+      #   output = convert_string_to_embedded input, safe: :safe
+      #   # NOTE notice there's a newline before the closing </pre> tag, but not before the closing </td> tag
+      #   assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
+      # end
+
+      # test 'should number all lines when isolated callout mark is on last line of source and starting line number is set' do
+      #   input = <<~'EOS'
+      #   :source-highlighter: rouge
+
+      #   [source%linenums,ruby,start=5]
+      #   ----
+      #   require 'app'
+
+      #   launch_app
+      #   # <1>
+      #   ----
+      #   <1> Profit.
+      #   EOS
+
+      #   output = convert_string_to_embedded input, safe: :safe
+      #   assert_xpath %(//pre[@class="lineno"][text()="5\n6\n7\n8\n"]), output, 1
+      #   # NOTE notice there's a newline before the closing </pre> tag, but not before the closing </td> tag
+      #   assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
+      # end
+
+    end
+
     test 'should read stylesheet for specified style' do
       css = (Asciidoctor::SyntaxHighlighter.for 'rouge').read_stylesheet 'monokai'
       refute_nil css
