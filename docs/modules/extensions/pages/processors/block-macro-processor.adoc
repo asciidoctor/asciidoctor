@@ -1,10 +1,28 @@
-= Block Macro Processor Extension Example
-:navtitle: Block Macro Processor
+= Block Macro Processor
+
+BlockMacroProcessor is a SyntaxProcessor.
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`resolve_attributes`::
+When called with `false`, sets the content_model to `:text`.
+
+== Process method
+
+`def process parent, target, attributes`
+
+* parent is the enclosing block or document.
+* target is the text between the `name::` and `[...]`
+* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+
+== Example
 
 Purpose::
 Create a block macro named `gist` for embedding a gist.
 
-== sample-with-gist-macro.adoc
+=== sample-with-gist-macro.adoc
 
 [source,asciidoc]
 ----
@@ -12,7 +30,7 @@ Create a block macro named `gist` for embedding a gist.
 gist::123456[]
 ----
 
-== GistBlockMacro
+=== GistBlockMacro
 
 [source,ruby]
 ----
@@ -20,7 +38,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 
 class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
-  use_dsl
+  enable_dsl
 
   named :gist
 

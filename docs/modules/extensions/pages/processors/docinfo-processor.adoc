@@ -9,7 +9,7 @@ Appends the Google Analytics tracking code to the bottom of an HTML document.
 [source,ruby]
 ----
 class GoogleAnalyticsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
-  use_dsl
+  enable_dsl
   at_location :footer
   def process document
     return unless (ga_account_id = document.attr 'google-analytics-account')

@@ -1,0 +1,106 @@
+= Block extension example
+
+Here we will show three ways to write, package, and use the same simple block processor.
+
+== Extension as a class
+
+Here's the code for the block processor:
+
+[source, ruby]
+----
+include::example$open-block-extension-class.rb[]
+----
+
+Until nested open blocks become part of the Asciidoc language, this is actually a useful extension for html.
+It allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
+With suitable css, you can use this to create any appearance you want.
+
+Running (in the directory of the open-block-extension file)
+[source,shell]
+----
+echo '[openblock,foo]\n----\nInside the Open Block\n----' | asciidoctor -s -r ./open-block-extension.rb -
+----
+
+should generate
+
+[source,html]
+----
+<div class="openblock foo">
+<div class="content">
+<div class="paragraph">
+<p>Inside the Open Block</p>
+</div>
+</div>
+</div>
+----
+
+Lets look at the extension in more detail.
+
+We've chosen to write the extension as a class.
+The other choices are to write it as a block or a class instance.
+
+`extend_dsl` causes an appropriate DSL module for the type of processor to  be mixed in, defining class methods to tell Asciidoctor about our extension.
+
+The next three lines use the DSL to specify the block name, the contexts in which it is allowed, and the positional parameter 'role'.
+Since 'role' is an attribute Asciidoctor already recognizes and maps to css class, specifying `[openblock,myrole]` will give the output div the class 'myrole'.
+
+In the extension class, finally, is the `process` method, which is called with the `reader` parameter set to the contents of the block.
+This is where the extension does its work.
+
+After the class, we've included self-registering code so the extension can be used from the command line.
+
+== Extension as a block
+
+Here's the 'same' extension expressed as a block:
+
+[source, ruby]
+----
+include::example$open-block-extension-block.rb[]
+----
+
+Note that:
+
+* The call to `enable_dsl` is not needed
+* In this code `process` is a call to a class method that ends up defining the process method out of the supplied block, rather than being a method definition.
+
+[source,shell]
+----
+echo '[openblock,foo]\n----\nInside the Open Block\n----' | asciidoctor -s -r ./open-block-extension-block.rb -
+----
+
+== Extension as an object
+
+This extension demonstrates one way to configure an extension via its constructor, here passing a default role.
+We also register several differenly-configured instances of the same class.
+
+Note that in this case the name must be supplied in the registration call to `block` as the second argument.
+
+[source, ruby]
+----
+include::example$open-block-extension-object.rb[]
+----
+
+[source,shell]
+----
+echo '[barblock,foo]\n----\nInside the Bar Block\n[bazblock,bax]\n------\nInside the Baz Block\n------\n----' | asciidoctor -s -r ./open-block-extension-object.rb -
+----
+
+producing
+
+[source,html]
+----
+<div class="openblock bar foo">
+<div class="content">
+<div class="paragraph">
+<p>Inside the Bar Block</p>
+</div>
+<div class="openblock baz bax">
+<div class="content">
+<div class="paragraph">
+<p>Inside the Baz Block</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+----

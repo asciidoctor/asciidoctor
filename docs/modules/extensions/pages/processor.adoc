@@ -1,0 +1,68 @@
+= Structure of a processor
+
+The block, class, or instance supplied to a `Registry` processor registration method such as 'block' serves two basic purposes:
+
+* Tell the Registry about the processor.
+The information needed depends on what kind of processor it is, but includes such items as name and positional attributes for syntax processors.
+
+* Supply a process method that does the work.
+
+Telling the Registry about the processor is done most easily through a "DSL" specific to the type of processor.
+Blocks have the appropriate DSL automatically mixed in when they are added to the Registry.
+A class or instance must call the Processor class method `enable_dsl` to cause this mixin.
+
+While most uses of the DSLs are the same for processors defined as classes and as blocks, there is a significant difference for the `process` method.
+For a class, this must be an actual method definition.
+For a block, this must be defined using the DSL method `process`.
+This is visible in the xref:block-example.adoc[].
+
+== Overview of DSL methods
+
+Note that there is further discussion on the pages devoted to each processor type.
+
+=== All processors
+
+`option key value`::
+Defines a configuration value for the processor.
+
+`process *args &block`::
+Defines the process method from the supplied block, only for processors defined as blocks.
+
+=== Document processors
+
+//tag::docproc[]
+`prefer`::
+Adds the processor at the beginning of the list of processors rather than the end.
+//end::docproc[]
+
+=== Syntax processors
+
+//tag::syntaxproc[]
+`named name`::
+Sets the name of the processor (i.e. the text used in the document to signal use of the processor).
+
+`content_model: model`::
+The content model to expect for the processor contents.
+Defaults to `:compound`.
+
+`positional_attributes *names`::
+The names, in order, for attribute values specified without names.
+
+`default_attributes value`::
+A hash of name: value pairs of default values for attributes.
+//end::syntaxproc[]
+`resolve_attributes *args`::
+Applies a complicated algorithm to decode a single array or hash into positional attributes and default attributes.
+Overridden in macro processors.
+
+== What can the `process` method do?
+
+* For document processors, this depends entirely on the specific processor type, which determines the state the document is in when the process method is called.
+
+* For non-inline syntax processors, there are three choices:
+** Return nothing, and avoid altering the parent's `blocks` array.
+** Return a single block, which will be appended to the parent's `blocks` array.
+** Append any number of blocks to the parent's `blocks` array.
+
+* InlineMacroProcessors should return a single InlineNode.
+Returning a String is possible but deprecated and will restrict the capabilities of the processor.

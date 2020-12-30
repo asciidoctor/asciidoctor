@@ -1,26 +1,132 @@
-= Register Extensions
+= Register Processors
 
-== Register one or more extensions
+There are several terms that it's easy to mix up.
 
-These extensions are registered per document using a callback that feels like a DSL:
+User supplied code:
+
+Extension::
+  This is an informal usage.
+Some code that extends or modifies Asciidoctor capabilities by means of Processors.
+Processor::
+  Some code that, when added to Asciidoctor via a Registry, directly extends or alters Asciidoctor behavior by manipulating the source, block tree, or output.
+A processor must in some way extend Asciidoctor::Extensions::Processor.
+Group::
+  Some standalone code that adds Processors to a Registry.
+Groups can be registered globally or associated with a particular Registry.
+Some groups are subclasses of the `Asciidoctor::Extensions::Group` class.
+
+Asciidoctor code:
+
+Registry::
+  A class whose instances track Processors and groups.
+Extensions::
+  The module and singleton object that encapsulates the extension system and provides global capabilities.
+The Object capabilities are provided by the Ruby `class << self` idiom.
+In particular, the Extensions object tracks globally registered groups.
+Extension::
+  A class whose instances delegate to user-provided code.
+ProcessorExtension::
+  An Extension subclass for delegating to Processors.
+
+== Adding processors to a Registry
+
+Processors are added to a Registry by calling a registry method named after the type of processor.
+For instance, to add a block macro, call `registry.blockMacro ...`.
+In all cases, the processor is wrapped in a ProcessorExtension.
+
+There are three choices for calling these methods:
+
+With a block::
+* The block is always the final argument.
+* An optional preceding argument is configuration for the processor.
+* If configuration is supplied, a syntax processor may also specify the name as the first argument.
+
+With a class::
+* The class or class name is always the first argument.
+* An optional last argument is configuration.
+* For syntax processors, if configuration is supplied, an optional middle argument is the name of the processor.
+Alternatively the name may be specified in the configuration.
+
+With an instance::
+* The instance is always the first argument.
+* An optional last argument is configuration.
+* For syntax processors, if configuration is supplied, an optional middle argument is the name of the processor.
+Alternatively the name may be specified in the configuration.
+
+== Using a registry
+
+The most direct method is to explicity create a registry using `Asciidoctor::Extensions.create`, directly add processors to that registry, and supply the registry to a document as `extension_registry: my_registry`.
+For instance:
 
 [source,ruby]
 ----
-Asciidoctor::Extensions.register do |document|
+      registry = Asciidoctor::Extensions.create
+      registry.tree_processor SampleTreeProcessor //We are supplying a processor class
+      doc = Asciidoctor::Document.new %(= Document Title\n\ncontent).lines, extension_registry: registry
+----
+
+More usually registration code is organized into `Groups`.
+There are three choices for a group:
+
+Code block::
+The block will be called by a Registry at an appropriate time to inform the Registry of the processors.
+Note that if the block takes no parameters, or a block (arity 0 or -1), the registry will use `instance_exec` to call the block, so the Registry methods such as `inlineMacro` are available directly in the block.
+
+Subclass of Asciidoctor::Extensions::Group::
+The subclass must implement an `activate` method taking the Registry as sole parameter.
+
+Instance of a Group subclass::
+This provides an opportunity to configure the group.
+
+The `Extensions` module/object tracks globally registered groups.
+To globally register a group, call the `Extensions.register` method with the group (or subclass name).
+As an optional first argument you may supply a name; these names are currently unused.
+Any Registry will include the processors registered by these global groups.
+The Group class has a class method `register` that delegates to this `Extensions.register` method.
+
+In addition, it is possible to register a group with a particular Registry.
+As with the global groups, groups are held in a hash, indexed with a currently unused name.
+
+Groups hash as a constructor argument::
+A `groups` hash may be supplied as an optional direct constructor argument: `Asciidoctor::Extensions::Registry.new groups`.
+In this case names are required for each group.
+
+Single group as a `create` argument::
+A single group, preceded with an optional name, may be supplied when constructing a Registry using the `Asciidoctor.Extensions.create` factory method.
+For instance, `Asciidoctor.Extensions.create 'meaningless-name' MyGroup`.
+
+With a pre-existing Registry::
+After a Registry is constructed, the groups hash may be accessed and added to.
+For instance,
+
+[source,ruby]
+----
+registry = Extensions.create
+registry.groups << 'meaningless': MyGroup
+----
+
+== Example
+
+Here is an example of registering many processors in a block Group.
+Since the block has no parameters, the methods and attributes of the Registry involved are directly available.
+In particular the Document being processed is available as `@document`.
+[source,ruby]
+----
+Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor
   tree_processor ShellSessionTreeProcessor
   postprocessor CopyrightFooterPostprocessor
-  docinfo_processor TrackingCodeDocinfoProcessor if document.basebackend? 'html'
+  docinfo_processor TrackingCodeDocinfoProcessor if @document.basebackend? 'html'
   block ShoutBlock
-  block_macro GistBlockMacro if document.basebackend? 'html'
+  block_macro GistBlockMacro if @document.basebackend? 'html'
   inline_macro ManInlineMacro
   include_processor UriIncludeProcessor
 end
 ----
 
-CAUTION: Extension classes must be defined outside of the register block.
-Once an extension class is registered, it is frozen, preventing further modification.
-If you define an extension class inside the register block, it will result in an error on subsequent invocations.
-
-You can register more than one processor of each type, though you can only have one processor per custom block or macro.
-Each registered class is instantiated when the [.class]#Asciidoctor::Document# is created.
+NOTE: The following commented out statement appears to be false.
+See open-block-extension-class.rb
+//CAUTION: Processor classes must be defined outside of the register block.
+//Once an processor class is registered, it is frozen, preventing further modification.
+//If you define an extension class inside the register block, it will result in an error on subsequent invocations.
+//However, processors supplied as code blocks can be defined in the register block.

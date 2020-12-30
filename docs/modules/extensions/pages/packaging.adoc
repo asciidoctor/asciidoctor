@@ -1,0 +1,7 @@
+= Packaging an extension
+
+== In with other code that calls Asciidoctor
+
+== For use from the command line
+
+== As a Ruby Gem

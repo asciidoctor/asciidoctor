@@ -22,7 +22,7 @@ require 'asciidoctor/extensions'
 class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
   PeriodRx = /\.(?= |$)/
 
-  use_dsl
+  enable_dsl
 
   named :shout
   on_context :paragraph

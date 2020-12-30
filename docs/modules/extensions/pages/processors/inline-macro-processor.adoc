@@ -19,7 +19,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 
 class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
-  use_dsl
+  enable_dsl
 
   named :man
   name_positional_attributes 'volnum'
