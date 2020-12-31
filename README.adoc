@@ -140,7 +140,7 @@ It's used to power the AsciiDoc preview extensions for Chrome, Atom, Brackets an
 
 Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {uri-ruby}[Ruby]:
 
-* CRuby (aka MRI) 2.3 - 2.6
+* CRuby (aka MRI) 2.3 - 3.0
 * JRuby 9.1 - 9.2
 * TruffleRuby (GraalVM)
 * Opal (JavaScript)
