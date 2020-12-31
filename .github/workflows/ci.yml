@@ -18,12 +18,12 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7']
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0']
         rouge-version: [~]
         asciimath-version: [~]
         exclude:
         - os: ubuntu-latest
-          ruby: '2.7'
+          ruby: '3.0'
         include:
         - os: ubuntu-latest
           ruby: truffleruby-20.2.0
@@ -32,7 +32,7 @@ jobs:
         - os: ubuntu-latest
           ruby: jruby-9.2.13.0
         - os: macos-latest
-          ruby: '2.7'
+          ruby: '3.0'
         - os: ubuntu-latest
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
@@ -40,7 +40,7 @@ jobs:
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
-          ruby: '2.7'
+          ruby: '3.0'
           primary: true
     runs-on: ${{ matrix.os }}
     env:
