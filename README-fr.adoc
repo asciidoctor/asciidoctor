@@ -411,7 +411,7 @@ L'organisation Asciidoctor sur GitHub:: {uri-org}
 
 == Licence
 
-Copyright (C) 2012-2020 Dan Allen, Sarah White, Ryan Waldron, et les contributeurs individuels d'Asciidoctor.
+Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, et les contributeurs individuels d'Asciidoctor.
 Une utilisation libre de ce logiciel est autorisée sous les termes de la licence MIT.
 
 Consultez le fichier {uri-license}[LICENSE] pour plus de détails.
