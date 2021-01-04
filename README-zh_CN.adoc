@@ -401,7 +401,7 @@ Asciidoctor 组织在 GitHub 托管代码、议案跟踪和相关子项目。
 [#copyright-and-licensing]
 == 版权和协议
 
-Copyright (C) 2012-2020 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
+Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 这个软件的免费使用是在MIT许可条款授予的。
 
 请看 {uri-license}[版权声明] 文件来获取更多详细信息。

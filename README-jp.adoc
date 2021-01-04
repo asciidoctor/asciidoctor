@@ -260,7 +260,7 @@ gem 'asciidoctor'
  $ bundle
 
 gemをアップグレードするには, Gemfileで新バージョンを指定し, `bundle` を再び実行してください.
-`bundle update` を（gemを指定せずに）行うことは推奨 *されません* . 他のgemもアップデートされて思わぬ結果になるかもしれないためです. 
+`bundle update` を（gemを指定せずに）行うことは推奨 *されません* . 他のgemもアップデートされて思わぬ結果になるかもしれないためです.
 
 == アップグレード
 
@@ -442,7 +442,7 @@ GitHub上のAsciidoctorのorganization:: {uri-org}
 
 == ライセンス
 
-Copyright (C) 2012-2020 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
+Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 本ソフトウェアはMITライセンスのもとで使用できます.
 
 ライセンスの詳細については {uri-license}[LICENSE] ファイルを参照してください.
