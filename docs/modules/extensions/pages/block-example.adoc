@@ -36,8 +36,8 @@ should generate
 
 Lets look at the extension in more detail.
 
-We've chosen to write the extension as a class.
-The other choices are to write it as a block or a class instance.
+For this section we've chosen to write the extension as a class.
+The other choices are to write it as a block or a class instance, covered in the following sections.
 
 `extend_dsl` causes an appropriate DSL module for the type of processor to  be mixed in, defining class methods to tell Asciidoctor about our extension.
 
@@ -47,7 +47,7 @@ Since 'role' is an attribute Asciidoctor already recognizes and maps to css clas
 In the extension class, finally, is the `process` method, which is called with the `reader` parameter set to the contents of the block.
 This is where the extension does its work.
 
-After the class, we've included self-registering code so the extension can be used from the command line.
+After the class, we've included a Group class and self-registering code so the extension can be used from the command line.
 
 == Extension as a block
 
@@ -62,6 +62,7 @@ Note that:
 
 * The call to `enable_dsl` is not needed
 * In this code `process` is a call to a class method that ends up defining the process method out of the supplied block, rather than being a method definition.
+* Here the group is also written as a block, exposed as a proc for the self-registering code.
 
 [source,shell]
 ----
@@ -71,14 +72,16 @@ echo '[openblock,foo]\n----\nInside the Open Block\n----' | asciidoctor -s -r ./
 == Extension as an object
 
 This extension demonstrates one way to configure an extension via its constructor, here passing a default role.
-We also register several differenly-configured instances of the same class.
+In the group we also register several differently-configured instances of the same class.
 
-Note that in this case the name must be supplied in the registration call to `block` as the second argument.
+Note that in this case the names must be supplied in the registration call to `block` as the second argument.
 
 [source, ruby]
 ----
 include::example$open-block-extension-object.rb[]
 ----
+
+The Group is used in the registration code as an Object as well.
 
 [source,shell]
 ----

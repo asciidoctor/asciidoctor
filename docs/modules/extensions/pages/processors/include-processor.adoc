@@ -1,5 +1,30 @@
-= Include Processor Extension Example
-:navtitle: Include Processor
+= Include Processor
+
+IncludeProcessor is a DocumentProcessor
+
+The `include::` preprocessor instruction has a target and attributes.
+The registered IncludeProcessors are queried by calling their `handles?` method with the target to determine if the processor wishes to handle the include instruction.
+The first processor to return true is the only processor used.
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+`handles? *args &block`::
+No args may be supplied.
+The block should have a `target` parameter to receive the `include::` instruction target.
+
+== Process method
+
+`def process document, reader, target, attributes`
+
+The process method is called from a PreprocessorReader.
+The document has not yet been parsed although (some) document attributes may be available.
+
+The process method should put the additional content to be included into an array of lines and call `reader.push_include lines` to add the content.
+Any return value is ignored.
+
+== Example
 
 Purpose::
 Include a file from a URI.

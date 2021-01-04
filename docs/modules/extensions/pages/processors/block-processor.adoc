@@ -1,5 +1,66 @@
-= Block Processor Extension Example
-:navtitle: Block Processor
+= Block Processor
+
+BlockProcessor is a SyntaxProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`contexts`::
+Sets the contexts allowed for this block.
+The choices are:
+
+[cols=2,opts=headers]
+|===
+| Context
+| (shortest) Delimiters
+
+| `:paragraph`
+| (no explicit delimiters, end delimiter is a blank line)
+
+| `:open`
+| `--`
+
+| `:listing`
+| `----`
+
+| `:literal`
+| `....`
+
+| `:example`
+| `====`
+
+| `:sidebar`
+| `\****`
+
+| `:quote`
+| `\____`
+
+| `:pass`
+| `\++++++`
+
+| `:table`
+| `\|===`, `,===`, `:===`, or `!===`
+
+| `:comment`
+| `////`
+
+| `:fenced_code`
+| \```
+
+|===
+
+== Process method
+
+`def process  parent, reader, attributes`
+
+* parent is the enclosing block or document.
+* reader supplies the lines in the block to be processed
+* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+* The process method should either:
+include::page$processor.adoc[tag=blockproc]
+
+== Example
 
 Purpose::
 Register a custom block style named `shout` that uppercases all the words and converts periods to exclamation points.

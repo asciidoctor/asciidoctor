@@ -16,6 +16,8 @@ When called with `false`, sets the content_model to `:text`.
 * parent is the enclosing block or document.
 * target is the text between the `name::` and `[...]`
 * attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+* The process method should either:
+include::page$processor.adoc[tag=blockproc]
 
 == Example
 

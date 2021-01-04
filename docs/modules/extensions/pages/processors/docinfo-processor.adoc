@@ -1,5 +1,28 @@
-= Docinfo Processor Extension Example
-:navtitle: Docinfo Processor
+= Docinfo Processor
+
+DocinfoProcessor is a DocumentProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+`at_location`::
+When called with `footer`, the supplied content will be added to the footer of the document.
+
+NOTE: The default location is `:head`.
+The recognized values for html5 are `:head` and `:footer`.
+The recognized values for docbook5 are `:header` and `:footer`.
+
+== Process method
+
+`def process document`
+
+The process method is called from a converter.
+Therefore document attributes are available and the block structure of the document is available.
+
+The `process` method should return the text to be added to the specified location as a string.
+
+== Example
 
 Purpose::
 Appends the Google Analytics tracking code to the bottom of an HTML document.

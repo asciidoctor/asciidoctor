@@ -1,5 +1,30 @@
-= Inline Macro Processor Extension Example
-:navtitle: Inline Macro Processor
+= Inline Macro Processor
+
+InlineMacroProcessor is a SyntaxProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`format`::
+When called with `short`, the inline macro will have no target, e.g. `mymacro:[attributes]`.
+
+`match`::
+Supplies a regexp to match the inline macro use.
+This overrides `format` as `format` uses `short` to set a particular regexp.
+
+== Process method
+
+`def process parent, target, attributes`
+
+* parent is the enclosing block or document.
+* target is the text between the `name::` and `[...]`.
+Target is missing for a `short` format macro.
+* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+
+The process method should return an `InlineNode` containing the desired content.
+
+== Example
 
 Purpose::
 Create an inline macro named `man` that links to a manpage.
@@ -34,7 +59,7 @@ class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
       nil
     end
     parent.document.register :links, target
-    %(#{(create_anchor parent, text, type: :link, target: target).convert}#{suffix})
+    create_anchor parent, text, type: :link, target: %(#{target}#{suffix})
   end
 end
 ----

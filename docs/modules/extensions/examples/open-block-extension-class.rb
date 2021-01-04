@@ -1,8 +1,6 @@
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
-# Self registering
-Asciidoctor::Extensions.register do
 class OpenBlock < Asciidoctor::Extensions::BlockProcessor
   enable_dsl
 
@@ -19,5 +17,18 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
   end
 end
 
-  block OpenBlock
+class OpenBlockGroup < Asciidoctor::Extensions::Group
+
+  def activate registry
+    registry.block OpenBlock
+  end
 end
+
+# Here's the group implemented as a proc:
+# openBlockGroup = proc do
+#   block OpenBlock
+# end
+
+# Self registering
+# For maximum flexibility put this in a different file.
+Asciidoctor::Extensions.register openBlockGroup

@@ -1,8 +1,7 @@
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
-# Self registering
-Asciidoctor::Extensions.register do
+openBlockGroup = proc do
   block do
     named :openblock
     contexts :listing, :paragraph
@@ -16,13 +15,7 @@ Asciidoctor::Extensions.register do
     end
   end
 end
-# Asciidoctor::Extensions.register do
-#   block do
-#     named :wrap
-#     on_context :open
-#     process do |parent, reader, attrs|
-#       wrap = create_open_block parent, nil, attrs
-#       parse_content wrap, reader.read_lines
-#     end
-#   end
-# end
+
+# Self registering code
+# For maximum flexibility put this in a different file.
+Asciidoctor::Extensions.register openBlockGroup

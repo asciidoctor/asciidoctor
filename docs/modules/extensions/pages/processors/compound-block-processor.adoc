@@ -1,12 +1,12 @@
 = Compound Block Processor Example
-:navtitle: Compound Block Processor
 
 Purpose::
 Register a custom block named `collapsible` that transforms a listing block into a compound block composed of the following:
 
 * an example block with the collapsible option enabled
-* the original listing block
-* the listing block is promoted to a source block if a language is specified using the second positional attribute.
+* the original listing block nested in the example block
+
+The listing block is promoted to a source block if a language is specified using the second positional attribute.
 
 .sample-with-collapsible-block.adoc
 [source,asciidoc]

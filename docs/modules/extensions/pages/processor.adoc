@@ -18,7 +18,7 @@ This is visible in the xref:block-example.adoc[].
 
 == Overview of DSL methods
 
-Note that there is further discussion on the pages devoted to each processor type.
+Note that there is further discussion on the pages devoted to each processor type, and that several processor types have additional configuration methods.
 
 === All processors
 
@@ -32,7 +32,7 @@ Defines the process method from the supplied block, only for processors defined 
 
 //tag::docproc[]
 `prefer`::
-Adds the processor at the beginning of the list of processors rather than the end.
+Adds the processor at the beginning of the list of processors of this type rather than the end.
 //end::docproc[]
 
 === Syntax processors
@@ -41,7 +41,7 @@ Adds the processor at the beginning of the list of processors rather than the en
 `named name`::
 Sets the name of the processor (i.e. the text used in the document to signal use of the processor).
 
-`content_model: model`::
+`content_model model`::
 The content model to expect for the processor contents.
 Defaults to `:compound`.
 
@@ -60,9 +60,11 @@ Overridden in macro processors.
 * For document processors, this depends entirely on the specific processor type, which determines the state the document is in when the process method is called.
 
 * For non-inline syntax processors, there are three choices:
+//tag::blockproc[]
 ** Return nothing, and avoid altering the parent's `blocks` array.
 ** Return a single block, which will be appended to the parent's `blocks` array.
 ** Append any number of blocks to the parent's `blocks` array.
+//end::blockproc[]
 
 * InlineMacroProcessors should return a single InlineNode.
 Returning a String is possible but deprecated and will restrict the capabilities of the processor.

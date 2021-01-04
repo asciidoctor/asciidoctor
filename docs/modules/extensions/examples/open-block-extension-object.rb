@@ -10,7 +10,6 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
 
   enable_dsl
 
-  named :openblock
   contexts :listing, :paragraph
   positional_attributes 'role'
 
@@ -23,9 +22,18 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
   end
 end
 
-# Self registering
-# bar_block = OpenBlock.new 'bar'
-Asciidoctor::Extensions.register do
-  block OpenBlock.new('bar'), :barblock
-  block OpenBlock.new('baz'), :bazblock
+class OpenBlockGroup < Asciidoctor::Extensions::Group
+  def initialize *default_role
+    @default_roles = *default_role
+  end
+
+  def activate registry
+    @default_roles.each do |default_role|
+      registry.block (OpenBlock.new default_role), %(#{default_role}block).to_sym
+    end
+  end
 end
+
+# Self registering
+# For maximum flexibility put this in a different file.
+Asciidoctor::Extensions.register OpenBlockGroup.new 'bar', 'baz'

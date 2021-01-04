@@ -17,6 +17,7 @@ Some groups are subclasses of the `Asciidoctor::Extensions::Group` class.
 
 Asciidoctor code:
 
+[#id_registry]
 Registry::
   A class whose instances track Processors and groups.
 Extensions::
@@ -65,7 +66,9 @@ For instance:
       doc = Asciidoctor::Document.new %(= Document Title\n\ncontent).lines, extension_registry: registry
 ----
 
-More usually registration code is organized into `Groups`.
+=== Groups
+
+More usually registration code is organized into one or more `Group`.
 There are three choices for a group:
 
 Code block::

@@ -1,7 +1,62 @@
 = Packaging an extension
 
-== In with other code that calls Asciidoctor
+Fundamentally this involves making the extension code visible to asciidoctor and registering the processors globally or with a particular registy.
 
-== For use from the command line
+There are two opposing forces at work here:
+
+* Ease of use, such as enabling extension use from the command line
+* Flexibility, such as enabling registering the processors in a specific Registry.
+
+Both can easily be accomodated by having the processors and a Group registering them in one file, and a script registering the group globally in another.
+
+== Use with other code that calls Asciidoctor
+
+In this case the other code can require the extension code file to make it available.
+It's convenient if the extension code exposes a group that registers the processors.
+The calling code can then register the group globally or add it to a particular registry.
+This gives the calling code the opportunity to supply additional configuration.
+For instance, Antora (using the javascript transpilation of Asciidoctor) configures groups with the Antora content catalog and current file.
+Of course, the group needs to be written to understand and use the configuration information in such an environment.
+
+== Use from the command line
+
+In this case having Ruby load the file must result in the processors being added to a registry.
+The simplest way to implement this is with a direct call to `Asciidoctor::Extensions.register` supplying a group.
+However, if this is in the same file as the extension code it will not be usable in the first scenario, so it may be advisable to use two files, one supplying the group and the other registering it.
 
 == As a Ruby Gem
+
+=== Naming convention
+
+TODO: what is the recommended naming convention for non-Asciidoctor-organization asciidoctor extensions?
+Is there a ruby gems namespace facility like npm namespaces, e.g. `@djencks`?
+
+=== File layout
+
+A Ruby Gem should have it's main "entry" file in the root of the lib source directory.
+This file should contain the self-registering code so that requiring the gem from the command line will result in the extension being registered.
+
+The processor and group implementations should be located in one or more nested files.
+
+For instance:
+
+....
+lib/
+├── openblock/
+│      └── processor.rb
+├── openblock.rb
+openblock.gemspec
+....
+
+In this example using Ruby code, a group in processor.rb can be accessed and added to a specific Registry by
+
+[source,ruby]
+----
+require 'asciidoctor'
+require 'asciidoctor/extensions'
+require 'openblock/processor'
+
+registry = Asciidoctor::Extensions::Registry.new :openblock=> OpenBlockGroup
+
+Asciidoctor.convert_file 'openblock-test.adoc', :extension_registry=> registry, :standalone=> false
+----
