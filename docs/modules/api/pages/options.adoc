@@ -1,5 +1,7 @@
 = API Options
 
+These options may be passed in a hash to the Asciidoctor load and convert methods as a second argument.
+
 [cols="~,~,30%,~"]
 |===
 |Name |Description |Default value |Allowed values
@@ -53,13 +55,13 @@ _(Experimental)._
 |`erb`, `erubis`
 
 |`:extensions`
-|A Ruby block that registers (and possibly defines) xref:extensions:register.adoc[Asciidoctor extensions] for this instance of the processor.
+|Specifies a xref:extensions:register.adoc#id_groups[processor extension group] to be registered globally for this instance of the processor.
 |_not set_
-|A Ruby block that conforms to the Asciidoctor extensions API (the same code that would be passed to the `Extensions.register` method).
+|A Ruby block, class, or instance that provides a processor extension group (the same code that would be passed to the `Extensions.register` method).
 
 |`:extension_registry`
-|Overrides the extensions registry instance.
-Instead of providing a Ruby block containing extensions to register, this option lets you replace the extension registry itself, giving you complete control over how extensions are registered for this processor.
+|Specifies an explicit xref:extensions:register.adoc#id_registry[extensions registry] instance.
+Instead of providing a processor extension group to register extensions, using the :extensions option, this option lets you replace the extension registry itself, giving you complete control over how extensions are registered for this processor.
 |_not set_
 |`Extensions::Registry` instance
 
