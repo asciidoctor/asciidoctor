@@ -22,6 +22,11 @@ Asciidoctor provides the following extension points, shown in the order of invoc
 (Block processors and Block Macro processors are called during the parse stage as uses are encountered in the document.)
 To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclass.
 
+WARNING: The extension API in Asciidoctor is stable with the exception of inline macros.
+Since inline content is not parsed until the convert phase, the inline macro processor must return converted text (e.g., HTML) rather than an AST node.
+Once Asciidoctor is changed to https://github.com/asciidoctor/asciidoctor/issues/61[process inline content during the parse phase^], the inline macro processor will need to return an inline node.
+When that switch occurs, there will either be some sort of adapter or required migration for inline macro processors, but that has yet to be determined.
+
 xref:processors/include-processor.adoc[] (Document)::
 Processes the `include::<filename>[]` directive.
 

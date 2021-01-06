@@ -16,6 +16,10 @@ When called with `short`, the inline macro will have no target, e.g. `mymacro:[a
 `match`::
 Supplies a regexp to match the inline macro use.
 This overrides `format` as `format` uses `short` to set a particular regexp.
++
+Use of this argument allows macros with a form defined by a regular expression.
+This allows them to match any naming convention in a document.
+One use for this would be automatically linking to standards as shown in the example below.
 
 == Process method
 
@@ -28,19 +32,19 @@ Target is missing for a `short` format macro.
 
 The process method should return an `InlineNode` containing the desired content.
 
-== Example
+== Example with name::[] form
 
 Purpose::
 Create an inline macro named `man` that links to a manpage.
 
-== sample-with-man-link.adoc
+=== sample-with-man-link.adoc
 
 [source,asciidoc]
 ----
 See man:gittutorial[7] to get started.
 ----
 
-== ManpageInlineMacro
+=== ManpageInlineMacro
 
 [source,ruby]
 ----
@@ -68,7 +72,7 @@ class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
 end
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
 ----
@@ -77,4 +81,33 @@ Asciidoctor::Extensions.register do
 end
 
 Asciidoctor.convert_file 'sample-with-man-link.adoc', safe: :safe
+----
+
+== Example with regular expression form
+
+Purpose::
+Create an inline macro to identify use of RFC standards in Asciidoc source and automatically provide hyperlinks to the document.
+
+=== RFCStandardLinkInlineMacro
+
+[source,ruby]
+----
+include::example$rfc-link-extension-inline.rb[tag=extension]
+----
+
+=== Usage
+
+[source, ruby]
+----
+include::example$rfc-link-extension-inline.rb[tag=usage]
+----
+
+=== Example output
+
+[source,html]
+----
+<div class="paragraph">
+<p>Check out for example <a href="https://tools.ietf.org/html/1882">1882</a> at Christmas, <a href="https://tools.ietf.org/html/1927">1927</a> when I forget the space.
+Not to mention <a href="https://tools.ietf.org/html/2549">2549</a>, a personal favorite.</p>
+</div>
 ----
