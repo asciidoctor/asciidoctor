@@ -50,6 +50,14 @@ The choices are:
 
 |===
 
+Each context type has implicit semantics associated with it.
+When choosing one or more contexts for your block processor, choose the context or contexts that most closely match the purpose of the processor.
+
+////
+TODO: link to explanation of these semantics.
+cf. https://github.com/asciidoctor/asciidoctor.org/issues/223
+////
+
 == Process method
 
 `def process  parent, reader, attributes`
