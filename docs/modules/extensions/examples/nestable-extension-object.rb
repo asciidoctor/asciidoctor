@@ -1,7 +1,7 @@
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
-class OpenBlock < Asciidoctor::Extensions::BlockProcessor
+class Nestable < Asciidoctor::Extensions::BlockProcessor
 
   def initialize default_role
     super
@@ -10,7 +10,7 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
 
   enable_dsl
 
-  contexts :listing, :paragraph
+  contexts :example, :paragraph
   positional_attributes 'role'
 
   def process parent, reader, attributes
@@ -22,18 +22,18 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
   end
 end
 
-class OpenBlockGroup < Asciidoctor::Extensions::Group
+class NestableGroup < Asciidoctor::Extensions::Group
   def initialize *default_role
     @default_roles = *default_role
   end
 
   def activate registry
     @default_roles.each do |default_role|
-      registry.block (OpenBlock.new default_role), %(#{default_role}block).to_sym
+      registry.block (Nestable.new default_role), %(#{default_role}block).to_sym
     end
   end
 end
 
 # Self registering
 # For maximum flexibility put this in a different file.
-Asciidoctor::Extensions.register OpenBlockGroup.new 'bar', 'baz'
+Asciidoctor::Extensions.register NestableGroup.new 'bar', 'baz'

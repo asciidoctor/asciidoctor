@@ -8,30 +8,24 @@ Here's the code for the block processor:
 
 [source, ruby]
 ----
-include::example$open-block-extension-class.rb[]
+include::example$nestable-extension-class.rb[]
 ----
 
 Until nested open blocks become part of the Asciidoc language, this is actually a useful extension for html.
 It allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
 With suitable css, you can use this to create any appearance you want.
 
-Running (in the directory of the open-block-extension file)
+Running (in the directory of the nestable-extension file)
 [source,shell]
 ----
-echo '[openblock,foo]\n----\nInside the Open Block\n----' | asciidoctor -s -r ./open-block-extension.rb -
+include::example$nestable-extension-class-runner.sh[tag=runner]
 ----
 
-should generate
+generating
 
 [source,html]
 ----
-<div class="openblock foo">
-<div class="content">
-<div class="paragraph">
-<p>Inside the Open Block</p>
-</div>
-</div>
-</div>
+include::example$nestable-extension-class-out.html[]
 ----
 
 Lets look at the extension in more detail.
@@ -42,7 +36,7 @@ The other choices are to write it as a block or a class instance, covered in the
 `extend_dsl` causes an appropriate DSL module for the type of processor to  be mixed in, defining class methods to tell Asciidoctor about our extension.
 
 The next three lines use the DSL to specify the block name, the contexts in which it is allowed, and the positional parameter 'role'.
-Since 'role' is an attribute Asciidoctor already recognizes and maps to css class, specifying `[openblock,myrole]` will give the output div the class 'myrole'.
+Since 'role' is an attribute Asciidoctor already recognizes and maps to css class, specifying `[nestable,myrole]` will give the output div the class 'myrole'.
 
 In the extension class, finally, is the `process` method, which is called with the `reader` parameter set to the contents of the block.
 This is where the extension does its work.
@@ -55,7 +49,7 @@ Here's the 'same' extension expressed as a block:
 
 [source, ruby]
 ----
-include::example$open-block-extension-block.rb[]
+include::example$nestable-extension-block.rb[]
 ----
 
 Note that:
@@ -66,7 +60,15 @@ Note that:
 
 [source,shell]
 ----
-echo '[openblock,foo]\n----\nInside the Open Block\n----' | asciidoctor -s -r ./open-block-extension-block.rb -
+include::example$nestable-extension-block-runner.sh[tag=runner]
+----
+
+
+generating
+
+[source,html]
+----
+include::example$nestable-extension-class-out.html[]
 ----
 
 == Extension as an object
@@ -78,32 +80,19 @@ Note that in this case the names must be supplied in the registration call to `b
 
 [source, ruby]
 ----
-include::example$open-block-extension-object.rb[]
+include::example$nestable-extension-object.rb[]
 ----
 
 The Group is used in the registration code as an Object as well.
 
 [source,shell]
 ----
-echo '[barblock,foo]\n----\nInside the Bar Block\n[bazblock,bax]\n------\nInside the Baz Block\n------\n----' | asciidoctor -s -r ./open-block-extension-object.rb -
+include::example$nestable-extension-object-runner.sh[tag=runner]
 ----
 
-producing
+generating
 
 [source,html]
 ----
-<div class="openblock bar foo">
-<div class="content">
-<div class="paragraph">
-<p>Inside the Bar Block</p>
-</div>
-<div class="openblock baz bax">
-<div class="content">
-<div class="paragraph">
-<p>Inside the Baz Block</p>
-</div>
-</div>
-</div>
-</div>
-</div>
+include::example$nestable-extension-object-out.html[]
 ----

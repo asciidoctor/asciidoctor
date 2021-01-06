@@ -1,10 +1,10 @@
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
-openBlockGroup = proc do
+nestableGroup = proc do
   block do
-    named :openblock
-    contexts :listing, :paragraph
+    named :nestable
+    contexts :example, :paragraph
     positional_attributes 'role'
 
     process do |parent, reader, attributes|
@@ -18,4 +18,4 @@ end
 
 # Self registering code
 # For maximum flexibility put this in a different file.
-Asciidoctor::Extensions.register openBlockGroup
+Asciidoctor::Extensions.register nestableGroup

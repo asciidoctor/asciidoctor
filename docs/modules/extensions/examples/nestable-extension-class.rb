@@ -1,11 +1,11 @@
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
-class OpenBlock < Asciidoctor::Extensions::BlockProcessor
+class Nestable < Asciidoctor::Extensions::BlockProcessor
   enable_dsl
 
-  named :openblock
-  contexts :listing, :paragraph
+  named :nestable
+  contexts :example, :paragraph
   positional_attributes 'role'
 
   def process parent, reader, attributes
@@ -17,18 +17,18 @@ class OpenBlock < Asciidoctor::Extensions::BlockProcessor
   end
 end
 
-class OpenBlockGroup < Asciidoctor::Extensions::Group
+class NestableGroup < Asciidoctor::Extensions::Group
 
   def activate registry
-    registry.block OpenBlock
+    registry.block Nestable
   end
 end
 
 # Here's the group implemented as a proc:
-# openBlockGroup = proc do
-#   block OpenBlock
+# nestableGroup = proc do
+#   block Nestable
 # end
 
 # Self registering
 # For maximum flexibility put this in a different file.
-Asciidoctor::Extensions.register openBlockGroup
+Asciidoctor::Extensions.register NestableGroup

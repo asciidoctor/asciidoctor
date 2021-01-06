@@ -44,10 +44,10 @@ For instance:
 
 ....
 lib/
-├── openblock/
+├── nestable/
 │      └── processor.rb
-├── openblock.rb
-openblock.gemspec
+├── nestable.rb
+nestable.gemspec
 ....
 
 In this example using Ruby code, a group in processor.rb can be accessed and added to a specific Registry by
@@ -56,9 +56,9 @@ In this example using Ruby code, a group in processor.rb can be accessed and add
 ----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
-require 'openblock/processor'
+require 'nestable/processor'
 
-registry = Asciidoctor::Extensions::Registry.new :openblock=> OpenBlockGroup
+registry = Asciidoctor::Extensions::Registry.new :nestable=> NestableGroup
 
-Asciidoctor.convert_file 'openblock-test.adoc', :extension_registry=> registry, :standalone=> false
+Asciidoctor.convert_file 'nestable-test.adoc', :extension_registry=> registry, :standalone=> false
 ----
