@@ -28,8 +28,10 @@ However, if this is in the same file as the extension code it will not be usable
 
 === Naming convention
 
-TODO: what is the recommended naming convention for non-Asciidoctor-organization asciidoctor extensions?
-Is there a ruby gems namespace facility like npm namespaces, e.g. `@djencks`?
+Currently there is no recommended naming convention for 3rd party processor extensions released as Ruby Gems.
+Consult https://github.com/asciidoctor/asciidoctor-community-docs/issues/6 for discussion on this issue.
+
+Existing extensions have been named using a pattern of `asciidoctor-<extensionname>` but this does not distinguish between projects part of the Asciidoctor organization and 3rd party projects, and is susceptible to naming collisions.
 
 === File layout
 
