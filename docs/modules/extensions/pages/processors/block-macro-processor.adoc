@@ -2,6 +2,10 @@
 
 BlockMacroProcessor is a SyntaxProcessor.
 
+== Registration method
+
+A BlockMacroProcessor is registered with `block_macro`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=syntaxproc]

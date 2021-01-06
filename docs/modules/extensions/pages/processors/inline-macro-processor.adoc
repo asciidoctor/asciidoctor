@@ -2,6 +2,10 @@
 
 InlineMacroProcessor is a SyntaxProcessor
 
+== Registration method
+
+An InlineMacroProcessor is registered with `inline_macro`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=syntaxproc]

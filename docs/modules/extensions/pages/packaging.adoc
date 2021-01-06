@@ -1,11 +1,11 @@
 = Packaging an extension
 
-Fundamentally this involves making the extension code visible to asciidoctor and registering the processors globally or with a particular registy.
+Fundamentally this involves making the extension code visible to Asciidoctor and registering the processors globally or with a particular Registry instance.
 
 There are two opposing forces at work here:
 
 * Ease of use, such as enabling extension use from the command line
-* Flexibility, such as enabling registering the processors in a specific Registry.
+* Flexibility, such as enabling registering the processors in a specific Registry instance.
 
 Both can easily be accomodated by having the processors and a Group registering them in one file, and a script registering the group globally in another.
 

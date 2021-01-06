@@ -5,7 +5,7 @@ Extensions are central to the power of AsciiDoc because they open up the languag
 Asciidoctor provides an extension API that offers a set of extension points.
 Extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
 
-Asciidoctor also allows extensions to be written using the full power of the programming language of your asciidoctor variant: Ruby, Java or other JVM based languages, or Javascript.
+Asciidoctor also allows extensions to be written using the full power of the programming language of your Asciidoctor variant: Ruby, Java or other JVM based languages, or Javascript.
 An extension may be included in custom code or packaged and distributed using a language-standard mechanism such as Gems, Jars/Maven, or npm packages.
 
 There are two general types of processors:
@@ -20,7 +20,7 @@ Syntax Processor::
 
 Asciidoctor provides the following extension points, shown in the order of invocation.
 (Block processors and Block Macro processors are called during the parse stage as uses are encountered in the document.)
-To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclasses.
+To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclass.
 
 xref:processors/include-processor.adoc[] (Document)::
 Processes the `include::<filename>[]` directive.
@@ -31,9 +31,6 @@ Processes the raw source lines before they are passed to the parser.
 xref:processors/block-processor.adoc[] (Syntax)::
 Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
 
-xref:processors/compound-block-processor.adoc[]:::
-Register a custom block named `collapsible` that transforms a listing block into a compound block.
-
 xref:processors/block-macro-processor.adoc[] (Syntax)::
 Registers a custom block macro and processes it (e.g., `gist::12345[]`).
 
@@ -41,7 +38,7 @@ xref:processors/tree-processor.adoc[] (Document)::
 Processes the [.class]#Asciidoctor::Document# (AST) once parsing is complete.
 
 xref:processors/inline-macro-processor.adoc[] (Syntax)::
-Registers a custom inline macro and processes it (e.g., `btn:[Save]`).
+Registers a custom inline macro and processes it (e.g., `pass:[btn:[Save]]`).
 
 xref:processors/docinfo-processor.adoc[] (Document)::
 Adds additional content to the header or footer regions of the generated document.

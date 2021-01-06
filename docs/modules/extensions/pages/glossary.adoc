@@ -1,0 +1,31 @@
+= Terms relevant to Asciidoctor processor extensions
+
+There are several terms that are easy to mix up.
+
+User supplied code:
+
+Extension::
+This is an informal usage.
+Some code that extends or modifies Asciidoctor capabilities by means of Processors.
+Processor::
+Some code that, when added to Asciidoctor via a Registry, directly extends or alters Asciidoctor behavior by manipulating the source, block tree, or output.
+A processor must in some way extend Asciidoctor::Extensions::Processor.
+Group::
+Some standalone code that adds Processors to a Registry.
+Groups can be registered globally or associated with a particular Registry.
+Some groups are subclasses of the `Asciidoctor::Extensions::Group` class.
+
+Asciidoctor code:
+
+[#id_registry]
+Registry::
+A class whose instances track Processors and groups.
+Extensions::
+The module and singleton object that encapsulates the extension system and provides global capabilities.
+The Object capabilities are provided by the Ruby `class << self` idiom.
+In particular, the Extensions object tracks globally registered groups.
+Extension::
+A class whose instances delegate to user-provided code.
+ProcessorExtension::
+An Extension subclass for delegating to Processors.
+

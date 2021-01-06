@@ -2,6 +2,10 @@
 
 TreeProcessor is a DocumentProcessor
 
+== Registration method
+
+A TreeProcessor is registered with `tree_processor`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=docproc]
@@ -21,7 +25,7 @@ There are two basic strategies for a TreeProcessor.
 
 === Query the document blocks using the `document.find_by` method
 
-This provides quick simple access to the blocks of interest, but does not provide access to the attributes set inline in the document.
+This provides quick simple access to the blocks of interest, but does not provide access to the attributes set in the document after the document header.
 Only the header attributes are available.
 
 A block found this way can be replaced with `parent.blocks[parent.blocks.index original_block] = new_block`.

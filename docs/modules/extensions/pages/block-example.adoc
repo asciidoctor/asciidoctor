@@ -11,9 +11,9 @@ Here's the code for the block processor:
 include::example$nestable-extension-class.rb[]
 ----
 
-Until nested open blocks become part of the Asciidoc language, this is actually a useful extension for html.
-It allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
+This extension allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
 With suitable css, you can use this to create any appearance you want.
+Until nested open blocks become part of the Asciidoc language (https://github.com/asciidoctor/asciidoctor/issues/1121), this is actually a useful extension for html.
 
 Running (in the directory of the nestable-extension file)
 [source,shell]
@@ -45,7 +45,7 @@ After the class, we've included a Group class and self-registering code so the e
 
 == Extension as a block
 
-Here's the 'same' extension expressed as a block:
+Here's the same functionality expressed as a block:
 
 [source, ruby]
 ----

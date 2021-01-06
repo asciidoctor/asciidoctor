@@ -2,6 +2,13 @@
 
 DocinfoProcessor is a DocumentProcessor
 
+For `standalone` document output, the html and docbook backends add context at the top and bottom of the converted content.
+A DocinfoProcessor can add additional content to this added context.
+
+== Registration method
+
+A DocinfoProcessor is registered with `docinfo_processor`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=docproc]

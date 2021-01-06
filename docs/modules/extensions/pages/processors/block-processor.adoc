@@ -2,6 +2,10 @@
 
 BlockProcessor is a SyntaxProcessor
 
+== Registration method
+
+A BlockProcessor is registered with `block`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=syntaxproc]

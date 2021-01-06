@@ -2,6 +2,10 @@
 
 Preprocessor is a DocumentProcessor
 
+== Registration method
+
+A Preprocessor is registered with `preprocessor`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=docproc]

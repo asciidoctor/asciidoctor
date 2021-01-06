@@ -2,6 +2,10 @@
 
 PostProcessor is a DocumentProcessor
 
+== Registration method
+
+A PostProcessor is registered with `postprocessor`.
+
 == DSL methods
 
 include::page$processor.adoc[tag=docproc]
@@ -13,7 +17,7 @@ include::page$processor.adoc[tag=docproc]
 The process method is called from a top-level Document after conversion.
 Postprocessors are not called for subdocuments.
 The document has been fully parsed and converted.
-The result of conversion and previous Postprocessors is supplied in the `output` parameter.
+The result of conversion and previous Postprocessors is supplied in the `output` parameter as a string.
 
 The `process` method should return the modified output string.
 

@@ -24,6 +24,7 @@ Note that there is further discussion on the pages devoted to each processor typ
 
 `option key value`::
 Defines a configuration value for the processor.
+Normally this method is not used since processor-specific DSL methods allow directly configuring each relevant option.
 
 `process *args &block`::
 Defines the process method from the supplied block, only for processors defined as blocks.

@@ -5,6 +5,11 @@ IncludeProcessor is a DocumentProcessor
 The `include::` preprocessor instruction has a target and attributes.
 The registered IncludeProcessors are queried by calling their `handles?` method with the target to determine if the processor wishes to handle the include instruction.
 The first processor to return true is the only processor used.
+Not implementing a `handles?` method indicates that the processor wishes to handle all includes.
+
+== Registration method
+
+An IncludeProcessor is registered with `include_processor`.
 
 == DSL methods
 
