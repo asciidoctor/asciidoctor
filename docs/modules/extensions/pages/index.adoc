@@ -18,44 +18,36 @@ Syntax Processor::
 
 == Available extension points
 
-Asciidoctor provides the following extension points, shown in the order of invocation:
+Asciidoctor provides the following extension points, shown in the order of invocation.
+(Block processors and Block Macro processors are called during the parse stage as uses are encountered in the document.)
 To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclasses.
 
-Preprocessor (Document)::
-Processes the raw source lines before they are passed to the parser.
-See xref:processors/preprocessor.adoc[].
-
-Include processor (Document)::
+xref:processors/include-processor.adoc[] (Document)::
 Processes the `include::<filename>[]` directive.
-See xref:processors/include-processor.adoc[].
 
-Block processor (Syntax)::
+xref:processors/preprocessor.adoc[] (Document)::
+Processes the raw source lines before they are passed to the parser.
+
+xref:processors/block-processor.adoc[] (Syntax)::
 Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
-See xref:processors/block-processor.adoc[].
 
-Compound block processor:::
+xref:processors/compound-block-processor.adoc[]:::
 Register a custom block named `collapsible` that transforms a listing block into a compound block.
-See xref:processors/compound-block-processor.adoc[].
 
-Block macro processor (Syntax)::
+xref:processors/block-macro-processor.adoc[] (Syntax)::
 Registers a custom block macro and processes it (e.g., `gist::12345[]`).
-See xref:processors/block-macro-processor.adoc[].
 
-Tree processor (Document)::
+xref:processors/tree-processor.adoc[] (Document)::
 Processes the [.class]#Asciidoctor::Document# (AST) once parsing is complete.
-See xref:processors/tree-processor.adoc[].
 
-Inline macro processor (Syntax)::
+xref:processors/inline-macro-processor.adoc[] (Syntax)::
 Registers a custom inline macro and processes it (e.g., `btn:[Save]`).
-See xref:processors/inline-macro-processor.adoc[].
 
-Docinfo Processor (Document)::
+xref:processors/docinfo-processor.adoc[] (Document)::
 Adds additional content to the header or footer regions of the generated document.
-See xref:processors/docinfo-processor.adoc[].
 
-Postprocessor (Document)::
+xref:processors/postprocessor.adoc[] (Document)::
 Processes the output after the document has been converted, but before it's written to disk.
-See xref:processors/postprocessor.adoc[].
 
 There are additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
 
@@ -63,14 +55,17 @@ There are additional extension examples in the {url-exten-lab}[Asciidoctor exten
 
 There are four main aspects to extension development:
 
-Registration::
-This involves telling Asciidoctor that you are using the extension in some context.
+Code::
+This is the actual code that implements the extension functionality.
+The inputs and expected outputs are described on the processor-specific pages linked above.
 
 Capabilities::
 This involves telling Asciidoctor about the extension, often with information such as `name` and which contexts it can appear in.
+General information is presented xref:processor.adoc[here] with more specific details on the processor-specific pages.
 
-Code::
-This is the actual code that implements the extension functionality.
+Registration::
+This involves xref:register.adoc[telling Asciidoctor] that you are using the extension in some context.
+Usually this is done in code that forms a xref:register.adoc#groups[group].
 
 Packaging::
-This involves making the code available to Asciidoctor for the preceding three aspects.
+xref:packaging.adoc[This] involves making the code available to Asciidoctor for the preceding three aspects.
