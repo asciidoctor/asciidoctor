@@ -1,4 +1,3 @@
-# tag::extension[]
 require "asciidoctor"
 require "asciidoctor/extensions"
 
@@ -6,30 +5,16 @@ class RFCStandardLinkInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
   enable_dsl
 
   named :rfc_standard_link
-  match /\b(?<target>RFC ?[0-9]{1,4})\b/
-  # named capture groups called _only_ target and content are allowed.
-  # The above could also be written alternatively:
-  #  match /(\b)(?<target>TP.[A-Z]{2} [0-9]{2}.[0-9]{2})/
-  content_model :text
+  match /\b(?:RFC ?)(?<target>[0-9]{1,4})\b/
+  # content_model :text
 
   def process(parent, target, attrs)
     base_path = "https://tools.ietf.org/html/"
-    create_anchor parent, target, type: :link, target: base_path + target.gsub(/\s+/, "")
+    create_anchor parent, %(RFC #{target}), type: :link, target: %(#{base_path}#{target})
   end
 end
-# end::extension[]
 
-# tag::usage[]
+# Global registration via a group block.
 Asciidoctor::Extensions.register do
   inline_macro RFCStandardLinkInlineMacro
 end
-
-source = "= Standards are Funny
-
-Check out for example RFC 1882 at Christmas, RFC1927 when I forget the space.
-Not to mention RFC 2549, a personal favorite."
-
-doc = Asciidoctor.load source
-
-puts doc.convert
-# end::usage[]

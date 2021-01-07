@@ -119,22 +119,19 @@ Create an inline macro to identify use of RFC standards in Asciidoc source and a
 
 [source,ruby]
 ----
-include::example$rfc-link-extension-inline.rb[tag=extension]
+include::example$rfc-link-extension-inline.rb[]
 ----
 
 === Usage
 
 [source, ruby]
 ----
-include::example$rfc-link-extension-inline.rb[tag=usage]
+include::example$rfc-link-extension-inline-runner.sh[tag=runner]
 ----
 
 === Example output
 
 [source,html]
 ----
-<div class="paragraph">
-<p>Check out for example <a href="https://tools.ietf.org/html/1882">1882</a> at Christmas, <a href="https://tools.ietf.org/html/1927">1927</a> when I forget the space.
-Not to mention <a href="https://tools.ietf.org/html/2549">2549</a>, a personal favorite.</p>
-</div>
+include::example$rfc-link-extension-inline-out.html[]
 ----
