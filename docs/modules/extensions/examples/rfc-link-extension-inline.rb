@@ -3,14 +3,14 @@ require "asciidoctor"
 require "asciidoctor/extensions"
 
 class RFCStandardLinkInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
-  use_dsl
+  enable_dsl
 
   named :rfc_standard_link
-  match /\bRFC ?([0-9]{1,4})/
+  match /\b(?<target>RFC ?[0-9]{1,4})\b/
   # named capture groups called _only_ target and content are allowed.
   # The above could also be written alternatively:
   #  match /(\b)(?<target>TP.[A-Z]{2} [0-9]{2}.[0-9]{2})/
-  parse_content_as :text
+  content_model :text
 
   def process(parent, target, attrs)
     base_path = "https://tools.ietf.org/html/"

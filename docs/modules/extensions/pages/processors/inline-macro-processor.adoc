@@ -22,27 +22,42 @@ include::page$processor.adoc[tag=syntaxproc]
 
 `format`::
 When called with `short`, the inline macro will have no target, e.g. `mymacro:[attributes]`.
+See <<recognizing-inline-macro-uses, below>>.
 
 `match`::
 Supplies a regexp to match the inline macro use.
-This overrides `format` as `format` uses `short` to set a particular regexp.
-+
-Regexp {uri-named-arguments}[named capturing groups] can be used, but only the defined names `target` and `content` are allowed.
-+
-Use of this argument allows macros with a form defined by a regular expression.
-This allows them to match any naming convention in a document.
-One use for this would be automatically linking to standards as shown in the example below.
+See <<recognizing-inline-macro-uses, below>>.
+Directly supplying a regex in this way allows recognizing many patterns normally used in text and processing them as macro uses.
+The second example shows an example recognizing RFC names and turning them into links.
 
 == Process method
 
 `def process parent, target, attributes`
 
 * parent is the enclosing block or document.
-* target is the text between the `name::` and `[...]`.
-Target is missing for a `short` format macro.
-* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+* target is, in the simplest case, the text between the `name::` and `[...]`.
+See below for a more detailed explanation.
+* attributes is, in the simplest case, a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+See <<recognizing-inline-macro-uses, below>> for a more detailed explanation.
 
-The process method should return an `InlineNode` containing the desired content.
+The process method should return an `Inline` node containing the desired content.
+
+== Recognizing inline macro uses
+
+Inline macros are recognized by means of a regular expression set up with the name, format, and match DSL methods.
+For clarity, this discussion presents only the formats using {uri-named-arguments}[named capturing groups].
+
+* By default, an inline macro is "long" format, looking like `mymacro:some-target[content]`.
+This is recognized by a regex equivalent to `#\{name}:(?<target>\S+?)\[(?<content>|.*?[^\\])\]`.
+* By specifying `format :short`, a use will look like `mymacro:[content]`.
+This is recognized by a regex equivalent to `#\{name}:\[(?<content>|.*?[^\\])\]`.
+* By specifying a regex directly using `match /..../`, any text matching the regex will be recognized as a macro use.
+The regex can extract information from the match using the two named groups `target` and `content`.
+** If the content_model is `:attributes` the content is parsed into the `attributes` parameter.
+** If the content_model is not `:attributes` the content is mapped to the `text` attribute.
+** If the `target` named group is not empty, it is mapped to the process method `target` paramter.
+Otherwise the `content` named group is mapped to the process method `target` parameter.
+
 
 == Example with name::[] form
 
