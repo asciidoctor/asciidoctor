@@ -3,6 +3,15 @@
 
 InlineMacroProcessor is a SyntaxProcessor
 
+Note:
+Currently, uses of inline macros are recognized and processed during the conversion phase of a parsed block.
+Furthermore, uses are recognized by means of a regular expression.
+One of the goals of many participating the in Asciidoc language standardization effort is to sufficiently define the language so that inline macro uses can be recognized and processed during the parse phase, so the inline Nodes returned from processing form part of the DOM or parse tree.
+This will certainly affect the state of the document visible to inline macros and may affect how uses are recognized, the input to the process method, and the expected contents of the inline nodes produced.
+See https://github.com/asciidoctor/asciidoctor/issues/61[].
+When this occurs it is possible that inline macros will have to be rewritten.
+Most likely an adapter will be provided to adapt the inputs and outputs, but an inline macro that depends on being able to examine the entire tree of blocks from the parse step is unlikely to be able to work.
+
 == Registration method
 
 An InlineMacroProcessor is registered with `inline_macro`.
