@@ -1,3 +1,4 @@
+:uri-named-arguments: https://www.regular-expressions.info/named.html
 = Inline Macro Processor
 
 InlineMacroProcessor is a SyntaxProcessor
@@ -16,6 +17,8 @@ When called with `short`, the inline macro will have no target, e.g. `mymacro:[a
 `match`::
 Supplies a regexp to match the inline macro use.
 This overrides `format` as `format` uses `short` to set a particular regexp.
++
+Regexp {uri-named-arguments}[named capturing groups] can be used, but only the defined names `target` and `content` are allowed.
 +
 Use of this argument allows macros with a form defined by a regular expression.
 This allows them to match any naming convention in a document.
