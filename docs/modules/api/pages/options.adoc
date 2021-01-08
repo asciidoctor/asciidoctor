@@ -61,7 +61,8 @@ _(Experimental)._
 
 |`:extension_registry`
 |Specifies an explicit xref:extensions:glossary.adoc#id_registry[extensions registry] instance.
-Instead of providing a processor extension group to register extensions, using the :extensions option, this option lets you replace the extension registry itself, giving you complete control over how extensions are registered for this processor.
+This registry instance can be configured independently of any groups registered globally using the :extensions option.
+All processors registered by globally registered groups will also be added to the registry instance upon activation.
 |_not set_
 |`Extensions::Registry` instance
 
