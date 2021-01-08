@@ -26,6 +26,7 @@ Improvements::
 Build / Infrastructure::
 
   * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
+  * Update pygments.rb to 2.0.0
 
 Documentation::
 
