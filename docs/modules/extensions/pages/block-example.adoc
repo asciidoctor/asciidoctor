@@ -11,9 +11,11 @@ Here's the code for the block processor:
 include::example$nestable-extension-class.rb[]
 ----
 
+This extension takes the block content, expressed as a paragraph or example block, and converts it unmodified to an open block.
+The purpose is to allow nested open blocks, which are not yet directly available through Asciidoc syntax (see https://github.com/asciidoctor/asciidoctor/issues/1121).
 This extension allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
 With suitable css, you can use this to create any appearance you want.
-Until nested open blocks become part of the Asciidoc language (https://github.com/asciidoctor/asciidoctor/issues/1121), this is actually a useful extension for html.
+Until nested open blocks become part of the Asciidoc language this is actually a useful extension for html.
 
 Running (in the directory of the nestable-extension file)
 [source,shell]

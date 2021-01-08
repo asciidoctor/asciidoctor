@@ -9,11 +9,7 @@ class Nestable < Asciidoctor::Extensions::BlockProcessor
   positional_attributes 'role'
 
   def process parent, reader, attributes
-    # puts attributes
-    result = create_open_block parent, nil, attributes
-    attributes.delete 'role'
-    attributes.delete 1
-    parse_content result, reader.read_lines, attributes
+    create_open_block parent, reader.read_lines, attributes
   end
 end
 

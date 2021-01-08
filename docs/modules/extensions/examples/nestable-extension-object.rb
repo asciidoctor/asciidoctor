@@ -15,10 +15,7 @@ class Nestable < Asciidoctor::Extensions::BlockProcessor
 
   def process parent, reader, attributes
     attributes['role'] = (role = attributes['role']) ? %(#{@default_role} #{role}) : default_role
-    result = create_open_block parent, nil, attributes
-    attributes.delete 'role'
-    attributes.delete 1
-    parse_content result, reader.read_lines, attributes
+    create_open_block parent, reader.read_lines, attributes
   end
 end
 

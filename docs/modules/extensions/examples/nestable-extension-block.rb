@@ -8,10 +8,7 @@ nestableGroup = proc do
     positional_attributes 'role'
 
     process do |parent, reader, attributes|
-      result = create_open_block parent, nil, attributes
-      attributes.delete 'role'
-      attributes.delete 1
-      parse_content result, reader.read_lines, attributes
+      create_open_block parent, reader.read_lines, attributes
     end
   end
 end
