@@ -23,30 +23,46 @@ Syntax Processor::
 
 == Available extension points
 
-Asciidoctor provides the following extension points, shown in the order of invocation.
-(Block processors and Block Macro processors are called during the parse stage as uses are encountered in the document.)
+Asciidoctor provides the following extension points, shown in the order of invocation, interleaved with a description of Asciidoctor processing stages.
 To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclass.
 
+Asciidoctor starts with a source document and starts reading it into an array of lines and preprocessing it. First, as `include::` directives are processed as they are encountered.
+
 xref:processors/include-processor.adoc[] (Document)::
-Processes the `include::<filename>[]` directive.
+Processes the `include::<target>[attributes]` directive for targets it handles.
+
+The lines from preprocessing include directives are streamed into the chain of preprocessors.
 
 xref:processors/preprocessor.adoc[] (Document)::
 Processes the raw source lines before they are passed to the parser.
 
+The preprocessed lines are streamed into the parse stage.
+The parser converts the lines into a tree of blocks, calling block and block macro processors as their uses are encountered.
+
 xref:processors/block-processor.adoc[] (Syntax)::
-Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
+Processes a block of content marked with a custom block style (e.g. `[custom]`).
 
 xref:processors/block-macro-processor.adoc[] (Syntax)::
-Registers a custom block macro and processes it (e.g., `gist::12345[]`).
+Processes a custom block macro (e.g., `gist::12345[]`).
+
+When the tree of blocks (also called the Asciidoctor Document Object Model (DOM) or Abstract Syntax Tree (AST)) is complete, the chain of tree processors is called to adjust the tree.
 
 xref:processors/tree-processor.adoc[] (Document)::
-Processes the [.class]#Asciidoctor::Document# (AST) once parsing is complete.
+Processes the `Asciidoctor::Document` block tree once parsing is complete.
+
+At this point the block tree is passed to the converter, which converts block contents to the appropriate output format.
+As inline macro uses are encountered, the appropriate processor is invoked.
 
 xref:processors/inline-macro-processor.adoc[] (Syntax)::
-Registers a custom inline macro and processes it (e.g., `pass:[btn:[Save]]`).
+Processes a custom inline macro (e.g., `pass:[btn:[Save]]`).
+
+Generally converters construct "header" content that goes before the converted block content, then convert the block content, and then append footer content.
+Docinfo processors may thus be invoked before and after the block conversion.
 
 xref:processors/docinfo-processor.adoc[] (Document)::
 Adds additional content to the header or footer regions of the generated document.
+
+Once the document has reached this stage of completion, the chain of postprocessors is invoked.
 
 xref:processors/postprocessor.adoc[] (Document)::
 Processes the output after the document has been converted, but before it's written to disk.
