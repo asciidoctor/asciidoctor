@@ -28,7 +28,7 @@ There are two basic strategies for a TreeProcessor.
 This provides quick simple access to the blocks of interest, but does not provide access to the attributes set in the document after the document header.
 Only the header attributes are available.
 
-A block found this way can be replaced with `parent.blocks[parent.blocks.index original_block] = new_block`.
+A block found this way can be replaced with `(parent_blocks = original_block.parent.blocks)[parent_blocks.index original_block] =  new_block`.
 
 === Traverse the block tree
 
@@ -36,9 +36,9 @@ The code here is more complicated and needs to be recursive to find all blocks, 
 To replay the attributes, for each block execute `document.playback_attributes block.attributes`.
 Remember to call `document.restore_attributes` before returning.
 
-NOTE: I suggest rewriting the existing example to use the `find_by' strategy and writing a new example to show how to get up-to-date attributes.
+NOTE: We could use an additional example to show how to get up-to-date attributes.
 
-== Example
+== Example using `find_by` strategy
 
 Purpose::
 Detect literal blocks that contain shell commands, strip the prompt character and style the command using CSS in such a way that the prompt character cannot be selected (as seen on help.github.com).

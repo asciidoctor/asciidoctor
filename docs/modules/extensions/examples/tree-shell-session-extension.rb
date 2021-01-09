@@ -4,21 +4,27 @@ require 'asciidoctor/extensions'
 class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   def process document
     return unless document.blocks?
-    process_blocks document
+    # Implementation using find_by
+    (document.find_by(context: :literal) {|literal| ((first_line = literal.lines.first).start_with? '$ ') ||
+      (first_line.start_with? '> ')}).each do |literal|
+        (parent_blocks = literal.parent.blocks)[parent_blocks.index literal] = convert_to_terminal_listing literal
+    end
+    # Alternate implementation using recursive traversal
+    # process_blocks document
     nil
   end
 
-  def process_blocks node
-    node.blocks.each_with_index do |block, i|
-      if block.context == :literal &&
-          (((first_line = block.lines.first).start_with? '$ ') ||
-            (first_line.start_with? '> '))
-        node.blocks[i] = convert_to_terminal_listing block
-      else
-        process_blocks block if block.blocks?
-      end
-    end
-  end
+  # def process_blocks node
+  #   node.blocks.each_with_index do |block, i|
+  #     if block.context == :literal &&
+  #         (((first_line = block.lines.first).start_with? '$ ') ||
+  #           (first_line.start_with? '> '))
+  #       node.blocks[i] = convert_to_terminal_listing block
+  #     else
+  #       process_blocks block if block.blocks?
+  #     end
+  #   end
+  # end
 
   def convert_to_terminal_listing block
     attrs = block.attributes
