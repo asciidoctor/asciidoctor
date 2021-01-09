@@ -24,6 +24,8 @@ In this case having Ruby load the file must result in the processors being added
 The simplest way to implement this is with a direct call to `Asciidoctor::Extensions.register` supplying a group.
 However, if this is in the same file as the extension code it will not be usable in the first scenario, so it may be advisable to use two files, one supplying the group and the other registering it.
 
+NOTE: For conciseness, the examples of each processor type that follow all include the registration group in the same file as the processor, thus restricting usability by forcing global registration.
+
 == As a Ruby Gem
 
 === Naming convention

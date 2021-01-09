@@ -7,7 +7,6 @@
 ** xref:processors/include-processor.adoc[]
 ** xref:processors/preprocessor.adoc[]
 ** xref:processors/block-processor.adoc[]
-*** xref:processors/compound-block-processor.adoc[]
 ** xref:processors/block-macro-processor.adoc[]
 ** xref:processors/tree-processor.adoc[]
 ** xref:processors/inline-macro-processor.adoc[]

@@ -28,32 +28,23 @@ Note that the type of converter may be determined from document attributes, as s
 Purpose::
 Insert copyright text in the footer.
 
-== CopyrightFooterPostprocessor
+=== CopyrightFooterPostprocessor
 
 [source,ruby]
 ----
-class CopyrightFooterPostprocessor < Asciidoctor::Extensions::Postprocessor
-  def process document, output
-    content = (document.attr 'copyright') || 'Copyright Acme, Inc.'
-    if document.basebackend? 'html'
-      replacement = %(<div id="footer-text">\\1<br>\n#{content}\n</div>)
-      output = output.sub(/<div id="footer-text">(.*?)<\/div>/m, replacement)
-    elsif document.basebackend? 'docbook'
-      replacement = %(<simpara>#{content}</simpara>\n\\1)
-      output = output.sub(/(<\/(?:article|book)>)/, replacement)
-    end
-    output
-  end
-end
+include::example$post-footer-extension.rb[]
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
 ----
-Asciidoctor::Extensions.register do
-  postprocessor CopyrightFooterPostprocessor
-end
+include::example$post-footer-extension-runner.sh[tag=runner]
+----
 
-Asciidoctor.convert_file 'sample-with-copyright-footer.adoc', safe: :safe
+=== Output
+
+[source,html]
+----
+include::example$post-footer-extension-out.html[]
 ----

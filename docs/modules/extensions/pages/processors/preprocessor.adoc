@@ -27,65 +27,23 @@ The returned reader can be an entirely new Reader or the original reader, perhap
 Purpose::
 Skim off, from the top of the document, front matter that gets used by site generators such as Jekyll and Awestruct.
 
-== sample-with-front-matter.adoc
-
-[source,asciidoc]
-----
-tags: [announcement, website]
----
-= Document Title
-
-content
-
-[subs=+attributes]
-.Captured front matter
-....
----
-{front-matter}
----
-....
-----
-
-== FrontMatterPreprocessor
+=== FrontMatterPreprocessor
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
-class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
-  def process document, reader
-    lines = reader.lines # get raw lines
-    return reader if lines.empty?
-    front_matter = []
-    if lines.first.chomp == '---'
-      original_lines = lines.dup
-      lines.shift
-      while !lines.empty? && lines.first.chomp != '---'
-        front_matter << lines.shift
-      end
-
-      if (first = lines.first).nil? || first.chomp != '---'
-        lines = original_lines
-      else
-        lines.shift
-        document.attributes['front-matter'] = front_matter.join.chomp
-        # advance the reader by the number of lines taken
-        (front_matter.length + 2).times { reader.advance }
-      end
-    end
-    reader
-  end
-end
+include::example$pre-front-matter-extension.rb[]
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
-----
-Asciidoctor::Extensions.register do
-  preprocessor FrontMatterPreprocessor
-end
+------
+include::example$pre-front-matter-extension-runner.sh[tag=runner]
+------
 
-Asciidoctor.convert_file 'sample-with-front-matter.adoc', safe: :safe
+=== Output
+
+[source,html]
+----
+include::example$pre-front-matter-extension-out.html[]
 ----

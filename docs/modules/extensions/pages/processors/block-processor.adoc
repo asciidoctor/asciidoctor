@@ -72,50 +72,64 @@ cf. https://github.com/asciidoctor/asciidoctor.org/issues/223
 * The process method should either:
 include::page$processor.adoc[tag=blockproc]
 
-== Example
+== Simple Example
 
 Purpose::
 Register a custom block style named `shout` that uppercases all the words and converts periods to exclamation points.
 
-== sample-with-shout-block.adoc
-
-[source,asciidoc]
-----
-[shout]
-The time is now. Get a move on.
-----
-
-== ShoutBlock
+=== ShoutBlock
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
-class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
-  PeriodRx = /\.(?= |$)/
-
-  enable_dsl
-
-  named :shout
-  on_context :paragraph
-  name_positional_attributes 'vol'
-  parse_content_as :simple
-
-  def process parent, reader, attrs
-    volume = ((attrs.delete 'vol') || 1).to_i
-    create_paragraph parent, (reader.lines.map {|l| l.upcase.gsub PeriodRx, '!' * volume }), attrs
-  end
-end
+include::example$block-shout-extension.rb[]
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
 ----
-Asciidoctor::Extensions.register do
-  block ShoutBlock
-end
-
-Asciidoctor.convert_file 'sample-with-shout-block.adoc', safe: :safe
+include::example$block-shout-extension-runner.sh[tag=runner]
 ----
+
+=== Output
+
+[source,html]
+----
+include::example$block-shout-extension-out.html[]
+----
+
+== Example showing a more complex block structure
+
+Purpose::
+Register a custom block named `collapsible` that transforms a listing block into a compound block composed of the following:
+
+* an example block with the collapsible option enabled
+* the original listing block nested in the example block
+
+The listing block is promoted to a source block if a language is specified using the second positional attribute.
+
+
+=== CollapsibleBlock
+
+[source,ruby]
+----
+include::example$block-collapsible-extension.rb[]
+----
+
+=== Usage
+
+[source,console]
+------
+include::example$block-collapsible-extension-runner.sh[tag=runner]
+------
+
+=== Output
+
+[source,html]
+----
+include::example$block-collapsible-extension-out.html[]
+----
+
+NOTE: This extension mimics the builtin `collapsible` option on the example block, but consolidates it to a single block.
+The purpose of this extension is to show how to assemble a compound block in an extension.
+

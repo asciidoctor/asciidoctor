@@ -28,48 +28,23 @@ include::page$processor.adoc[tag=blockproc]
 Purpose::
 Create a block macro named `gist` for embedding a gist.
 
-=== sample-with-gist-macro.adoc
-
-[source,asciidoc]
-----
-.My Gist
-gist::123456[]
-----
-
 === GistBlockMacro
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
-class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
-  enable_dsl
-
-  named :gist
-
-  def process parent, target, attrs
-    title_html = (attrs.has_key? 'title') ?
-        %(<div class="title">#{attrs['title']}</div>\n) : nil
-
-    html = %(<div class="openblock gist">
-#{title_html}<div class="content">
-<script src="https://gist.github.com/#{target}.js"></script>
-</div>
-</div>)
-
-    create_pass_block parent, html, attrs, subs: nil
-  end
-end
+include::example$block-macro-gist-extension.rb[]
 ----
 
-== Usage
+=== Usage
 
-[source,ruby]
+[source,console]
 ----
-Asciidoctor::Extensions.register do
-  block_macro GistBlockMacro if document.basebackend? 'html'
-end
+include::example$block-macro-gist-extension-runner.sh[tag=runner]
+----
 
-Asciidoctor.convert_file 'sample-with-gist.adoc', safe: :safe
+=== Output
+
+[source,html]
+----
+include::example$block-macro-gist-extension-out.html[]
 ----

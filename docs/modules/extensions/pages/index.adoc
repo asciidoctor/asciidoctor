@@ -1,6 +1,11 @@
 = Extensions
 :url-exten-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
 
+////
+The code examples for this module are all in the examples directory.
+They are set up so that they may be run individually through the *-runner.sh script or tested all at once with the extensions-test.sh script.
+////
+
 Extensions are central to the power of AsciiDoc because they open up the language to new use cases.
 Asciidoctor provides an extension API that offers a set of extension points.
 Extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
