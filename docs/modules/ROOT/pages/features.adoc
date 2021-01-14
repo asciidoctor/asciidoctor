@@ -129,7 +129,7 @@ In addition to its performance, these security levels make Asciidoctor well-suit
 Installating Asciidoctor is just the beginning of your publishing experience.
 Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools^], ranging from converters, to extended syntax, to build plugins, to integrated writing and preview environments.
 
-One popular extension is {url-org}/asciidoctor-diagram[Asciidoctor Diagram^].
+One popular extension is xref:diagram-extension::index.adoc[Asciidoctor Diagram].
 When loaded, Asciidoctor Diagram allows you to make diagrams from plain text (much like AsciiDoc does for writing).
 Asciidoctor Diagram does this by extending the syntax of AsciiDoc to recognize specially marked literal blocks.
 It takes the text inside those blocks, passes it through one of the diagramming tools it integrates with, and reinserts the image back into the document as it is being processed.

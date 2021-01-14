@@ -1,5 +1,4 @@
 = Migrate from AsciiDoc.py
-:url-diagram: {url-org}/asciidoctor-diagram
 :url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-manpage: {url-project}/man/asciidoctor
@@ -314,7 +313,7 @@ a|
 |Use a xref:asciidoc:stem:stem.adoc#block[stem block].
 
 |`graphviz`
-|Use {url-diagram}[Asciidoctor Diagram^].
+|Use xref:diagram-extension::index.adoc[Asciidoctor Diagram].
 |===
 
 === Custom extensions
@@ -382,7 +381,7 @@ These are some of the more interesting ones when migrating:
 * xref:directives:include-lines-and-tags.adoc[Partial includes]
 * xref:attributes:safe-modes.adoc[Additional safe modes]
 * xref:macros:icons.adoc[Icon-based fonts and inline icons]
-* {url-diagram}[Asciidoctor Diagram^]
+* xref:diagram-extension::index.adoc[Asciidoctor Diagram]
 
 A detailed list of the improvements is shown in #Differences between Asciidoctor and AsciiDoc.py#.
 
