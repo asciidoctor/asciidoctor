@@ -17,7 +17,7 @@ That means you don't need a Ruby runtime installed on your machine after all.
 AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript.
 
 Whether your working in Ruby, Java, or JavaScript, Asciidoctor is readily available for you to start using.
-Only when you get into extended converters and extensions do you need to install dependencies.
+Only when you get into add-on converters and extensions do you need to install dependencies.
 
 == Quick wins
 
@@ -29,10 +29,10 @@ The following before and after picture gives you an idea of what to expect:
 image::source-vs-output.png[AsciiDoc source vs HTML output]
 
 If you're looking for more advanced output, or you have an existing DocBook toolchain in place, you can instead xref:docbook-backend:index.adoc[convert to DocBook] and feed the result into that pipeline.
-Once you get more familiar with AsciiDoc and Asciidoctor, you can explore customizing the built-in converter using templates or using extended converters to produce other output formats such as PDF and EPUB 3.
+Once you get more familiar with AsciiDoc and Asciidoctor, you can explore customizing the built-in converter using templates or using add-on converters to produce other output formats such as PDF and EPUB 3.
 So there is plenty of room to grow.
 
-== Built-in and extended converters
+== Built-in and add-on converters
 
 Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[manpage] (manual page).
 These converters are designed to cover a majority of users`' needs for basic preview and publishing.
@@ -127,7 +127,7 @@ In addition to its performance, these security levels make Asciidoctor well-suit
 == Access to an ecosystem of extensions and tools
 
 Installating Asciidoctor is just the beginning of your publishing experience.
-Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools^], ranging from converters, to extended syntax, to build plugins, to integrated writing and preview environments.
+Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools^], ranging from add-on converters, to extended syntax, to build plugins, to integrated writing and preview environments.
 
 One popular extension is xref:diagram-extension::index.adoc[Asciidoctor Diagram].
 When loaded, Asciidoctor Diagram allows you to make diagrams from plain text (much like AsciiDoc does for writing).
