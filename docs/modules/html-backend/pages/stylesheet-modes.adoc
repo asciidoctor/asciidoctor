@@ -11,7 +11,7 @@ That's because the stylesheet goes in the HTML `<head>` and the converter only g
 [#embed]
 == Embed the stylesheet
 
-When the xref:ROOT:safe-modes.adoc[safe mode] is server or lower, the default behavior of the HTML converter is to read the the stylesheet file, enclose its contents in a `<style>` tag, and embed it directly into the `<head>` of the generated HTML.
+When the xref:ROOT:safe-modes.adoc[safe mode] is server or lower, the default behavior of the HTML converter is to read the stylesheet file, enclose its contents in a `<style>` tag, and embed it directly into the `<head>` of the generated HTML.
 This default makes the HTML more portable since you don't lose the stylesheet if you move the file.
 
 However, if the safe mode is secure, the converter will <<link,link to the stylesheet file>> instead.

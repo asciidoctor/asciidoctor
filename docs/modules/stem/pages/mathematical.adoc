@@ -26,7 +26,7 @@ When the extension finishes processing all the STEM nodes, it unsets the `stem` 
 
 == Benefits and drawbacks
 
-Since Asciidoctor Mathematical replaces all STEM nodes with image nodes, it serves as an an all-purpose solution for STEM processing.
+Since Asciidoctor Mathematical replaces all STEM nodes with image nodes, it serves as an all-purpose solution for STEM processing.
 All converters know how do deal with image nodes.
 The extension can be used with the built-in converters as well as add-on converters such as PDF and EPUB3.
 
