@@ -89,7 +89,7 @@ _**Release date:** 2020.11.02_
 
 * Run test suite on TruffleRuby nightly (*@mogztter*, *@erebor*)
 * Upgrade TruffleRuby to 20.0.0 (*@mogztter*)
-* Trigger upstream builds for AsciidoctorJ on Github Actions (*@robertpanzer*)
+* Trigger upstream builds for AsciidoctorJ on GitHub Actions (*@robertpanzer*)
 
 = Asciidoctor 2.0.10
 

@@ -52,7 +52,7 @@ More information:
 
 === Eclipse
 
-Install the open source plugin `AsciiDoctor Editor` from the {url-eclipse-marketplace}[Eclipse Marketplace^] or visit the
+Install the open source plugin `Asciidoctor Editor` from the {url-eclipse-marketplace}[Eclipse Marketplace^] or visit the
 {url-eclipse-plugin-github}[project repository^].
 
 === IntelliJ IDEA
