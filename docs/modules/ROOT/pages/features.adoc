@@ -56,9 +56,9 @@ While Asciidoctor provides a built-in converter for producing publish-ready HTML
 There are two ways to modify the HTML that Asciidoctor produces: a custom converter or converter templates.
 
 If you're an experienced programmer, you may lean towards the *custom converter*.
-You can extend the built-in HTML converter and override the methods for that handles the conversion for any node in the document tree.
+You can extend the built-in HTML converter and override the methods that handle the conversion for any node in the document tree.
 
-If you're expertise is more on the technical writing side, you may find the *converter templates* to be more approachable.
+If your expertise is more on the technical writing side, you may find the *converter templates* to be more approachable.
 The templates can be written in any template language supported by the Tilt template abstraction library, such as ERB, Haml, or Slim.
 These templates augment the built-in converter by replacing the processing for a node in the document.
 You introduce one template for each type of node for which you want to control conversion.
@@ -82,7 +82,7 @@ puts phrase
 ----
 
 Asciidoctor provides adapters for several popular syntax highlighters, including Rouge and Highlight.js.
-Aside from installing the library (if necessary), all you need to do is set an document attribute on your document and Asciidoctor will handle the rest.
+Aside from installing the library (if necessary), all you need to do is set a document attribute on your document and Asciidoctor will handle the rest.
 From there, you can configure the behavior of the syntax highlighter, such as changing the style/theme, enabling line numbers, and block highlighting select lines.
 
 == Multiple interfaces: CLI and API
@@ -126,7 +126,7 @@ In addition to its performance, these security levels make Asciidoctor well-suit
 
 == Access to an ecosystem of extensions and tools
 
-Installating Asciidoctor is just the beginning of your publishing experience.
+Installing Asciidoctor is just the beginning of your publishing experience.
 Asciidoctor gives you access to a {url-org}[healthy ecosystem of extensions and tools^], ranging from add-on converters, to extended syntax, to build plugins, to integrated writing and preview environments.
 
 One popular extension is xref:diagram-extension::index.adoc[Asciidoctor Diagram].
@@ -136,10 +136,10 @@ It takes the text inside those blocks, passes it through one of the diagramming 
 The result is that the diagram source in the AsciiDoc document becomes an image in the generated output.
 
 Another popular tool is the {url-org}/asciidoctor-browser-extension[browser extension^].
-When this extension is installed, you can browse to an AsciiDoc file on your harddisk or on the web and the browser will show you the converted HTML *instead of* the AsciiDoc source.
+When this extension is installed, you can browse to an AsciiDoc file on your local storage or on the web and the browser will show you the converted HTML *instead of* the AsciiDoc source.
 That means you can get the out-of-the-box HTML experience that Asciidoctor provides without even having to run a command or script.
 The extension running in the browser does everything for you.
 
 These are just two examples.
 There are plenty more possibilities to explore in the ever-growing Asciidoctor ecosystem.
-All the components of this ecosystem work together to achieve one goal, to make writing in AsciiDoc a rewording and productive experience.
+All the components of this ecosystem work together to achieve one goal, to make writing in AsciiDoc a rewarding and productive experience.
