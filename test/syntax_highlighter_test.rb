@@ -1102,7 +1102,7 @@ context 'Syntax Highlighter' do
   end
 
   context 'Pygments', if: ENV['PYGMENTS_VERSION'] do
-    test 'wip should syntax highlight source if source-highlighter attribute is set' do
+    test 'should syntax highlight source if source-highlighter attribute is set' do
       input = <<~'EOS'
       :source-highlighter: pygments
       :pygments-style: monokai
