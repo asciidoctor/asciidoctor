@@ -1,4 +1,4 @@
-// Italian translation, courtesy of Marco Ciampa <ciampix@libero.it>
+// Italian translation, courtesy of Marco Ciampa <ciampix@posteo.net>
 :appendix-caption: Appendice
 :appendix-refsig: {appendix-caption}
 :caution-caption: Attenzione
@@ -11,10 +11,10 @@
 ifdef::listing-caption[:listing-caption: Elenco]
 ifdef::manname-title[:manname-title: Nome]
 :note-caption: Nota
-//:part-signifier: ???
-//:part-refsig: {part-signifier}
+:part-signifier: Parte
+:part-refsig: {part-signifier}
 ifdef::preface-title[:preface-title: Prefazione]
-//:section-refsig: ???
+:section-refsig: Sezione
 :table-caption: Tabella
 :tip-caption: Suggerimento
 :toc-title: Indice
