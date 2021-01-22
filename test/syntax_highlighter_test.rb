@@ -758,7 +758,7 @@ context 'Syntax Highlighter' do
       output = convert_string_to_embedded input, safe: :safe, attributes: { 'source-highlighter' => 'rouge' }
       assert_css 'pre.rouge > code[data-lang="php"]', output, 1
       # if class is "nb", then the funcnamehighlighting option is not honored
-      assert_include '<span class="nx">cal_days_in_month</span>', output
+      refute_include '<span class="nb">cal_days_in_month</span>', output
       assert_include '<span class="mi">2019</span>', output
     end
 
