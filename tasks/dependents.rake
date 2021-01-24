@@ -25,7 +25,6 @@ namespace :build do
     require 'yaml'
 
     %w(
-      asciidoctor/asciidoctor-diagram
     ).each do |project|
       org, name, branch = parse_project project
       project = [org, name, branch] * '/'
