@@ -1,0 +1,1 @@
+* xref:static-site-generators.adoc[]
