@@ -23,6 +23,10 @@ Build / Infrastructure::
 
   * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
 
+Documentation::
+
+  * add Belarusian translation of built-in attributes (PR #3928) (*@morganov*)
+
 // tag::compact[]
 == 2.0.12 (2020-11-10) - @mojavelinux
 
