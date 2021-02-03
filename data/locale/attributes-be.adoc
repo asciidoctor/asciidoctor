@@ -1,0 +1,23 @@
+// Belarusian translation, courtesy of Dexter Morganov <dexter.morganov@gmail.com>
+:appendix-caption: Дадатак
+:appendix-refsig: {appendix-caption}
+:caution-caption: Увага
+:chapter-signifier: Глава
+:chapter-refsig: {chapter-signifier}
+:example-caption: Прыклад
+:figure-caption: Малюнак
+:important-caption: Важна
+:last-update-label: Апошняе абнаўленне
+ifdef::listing-caption[:listing-caption: Лістынг]
+ifdef::manname-title[:manname-title: Назва]
+:note-caption: Заўвага
+:part-signifier: Частка
+:part-refsig: {part-signifier}
+ifdef::preface-title[:preface-title: Прадмова]
+:section-refsig: Раздзел
+:table-caption: Табліца
+:tip-caption: Падказка
+:toc-title: Змест
+:untitled-label: Без назвы
+:version-label: Версія
+:warning-caption: Папярэджанне
