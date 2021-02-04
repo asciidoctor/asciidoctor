@@ -1304,7 +1304,7 @@ class ReaderTest < Minitest::Test
       test 'include directive skips lines all tagged regions except ones enabled when value of tags attribute is negated wildcard' do
         input = <<~'EOS'
         ----
-        include::fixtures/tagged-class.rb[tags=!*;init]
+        include::fixtures/tagged-class.rb[tags=**;!*;init]
         ----
         EOS
 
@@ -1319,11 +1319,10 @@ class ReaderTest < Minitest::Test
         assert_includes output, expected
       end
 
-=begin
       test 'include directive does not include tag that has been included then excluded' do
         input = <<~'EOS'
         ----
-        include::fixtures/tagged-class.rb[tags=!*;init;!init]
+        include::fixtures/tagged-class.rb[tags=**;!*;init;!init]
         ----
         EOS
 
@@ -1334,7 +1333,6 @@ class ReaderTest < Minitest::Test
         EOS
         assert_includes output, expected
       end
-=end
 
       test 'include directive selects specified tagged lines and ignores the other tag directives' do
         input = <<~'EOS'
