@@ -1319,6 +1319,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, expected
       end
 
+=begin
       test 'include directive does not include tag that has been included then excluded' do
         input = <<~'EOS'
         ----
@@ -1333,6 +1334,7 @@ class ReaderTest < Minitest::Test
         EOS
         assert_includes output, expected
       end
+=end
 
       test 'include directive selects specified tagged lines and ignores the other tag directives' do
         input = <<~'EOS'
