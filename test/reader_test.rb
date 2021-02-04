@@ -1289,7 +1289,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, expected
       end
 
-      test 'include directive skips lines all tagged lines when value of tags attribute is negated wildcard' do
+      test 'include directive skips lines all tagged regions when value of tags attribute is negated wildcard' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!*]
@@ -1298,6 +1298,39 @@ class ReaderTest < Minitest::Test
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
         expected = %(class Dog\nend)
+        assert_includes output, expected
+      end
+
+      test 'include directive skips lines all tagged regions except ones enabled when value of tags attribute is negated wildcard' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class.rb[tags=!*;init]
+        ----
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        expected = <<~'EOS'.chomp
+        class Dog
+          def initialize breed
+            @breed = breed
+          end
+        end
+        EOS
+        assert_includes output, expected
+      end
+
+      test 'include directive does not include tag that has been included then excluded' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class.rb[tags=!*;init;!init]
+        ----
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        expected = <<~'EOS'.chomp
+        class Dog
+        end
+        EOS
         assert_includes output, expected
       end
 
