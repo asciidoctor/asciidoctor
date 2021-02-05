@@ -1138,9 +1138,10 @@ class PreprocessorReader < Reader
           else
             select = base_select = wildcard = inc_tags.delete '**'
           end
+        elsif inc_tags.key? '*'
+          select = base_select = !(wildcard = inc_tags.delete '*')
         else
-          select = base_select = !(inc_tags.value? true)
-          wildcard = inc_tags.delete '*'
+          select = base_select = false
         end
         begin
           reader.call inc_path, read_mode do |f|
