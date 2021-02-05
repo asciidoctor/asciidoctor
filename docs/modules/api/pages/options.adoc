@@ -63,6 +63,11 @@ Instead of providing a Ruby block containing extensions to register, this option
 |_not set_
 |`Extensions::Registry` instance
 
+|`:header_only`
+|If `true`, the parser stops after reading the header.
+|`false`
+|_Boolean_
+
 |`:standalone`
 |If `true`, generates a standalone output document (which includes the shell around the body content, such as the header and footer).
 When converting to a file, the default value is `true`.
