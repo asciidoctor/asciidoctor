@@ -3,7 +3,9 @@ on:
   push:
     branches: ['**']
     tags-ignore: ['**']
+    paths-ignore: ['docs/**']
   pull_request:
+    paths-ignore: ['docs/**']
   schedule:
   - cron: '0 2 * * *'
 jobs:
