@@ -1122,6 +1122,46 @@ context 'Attributes' do
       assert_xpath '//div[@class="title"][text() = "Figure 3. Title for Baz"]', output, 1
       assert_xpath '//div[@class="title"][text() = "Figure 4. Title for Qux"]', output, 1
     end
+
+    test 'should not allow counter to modify locked attribute' do
+      input = <<~'EOS'
+      {counter:foo:baz} is still {foo}
+      EOS
+
+      output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
+      assert_xpath '//p[text()="bar is still bar"]', output, 1
+    end
+
+    test 'should not allow counter2 to modify locked attribute' do
+      input = <<~'EOS'
+      {counter2:foo:baz}{foo}
+      EOS
+
+      output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
+      assert_xpath '//p[text()="bar"]', output, 1
+    end
+
+    test 'should not allow counter to modify built-in locked attribute' do
+      input = <<~'EOS'
+      {counter:max-include-depth:128} is still {max-include-depth}
+      EOS
+
+      doc = document_from_string input, standalone: false
+      output = doc.convert
+      assert_xpath '//p[text()="64 is still 64"]', output, 1
+      assert_equal 64, doc.attributes['max-include-depth']
+    end
+
+    test 'should not allow counter2 to modify built-in locked attribute' do
+      input = <<~'EOS'
+      {counter2:max-include-depth:128}{max-include-depth}
+      EOS
+
+      doc = document_from_string input, standalone: false
+      output = doc.convert
+      assert_xpath '//p[text()="64"]', output, 1
+      assert_equal 64, doc.attributes['max-include-depth']
+    end
   end
 
   context 'Block attributes' do

@@ -17,6 +17,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
+  * Don't allow counter and counter2 directives in attribute reference to override locked attributes (#3939)
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
   * Don't escape hyphen in manname in manpage output
   * Remove extra .sp before content of verse block in manpage output

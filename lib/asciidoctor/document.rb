@@ -562,7 +562,9 @@ class Document < AbstractBlock
   # returns the next number in the sequence for the specified counter
   def counter name, seed = nil
     return @parent_document.counter name, seed if @parent_document
-    if (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
+    if attribute_locked? name
+      @attributes[name]
+    elsif (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
       @attributes[name] = @counters[name] = Helpers.nextval attr_val
     elsif seed
       @attributes[name] = @counters[name] = seed == seed.to_i.to_s ? seed.to_i : seed
