@@ -975,6 +975,14 @@ context 'Substitutions' do
       assert_equal '<a href="https://github.com/jline/jline2" class="bare">https://github.com/jline/jline2</a>', fn1.text
     end
 
+    test 'a footnote macro may contain text formatting' do
+      para = block_from_string('You can download patches from the product page.footnote:[Only available with an _active_ subscription.]')
+      para.convert
+      footnotes = para.document.catalog[:footnotes]
+      assert_equal 1, footnotes.size
+      assert_equal 'Only available with an <em>active</em> subscription.', footnotes[0].text
+    end
+
     test 'a footnote macro may contain a shorthand xref' do
       # specialcharacters escaping is simulated
       para = block_from_string('text footnote:[&lt;&lt;_install,install&gt;&gt;]')
