@@ -976,9 +976,22 @@ context 'Substitutions' do
     end
 
     test 'a footnote macro may contain text formatting' do
-      para = block_from_string('You can download patches from the product page.footnote:[Only available with an _active_ subscription.]')
+      para = block_from_string 'You can download patches from the product page.footnote:[Only available with an _active_ subscription.]'
       para.convert
       footnotes = para.document.catalog[:footnotes]
+      assert_equal 1, footnotes.size
+      assert_equal 'Only available with an <em>active</em> subscription.', footnotes[0].text
+    end
+
+    test 'an externalized footnote macro may contain text formatting' do
+      input = <<~'EOS'
+      :fn-disclaimer: pass:q[footnote:[Only available with an _active_ subscription.]]
+
+      You can download patches from the production page.{fn-disclaimer}
+      EOS
+      doc = document_from_string input
+      doc.convert
+      footnotes = doc.catalog[:footnotes]
       assert_equal 1, footnotes.size
       assert_equal 'Only available with an <em>active</em> subscription.', footnotes[0].text
     end
