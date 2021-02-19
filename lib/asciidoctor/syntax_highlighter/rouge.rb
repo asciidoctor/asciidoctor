@@ -32,10 +32,18 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
       formatter = ::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new
     end
     if (highlight_lines = opts[:highlight_lines])
-      formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
+      if (opts[:number_lines] == :inline)
+        formatter = RougeExt::Formatters::HTMLSingleLineHighlighter.new formatter, lines: highlight_lines
+      else
+        formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
+      end
     end
     if opts[:number_lines]
-      formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
+      if (opts[:number_lines] == :inline)
+        formatter = RougeExt::Formatters::HTMLLineTable.new formatter, start_line: opts[:start_line_number]
+      else
+        formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
+      end
       if opts[:callouts]
         return [(highlighted = formatter.format lexer.lex source), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
       end
