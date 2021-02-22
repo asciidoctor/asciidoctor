@@ -505,6 +505,16 @@ context 'Substitutions' do
       assert_equal para.source, para.sub_quotes(para.source)
     end
 
+    test 'allow spaces in superscript if spaces are inserted using an attribute reference' do
+      para = block_from_string 'Night ^A{sp}poem{sp}by{sp}Jane{sp}Kondo^.'
+      assert_equal 'Night <sup>A poem by Jane Kondo</sup>.', para.apply_subs(para.source)
+    end
+
+    test 'allow spaces in superscript if text is wrapped in a passthrough' do
+      para = block_from_string 'Night ^+A poem by Jane Kondo+^.'
+      assert_equal 'Night <sup>A poem by Jane Kondo</sup>.', para.apply_subs(para.source)
+    end
+
     test 'does not match adjacent superscript chars' do
       para = block_from_string 'a ^^ b'
       assert_equal 'a ^^ b', para.sub_quotes(para.source)
