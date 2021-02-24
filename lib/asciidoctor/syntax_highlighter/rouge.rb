@@ -15,10 +15,8 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   def highlight node, source, lang, opts
     @style ||= (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE
     @requires_stylesheet = true if opts[:css_mode] == :class
-
     lexer = create_lexer node, source, lang, opts
     formatter = create_formatter node, source, lang, opts
-
     highlighted = formatter.format lexer.lex source
     if opts[:number_lines] && opts[:callouts]
       [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
@@ -70,22 +68,17 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     elsif (lexer = ::Rouge::Lexer.find lang)
       lexer = lexer.tag == 'php' && !(node.option? 'mixed') ? (lexer.new start_inline: true) : lexer.new
     end if lang
-    lexer ||= ::Rouge::Lexers::PlainText.new
+    lexer || ::Rouge::Lexers::PlainText.new
   end
 
   def create_formatter node, source, lang, opts
-    if opts[:css_mode] == :class
-      formatter = ::Rouge::Formatters::HTML.new inline_theme: @style
-    else
-      formatter = ::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new
-    end
+    formatter = opts[:css_mode] == :class ?
+      (::Rouge::Formatters::HTML.new inline_theme: @style) :
+      (::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new)
     if (highlight_lines = opts[:highlight_lines])
       formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
     end
-    if opts[:number_lines]
-      formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
-    end
-    formatter
+    opts[:number_lines] ? (RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]) : formatter
   end
 
   module Loader
