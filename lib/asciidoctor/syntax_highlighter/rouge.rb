@@ -13,34 +13,18 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   end
 
   def highlight node, source, lang, opts
-    if lang.include? '?'
-      # NOTE cgi-style options only properly supported in Rouge >= 2.1
-      if (lexer = ::Rouge::Lexer.find_fancy lang)
-        unless lexer.tag != 'php' || (node.option? 'mixed') || ((lexer_opts = lexer.options).key? 'start_inline')
-          lexer = lexer.class.new lexer_opts.merge 'start_inline' => true
-        end
-      end
-    elsif (lexer = ::Rouge::Lexer.find lang)
-      lexer = lexer.tag == 'php' && !(node.option? 'mixed') ? (lexer.new start_inline: true) : lexer.new
-    end if lang
-    lexer ||= ::Rouge::Lexers::PlainText.new
     @style ||= (style = opts[:style]) && (style_available? style) || DEFAULT_STYLE
-    if opts[:css_mode] == :class
-      @requires_stylesheet = true
-      formatter = ::Rouge::Formatters::HTML.new inline_theme: @style
+    @requires_stylesheet = true if opts[:css_mode] == :class
+
+    lexer = create_lexer node, source, lang, opts
+    formatter = create_formatter node, source, lang, opts
+
+    highlighted = formatter.format lexer.lex source
+    if opts[:number_lines] && opts[:callouts]
+      [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
     else
-      formatter = ::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new
+      highlighted
     end
-    if (highlight_lines = opts[:highlight_lines])
-      formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
-    end
-    if opts[:number_lines]
-      formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
-      if opts[:callouts]
-        return [(highlighted = formatter.format lexer.lex source), (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
-      end
-    end
-    formatter.format lexer.lex source
   end
 
   def format node, lang, opts
@@ -73,6 +57,35 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
 
   def write_stylesheet doc, to_dir
     ::File.write (::File.join to_dir, (stylesheet_basename @style)), (read_stylesheet @style), mode: FILE_WRITE_MODE
+  end
+
+  def create_lexer node, source, lang, opts
+    if lang.include? '?'
+      # NOTE cgi-style options only properly supported in Rouge >= 2.1
+      if (lexer = ::Rouge::Lexer.find_fancy lang)
+        unless lexer.tag != 'php' || (node.option? 'mixed') || ((lexer_opts = lexer.options).key? 'start_inline')
+          lexer = lexer.class.new lexer_opts.merge 'start_inline' => true
+        end
+      end
+    elsif (lexer = ::Rouge::Lexer.find lang)
+      lexer = lexer.tag == 'php' && !(node.option? 'mixed') ? (lexer.new start_inline: true) : lexer.new
+    end if lang
+    lexer ||= ::Rouge::Lexers::PlainText.new
+  end
+
+  def create_formatter node, source, lang, opts
+    if opts[:css_mode] == :class
+      formatter = ::Rouge::Formatters::HTML.new inline_theme: @style
+    else
+      formatter = ::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new
+    end
+    if (highlight_lines = opts[:highlight_lines])
+      formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
+    end
+    if opts[:number_lines]
+      formatter = RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]
+    end
+    formatter
   end
 
   module Loader
