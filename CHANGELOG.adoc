@@ -19,6 +19,10 @@ Bug Fixes::
 
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
 
+Improvements::
+
+  * Extract method to create lexer and formatter in Rouge adapter (#3952)
+
 Build / Infrastructure::
 
   * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
