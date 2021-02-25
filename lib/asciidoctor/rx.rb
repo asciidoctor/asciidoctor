@@ -1,3 +1,4 @@
+# coding: utf-8
 module Asciidoctor
   # A collection of regular expression constants used by the parser. (For speed, these are not defined in the Rx module,
   # but rather directly in the Asciidoctor module).
@@ -236,10 +237,10 @@ module Asciidoctor
   #   == Foo ==
   #   // ^ also a level 1 (h2) section title
   #
-  AtxSectionTitleRx = /^(=={0,5})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
+  AtxSectionTitleRx = /^(=={0,8})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
 
   # Matches an extended Atx section title that includes support for the Markdown variant.
-  ExtAtxSectionTitleRx = /^(=={0,5}|#\#{0,5})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
+  ExtAtxSectionTitleRx = /^(=={0,8}|#\#{0,8})[ \t]+(#{CC_ANY}+?)(?:[ \t]+\1)?$/
 
   # Matches the title only (first line) of an Setext (two-line) section title.
   # The title cannot begin with a dot and must have at least one alphanumeric character.
