@@ -23,11 +23,6 @@ If you use docker you can also use pandoc with docker without installing it:
 
  $ docker run --rm --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
  -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media  -o output2.adoc
-    
-or simply running the following as pandoc should recognize the input and output format from the extensions
-
- $ docker run --rm --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/core input.docx -o output.adoc
-
 
 Then, edit the output file to tidy it up.
 
