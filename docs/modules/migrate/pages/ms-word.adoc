@@ -16,8 +16,22 @@ However, in this case, it's a good choice.
 
 To perform the conversion from MS Word docx to AsciiDoc, you need to perform the following command:
 
+.pandoc < 2.11.2
+ 
  $ pandoc --from=docx --to=asciidoc --wrap=none --atx-headers \
      --extract-media=extracted-media input.docx > output.adoc
+ 
+.pandoc (2.11.2 or newer)
+ 
+ $ pandoc input.docx -f docx -t asciidoc --wrap=none --markdown-headings=atx \                                                                             
+    --extract-media=extracted-media  -o output2.adoc
+
+.pandoc (2.11.2 or newer) and docker
+
+If you use docker you can also use the latest version of pandoc with docker without installing it:
+
+ $ docker run --rm --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
+ -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media  -o output2.adoc
 
 Then, edit the output file to tidy it up.
 
