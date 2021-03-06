@@ -76,13 +76,13 @@ when 'userguide'
   sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/userguide.adoc'
   backend = ENV['BENCH_BACKEND'] || 'html5'
   fetch_userguide if sample_file == 'sample-data/userguide.adoc' && !(File.exist? sample_file)
-  result = Benchmark.bmbm {|bm|
-    bm.report(%(Convert #{sample_file} (x#{$repeat}))) {
-      $repeat.times {
+  result = Benchmark.bmbm do |bm|
+    bm.report(%(Convert #{sample_file} (x#{$repeat}))) do
+      $repeat.times do
         Asciidoctor.render_file sample_file, :backend => backend, :safe => Asciidoctor::SafeMode::SAFE, :eruby => 'erubis', :header_footer => true, :to_file => false, :attributes => {'stylesheet' => nil, 'toc' => nil, 'numbered' => nil, 'icons' => nil, 'compat-mode' => ''}
-      }
-    }
-  }
+      end
+    end
+  end
   # prints average for real run
   puts %(>avg: #{result.first.real / $repeat})
 
