@@ -83,7 +83,7 @@ module Asciidoctor
 class Document < AbstractBlock
 
   ImageReference = ::Struct.new :target, :imagesdir do
-    alias to_s target
+    alias_method :to_s, :target
   end
 
   Footnote = ::Struct.new :index, :id, :text
