@@ -116,7 +116,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
 
     @@base_style_cache = ::Hash.new do |cache, key|
       base_style = (theme = ::Rouge::Theme.find key).base_style
-      (val = base_style[:fg]) && ((style ||= []) << %(color: #{theme.palette val}))
+      (val = base_style[:fg]) && ((style = []) << %(color: #{theme.palette val}))
       (val = base_style[:bg]) && ((style ||= []) << %(background-color: #{theme.palette val}))
       @@base_style_cache = cache.merge key => (resolved_base_style = style && (style.join ';'))
       resolved_base_style
