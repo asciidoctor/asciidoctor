@@ -216,7 +216,6 @@ module SyntaxHighlighter
         'rouge' => %(#{__dir__}/syntax_highlighter/rouge),
       }
 
-      private
 
       @@mutex = ::Mutex.new
     end
