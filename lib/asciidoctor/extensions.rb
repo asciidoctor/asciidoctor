@@ -1021,8 +1021,6 @@ module Extensions
         else
           @docinfo_processor_extensions
         end
-      else
-        nil
       end
     end
 
