@@ -8,6 +8,7 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 :language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
+:status:
 :outfilesuffix: .adoc
 :caution-caption: :fire:
 :important-caption: :exclamation:
@@ -75,6 +76,14 @@ Asciidoctor 是开源的，link:{uri-repo}[代码托管在 GitHub]，遵从 {uri
 * {uri-docs}/asciidoc-writers-guide[AsciiDoc 写作指南]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc 语法快速参考]
 * {uri-docs}/user-manual[Asciidoctor 用户手册]
+
+ifdef::status[]
+image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={uri-gem}]
+image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
+image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build Status (GitHub Actions),link={uri-repo}/actions]
+image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
+image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[project chat,link=https://asciidoctor.zulipchat.com/]
+endif::[]
 
 .Ruby 所至， Asciidoctor 相随
 ****

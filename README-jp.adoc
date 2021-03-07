@@ -7,6 +7,7 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 :language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
+:status:
 :outfilesuffix: .adoc
 :caution-caption: :fire:
 :important-caption: :exclamation:
@@ -87,6 +88,14 @@ endif::[]
 * {uri-docs}/asciidoc-writers-guide[AsciiDoc Writer's Guide]
 * {uri-docs}/user-manual[Asciidoctor User Manual]
 * {uri-docs}/asciidoc-syntax-quick-reference[AsciiDoc Syntax Reference]
+
+ifdef::status[]
+image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={uri-gem}]
+image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
+image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build Status (GitHub Actions),link={uri-repo}/actions]
+image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
+image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[project chat,link=https://asciidoctor.zulipchat.com/]
+endif::[]
 
 == スポンサー
 
