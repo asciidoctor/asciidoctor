@@ -44,7 +44,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-irc: irc://irc.freenode.org/#asciidoctor
+:uri-chat: https://asciidoctor.zulipchat.com
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -433,7 +433,7 @@ Asciidoctorは, コンテンツの執筆と公開を簡単にするために開�
 しかしあなたからのフィードバックがなくてはAsciidoctorの開発は進みません!
 ディスカッションリスト, Twitter, チャットルームを使って, 質問をしたりプロジェクトのさまざまな側面について話し合ったりすることをお勧めします.
 
-チャット(Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+チャット(Zulip):: {uri-chat}
 ディスカッションリスト(Nabble):: {uri-discuss}
 Twitter:: ハッシュタグ https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] またはメンション https://twitter.com/asciidoctor[@asciidoctor]
 

@@ -40,7 +40,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-irc: irc://irc.freenode.org/#asciidoctor
+:uri-chat: https://asciidoctor.zulipchat.com
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -433,9 +433,9 @@ Asciidoctor wurde entwickelt, um Ihnen das Schreiben und Veröffentlichen Ihrer 
 Aber wir können es nicht ohne ihr Feedback machen!
 Wir ermutigen Sie, Fragen zu stellen und alle Aspekte des Projekts auf der Diskussionsliste, auf Twitter oder im Chatroom zu diskutieren.
 
-Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+Chat (Zulip):: {uri-chat}
 Discussionsliste (Nabble):: {uri-discuss}
-Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag or https://twitter.com/asciidoctor[@asciidoctor] mention
+Twitter:: Follow https://twitter.com/asciidoctor[@asciidoctor] or search for the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
 
 ifdef::env-github[]
 Weitere Informationen und Dokumentation zu Asciidoctor finden Sie auf der Website des Projekts.

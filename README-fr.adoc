@@ -40,7 +40,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-irc: irc://irc.freenode.org/#asciidoctor
+:uri-chat: https://asciidoctor.zulipchat.com
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -399,12 +399,9 @@ Asciidoctor est développé dans le but de vous aider à écrire et publier du c
 Mais nous ne pouvons pas le faire sans vos avis !
 Nous vous encourageons à poser vos questions et à discuter de n'importe quels aspects du projet sur la liste de discussion, Twitter ou dans le salon de discussion.
 
-Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+Chat (Zulip):: {uri-chat}
 Forum (Nabble):: {uri-discuss}
 Twitter:: hashtag https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] ou la mention https://twitter.com/asciidoctor[@asciidoctor]
-////
-IRC (Chat):: {uri-irc}[#asciidoctor] sur FreeNode IRC
-////
 
 ifdef::env-github[]
 De plus amples informations et documentations sur Asciidoctor peuvent être trouvées sur le site web du projet.

@@ -44,7 +44,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-irc: irc://irc.freenode.org/#asciidoctor
+:uri-chat: https://asciidoctor.zulipchat.com
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -96,7 +96,7 @@ image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build St
 //image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Coverage Status,link=https://coveralls.io/r/asciidoctor/asciidoctor]
 //image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate,link=https://codeclimate.com/github/asciidoctor/asciidoctor]
 image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
-image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[project chat,link=https://asciidoctor.zulipchat.com/]
+image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[Project Chat (Zulip),link={uri-chat}]
 endif::[]
 
 == Sponsors
@@ -435,9 +435,9 @@ Asciidoctor is developed to help you easily write and publish your content.
 But we can't do it without your feedback!
 We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
 
-Chat (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
+Chat (Zulip):: {uri-chat}
 Discussion list (Nabble):: {uri-discuss}
-Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag or https://twitter.com/asciidoctor[@asciidoctor] mention
+Twitter:: Follow https://twitter.com/asciidoctor[@asciidoctor] or search for the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.

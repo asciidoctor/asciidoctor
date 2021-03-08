@@ -41,7 +41,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-irc: irc://irc.freenode.org/#asciidoctor
+:uri-chat: https://asciidoctor.zulipchat.com
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -391,9 +391,9 @@ Asciidoctor 支持自定义转化器，它可以操作从待处理文件到生�
 但是，如果没有反馈，我们将寸步难行。
 我们鼓励你在讨论组、Twitter或聊天室里，提问为题，讨论项目的方方面面，
 
+聊天 (Zulip):: {uri-chat}
 讨论组 (Nabble):: {uri-discuss}
 Twitter:: https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] 来加入话题 或 https://twitter.com/asciidoctor[@asciidoctor] at并提醒我们
-聊天 (Gitter):: image:https://badges.gitter.im/Join%20In.svg[Gitter, link=https://gitter.im/asciidoctor/asciidoctor]
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
