@@ -1,10 +1,14 @@
-= Tree Processor
+= Tree Processor (Document)
 
 TreeProcessor is a DocumentProcessor
 
 == Registration method
 
 A TreeProcessor is registered with `tree_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::TreeProcessor
 
 == DSL methods
 
@@ -32,11 +36,13 @@ A block found this way can be replaced with `(parent_blocks = original_block.par
 
 === Traverse the block tree
 
+The only known use of this strategy is to replace the default STEM processing.
+It is extremely unlikely that you will need to use this.
+For this reason, no example is presented.
+
 The code here is more complicated and needs to be recursive to find all blocks, but the attributes present at each block may be computed as the traversal proceeds.
 To replay the attributes, for each block execute `document.playback_attributes block.attributes`.
 Remember to call `document.restore_attributes` before returning.
-
-NOTE: We could use an additional example to show how to get up-to-date attributes.
 
 == Example using `find_by` strategy
 

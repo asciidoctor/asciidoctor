@@ -1,14 +1,16 @@
 = Terms relevant to Asciidoctor processor extensions
 
-There are several terms that are easy to mix up.
+When working with extensions in Asciidoctor, it's important to understand the meaning of the terms.
+Let's review the terms that you will come across and what they mean.
+Note that some terms have different meanings depending on whether they are used in reference to user supplied code or Asciidoctor code.
 
 User supplied code:
 
 Extension::
-This is an informal usage.
-Some code that extends or modifies Asciidoctor capabilities by means of Processors.
+A software package or script that augments or enhances AsciiDoc processing.
+When applied to user-supplied code, this is an informal usage.
 Processor::
-Some code that, when added to Asciidoctor via a Registry, directly extends or alters Asciidoctor behavior by manipulating the source, block tree, or output.
+Code that, when registered with Asciidoctor via a Registry, is invoked by Asciidoctor to extend or alter Asciidoctor processing by manipulating the source, block tree, or output.
 A processor must in some way extend Asciidoctor::Extensions::Processor.
 Group::
 Some standalone code that adds Processors to a Registry.

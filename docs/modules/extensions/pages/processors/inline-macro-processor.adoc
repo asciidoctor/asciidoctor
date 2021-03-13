@@ -1,5 +1,5 @@
+= Inline Macro Processor (Syntax)
 :uri-named-arguments: https://www.regular-expressions.info/named.html
-= Inline Macro Processor
 
 InlineMacroProcessor is a SyntaxProcessor
 
@@ -15,6 +15,10 @@ Most likely an adapter will be provided to adapt the inputs and outputs, but an 
 == Registration method
 
 An InlineMacroProcessor is registered with `inline_macro`.
+
+== Superclass
+
+Asciidoctor::Extensions::InlineMacroProcessor
 
 == DSL methods
 

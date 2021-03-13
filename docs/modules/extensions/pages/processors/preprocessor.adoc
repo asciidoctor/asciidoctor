@@ -1,10 +1,19 @@
-= Preprocessor
+= Preprocessor (Document)
 
 Preprocessor is a DocumentProcessor
+
+WARNING: It is extremely difficult to write a Preprocessor that is compatible with `include::`.
+For this reason we suggest that you not distribute Preprocessors and use them only in environments where they can be validated to work properly on the particular documents involved.
+The most likely way to succeed in writing an `include::` compatible Preprocessor is to stream in single lines and stream out the result of processing that line.
+The major reason for this difficulty is that the `include::` preprocessor instruction can involve attributes, and attributes can be set on any line, or by block and block macro processors.
 
 == Registration method
 
 A Preprocessor is registered with `preprocessor`.
+
+== Superclass
+
+Asciidoctor::Extensions::Preprocessor
 
 == DSL methods
 

@@ -7,36 +7,38 @@ They are set up so that they may be run individually through the *-runner.sh scr
 ////
 
 Extensions are central to the power of AsciiDoc because they open up the language to new use cases.
-Asciidoctor provides an extension API that offers a set of extension points.
+To implement this critical functionality, Asciidoctor provides an extension API that offers a set of extension points.
 Extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
 
 Asciidoctor also allows extensions to be written using the full power of the programming language of your Asciidoctor variant: Ruby, Java or other JVM based languages, or Javascript.
-An extension may be included in custom code or packaged and distributed using a language-standard mechanism such as Gems, Jars/Maven, or npm packages.
+An extension may be included in custom code or packaged and distributed using a language-standard mechanism such as RubyGems, Jars/Maven, or npm packages.
 
 There are two general types of processors:
 
 Document Processor::
-  A document processor does not have an explicit invocation in the document.
-Except for `IncludeProcessor`, a document processor is invoked at the appropriate stage of processing with the entire document.
+  A processor that operates on the document as text as an array of lines or as a string, or, for tree processors, as a block tree.
+Document processors are invoked at several stages of processing, before, during, and after conversion.
+A document processor does not have an explicit invocation in the document.
 Syntax Processor::
-  A syntax processor has a name and is invoked when that name is encountered in the document.
+  A processor that operates on the document as a DOM/AST tree.
+A syntax processor has a name and is invoked when that name is encountered in the document.
 
 == Available extension points
 
 Asciidoctor provides the following extension points, shown in the order of invocation, interleaved with a description of Asciidoctor processing stages.
 To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclass.
 
-Asciidoctor starts with a source document and starts reading it into an array of lines and preprocessing it. First, as `include::` directives are processed as they are encountered.
+. Asciidoctor starts with a source document and starts reading it into an array of lines and preprocessing it. First, as `include::` directives are processed as they are encountered.
 
 xref:processors/include-processor.adoc[] (Document)::
 Processes the `include::<target>[attributes]` directive for targets it handles.
 
-The lines from preprocessing include directives are streamed into the chain of preprocessors.
+. The lines from preprocessing include directives are streamed into the chain of preprocessors.
 
 xref:processors/preprocessor.adoc[] (Document)::
 Processes the raw source lines before they are passed to the parser.
 
-The preprocessed lines are streamed into the parse stage.
+. The preprocessed lines are streamed into the parse stage.
 The parser converts the lines into a tree of blocks, calling block and block macro processors as their uses are encountered.
 
 xref:processors/block-processor.adoc[] (Syntax)::
@@ -45,29 +47,29 @@ Processes a block of content marked with a custom block style (e.g. `[custom]`).
 xref:processors/block-macro-processor.adoc[] (Syntax)::
 Processes a custom block macro (e.g., `gist::12345[]`).
 
-When the tree of blocks (also called the Asciidoctor Document Object Model (DOM) or Abstract Syntax Tree (AST)) is complete, the chain of tree processors is called to adjust the tree.
+. When the tree of blocks (also called the Asciidoctor Document Object Model (DOM) or Abstract Syntax Tree (AST)) is complete, the chain of tree processors is called to adjust the tree.
 
 xref:processors/tree-processor.adoc[] (Document)::
 Processes the `Asciidoctor::Document` block tree once parsing is complete.
 
-At this point the block tree is passed to the converter, which converts block contents to the appropriate output format.
+. At this point the block tree is passed to the converter, which converts block contents to the appropriate output format.
 As inline macro uses are encountered, the appropriate processor is invoked.
 
 xref:processors/inline-macro-processor.adoc[] (Syntax)::
 Processes a custom inline macro (e.g., `pass:[btn:[Save]]`).
 
-Generally converters construct "header" content that goes before the converted block content, then convert the block content, and then append footer content.
+. Generally converters construct "header" content that goes before the converted block content, then convert the block content, and then append footer content.
 Docinfo processors may thus be invoked before and after the block conversion.
 
 xref:processors/docinfo-processor.adoc[] (Document)::
 Adds additional content to the header or footer regions of the generated document.
 
-Once the document has reached this stage of completion, the chain of postprocessors is invoked.
+. Once the document has reached this stage of completion, the chain of postprocessors is invoked.
 
 xref:processors/postprocessor.adoc[] (Document)::
 Processes the output after the document has been converted, but before it's written to disk.
 
-There are additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
+There are several extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
 
 == Aspects of extension development
 
@@ -77,7 +79,7 @@ Code::
 This is the actual code that implements the extension functionality.
 The inputs and expected outputs are described on the processor-specific pages linked above.
 
-Capabilities::
+Configuration::
 This involves telling Asciidoctor about the extension, often with information such as `name` and which contexts it can appear in.
 General information is presented xref:processor.adoc[here] with more specific details on the processor-specific pages.
 
@@ -86,4 +88,4 @@ This involves xref:register.adoc[telling Asciidoctor] that you are using the ext
 Usually this is done in code that forms a xref:register.adoc#groups[group].
 
 Packaging::
-xref:packaging.adoc[This] involves making the code available to Asciidoctor for the preceding three aspects.
+xref:packaging.adoc[This] involves making the code available for distribution and loading by the language runtime (e.g., -r asciidoctor-diagram).

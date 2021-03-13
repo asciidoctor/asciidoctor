@@ -1,10 +1,14 @@
-= Postprocessor
+= Postprocessor (Document)
 
 PostProcessor is a DocumentProcessor
 
 == Registration method
 
 A PostProcessor is registered with `postprocessor`.
+
+== Superclass
+
+Asciidoctor::Extensions::Postprocessor
 
 == DSL methods
 

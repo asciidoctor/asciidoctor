@@ -7,7 +7,7 @@ There are two opposing forces at work here:
 * Ease of use, such as enabling extension use from the command line
 * Flexibility, such as enabling registering the processors in a specific Registry instance.
 
-Both can easily be accomodated by having the processors and a Group registering them in one file, and a script registering the group globally in another.
+Both can easily be accomodated by having the processors and a group registering them in one file, and a script registering the group globally in another.
 
 == Use with other code that calls Asciidoctor
 
@@ -34,6 +34,7 @@ Currently there is no recommended naming convention for 3rd party processor exte
 Consult https://github.com/asciidoctor/asciidoctor-community-docs/issues/6 for discussion on this issue.
 
 Existing extensions have been named using a pattern of `asciidoctor-<extensionname>` but this does not distinguish between projects part of the Asciidoctor organization and 3rd party projects, and is susceptible to naming collisions.
+A possible solution would be to name using a pattern of `asciidoctor-<my-project-name>-<extensionname>`.
 
 === File layout
 
@@ -46,9 +47,11 @@ For instance:
 
 ....
 lib/
-├── nestable/
-│      └── processor.rb
-├── nestable.rb
+├── asciidoctor/
+│      ├── nestable/
+│      │      └── processor.rb
+│      └── nestable.rb
+├── asciidoctor-nestable.rb
 nestable.gemspec
 ....
 
@@ -60,7 +63,7 @@ require 'asciidoctor'
 require 'asciidoctor/extensions'
 require 'nestable/processor'
 
-registry = Asciidoctor::Extensions::Registry.new :nestable=> NestableGroup
+registry = Asciidoctor::Extensions::Registry.new :nestable: Asciidoctor::NestableGroup
 
-Asciidoctor.convert_file 'nestable-test.adoc', :extension_registry=> registry, :standalone=> false
+Asciidoctor.convert_file 'nestable-test.adoc', :extension_registry: registry, :standalone: false
 ----

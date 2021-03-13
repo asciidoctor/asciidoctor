@@ -1,4 +1,4 @@
-= Docinfo Processor
+= Docinfo Processor (Document)
 
 DocinfoProcessor is a DocumentProcessor
 
@@ -8,6 +8,10 @@ A DocinfoProcessor can add additional content to this added context.
 == Registration method
 
 A DocinfoProcessor is registered with `docinfo_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::DocinfoProcessor
 
 == DSL methods
 

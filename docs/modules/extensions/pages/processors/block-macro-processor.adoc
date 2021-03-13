@@ -1,10 +1,14 @@
-= Block Macro Processor
+= Block Macro Processor (Syntax)
 
 BlockMacroProcessor is a SyntaxProcessor.
 
 == Registration method
 
 A BlockMacroProcessor is registered with `block_macro`.
+
+== Superclass
+
+Asciidoctor::Extensions::BlockMacroProcessor
 
 == DSL methods
 

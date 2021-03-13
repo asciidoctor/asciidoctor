@@ -1,10 +1,14 @@
-= Block Processor
+= Block Processor (Syntax)
 
 BlockProcessor is a SyntaxProcessor
 
 == Registration method
 
 A BlockProcessor is registered with `block`.
+
+== Superclass
+
+Asciidoctor::Extensions::BlockProcessor
 
 == DSL methods
 
@@ -49,10 +53,13 @@ The choices are:
 | `:comment`
 | `////`
 
+|===
+
+////
+obsolete
 | `:fenced_code`
 | \```
-
-|===
+////
 
 Each context type has implicit semantics associated with it.
 When choosing one or more contexts for your block processor, choose the context or contexts that most closely match the purpose of the processor.

@@ -1,4 +1,4 @@
-= Include Processor
+= Include Processor (Document)
 
 IncludeProcessor is a DocumentProcessor
 
@@ -10,6 +10,10 @@ Not implementing a `handles?` method indicates that the processor wishes to hand
 == Registration method
 
 An IncludeProcessor is registered with `include_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::IncludeProcessor
 
 == DSL methods
 
