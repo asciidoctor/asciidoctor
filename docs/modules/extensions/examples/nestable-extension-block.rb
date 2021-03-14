@@ -5,7 +5,6 @@ nestableGroup = proc do
   block do
     named :nestable
     contexts :example, :paragraph
-    positional_attributes 'role'
 
     process do |parent, reader, attributes|
       create_open_block parent, reader.read_lines, attributes

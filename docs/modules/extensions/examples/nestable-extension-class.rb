@@ -6,7 +6,6 @@ class Nestable < Asciidoctor::Extensions::BlockProcessor
 
   named :nestable
   contexts :example, :paragraph
-  positional_attributes 'role'
 
   def process parent, reader, attributes
     create_open_block parent, reader.read_lines, attributes

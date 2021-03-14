@@ -11,7 +11,6 @@ class Nestable < Asciidoctor::Extensions::BlockProcessor
   enable_dsl
 
   contexts :example, :paragraph
-  positional_attributes 'role'
 
   def process parent, reader, attributes
     attributes['role'] = (role = attributes['role']) ? %(#{@default_role} #{role}) : default_role

@@ -1,4 +1,4 @@
-[nestable,foo]
+[nestable,role=foo]
 ====
 Inside the Nestable Open Block
 ====

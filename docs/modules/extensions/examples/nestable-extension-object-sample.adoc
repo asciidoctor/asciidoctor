@@ -1,7 +1,7 @@
-[barblock,foo]
+[barblock,role=foo]
 ====
 Inside the Bar Block
-[bazblock,bax]
+[bazblock,role=bax]
 ======
 Inside the Baz Block
 ======
