@@ -69,13 +69,6 @@ Otherwise the `content` named group is mapped to the process method `target` par
 Purpose::
 Create an inline macro named `man` that links to a manpage.
 
-=== sample-with-man-link.adoc
-
-[source,asciidoc]
-----
-See man:gittutorial[7] to get started.
-----
-
 === ManpageInlineMacro
 
 [source,ruby]
@@ -90,11 +83,18 @@ include::example$inline-man-extension.rb[]
 include::example$inline-man-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$inline-man-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$inline-man-extension-out.html[]
+include::example$inline-man-extension-sample.html[]
 ----
 
 == Example with regular expression form
@@ -116,9 +116,16 @@ include::example$inline-rfc-link-extension.rb[]
 include::example$inline-rfc-link-extension-runner.sh[tag=runner]
 ----
 
-=== Example output
+=== Input
+
+[source,adoc]
+----
+include::example$inline-rfc-link-extension-sample.adoc[]
+----
+
+=== Output
 
 [source,html]
 ----
-include::example$inline-rfc-link-extension-out.html[]
+include::example$inline-rfc-link-extension-sample.html[]
 ----

@@ -52,8 +52,16 @@ include::example$docinfo-google-analytics-extension.rb[]
 include::example$docinfo-google-analytics-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$docinfo-google-analytics-extension-sample.adoc[]
+----
+
 === Output
 
+[source,html]
 ----
-include::example$docinfo-google-analytics-extension-out.html[]
+include::example$docinfo-google-analytics-extension-sample.html[]
 ----

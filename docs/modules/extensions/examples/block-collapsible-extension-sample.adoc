@@ -1,0 +1,7 @@
+.Show JSON
+[collapsible,json]
+----
+{
+   "foo": "bar"
+}
+----

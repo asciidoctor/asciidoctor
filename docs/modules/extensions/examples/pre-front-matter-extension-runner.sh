@@ -1,20 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-'tags: [announcement, website]
----
-= Document Title
-
-content
-
-[subs=+attributes]
-.Captured front matter
-....
----
-{front-matter}
----
-....
-' \
-| asciidoctor -s -r ./pre-front-matter-extension.rb -
+asciidoctor -s -r ./pre-front-matter-extension.rb ./pre-front-matter-extension-sample.adoc
 #end::runner[]

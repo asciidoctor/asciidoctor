@@ -63,11 +63,18 @@ include::example$tree-shell-session-extension.rb[]
 include::example$tree-shell-session-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$tree-shell-session-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$tree-shell-session-extension-out.html[]
+include::example$tree-shell-session-extension-sample.html[]
 ----
 
 ////

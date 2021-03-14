@@ -1,11 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-' $ echo "Hello, World!"
- > Hello, World!
-
- $ gem install asciidoctor
- ' \
-| asciidoctor -s -r ./tree-shell-session-extension.rb - --trace
+asciidoctor -s -r ./tree-shell-session-extension.rb ./tree-shell-session-extension-sample.adoc
 #end::runner[]

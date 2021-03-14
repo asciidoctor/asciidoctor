@@ -1,0 +1,8 @@
+[barblock,foo]
+====
+Inside the Bar Block
+[bazblock,bax]
+======
+Inside the Baz Block
+======
+====

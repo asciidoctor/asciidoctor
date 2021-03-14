@@ -1,13 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-'.Show JSON
-[collapsible,json]
-----
-{
-   "foo": "bar"
-}
-----' \
-| asciidoctor -s -r ./block-collapsible-extension.rb -
+asciidoctor -s -r ./block-collapsible-extension.rb ./block-collapsible-extension-sample.adoc
 #end::runner[]

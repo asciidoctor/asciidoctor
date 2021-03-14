@@ -67,9 +67,16 @@ include::example$include-uri-extension.rb[]
 include::example$include-uri-extension-runner.sh[tag=runner]
 ------
 
+=== Input
+
+[source,adoc]
+----
+include::example$include-uri-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$include-uri-extension-out.html[]
+include::example$include-uri-extension-sample.html[]
 ----

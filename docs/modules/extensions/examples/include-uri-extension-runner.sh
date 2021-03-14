@@ -1,13 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-'
-.Gemfile
-[source,ruby]
-----
-include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/Gemfile[]
-----
-' \
-| asciidoctor -s -r ./include-uri-extension.rb -
+asciidoctor -s -r ./include-uri-extension.rb ./include-uri-extension-sample.adoc
 #end::runner[]

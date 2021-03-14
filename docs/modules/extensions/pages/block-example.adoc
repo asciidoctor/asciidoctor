@@ -1,6 +1,8 @@
 = Block extension example
 
 Here we will show three ways to write, package, and use the same simple block processor.
+There are three choices (block, class, and object) for the processor, and similarly the same three choices for the group that registers the processor, giving a total of 9 possibilities.
+For simplicity we show only the 3 cases where the choice is the same for both processor and group.
 
 == Extension as a class
 
@@ -23,11 +25,18 @@ Running (in the directory of the nestable-extension file)
 include::example$nestable-extension-class-runner.sh[tag=runner]
 ----
 
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-class-sample.adoc[]
+----
+
 generating
 
 [source,html]
 ----
-include::example$nestable-extension-class-out.html[]
+include::example$nestable-extension-class-sample.html[]
 ----
 
 Lets look at the extension in more detail.
@@ -65,12 +74,18 @@ Note that:
 include::example$nestable-extension-block-runner.sh[tag=runner]
 ----
 
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-block-sample.adoc[]
+----
 
 generating
 
 [source,html]
 ----
-include::example$nestable-extension-class-out.html[]
+include::example$nestable-extension-block-sample.html[]
 ----
 
 == Extension as an object
@@ -92,9 +107,16 @@ The Group is used in the registration code as an Object as well.
 include::example$nestable-extension-object-runner.sh[tag=runner]
 ----
 
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-object-sample.adoc[]
+----
+
 generating
 
 [source,html]
 ----
-include::example$nestable-extension-object-out.html[]
+include::example$nestable-extension-object-sample.html[]
 ----

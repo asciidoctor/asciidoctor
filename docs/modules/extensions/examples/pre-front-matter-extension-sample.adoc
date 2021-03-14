@@ -1,0 +1,13 @@
+tags: [announcement, website]
+---
+= Document Title
+
+content
+
+[subs=+attributes]
+.Captured front matter
+....
+---
+{front-matter}
+---
+....

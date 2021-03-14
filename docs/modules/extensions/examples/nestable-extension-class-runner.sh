@@ -1,10 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-'[nestable,foo]
-====
-Inside the Nestable Open Block
-====' \
-| asciidoctor -s -r ./nestable-extension-class.rb -
+asciidoctor -s -r ./nestable-extension-class.rb ./nestable-extension-class-sample.adoc
 #end::runner[]

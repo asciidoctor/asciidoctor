@@ -46,9 +46,16 @@ include::example$block-macro-gist-extension.rb[]
 include::example$block-macro-gist-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$block-macro-gist-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$block-macro-gist-extension-out.html[]
+include::example$block-macro-gist-extension-sample.html[]
 ----

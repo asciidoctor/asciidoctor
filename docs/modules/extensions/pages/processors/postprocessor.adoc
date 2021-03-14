@@ -46,9 +46,16 @@ include::example$post-footer-extension.rb[]
 include::example$post-footer-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$post-footer-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$post-footer-extension-out.html[]
+include::example$post-footer-extension-sample.html[]
 ----

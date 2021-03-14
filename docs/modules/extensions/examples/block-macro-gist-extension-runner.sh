@@ -1,8 +1,5 @@
 #!/bin/sh
 
 #tag::runner[]
-echo \
-'.My Gist
-gist::123456[]' \
-| asciidoctor -s -r ./block-macro-gist-extension.rb -
+asciidoctor -s -r ./block-macro-gist-extension.rb ./block-macro-gist-extension-sample.adoc
 #end::runner[]

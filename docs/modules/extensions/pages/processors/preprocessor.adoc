@@ -50,9 +50,16 @@ include::example$pre-front-matter-extension.rb[]
 include::example$pre-front-matter-extension-runner.sh[tag=runner]
 ------
 
+=== Input
+
+[source,adoc]
+----
+include::example$pre-front-matter-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$pre-front-matter-extension-out.html[]
+include::example$pre-front-matter-extension-sample.html[]
 ----

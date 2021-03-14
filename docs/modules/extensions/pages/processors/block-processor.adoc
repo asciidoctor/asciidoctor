@@ -98,11 +98,18 @@ include::example$block-shout-extension.rb[]
 include::example$block-shout-extension-runner.sh[tag=runner]
 ----
 
+=== Input
+
+[source,adoc]
+----
+include::example$block-shout-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$block-shout-extension-out.html[]
+include::example$block-shout-extension-sample.html[]
 ----
 
 == Example showing a more complex block structure
@@ -130,11 +137,18 @@ include::example$block-collapsible-extension.rb[]
 include::example$block-collapsible-extension-runner.sh[tag=runner]
 ------
 
+=== Input
+
+[source,adoc]
+----
+include::example$block-collapsible-extension-sample.adoc[]
+----
+
 === Output
 
 [source,html]
 ----
-include::example$block-collapsible-extension-out.html[]
+include::example$block-collapsible-extension-sample.html[]
 ----
 
 NOTE: This extension mimics the builtin `collapsible` option on the example block, but consolidates it to a single block.
