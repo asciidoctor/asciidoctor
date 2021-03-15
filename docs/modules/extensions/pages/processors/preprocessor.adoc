@@ -28,7 +28,7 @@ The document has not yet been parsed.
 The reader is positioned at the "start" of the document, which may be the actual beginning of the source available to the Reader or a position advanced by a preceding Preprocessor.
 Depending on the circumstances, the reader may be the reader originally created to read the source for the document or a reader from a preceding Preprocessor.
 
-The `process` method should a Reader or nil.
+The `process` method should return a Reader or nil.
 The returned reader can be an entirely new Reader or the original reader, perhaps advanced, as in the example.
 
 == Example

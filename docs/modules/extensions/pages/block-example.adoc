@@ -13,6 +13,7 @@ Here's the code for the block processor:
 include::example$nestable-extension-class.rb[]
 ----
 
+[sidebar]
 This extension takes the block content, expressed as a paragraph or example block, and converts it unmodified to an open block.
 The purpose is to allow nested open blocks, which are not yet directly available through Asciidoc syntax (see https://github.com/asciidoctor/asciidoctor/issues/1121).
 This extension allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
@@ -46,8 +47,7 @@ The other choices are to write it as a block or a class instance, covered in the
 
 `extend_dsl` causes an appropriate DSL module for the type of processor to  be mixed in, defining class methods to tell Asciidoctor about our extension.
 
-The next three lines use the DSL to specify the block name, the contexts in which it is allowed, and the positional parameter 'role'.
-Since 'role' is an attribute Asciidoctor already recognizes and maps to css class, specifying `[nestable,myrole]` will give the output div the class 'myrole'.
+The next two lines use the DSL to specify the block name and the contexts in which it is allowed.
 
 In the extension class, finally, is the `process` method, which is called with the `reader` parameter set to the contents of the block.
 This is where the extension does its work.

@@ -18,11 +18,12 @@ Asciidoctor::Extensions::DocinfoProcessor
 include::page$processor.adoc[tag=docproc]
 
 `at_location`::
-When called with `footer`, the supplied content will be added to the footer of the document.
+Specifies the location for insertion of the added content.
 
-NOTE: The default location is `:head`.
-The recognized values for html5 are `:head` and `:footer`.
-The recognized values for docbook5 are `:header` and `:footer`.
+* The default location is `:head`.
+* The recognized values for html5 are `:head`, `:header`, and `:footer`.
+* The recognized values for docbook5 are `:header` and `:footer`.
+* Other environments, such as `jekyll-asciidoc`, may allow arbitrary custom locations.
 
 == Process method
 

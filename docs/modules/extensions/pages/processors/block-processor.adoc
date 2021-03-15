@@ -18,6 +18,10 @@ include::page$processor.adoc[tag=syntaxproc]
 Sets the contexts allowed for this block.
 The choices are:
 
+////
+TODO: put this table somewhere more appropriate
+////
+
 [cols=2,opts=headers]
 |===
 | Context
@@ -33,7 +37,7 @@ The choices are:
 | `----`
 
 | `:literal`
-| `....`
+| `\....`
 
 | `:example`
 | `====`
@@ -140,9 +144,9 @@ include::example$block-collapsible-extension-runner.sh[tag=runner]
 === Input
 
 [source,adoc]
-----
+------
 include::example$block-collapsible-extension-sample.adoc[]
-----
+------
 
 === Output
 

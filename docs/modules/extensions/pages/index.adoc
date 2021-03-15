@@ -10,25 +10,25 @@ Extensions are central to the power of AsciiDoc because they open up the languag
 To implement this critical functionality, Asciidoctor provides an extension API that offers a set of extension points.
 Extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
 
-Asciidoctor also allows extensions to be written using the full power of the programming language of your Asciidoctor variant: Ruby, Java or other JVM based languages, or Javascript.
+Asciidoctor allows extensions to be written using the full power of the programming language of your Asciidoctor variant: Ruby, Java or other JVM based languages, or Javascript.
 An extension may be included in custom code or packaged and distributed using a language-standard mechanism such as RubyGems, Jars/Maven, or npm packages.
 
 There are two general types of processors:
 
 Document Processor::
-  A processor that operates on the document as text as an array of lines or as a string, or, for tree processors, as a block tree.
-Document processors are invoked at several stages of processing, before, during, and after conversion.
-A document processor does not have an explicit invocation in the document.
+A document processor does not have an explicit invocation in the document,
+but is invoked at one of several stages of processing, before, during, and after conversion.
+  A document processor operates on the document as text as an array of lines or as a string, or, for tree processors, as a block tree as a whole.
 Syntax Processor::
-  A processor that operates on the document as a DOM/AST tree.
 A syntax processor has a name and is invoked when that name is encountered in the document.
+  A syntax processor operates on the document as a DOM/AST tree, at the location in the tree corresponding to the invocation in the source.
 
 == Available extension points
 
 Asciidoctor provides the following extension points, shown in the order of invocation, interleaved with a description of Asciidoctor processing stages.
 To be more specific, these are types of Processor, and a concrete implementation extends the corresponding Processor subclass.
 
-. Asciidoctor starts with a source document and starts reading it into an array of lines and preprocessing it. First, as `include::` directives are processed as they are encountered.
+. Asciidoctor starts with a source document and starts reading it into an array of lines and preprocessing it. First, `include::` directives are processed as they are encountered.
 
 xref:processors/include-processor.adoc[] (Document)::
 Processes the `include::<target>[attributes]` directive for targets it handles.

@@ -40,19 +40,6 @@ Include a file from a URI.
 
 TIP: Asciidoctor supports including content from a URI out of the box if you set the `allow-uri-read` attribute (not available if the safe mode is `secure`).
 
-== sample-with-uri-include.adoc
-
-[source,asciidoc]
-....
-:source-highlighter: coderay
-
-.Gemfile
-[source,ruby]
-----
-\include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/Gemfile[]
-----
-....
-
 === UriIncludeProcessor
 
 [source,ruby]
@@ -70,9 +57,9 @@ include::example$include-uri-extension-runner.sh[tag=runner]
 === Input
 
 [source,adoc]
-----
-include::example$include-uri-extension-sample.adoc[]
-----
+------
+include::example$include-uri-extension-sample-source.adoc[]
+------
 
 === Output
 
