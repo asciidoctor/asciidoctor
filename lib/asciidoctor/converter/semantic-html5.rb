@@ -20,7 +20,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_paragraph node
-    attributes = html_attributes node.id, node.role, 'paragraph'
+    attributes = html_attributes node.id, node.role
     if node.title?
       %(<p#{attributes}>
 <strong class="title">#{node.title}</strong>
@@ -33,7 +33,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
-  def html_attributes id, role, default_role
+  def html_attributes id, role, default_role = nil
     roles = []
     roles << default_role if default_role
     roles << role if role
