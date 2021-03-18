@@ -21,8 +21,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0']
-        rouge-version: [~]
         asciimath-version: [~]
+        pygments-version: ['~> 1.2.0']
+        rouge-version: [~]
         exclude:
         - os: ubuntu-latest
           ruby: '3.0'
@@ -31,6 +32,7 @@ jobs:
           ruby: truffleruby-20.2.0
         - os: ubuntu-latest
           ruby: jruby-9.1.17.0
+          pygments-version: ~
         - os: ubuntu-latest
           ruby: jruby-9.2.13.0
         - os: macos-latest
@@ -47,7 +49,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
-      PYGMENTS_VERSION: '~> 1.2.0'
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
     - name: Checkout
@@ -71,6 +72,9 @@ jobs:
     - name: Set AsciiMath version
       if: matrix.asciimath-version
       run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
+    - name: Set Pygments version
+      if: matrix.pygments-version
+      run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
