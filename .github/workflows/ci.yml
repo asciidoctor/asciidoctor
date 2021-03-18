@@ -47,7 +47,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
-      JRUBY_OPTS: '-J-XX:+TieredCompilation -J-XX:TieredStopAtLevel=1 -J-Xss2m -Xcompile.invokedynamic=false'
       PYGMENTS_VERSION: '~> 1.2.0'
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
@@ -75,9 +74,6 @@ jobs:
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
-    - name: Set JRUBY_OPTS
-      if: matrix.jruby-opts
-      run: echo 'JRUBY_OPTS=${{ matrix.jruby-opts }}' >> $GITHUB_ENV
     - name: Install dependencies
       run: bundle --jobs 3 --retry 3
     - name: Run tests
