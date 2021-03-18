@@ -49,26 +49,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
+      BUNDLE_WITHOUT: docs
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Install Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-    - name: Configure Bundler
-      run: |
-        bundle config --local path .bundle/gems
-        bundle config --local without docs
-    - name: Configure Nokogiri installation (Linux)
+    - name: Install prerequisites for Nokogiri (Linux)
       if: matrix.os == 'ubuntu-latest'
-      run: |
-        bundle config --local build__nokogiri --use-system-libraries
-        sudo apt-get install libxslt1-dev
-    - name: Configure Nokogiri installation (macOS)
-      if: matrix.os == 'macos-latest'
-      run: bundle config --local build__nokogiri --use-system-libraries
+      run: sudo apt-get install libxslt1-dev
+    - name: Configure Nokogiri installation (Linux, macOS)
+      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
+      run: echo 'BUNDLE_BUILD__NOKOGIRI=--use-system-libraries' >> $GITHUB_ENV
     - name: Set AsciiMath version
       if: matrix.asciimath-version
       run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
@@ -78,8 +69,16 @@ jobs:
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
-    - name: Install dependencies
-      run: bundle --jobs 3 --retry 3
+    - name: Install Ruby (uses cached dependencies for non-scheduled build)
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: ${{ github.event_name != 'schedule' }}
+    - name: Install dependencies (scheduled build only)
+      if: github.event_name == 'schedule'
+      run: |
+        bundle config --local path .bundle/gems
+        bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Build dependents
