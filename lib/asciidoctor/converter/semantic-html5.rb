@@ -3,7 +3,7 @@ module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # that maximizes the use of semantic constructs.
 class Converter::SemanticHtml5Converter < Converter::Base
-  register_for 'semantic-html5', 'sem-html5'
+  register_for 'semantic-html5'
 
   def initialize backend, opts = {}
     @backend = backend
