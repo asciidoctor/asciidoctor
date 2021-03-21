@@ -7,11 +7,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
   def initialize backend, opts = {}
     @backend = backend
-    if opts[:htmlsyntax] == 'xml'
-      syntax = 'xml'
-    else
-      syntax = 'html'
-    end
+    syntax = opts[:htmlsyntax] == 'xml' ? 'xml' : 'html'
     init_backend_traits basebackend: 'html', filetype: 'html', htmlsyntax: syntax, outfilesuffix: '.html', supports_templates: true
   end
 
@@ -20,7 +16,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_paragraph node
-    attributes = html_attributes node.id, node.role
+    attributes = common_html_attributes node.id, node.role
     if node.title?
       %(<p#{attributes}>
 <strong class="title">#{node.title}</strong>
@@ -33,9 +29,8 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
-  def html_attributes id, role, default_role = nil
-    roles = []
-    roles << default_role if default_role
+  def common_html_attributes id, role, default_role = nil
+    roles = default_role ? [default_role] : []
     roles << role if role
     %(#{id ? %( id="#{id}") : ''}#{roles.empty? ? '' : %( class="#{roles.join(' ')}") })
   end
