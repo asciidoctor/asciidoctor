@@ -2,8 +2,12 @@
 module Asciidoctor
 # A built-in {Converter} implementation that generates the man page (troff) format.
 #
-# The output follows the groff man page definition while also trying to be
-# consistent with the output produced by the a2x tool from AsciiDoc Python.
+# The output of this converter adheres to the man definition as defined by
+# groff and uses the manpage output of the DocBook toolchain as a foundation.
+# That means if you've previously been generating man pages using the a2x tool
+# from AsciiDoc Python, you should be able to achieve a very similar result
+# using this converter. Though you'll also get to enjoy some notable
+# enhancements that have been added since, such as the customizable linkstyle.
 #
 # See http://www.gnu.org/software/groff/manual/html_node/Man-usage.html#Man-usage
 class Converter::ManPageConverter < Converter::Base
