@@ -6,13 +6,14 @@ This, in turn, gets you up and running quickly by giving you a result to preview
 This page covers why the default is necessary, how to apply it, and how to build on it so you don't have to create a stylesheet from scratch.
 
 NOTE: The default stylesheet that Asciidoctor provides is just that, _a default_.
-If you don't like its appearance, you can customize it or replace it with a different one,
-though it's important to understand what purpose the stylesheet serves when doing so.
+If you prefer a different style, you can customize it or replace it with a different one.
+When replacing the default stylesheet, it's important to understand that it's providing support for numerous features in AsciiDoc, as covered in the next section.
+You'll need to include these required styles when developing your own stylesheet if you want these features to continue to work.
 
 // TODO: we probably need a page to defines what styles any stylesheet must provide to be fully compatible with AsciiDoc
 == Why provide a default?
 
-As previously stated, a default stylesheet is included to provide a nice out-of-the-box experience.
+Asciidoctor includes a default stylesheet to provide a nice out-of-the-box experience when generating HTML from AsciiDoc.
 But there's more to it.
 There are elements of AsciiDoc that require stylesheet support.
 
