@@ -27,7 +27,7 @@ class AttributeList
   QUOT = '"'
 
   # Public: Regular expressions for detecting the boundary of a value
-  BoundaryRxs = {
+  BoundaryRx = {
     QUOT => /.*?[^\\](?=")/,
     APOS => /.*?[^\\](?=')/,
     ',' => /.*?(?=[ \t]*(,|$))/
@@ -46,7 +46,7 @@ class AttributeList
   BlankRx = /[ \t]+/
 
   # Public: Regular expressions for skipping delimiters
-  SkipRxs = {
+  SkipRx = {
     ',' => /[ \t]*(,|$)/
   }
 
@@ -54,8 +54,8 @@ class AttributeList
     @scanner = ::StringScanner.new source
     @block = block
     @delimiter = delimiter
-    @delimiter_skip_pattern = SkipRxs[delimiter]
-    @delimiter_boundary_pattern = BoundaryRxs[delimiter]
+    @delimiter_skip_pattern = SkipRx[delimiter]
+    @delimiter_boundary_pattern = BoundaryRx[delimiter]
     @attributes = nil
   end
 
@@ -214,7 +214,7 @@ class AttributeList
   end
 
   def scan_to_quote quote
-    @scanner.scan BoundaryRxs[quote]
+    @scanner.scan BoundaryRx[quote]
   end
 end
 end
