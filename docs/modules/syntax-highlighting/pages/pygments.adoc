@@ -16,7 +16,7 @@ It comes bundled with the pygments.rb gem.
 
 IMPORTANT: You must have Python installed to use pygments.rb.
 
-Depending on pygments.rb release, you must have different Python versions installed:
+The version of Python required depends on which pygments.rb release you using:
 
 * pygments.rb 1.x requires Python 2.
 Check that you have a `python2` (Linux), `python` (macOS), or `py -2` (Windows) executable on your PATH.
@@ -100,6 +100,20 @@ To list the available Pygments styles, run the following command in a terminal:
 
 The pygments.rb gem uses a bundled version of Pygments (often ahead of the latest release).
 This command ensures that you are invoking the `pygmentize` command from the Pygments used by that gem.
+
+[#pygments-timeout]
+== Pygments timeout (pygments.rb 1.x only)
+
+If you're using pygments.rb 1.x, you may need to adjust the timeout.
+This configuration step is not necessary if you're using pygments.rb 2.x with Python 3.
+
+Since Pygments is an external program, the call to that command in pygments.rb 1.x is managed by a timeout to safe-guard against a hanging process.
+By default, this timeout is 8 seconds.
+If you discover that the call is failing to complete within this timeout period, you can increase the timeout (in seconds) by setting the `MENTOS_TIMEOUT` environment variable.
+
+ export MENTOS_TIMEOUT=30
+
+Now the call to Pygments (via pygments.rb 1.x) will be allocated up to 30 seconds to complete.
 
 == Using a custom Pygments installation
 

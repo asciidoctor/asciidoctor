@@ -36,11 +36,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
         node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
       end
     elsif (highlighted = lexer.highlight source, options: highlight_opts)
-      if linenos && noclasses
-        StyledLinenoSpanTagRx.each do |rx, cs|
-          highlighted = highlighted.gsub rx, cs
-        end
-      end
+      highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs if linenos && noclasses
       highlighted.sub WrapperTagRx, '\1'
     else
       node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
@@ -137,18 +133,16 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
 
   CodeCellStartTagCs = '<td class="code">'
   LinenoColumnStartTagsCs = '<td class="linenos"><div class="linenodiv"><pre>'
+  LinenoSpanTagCs = '<span class="lineno">\1 </span>'
   PreTagCs = '<pre>\1</pre>'
   StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
-  StyledLinenoSpanTagRx = {
-    %r{<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">( *\d+ )</span>} => '<span class="lineno">\1</span>',
-    %r{<span style="color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px;">( *\d+)</span>} => '<span class="lineno">\1 </span>',
-  }.freeze
+  StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>)
   WRAPPER_CLASS = 'lineno' # doesn't appear in output; Pygments appends "table" to this value to make nested table class
   # NOTE <pre> has style attribute when pygments-css=style
   # NOTE <div> has trailing newline when pygments-linenums-mode=table
   # NOTE initial <span></span> preserves leading blank lines
   WrapperTagRx = %r(<div class="#{WRAPPER_CLASS}"><pre\b[^>]*?>(.*)</pre></div>\n*)m
 
-  private_constant :CodeCellStartTagCs, :LinenoColumnStartTagsCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
+  private_constant :CodeCellStartTagCs, :LinenoColumnStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
 end
 end
