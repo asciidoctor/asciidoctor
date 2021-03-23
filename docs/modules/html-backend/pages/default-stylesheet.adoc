@@ -21,6 +21,9 @@ One example is to honor *built-in roles*, such as `text-center`.
 In order for a role to take effect, it needs a companion CSS class in the stylesheet.
 To satisfy the expectations of a built-in role, a stylesheet is required.
 
+You may have noticed the floating anchors next to section titles when you hover over them.
+Although the HTML to make them is there, it's the stylesheet that brings them to life.
+
 Another example is to implement *list marker styles*.
 AsciiDoc allows you to specify the marker for a list using a block style (e.g., `loweralpha`).
 However, HTML does not apply these markers by default.
