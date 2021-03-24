@@ -22,10 +22,12 @@ Bug Fixes::
 Improvements::
 
   * Extract method to create lexer and formatter in Rouge adapter (#3952)
+  * Add support for pygments.rb 2.x (#3969) (*@slonopotamus*)
 
 Build / Infrastructure::
 
   * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
+  * Run tests against both pygments.rb 1.x and 2.x (#3969) (*@slonopotamus*)
 
 Documentation::
 

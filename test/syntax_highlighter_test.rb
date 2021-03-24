@@ -1163,7 +1163,10 @@ context 'Syntax Highlighter' do
       assert_css 'table.linenotable td.linenos .linenodiv pre:not([class])', output, 1
       assert_css 'table.linenotable td.code', output, 1
       assert_css 'table.linenotable td.code pre:not([class])', output, 1
-      assert_xpath %(//*[@class="linenodiv"]/pre[text()="1\n2"]), output, 1
+      # NOTE new versions of Pygments wrap the numbers in span
+      linenos_node = xmlnodes_at_xpath %(//*[@class="linenodiv"]/pre), output, 1
+      linenos = linenos_node.content.gsub %r(<span class="normal">\d+</span>), '\1'
+      assert_equal %(1\n2), linenos
     end
 
     test 'should restore callout marks to correct lines if table line numbering is enabled' do
@@ -1227,7 +1230,7 @@ context 'Syntax Highlighter' do
       assert_css 'pre:not([style])', output, 2
     end
 
-    test 'should not hardcode inline styles on lineno spans when linenums are enabled and source-highlighter is pygments' do
+    test 'should replace inline styles on lineno spans with class and preserve trailing space when linenums are enabled and source-highlighter is pygments' do
       input = <<~'EOS'
       :source-highlighter: pygments
       :pygments-css: inline

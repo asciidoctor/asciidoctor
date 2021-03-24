@@ -8,16 +8,21 @@
 
 == Install Pygments
 
-In order to use Pygments with Asciidoctor, you need {url-python}[Python 2^] and the {url-pygments-gem}[pygments.rb gem^].
+In order to use Pygments with Asciidoctor, you need {url-python}[Python] and the {url-pygments-gem}[pygments.rb gem^].
 The pygments.rb gem manages calls to Pygments, which is an external program that runs using Python.
 
 TIP: You do not need to install Pygments itself.
 It comes bundled with the pygments.rb gem.
 
-IMPORTANT: You must have Python 2 installed to use pygments.rb.
-Python 3 is not compatible with the pygments.rb gem.
+IMPORTANT: You must have Python installed to use pygments.rb.
+
+The version of Python required depends on which pygments.rb release you using:
+
+* pygments.rb 1.x requires Python 2.
 Check that you have a `python2` (Linux), `python` (macOS), or `py -2` (Windows) executable on your PATH.
 (On macOS, verify that the `python` executable uses Python 2 by running `python -V`).
+* pygments.rb 2.x requires Python 3.
+Check that you have a `python3` (Linux/macOS) or `py -3` (Windows) executable on your PATH.
 
 .Installing Python and the pygments.rb gem via the CLI (cross platform)
 [source,console]
@@ -96,15 +101,19 @@ To list the available Pygments styles, run the following command in a terminal:
 The pygments.rb gem uses a bundled version of Pygments (often ahead of the latest release).
 This command ensures that you are invoking the `pygmentize` command from the Pygments used by that gem.
 
-== Pygments timeout
+[#pygments-timeout]
+== Pygments timeout (pygments.rb 1.x only)
 
-Since Pygments is an external program, the call to that command is managed by a timeout to safe-guard against a hanging process.
+If you're using pygments.rb 1.x, you may need to adjust the timeout.
+This configuration step is not necessary if you're using pygments.rb 2.x with Python 3.
+
+Since Pygments is an external program, the call to that command in pygments.rb 1.x is managed by a timeout to safe-guard against a hanging process.
 By default, this timeout is 8 seconds.
 If you discover that the call is failing to complete within this timeout period, you can increase the timeout (in seconds) by setting the `MENTOS_TIMEOUT` environment variable.
 
  export MENTOS_TIMEOUT=30
 
-Now the call to Pygments will be allocated up to 30 seconds to complete.
+Now the call to Pygments (via pygments.rb 1.x) will be allocated up to 30 seconds to complete.
 
 == Using a custom Pygments installation
 

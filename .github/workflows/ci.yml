@@ -22,7 +22,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0']
         asciimath-version: [~]
-        pygments-version: ['~> 1.2.0']
+        pygments-version: ['~> 2.0']
         rouge-version: [~]
         exclude:
         - os: ubuntu-latest
@@ -40,6 +40,9 @@ jobs:
         - os: ubuntu-latest
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
+        - os: ubuntu-latest
+          ruby: '2.3'
+          pygments-version: '~> 1.2.0'
         - os: ubuntu-latest
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
