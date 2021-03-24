@@ -10,7 +10,7 @@ context 'Semantic HTML 5 converter' do
     test scenario_name do
       input = IO.read input_filename, mode: 'r:UTF-8', newline: :universal
       expected = (IO.read output_filename, mode: 'r:UTF-8', newline: :universal).chomp
-      result = (convert_string_to_embedded input, backend: 'semantic-html5')
+      result = (convert_string_to_embedded input, backend: 'semantic-html5').chomp
       assert_equal expected, result
     end
   end

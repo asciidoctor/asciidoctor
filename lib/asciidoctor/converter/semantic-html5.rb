@@ -12,7 +12,12 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_embedded node
-    node.content
+    result = []
+    if (header = generate_header node)
+      result << header
+    end
+    result << node.content
+    result.join LF
   end
 
   def convert_paragraph node
@@ -26,6 +31,25 @@ class Converter::SemanticHtml5Converter < Converter::Base
       %(<p#{attributes}>
 #{node.content}
 </p>)
+    end
+  end
+
+  def generate_header node
+    if node.header? && !node.noheader
+      result = ['<header>']
+      if (doctitle = generate_document_title node)
+        result << doctitle
+      end
+      result << '</header>'
+      result.join LF
+    end
+  end
+
+  def generate_document_title node
+    unless node.notitle
+      doctitle = node.doctitle partition: true, sanitize: true
+      attributes = common_html_attributes node.id, node.role
+      %(<h1#{attributes}>#{doctitle.main}#{doctitle.subtitle? ? %( <small class="subtitle">#{doctitle.subtitle}</small>) : ''}</h1>)
     end
   end
 
