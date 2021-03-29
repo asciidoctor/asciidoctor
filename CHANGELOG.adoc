@@ -23,6 +23,7 @@ Improvements::
 
   * Extract method to create lexer and formatter in Rouge adapter (#3952)
   * Add support for pygments.rb 2.x (#3969) (*@slonopotamus*)
+  * Allow NullLogger to be enabled by setting the `:logger` option to a falsy value (#3982)
 
 Build / Infrastructure::
 

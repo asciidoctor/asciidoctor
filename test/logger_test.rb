@@ -129,6 +129,18 @@ context 'Logger' do
         Asciidoctor::LoggerManager.logger = old_logger
       end
     end
+
+    test 'should be able to set logger to NullLogger by setting :logger option to a falsy value' do
+      [nil, false].each do |falsy_val|
+        old_logger = Asciidoctor::LoggerManager.logger
+        begin
+          Asciidoctor.load 'contents', logger: falsy_val
+          assert_kind_of Asciidoctor::NullLogger, Asciidoctor::LoggerManager.logger
+        ensure
+          Asciidoctor::LoggerManager.logger = old_logger
+        end
+      end
+    end
   end
 
   context 'Logging' do
