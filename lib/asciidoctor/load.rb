@@ -20,8 +20,8 @@ module Asciidoctor
         timings.start :read
       end
 
-      if (logger = options[:logger]) && logger != LoggerManager.logger
-        LoggerManager.logger = logger
+      if (options.key? :logger) && (logger = options[:logger]) != LoggerManager.logger
+        LoggerManager.logger = logger || NullLogger.new
       end
 
       if !(attrs = options[:attributes])
