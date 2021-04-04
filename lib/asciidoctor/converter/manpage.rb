@@ -104,7 +104,10 @@ class Converter::ManPageConverter < Converter::Base
     # QUESTION should NOTES come after AUTHOR(S)?
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result << '.SH "NOTES"'
-      result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
+      node.footnotes.each_with_index do |fn, idx|
+        result << %(.IP [#{fn.index}])
+        result << fn.text
+      end
     end
 
     unless (authors = node.authors).empty?
@@ -130,7 +133,10 @@ class Converter::ManPageConverter < Converter::Base
 
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result << '.SH "NOTES"'
-      result.concat(node.footnotes.map {|fn| %(#{fn.index}. #{fn.text}) })
+      node.footnotes.each_with_index do |fn, idx|
+        result << %(.IP [#{fn.index}])
+        result << fn.text
+      end
     end
 
     # QUESTION should we add an AUTHOR(S) section?
