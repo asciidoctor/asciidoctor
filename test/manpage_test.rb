@@ -845,6 +845,69 @@ context 'Manpage' do
       output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? expected_coda
     end
+
+    test 'should format footnote with bare URL' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:[https://example.org]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "NOTES"
+      .IP [1]
+      .URL "https://example.org" "" ""
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format footnote with text before bare URL' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:[see https://example.org]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "NOTES"
+      .IP [1]
+      see \c
+      .URL "https://example.org" "" ""
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format footnote with text after bare URL' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:[https://example.org is the place]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "NOTES"
+      .IP [1]
+      .URL "https://example.org" "" " "
+      is the place
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format footnote with URL macro' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:[go to https://example.org[example site].]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "NOTES"
+      .IP [1]
+      go to \c
+      .URL "https://example.org" "example site" "."
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
   end
 
   context 'Environment' do
