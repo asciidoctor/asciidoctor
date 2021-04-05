@@ -789,6 +789,64 @@ context 'Manpage' do
     end
   end
 
+  context 'Footnotes' do
+    test 'should generate list of footnotes using numbered list with numbers enclosed in brackets' do
+      [true, false].each do |standalone|
+        input = <<~EOS.chop
+        #{SAMPLE_MANPAGE_HEADER}
+
+        text.footnote:[first footnote]
+
+        more text.footnote:[second footnote]
+        EOS
+        expected_coda = <<~'EOS'.chop
+        .sp
+        text.[1]
+        .sp
+        more text.[2]
+        .SH "NOTES"
+        .IP [1]
+        first footnote
+        .IP [2]
+        second footnote
+        EOS
+        if standalone
+          expected_coda = <<~EOS.chop
+          #{expected_coda}
+          .SH "AUTHOR"
+          .sp
+          Author Name
+          EOS
+        end
+        output = Asciidoctor.convert input, backend: :manpage, standalone: standalone
+        assert output.end_with? expected_coda
+      end
+    end
+
+    test 'should number footnotes according to footnote index' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:fn1[first footnote]footnote:[second footnote]
+
+      more text.footnote:fn1[]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .sp
+      text.[1][2]
+      .sp
+      more text.[1]
+      .SH "NOTES"
+      .IP [1]
+      first footnote
+      .IP [2]
+      second footnote
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+  end
+
   context 'Environment' do
     test 'should use SOURCE_DATE_EPOCH as modified time of input file and local time' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'

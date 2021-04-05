@@ -18,6 +18,7 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
+  * Fix layout of footnotes in manpage output (#3989)
 
 Improvements::
 
