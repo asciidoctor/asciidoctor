@@ -22,6 +22,7 @@ class Converter::ManPageConverter < Converter::Base
   LiteralBackslashRx = /\A\\|(#{ESC})?\\/
   LeadingPeriodRx = /^\./
   EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) "#{CC_ANY}*?" "#{CC_ANY}*?" )( |[^\s]*)(#{CC_ANY}*?)(?: *#{ESC}\\c)?$/
+  MalformedEscapedMacroRx = /(#{ESC}\\c) (#{ESC}\.(?:URL|MTO) )/
   MockBoundaryRx = /<\/?BOUNDARY>/
   EmDashCharRefRx = /&#8212;(?:&#8203;)?/
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
@@ -102,13 +103,7 @@ class Converter::ManPageConverter < Converter::Base
     result << node.content
 
     # QUESTION should NOTES come after AUTHOR(S)?
-    if node.footnotes? && !(node.attr? 'nofootnotes')
-      result << '.SH "NOTES"'
-      node.footnotes.each_with_index do |fn, idx|
-        result << %(.IP [#{fn.index}])
-        result << fn.text
-      end
-    end
+    append_footnotes result, node
 
     unless (authors = node.authors).empty?
       if authors.size > 1
@@ -131,13 +126,7 @@ class Converter::ManPageConverter < Converter::Base
   def convert_embedded node
     result = [node.content]
 
-    if node.footnotes? && !(node.attr? 'nofootnotes')
-      result << '.SH "NOTES"'
-      node.footnotes.each_with_index do |fn, idx|
-        result << %(.IP [#{fn.index}])
-        result << fn.text
-      end
-    end
+    append_footnotes result, node
 
     # QUESTION should we add an AUTHOR(S) section?
 
@@ -687,6 +676,22 @@ allbox tab(:);'
   end
 
   private
+
+  def append_footnotes result, node
+    if node.footnotes? && !(node.attr? 'nofootnotes')
+      result << '.SH "NOTES"'
+      node.footnotes.each_with_index do |fn, idx|
+        result << %(.IP [#{fn.index}])
+        # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
+        if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
+          text = (manify %(#{text.gsub MalformedEscapedMacroRx, %(\\1#{LF}\\2)} ), whitespace: :normalize).chomp ' '
+        else
+          text = manify text, whitespace: :normalize
+        end
+        result << text
+      end
+    end
+  end
 
   # Converts HTML entity references back to their original form, escapes
   # special man characters and strips trailing whitespace.

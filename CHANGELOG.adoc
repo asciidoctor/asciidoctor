@@ -19,6 +19,7 @@ Bug Fixes::
 
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
   * Fix layout of footnotes in manpage output (#3989)
+  * Fix formatting of footnote text with URL in manpage output (#3988)
 
 Improvements::
 
