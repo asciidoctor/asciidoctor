@@ -314,8 +314,9 @@ r lw(\n(.lu*75u/100u).'
     end
   end
 
-  # TODO use Page Control https://www.gnu.org/software/groff/manual/html_node/Page-Control.html#Page-Control
-  alias convert_page_break skip
+  def convert_page_break node
+    '.bp'
+  end
 
   def convert_paragraph node
     if node.title?

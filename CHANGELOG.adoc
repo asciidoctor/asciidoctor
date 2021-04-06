@@ -22,6 +22,7 @@ Bug Fixes::
   * Remove extra .sp before content of verse block in manpage output
   * Fix layout of footnotes in manpage output (#3989)
   * Fix formatting of footnote text with URL in manpage output (#3988)
+  * Use .bp macro at location of page break in manpage output (#3992)
 
 Improvements::
 
