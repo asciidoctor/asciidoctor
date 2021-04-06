@@ -908,6 +908,23 @@ context 'Manpage' do
       output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? expected_coda
     end
+
+    test 'should produce a warning message and output fallback text at location of macro of unresolved footnote' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      text.footnote:does-not-exist[]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .sp
+      text.[does\-not\-exist]
+      EOS
+      using_memory_logger do |logger|
+        output = Asciidoctor.convert input, backend: :manpage
+        assert output.end_with? expected_coda
+        assert_message logger, :WARN, 'invalid footnote reference: does-not-exist'
+      end
+    end
   end
 
   context 'Environment' do
