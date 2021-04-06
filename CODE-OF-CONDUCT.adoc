@@ -1,0 +1,3 @@
+== Code of Conduct
+
+Please read the https://github.com/asciidoctor/.github/blob/main/CODE-OF-CONDUCT.md[Asciidoctor Community Code of Conduct].
