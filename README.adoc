@@ -451,6 +451,12 @@ Source repository (git):: {uri-repo}
 Issue tracker:: {uri-issues}
 Asciidoctor organization on GitHub:: {uri-org}
 
+== Code of Conduct
+
+The core Asciidoctor project is governed by the https://github.com/asciidoctor/.github/blob/main/CODE-OF-CONDUCT.md[Code of Conduct] for the Asciidoctor community of projects.
+By participating, you're agreeing to honor this code.
+Let's work together to make this a welcoming, professional, inclusive, and safe environment for everyone.
+
 == Copyright and License
 
 Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
