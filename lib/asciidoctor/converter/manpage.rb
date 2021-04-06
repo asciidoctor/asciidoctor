@@ -608,7 +608,6 @@ allbox tab(:);'
     %(#{ESC_BS}fB(#{node.text})#{ESC_BS}fP)
   end
 
-  # TODO supposedly groff has footnotes, but we're in search of an example
   def convert_inline_footnote node
     if (index = node.attr 'index')
       %([#{index}])
