@@ -824,6 +824,32 @@ context 'Manpage' do
     end
   end
 
+  context 'Page breaks' do
+    test 'should insert page break at location of page break macro' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == Section With Break
+
+      before break
+
+      <<<
+
+      after break
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "SECTION WITH BREAK"
+      .sp
+      before break
+      .bp
+      .sp
+      after break
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+  end
+
   context 'Footnotes' do
     test 'should generate list of footnotes using numbered list with numbers enclosed in brackets' do
       [true, false].each do |standalone|
