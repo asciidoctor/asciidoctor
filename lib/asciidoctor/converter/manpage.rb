@@ -96,7 +96,7 @@ class Converter::ManPageConverter < Converter::Base
       if node.attr? 'manpurpose'
         mannames = node.attr 'mannames', [manname]
         result << %(.SH "#{(node.attr 'manname-title', 'NAME').upcase}"
-#{mannames.map {|n| manify n }.join ', '} \\- #{manify node.attr('manpurpose'), whitespace: :normalize})
+#{mannames.map {|n| (manify n).gsub '\-', '-' }.join ', '} \\- #{manify node.attr('manpurpose'), whitespace: :normalize})
       end
     end
 

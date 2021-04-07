@@ -34,6 +34,12 @@ context 'Manpage' do
       assert_equal 'command', doc.attributes['docname']
     end
 
+    test 'should not escape hyphen when printing manname in NAME section' do
+      input = SAMPLE_MANPAGE_HEADER.sub(/^command - /, 'git-describe - ')
+      output = Asciidoctor.convert input, backend: :manpage, standalone: true
+      assert_includes output, %(\n.SH "NAME"\ngit-describe \\- does stuff\n)
+    end
+
     test 'should output multiple mannames in NAME section' do
       input = SAMPLE_MANPAGE_HEADER.sub(/^command - /, 'command, alt_command - ')
       output = Asciidoctor.convert input, backend: :manpage, standalone: true
