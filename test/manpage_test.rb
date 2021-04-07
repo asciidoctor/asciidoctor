@@ -771,6 +771,35 @@ context 'Manpage' do
     end
   end
 
+  context 'Verse Block' do
+    test 'should preserve hard line breaks in verse block' do
+      input = SAMPLE_MANPAGE_HEADER.lines
+      synopsis_idx = input.find_index {|it| it == %(== SYNOPSIS\n) } + 2
+      input[synopsis_idx..synopsis_idx] = <<~'EOS'.lines
+      [verse]
+      _command_ [_OPTION_]... _FILE_...
+      EOS
+      input = <<~EOS.chop
+      #{input.join}
+
+      description
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "SYNOPSIS"
+      .sp
+      .nf
+      \fIcommand\fP [\fIOPTION\fP]... \fIFILE\fP...
+      .fi
+      .br
+      .SH "DESCRIPTION"
+      .sp
+      description
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+  end
+
   context 'Callout List' do
     test 'should generate callout list using proper formatting commands' do
       input = <<~EOS.chop

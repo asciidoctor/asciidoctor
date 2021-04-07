@@ -533,9 +533,11 @@ allbox tab(:);'
   # FIXME git uses [verse] for the synopsis; detect this special case
   def convert_verse node
     result = []
-    result << (node.title? ? %(.sp
+    if node.title?
+      result << %(.sp
 .B #{manify node.title}
-.br) : '.sp')
+.br)
+    end
     attribution_line = (node.attr? 'citetitle') ? %(#{node.attr 'citetitle'} ) : nil
     attribution_line = (node.attr? 'attribution') ? %[#{attribution_line}\\(em #{node.attr 'attribution'}] : nil
     result << %(.sp
