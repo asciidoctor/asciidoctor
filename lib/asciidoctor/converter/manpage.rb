@@ -530,7 +530,6 @@ allbox tab(:);'
     result.join LF
   end
 
-  # FIXME git uses [verse] for the synopsis; detect this special case
   def convert_verse node
     result = []
     if node.title?
