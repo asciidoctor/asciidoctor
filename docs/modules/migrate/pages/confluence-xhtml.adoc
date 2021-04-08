@@ -24,6 +24,6 @@ The script is designed to be run locally on HTML files or directories containing
 . Save the script contents to a `convert.groovy` file in a working directory.
 . Make the file executable according to your specific OS requirements.
 . Create a `html` directory for input files and a `asciidoc` directory for output files, both inside the working directory.
-. Place individual files, or a directory containing files into the aforementioned `html` directory.
+. Place individual files, or a directory containing files, into the aforementioned `html` directory.
 . Run `groovy convert` to convert the files contained inside the `html` directory.
 . Confirm the output file located in the `asciidoc` directory meets requirements.
