@@ -136,7 +136,7 @@ Matching templates found in subsequent directories override ones previously disc
   Include backtrace information when reporting errors.
 
 *-v, --verbose*::
-  Verbosely print processing information to stderr, including debug-level log messages.
+  Sets log level to DEBUG so application messages logged at INFO or DEBUG level are printed to stderr.
 
 *-w, --warnings*::
   Turn on script warnings (applies to executed code).
