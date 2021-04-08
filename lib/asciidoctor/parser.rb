@@ -215,9 +215,6 @@ class Parser
           name_section = initialize_section reader, document, {}
           name_section_buffer = (reader.read_lines_until break_on_blank_lines: true, skip_line_comments: true).map {|l| l.lstrip }.join ' '
           if ManpageNamePurposeRx =~ name_section_buffer
-            doc_attrs['manname-title'] ||= name_section.title
-            doc_attrs['manname-id'] = name_section.id if name_section.id
-            doc_attrs['manpurpose'] = $2
             if (manname = $1).include? ATTR_REF_HEAD
               manname = document.sub_attributes manname
             end
@@ -226,8 +223,14 @@ class Parser
             else
               mannames = [manname]
             end
+            if (manpurpose = $2).include? ATTR_REF_HEAD
+              manpurpose = document.sub_attributes manpurpose
+            end
+            doc_attrs['manname-title'] ||= name_section.title
+            doc_attrs['manname-id'] = name_section.id if name_section.id
             doc_attrs['manname'] = manname
             doc_attrs['mannames'] = mannames
+            doc_attrs['manpurpose'] = manpurpose
             if document.backend == 'manpage'
               doc_attrs['docname'] = manname
               doc_attrs['outfilesuffix'] = %(.#{manvolnum})

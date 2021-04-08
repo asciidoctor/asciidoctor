@@ -46,6 +46,26 @@ context 'Manpage' do
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
+    test 'should substitute attributes in manname and manpurpose in NAME section' do
+      input = <<~'EOS'
+      = {cmdname} (1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
+
+      == NAME
+
+      {cmdname} - {cmdname} puts the foo in your bar
+      EOS
+
+      doc = Asciidoctor.load input, backend: :manpage, standalone: true, attributes: { 'cmdname' => 'foobar' }
+      assert_equal 'foobar', (doc.attr 'manname')
+      assert_equal ['foobar'], (doc.attr 'mannames')
+      assert_equal 'foobar puts the foo in your bar', (doc.attr 'manpurpose')
+      assert_equal 'foobar', (doc.attr 'docname')
+    end
+
     test 'should not parse NAME section if manname and manpurpose attributes are set' do
       input = <<~'EOS'
       = foobar (1)
