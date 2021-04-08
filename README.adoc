@@ -56,7 +56,7 @@ endif::[]
 
 {url-project}[Asciidoctor] is a fast, open source, Ruby-based text processor for parsing {url-what-is-asciidoc}[AsciiDoc] into a document model and converting it to output formats such as HTML 5, DocBook 5, manual pages, PDF, EPUB 3, and other formats.
 Asciidoctor also has an ecosystem of extensions, converters, build plugins, and tools to help you author and publish AsciiDoc.
-You can find the documentation for these projects elsewhere on this site or in the {url-org)[Asciidoctor organization on GitHub].
+You can find the documentation for these projects elsewhere on this site or in the {url-org}[Asciidoctor organization on GitHub].
 
 In addition to running on Ruby, Asciidoctor can be executed on a JVM using {url-asciidoctorj}[AsciidoctorJ] or in any JavaScript environment using {url-asciidoctorjs}[Asciidoctor.js].
 
