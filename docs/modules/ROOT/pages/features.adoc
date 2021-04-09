@@ -34,12 +34,12 @@ So there is plenty of room to grow.
 
 == Built-in and add-on converters
 
-Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[manpage] (manual page).
+Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[man page] (short for manual page).
 These converters are designed to cover a majority of users`' needs for basic preview and publishing.
 
 The *HTML* converter provides a result you can publish the web straight away without any tweaking.
 The *DocBook* converter allows you to leverage an existing publishing toolchain or migrate the content to a different authoring format (without the tool needing to know how to parse AsciiDoc).
-The *manpage* converter drastically lowers the barrier to making system help files.
+The *man page* converter drastically lowers the barrier to making system help files.
 
 But it doesn't end there.
 The converter interface in Asciidoctor is an extension point.

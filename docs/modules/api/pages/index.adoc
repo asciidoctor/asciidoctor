@@ -7,7 +7,7 @@ doc-asciidoctorj is now url-asciidoctorj-docs but! that means I need to fix docr
 ////
 
 In addition to its CLI, Asciidoctor provides a Ruby API.
-The API is intended for integration with other software projects and is suitable for server-side applications, such as Rails, Sinatra and GitHub.
+The API is intended for integration with other Ruby software, such as Rails, GitHub, and GitLab, as well as other languages, such as Java (via AsciidoctorJ) and JavaScript (via Asciidoctor.js).
 
 Asciidoctor also has a Java API that mirrors the Ruby API.
 The Java API calls through to the Ruby API using an embedded JRuby runtime.

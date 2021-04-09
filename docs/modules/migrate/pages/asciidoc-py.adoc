@@ -4,7 +4,8 @@
 :url-manpage: {url-project}/man/asciidoctor
 //:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
 
-AsciiDoc.py (aka AsciiDoc Python) is the original AsciiDoc processor, which has now been superseded by Asciidoctor.
+AsciiDoc.py is the original and legacy Python-based processor for the AsciiDoc language.
+It has been superseded by Asciidoctor.
 If you're currently using AsciiDoc.py to convert your AsciiDoc documents and are ready to switch to Asciidoctor, you'll need to migrate your legacy AsciiDoc content to the official AsciiDoc syntax defined and supported by Asciidoctor.
 In doing so, you'll also benefit from the enhancements that have been added to the AsciiDoc language since Asciidoctor took over development of the language.
 This page covers those differences and how to migrate.
