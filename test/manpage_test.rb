@@ -343,6 +343,18 @@ context 'Manpage' do
       assert_includes output, 'Source: Control All The Things 5.0'
       assert_includes output, '"Control All The Things 5.0" "General Commands Manual"'
     end
+
+    test 'should uppercase section titles without mangling formatting macros' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      does stuff
+
+      == "`Main`" _<Options>_
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, '.SH "\(lqMAIN\(rq \fI<OPTIONS>\fP"'
+    end
   end
 
   context 'Backslash' do

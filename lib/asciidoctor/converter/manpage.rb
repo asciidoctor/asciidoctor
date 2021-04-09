@@ -23,10 +23,12 @@ class Converter::ManPageConverter < Converter::Base
   LeadingPeriodRx = /^\./
   EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) "#{CC_ANY}*?" "#{CC_ANY}*?" )( |[^\s]*)(#{CC_ANY}*?)(?: *#{ESC}\\c)?$/
   MalformedEscapedMacroRx = /(#{ESC}\\c) (#{ESC}\.(?:URL|MTO) )/
-  MockBoundaryRx = /<\/?BOUNDARY>/
+  MockMacroRx = /<\/?(#{ESC}\\[^>]+)>/
   EmDashCharRefRx = /&#8212;(?:&#8203;)?/
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
   WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
+  XMLMarkupRx = /&#?[a-z\d]+;|</
+  PCDATAFilterRx = /(&#?[a-z\d]+;|<[^>]+>)|([^&<]+)/
 
   def initialize backend, opts = {}
     @backend = backend
@@ -141,7 +143,7 @@ class Converter::ManPageConverter < Converter::Base
       stitle = node.captioned_title
     else
       macro = 'SH'
-      stitle = node.title.upcase
+      stitle = uppercase_pcdata node.title
     end
     result << %(.#{macro} "#{manify stitle}"
 #{node.content})
@@ -647,19 +649,19 @@ allbox tab(:);'
     end
   end
 
-  # NOTE use fake <BOUNDARY> element to prevent creating artificial word boundaries
+  # NOTE use fake XML elements to prevent creating artificial word boundaries
   def convert_inline_quoted node
     case node.type
     when :emphasis
-      %(#{ESC_BS}fI<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
+      %(<#{ESC_BS}fI>#{node.text}</#{ESC_BS}fP>)
     when :strong
-      %(#{ESC_BS}fB<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP)
+      %(<#{ESC_BS}fB>#{node.text}</#{ESC_BS}fP>)
     when :monospaced
-      %[#{ESC_BS}f(CR<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}fP]
+      %[<#{ESC_BS}f(CR>#{node.text}</#{ESC_BS}fP>]
     when :single
-      %[#{ESC_BS}(oq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}(cq]
+      %[<#{ESC_BS}(oq>#{node.text}</#{ESC_BS}(cq>]
     when :double
-      %[#{ESC_BS}(lq<BOUNDARY>#{node.text}</BOUNDARY>#{ESC_BS}(rq]
+      %[<#{ESC_BS}(lq>#{node.text}</#{ESC_BS}(rq>]
     else
       node.text
     end
@@ -742,11 +744,15 @@ allbox tab(:);'
       gsub('&#8203;', '\:').    # zero width space
       gsub('&amp;', '&').       # literal ampersand (NOTE must take place after any other replacement that includes &)
       gsub('\'', '\(aq').       # apostrophe-quote
-      gsub(MockBoundaryRx, ''). # mock boundary
+      gsub(MockMacroRx, '\1').  # mock boundary
       gsub(ESC_BS, '\\').       # unescape troff backslash (NOTE update if more escapes are added)
       gsub(ESC_FS, '.').        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
       rstrip                    # strip trailing space
     opts[:append_newline] ? %(#{str}#{LF}) : str
+  end
+
+  def uppercase_pcdata string
+    (XMLMarkupRx.match? string) ? string.gsub(PCDATAFilterRx) { $2 ? $2.upcase : $1 } : string.upcase
   end
 
   def enclose_content node
