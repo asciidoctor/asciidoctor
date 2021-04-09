@@ -14,11 +14,11 @@ When we say Asciidoctor in this section of the documentation, we're specifically
 
 To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}/asciidoctor[RubyGem named asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
-Asciidoctor is also distributed as a package for numerous Linux distributions as well as macOS.
+Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew).
 
 Asciidoctor is open source software available under the terms of the MIT license and {url-org}[hosted on GitHub^].
 
-Asciidoctor is the successor to AsciiDoc.py (aka AsciiDoc Python).
+Asciidoctor is the successor to AsciiDoc.py, the legacy Python-based processor for the AsciiDoc language.
 If you're using AsciiDoc.py, follow xref:migrate:asciidoc-py.adoc[] to learn how to upgrade to Asciidoctor.
 
 == Basic usage
@@ -70,13 +70,13 @@ In brief, you give AsciiDoc source to Asciidoctor and it gives you a result you 
 == Ecosystem
 
 When we talk about Asciidoctor in this section, we are talking about the core processor and built-in converters.
-Asciidoctor also has an ecosystem of extensions, converters, build plugins, and tools to help you author and publish AsciiDoc.
+Asciidoctor also has an ecosystem of extensions, converters, build plugins, and tools to help you author and publish content written in AsciiDoc.
 You can find the documentation for these projects elsewhere on this site or in the Asciidoctor organization on GitHub.
 
 == Beyond Ruby
 
-Although Asciidoctor is written in Ruby, it does not mean you have to use Ruby.
-You can also run Asciidoctor using a JVM or JavaScript.
+Although Asciidoctor is written in Ruby, it does not mean you need Ruby to use it.
+You can also run Asciidoctor using a JVM via AsciidoctorJ or JavaScript via Asciidoctor.js.
 
 === Java / JVM
 
