@@ -1032,34 +1032,120 @@ context 'Attributes' do
       assert_equal 'A', doc.attributes['mycounter']
     end
 
-    test 'increments counter with numeric value' do
+    test 'can seed counter to start at 1' do
       input = <<~'EOS'
-      :mycounter: 1
+      :mycounter: 0
 
       {counter:mycounter}
-
-      {mycounter}
       EOS
 
-      doc = document_from_string input
-      output = doc.convert
-      assert_equal 2, doc.attributes['mycounter']
-      assert_xpath '//p[text()="2"]', output, 2
+      output = convert_string_to_embedded input
+      assert_xpath '//p[text()="1"]', output, 1
     end
 
-    test 'increments counter with character value' do
+    test 'can seed counter to start at A' do
       input = <<~'EOS'
       :mycounter: @
 
       {counter:mycounter}
-
-      {mycounter}
       EOS
 
-      doc = document_from_string input
+      output = convert_string_to_embedded input
+      assert_xpath '//p[text()="A"]', output, 1
+    end
+
+    test 'increments counter with positive numeric value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:mycounter:1}
+      {counter:mycounter}
+      {counter:mycounter}
+      {mycounter}
+      ++++
+      EOS
+
+      doc = document_from_string input, standalone: false
       output = doc.convert
-      assert_equal 'A', doc.attributes['mycounter']
-      assert_xpath '//p[text()="A"]', output, 2
+      assert_equal 3, doc.attributes['mycounter']
+      assert_equal %w(1 2 3 3), output.lines.map {|l| l.rstrip }
+    end
+
+    test 'increments counter with negative numeric value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:mycounter:-2}
+      {counter:mycounter}
+      {counter:mycounter}
+      {mycounter}
+      ++++
+      EOS
+
+      doc = document_from_string input, standalone: false
+      output = doc.convert
+      assert_equal 0, doc.attributes['mycounter']
+      assert_equal %w(-2 -1 0 0), output.lines.map {|l| l.rstrip }
+    end
+
+    test 'increments counter with ASCII character value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:mycounter:A}
+      {counter:mycounter}
+      {counter:mycounter}
+      {mycounter}
+      ++++
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_equal %w(A B C C), output.lines.map {|l| l.rstrip }
+    end
+
+    test 'increments counter with non-ASCII character value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:mycounter:é}
+      {counter:mycounter}
+      {counter:mycounter}
+      {mycounter}
+      ++++
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_equal %w(é ê ë ë), output.lines.map {|l| l.rstrip }
+    end
+
+    test 'increments counter with emoji character value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:smiley:😋}
+      {counter:smiley}
+      {counter:smiley}
+      {smiley}
+      ++++
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_equal %w(😋 😌 😍 😍), output.lines.map {|l| l.rstrip }
+    end
+
+    test 'increments counter with multi-character value' do
+      input = <<~'EOS'
+      [subs=attributes]
+      ++++
+      {counter:math:1x}
+      {counter:math}
+      {counter:math}
+      {math}
+      ++++
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_equal %w(1x 1y 1z 1z), output.lines.map {|l| l.rstrip }
     end
 
     test 'counter uses 0 as seed value if seed attribute is nil' do
