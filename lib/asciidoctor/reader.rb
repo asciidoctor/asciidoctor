@@ -59,6 +59,7 @@ class Reader
       end
       @lineno = cursor.lineno || 1
     end
+    @next_lineno_inc = 1
     @lines = prepare_lines data, opts
     @source_lines = @lines.drop 0
     @mark = nil
@@ -154,8 +155,9 @@ class Reader
   # if there are no more lines in this Reader.
   def peek_lines num = nil, direct = false
     old_look_ahead = @look_ahead
+    start_lineno = @lineno
     result = []
-    (num || MAX_INT).times do
+    (num ||= MAX_INT).times do
       if (line = direct ? shift : read_line)
         result << line
       else
@@ -166,7 +168,12 @@ class Reader
 
     unless result.empty?
       unshift_all result
-      @look_ahead = old_look_ahead if direct
+      if direct
+        @look_ahead = old_look_ahead
+      elsif @lineno > start_lineno
+        @next_lineno_inc += @lineno - start_lineno
+        @lineno = start_lineno
+      end
     end
 
     result
@@ -457,7 +464,8 @@ class Reader
   #
   # Returns The String line at the top of the stack
   def shift
-    @lineno += 1
+    @lineno += @next_lineno_inc
+    @next_lineno_inc = 1
     @look_ahead -= 1 unless @look_ahead == 0
     @lines.shift
   end
@@ -675,7 +683,7 @@ class PreprocessorReader < Reader
   #
   # Returns this Reader object.
   def push_include data, file = nil, path = nil, lineno = 1, attributes = {}
-    @include_stack << [@lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines]
+    @include_stack << [@lines, @file, @dir, @path, @lineno, @next_lineno_inc, @maxdepth, @process_lines]
     if (@file = file)
       # NOTE if file is not a string, assume it's a URI
       if ::String === file
@@ -1263,7 +1271,7 @@ class PreprocessorReader < Reader
 
   def pop_include
     if @include_stack.size > 0
-      @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
+      @lines, @file, @dir, @path, @lineno, @next_lineno_inc, @maxdepth, @process_lines = @include_stack.pop
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
       #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
