@@ -720,7 +720,7 @@ allbox tab(:);'
       gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
       gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
       # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-      gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#$2"#{LF}#{rest}) }.
+      gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#$1"#$2") : %(.#$1"#{$2.rstrip}"#{LF}#{rest}) }.
       gsub('-', '\-').
       gsub('&lt;', '<').
       gsub('&gt;', '>').
