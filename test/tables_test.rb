@@ -805,7 +805,7 @@ context 'Tables' do
       assert_css 'tbody p.tableblock', output, 1
     end
 
-    test 'wip should format first cell as AsciiDoc if there is no implicit header row and column has a style' do
+    test 'should format first cell as AsciiDoc if there is no implicit header row and column has a style' do
       input = <<~'EOS'
       [cols="1a,1"]
       |===
