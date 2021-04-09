@@ -274,13 +274,10 @@ module Helpers
   def nextval current
     if ::Integer === current
       current + 1
+    elsif (intval = current.to_i).to_s == current.to_s
+      intval + 1
     else
-      intval = current.to_i
-      if intval.to_s != current.to_s
-        (current[0].ord + 1).chr
-      else
-        intval + 1
-      end
+      current.succ
     end
   end
 
