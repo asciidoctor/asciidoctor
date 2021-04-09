@@ -55,8 +55,9 @@ endif::[]
 :image-url-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
 
 {url-project}[Asciidoctor] is a fast, open source, Ruby-based text processor for parsing AsciiDoc(R) into a document model and converting it to output formats such as HTML 5, DocBook 5, manual pages, PDF, EPUB 3, and other formats.
+
 Asciidoctor also has an ecosystem of extensions, converters, build plugins, and tools to help you author and publish content written in {url-what-is-asciidoc}[AsciiDoc].
-You can find the documentation for these projects elsewhere on this site or in the {url-org}[Asciidoctor organization on GitHub].
+You can find the documentation for these projects at {url-docs}.
 
 In addition to running on Ruby, Asciidoctor can be executed on a JVM using {url-asciidoctorj}[AsciidoctorJ] or in any JavaScript environment using {url-asciidoctorjs}[Asciidoctor.js].
 
@@ -104,12 +105,13 @@ Asciidoctor reads the AsciiDoc source, as shown in the panel on the left in the 
 
 image::{image-url-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
-Asciidoctor provides {url-docs}/asciidoctor/latest/converters/[converters] for three output formats by default: {url-docs}/asciidoctor/latest/html-backend/[HTML 5], {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5], and {url-docs}/asciidoctor/latest/manpage-backend/[manpage] (manual page).
+Asciidoctor provides {url-docs}/asciidoctor/latest/converters/[converters] for three output formats by default: {url-docs}/asciidoctor/latest/html-backend/[HTML 5], {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5], and {url-docs}/asciidoctor/latest/manpage-backend/[man page] (short for manual page).
+Additional converters are provided by separate gems.
 Asciidoctor also provides an out-of-the-box HTML experience complete with a {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[default stylesheet] and built-in integrations like Font Awesome (for icons), Highlight.js (for source highlighting), and MathJax (for STEM processing).
 
 == Asciidoctor Ecosystem
 
-Although Asciidoctor is written in Ruby, it does not mean you have to use Ruby.
+Although Asciidoctor is written in Ruby, it does not mean you need Ruby to use it.
 Asciidoctor can be executed on a JVM using {url-docs}/asciidoctorj/latest/[AsciidoctorJ] or in any JavaScript environment (including the browser) using {url-docs}/asciidoctor.js/latest/[Asciidoctor.js].
 
 Installing an Asciidoctor processor is just the beginning of your publishing experience.
@@ -125,7 +127,7 @@ Asciidoctor gives you access to a ecosystem of extensions and tools, ranging fro
 * {url-docs}/asciidoctor/latest/tooling/#web-browser-add-ons-preview-only[web browser extensions]
 * {url-org}[and more]
 
-Asciidoctor is the successor to AsciiDoc.py (aka AsciiDoc Python).
+Asciidoctor is the successor to AsciiDoc.py.
 If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-py/[Migrate from AsciiDoc.py] to learn how to upgrade to Asciidoctor.
 
 == Requirements
@@ -152,7 +154,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}[RubyGem named asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
-Asciidoctor is also distributed as a Docker image and as a package for numerous Linux distributions as well as macOS.
+Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew).
 
 === Linux package managers
 
@@ -347,7 +349,7 @@ Refer to the following resources to learn more about how to use the `asciidoctor
 === Ruby API
 
 Asciidoctor also provides an API.
-The API is intended for integration with other Ruby software, such as Rails, Sinatra and GitHub, and other languages, such as Java (via AsciidoctorJ) and JavaScript (via Asciidoctor.js).
+The API is intended for integration with other Ruby software, such as Rails, GitHub, and GitLab, as well as other languages, such as Java (via AsciidoctorJ) and JavaScript (via Asciidoctor.js).
 
 To use Asciidoctor in your application, you first need to require the gem:
 
@@ -454,7 +456,7 @@ Let's work together to make this a welcoming, professional, inclusive, and safe 
 
 == Copyright and License
 
-Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
+Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 Use of this software is granted under the terms of the MIT License.
 
 See the {url-license}[LICENSE] for the full license text.
@@ -462,9 +464,9 @@ See the {url-license}[LICENSE] for the full license text.
 == Authors
 
 *Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {url-contributors}[many individuals] in Asciidoctor's awesome community.
-The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] and based on a prototype written by https://github.com/nickh[Nick Hengeveld].
+The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] based on a prototype written by https://github.com/nickh[Nick Hengeveld] for the Git website.
 
-*AsciiDoc* was started and maintained by Stuart Rackham from https://github.com/asciidoc/asciidoc/blob/master/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc/asciidoc/graphs/contributors[AsciiDoc community].
+*AsciiDoc.py* was started and maintained by Stuart Rackham from https://github.com/asciidoc-py/asciidoc-py2/blob/master/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc-py/asciidoc-py2/graphs/contributors[AsciiDoc.py community].
 
 == Trademarks
 
