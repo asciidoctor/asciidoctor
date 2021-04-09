@@ -427,7 +427,7 @@ context 'Manpage' do
       http://asciidoc.org[AsciiDoc] can be used to create man pages.
       EOS
       expected = <<~'EOS'.chop
-      .URL "http://asciidoc.org" "AsciiDoc" " "
+      .URL "http://asciidoc.org" "AsciiDoc" ""
       can be used to create man pages.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
@@ -533,7 +533,7 @@ context 'Manpage' do
       expected = <<~'EOS'.chop
       .sp
       Enter the \c
-      .URL "cat" "\f(CRcat\fP" " "
+      .URL "cat" "\f(CRcat\fP" ""
       command.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
@@ -967,7 +967,7 @@ context 'Manpage' do
       expected_coda = <<~'EOS'.chop
       .SH "NOTES"
       .IP [1]
-      .URL "https://example.org" "" " "
+      .URL "https://example.org" "" ""
       is the place
       EOS
       output = Asciidoctor.convert input, backend: :manpage

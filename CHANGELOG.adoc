@@ -24,6 +24,7 @@ Bug Fixes::
   * Remove extra .sp before content of verse block in manpage output
   * Fix layout of footnotes in manpage output (#3989)
   * Fix formatting of footnote text with URL in manpage output (#3988)
+  * Remove redundant trailing space on URL followed by non-adjacent text in man page output (#4004)
   * Use .bp macro at location of page break in manpage output (#3992)
 
 Improvements::
