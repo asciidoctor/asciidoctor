@@ -17,34 +17,37 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
-  * Don't allow counter and counter2 attribute directives to override locked attributes (#3939)
-  * Fix crash when resolving next value in sequence for counter with non-numeric value (#3940)
   * Rollback change for #3470, which added logic to remove leading and trailing empty lines in an AsciiDoc include file; instead skip empty lines before processing document header (#3997)
+  * Don't allow `counter` and `counter2` attribute directives to override locked attributes (#3939) (*@mogztter*)
+  * Fix crash when resolving next value in sequence for counter with non-numeric value (#3940)
+  * Honor list of tags following negated wildcard on include directive (#3932)
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
   * Don't mangle formatting macros when uppercasing section titles in man page output (#3892)
-  * Don't escape hyphen in manname in man page output
-  * Remove extra .sp before content of verse block in man page output
+  * Don't escape hyphen in `manname` in man page output
+  * Remove extra `.sp` line before content of verse block in man page output
   * Fix layout of footnotes in man page output (#3989)
   * Fix formatting of footnote text with URL in man page output (#3988)
   * Remove redundant trailing space on URL followed by non-adjacent text in man page output (#4004)
-  * Use .bp macro at location of page break in man page output (#3992)
+  * Use `.bp` macro at location of page break in man page output (#3992)
 
 Improvements::
 
   * Extract method to create lexer and formatter in Rouge adapter (#3953) (*@Oblomov*)
   * Add support for pygments.rb 2.x (#3969) (*@slonopotamus*)
-  * Allow NullLogger to be enabled by setting the `:logger` option to a falsy value (#3982)
-  * Substitute attributes in manpurpose in NAME section of man page (#4000)
+  * Allow `NullLogger` to be enabled by setting the `:logger` option to a falsy value (#3982)
+  * Substitute attributes in manpurpose part of NAME section in manpage doctype (#4000)
   * Output all mannames in name section of HTML output for manpage doctype (#3757)
 
 Build / Infrastructure::
 
-  * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
+  * Enable running tests as root (PR #3874) (*@mikemckiernan*)
   * Run tests against both pygments.rb 1.x and 2.x (#3969) (*@slonopotamus*)
+  * Speed up CI by using Bundler cache (PR #3901) (*@slonopotamus*)
 
 Documentation::
 
-  * add Belarusian translation of built-in attributes (PR #3928) (*@morganov*)
+  * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
+  * Add Belarusian translation of built-in attributes (PR #3928) (*@morganov*)
 
 // tag::compact[]
 == 2.0.12 (2020-11-10) - @mojavelinux
