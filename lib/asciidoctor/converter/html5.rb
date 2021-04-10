@@ -1310,7 +1310,7 @@ Your browser does not support the video tag.
     manname_id_attr = (manname_id = node.attr 'manname-id') ? %( id="#{manname_id}") : ''
     %(<h2#{manname_id_attr}>#{manname_title}</h2>
 <div class="sectionbody">
-<p>#{node.attr 'manname'} - #{node.attr 'manpurpose'}</p>
+<p>#{(node.attr 'mannames').join ', '} - #{node.attr 'manpurpose'}</p>
 </div>)
   end
 
