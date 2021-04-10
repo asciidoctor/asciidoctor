@@ -3,7 +3,7 @@
 :url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/master/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
 // um anchor: docinfo-file
 
-You can add custom content to the head or footer of an output document using docinfo files.
+You can add custom content to the head, header or footer of an output document using docinfo files.
 Docinfo files are useful for injecting auxiliary metadata, stylesheet, and script information into the output not added by the converter.
 
 The docinfo feature does not apply to all backends.
@@ -87,6 +87,16 @@ See <<naming>> for more details.
 
 To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file^].
 
+[#header]
+== Header docinfo files
+
+Header docinfo files are differentiated from head docinfo files by the addition of `-header` to the file name.
+In the HTML output, the header content is inserted immediately before the header div (i.e., `<div id="header">`).
+In the DocBook output, the header content is inserted immediately after the opening tag (e.g., `<article>` or `<book>`).
+
+TIP: One possible use of the header docinfo file is to completely replace the default header in the standard stylesheet.
+Just set the attribute `noheader`, then apply a custom header docinfo file.
+
 [#footer]
 == Footer docinfo files
 
@@ -115,19 +125,27 @@ The file extension of the docinfo file must match the file extension of the outp
 |===
 |Mode |Location |Behavior |Docinfo file name
 
-.2+|Private
+.3+|Private
 |Head
 |Adds content to `<head>`/`<info>` for <docname>.adoc files.
 |`<docname>-docinfo<outfilesuffix>`
+
+|Header
+|Adds content to start of document for <docname>.adoc files.
+|`<docname>-docinfo-header<outfilesuffix>`
 
 |Footer
 |Adds content to end of document for <docname>.adoc files.
 |`<docname>-docinfo-footer<outfilesuffix>`
 
-.2+|Shared
+.3+|Shared
 |Head
 |Adds content to `<head>`/`<info>` for any document in same directory.
 |`docinfo<outfilesuffix>`
+
+|Header
+|Adds content to start of document for any document in same directory.
+|`docinfo-header<outfilesuffix>`
 
 |Footer
 |Adds content to end of document for any document in same directory.
@@ -140,11 +158,12 @@ The file extension of the docinfo file must match the file extension of the outp
 To specify which file(s) you want to apply, set the `docinfo` attribute to any combination of these values:
 
 * `private-head`
+* `private-header`
 * `private-footer`
-* `private` (alias for `private-head,private-footer`)
+* `private` (alias for `private-head,private-header,private-footer`)
 * `shared-head`
 * `shared-footer`
-* `shared` (alias for `shared-head,shared-footer`)
+* `shared` (alias for `shared-head,shared-header,shared-footer`)
 
 Setting `docinfo` with no value is equivalent to setting the value to `private`.
 
@@ -155,7 +174,7 @@ For example:
 :docinfo: shared,private-footer
 ----
 
-This docinfo configuration will apply the shared docinfo head and footer files, if they exist, as well as the private footer file, if it exists.
+This docinfo configuration will apply the shared docinfo head, header and footer files, if they exist, as well as the private footer file, if it exists.
 
 // NOTE migrate this NOTE to the migration guide once 1.6 is released
 [NOTE]
