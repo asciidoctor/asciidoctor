@@ -34,6 +34,7 @@ Improvements::
   * Add support for pygments.rb 2.x (#3969) (*@slonopotamus*)
   * Allow NullLogger to be enabled by setting the `:logger` option to a falsy value (#3982)
   * Substitute attributes in manpurpose in NAME section of man page (#4000)
+  * Output all mannames in name section of HTML output for manpage doctype (#3757)
 
 Build / Infrastructure::
 

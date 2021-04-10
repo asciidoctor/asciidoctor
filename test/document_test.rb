@@ -1874,6 +1874,25 @@ context 'Document' do
       assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]', output, 1
       assert_xpath '/h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="asciidoctor - converts AsciiDoc source files to HTML, DocBook and other formats"]', output, 1
     end
+
+    test 'should output all mannames in name section in man page output' do
+      input = <<~'EOS'
+      = eve(1)
+      :doctype: manpage
+
+      == NAME
+
+      eve, probe - analyzes an image to determine if it is a picture of a life form
+
+      == SYNOPSIS
+
+      *eve* [OPTION]... FILE...
+      EOS
+
+      output = convert_string input
+      assert_css 'body.manpage', output, 1
+      assert_xpath '//h2[text()="NAME"]/following-sibling::*[@class="sectionbody"]/p[text()="eve, probe - analyzes an image to determine if it is a picture of a life form"]', output, 1
+    end
   end
 
   context 'Secure Asset Path' do
