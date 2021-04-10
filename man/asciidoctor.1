@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White, Ryan Waldron
-.\" Generator: Asciidoctor 2.0.12
-.\"      Date: 2020-11-10
+.\" Generator: Asciidoctor 2.0.13
+.\"      Date: 2021-04-10
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 2.0.12
+.\"    Source: Asciidoctor 2.0.13
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2020-11-10" "Asciidoctor 2.0.12" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2021-04-10" "Asciidoctor 2.0.13" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -188,7 +188,7 @@ Include backtrace information when reporting errors.
 .sp
 \fB\-v, \-\-verbose\fP
 .RS 4
-Verbosely print processing information to stderr, including debug\-level log messages.
+Sets log level to DEBUG so application messages logged at INFO or DEBUG level are printed to stderr.
 .RE
 .sp
 \fB\-w, \-\-warnings\fP
@@ -220,7 +220,7 @@ Print program version number.
 \fBAsciidoctor\fP honors the \fBSOURCE_DATE_EPOCH\fP environment variable.
 If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
 See \c
-.URL "https://reproducible\-builds.org/specs/source\-date\-epoch/" "" " "
+.URL "https://reproducible\-builds.org/specs/source\-date\-epoch/" "" ""
 for more information about this environment variable.
 .SH "EXIT STATUS"
 .sp

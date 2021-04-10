@@ -1,7 +1,7 @@
 = asciidoctor(1)
 Dan Allen; Sarah White; Ryan Waldron
 :doctype: manpage
-:release-version: 2.0.12
+:release-version: 2.0.13
 :man manual: Asciidoctor Manual
 :man source: Asciidoctor {release-version}
 :page-layout: base
