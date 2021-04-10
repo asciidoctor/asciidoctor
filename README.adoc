@@ -101,13 +101,13 @@ You can support this project by becoming a sponsor through https://opencollectiv
 AsciiDoc is the language. +
 Asciidoctor is the processor.
 
-Asciidoctor reads the AsciiDoc source, as shown in the panel on the left in the image below, and converts it to publishable formats, such as HTML 5, as shown rendered in the right panel.
+Asciidoctor reads the AsciiDoc source, as shown in the panel on the left in the image below, and converts it to publishable formats, such as HTML 5, as shown rendered in the panel on the right.
 
 image::{image-url-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
-Asciidoctor provides {url-docs}/asciidoctor/latest/converters/[converters] for three output formats by default: {url-docs}/asciidoctor/latest/html-backend/[HTML 5], {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5], and {url-docs}/asciidoctor/latest/manpage-backend/[man page] (short for manual page).
-Additional converters are provided by separate gems.
-Asciidoctor also provides an out-of-the-box HTML experience complete with a {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[default stylesheet] and built-in integrations like Font Awesome (for icons), Highlight.js (for source highlighting), and MathJax (for STEM processing).
+Asciidoctor provides built-in {url-docs}/asciidoctor/latest/converters/[converters] for three output formats by default: {url-docs}/asciidoctor/latest/html-backend/[HTML 5], {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5], and {url-docs}/asciidoctor/latest/manpage-backend/[man page] (short for manual page).
+Additional converters, such as PDF and EPUB 3, are provided by separate gems.
+Asciidoctor also provides an out-of-the-box HTML experience complete with a {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[default stylesheet] and built-in integrations like Font Awesome (for icons), highlight.js, Rouge, and Pygments (for source highlighting), and MathJax (for STEM processing).
 
 == Asciidoctor Ecosystem
 
@@ -152,7 +152,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 == Installation
 
-Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}[RubyGem named asciidoctor^].
+Asciidoctor is packaged and distributed to RubyGems.org as a RubyGem (aka gem) named {url-rubygem}[asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
 Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew).
 
@@ -168,7 +168,7 @@ Consult the package repository for your distribution to find out which version i
 * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
-If you want to use a version of Asciidoctor that is newer than what is installed by the package manager, see the <<gem-install,gem installation instructions>>.
+If you want to use a version of Asciidoctor that's newer than what is installed by the package manager, see the <<gem-install,gem installation instructions>>.
 
 ==== apk (Alpine Linux)
 
@@ -209,7 +209,7 @@ Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independ
 
 === Windows
 
-To use Asciidoctor with Windows, you have two easy options.
+To use Asciidoctor with Windows, you have two options.
 
 ==== Chocolatey
 
@@ -229,11 +229,12 @@ Or you use the https://rubyinstaller.org/downloads/[Rubyinstaller], download the
 [#gem-install]
 === gem install
 
-Before installing Asciidoctor using `gem install`, you should set up https://rvm.io[RVM] to install Ruby in your home directory (i.e., user space).
+Before installing Asciidoctor using `gem install`, you should set up https://rvm.io[RVM] (or similar) to install Ruby in your home directory (i.e., user space).
 Then, you can safely use the `gem` command to install or update the Asciidoctor gem, or any other gem for that matter.
 When using RVM, gems are installed in a location isolated from the system.
+(You should never use the gem command to install system-wide gems).
 
-Once you've installed Ruby using RVM, and you have activated it using `rvm use 2.6`, open a terminal and type:
+Once you've installed Ruby using RVM, and you have activated it using `rvm use 3.0`, open a terminal and type:
 
  $ gem install asciidoctor
 
