@@ -119,7 +119,7 @@ class Parser
   # returns the Hash of orphan block attributes captured above the header
   def self.parse_document_header(reader, document)
     # capture lines of block-level metadata and plow away comment lines that precede first block
-    block_attrs = parse_block_metadata_lines reader, document
+    block_attrs = reader.skip_blank_lines ? (parse_block_metadata_lines reader, document) : {}
     doc_attrs = document.attributes
 
     # special case, block title is not allowed above document title,

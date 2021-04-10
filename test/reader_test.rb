@@ -454,7 +454,7 @@ class ReaderTest < Minitest::Test
         data.push ''
         doc = Asciidoctor::Document.new data
         reader = doc.reader
-        assert_equal SAMPLE_DATA, reader.lines
+        assert_equal [''] + SAMPLE_DATA, reader.lines
       end
 
       test 'should prepare and normalize lines from String data' do
@@ -464,7 +464,14 @@ class ReaderTest < Minitest::Test
         data_as_string = data * ::Asciidoctor::LF
         doc = Asciidoctor::Document.new data_as_string
         reader = doc.reader
-        assert_equal SAMPLE_DATA, reader.lines
+        assert_equal [''] + SAMPLE_DATA, reader.lines
+      end
+
+      test 'should drop all lines if all lines are empty' do
+        data = ['', ' ', '', ' ']
+        doc = Asciidoctor::Document.new data
+        reader = doc.reader
+        assert reader.lines.empty?
       end
 
       test 'should clean CRLF from end of lines' do

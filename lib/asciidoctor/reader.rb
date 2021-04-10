@@ -44,11 +44,11 @@ class Reader
       @file = nil
       @dir = '.'
       @path = '<stdin>'
-      @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
+      @lineno = 1
     elsif ::String === cursor
       @file = cursor
       @dir, @path = ::File.split @file
-      @lineno = 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
+      @lineno = 1
     else
       if (@file = cursor.file)
         @dir = cursor.dir || (::File.dirname @file)
@@ -57,7 +57,7 @@ class Reader
         @dir = cursor.dir || '.'
         @path = cursor.path || '<stdin>'
       end
-      @lineno = cursor.lineno || 1 # IMPORTANT lineno assignment must proceed prepare_lines call!
+      @lineno = cursor.lineno || 1
     end
     @lines = prepare_lines data, opts
     @source_lines = @lines.drop 0
@@ -718,7 +718,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: @process_lines, indent: attributes['indent']).empty?
+    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: false, indent: attributes['indent']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
@@ -809,7 +809,6 @@ class PreprocessorReader < Reader
     end
 
     if opts.fetch :condense, true
-      result.shift && @lineno += 1 while (first = result[0]) && first.empty?
       result.pop while (last = result[-1]) && last.empty?
     end
 

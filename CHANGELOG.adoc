@@ -19,6 +19,7 @@ Bug Fixes::
 
   * Don't allow counter and counter2 attribute directives to override locked attributes (#3939)
   * Fix crash when resolving next value in sequence for counter with non-numeric value (#3940)
+  * Rollback change for #3470, which added logic to remove leading and trailing empty lines in an AsciiDoc include file; instead skip empty lines before processing document header (#3997)
   * Update default stylesheet to remove dash in front of cite on nested quote block (#3847)
   * Don't escape hyphen in manname in man page output
   * Remove extra .sp before content of verse block in man page output

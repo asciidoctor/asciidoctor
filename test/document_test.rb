@@ -705,6 +705,41 @@ context 'Document' do
 
     test 'should recognize document title when preceded by blank lines' do
       input = <<~'EOS'
+
+      = Title
+
+      preamble
+
+      == Section 1
+
+      text
+      EOS
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+      assert_css '#header h1', output, 1
+      assert_css '#content h1', output, 0
+    end
+
+    test 'should recognize document title when preceded by blank lines introduced by a preprocessor conditional' do
+      input = <<~'EOS'
+      ifdef::sectids[]
+
+      :foo: bar
+      endif::[]
+      = Title
+
+      preamble
+
+      == Section 1
+
+      text
+      EOS
+      output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+      assert_css '#header h1', output, 1
+      assert_css '#content h1', output, 0
+    end
+
+    test 'should recognize document title when preceded by blank lines after an attribute entry' do
+      input = <<~'EOS'
       :doctype: book
 
       = Title
