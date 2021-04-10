@@ -41,14 +41,14 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
   s.add_development_dependency 'cucumber', '~> 3.1.0'
   # erubi is needed for testing alternate eRuby impls
-  s.add_development_dependency 'erubi', '~> 1.9.0'
-  s.add_development_dependency 'haml', '~> 5.0.0'
+  s.add_development_dependency 'erubi', '~> 1.10.0'
+  s.add_development_dependency 'haml', '~> 5.2.0'
   s.add_development_dependency 'minitest', '~> 5.11.0'
   s.add_development_dependency 'nokogiri', '~> 1.10.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
   # Asciidoctor supports Rouge >= 2
   s.add_development_dependency 'rouge', '~> 3.26.0'
   s.add_development_dependency 'rspec-expectations', '~> 3.8.0'
-  s.add_development_dependency 'slim', '~> 4.0.0'
+  s.add_development_dependency 'slim', '~> 4.1.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'
 end
