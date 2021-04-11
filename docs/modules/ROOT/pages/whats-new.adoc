@@ -37,7 +37,7 @@ _**Release date:** 2021.04.10_
 * Substitute attributes in manpurpose part of NAME section in manpage doctype (#4000)
 * Output all mannames in name section of HTML output for manpage doctype (#3757)
 
-== Build and infrastructure::
+== Build and infrastructure
 
 * Enable running tests as root (PR #3874) (*@mikemckiernan*)
 * Import documentation for processor into Asciidoctor core repository (#3861) (*@graphitefriction*)
