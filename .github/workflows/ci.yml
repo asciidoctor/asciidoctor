@@ -48,7 +48,7 @@ jobs:
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
           ruby: '3.0'
-          primary: true
+          primary: primary
     runs-on: ${{ matrix.os }}
     env:
       COVERAGE: ${{ matrix.primary }}
