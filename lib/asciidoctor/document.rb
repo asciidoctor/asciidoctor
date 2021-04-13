@@ -562,15 +562,17 @@ class Document < AbstractBlock
   # returns the next number in the sequence for the specified counter
   def counter name, seed = nil
     return @parent_document.counter name, seed if @parent_document
-    if attribute_locked? name
-      @attributes[name]
-    elsif (attr_seed = !(attr_val = @attributes[name]).nil_or_empty?) && (@counters.key? name)
-      @attributes[name] = @counters[name] = Helpers.nextval attr_val
+    if (locked = attribute_locked? name) && (curr_val = @counters[name])
+      next_val = @counters[name] = Helpers.nextval curr_val
+    elsif !(curr_val = @attributes[name]).nil_or_empty?
+      next_val = @counters[name] = Helpers.nextval curr_val
     elsif seed
-      @attributes[name] = @counters[name] = seed == seed.to_i.to_s ? seed.to_i : seed
+      next_val = @counters[name] = seed == seed.to_i.to_s ? seed.to_i : seed
     else
-      @attributes[name] = @counters[name] = Helpers.nextval attr_seed ? attr_val : 0
+      next_val = @counters[name] = 1
     end
+    @attributes[name] = next_val unless locked
+    next_val
   end
 
   # Public: Increment the specified counter and store it in the block's attributes

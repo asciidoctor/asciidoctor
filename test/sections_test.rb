@@ -1624,7 +1624,7 @@ context 'Sections' do
       :doctype: book
       :sectnums:
       :chapter-signifier: Chapter
-      :chapter-number: {counter:chapter-number:9}
+      :chapter-number: 9
 
       == Not the Beginning
 
@@ -2048,7 +2048,7 @@ context 'Sections' do
 
     test 'should allow appendix number to be controlled using appendix-number attribute' do
       input = <<~'EOS'
-      :appendix-number: {counter:appendix-number:α}
+      :appendix-number: α
 
       [appendix]
       == Attribute Options

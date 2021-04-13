@@ -804,6 +804,30 @@ context 'Blocks' do
       assert_equal 'B', doc.attributes['example-number']
     end
 
+    test 'should increment counter for example even when example-number is locked by the API' do
+      input = <<~'EOS'
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
+
+      You just write.
+      ====
+
+      .Writing Docs with DocBook
+      ====
+      Here's how you write DocBook.
+
+      You futz with XML.
+      ====
+      EOS
+
+      doc = document_from_string input, attributes: { 'example-number' => '`' }
+      output = doc.convert
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Example a. Writing Docs with AsciiDoc"]', output, 1
+      assert_xpath '(//*[@class="exampleblock"])[2]/*[@class="title"][text()="Example b. Writing Docs with DocBook"]', output, 1
+      assert_equal 'b', doc.attributes['example-number']
+    end
+
     test "explicit caption is used if provided" do
       input = <<~'EOS'
       [caption="Look! "]
