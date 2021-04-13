@@ -816,6 +816,7 @@ context 'Sections' do
         assert_message logger, :WARN, '<stdin>: line 5: section title out of sequence: expected level 3, got level 4', Hash
       end
     end
+
     test 'should log error if subsections are found in special sections in article that do not support subsections' do
       input = <<~'EOS'
       = Document Title
@@ -1617,6 +1618,24 @@ context 'Sections' do
       assert_xpath '//h2[@id="_cli"][text() = "Chapter 2. CLI"]', output, 1
     end
 
+    test 'should allow chapter number to be controlled using chapter-number attribute' do
+      input = <<~'EOS'
+      = Book Title
+      :doctype: book
+      :sectnums:
+      :chapter-signifier: Chapter
+      :chapter-number: {counter:chapter-number:9}
+
+      == Not the Beginning
+
+      == Maybe the End
+      EOS
+
+      output = convert_string input
+      assert_xpath '//h2[@id="_not_the_beginning"][text() = "Chapter 10. Not the Beginning"]', output, 1
+      assert_xpath '//h2[@id="_maybe_the_end"][text() = "Chapter 11. Maybe the End"]', output, 1
+    end
+
     test 'blocks should have level' do
       input = <<~'EOS'
       = Title
@@ -2025,6 +2044,26 @@ context 'Sections' do
 
       output = convert_string_to_embedded input
       assert_xpath '//h2[text()="Appendix A: Attribute Options"]', output, 1
+    end
+
+    test 'should allow appendix number to be controlled using appendix-number attribute' do
+      input = <<~'EOS'
+      :appendix-number: {counter:appendix-number:α}
+
+      [appendix]
+      == Attribute Options
+
+      Details
+
+      [appendix]
+      == All the Other Stuff
+
+      Details
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath %(//h2[text()="Appendix #{decode_char 946}: Attribute Options"]), output, 1
+      assert_xpath %(//h2[text()="Appendix #{decode_char 947}: All the Other Stuff"]), output, 1
     end
 
     test 'should use style from last block attribute line above section that defines a style' do
