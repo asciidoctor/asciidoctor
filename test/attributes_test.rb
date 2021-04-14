@@ -1181,6 +1181,22 @@ context 'Attributes' do
       assert_xpath '//p[text()="after: 1"]', output, 1
     end
 
+    test 'counter value can be advanced by attribute entry' do
+      input = <<~'EOS'
+      before: {counter:mycounter}
+
+      :mycounter: 10
+
+      after: {counter:mycounter}
+      EOS
+
+      doc = document_from_string input
+      output = doc.convert standalone: false
+      assert_equal 11, doc.attributes['mycounter']
+      assert_xpath '//p[text()="before: 1"]', output, 1
+      assert_xpath '//p[text()="after: 11"]', output, 1
+    end
+
     test 'nested document should use counter from parent document' do
       input = <<~'EOS'
       .Title for Foo
