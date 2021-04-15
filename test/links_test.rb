@@ -518,6 +518,16 @@ context 'Links' do
     assert_xpath '//a[@href="#using-.net-web-services"][text() = "Using .NET web services"]', result, 1
   end
 
+  test 'should not interpret double underscore in target of xref macro if sequence is preceded by a backslash' do
+    result = convert_string_to_embedded 'xref:doc\__with_double__underscore.adoc[text]'
+    assert_xpath '//a[@href="doc__with_double__underscore.html"][text() = "text"]', result, 1
+  end
+
+  test 'should not interpret double underscore in target of xref shorthand if sequence is preceded by a backslash' do
+    result = convert_string_to_embedded '<<doc\__with_double__underscore.adoc#,text>>'
+    assert_xpath '//a[@href="doc__with_double__underscore.html"][text() = "text"]', result, 1
+  end
+
   test 'xref using angled bracket syntax with path sans extension using docbook backend' do
     doc = document_from_string '<<tigers#>>', standalone: false, backend: 'docbook'
     assert_match '<link xl:href="tigers.xml">tigers.xml</link>', doc.convert, 1
