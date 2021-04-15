@@ -678,7 +678,7 @@ context 'Invoker' do
     assert_equal 'erubi', doc.instance_variable_get('@options')[:eruby]
   end
 
-  test 'should force default external encoding to UTF-8' do
+  test 'should force default external encoding to UTF-8', unless: jruby_9_1_windows? do
     input_path = fixture_path 'encoding.adoc'
     # using open3 to work around a bug in JRuby process_manager.rb,
     # which tries to run a gsub on stdout prematurely breaking the test
@@ -691,7 +691,7 @@ context 'Invoker' do
     assert_includes stdout_str, 'Codierungen sind verrückt auf älteren Versionen von Ruby'
   end
 
-  test 'should force stdio encoding to UTF-8' do
+  test 'should force stdio encoding to UTF-8', unless: jruby_9_1_windows? do
     cmd = asciidoctor_cmd ['-E', 'IBM866:IBM866']
     # NOTE configure-stdin.rb populates stdin
     result = run_command(cmd, '-r', (fixture_path 'configure-stdin.rb'), '-s', '-o', '-', '-') {|out| out.read }
@@ -702,7 +702,7 @@ context 'Invoker' do
     assert_include '<p>IBM866:IBM866</p>', result
   end
 
-  test 'should not fail to load if call to Dir.home fails' do
+  test 'should not fail to load if call to Dir.home fails', unless: jruby_9_1_windows? do
     cmd = asciidoctor_cmd ['-r', (fixture_path 'undef-dir-home.rb')]
     result = run_command(cmd, '-s', '-o', '-', (fixture_path 'basic.adoc')) {|out| out.read }
     assert_include 'Body content', result
@@ -721,7 +721,7 @@ context 'Invoker' do
     assert_match(/Total time/, error)
   end
 
-  test 'should show timezone as UTC if system TZ is set to UTC' do
+  test 'should show timezone as UTC if system TZ is set to UTC', unless: jruby_9_1_windows? do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)
@@ -729,7 +729,7 @@ context 'Invoker' do
     assert localtime.end_with?(' UTC')
   end
 
-  test 'should show timezone as offset if system TZ is not set to UTC' do
+  test 'should show timezone as offset if system TZ is not set to UTC', unless: jruby_9_1_windows? do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)

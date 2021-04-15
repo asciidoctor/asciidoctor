@@ -84,7 +84,8 @@ context 'API' do
       assert_match(/reader\.rb.*prepare_lines/, exception.backtrace[0..4].join(?\n))
     end
 
-    test 'should convert filename that contains non-ASCII characters independent of default encodings' do
+    # NOTE JRuby for Windows does not permit creating a file with non-Windows-1252 characters in the filename
+    test 'should convert filename that contains non-ASCII characters independent of default encodings', unless: (jruby? && windows?) do
       old_external = Encoding.default_external
       old_internal = Encoding.default_internal
       old_verbose = $VERBOSE

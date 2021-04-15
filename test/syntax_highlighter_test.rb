@@ -1095,7 +1095,7 @@ context 'Syntax Highlighter' do
       assert_includes css, 'background-color: #49483e;'
     end
 
-    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace' do
+    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace', unless: jruby_9_1_windows? do
       result = run_command(asciidoctor_cmd, '-r', (fixture_path 'include-asciidoctor.rb'), '-s', '-o', '-', '-a', 'source-highlighter=rouge', (fixture_path 'source-block.adoc'), use_bundler: true) {|out| out.read }
       assert_xpath '//pre[@class="rouge highlight"]', result, 1
     end
