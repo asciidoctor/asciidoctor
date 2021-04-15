@@ -1227,16 +1227,16 @@ context 'Attributes' do
 
     test 'should not allow counter to modify locked attribute' do
       input = <<~'EOS'
-      {counter:foo:baz} is still {foo}
+      {counter:foo:ignored} is not {foo}
       EOS
 
       output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
-      assert_xpath '//p[text()="bar is still bar"]', output, 1
+      assert_xpath '//p[text()="bas is not bar"]', output, 1
     end
 
     test 'should not allow counter2 to modify locked attribute' do
       input = <<~'EOS'
-      {counter2:foo:baz}{foo}
+      {counter2:foo:ignored}{foo}
       EOS
 
       output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
@@ -1245,12 +1245,12 @@ context 'Attributes' do
 
     test 'should not allow counter to modify built-in locked attribute' do
       input = <<~'EOS'
-      {counter:max-include-depth:128} is still {max-include-depth}
+      {counter:max-include-depth:128} is one more than {max-include-depth}
       EOS
 
       doc = document_from_string input, standalone: false
       output = doc.convert
-      assert_xpath '//p[text()="64 is still 64"]', output, 1
+      assert_xpath '//p[text()="65 is one more than 64"]', output, 1
       assert_equal 64, doc.attributes['max-include-depth']
     end
 
