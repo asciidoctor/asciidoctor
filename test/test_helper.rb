@@ -34,6 +34,10 @@ class Minitest::Test
     RUBY_ENGINE == 'jruby'
   end
 
+  def self.jruby_9_1_windows?
+    RUBY_ENGINE == 'jruby' && windows? && (JRUBY_VERSION.start_with? '9.1.')
+  end
+
   def self.windows?
     /mswin|msys|mingw/.match? RbConfig::CONFIG['host_os']
   end
@@ -331,6 +335,8 @@ class Minitest::Test
     [Gem.ruby, *ruby_args, (File.join bindir, 'asciidoctor')]
   end
 
+  # NOTE run_command fails on JRuby 9.1 for Windows with the following error:
+  # Java::JavaLang::ClassCastException at org.jruby.util.ShellLauncher.getModifiedEnv(ShellLauncher.java:271)
   def run_command cmd, *args, &block
     if Array === cmd
       args.unshift(*cmd)
@@ -348,7 +354,7 @@ class Minitest::Test
           old_env, env = ENV.merge, (ENV.merge env)
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
           ENV.replace env
-          IO.popen [cmd, *args, opts], &block
+          popen [cmd, *args, opts], &block
         ensure
           ENV.replace old_env
         end
@@ -357,12 +363,25 @@ class Minitest::Test
           val.nil? ? (accum.delete key) : (accum[key] = val)
           accum
         end
-        IO.popen [env, cmd, *args, (opts.merge unsetenv_others: true)], &block
+        popen [env, cmd, *args, (opts.merge unsetenv_others: true)], &block
       else
-        IO.popen [env, cmd, *args, opts], &block
+        popen [env, cmd, *args, opts], &block
       end
     else
-      IO.popen [cmd, *args, opts], &block
+      popen [cmd, *args, opts], &block
+    end
+  end
+
+  def popen args, &block
+    # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
+    if jruby? && windows?
+      result = nil
+      IO.popen args do |io|
+        result = yield io
+      end
+      result
+    else
+      IO.popen args, &block
     end
   end
 
