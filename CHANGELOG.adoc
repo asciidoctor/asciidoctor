@@ -17,16 +17,16 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
- * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of docdatetime attribute) (#3550)
+  * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of docdatetime attribute) (#3550)
 
 Improvements::
 
- * Increment counter (but not the corresponding attribute) if attribute is locked (#4013)
- * Use attribute as seed value for counter even if not already registered as a counter (#4014)
+  * Increment counter (but not the corresponding attribute) if attribute is locked (#4013)
+  * Use attribute as seed value for counter even if not already registered as a counter (#4014)
 
 Build / Infrastructure::
 
- * Run tests on JRuby for Windows (#3550)
+  * Run tests on JRuby for Windows (#3550)
 
 // tag::compact[]
 == 2.0.13 (2021-04-10) - @mojavelinux
