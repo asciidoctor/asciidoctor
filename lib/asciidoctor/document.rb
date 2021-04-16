@@ -262,6 +262,8 @@ class Document < AbstractBlock
       @attribute_overrides = attr_overrides = (parent_doc.instance_variable_get :@attribute_overrides).merge parent_doc.attributes
       attr_overrides.delete 'compat-mode'
       parent_doctype = attr_overrides.delete 'doctype'
+      attr_overrides.delete 'notitle'
+      attr_overrides.delete 'showtitle'
       # QUESTION if toc is hard unset in parent document, should it be hard unset in nested document?
       attr_overrides.delete 'toc'
       @attributes['toc-placement'] = (attr_overrides.delete 'toc-placement') || 'auto'
