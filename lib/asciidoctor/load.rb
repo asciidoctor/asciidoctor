@@ -53,7 +53,7 @@ module Asciidoctor
       end
 
       if ::File === input
-        # JRuby for Windows does not honor TZ environment value when reading mtime on IO; run it through ::Time.at to fix
+        # File#mtime on JRuby for Windows doesn't honor TZ environment variable; see https://github.com/jruby/jruby/issues/6659
         options[:input_mtime] = RUBY_ENGINE == 'jruby' ? (::Time.at input.mtime.to_i) : input.mtime
         # NOTE defer setting infile and indir until we get a better sense of their purpose
         # TODO cli checks if input path can be read and is file, but might want to add check to API too
