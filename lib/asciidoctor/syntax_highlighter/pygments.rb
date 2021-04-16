@@ -33,13 +33,13 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
         highlighted = highlighted.sub WrapperTagRx, PreTagCs
         opts[:callouts] ? [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil] : highlighted
       else
-        node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
+        node.sub_source source, false # handles nil response from ::Pygments::Lexer#highlight
       end
     elsif (highlighted = lexer.highlight source, options: highlight_opts)
       highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs if linenos && noclasses
       highlighted.sub WrapperTagRx, '\1'
     else
-      node.sub_specialchars source # handles nil response from ::Pygments::Lexer#highlight
+      node.sub_source source, false # handles nil response from ::Pygments::Lexer#highlight
     end
   end
 
