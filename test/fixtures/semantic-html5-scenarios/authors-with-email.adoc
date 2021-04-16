@@ -1,0 +1,2 @@
+= Document Title
+Doc Writer <doc.writer@asciidoc.org>; John Smith <john.smith@asciidoc.org>
