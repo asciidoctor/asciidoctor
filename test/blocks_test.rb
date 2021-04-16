@@ -828,7 +828,7 @@ context 'Blocks' do
       assert_equal 'b', doc.attributes['example-number']
     end
 
-    test "explicit caption is used if provided" do
+    test 'should use explicit caption if specified' do
       input = <<~'EOS'
       [caption="Look! "]
       .Writing Docs with AsciiDoc
@@ -843,7 +843,7 @@ context 'Blocks' do
       assert_nil doc.blocks[0].numeral
       output = doc.convert
       assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
-      refute doc.attributes.has_key?('example-number')
+      refute doc.attributes.key? 'example-number'
     end
 
     test 'automatic caption can be turned off and on and modified' do
@@ -874,6 +874,62 @@ context 'Blocks' do
       assert_xpath '(/*[@class="exampleblock"])[1]/*[@class="title"][starts-with(text(), "Example ")]', output, 1
       assert_xpath '(/*[@class="exampleblock"])[2]/*[@class="title"][text()="second example"]', output, 1
       assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
+    end
+
+    test 'should use explicit caption if specified even if block-specific global caption is disabled' do
+      input = <<~'EOS'
+      :!example-caption:
+
+      [caption="Look! "]
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
+
+      You just write.
+      ====
+      EOS
+
+      doc = document_from_string input
+      assert_nil doc.blocks[0].numeral
+      output = doc.convert
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
+      refute doc.attributes.key? 'example-number'
+    end
+
+    test 'should use global caption if specified even if block-specific global caption is disabled' do
+      input = <<~'EOS'
+      :!example-caption:
+      :caption: Look!{sp}
+
+      .Writing Docs with AsciiDoc
+      ====
+      Here's how you write AsciiDoc.
+
+      You just write.
+      ====
+      EOS
+
+      doc = document_from_string input
+      assert_nil doc.blocks[0].numeral
+      output = doc.convert
+      assert_xpath '(//*[@class="exampleblock"])[1]/*[@class="title"][text()="Look! Writing Docs with AsciiDoc"]', output, 1
+      refute doc.attributes.key? 'example-number'
+    end
+
+    test 'should not process caption attribute on block that does not support a caption' do
+      input = <<~'EOS'
+      [caption="Look! "]
+      .No caption here
+      --
+      content
+      --
+      EOS
+
+      doc = document_from_string input
+      assert_nil doc.blocks[0].caption
+      assert_equal 'Look! ', (doc.blocks[0].attr 'caption')
+      output = doc.convert
+      assert_xpath '(//*[@class="openblock"])[1]/*[@class="title"][text()="No caption here"]', output, 1
     end
 
     test 'should create details/summary set if collapsible option is set' do
@@ -1438,6 +1494,45 @@ context 'Blocks' do
       assert_xpath '/formalpara', output, 1
       assert_xpath '/formalpara/title[text()="title"]', output, 1
       assert_xpath '/formalpara/para/screen[text()="listing block"]', output, 1
+    end
+
+    test 'should not prepend caption to title of listing block with title if listing-caption attribute is not set' do
+      input = <<~'EOS'
+      .title
+      ----
+      listing block content
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="listingblock"][1]/*[@class="title"][text()="title"]', output, 1
+    end
+
+    test 'should prepend caption specified by listing-caption attribute and number to title of listing block with title' do
+      input = <<~'EOS'
+      :listing-caption: Listing
+
+      .title
+      ----
+      listing block content
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="listingblock"][1]/*[@class="title"][text()="Listing 1. title"]', output, 1
+    end
+
+    test 'should prepend caption specified by caption attribute on listing block even if listing-caption attribute is not set' do
+      input = <<~'EOS'
+      [caption="Listing {counter:listing-number}. "]
+      .Behold!
+      ----
+      listing block content
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="listingblock"][1]/*[@class="title"][text()="Listing 1. Behold!"]', output, 1
     end
 
     test 'listing block without an explicit style and with a second positional argument should be promoted to a source block' do
