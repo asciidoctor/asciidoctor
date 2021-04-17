@@ -1319,7 +1319,7 @@ class Parser
         list_item.marker = sibling_trait
         if ordinal == 0 && !style
           # using list level makes more sense, but we don't track it
-          # basing style on marker level is compliant with AsciiDoc Python
+          # basing style on marker level is compliant with AsciiDoc.py
           list_block.style = implicit_style || ((ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s)
         end
         if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text

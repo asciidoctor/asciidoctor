@@ -371,7 +371,7 @@ class Document < AbstractBlock
     attr_overrides[%(safe-mode-#{safe_mode_name})] = ''
     attr_overrides['safe-mode-level'] = @safe
 
-    # the only way to set the max-include-depth attribute is via the API; default to 64 like AsciiDoc Python
+    # the only way to set the max-include-depth attribute is via the API; default to 64 like AsciiDoc.py
     attr_overrides['max-include-depth'] ||= 64
 
     # the only way to set the allow-uri-read attribute is via the API; disabled by default

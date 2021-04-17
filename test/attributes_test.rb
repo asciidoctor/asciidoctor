@@ -23,7 +23,7 @@ context 'Attributes' do
       assert_nil doc.attributes['foo']
     end
 
-    # NOTE AsciiDoc Python recognizes this entry
+    # NOTE AsciiDoc.py recognizes this entry
     test 'does not recognize attribute entry if name contains colon' do
       input = ':foo:bar: baz'
       doc = document_from_string input
@@ -32,7 +32,7 @@ context 'Attributes' do
       assert_equal :paragraph, doc.blocks[0].context
     end
 
-    # NOTE AsciiDoc Python recognizes this entry
+    # NOTE AsciiDoc.py recognizes this entry
     test 'does not recognize attribute entry if name ends with colon' do
       input = ':foo:: bar'
       doc = document_from_string input
@@ -41,7 +41,7 @@ context 'Attributes' do
       assert_equal :dlist, doc.blocks[0].context
     end
 
-    # NOTE AsciiDoc Python does not recognize this entry
+    # NOTE AsciiDoc.py does not recognize this entry
     test 'allows any word character defined by Unicode in an attribute name' do
       [['café', 'a coffee shop'], ['سمن', %(سازمان مردمنهاد)]].each do |(name, value)|
         str = <<~EOS

@@ -592,7 +592,7 @@ module Asciidoctor
   #   $$text$$
   #   pass:quotes[text]
   #
-  # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc Python
+  # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc.py
   InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
   # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
@@ -611,7 +611,7 @@ module Asciidoctor
   # Matches a trailing + preceded by at least one space character,
   # which forces a hard line break (<br> tag in HTML output).
   #
-  # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
+  # NOTE AsciiDoc.py allows + to be preceded by TAB; Asciidoctor does not
   #
   # Examples
   #

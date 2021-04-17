@@ -1761,7 +1761,7 @@ context 'Sections' do
       assert_xpath '//h2[@id="_section_three"][text()="Section Three"]', output, 1
     end
 
-    # NOTE AsciiDoc Python fails this test because it does not properly check for a None value when looking up the numbered attribute
+    # NOTE AsciiDoc.py fails this test because it does not properly check for a None value when looking up the numbered attribute
     test 'section numbers should not increment until numbered attribute is turned back on' do
       input = <<~'EOS'
       = Document Title

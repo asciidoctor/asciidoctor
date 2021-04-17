@@ -332,7 +332,7 @@ module Asciidoctor
 
   LIST_CONTINUATION = '+'
 
-  # NOTE AsciiDoc Python allows + to be preceded by TAB; Asciidoctor does not
+  # NOTE AsciiDoc.py allows + to be preceded by TAB; Asciidoctor does not
   HARD_LINE_BREAK = ' +'
 
   LINE_CONTINUATION = ' \\'
@@ -459,9 +459,9 @@ module Asciidoctor
       [:emphasis, :unconstrained, /\\?(?:\[([^\]]+)\])?__(#{CC_ALL}+?)__/m],
       # _emphasis_
       [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
-      # ##mark## (referred to in AsciiDoc Python as unquoted)
+      # ##mark## (referred to in AsciiDoc.py as unquoted)
       [:mark, :unconstrained, /\\?(?:\[([^\]]+)\])?##(#{CC_ALL}+?)##/m],
-      # #mark# (referred to in AsciiDoc Python as unquoted)
+      # #mark# (referred to in AsciiDoc.py as unquoted)
       [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:\[([^\]]+)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
       # ^superscript^
       [:superscript, :unconstrained, /\\?(?:\[([^\]]+)\])?\^(\S+?)\^/],

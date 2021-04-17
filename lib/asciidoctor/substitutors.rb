@@ -1118,7 +1118,7 @@ module Substitutors
       end
       subs = $2
       content = normalize_text $3, nil, true
-      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc Python
+      # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc.py
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
       subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
@@ -1276,7 +1276,7 @@ module Substitutors
         # NOTE :literal with listparagraph-option gets folded into text of list item later
         default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
       when :raw
-        # TODO make pass subs a compliance setting; AsciiDoc Python performs :attributes and :macros on a pass block
+        # TODO make pass subs a compliance setting; AsciiDoc.py performs :attributes and :macros on a pass block
         default_subs = @context == :stem ? BASIC_SUBS : NO_SUBS
       else
         return @subs
