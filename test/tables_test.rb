@@ -1719,15 +1719,18 @@ context 'Tables' do
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 1
     end
 
-    test 'toc from parent document should not be included in an AsciiDoc table cell' do
+    test 'AsciiDoc table cell should not inherit toc setting from parent document' do
       input = <<~'EOS'
       = Document Title
       :toc:
 
-      == Section A
+      == Section
 
       |===
-      a|AsciiDoc content
+      a|
+      == Section in Nested Document
+
+      content
       |===
       EOS
 
