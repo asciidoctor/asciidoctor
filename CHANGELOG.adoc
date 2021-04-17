@@ -458,7 +458,7 @@ Bug Fixes::
 Build / Infrastructure::
 
   * clear SOURCE_DATE_EPOCH env var when testing timezones (PR #2969) (*@aerostitch*)
-  * remove compat folder (removes the AsciiDoc Python config file that provides pseudo-compliance with Asciidoctor and a stylesheet for an old Font Awesome migration)
+  * remove compat folder (removes the AsciiDoc.py config file that provides pseudo-compliance with Asciidoctor and a stylesheet for an old Font Awesome migration)
   * add Ruby 2.6.0 to build matrix
   * stop running CI job on unsupported versions of Ruby
   * exclude test suite, build script, and Gemfile from gem (#3044)
@@ -1649,13 +1649,13 @@ Compliance::
   * skip include directives when processing comment blocks
   * added xmlns to root element in docbook45 backend, set noxmlns attribute to disable
   * added a Compliance module to control compliance-related behavior
-  * added linkattrs feature to AsciiDoc compatibility file (#441)
-  * added level-5 heading to AsciiDoc compatibility file (#388)
-  * added new XML-based callouts to AsciiDoc compatibility file
-  * added absolute and uri image target matching to AsciiDoc compatibility file
-  * added float attribute on inline image macro to AsciiDoc compatibility file
-  * removed linkcss in AsciiDoc compatibility file
-  * fixed fenced code entry in compatibility file
+  * added linkattrs feature to AsciiDoc.py compatibility file (#441)
+  * added level-5 heading to AsciiDoc.py compatibility file (#388)
+  * added new XML-based callouts to AsciiDoc.py compatibility file
+  * added absolute and uri image target matching to AsciiDoc.py compatibility file
+  * added float attribute on inline image macro to AsciiDoc.py compatibility file
+  * removed linkcss in AsciiDoc.py compatibility file
+  * fixed fenced code entry in AsciiDoc.py compatibility file
 
 Bug Fixes::
 
@@ -1753,7 +1753,7 @@ Enhancements::
 
 Compliance::
 
-  * ~ 99.5% compliance with AsciiDoc
+  * ~ 99.5% compliance with AsciiDoc.py
   * drop line if target of include directive is blank (#376)
   * resolve attribute references in target of include directive (#367)
   * added irc scheme to link detection (#314)
@@ -1814,7 +1814,7 @@ Enhancements::
 
 Compliance::
 
-  * added AsciiDoc compatibility file to make AsciiDoc behave like Asciidoctor (#257)
+  * added compatibility file to make AsciiDoc.py behave like Asciidoctor (#257)
   * restore alpha-based xml entities (#211)
   * implement video and audio block macros (#155)
   * implement toc block macro (#269)
@@ -1914,7 +1914,7 @@ Enhancements::
   * added hardbreaks option to preserve line breaks in paragraph text (#119)
   * :header_footer option defaults to false when using the API, unless rendering to file
   * added idseparator attribute to customized separator used in generated section ids
-  * do not number special sections (differs from AsciiDoc)
+  * do not number special sections (differs from AsciiDoc.py)
 
 Compliance::
 
