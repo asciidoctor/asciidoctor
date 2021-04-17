@@ -1,0 +1,122 @@
+= Block extension example
+
+Here we will show three ways to write, package, and use the same simple block processor.
+There are three choices (block, class, and object) for the processor, and similarly the same three choices for the group that registers the processor, giving a total of 9 possibilities.
+For simplicity we show only the 3 cases where the choice is the same for both processor and group.
+
+== Extension as a class
+
+Here's the code for the block processor:
+
+[source, ruby]
+----
+include::example$nestable-extension-class.rb[]
+----
+
+[sidebar]
+This extension takes the block content, expressed as a paragraph or example block, and converts it unmodified to an open block.
+The purpose is to allow nested open blocks, which are not yet directly available through Asciidoc syntax (see https://github.com/asciidoctor/asciidoctor/issues/1121).
+This extension allows you to lay out your content in arbitrarily nested `div` elements, with specified css classes (mapped from the block role).
+With suitable css, you can use this to create any appearance you want.
+Until nested open blocks become part of the Asciidoc language this is actually a useful extension for html.
+
+Running (in the directory of the nestable-extension file)
+[source,shell]
+----
+include::example$nestable-extension-class-runner.sh[tag=runner]
+----
+
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-class-sample.adoc[]
+----
+
+generating
+
+[source,html]
+----
+include::example$nestable-extension-class-sample.html[]
+----
+
+Lets look at the extension in more detail.
+
+For this section we've chosen to write the extension as a class.
+The other choices are to write it as a block or a class instance, covered in the following sections.
+
+`extend_dsl` causes an appropriate DSL module for the type of processor to  be mixed in, defining class methods to tell Asciidoctor about our extension.
+
+The next two lines use the DSL to specify the block name and the contexts in which it is allowed.
+
+In the extension class, finally, is the `process` method, which is called with the `reader` parameter set to the contents of the block.
+This is where the extension does its work.
+
+After the class, we've included a Group class and self-registering code so the extension can be used from the command line.
+
+== Extension as a block
+
+Here's the same functionality expressed as a block:
+
+[source, ruby]
+----
+include::example$nestable-extension-block.rb[]
+----
+
+Note that:
+
+* The call to `enable_dsl` is not needed
+* In this code `process` is a call to a class method that ends up defining the process method out of the supplied block, rather than being a method definition.
+* Here the group is also written as a block, exposed as a proc for the self-registering code.
+
+[source,shell]
+----
+include::example$nestable-extension-block-runner.sh[tag=runner]
+----
+
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-block-sample.adoc[]
+----
+
+generating
+
+[source,html]
+----
+include::example$nestable-extension-block-sample.html[]
+----
+
+== Extension as an object
+
+This extension demonstrates one way to configure an extension via its constructor, here passing a default role.
+In the group we also register several differently-configured instances of the same class.
+
+Note that in this case the names must be supplied in the registration call to `block` as the second argument.
+
+[source, ruby]
+----
+include::example$nestable-extension-object.rb[]
+----
+
+The Group is used in the registration code as an Object as well.
+
+[source,shell]
+----
+include::example$nestable-extension-object-runner.sh[tag=runner]
+----
+
+on
+
+[source,adoc]
+----
+include::example$nestable-extension-object-sample.adoc[]
+----
+
+generating
+
+[source,html]
+----
+include::example$nestable-extension-object-sample.html[]
+----

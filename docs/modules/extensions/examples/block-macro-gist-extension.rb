@@ -1,32 +1,14 @@
-= Block Macro Processor Extension Example
-:navtitle: Block Macro Processor
-
-Purpose::
-Create a block macro named `gist` for embedding a gist.
-
-== sample-with-gist-macro.adoc
-
-[source,asciidoc]
-----
-.My Gist
-gist::123456[]
-----
-
-== GistBlockMacro
-
-[source,ruby]
-----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
 class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
-  use_dsl
+  enable_dsl
 
   named :gist
 
   def process parent, target, attrs
     title_html = (attrs.has_key? 'title') ?
-        %(<div class="title">#{attrs['title']}</div>\n) : nil
+                   %(<div class="title">#{attrs['title']}</div>\n) : nil
 
     html = %(<div class="openblock gist">
 #{title_html}<div class="content">
@@ -37,15 +19,8 @@ class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
     create_pass_block parent, html, attrs, subs: nil
   end
 end
-----
 
-== Usage
-
-[source,ruby]
-----
+# Self-registering
 Asciidoctor::Extensions.register do
   block_macro GistBlockMacro if document.basebackend? 'html'
 end
-
-Asciidoctor.convert_file 'sample-with-gist.adoc', safe: :safe
-----

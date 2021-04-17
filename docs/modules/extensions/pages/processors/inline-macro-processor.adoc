@@ -1,0 +1,131 @@
+= Inline Macro Processor (Syntax)
+:uri-named-arguments: https://www.regular-expressions.info/named.html
+
+InlineMacroProcessor is a SyntaxProcessor
+
+NOTE: Currently, uses of inline macros are recognized and processed during the conversion phase of a parsed block.
+Furthermore, uses are recognized by means of a regular expression.
+One of the goals of many participating in the Asciidoc language standardization effort is to sufficiently define the language so that inline macro uses can be recognized and processed during the parse phase.
+As a result the inline Nodes returned from processing will form part of the Asciidoc Document Object Model (DOM) or Abstract Syntax Tree (AST).
+This will certainly affect the state of the document visible to inline macros and may affect how uses are recognized, the input to the process method, and the expected contents of the inline nodes produced.
+See https://github.com/asciidoctor/asciidoctor/issues/61[].
+When parsing changes in this way it is possible that inline macros will have to be rewritten.
+Most likely an adapter will be provided to adapt the inputs and outputs, but an inline macro that depends on being able to examine the entire tree of blocks from the parse step is unlikely to be able to work.
+
+== Registration method
+
+An InlineMacroProcessor is registered with `inline_macro`.
+
+== Superclass
+
+Asciidoctor::Extensions::InlineMacroProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`format`::
+When called with `short`, the inline macro will have no target, e.g. `mymacro:[attributes]`.
+See <<recognizing-inline-macro-uses, below>>.
+
+`match`::
+Supplies a regexp to match the inline macro use.
+See <<recognizing-inline-macro-uses, below>>.
+Directly supplying a regex in this way allows recognizing many patterns normally used in text and processing them as macro uses.
+The <<example-with-regular-expression-form, second example>> shows an inline macro processor recognizing RFC names and turning them into links.
+
+== Process method
+
+`def process parent, target, attributes`
+
+* parent is the enclosing block or document.
+* target is, in the simplest case, the text between the `name::` and `[...]`.
+See below for a more detailed explanation.
+* attributes is, in the simplest case, a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+See <<recognizing-inline-macro-uses, below>> for a more detailed explanation.
+
+The process method should return an `Inline` node containing the desired content.
+
+== Recognizing inline macro uses
+
+Inline macros are recognized by means of a regular expression set up through the name, format, and match DSL methods.
+For clarity, this discussion presents only the formats using {uri-named-arguments}[named capturing groups].
+Numbered capturing groups $1 and $2 may be used instead.
+
+* By default, an inline macro is "long" format, looking like `mymacro:some-target[content]`.
+This is recognized by a regex equivalent to `#\{name}:(?<target>\S+?)\[(?<content>|.*?[^\\])\]`.
+* By specifying `format :short`, a use will look like `mymacro:[content]`.
+This is recognized by a regex equivalent to `#\{name}:\[(?<content>|.*?[^\\])\]`.
+* By specifying a regex directly using `match /..../`, any text matching the regex will be recognized as a macro use.
+The regex can extract information from the match using the two named groups `target` and `content`.
+** If the content_model is `:attributes` the content is parsed into the `attributes` parameter.
+** If the content_model is not `:attributes` the content is mapped to the `text` attribute.
+** If the `target` named group is not empty, it is mapped to the process method `target` paramter.
+Otherwise the `content` named group is mapped to the process method `target` parameter.
+
+
+== Example with name:target[content] form
+
+Purpose::
+Create an inline macro named `man` that links to a manpage.
+
+=== ManpageInlineMacro
+
+[source,ruby]
+----
+include::example$inline-man-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+----
+include::example$inline-man-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$inline-man-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$inline-man-extension-sample.html[]
+----
+
+== Example with regular expression form
+
+Purpose::
+Create an inline macro to identify use of RFC standards in Asciidoc source and automatically provide hyperlinks to the document.
+
+=== RFCStandardLinkInlineMacro
+
+[source,ruby]
+----
+include::example$inline-rfc-link-extension.rb[]
+----
+
+=== Usage
+
+[source, ruby]
+----
+include::example$inline-rfc-link-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$inline-rfc-link-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$inline-rfc-link-extension-sample.html[]
+----

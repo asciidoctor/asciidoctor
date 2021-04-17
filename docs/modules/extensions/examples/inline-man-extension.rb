@@ -1,25 +1,8 @@
-= Inline Macro Processor Extension Example
-:navtitle: Inline Macro Processor
-
-Purpose::
-Create an inline macro named `man` that links to a manpage.
-
-== sample-with-man-link.adoc
-
-[source,asciidoc]
-----
-See man:gittutorial[7] to get started.
-----
-
-== ManpageInlineMacro
-
-[source,ruby]
-----
 require 'asciidoctor'
 require 'asciidoctor/extensions'
 
 class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
-  use_dsl
+  enable_dsl
 
   named :man
   name_positional_attributes 'volnum'
@@ -34,18 +17,11 @@ class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
       nil
     end
     parent.document.register :links, target
-    %(#{(create_anchor parent, text, type: :link, target: target).convert}#{suffix})
+    create_anchor parent, text, type: :link, target: %(#{target}#{suffix})
   end
 end
-----
 
-== Usage
-
-[source,ruby]
-----
+# Self-registering
 Asciidoctor::Extensions.register do
   inline_macro ManInlineMacro
 end
-
-Asciidoctor.convert_file 'sample-with-man-link.adoc', safe: :safe
-----

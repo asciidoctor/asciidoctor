@@ -1,0 +1,68 @@
+= Docinfo Processor (Document)
+
+DocinfoProcessor is a DocumentProcessor
+
+For `standalone` document output, the html and docbook backends add context at the top and bottom of the converted content.
+A DocinfoProcessor can add additional content to this added context.
+
+== Registration method
+
+A DocinfoProcessor is registered with `docinfo_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::DocinfoProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+`at_location`::
+Specifies the location for insertion of the added content.
+
+* The default location is `:head`.
+* The recognized values for html5 are `:head`, `:header`, and `:footer`.
+* The recognized values for docbook5 are `:header` and `:footer`.
+* Other environments, such as `jekyll-asciidoc`, may allow arbitrary custom locations.
+
+== Process method
+
+`def process document`
+
+The process method is called from a converter.
+Therefore document attributes are available and the block structure of the document is available.
+
+The `process` method should return the text to be added to the specified location as a string.
+
+== Example
+
+Purpose::
+Appends the Google Analytics tracking code to the bottom of an HTML document.
+
+=== GoogleAnalyticsDocinfoProcessor
+
+[source,ruby]
+----
+include::example$docinfo-google-analytics-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+----
+include::example$docinfo-google-analytics-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$docinfo-google-analytics-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$docinfo-google-analytics-extension-sample.html[]
+----

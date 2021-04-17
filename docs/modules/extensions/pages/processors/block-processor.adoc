@@ -1,0 +1,160 @@
+= Block Processor (Syntax)
+
+BlockProcessor is a SyntaxProcessor
+
+== Registration method
+
+A BlockProcessor is registered with `block`.
+
+== Superclass
+
+Asciidoctor::Extensions::BlockProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`contexts`::
+Sets the contexts allowed for this block.
+The choices are:
+
+////
+TODO: put this table somewhere more appropriate
+////
+
+[cols=2,opts=headers]
+|===
+| Context
+| (shortest) Delimiters
+
+| `:paragraph`
+| (no explicit delimiters, end delimiter is a blank line)
+
+| `:open`
+| `--`
+
+| `:listing`
+| `----`
+
+| `:literal`
+| `\....`
+
+| `:example`
+| `====`
+
+| `:sidebar`
+| `\****`
+
+| `:quote`
+| `\____`
+
+| `:pass`
+| `\++++++`
+
+| `:table`
+| `\|===`, `,===`, `:===`, or `!===`
+
+| `:comment`
+| `////`
+
+|===
+
+////
+obsolete
+| `:fenced_code`
+| \```
+////
+
+Each context type has implicit semantics associated with it.
+When choosing one or more contexts for your block processor, choose the context or contexts that most closely match the purpose of the processor.
+
+////
+TODO: link to explanation of these semantics.
+cf. https://github.com/asciidoctor/asciidoctor.org/issues/223
+////
+
+== Process method
+
+`def process  parent, reader, attributes`
+
+* parent is the enclosing block or document.
+* reader supplies the lines in the block to be processed
+* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+* The process method should either:
+include::page$processor.adoc[tag=blockproc]
+
+== Simple Example
+
+Purpose::
+Register a custom block style named `shout` that uppercases all the words and converts periods to exclamation points.
+
+=== ShoutBlock
+
+[source,ruby]
+----
+include::example$block-shout-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+----
+include::example$block-shout-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$block-shout-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$block-shout-extension-sample.html[]
+----
+
+== Example showing a more complex block structure
+
+Purpose::
+Register a custom block named `collapsible` that transforms a listing block into a compound block composed of the following:
+
+* an example block with the collapsible option enabled
+* the original listing block nested in the example block
+
+The listing block is promoted to a source block if a language is specified using the second positional attribute.
+
+
+=== CollapsibleBlock
+
+[source,ruby]
+----
+include::example$block-collapsible-extension.rb[]
+----
+
+=== Usage
+
+[source,console]
+------
+include::example$block-collapsible-extension-runner.sh[tag=runner]
+------
+
+=== Input
+
+[source,adoc]
+------
+include::example$block-collapsible-extension-sample.adoc[]
+------
+
+=== Output
+
+[source,html]
+----
+include::example$block-collapsible-extension-sample.html[]
+----
+
+NOTE: This extension mimics the builtin `collapsible` option on the example block, but consolidates it to a single block.
+The purpose of this extension is to show how to assemble a compound block in an extension.
+

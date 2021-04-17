@@ -419,6 +419,22 @@ context 'Extensions' do
       end
 
     end
+
+    test 'should supply Registry instance to 1-parameter group block' do
+      begin
+        Asciidoctor::Extensions.register do |registry|
+          @registry = registry
+          registry.preprocessor SamplePreprocessor
+        end
+        doc = Asciidoctor::Document.new
+        assert doc.extensions?
+        assert_kind_of Asciidoctor::Extensions::Registry, doc.extensions
+        assert_equal doc.extensions, @registry
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+
+    end
   end
 
   context 'Instantiate' do
@@ -1851,6 +1867,120 @@ context 'Extensions' do
       assert_xpath '/div[@class="olist"]/ol/li[@id="santa-list-pepijn"][not(@class)]', output, 1
       assert_xpath '/div[@class="olist"]/ol/li[@id="santa-list-dan"][@class="naughty"]', output, 1
       assert_xpath '/div[@class="olist"]/ol/li[not(@id)][not(@class)]/p[text()="Sarah"]', output, 1
+    end
+
+    test 'block processor should support all possible contexts' do
+      group = proc do
+        block do
+          named 'allcontexts'
+          contexts :paragraph, :open, :listing, :literal, :example, :sidebar, :quote, :pass, :table, :comment, :fenced_code
+
+          process do |parent, reader, attributes|
+            create_pass_block parent, reader.lines << attributes['cloaked-context'], attributes
+          end
+        end
+      end
+      input = <<~EOS
+[allcontexts]
+:paragraph
+
+[allcontexts]
+--
+:open
+--
+
+[allcontexts]
+----
+:listing
+----
+
+[allcontexts]
+....
+:literal
+....
+
+[allcontexts]
+====
+:example
+====
+
+[allcontexts]
+****
+:sidebar
+****
+
+[allcontexts]
+____
+:quote
+____
+
+[allcontexts]
+++++
+:pass
+++++
+
+[allcontexts]
+|===
+:table
+|===
+
+[allcontexts]
+,===
+:table
+,===
+
+[allcontexts]
+:===
+:table
+:===
+
+[allcontexts]
+!===
+:table
+!===
+
+[allcontexts]
+////
+:comment
+////
+
+[allcontexts]
+```
+:fenced_code
+```
+
+      EOS
+      doc = document_from_string input, standalone: false, extensions: group
+      output = doc.convert
+      expected = <<~EOS
+:paragraph
+paragraph
+:open
+open
+:listing
+listing
+:literal
+literal
+:example
+example
+:sidebar
+sidebar
+:quote
+quote
+:pass
+pass
+:table
+table
+:table
+table
+:table
+table
+:table
+table
+:fenced_code
+fenced_code
+      EOS
+      assert_equal expected.chomp, output
     end
   end
 end

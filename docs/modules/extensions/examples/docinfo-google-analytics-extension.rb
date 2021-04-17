@@ -1,15 +1,8 @@
-= Docinfo Processor Extension Example
-:navtitle: Docinfo Processor
+require 'asciidoctor'
+require 'asciidoctor/extensions'
 
-Purpose::
-Appends the Google Analytics tracking code to the bottom of an HTML document.
-
-== GoogleAnalyticsDocinfoProcessor
-
-[source,ruby]
-----
 class GoogleAnalyticsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
-  use_dsl
+  enable_dsl
   at_location :footer
   def process document
     return unless (ga_account_id = document.attr 'google-analytics-account')
@@ -23,15 +16,8 @@ ga('send','pageview');
 </script>)
   end
 end
-----
 
-== Usage
-
-[source,ruby]
-----
+# Self-registering
 Asciidoctor::Extensions.register do
   docinfo_processor GoogleAnalyticsDocinfoProcessor
 end
-
-Asciidoctor.convert_file 'sample.adoc', safe: :safe, attributes: 'UA-ABCXYZ123'
-----

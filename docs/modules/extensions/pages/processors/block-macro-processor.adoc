@@ -1,0 +1,61 @@
+= Block Macro Processor (Syntax)
+
+BlockMacroProcessor is a SyntaxProcessor.
+
+== Registration method
+
+A BlockMacroProcessor is registered with `block_macro`.
+
+== Superclass
+
+Asciidoctor::Extensions::BlockMacroProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=syntaxproc]
+
+`resolve_attributes`::
+When called with `false`, sets the content_model to `:text`.
+
+== Process method
+
+`def process parent, target, attributes`
+
+* parent is the enclosing block or document.
+* target is the text between the `name::` and `[...]`
+* attributes is a hash of the contents of `[...]` interpreted using positional_attributes and combined with default attributes.
+* The process method should either:
+include::page$processor.adoc[tag=blockproc]
+
+== Example
+
+Purpose::
+Create a block macro named `gist` for embedding a gist.
+
+=== GistBlockMacro
+
+[source,ruby]
+----
+include::example$block-macro-gist-extension.rb[]
+----
+
+=== Usage
+
+[source,console]
+----
+include::example$block-macro-gist-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$block-macro-gist-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$block-macro-gist-extension-sample.html[]
+----

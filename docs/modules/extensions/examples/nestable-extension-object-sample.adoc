@@ -1,0 +1,8 @@
+[barblock,role=foo]
+====
+Inside the Bar Block
+[bazblock,role=bax]
+======
+Inside the Baz Block
+======
+====

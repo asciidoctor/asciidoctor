@@ -1,0 +1,95 @@
+= Tree Processor (Document)
+
+TreeProcessor is a DocumentProcessor
+
+== Registration method
+
+A TreeProcessor is registered with `tree_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::TreeProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+== Process method
+
+`def process document`
+
+The process method is called from a Document after parsing.
+Therefore document attributes are available and the block structure of the document is available.
+
+The `process` method may modify the document and return the document or nil, or return a new Document.
+The document attributes are reset to the header attributes before the first tree processor is called.
+A tree processor should thus assure that the attributes of the original or returned document are reset to the header attributes by calling `document.restore_attributes` if the attributes have been modified.
+
+There are two basic strategies for a TreeProcessor.
+
+=== Query the document blocks using the `document.find_by` method
+
+This provides quick simple access to the blocks of interest, but does not provide access to the attributes set in the document after the document header.
+Only the header attributes are available.
+
+A block found this way can be replaced with `(parent_blocks = original_block.parent.blocks)[parent_blocks.index original_block] =  new_block`.
+
+=== Traverse the block tree
+
+The only known use of this strategy is to replace the default STEM processing.
+It is extremely unlikely that you will need to use this.
+For this reason, no example is presented.
+
+The code here is more complicated and needs to be recursive to find all blocks, but the attributes present at each block may be computed as the traversal proceeds.
+To replay the attributes, for each block execute `document.playback_attributes block.attributes`.
+Remember to call `document.restore_attributes` before returning.
+
+== Example using `find_by` strategy
+
+Purpose::
+Detect literal blocks that contain shell commands, strip the prompt character and style the command using CSS in such a way that the prompt character cannot be selected (as seen on help.github.com).
+
+=== ShellSessionTreeProcessor
+
+[source,ruby]
+----
+include::example$tree-shell-session-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+----
+include::example$tree-shell-session-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$tree-shell-session-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$tree-shell-session-extension-sample.html[]
+----
+
+////
+In the example below the TreeProcessor examines the block contents looking for the `// (*)` suffix and rewrites the line so that Asciidoctor formats it appropriately.
+
+[source,java]
+----
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .authorizeRequests()
+            .antMatchers("/resources/**").permitAll() // (*)
+            .anyRequest().authenticated()
+            .and()
+        .formLogin()
+            .loginPage("/login")
+            .permitAll();
+----
+////

@@ -1,0 +1,69 @@
+= Packaging an extension
+
+Fundamentally this involves making the extension code visible to Asciidoctor and registering the processors globally or with a particular Registry instance.
+
+There are two opposing forces at work here:
+
+* Ease of use, such as enabling extension use from the command line
+* Flexibility, such as enabling registering the processors in a specific Registry instance.
+
+Both can easily be accomodated by having the processors and a group registering them in one file, and a script registering the group globally in another.
+
+== Use with other code that calls Asciidoctor
+
+In this case the other code can require the extension code file to make it available.
+It's convenient if the extension code exposes a group that registers the processors.
+The calling code can then register the group globally or add it to a particular registry.
+This gives the calling code the opportunity to supply additional configuration.
+For instance, Antora (using the javascript transpilation of Asciidoctor) configures groups with the Antora content catalog and current file.
+Of course, the group needs to be written to understand and use the configuration information in such an environment.
+
+== Use from the command line
+
+In this case having Ruby load the file must result in the processors being added to a registry.
+The simplest way to implement this is with a direct call to `Asciidoctor::Extensions.register` supplying a group.
+However, if this is in the same file as the extension code it will not be usable in the first scenario, so it may be advisable to use two files, one supplying the group and the other registering it.
+
+NOTE: For conciseness, the examples of each processor type that follow all include the registration group in the same file as the processor, thus restricting usability by forcing global registration.
+
+== As a Ruby Gem
+
+=== Naming convention
+
+Currently there is no recommended naming convention for 3rd party processor extensions released as Ruby Gems.
+Consult https://github.com/asciidoctor/asciidoctor-community-docs/issues/6 for discussion on this issue.
+
+Existing extensions have been named using a pattern of `asciidoctor-<extensionname>` but this does not distinguish between projects part of the Asciidoctor organization and 3rd party projects, and is susceptible to naming collisions.
+A possible solution would be to name using a pattern of `asciidoctor-<my-project-name>-<extensionname>`.
+
+=== File layout
+
+A Ruby Gem should have it's main "entry" file in the root of the lib source directory.
+This file should contain the self-registering code so that requiring the gem from the command line will result in the extension being registered.
+
+The processor and group implementations should be located in one or more nested files.
+
+For instance:
+
+....
+lib/
+├── asciidoctor/
+│      ├── nestable/
+│      │      └── processor.rb
+│      └── nestable.rb
+├── asciidoctor-nestable.rb
+nestable.gemspec
+....
+
+In this example using Ruby code, a group in processor.rb can be accessed and added to a specific Registry by
+
+[source,ruby]
+----
+require 'asciidoctor'
+require 'asciidoctor/extensions'
+require 'nestable/processor'
+
+registry = Asciidoctor::Extensions::Registry.new :nestable: Asciidoctor::NestableGroup
+
+Asciidoctor.convert_file 'nestable-test.adoc', :extension_registry: registry, :standalone: false
+----

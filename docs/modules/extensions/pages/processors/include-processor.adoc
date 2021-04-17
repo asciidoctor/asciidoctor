@@ -1,0 +1,69 @@
+= Include Processor (Document)
+
+IncludeProcessor is a DocumentProcessor
+
+The `include::` preprocessor instruction has a target and attributes.
+The registered IncludeProcessors are queried by calling their `handles?` method with the target to determine if the processor wishes to handle the include instruction.
+The first processor to return true is the only processor used.
+Not implementing a `handles?` method indicates that the processor wishes to handle all includes.
+
+== Registration method
+
+An IncludeProcessor is registered with `include_processor`.
+
+== Superclass
+
+Asciidoctor::Extensions::IncludeProcessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+`handles? *args &block`::
+No args may be supplied.
+The block should have a `target` parameter to receive the `include::` instruction target.
+
+== Process method
+
+`def process document, reader, target, attributes`
+
+The process method is called from a PreprocessorReader.
+The document has not yet been parsed although (some) document attributes may be available.
+
+The process method should put the additional content to be included into an array of lines and call `reader.push_include lines` to add the content.
+Any return value is ignored.
+
+== Example
+
+Purpose::
+Include a file from a URI.
+
+TIP: Asciidoctor supports including content from a URI out of the box if you set the `allow-uri-read` attribute (not available if the safe mode is `secure`).
+
+=== UriIncludeProcessor
+
+[source,ruby]
+----
+include::example$include-uri-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+------
+include::example$include-uri-extension-runner.sh[tag=runner]
+------
+
+=== Input
+
+[source,adoc]
+------
+include::example$include-uri-extension-sample-source.adoc[]
+------
+
+=== Output
+
+[source,html]
+----
+include::example$include-uri-extension-sample.html[]
+----

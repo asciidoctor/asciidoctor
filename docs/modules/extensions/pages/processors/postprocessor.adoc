@@ -1,0 +1,61 @@
+= Postprocessor (Document)
+
+PostProcessor is a DocumentProcessor
+
+== Registration method
+
+A PostProcessor is registered with `postprocessor`.
+
+== Superclass
+
+Asciidoctor::Extensions::Postprocessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+== Process method
+
+`def process document, output`
+
+The process method is called from a top-level Document after conversion.
+Postprocessors are not called for subdocuments.
+The document has been fully parsed and converted.
+The result of conversion and previous Postprocessors is supplied in the `output` parameter as a string.
+
+The `process` method should return the modified output string.
+
+Note that the type of converter may be determined from document attributes, as seen in the example.
+
+== Example
+
+Purpose::
+Insert copyright text in the footer.
+
+=== CopyrightFooterPostprocessor
+
+[source,ruby]
+----
+include::example$post-footer-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+----
+include::example$post-footer-extension-runner.sh[tag=runner]
+----
+
+=== Input
+
+[source,adoc]
+----
+include::example$post-footer-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$post-footer-extension-sample.html[]
+----

@@ -1,0 +1,65 @@
+= Preprocessor (Document)
+
+Preprocessor is a DocumentProcessor
+
+WARNING: It is extremely difficult to write a Preprocessor that is compatible with `include::`.
+For this reason we suggest that you not distribute Preprocessors and use them only in environments where they can be validated to work properly on the particular documents involved.
+The most likely way to succeed in writing an `include::` compatible Preprocessor is to stream in single lines and stream out the result of processing that line.
+The major reason for this difficulty is that the `include::` preprocessor instruction can involve attributes, and attributes can be set on any line, or by block and block macro processors.
+
+== Registration method
+
+A Preprocessor is registered with `preprocessor`.
+
+== Superclass
+
+Asciidoctor::Extensions::Preprocessor
+
+== DSL methods
+
+include::page$processor.adoc[tag=docproc]
+
+== Process method
+
+`def process document, reader`
+
+The process method is called from a Document.
+The document has not yet been parsed.
+The reader is positioned at the "start" of the document, which may be the actual beginning of the source available to the Reader or a position advanced by a preceding Preprocessor.
+Depending on the circumstances, the reader may be the reader originally created to read the source for the document or a reader from a preceding Preprocessor.
+
+The `process` method should return a Reader or nil.
+The returned reader can be an entirely new Reader or the original reader, perhaps advanced, as in the example.
+
+== Example
+
+Purpose::
+Skim off, from the top of the document, front matter that gets used by site generators such as Jekyll and Awestruct.
+
+=== FrontMatterPreprocessor
+
+[source,ruby]
+----
+include::example$pre-front-matter-extension.rb[]
+----
+
+=== Usage
+
+[source,ruby]
+------
+include::example$pre-front-matter-extension-runner.sh[tag=runner]
+------
+
+=== Input
+
+[source,adoc]
+----
+include::example$pre-front-matter-extension-sample.adoc[]
+----
+
+=== Output
+
+[source,html]
+----
+include::example$pre-front-matter-extension-sample.html[]
+----
