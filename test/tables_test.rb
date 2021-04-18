@@ -1421,6 +1421,78 @@ context 'Tables' do
       assert_xpath '//td[@class="icon"]/*[@class="title"][text()="Note"]', result, 1
     end
 
+    test 'should keep attribute unset in AsciiDoc table cell if unset in parent document' do
+      input = <<~'EOS'
+      :!sectids:
+      :!table-caption:
+
+      == Outer Heading
+
+      .Outer Table
+      |===
+      a|
+
+      == Inner Heading
+
+      .Inner Table
+      !===
+      ! table cell
+      !===
+      |===
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_xpath 'h2[id]', result, 0
+      assert_xpath '//caption[text()="Outer Table"]', result, 1
+      assert_xpath '//caption[text()="Inner Table"]', result, 1
+    end
+
+    test 'should allow attribute unset in parent document to be set in AsciiDoc table cell' do
+      input = <<~'EOS'
+      :!sectids:
+
+      == No ID
+
+      |===
+      a|
+
+      == No ID
+
+      :sectids:
+
+      == Has ID
+      |===
+      EOS
+
+      result = convert_string_to_embedded input
+      headings = xmlnodes_at_css 'h2', result
+      assert_equal 3, headings.size
+      assert_nil headings[0].attr :id
+      assert_nil headings[1].attr :id
+      assert_equal '_has_id', (headings[2].attr :id)
+    end
+
+    test 'should not allow locked attribute unset in parent document to be set in AsciiDoc table cell' do
+      input = <<~'EOS'
+      == No ID
+
+      |===
+      a|
+
+      == No ID
+
+      :sectids:
+
+      == Has ID
+      |===
+      EOS
+
+      result = convert_string_to_embedded input, attributes: { 'sectids' => nil }
+      headings = xmlnodes_at_css 'h2', result
+      assert_equal 3, headings.size
+      headings.each {|heading| assert_nil (heading.attr :id) }
+    end
+
     test 'AsciiDoc content' do
       input = <<~'EOS'
       [cols="1e,1,5a"]

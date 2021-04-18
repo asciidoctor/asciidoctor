@@ -264,7 +264,7 @@ class Document < AbstractBlock
       parent_doctype = attr_overrides.delete 'doctype'
       # QUESTION if toc is hard unset in parent document, should it be hard unset in nested document?
       attr_overrides.delete 'toc'
-      attr_overrides.delete 'toc-placement'
+      @attributes['toc-placement'] = (attr_overrides.delete 'toc-placement') || 'auto'
       attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
       @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
@@ -339,11 +339,13 @@ class Document < AbstractBlock
     (@options = options).freeze
 
     attrs = @attributes
-    attrs['attribute-undefined'] = Compliance.attribute_undefined
-    attrs['attribute-missing'] = Compliance.attribute_missing
-    attrs.update DEFAULT_ATTRIBUTES
-    # TODO if lang attribute is set, @safe mode < SafeMode::SERVER, and !parent_doc,
-    # load attributes from data/locale/attributes-<lang>.adoc
+    unless parent_doc
+      attrs['attribute-undefined'] = Compliance.attribute_undefined
+      attrs['attribute-missing'] = Compliance.attribute_missing
+      attrs.update DEFAULT_ATTRIBUTES
+      # TODO if lang attribute is set, @safe mode < SafeMode::SERVER, and !parent_doc,
+      # load attributes from data/locale/attributes-<lang>.adoc
+    end
 
     if standalone
       # sync embedded attribute with :standalone option value
