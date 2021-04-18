@@ -1390,6 +1390,37 @@ context 'Tables' do
       assert_includes result, '{backend-html5-doctype-article}'
     end
 
+    test 'should not allow AsciiDoc table cell to set a document attribute that was hard set by the API' do
+      input = <<~'EOS'
+      |===
+      a|
+      :icons:
+
+      NOTE: This admonition does not have a font-based icon.
+      |===
+      EOS
+
+      result = convert_string_to_embedded input, safe: :safe, attributes: { 'icons' => 'font' }
+      assert_css 'td.icon .title', result, 0
+      assert_css 'td.icon i.icon-note', result, 1
+    end
+
+    test 'should not allow AsciiDoc table cell to set a document attribute that was hard unset by the API' do
+      input = <<~'EOS'
+      |===
+      a|
+      :icons: font
+
+      NOTE: This admonition does not have a font-based icon.
+      |===
+      EOS
+
+      result = convert_string_to_embedded input, safe: :safe, attributes: { 'icons' => nil }
+      assert_css 'td.icon .title', result, 1
+      assert_css 'td.icon i.icon-note', result, 0
+      assert_xpath '//td[@class="icon"]/*[@class="title"][text()="Note"]', result, 1
+    end
+
     test 'AsciiDoc content' do
       input = <<~'EOS'
       [cols="1e,1,5a"]
@@ -1757,6 +1788,28 @@ context 'Tables' do
       EOS
 
       output = convert_string input
+      assert_css '.toc', output, 1
+      assert_css 'table .toc', output, 1
+    end
+
+    test 'should be able to enable toc in an AsciiDoc table cell even if hard unset by API' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Section A
+
+      |===
+      a|
+      = Subdocument Title
+      :toc:
+
+      == Subdocument Section A
+
+      content
+      |===
+      EOS
+
+      output = convert_string input, attributes: { 'toc' => nil }
       assert_css '.toc', output, 1
       assert_css 'table .toc', output, 1
     end

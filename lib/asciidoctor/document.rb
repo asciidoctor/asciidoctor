@@ -259,10 +259,10 @@ class Document < AbstractBlock
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
       @catalog = parent_doc.catalog.merge footnotes: []
       # QUESTION should we support setting attribute in parent document from nested document?
-      # NOTE we must dup or else all the assignments to the overrides clobbers the real attributes
-      @attribute_overrides = attr_overrides = parent_doc.attributes.merge
-      parent_doctype = attr_overrides.delete 'doctype'
+      @attribute_overrides = attr_overrides = (parent_doc.instance_variable_get :@attribute_overrides).merge parent_doc.attributes
       attr_overrides.delete 'compat-mode'
+      parent_doctype = attr_overrides.delete 'doctype'
+      # QUESTION if toc is hard unset in parent document, should it be hard unset in nested document?
       attr_overrides.delete 'toc'
       attr_overrides.delete 'toc-placement'
       attr_overrides.delete 'toc-position'
