@@ -703,16 +703,48 @@ context 'Document' do
       assert_xpath '//*[@id="preamble"]//p[text()="Override"]', doc.convert, 1
     end
 
-    test 'header substitutions should be applied to the value of the doctitle attribute' do
+    test 'should apply header substitutions to value of the doctitle attribute assigned from implicit doctitle' do
       input = <<~'EOS'
-      = <Foo> & <Bar>
+      = <Foo> {plus} <Bar>
 
       The name of the game is {doctitle}.
       EOS
 
       doc = document_from_string input
-      assert_equal '&lt;Foo&gt; &amp; &lt;Bar&gt;', (doc.attr 'doctitle')
-      assert_includes doc.blocks[0].content, '&lt;Foo&gt; &amp; &lt;Bar&gt;'
+      assert_equal '&lt;Foo&gt; &#43; &lt;Bar&gt;', (doc.attr 'doctitle')
+      assert_includes doc.blocks[0].content, '&lt;Foo&gt; &#43; &lt;Bar&gt;'
+    end
+
+    test 'should substitute attribute reference in implicit document title for attribute defined earlier in header' do
+      using_memory_logger do |logger|
+        input = <<~'EOS'
+        :project-name: ACME
+        = {project-name} Docs
+
+        {doctitle}
+        EOS
+        doc = document_from_string input, attributes: { 'attribute-missing' => 'warn' }
+        assert_empty logger
+        assert_equal 'ACME Docs', (doc.attr 'doctitle')
+        assert_equal 'ACME Docs', doc.doctitle
+        assert_xpath '//p[text()="ACME Docs"]', doc.convert, 1
+      end
+    end
+
+    test 'should not warn if implicit document title contains attribute reference for attribute defined later in header' do
+      using_memory_logger do |logger|
+        input = <<~'EOS'
+        = {project-name} Docs
+        :project-name: ACME
+
+        {doctitle}
+        EOS
+        doc = document_from_string input, attributes: { 'attribute-missing' => 'warn' }
+        assert_empty logger
+        assert_equal '{project-name} Docs', (doc.attr 'doctitle')
+        assert_equal 'ACME Docs', doc.doctitle
+        assert_xpath '//p[text()="{project-name} Docs"]', doc.convert, 1
+      end
     end
 
     test 'should recognize document title when preceded by blank lines' do

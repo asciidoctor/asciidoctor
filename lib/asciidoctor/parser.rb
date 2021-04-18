@@ -144,7 +144,10 @@ class Parser
         l0_section_title = nil
       else
         document.title = l0_section_title
-        doc_attrs['doctitle'] = doctitle_attr_val = document.apply_header_subs l0_section_title
+        if (doc_attrs['doctitle'] = doctitle_attr_val = document.sub_specialchars l0_section_title).include? ATTR_REF_HEAD
+          # QUESTION should we defer substituting attributes until the end of the header? or should we substitute again if necessary?
+          doc_attrs['doctitle'] = doctitle_attr_val = document.sub_attributes doctitle_attr_val, attribute_missing: 'skip'
+        end
       end
       document.header.source_location = source_location if source_location
       # default to compat-mode if document has setext doctitle
