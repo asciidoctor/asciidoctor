@@ -634,6 +634,18 @@ context 'Document' do
       assert_xpath '//*[@id="preamble"]//p[text()="Document Title"]', doc.convert, 1
     end
 
+    test 'document header can reference intrinsic doctitle attribute' do
+      input = <<~'EOS'
+      = ACME Documentation
+      :intro: Welcome to the {doctitle}!
+
+      {intro}
+      EOS
+      doc = document_from_string input
+      assert_equal 'Welcome to the ACME Documentation!', (doc.attr 'intro')
+      assert_xpath '//p[text()="Welcome to the ACME Documentation!"]', doc.convert, 1
+    end
+
     test 'document with title attribute entry overrides doctitle attribute entry' do
       input = <<~'EOS'
       = Document Title
