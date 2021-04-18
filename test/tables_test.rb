@@ -1493,6 +1493,88 @@ context 'Tables' do
       headings.each {|heading| assert_nil (heading.attr :id) }
     end
 
+    test 'showtitle can be enabled in AsciiDoc table cell if unset in parent document' do
+      %w(showtitle notitle).each do |name|
+        input = <<~EOS
+        = Document Title
+        :#{name == 'showtitle' ? '!' : ''}#{name}:
+
+        |===
+        a|
+        = Nested Document Title
+        :#{name == 'showtitle' ? '' : '!'}#{name}:
+
+        content
+        |===
+        EOS
+
+        result = convert_string_to_embedded input
+        assert_css 'h1', result, 1
+        assert_css '.tableblock h1', result, 1
+      end
+    end
+
+    test 'showtitle can be enabled in AsciiDoc table cell if unset by API' do
+      %w(showtitle notitle).each do |name|
+        input = <<~EOS
+        = Document Title
+
+        |===
+        a|
+        = Nested Document Title
+        :#{name == 'showtitle' ? '' : '!'}#{name}:
+
+        content
+        |===
+        EOS
+
+        result = convert_string_to_embedded input, attributes: { name => (name == 'showtitle' ? nil : '') }
+        assert_css 'h1', result, 1
+        assert_css '.tableblock h1', result, 1
+      end
+    end
+
+    test 'showtitle can be disabled in AsciiDoc table cell if set in parent document' do
+      %w(showtitle notitle).each do |name|
+        input = <<~EOS
+        = Document Title
+        :#{name == 'showtitle' ? '' : '!'}#{name}:
+
+        |===
+        a|
+        = Nested Document Title
+        :#{name == 'showtitle' ? '!' : ''}#{name}:
+
+        content
+        |===
+        EOS
+
+        result = convert_string_to_embedded input
+        assert_css 'h1', result, 1
+        assert_css '.tableblock h1', result, 0
+      end
+    end
+
+    test 'showtitle can be disabled in AsciiDoc table cell if set by API' do
+      %w(showtitle notitle).each do |name|
+        input = <<~EOS
+        = Document Title
+
+        |===
+        a|
+        = Nested Document Title
+        :#{name == 'showtitle' ? '!' : ''}#{name}:
+
+        content
+        |===
+        EOS
+
+        result = convert_string_to_embedded input, attributes: { name => (name == 'showtitle' ? '' : nil) }
+        assert_css 'h1', result, 1
+        assert_css '.tableblock h1', result, 0
+      end
+    end
+
     test 'AsciiDoc content' do
       input = <<~'EOS'
       [cols="1e,1,5a"]

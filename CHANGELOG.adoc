@@ -17,8 +17,9 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
-  * Do not allow AsciiDoc table cell to set document attribute that was unset from the API (except compat-mode and toc) (#4017)
+  * Do not allow AsciiDoc table cell to set document attribute that was unset from the API (except compat-mode, toc, and showtitle/notitle) (#4017)
   * Ensure default document attributes unset in parent document remain unset in AsciiDoc table cell (nested) document (#2586)
+  * Allow showtitle/notitle to be toggled in AsciiDoc table cell if set in parent document (#4018)
   * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of docdatetime attribute) (#3550)
   * Honor caption attribute on blocks that support captioned title even if corresponding *-caption document attribute is not set (#4023)
 
