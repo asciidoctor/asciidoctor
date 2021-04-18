@@ -23,6 +23,7 @@ Bug Fixes::
   * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of docdatetime attribute) (#3550)
   * Honor caption attribute on blocks that support captioned title even if corresponding *-caption document attribute is not set (#4023)
   * Suppress missing attribute warning when applying substitutions to implicit document title to assign to doctitle attribute (#4024)
+  * More accurately account for preprocessor behavior when tracking lineno in reader (#3966)
 
 Improvements::
 

@@ -520,8 +520,7 @@ context 'API' do
       assert_equal 96, unordered_complex_items[4].lineno
     end
 
-    # FIXME see #3966
-    test 'should assign incorrect lineno for single-line paragraph inside a conditional preprocessor directive' do
+    test 'should assign correct lineno for single-line paragraph inside a conditional preprocessor directive' do
       input = <<~'EOS'
       :conditional-attribute:
 
@@ -535,8 +534,7 @@ context 'API' do
       EOS
 
       doc = document_from_string input, sourcemap: true
-      # FIXME the second line number should be 6 instead of 7
-      assert_equal [3, 7, 9], (doc.find_by context: :paragraph).map(&:lineno)
+      assert_equal [3, 6, 9], (doc.find_by context: :paragraph).map(&:lineno)
     end
 
     test 'should assign correct lineno for multi-line paragraph inside a conditional preprocessor directive' do
