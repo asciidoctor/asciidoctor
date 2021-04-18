@@ -87,14 +87,14 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def format_author node, author
-    with_context 'author' do
+    in_context 'author' do
       %(<span class="author">#{node.sub_replacements author.name}#{author.email ? %( #{node.sub_macros author.email}) : ''}</span>)
     end
   end
 
-  def with_context name, &block
+  def in_context name
     (@convert_context ||= []).push name
-    result = block.call
+    result = yield
     @convert_context.pop
     result
   end
