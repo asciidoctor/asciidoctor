@@ -331,8 +331,8 @@ module Substitutors
             target ||= ext_config[:format] == :short ? content : target
           end
           if (Inline === (replacement = extension.process_method[self, target, attributes]))
-            if (inline_subs = replacement.attributes.delete 'subs')
-              replacement.text = apply_subs replacement.text, (expand_subs inline_subs)
+            if (inline_subs = replacement.attributes.delete 'subs') && (inline_subs = expand_subs inline_subs)
+              replacement.text = apply_subs replacement.text, inline_subs
             end
             replacement.convert
           elsif replacement
