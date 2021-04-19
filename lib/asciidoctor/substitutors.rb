@@ -1232,16 +1232,14 @@ module Substitutors
     resolve_subs subs, :inline, nil, 'passthrough macro'
   end
 
-  # Public: Expand all groups in the subs list and return. If no subs are resolve, return nil.
+  # Public: Expand all groups in the subs list and return. If no subs are resolved, return nil.
   #
-  # subs - The substitutions to expand; can be a Symbol, Symbol Array or nil
+  # subs - The substitutions to expand; can be a Symbol or Symbol Array
   #
   # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
   def expand_subs subs
     if ::Symbol === subs
-      unless subs == :none
-        SUB_GROUPS[subs] || [subs]
-      end
+      subs == :none ? nil : SUB_GROUPS[subs] || [subs]
     else
       expanded_subs = []
       subs.each do |key|
