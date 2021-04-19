@@ -381,8 +381,6 @@ class Document < AbstractBlock
     # the only way to set the allow-uri-read attribute is via the API; disabled by default
     attr_overrides['allow-uri-read'] ||= nil
 
-    attr_overrides['user-home'] = USER_HOME
-
     # remap legacy attribute names
     attr_overrides['sectnums'] = attr_overrides.delete 'numbered' if attr_overrides.key? 'numbered'
     attr_overrides['hardbreaks-option'] = attr_overrides.delete 'hardbreaks' if attr_overrides.key? 'hardbreaks'
@@ -418,7 +416,7 @@ class Document < AbstractBlock
         attr_overrides['docfile'] = attr_overrides['docfile'][(attr_overrides['docdir'].length + 1)..-1]
       end
       attr_overrides['docdir'] = ''
-      attr_overrides['user-home'] = '.'
+      attr_overrides['user-home'] ||= '.'
       if @safe >= SafeMode::SECURE
         attr_overrides['max-attribute-value-size'] = 4096 unless attr_overrides.key? 'max-attribute-value-size'
         # assign linkcss (preventing css embedding) unless explicitly disabled from the commandline or API
@@ -427,6 +425,8 @@ class Document < AbstractBlock
         # restrict document from enabling icons
         attr_overrides['icons'] ||= nil
       end
+    else
+      attr_overrides['user-home'] ||= USER_HOME
     end
 
     # the only way to set the max-attribute-value-size attribute is via the API; disabled by default
