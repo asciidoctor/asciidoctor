@@ -17,17 +17,17 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 
 Bug Fixes::
 
-  * Do not allow AsciiDoc table cell to set document attribute that was unset from the API (except compat-mode, toc, and showtitle/notitle) (#4017)
+  * Don't allow AsciiDoc table cell to set document attribute that was unset from the API (except compat-mode, toc, and showtitle/notitle) (#4017)
   * Ensure default document attributes unset in parent document remain unset in AsciiDoc table cell (nested) document (#2586)
   * Allow showtitle/notitle to be toggled in AsciiDoc table cell if set in parent document (#4018)
   * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of docdatetime attribute) (#3550)
   * Honor caption attribute on blocks that support captioned title even if corresponding *-caption document attribute is not set (#4023)
   * Suppress missing attribute warning when applying substitutions to implicit document title to assign to doctitle attribute (#4024)
+  * Increment counter (but not the corresponding attribute) if attribute is locked (#4013)
 
 Improvements::
 
-  * Increment counter (but not the corresponding attribute) if attribute is locked (#4013)
-  * Use attribute as seed value for counter even if not already registered as a counter (#4014)
+  * Use attribute, if set, as seed value for counter even if not already registered as a counter (#4014)
 
 Build / Infrastructure::
 
