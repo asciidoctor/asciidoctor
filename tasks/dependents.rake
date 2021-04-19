@@ -47,8 +47,8 @@ namespace :build do
 
     %w(
       asciidoctor/asciidoctor.js
-      asciidoctor/asciidoctorj
-      asciidoctor/asciidoctor-pdf
+      asciidoctor/asciidoctorj/main
+      asciidoctor/asciidoctor-pdf/main
       asciidoctor/asciidoctor-reveal.js
     ).each do |project|
       org, name, branch = parse_project project
