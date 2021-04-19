@@ -331,7 +331,7 @@ module Substitutors
             target ||= ext_config[:format] == :short ? content : target
           end
           if (Inline === (replacement = extension.process_method[self, target, attributes]))
-            if (inline_subs = replacement.attributes.delete 'subs') && (inline_subs = expand_subs inline_subs)
+            if (inline_subs = replacement.attributes.delete 'subs') && (inline_subs = expand_subs inline_subs, 'custom inline macro')
               replacement.text = apply_subs replacement.text, inline_subs
             end
             replacement.convert
@@ -1234,13 +1234,14 @@ module Substitutors
 
   # Public: Expand all groups in the subs list and return. If no subs are resolved, return nil.
   #
-  # subs - The substitutions to expand; can be a Symbol or Symbol Array
+  # subs - The substitutions to expand; can be a Symbol, Symbol Array, or String
+  # subject - The String to use in log messages to communicate the subject for which subs are being resolved (default: nil)
   #
   # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
-  def expand_subs subs
+  def expand_subs subs, subject = nil
     if ::Symbol === subs
       subs == :none ? nil : SUB_GROUPS[subs] || [subs]
-    else
+    elsif ::Array === subs
       expanded_subs = []
       subs.each do |key|
         unless key == :none
@@ -1251,8 +1252,9 @@ module Substitutors
           end
         end
       end
-
       expanded_subs.empty? ? nil : expanded_subs
+    else
+      resolve_subs subs, :inline, nil, subject
     end
   end
 
