@@ -28,6 +28,7 @@ Bug Fixes::
 Improvements::
 
   * Use attribute, if set, as seed value for counter even if not already registered as a counter (#4014)
+  * Allow subs attribute value on Inline node returned by process method for custom inline macro to be a String (#3938)
 
 Build / Infrastructure::
 
