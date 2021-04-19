@@ -250,6 +250,22 @@ context 'Attributes' do
       assert_equal './etc/images', output
     end
 
+    test 'user-home attribute can be overridden by API if safe mode is less than SERVER' do
+      input = <<~'EOS'
+      Go {user-home}!
+      EOS
+      output = convert_inline_string input, attributes: { 'user-home' => '/home' }
+      assert_equal 'Go /home!', output
+    end
+
+    test 'user-home attribute can be overridden by API if safe mode is SERVER or greater' do
+      input = <<~'EOS'
+      Go {user-home}!
+      EOS
+      output = convert_inline_string input, safe: :server, attributes: { 'user-home' => '/home' }
+      assert_equal 'Go /home!', output
+    end
+
     test "apply custom substitutions to text in passthrough macro and assign to attribute" do
       doc = document_from_string(":xml-busters: pass:[<>&]")
       assert_equal '<>&', doc.attributes['xml-busters']
