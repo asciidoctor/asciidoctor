@@ -10,6 +10,29 @@ The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
 
+= Asciidoctor 2.0.14
+
+_**Release date:** 2021.04.19_
+
+== Bug fixes
+
+* Don't allow AsciiDoc table cell to set document attribute that was unset from the API (exceptions include: compat-mode, toc, showtitle, and notitle) (#4017)
+* Ensure default document attributes unset in parent document remain unset in AsciiDoc table cell (#2586)
+* Allow showtitle/notitle to be toggled in AsciiDoc table cell if set in parent document (#4018)
+* Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of `docdatetime` attribute) (#3550)
+* Honor caption attribute on blocks that support captioned title even if corresponding `*-caption` document attribute (e.g., `example-caption`) is unset (#4023)
+* Suppress missing attribute warning when applying substitutions to implicit document title for assignment to intrinsic `doctitle` attribute (#4024)
+
+== Improvements
+
+* Use attribute, if set, as seed value for counter even if not already registered as a counter (#4014)
+* Allow subs attribute value on Inline node returned by process method for custom inline macro to be a String (#3938)
+* Allow value of `user-home` attribute to be overridden by API or CLI (#3732)
+
+== Build and infrastructure
+
+* Run tests on JRuby for Windows (#3550)
+
 = Asciidoctor 2.0.13
 
 _**Release date:** 2021.04.10_
