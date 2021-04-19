@@ -13,7 +13,8 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
-== Unreleased
+// tag::compact[]
+== 2.0.14 (2021-04-19) - @mojavelinux
 
 Bug Fixes::
 
@@ -35,7 +36,7 @@ Build / Infrastructure::
 
   * Run tests on JRuby for Windows (#3550)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.13 (2021-04-10) - @mojavelinux
 
 Bug Fixes::
@@ -72,7 +73,6 @@ Documentation::
   * Import documentation for processor into this repository (#3861) (*@graphitefriction*)
   * Add Belarusian translation of built-in attributes (PR #3928) (*@morganov*)
 
-// end::compact[]
 == 2.0.12 (2020-11-10) - @mojavelinux
 
 Bug Fixes::
