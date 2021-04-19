@@ -22,6 +22,9 @@ _**Release date:** 2021.04.19_
 * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of `docdatetime` attribute) (#3550)
 * Honor caption attribute on blocks that support captioned title even if corresponding `*-caption` document attribute (e.g., `example-caption`) is unset (#4023)
 * Suppress missing attribute warning when applying substitutions to implicit document title for assignment to intrinsic `doctitle` attribute (#4024)
++
+If you want to use an attribute reference in the document title (i.e., level-0 section title), and you also need to reference the `doctitle` attribute somewhere in the document, then any attributes you reference in the document title must be defined before that line (aka follow document order, just like any other attribute entry).
+Otherwise, they will remain unresolved in the value of the `doctitle` attribute (though they will still work in the document title itself).
 
 == Improvements
 
