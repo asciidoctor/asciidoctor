@@ -96,9 +96,15 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
     revision_date = if (revdate = node.attr 'revdate')
       date = ::Date._parse revdate
-      date_text = "#{date[:year]}-#{date[:mon].to_s.rjust 2, '0'}-#{date[:mday].to_s.rjust 2, '0'}"
-
-      %(<time datetime="#{date_text}">#{revdate}</time>)
+      if (date.has_key? :year) || (date.has_key? :mon) || (date.has_key? :mday)
+        date_parts = []
+        date_parts << "#{date[:year]}" if date.has_key? :year
+        date_parts << "#{date[:mon].to_s.rjust 2, '0'}" if date.has_key? :mon
+        date_parts << "#{date[:mday].to_s.rjust 2, '0'}" if date.has_key? :mday
+        %(<time datetime="#{date_parts.join '-'}">#{revdate}</time>)
+      else
+        revdate
+      end
     else
       ''
     end
