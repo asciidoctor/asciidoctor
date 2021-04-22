@@ -575,6 +575,12 @@ context 'Substitutions' do
       assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
     end
 
+    # FIXME this is a negative test that should be updated once the problem is fixed
+    test 'should set role to empty if value before command is empty' do
+      para = block_from_string(%q{[,]#anonymous#})
+      assert_equal '<span class="">anonymous</span>', para.sub_quotes(para.source)
+    end
+
     test 'inline passthrough with id and role set using shorthand' do
       %w(#idname.rolename .rolename#idname).each do |attrlist|
         para = block_from_string %([#{attrlist}]+pass+)
