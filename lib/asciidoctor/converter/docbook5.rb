@@ -477,6 +477,9 @@ class Converter::DocBook5Converter < Converter::Base
         # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
         %(<link xl:href="#{node.target}">#{node.text || path}</link>)
       else
+        # NOTE the xref tag in DocBook does not support explicit link text, so the link tag must be used instead
+        # The section at http://www.sagehill.net/docbookxsl/CrossRefs.html#IdrefLinks gives an explanation for this choice
+        # "link - a cross reference where you supply the text of the reference as the content of the link element."
         linkend = node.attributes['fragment'] || node.target
         (text = node.text) ? %(<link linkend="#{linkend}">#{text}</link>) : %(<xref linkend="#{linkend}"/>)
       end
