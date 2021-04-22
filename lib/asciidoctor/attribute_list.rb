@@ -173,7 +173,7 @@ class AttributeList
       end
     else
       name = @block.apply_subs name if single_quoted && @block
-      if (positional_attr_name = positional_attrs[index])
+      if (positional_attr_name = positional_attrs[index]) && name
         @attributes[positional_attr_name] = name
       end
       # QUESTION should we assign the positional key even when it's claimed by a positional attribute?
