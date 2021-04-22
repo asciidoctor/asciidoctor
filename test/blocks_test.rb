@@ -2590,6 +2590,13 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
     end
 
+    # FIXME this is a negative test that should be updated when the problem is fixed
+    test 'should output empty width attribute if positional width attribute is empty' do
+      input = 'image::images/tiger.png[Tiger,]'
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@width=""]', output, 1
+    end
+
     test "can convert block image with link" do
       input = <<~'EOS'
       image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']

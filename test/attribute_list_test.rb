@@ -262,6 +262,15 @@ context 'AttributeList' do
     assert_equal expected, attributes
   end
 
+  # FIXME this is a negative test that should be updated when the problem is fixed
+  test 'should assign nil to attribute mapped to missing positional attribute' do
+    attributes = {}
+    line = 'alt text,,100'
+    expected = { 1 => 'alt text', 2 => nil, 3 => '100', 'alt' => 'alt text', 'width' => nil, 'height' => '100' }
+    Asciidoctor::AttributeList.new(line).parse_into(attributes, %w(alt width height))
+    assert_equal expected, attributes
+  end
+
   test 'rekey positional attributes' do
     attributes = { 1 => 'source', 2 => 'java' }
     expected = { 1 => 'source', 2 => 'java', 'style' => 'source', 'language' => 'java' }
