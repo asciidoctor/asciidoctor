@@ -140,6 +140,7 @@ Bug Fixes::
 
 Compliance::
 
+  * Account for empty positional attribute when parsing attrlist (#3813)
   * Add support for muted option to self-hosted video (#3408)
   * Move style tag for convert-time syntax highlighters (coderay, rouge, pygments) into head (#3462)
   * Move style tag for client-side syntax highlighters (highlight.js, prettify) into head (#3503)
