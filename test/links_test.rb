@@ -899,6 +899,26 @@ context 'Links' do
     end
   end
 
+  # FIXME this is a negative test; it should be updated when the problem is fixed
+  test 'should output empty square brackets if inter-document xref points to current doc and no link text is provided' do
+    input = <<~'EOS'
+    = Links & Stuff at https://example.org
+
+    See xref:test.adoc[]
+    EOS
+    output = convert_string_to_embedded input, attributes: { 'docname' => 'test' }
+    assert_include '<a href="#">[]</a>', output
+  end
+
+  # FIXME this is a negative test; it should be updated when the problem is fixed
+  test 'should output empty square brackets if inter-document xref points to current doc without header and no link text is provided' do
+    input = <<~'EOS'
+    See xref:test.adoc[]
+    EOS
+    output = convert_string_to_embedded input, attributes: { 'docname' => 'test' }
+    assert_include '<a href="#">[]</a>', output
+  end
+
   test 'should produce an internal anchor for inter-document xref to file outside of base directory' do
     input = <<~'EOS'
     = Document Title
