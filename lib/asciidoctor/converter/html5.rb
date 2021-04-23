@@ -1111,14 +1111,17 @@ Your browser does not support the video tag.
       else
         attrs = node.role ? %( class="#{node.role}") : ''
         unless (text = node.text)
-          refid = node.attributes['refid']
-          if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid]) && (@resolving_xref ||= (outer = true)) && outer
-            if !(text = ref.xreftext node.attr 'xrefstyle', nil, true)
-              text = %([#{refid}])
-            elsif text.include? '<a'
-              text = text.gsub DropAnchorRx, ''
+          if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid = node.attributes['refid']] || (refid.nil_or_empty? ? (top = node.document) : nil))
+            if (@resolving_xref ||= (outer = true)) && outer
+              if (text = ref.xreftext node.attr 'xrefstyle', nil, true)
+                text = text.gsub DropAnchorRx, '' if text.include? '<a'
+              else
+                text = top ? '[^top]' : %([#{refid}])
+              end
+              @resolving_xref = nil
+            else
+              text = top ? '[^top]' : %([#{refid}])
             end
-            @resolving_xref = nil
           else
             text = %([#{refid}])
           end
