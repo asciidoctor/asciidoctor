@@ -118,9 +118,9 @@ class Converter::SemanticHtml5Converter < Converter::Base
 </thead>
 <tbody>
 <tr>
-<td data-title="#{node.attr 'version-label', ''}">#{node.attr 'revnumber', ''}</td>
+<td data-title="#{node.attr 'version-label'}">#{node.attr 'revnumber'}</td>
 <td data-title="Date">#{revision_date}</td>
-<td data-title="Remark">#{node.attr 'revremark', ''}</td>
+<td data-title="Remark">#{node.attr 'revremark'}</td>
 </tr>
 </tbody>
 </table>)
