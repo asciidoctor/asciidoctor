@@ -13,6 +13,12 @@ endif::[]
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
 For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
+
 // tag::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
 
