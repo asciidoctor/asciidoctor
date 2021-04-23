@@ -49,3 +49,32 @@ end
 
 Asciidoctor.convert_file 'sample-with-man-link.adoc', safe: :safe
 ----
+
+== Tips & Techniques
+
+=== Apply substitutions
+
+By the time an inline macro is processed, most substitutions have already been applied (since macros is one of the last substitutions).
+In order to get the processor to apply substitutions to the text of the Inline node returned by the extension, you must specify those extensions on the node instance itself.
+
+You can specify substitutions to apply to the text of the node using the `subs` attribute.
+This attribute accepts a symbol, an array of symbols, or a comma-separated string.
+
+Let's say that we want normal substitutions to be applied to the text.
+Here's how that can be done:
+
+[source,ruby]
+----
+create_inline_pass parent, '*https://asciidoctor.org[Asciidoctor]*', attributes: { 'subs' => :normal }
+----
+
+This node will be converted into a link with bold link text.
+
+You can also specify the substitutions as a string, which is parsed just like the value of the subs attribute on a block.
+
+[source,ruby]
+----
+create_inline_pass parent, '*https://asciidoctor.org[Asciidoctor]*', attributes: { 'subs' => 'quotes,macros' }
+----
+
+You can specify whichever substitutions you want applied, and in what order.
