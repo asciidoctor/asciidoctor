@@ -800,7 +800,7 @@ module Substitutors
               refid, path, target = nil, nil, '#'
             end
           else
-            refid, path = path, %(#{doc.attributes['relfileprefix']}#{path}#{src2src ? (doc.attributes.fetch 'relfilesuffix', doc.outfilesuffix) : ''})
+            refid, path = path, %(#{doc.attributes['relfileprefix'] || ''}#{path}#{src2src ? (doc.attributes.fetch 'relfilesuffix', doc.outfilesuffix) : ''})
             if fragment
               refid, target = %(#{refid}##{fragment}), %(#{path}##{fragment})
             else
