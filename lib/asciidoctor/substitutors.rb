@@ -1472,13 +1472,13 @@ module Substitutors
   #
   # Returns a Hash of attributes (role and id only)
   def parse_quoted_text_attributes str
-    return {} if (str = str.rstrip).empty?
     # NOTE attributes are typically resolved after quoted text, so substitute eagerly
     str = sub_attributes str if str.include? ATTR_REF_HEAD
     # for compliance, only consider first positional attribute (very unlikely)
     str = str.slice 0, (str.index ',') if str.include? ','
-
-    if (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
+    if (str = str.strip).empty?
+      {}
+    elsif (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
       segments = str.split '#', 2
 
       if segments.size > 1

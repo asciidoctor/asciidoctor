@@ -18,6 +18,8 @@ For a detailed view of what has changed, refer to the {uri-repo}/commits/master[
 Bug Fixes::
 
   * Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
+  * Remove leading and trailing spaces around role on inline phrase (#4035)
+  * Ignore empty role on inline phrase defined using legacy syntax and followed by comma (#4035)
 
 // tag::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux

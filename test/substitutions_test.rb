@@ -575,10 +575,14 @@ context 'Substitutions' do
       assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
     end
 
-    # FIXME this is a negative test that should be updated once the problem is fixed
-    test 'should set role to empty if value before command is empty' do
+    test 'should remove leading and trailing spaces around role after ignoring attributes after comma' do
+      para = block_from_string(%q{[ red , foobar]#alert#})
+      assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
+    end
+
+    test 'should not assign role if value before comma is empty' do
       para = block_from_string(%q{[,]#anonymous#})
-      assert_equal '<span class="">anonymous</span>', para.sub_quotes(para.source)
+      assert_equal 'anonymous', para.sub_quotes(para.source)
     end
 
     test 'inline passthrough with id and role set using shorthand' do
@@ -591,6 +595,11 @@ context 'Substitutions' do
     test 'should not assign role attribute if shorthand style has no roles' do
       para = block_from_string '[#idname]*blah*'
       assert_equal '<strong id="idname">blah</strong>', para.content
+    end
+
+    test 'should remove trailing spaces from role defined using shorthand' do
+      para = block_from_string '[.rolename ]*blah*'
+      assert_equal '<strong class="rolename">blah</strong>', para.content
     end
   end
 
