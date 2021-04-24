@@ -11,7 +11,9 @@ endif::[]
 {uri-asciidoctor}[Asciidoctor] is a _fast_, open source text processor and publishing toolchain for converting {uri-asciidoc}[AsciiDoc] content into HTML 5, DocBook 5, and other formats.
 
 This document provides a high-level view of the changes introduced in Asciidoctor by release.
-For a detailed view of what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
+For an even more detailed look at what has changed, refer to the {uri-repo}/commits/master[commit history] on GitHub.
+
+This project utilizes semantic versioning.
 
 == Unreleased
 

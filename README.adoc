@@ -455,6 +455,12 @@ The core Asciidoctor project is governed by the https://github.com/asciidoctor/.
 By participating, you're agreeing to honor this code.
 Let's work together to make this a welcoming, professional, inclusive, and safe environment for everyone.
 
+== Versioning and Release Policy
+
+This project adheres to semantic versioning (*major.minor.patch*).
+Typically, patch releases are only made for the current minor release.
+However, exceptions are made on a case-by-case basis to address security vulnerabilities and other high-priority issues.
+
 == Copyright and License
 
 Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
