@@ -555,10 +555,12 @@ module Substitutors
           end
           text = ''
           case $3
-          when ')'
-            # move trailing ) out of URL
+          when ')', '?', '!'
             target = target.chop
-            suffix = ')'
+            if (suffix = $3) == ')' && (target.end_with? '.', '?', '!')
+              suffix = target[-1] + suffix
+              target = target.chop
+            end
             # NOTE handle case when modified target is a URI scheme (e.g., http://)
             next $& if target.end_with? '://'
           when ';'
