@@ -605,11 +605,11 @@ allbox tab(:);'
   end
 
   def convert_inline_button node
-    %(#{ESC_BS}fB[#{ESC_BS}0#{node.text}#{ESC_BS}0]#{ESC_BS}fP)
+    %(<#{ESC_BS}fB>[#{ESC_BS}0#{node.text}#{ESC_BS}0]</#{ESC_BS}fP>)
   end
 
   def convert_inline_callout node
-    %(#{ESC_BS}fB(#{node.text})#{ESC_BS}fP)
+    %(<#{ESC_BS}fB>(#{node.text})<#{ESC_BS}fP>)
   end
 
   def convert_inline_footnote node
@@ -640,12 +640,12 @@ allbox tab(:);'
     caret = %[#{ESC_BS}0#{ESC_BS}(fc#{ESC_BS}0]
     menu = node.attr 'menu'
     if !(submenus = node.attr 'submenus').empty?
-      submenu_path = submenus.map {|item| %(#{ESC_BS}fI#{item}#{ESC_BS}fP) }.join caret
-      %(#{ESC_BS}fI#{menu}#{ESC_BS}fP#{caret}#{submenu_path}#{caret}#{ESC_BS}fI#{node.attr 'menuitem'}#{ESC_BS}fP)
+      submenu_path = submenus.map {|item| %(<#{ESC_BS}fI>#{item}</#{ESC_BS}fP>) }.join caret
+      %(<#{ESC_BS}fI>#{menu}</#{ESC_BS}fP>#{caret}#{submenu_path}#{caret}<#{ESC_BS}fI>#{node.attr 'menuitem'}</#{ESC_BS}fP>)
     elsif (menuitem = node.attr 'menuitem')
-      %(#{ESC_BS}fI#{menu}#{caret}#{menuitem}#{ESC_BS}fP)
+      %(<#{ESC_BS}fI>#{menu}#{caret}#{menuitem}</#{ESC_BS}fP>)
     else
-      %(#{ESC_BS}fI#{menu}#{ESC_BS}fP)
+      %(<#{ESC_BS}fI>#{menu}</#{ESC_BS}fP>)
     end
   end
 
