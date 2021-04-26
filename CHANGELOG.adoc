@@ -401,6 +401,7 @@ Enhancements / Compliance::
   * require space after semi-colon that separates multiple authors (#2441)
   * catalog inline anchors at start of callout list items (#2818) (*@owenh000*)
   * add parse_attributes helper method to base extension Processor class (#2134)
+  * require at least one character in the term position of a description list (#2766)
 
 Improvements::
 
