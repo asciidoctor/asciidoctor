@@ -26,6 +26,8 @@ Bug Fixes::
   * Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
   * Remove leading and trailing spaces around role on inline phrase (#4035)
   * Ignore empty role on inline phrase defined using legacy syntax and followed by comma (#4035)
+  * Use xreftext of document as fallback link text for inter-document xref that resolves to current document when no link text is provided (#4032)
+  * Use xreftext of document as fallback link text for interal xref with empty fragment when no link text is provided (#4032)
 
 // tag::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
