@@ -900,7 +900,7 @@ context 'Manpage' do
       assert output.end_with? expected_coda
     end
 
-    test 'should format single key in plain text' do
+    test 'should format single key in monospaced text' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
@@ -911,13 +911,13 @@ context 'Manpage' do
       expected_coda = <<~'EOS'.chop
       .SH "UI MACROS"
       .sp
-      Enter
+      \f(CREnter\fP
       EOS
       output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
       assert output.end_with? expected_coda
     end
 
-    test 'should format each key in sequence as plain text separated by +' do
+    test 'should format each key in sequence as monospaced text separated by +' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
@@ -928,7 +928,7 @@ context 'Manpage' do
       expected_coda = <<~'EOS'.chop
       .SH "UI MACROS"
       .sp
-      Ctrl\0+\0s
+      \f(CRCtrl\0+\0s\fP
       EOS
       output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
       assert output.end_with? expected_coda

@@ -629,11 +629,7 @@ allbox tab(:);'
   end
 
   def convert_inline_kbd node
-    if (keys = node.attr 'keys').size == 1
-      keys[0]
-    else
-      keys.join %(#{ESC_BS}0+#{ESC_BS}0)
-    end
+    %[<#{ESC_BS}f(CR>#{(keys = node.attr 'keys').size == 1 ? keys[0] : (keys.join "#{ESC_BS}0+#{ESC_BS}0")}</#{ESC_BS}fP>]
   end
 
   def convert_inline_menu node

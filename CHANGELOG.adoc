@@ -17,6 +17,10 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
+Improvements::
+
+  * Format keyboard references in monospace in manpage output
+
 Bug Fixes::
 
   * Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
