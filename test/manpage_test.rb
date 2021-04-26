@@ -882,6 +882,110 @@ context 'Manpage' do
     end
   end
 
+  context 'UI macros' do
+    test 'should enclose button in square brackets and format as bold' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      btn:[Save]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      \fB[\0Save\0]\fP
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format single key in plain text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      kbd:[Enter]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      Enter
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format each key in sequence as plain text separated by +' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      kbd:[Ctrl,s]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      Ctrl\0+\0s
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format single menu reference in italic' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      menu:File[]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      \fIFile\fP
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format menu sequence in italic separated by carets' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      menu:File[New Tab]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      \fIFile\0\(fc\0New Tab\fP
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+
+    test 'should format menu sequence with submenu in italic separated by carets' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      == UI Macros
+
+      menu:View[Zoom > Zoom In]
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .SH "UI MACROS"
+      .sp
+      \fIView\fP\0\(fc\0\fIZoom\fP\0\(fc\0\fIZoom In\fP
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert output.end_with? expected_coda
+    end
+  end
+
   context 'Footnotes' do
     test 'should generate list of footnotes using numbered list with numbers enclosed in brackets' do
       [true, false].each do |standalone|
