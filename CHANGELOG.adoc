@@ -360,7 +360,7 @@ Enhancements / Compliance::
   * change default value of third argument to Abstractnode#attr / AbstractNode#attr? to nil so attribute doesn't inherit by default (#3059)
   * look for table-frame, table-grid, and table-stripes attributes on document as fallback for frame, grid, and stripes attributes on table (#3059)
   * add support for hover mode for table stripes (stripes=hover) (#3110)
-  * always assume the target of a shorthand interdocument xref is a reference to an AsciiDoc document (source-to-source) (#3021)
+  * always assume the target of a shorthand inter-document xref is a reference to an AsciiDoc document (source-to-source) (#3021)
   * if the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
   * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
   * encode characters in URI to comply with RFC-3986
@@ -597,11 +597,11 @@ Enhancements::
 
   * BREAKING: drop XML tags, character refs, and non-word characters (except hyphen, dot, and space) when auto-generating section IDs (#794)
    ** hyphen, dot, and space are replaced with value of idseparator, if set; otherwise, spaces are dropped
-  * BREAKING: disable interdocument xrefs in compat mode (#2740)
+  * BREAKING: disable inter-document xrefs in compat mode (#2740)
   * BREAKING: automatically parse attributes in link macro if equals is present, ignoring linkattrs (except in compat mode) (#2059)
   * pass non-AsciiDoc file extensions in target of xref through unprocessed (#2740)
-  * process any known AsciiDoc file extension in target of shorthand interdocument xref if hash is also present (e.g., `<<target.asciidoc#,text>>`) (#2740)
-  * only allow .adoc to be used in target of formal xref macro to create an interdocument xref (with or without a hash) (#2740)
+  * process any known AsciiDoc file extension in target of shorthand inter-document xref if hash is also present (e.g., `<<target.asciidoc#,text>>`) (#2740)
+  * only allow .adoc to be used in target of formal xref macro to create an inter-document xref (with or without a hash) (#2740)
   * allow attribute names to contain any word character defined by Unicode (#2376, PR #2393)
   * do not recognize attribute entry line if name contains a colon (PR #2377)
   * route all processor messages through a logger instead of using Kernel#warn (#44, PR #2660)
@@ -613,7 +613,7 @@ Enhancements::
   * add `--failure-level=LEVEL` option to CLI to force non-zero exit code if specified logging level is reached (#2003, PR #2674)
   * parse text of xref macro as attributes if attribute signature found (equal sign) (#2381)
   * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
-  * recognize target with .adoc extension in xref macro as an interdocument xref
+  * recognize target with .adoc extension in xref macro as an inter-document xref
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
   * allow `relfilesuffix` attribute to control file extension used for interdoc xrefs (#1273)
   * support `!name@` (preferred), `!name=@`, `name!@`, and `name!=@` syntax to soft unset attribute from API or CLI (#642, PR #2649)
