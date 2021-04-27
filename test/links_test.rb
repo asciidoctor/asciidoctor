@@ -909,6 +909,18 @@ context 'Links' do
     assert_include '<a href="#">Links &amp; Stuff at https://example.org</a>', output
   end
 
+  test 'should use doctitle of root document as fallback link text for inter-document xref in AsciiDoc table cell that resolves to current doc' do
+    input = <<~'EOS'
+    = Document Title
+
+    |===
+    a|See xref:test.adoc[]
+    |===
+    EOS
+    output = convert_string_to_embedded input, attributes: { 'docname' => 'test' }
+    assert_include '<a href="#">Document Title</a>', output
+  end
+
   test 'should use reftext on document as fallback link text if inter-document xref points to current doc and no link text is provided' do
     input = <<~'EOS'
     [reftext="Links and Stuff"]

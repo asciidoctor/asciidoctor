@@ -1111,7 +1111,7 @@ Your browser does not support the video tag.
       else
         attrs = node.role ? %( class="#{node.role}") : ''
         unless (text = node.text)
-          if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid = node.attributes['refid']] || (refid.nil_or_empty? ? (top = node.document) : nil))
+          if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid = node.attributes['refid']] || (refid.nil_or_empty? ? (top = get_root_document node) : nil))
             if (@resolving_xref ||= (outer = true)) && outer
               if (text = ref.xreftext node.attr 'xrefstyle', nil, true)
                 text = text.gsub DropAnchorRx, '' if text.include? '<a'
@@ -1315,6 +1315,13 @@ Your browser does not support the video tag.
 <div class="sectionbody">
 <p>#{(node.attr 'mannames').join ', '} - #{node.attr 'manpurpose'}</p>
 </div>)
+  end
+
+  def get_root_document node
+    while (node = node.document).nested?
+      node = node.parent_document
+    end
+    node
   end
 
   # NOTE adapt to older converters that relied on unprefixed method names
