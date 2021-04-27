@@ -30,6 +30,10 @@ Improvements::
 
   * Format keyboard references in monospace in manpage output
 
+Build / Infrastructure::
+
+  * Get remaining invoker tests working on JRuby 9.1 for Windows
+
 // tag::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
 
