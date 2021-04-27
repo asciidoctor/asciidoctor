@@ -10,6 +10,28 @@ The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
 
+= Asciidoctor 2.0.15
+
+_**Release date:** 2021.04.27_
+
+== Bug Fixes
+
+* Don't include trailing period, question mark, or exclamation point in target (URL) of autolink (#3860)
+* Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
+* Remove leading and trailing spaces around role on inline phrase (#4035)
+* Ignore empty role on inline phrase defined using legacy syntax and followed by comma (#4035)
+* Use xreftext on document as fallback link text in HTML output for inter-document xref that resolves to current document when no link text is provided (#4032)
+* Use xreftext on document as fallback link text in HTML output for internal xref with empty fragment when no link text is provided (#4032)
+* Use document ID as linkend in DocBook output for internal xref with empty fragment; auto-generating one if necessary (#4032)
+
+== Improvements
+
+* Format keyboard references in monospace in manpage output
+
+== Build and infrastructure
+
+* Get remaining invoker tests working on JRuby 9.1 for Windows
+
 = Asciidoctor 2.0.14
 
 _**Release date:** 2021.04.19_
