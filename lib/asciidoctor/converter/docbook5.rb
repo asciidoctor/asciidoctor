@@ -474,7 +474,6 @@ class Converter::DocBook5Converter < Converter::Base
       %(<anchor#{common_attributes((id = node.id), nil, node.reftext || %([#{id}]))}/>)
     when :xref
       if (path = node.attributes['path'])
-        # QUESTION should we use refid as fallback text instead? (like the html5 backend?)
         %(<link xl:href="#{node.target}">#{node.text || path}</link>)
       else
         # NOTE the xref tag in DocBook does not support explicit link text, so the link tag must be used instead
