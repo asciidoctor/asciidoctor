@@ -250,7 +250,7 @@ Also see https://github.com/asciidoctor/asciidoctor/milestone/33?closed=1[issues
 
 Bug Fixes::
 
-  * assume implicit AsciiDoc extension on interdoc xref macro target with no extension (e.g., `document#`); restores 1.5.x behavior (#3231)
+  * assume implicit AsciiDoc extension on inter-document xref macro target with no extension (e.g., `document#`); restores 1.5.x behavior (#3231)
   * don't fail to load application if call to Dir.home fails; use a rescue with fallback values (#3238)
   * Helpers.rootname should only consider final path segment when dropping file extension
 
@@ -619,7 +619,7 @@ Enhancements::
   * allow xrefstyle to be specified per xref by assigning the xrefstyle attribute on the xref macro (#2365)
   * recognize target with .adoc extension in xref macro as an inter-document xref
   * resolve nested includes in remote documents relative to URI (#2506, PR #2511)
-  * allow `relfilesuffix` attribute to control file extension used for interdoc xrefs (#1273)
+  * allow `relfilesuffix` attribute to control file extension used for inter-document xrefs (#1273)
   * support `!name@` (preferred), `!name=@`, `name!@`, and `name!=@` syntax to soft unset attribute from API or CLI (#642, PR #2649)
   * allow modifier to be placed at end of name to soft set an attribute (e.g., `icons@=font`) (#642, PR #2649)
   * interpret `false` attribute value defined using API as a soft unset (#642, PR #2649)
@@ -733,7 +733,7 @@ Improvements / Refactoring::
   * add methods to read results from timings (#2578, PR #2580)
   * collapse bottom margin of last block in AsciiDoc table cell (#2568, PR #2593)
   * set authorcount to 0 if there are no authors (#2519, PR #2520)
-  * validate fragment of interdoc xref that resolves to current doc (#2448, PR #2449)
+  * validate fragment of inter-document xref that resolves to current doc (#2448, PR #2449)
   * put id attribute on tag around phrase instead of preceding anchor (#2445, PR #2446)
   * add .plist extension to XML circumfix comment family (#2430, PR #2431) (*@akosma*)
   * alias Document#title method to no args Document#doctitle method (#2429, PR #2432)
