@@ -15,7 +15,8 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
-== Unreleased
+// tag::compact[]
+== 2.0.15 (2021-04-27) - @mojavelinux
 
 Bug Fixes::
 
@@ -35,7 +36,7 @@ Build / Infrastructure::
 
   * Get remaining invoker tests working on JRuby 9.1 for Windows
 
-// tag::compact[]
+// end::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
 
 Bug Fixes::
@@ -58,7 +59,6 @@ Build / Infrastructure::
 
   * Run tests on JRuby for Windows (#3550)
 
-// end::compact[]
 == 2.0.13 (2021-04-10) - @mojavelinux
 
 Bug Fixes::
