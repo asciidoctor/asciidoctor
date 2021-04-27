@@ -320,7 +320,7 @@ You should see information about the Asciidoctor version and your Ruby environme
 [.output,subs=attributes+]
 ....
 Asciidoctor {release-version} [https://asciidoctor.org]
-Runtime Environment (ruby 2.6.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 3.0.1p64 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:UTF-8 ex:UTF-8)
 ....
 
 === Command line interface (CLI)
