@@ -41,7 +41,8 @@ class Converter::DocBook5Converter < Converter::Base
     if (root_tag_name = node.doctype) == 'manpage'
       root_tag_name = 'refentry'
     end
-    result << %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{common_attributes node.id}>)
+    root_tag_idx = result.size
+    id = node.id
     result << (document_info_tag node) unless node.noheader
     unless (docinfo_content = node.docinfo :header).empty?
       result << docinfo_content
@@ -50,6 +51,9 @@ class Converter::DocBook5Converter < Converter::Base
     unless (docinfo_content = node.docinfo :footer).empty?
       result << docinfo_content
     end
+    id, node.id = node.id, nil unless id
+    # defer adding root tag in case document ID is auto-generated on demand
+    result.insert root_tag_idx, %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{common_attributes id}>)
     result << %(</#{root_tag_name}>)
     result.join LF
   end
@@ -476,7 +480,11 @@ class Converter::DocBook5Converter < Converter::Base
       if (path = node.attributes['path'])
         %(<link xl:href="#{node.target}">#{node.text || path}</link>)
       else
-        linkend = node.attributes['refid'] || node.target
+        if (linkend = node.attributes['refid']).nil_or_empty?
+          root_doc = get_root_document node
+          # Q: should we warn instead of generating a document ID on demand?
+          linkend = (root_doc.id ||= generate_document_id root_doc)
+        end
         # NOTE the xref tag in DocBook does not support explicit link text, so the link tag must be used instead
         # The section at http://www.sagehill.net/docbookxsl/CrossRefs.html#IdrefLinks gives an explanation for this choice
         # "link - a cross reference where you supply the text of the reference as the content of the link element."
@@ -710,6 +718,17 @@ class Converter::DocBook5Converter < Converter::Base
     end
 
     result.join LF
+  end
+
+  def get_root_document node
+    while (node = node.document).nested?
+      node = node.parent_document
+    end
+    node
+  end
+
+  def generate_document_id doc
+    %(__#{doc.doctype}-root__)
   end
 
   # FIXME this should be handled through a template mechanism

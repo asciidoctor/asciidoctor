@@ -995,6 +995,31 @@ context 'Links' do
     assert_include '<a href="#">[^top]</a>', output
   end
 
+  test 'should use document id as linkend for self xref in DocBook backend' do
+    input = <<~'EOS'
+    [#docid]
+    = Document Title
+
+    See xref:test.adoc[]
+    EOS
+    output = convert_string_to_embedded input, backend: :docbook, attributes: { 'docname' => 'test' }
+    assert_include '<xref linkend="docid"/>', output
+  end
+
+  test 'should auto-generate document id to use as linkend for self xref in DocBook backend' do
+    input = <<~'EOS'
+    = Document Title
+
+    See xref:test.adoc[]
+    EOS
+    doc = document_from_string input, backend: :docbook, attributes: { 'docname' => 'test' }
+    assert_nil doc.id
+    output = doc.convert
+    assert_nil doc.id
+    assert_include ' xml:id="__article-root__"', output
+    assert_include '<xref linkend="__article-root__"/>', output
+  end
+
   test 'should produce an internal anchor for inter-document xref to file outside of base directory' do
     input = <<~'EOS'
     = Document Title
