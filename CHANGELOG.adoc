@@ -23,6 +23,7 @@ Improvements::
 
 Bug Fixes::
 
+  * Don't include trailing period, question mark, or exclamation point in target (URL) of autolink (#3860)
   * Don't assign nil value to named attribute mapped to absent positional attribute when parsing attrlist (#4033)
   * Remove leading and trailing spaces around role on inline phrase (#4035)
   * Ignore empty role on inline phrase defined using legacy syntax and followed by comma (#4035)

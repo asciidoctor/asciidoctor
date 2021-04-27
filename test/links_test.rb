@@ -85,10 +85,46 @@ context 'Links' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', convert_string('(http://asciidoc.org) is the project page for AsciiDoc.'), 1
   end
 
+  test 'qualified url with trailing period' do
+    result = convert_string_to_embedded 'The homepage for Asciidoctor is https://asciidoctor.org.'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,".")]', result, 1
+  end
+
+  test 'qualified url with trailing explanation point' do
+    result = convert_string_to_embedded 'Check out https://asciidoctor.org!'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,"!")]', result, 1
+  end
+
+  test 'qualified url with trailing question mark' do
+    result = convert_string_to_embedded 'Is the homepage for Asciidoctor https://asciidoctor.org?'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,"?")]', result, 1
+  end
+
   test 'qualified url with trailing round bracket' do
     result = convert_string_to_embedded 'Asciidoctor is a Ruby-based AsciiDoc processor (see https://asciidoctor.org)'
     assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
     assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,")")]', result, 1
+  end
+
+  test 'qualified url with trailing period followed by round bracket' do
+    result = convert_string_to_embedded '(The homepage for Asciidoctor is https://asciidoctor.org.)'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,".)")]', result, 1
+  end
+
+  test 'qualified url with trailing exclamation point followed by round bracket' do
+    result = convert_string_to_embedded '(Check out https://asciidoctor.org!)'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,"!)")]', result, 1
+  end
+
+  test 'qualified url with trailing question mark followed by round bracket' do
+    result = convert_string_to_embedded '(Is the homepage for Asciidoctor https://asciidoctor.org?)'
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]', result, 1
+    assert_xpath '//a[@href="https://asciidoctor.org"][text()="https://asciidoctor.org"]/following-sibling::text()[starts-with(.,"?)")]', result, 1
   end
 
   test 'qualified url with trailing semi-colon' do
