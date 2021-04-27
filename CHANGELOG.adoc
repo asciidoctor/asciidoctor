@@ -17,10 +17,6 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
-Improvements::
-
-  * Format keyboard references in monospace in manpage output
-
 Bug Fixes::
 
   * Don't include trailing period, question mark, or exclamation point in target (URL) of autolink (#3860)
@@ -29,6 +25,10 @@ Bug Fixes::
   * Ignore empty role on inline phrase defined using legacy syntax and followed by comma (#4035)
   * Use xreftext of document as fallback link text for inter-document xref that resolves to current document when no link text is provided (#4032)
   * Use xreftext of document as fallback link text for interal xref with empty fragment when no link text is provided (#4032)
+
+Improvements::
+
+  * Format keyboard references in monospace in manpage output
 
 // tag::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
