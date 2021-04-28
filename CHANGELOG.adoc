@@ -15,6 +15,12 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Update default stylesheet to indent blocks attached to list item in checklist (#2550)
+
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 
