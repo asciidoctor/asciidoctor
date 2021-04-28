@@ -1,0 +1,3 @@
+= Document Title
+Stuart Rackham <founder@asciidoc.org>
+v8.6.8, 2012-07-12: See changelog.
