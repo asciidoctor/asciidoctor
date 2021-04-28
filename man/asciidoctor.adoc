@@ -144,6 +144,10 @@ Matching templates found in subsequent directories override ones previously disc
 *-t, --timings*::
   Print timings report to stderr (time to read, parse, and convert).
 
+*--sourcemap*::
+    Enable the sourcemap option. Keeps track of the file and line number for each parsed block.
+    (Useful for tooling applications where the association between the converted output and the source file is important).
+
 === Program Information
 
 *-h, --help* [_TOPIC_]::

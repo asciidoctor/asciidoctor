@@ -28,6 +28,7 @@ module Asciidoctor
         self[:failure_level] = ::Logger::Severity::FATAL
         self[:trace] = false
         self[:timings] = false
+        self[:sourcemap] = false
       end
 
       def self.parse!(args)
@@ -137,6 +138,9 @@ module Asciidoctor
           end
           opts.on('-t', '--timings', 'print timings report (default: false)') do |timing|
             self[:timings] = true
+          end
+          opts.on('--sourcemap', 'keep track of the file and line number for each parsed block (default: false)') do |sourcemap|
+            self[:sourcemap] = true
           end
           opts.on_tail('-h', '--help [TOPIC]', 'print a help message',
               'show this usage if TOPIC is not specified or recognized',
