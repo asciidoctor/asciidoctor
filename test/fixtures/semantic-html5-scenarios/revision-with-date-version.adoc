@@ -1,0 +1,4 @@
+= Document Title
+Author Name
+:revdate: 2011-11-11
+:revnumber: 1.0

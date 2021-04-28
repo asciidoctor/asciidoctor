@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+autoload :Date, 'date' unless RUBY_ENGINE == 'opal'
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # that maximizes the use of semantic constructs.
@@ -56,6 +58,9 @@ class Converter::SemanticHtml5Converter < Converter::Base
       if (authors = generate_authors node)
         result << authors
       end
+      if (revision = generate_revision node)
+        result << revision
+      end
       result << '</header>'
       result.join LF
     end
@@ -84,6 +89,41 @@ class Converter::SemanticHtml5Converter < Converter::Base
       result << '</ul>'
       result.join LF
     end
+  end
+
+  def generate_revision node
+    return unless (node.attr? 'revnumber') || (node.attr? 'revdate') || (node.attr? 'revremark')
+
+    revision_date = if (revdate = node.attr 'revdate')
+      date = ::Date._parse revdate
+      if (date.has_key? :year) || (date.has_key? :mon) || (date.has_key? :mday)
+        date_parts = []
+        date_parts << "#{date[:year]}" if date.has_key? :year
+        date_parts << "#{date[:mon].to_s.rjust 2, '0'}" if date.has_key? :mon
+        date_parts << "#{date[:mday].to_s.rjust 2, '0'}" if date.has_key? :mday
+        %(<time datetime="#{date_parts.join '-'}">#{revdate}</time>)
+      else
+        revdate
+      end
+    else
+      ''
+    end
+    %(<table class="revision">
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Remark</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-title="#{node.attr 'version-label'}">#{node.attr 'revnumber'}</td>
+<td data-title="Date">#{revision_date}</td>
+<td data-title="Remark">#{node.attr 'revremark'}</td>
+</tr>
+</tbody>
+</table>)
   end
 
   def format_author node, author
