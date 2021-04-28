@@ -1,0 +1,3 @@
+= Document Title
+Author Name
+:revremark: The spring incarnation of {doctitle}

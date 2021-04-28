@@ -1,0 +1,4 @@
+= Document Title
+Author Name
+:revdate: Once upon a time
+:revnumber: 1.0
