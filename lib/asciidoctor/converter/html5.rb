@@ -554,14 +554,38 @@ Your browser does not support the audio tag.
       end
       node.items.each do |terms, dd|
         result << '<tr>'
-        result << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : ''}">)
+
+        len=0 
+        labelspan=(node.attr 'labelspan').to_i
+        if(labelspan!=0)      
+          terms.each do |dt|  
+            termstr=dt.text
+            termstr.gsub!(/<[^>]+>/,'')
+            if(termstr.length>len)
+              len=termstr.length;
+            end
+          end
+
+          if(len<labelspan)
+            result << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : ''}">)
+          else
+            result << %(<td class="hdlist2#{(node.option? 'strong') ? ' strong' : ''}"  colspan="2">)
+          end
+        else
+          result << %(<td class="hdlist1#{(node.option? 'strong') ? ' strong' : ''}">)
+        end
+
         first_term = true
         terms.each do |dt|
           result << %(<br#{slash}>) unless first_term
           result << dt.text
           first_term = nil
         end
-        result << '</td>'
+        if( (labelspan==0) || (len<labelspan) )
+          result << '</td>'
+        else
+          result << '</td></tr><tr><td></td>'
+        end
         result << '<td class="hdlist2">'
         if dd
           result << %(<p>#{dd.text}</p>) if dd.text?
