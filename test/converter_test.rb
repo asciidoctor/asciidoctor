@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require_relative 'test_helper'
-require 'tilt' unless defined? ::Tilt.new
+require 'tilt' unless defined? Tilt.new
 
 context 'Converter' do
   context 'View options' do
