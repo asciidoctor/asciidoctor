@@ -54,12 +54,12 @@ module Asciidoctor
   module SafeMode
     # A safe mode level that disables any of the security features enforced
     # by Asciidoctor (Ruby is still subject to its own restrictions).
-    UNSAFE = 0;
+    UNSAFE = 0
 
     # A safe mode level that closely parallels safe mode in AsciiDoc. This value
     # prevents access to files which reside outside of the parent directory of
     # the source file and disables any macro other than the include::[] directive.
-    SAFE = 1;
+    SAFE = 1
 
     # A safe mode level that disallows the document from setting attributes
     # that would affect the conversion of the document, in addition to all the
@@ -67,7 +67,7 @@ module Asciidoctor
     # changing the backend or source-highlighter using an attribute defined
     # in the source document header. This is the most fundamental level of
     # security for server deployments (hence the name).
-    SERVER = 10;
+    SERVER = 10
 
     # A safe mode level that disallows the document from attempting to read
     # files from the file system and including the contents of them into the
@@ -79,7 +79,7 @@ module Asciidoctor
     #
     # Since Asciidoctor is aiming for wide adoption, this level is the default
     # and is recommended for server deployments.
-    SECURE = 20;
+    SECURE = 20
 
     # A planned safe mode level that disallows the use of passthrough macros and
     # prevents the document from setting any known attributes, in addition to all
@@ -87,7 +87,7 @@ module Asciidoctor
     #
     # Please note that this level is not currently implemented (and therefore not
     # enforced)!
-    #PARANOID = 100;
+    #PARANOID = 100
 
     @names_by_value = {}.tap {|accum| (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase } }
 
