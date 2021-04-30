@@ -290,11 +290,11 @@ module Asciidoctor
       rescue ::OptionParser::MissingArgument
         $stderr.puts %(asciidoctor: option #{$!.message})
         $stdout.puts opts_parser
-        return 1
+        1
       rescue ::OptionParser::InvalidOption, ::OptionParser::InvalidArgument
         $stderr.puts %(asciidoctor: #{$!.message})
         $stdout.puts opts_parser
-        return 1
+        1
       ensure
         $VERBOSE = old_verbose
       end
