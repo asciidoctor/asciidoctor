@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
   class << self
     # Public: Parse the AsciiDoc source input into a {Document}

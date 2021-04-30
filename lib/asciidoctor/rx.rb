@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Asciidoctor
   # A collection of regular expression constants used by the parser. (For speed, these are not defined in the Rx module,
   # but rather directly in the Asciidoctor module).
