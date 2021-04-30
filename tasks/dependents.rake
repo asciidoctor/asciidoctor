@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 namespace :build do
   desc 'Trigger builds for all dependent projects on Travis CI and Github Actions'
   task :dependents do

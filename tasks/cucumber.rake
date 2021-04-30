@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 begin
   require 'cucumber/rake/task'
   Cucumber::Rake::Task.new :features do |t|
