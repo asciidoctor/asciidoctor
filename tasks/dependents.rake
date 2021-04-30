@@ -27,7 +27,7 @@ namespace :build do
     %w(
     ).each do |project|
       org, name, branch = parse_project project
-      project = [org, name, branch] * '/'
+      project = [org, name, branch].join '/'
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json',
@@ -52,7 +52,7 @@ namespace :build do
       asciidoctor/asciidoctor-reveal.js
     ).each do |project|
       org, name, branch = parse_project project
-      project = [org, name, branch] * '/'
+      project = [org, name, branch].join '/'
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/vnd.github.everest-preview+json',
@@ -84,6 +84,6 @@ namespace :build do
   def parse_project project
     org, name, branch = project.split '/', 3
     branch ||= 'master'
-    return org, name, branch
+    [org, name, branch]
   end
 end
