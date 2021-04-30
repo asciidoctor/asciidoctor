@@ -1639,9 +1639,8 @@ class Parser
   #
   # Returns the Integer section level if the Reader is positioned at a section title or nil otherwise
   def self.is_next_line_section?(reader, attributes)
-    if (style = attributes[1]) && (style == 'discrete' || style == 'float')
-      return
-    elsif Compliance.underline_style_section_titles
+    return if (style = attributes[1]) && (style == 'discrete' || style == 'float')
+    if Compliance.underline_style_section_titles
       next_lines = reader.peek_lines 2, style && style == 'comment'
       is_section_title?(next_lines[0] || '', next_lines[1])
     else

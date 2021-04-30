@@ -1389,7 +1389,7 @@ class Document < AbstractBlock
         attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
       end
       attrs[%(doctype-#{new_doctype})] = ''
-      return @doctype = attrs['doctype'] = new_doctype
+      @doctype = attrs['doctype'] = new_doctype
     end
   end
 end

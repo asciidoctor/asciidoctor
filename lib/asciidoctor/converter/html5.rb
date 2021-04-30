@@ -49,44 +49,44 @@ class Converter::Html5Converter < Converter::Base
   end
 
   def convert node, transform = node.node_name, opts = nil
-    if transform == 'inline_quoted'; return convert_inline_quoted node
-    elsif transform == 'paragraph'; return convert_paragraph node
-    elsif transform == 'inline_anchor'; return convert_inline_anchor node
-    elsif transform == 'section'; return convert_section node
-    elsif transform == 'listing'; return convert_listing node
-    elsif transform == 'literal'; return convert_literal node
-    elsif transform == 'ulist'; return convert_ulist node
-    elsif transform == 'olist'; return convert_olist node
-    elsif transform == 'dlist'; return convert_dlist node
-    elsif transform == 'admonition'; return convert_admonition node
-    elsif transform == 'colist'; return convert_colist node
-    elsif transform == 'embedded'; return convert_embedded node
-    elsif transform == 'example'; return convert_example node
-    elsif transform == 'floating_title'; return convert_floating_title node
-    elsif transform == 'image'; return convert_image node
-    elsif transform == 'inline_break'; return convert_inline_break node
-    elsif transform == 'inline_button'; return convert_inline_button node
-    elsif transform == 'inline_callout'; return convert_inline_callout node
-    elsif transform == 'inline_footnote'; return convert_inline_footnote node
-    elsif transform == 'inline_image'; return convert_inline_image node
-    elsif transform == 'inline_indexterm'; return convert_inline_indexterm node
-    elsif transform == 'inline_kbd'; return convert_inline_kbd node
-    elsif transform == 'inline_menu'; return convert_inline_menu node
-    elsif transform == 'open'; return convert_open node
-    elsif transform == 'page_break'; return convert_page_break node
-    elsif transform == 'preamble'; return convert_preamble node
-    elsif transform == 'quote'; return convert_quote node
-    elsif transform == 'sidebar'; return convert_sidebar node
-    elsif transform == 'stem'; return convert_stem node
-    elsif transform == 'table'; return convert_table node
-    elsif transform == 'thematic_break'; return convert_thematic_break node
-    elsif transform == 'verse'; return convert_verse node
-    elsif transform == 'video'; return convert_video node
-    elsif transform == 'document'; return convert_document node
-    elsif transform == 'toc'; return convert_toc node
-    elsif transform == 'pass'; return convert_pass node
-    elsif transform == 'audio'; return convert_audio node
-    else; return super
+    if transform == 'inline_quoted'; convert_inline_quoted node
+    elsif transform == 'paragraph'; convert_paragraph node
+    elsif transform == 'inline_anchor'; convert_inline_anchor node
+    elsif transform == 'section'; convert_section node
+    elsif transform == 'listing'; convert_listing node
+    elsif transform == 'literal'; convert_literal node
+    elsif transform == 'ulist'; convert_ulist node
+    elsif transform == 'olist'; convert_olist node
+    elsif transform == 'dlist'; convert_dlist node
+    elsif transform == 'admonition'; convert_admonition node
+    elsif transform == 'colist'; convert_colist node
+    elsif transform == 'embedded'; convert_embedded node
+    elsif transform == 'example'; convert_example node
+    elsif transform == 'floating_title'; convert_floating_title node
+    elsif transform == 'image'; convert_image node
+    elsif transform == 'inline_break'; convert_inline_break node
+    elsif transform == 'inline_button'; convert_inline_button node
+    elsif transform == 'inline_callout'; convert_inline_callout node
+    elsif transform == 'inline_footnote'; convert_inline_footnote node
+    elsif transform == 'inline_image'; convert_inline_image node
+    elsif transform == 'inline_indexterm'; convert_inline_indexterm node
+    elsif transform == 'inline_kbd'; convert_inline_kbd node
+    elsif transform == 'inline_menu'; convert_inline_menu node
+    elsif transform == 'open'; convert_open node
+    elsif transform == 'page_break'; convert_page_break node
+    elsif transform == 'preamble'; convert_preamble node
+    elsif transform == 'quote'; convert_quote node
+    elsif transform == 'sidebar'; convert_sidebar node
+    elsif transform == 'stem'; convert_stem node
+    elsif transform == 'table'; convert_table node
+    elsif transform == 'thematic_break'; convert_thematic_break node
+    elsif transform == 'verse'; convert_verse node
+    elsif transform == 'video'; convert_video node
+    elsif transform == 'document'; convert_document node
+    elsif transform == 'toc'; convert_toc node
+    elsif transform == 'pass'; convert_pass node
+    elsif transform == 'audio'; convert_audio node
+    else; super
     end
   end
 
