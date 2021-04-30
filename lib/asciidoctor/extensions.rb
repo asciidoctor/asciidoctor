@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 (require 'asciidoctor' unless defined? Asciidoctor.load) unless RUBY_ENGINE == 'opal'
 
 module Asciidoctor

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'rouge' unless defined? Rouge.version
 
 module Asciidoctor; module RougeExt; module Formatters

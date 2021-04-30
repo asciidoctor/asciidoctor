@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: A pluggable adapter for integrating a syntax (aka code) highlighter into AsciiDoc processing.
 #

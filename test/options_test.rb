@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli/options'
 

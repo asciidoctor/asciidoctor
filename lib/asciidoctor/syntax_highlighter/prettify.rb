@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
   register_for 'prettify'

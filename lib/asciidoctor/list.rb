@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and description lists)
 class List < AbstractBlock

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Internal: Methods to parse lines of AsciiDoc into an object hierarchy
 # representing the structure of the document. All methods are class methods and

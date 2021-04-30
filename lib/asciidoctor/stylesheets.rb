@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A utility class for working with the built-in stylesheets.
 #--

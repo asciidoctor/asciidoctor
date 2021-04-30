@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # NOTE remove once minimum required Ruby version is at least 2.6
 # NOTE use `send :prepend` to be nice to Ruby 2.0
 Hash.send :prepend, (Module.new do

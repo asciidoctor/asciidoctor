@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Handles parsing AsciiDoc attribute lists into a Hash of key/value
 # pairs. By default, attributes must each be separated by a comma and quotes

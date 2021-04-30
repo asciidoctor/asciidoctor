@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates DocBook 5 output. The output is inspired by the output produced
 # by the docbook45 backend from AsciiDoc.py, except it has been migrated to the DocBook 5 specification.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: The Document class represents a parsed AsciiDoc document.
 #

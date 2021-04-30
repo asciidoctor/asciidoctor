@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # consistent with the html5 backend from AsciiDoc.py.

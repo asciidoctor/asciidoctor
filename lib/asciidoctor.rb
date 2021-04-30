@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class AbstractBlock < AbstractNode
   # Public: Get the Array of {AbstractBlock} child blocks for this block. Only applies if content model is :compound.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
   register_for 'coderay'

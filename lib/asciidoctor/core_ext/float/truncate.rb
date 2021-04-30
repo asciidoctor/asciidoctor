@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # NOTE remove once minimum required Ruby version is at least 2.4
 # NOTE use `send :prepend` to be nice to Ruby 2.0
 Float.send :prepend, (Module.new do
