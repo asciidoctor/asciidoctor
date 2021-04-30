@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ASCIIDOCTOR_FEATURES_DIR = File.absolute_path __dir__
 ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || File.join(ASCIIDOCTOR_FEATURES_DIR, '../lib')
 
