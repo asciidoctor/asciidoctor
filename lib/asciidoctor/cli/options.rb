@@ -162,7 +162,7 @@ module Asciidoctor
               elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
                 $stdout.puts ::File.read manpage_path
               else
-                manpage_path = `man -w asciidoctor`.chop rescue ''
+                manpage_path = %x(man -w asciidoctor).chop rescue ''
                 if manpage_path.empty?
                   $stderr.puts 'asciidoctor: FAILED: manual page not found; try `man asciidoctor`'
                   return 1
