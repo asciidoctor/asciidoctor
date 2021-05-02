@@ -379,9 +379,9 @@ class Converter::DocBook5Converter < Converter::Base
     frame = 'topbot' if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
     grid = node.attr 'grid', nil, 'table-grid'
     result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
-    if (node.option? 'unbreakable')
+    if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
-    elsif (node.option? 'breakable')
+    elsif node.option? 'breakable'
       result << '<?dbfo keep-together="auto"?>'
     end
     result << %(<title>#{node.title}</title>) if tag_name == 'table'
