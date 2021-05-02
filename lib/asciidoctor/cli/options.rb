@@ -52,8 +52,8 @@ module Asciidoctor
             self[:attributes]['backend'] = backend
           end
           opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
-                  'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doc_type|
-            self[:attributes]['doctype'] = doc_type
+                  'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doctype|
+            self[:attributes]['doctype'] = doctype
           end
           opts.on('-e', '--embedded', 'suppress enclosing document structure and output an embedded document (default: false)') do
             self[:standalone] = false
@@ -124,19 +124,19 @@ module Asciidoctor
             level = 'WARN' if (level = level.upcase) == 'WARNING'
             self[:failure_level] = ::Logger::Severity.const_get level, false
           end
-          opts.on('-q', '--quiet', 'silence application log messages and script warnings (default: false)') do |verbose|
+          opts.on('-q', '--quiet', 'silence application log messages and script warnings (default: false)') do
             self[:verbose] = 0
           end
-          opts.on('--trace', 'include backtrace information when reporting errors (default: false)') do |trace|
+          opts.on('--trace', 'include backtrace information when reporting errors (default: false)') do
             self[:trace] = true
           end
-          opts.on('-v', '--verbose', 'directs application messages logged at DEBUG or INFO level to STDERR (default: false)') do |verbose|
+          opts.on('-v', '--verbose', 'directs application messages logged at DEBUG or INFO level to STDERR (default: false)') do
             self[:verbose] = 2
           end
-          opts.on('-w', '--warnings', 'turn on script warnings (default: false)') do |warnings|
+          opts.on('-w', '--warnings', 'turn on script warnings (default: false)') do
             self[:warnings] = true
           end
-          opts.on('-t', '--timings', 'print timings report (default: false)') do |timing|
+          opts.on('-t', '--timings', 'print timings report (default: false)') do
             self[:timings] = true
           end
           opts.on_tail('-h', '--help [TOPIC]', 'print a help message',
@@ -250,7 +250,7 @@ module Asciidoctor
 
         self[:input_files] = infiles
 
-        self.delete :attributes if self[:attributes].empty?
+        delete :attributes if self[:attributes].empty?
 
         if self[:template_dirs]
           begin
