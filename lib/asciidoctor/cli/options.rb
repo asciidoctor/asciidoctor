@@ -7,7 +7,6 @@ module Asciidoctor
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash
-
       def initialize(options = {})
         self[:attributes] = options[:attributes] || {}
         self[:input_files] = options[:input_files]
