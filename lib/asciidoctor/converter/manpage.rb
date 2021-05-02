@@ -680,7 +680,7 @@ allbox tab(:);'
   def append_footnotes result, node
     if node.footnotes? && !(node.attr? 'nofootnotes')
       result << '.SH "NOTES"'
-      node.footnotes.each_with_index do |fn, idx|
+      node.footnotes.each do |fn|
         result << %(.IP [#{fn.index}])
         # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
         if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
