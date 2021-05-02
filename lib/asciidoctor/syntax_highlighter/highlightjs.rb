@@ -10,7 +10,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    super node, lang, (opts.merge transform: proc {|_, code| code['class'] = %(language-#{lang || 'none'} hljs) } )
+    super node, lang, (opts.merge transform: proc {|_, code| code['class'] = %(language-#{lang || 'none'} hljs) })
   end
 
   def docinfo? location
