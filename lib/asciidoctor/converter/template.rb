@@ -187,8 +187,8 @@ class Converter::TemplateConverter < Converter::Base
       else
         @templates.update scan_dir(template_dir, pattern, @caches[:templates])
       end
-      nil
     end
+    nil
   end
 
   # Internal: Scan the specified directory for template files matching pattern and instantiate
