@@ -46,7 +46,7 @@ class MemoryLogger < ::Logger
   end
 
   def add severity, message = nil, progname = nil
-    message = block_given? ? yield : progname unless message
+    message ||= block_given? ? yield : progname
     @messages << { severity: SEVERITY_LABELS[severity || UNKNOWN], message: message }
     true
   end
