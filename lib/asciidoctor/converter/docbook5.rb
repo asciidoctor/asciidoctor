@@ -26,7 +26,7 @@ class Converter::DocBook5Converter < Converter::Base
   MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
   TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
 
-  CopyrightRx = /^(#{CC_ANY}+?)(?: ((?:\d{4}\-)?\d{4}))?$/
+  CopyrightRx = /^(#{CC_ANY}+?)(?: ((?:\d{4}-)?\d{4}))?$/
   ImageMacroRx = /^image::?(\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
   def initialize backend, opts = {}
