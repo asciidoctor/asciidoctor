@@ -135,12 +135,10 @@ class Converter::TemplateConverter < Converter::Base
   #
   # Returns the Tilt template object
   def register name, template
-    @templates[name] = if (template_cache = @caches[:templates])
+    if (template_cache = @caches[:templates])
       template_cache[template.file] = template
-    else
-      template
     end
-    #create_handler name, template
+    @templates[name] = template
   end
 
   private
