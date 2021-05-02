@@ -141,8 +141,8 @@ module Extensions
         if opts.fetch :numbered, (doc.attr? 'sectnums')
           sect.numbered = sect.special ? parent.numbered && true : true
         end
-      else
-        sect.numbered = true if opts.fetch :numbered, (book && (doc.attr? 'partnums'))
+      elsif opts.fetch :numbered, (book && (doc.attr? 'partnums'))
+        sect.numbered = true
       end
       if (id = attrs['id']) == false
         attrs.delete 'id'
