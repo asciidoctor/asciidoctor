@@ -2267,6 +2267,38 @@ class ReaderTest < Minitest::Test
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
+      test 'ifeval running unsupported operation on missing attribute drops content' do
+        input = <<~'EOS'
+        ifeval::[{leveloffset} >= 3]
+        I didn't make the cut!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal '', (lines * ::Asciidoctor::LF)
+      end
+
+      test 'ifeval running invalid operation drops content' do
+        input = <<~'EOS'
+        ifeval::[{asciidoctor-version} > true]
+        I didn't make the cut!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        while reader.has_more_lines?
+          lines << reader.read_line
+        end
+        assert_equal '', (lines * ::Asciidoctor::LF)
+      end
+
       test 'ifeval comparing double-quoted attribute to matching string includes content' do
         input = <<~'EOS'
         ifeval::["{gem}" == "asciidoctor"]

@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 Bug Fixes::
 
   * Include all lines outside of specified tagged region when tag filter on include directive is a single negated tag (#4048)
+  * Change ifeval directive to resolve to false if comparison operation cannot be performed (#4046)
   * Update default stylesheet to indent blocks attached to list item in checklist (#2550)
   * Update default stylesheet to reenable styling of implicit lead role on first paragraph of preamble inside AsciiDoc table cell
 
