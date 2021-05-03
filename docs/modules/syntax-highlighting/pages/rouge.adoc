@@ -40,7 +40,7 @@ Controls what method is used for applying CSS to the tokens.
 Can be `class` or `style`.
 Default: `class`.
 
-[.line-through]#rouge-linenums-mode# (not currently implemented)::
+[.line-through]#rouge-linenums-mode# (not currently implemented, see https://github.com/asciidoctor/asciidoctor/issues/3641[#3641])::
 Controls how line numbers are laid out.
 Can be `table` or `inline`.
 If line wrapping is enabled on preformatted blocks (i.e., `prewrap`), and you want to use line numbering on source blocks, you must set the value of this attribute to `inline` in order for the numbers to line up properly with their target lines.
@@ -50,12 +50,29 @@ rouge-style::
 Controls the color theme used to for highlighting.
 You can find the list of themes in the {url-rouge-repo}[Rouge code repository^].
 
+Typically, you set these attributes using the CLI or API (e.g., `-a source-highlighter=rouge -a rouge-style=colorful`) so you don't have to define them in each document.
+However, you can define them per document as shown in the following example.
+
+.Activating the Rouge syntax highlighter and applying a different style
+[source,asciidoc]
+....
+:source-highlighter: rouge
+:rouge-style: monokai
+
+[source,ruby]
+----
+puts "Hello, Rouge!"
+----
+....
+
+You can enable line numbering using the linenums option on the block.
+
 .Customizing a source block with Rouge line numbers
 [source,asciidoc]
 ....
 :source-highlighter: rouge
 
-[source,ruby,linenums]
+[source%linenums,ruby]
 ----
 ORDERED_LIST_KEYWORDS = {
   'loweralpha' => 'a',
@@ -68,3 +85,5 @@ ORDERED_LIST_KEYWORDS = {
 }
 ----
 ....
+
+It's also possible to enable linenums for all source blocks by setting the `source-linenums-option` attribute on the document.
