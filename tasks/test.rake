@@ -14,7 +14,7 @@ begin
   require 'rake/testtask'
   Rake::TestTask.new :test do |t|
     prepare_test_env
-    puts %(LANG: #{ENV['LANG']}) if ENV.key? 'TRAVIS_BUILD_ID'
+    puts %(LANG: #{ENV['LANG']}) if ENV['CI']
     t.libs << 'test'
     t.pattern = 'test/**/*_test.rb'
     t.verbose = true
