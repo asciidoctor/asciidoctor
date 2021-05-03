@@ -89,11 +89,19 @@ context 'Options' do
   end
 
   test 'basic argument assignment' do
-    options = Asciidoctor::Cli::Options.parse!(%w(-w -v -s -d book test/fixtures/sample.adoc))
+    options = Asciidoctor::Cli::Options.parse!(%w(-w -v -e -d book test/fixtures/sample.adoc))
 
     assert_equal 2, options[:verbose]
     assert_equal false, options[:standalone]
     assert_equal 'book', options[:attributes]['doctype']
+    assert_equal 1, options[:input_files].size
+    assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]
+  end
+
+  test 'supports legacy option for no header footer' do
+    options = Asciidoctor::Cli::Options.parse!(%w(-s test/fixtures/sample.adoc))
+
+    assert_equal false, options[:standalone]
     assert_equal 1, options[:input_files].size
     assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]
   end

@@ -55,7 +55,7 @@ context 'Invoker' do
   end
 
   test 'should accept document from stdin and write to stdout' do
-    invoker = invoke_cli_to_buffer(%w(-s), '-') { 'content' }
+    invoker = invoke_cli_to_buffer(%w(-e), '-') { 'content' }
     doc = invoker.document
     refute doc.attr?('docname')
     refute doc.attr?('docfile')
@@ -74,7 +74,7 @@ context 'Invoker' do
     begin
       old_stdin = $stdin
       $stdin = StringIO.new 'paragraph'
-      invoker = invoke_cli_to_buffer(%w(-s), '-')
+      invoker = invoke_cli_to_buffer(%w(-e), '-')
       assert_equal 0, invoker.code
       assert_equal 1, invoker.document.blocks.size
     ensure
@@ -85,7 +85,7 @@ context 'Invoker' do
   test 'should accept document from stdin and write to output file' do
     sample_outpath = fixture_path 'sample-output.html'
     begin
-      invoker = invoke_cli(%W(-s -o #{sample_outpath}), '-') { 'content' }
+      invoker = invoke_cli(%W(-e -o #{sample_outpath}), '-') { 'content' }
       doc = invoker.document
       refute doc.attr?('docname')
       refute doc.attr?('docfile')
@@ -131,7 +131,7 @@ context 'Invoker' do
 
   test 'should allow docdir to be specified when input is a string' do
     expected_docdir = fixturedir
-    invoker = invoke_cli_to_buffer(%w(-s --base-dir test/fixtures -o /dev/null), '-') { 'content' }
+    invoker = invoke_cli_to_buffer(%w(-e --base-dir test/fixtures -o /dev/null), '-') { 'content' }
     doc = invoker.document
     assert_equal expected_docdir, doc.attr('docdir')
     assert_equal expected_docdir, doc.base_dir
@@ -466,7 +466,8 @@ context 'Invoker' do
   end
 
   test 'should suppress header footer if specified' do
-    [%w(-s -o -), %w(-e -o -)].each do |flags|
+    # NOTE this verifies support for the legacy alias -s
+    [%w(-e -o -), %w(-s -o -)].each do |flags|
       invoker = invoke_cli_to_buffer flags
       output = invoker.read_output
       assert_xpath '/html', output, 0
@@ -591,14 +592,14 @@ context 'Invoker' do
   test 'should load custom templates from multiple template directories' do
     custom_backend_1 = fixture_path 'custom-backends/haml/html5'
     custom_backend_2 = fixture_path 'custom-backends/haml/html5-tweaks'
-    invoker = invoke_cli_to_buffer %W(-T #{custom_backend_1} -T #{custom_backend_2} -o - -s)
+    invoker = invoke_cli_to_buffer %W(-T #{custom_backend_1} -T #{custom_backend_2} -o - -e)
     output = invoker.read_output
     assert_css '.paragraph', output, 0
     assert_css '#preamble > .sectionbody > p', output, 1
   end
 
   test 'should set attribute with value' do
-    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id -s -o -)
+    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id -e -o -)
     doc = invoker.document
     assert_equal 'id', doc.attr('idprefix')
     output = invoker.read_output
@@ -623,7 +624,7 @@ context 'Invoker' do
   end
 
   test 'should not set attribute ending in @ if defined in document' do
-    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id@ -s -o -)
+    invoker = invoke_cli_to_buffer %w(--trace -a idprefix=id@ -e -o -)
     doc = invoker.document
     assert_equal 'id_', doc.attr('idprefix')
     output = invoker.read_output
@@ -631,7 +632,7 @@ context 'Invoker' do
   end
 
   test 'should set attribute with no value' do
-    invoker = invoke_cli_to_buffer %w(-a icons -s -o -)
+    invoker = invoke_cli_to_buffer %w(-a icons -e -o -)
     doc = invoker.document
     assert_equal '', doc.attr('icons')
     output = invoker.read_output
@@ -639,7 +640,7 @@ context 'Invoker' do
   end
 
   test 'should unset attribute ending in bang' do
-    invoker = invoke_cli_to_buffer %w(-a sectids! -s -o -)
+    invoker = invoke_cli_to_buffer %w(-a sectids! -e -o -)
     doc = invoker.document
     refute doc.attr?('sectids')
     output = invoker.read_output
@@ -695,7 +696,7 @@ context 'Invoker' do
   test 'should force stdio encoding to UTF-8' do
     cmd = asciidoctor_cmd ['-E', 'IBM866:IBM866']
     # NOTE configure-stdin.rb populates stdin
-    result = run_command(cmd, '-r', (fixture_path 'configure-stdin.rb'), '-s', '-o', '-', '-') {|out| out.read }
+    result = run_command(cmd, '-r', (fixture_path 'configure-stdin.rb'), '-e', '-o', '-', '-') {|out| out.read }
     # NOTE Ruby on Windows runs with a IBM437 encoding by default
     result.force_encoding Encoding::UTF_8 unless Encoding.default_external == Encoding::UTF_8
     assert_equal Encoding::UTF_8, result.encoding
@@ -705,7 +706,7 @@ context 'Invoker' do
 
   test 'should not fail to load if call to Dir.home fails' do
     cmd = asciidoctor_cmd ['-r', (fixture_path 'undef-dir-home.rb')]
-    result = run_command(cmd, '-s', '-o', '-', (fixture_path 'basic.adoc')) {|out| out.read }
+    result = run_command(cmd, '-e', '-o', '-', (fixture_path 'basic.adoc')) {|out| out.read }
     assert_include 'Body content', result
   end
 
@@ -724,7 +725,7 @@ context 'Invoker' do
 
   test 'should show timezone as UTC if system TZ is set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
-    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
+    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)
     assert doctime.end_with?(' UTC')
     assert localtime.end_with?(' UTC')
@@ -732,7 +733,7 @@ context 'Invoker' do
 
   test 'should show timezone as offset if system TZ is not set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
-    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-s', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
+    output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
     doctime, localtime = output.lines.map(&:chomp)
     assert doctime.end_with?(' -0500')
     assert localtime.end_with?(' -0500')
