@@ -514,16 +514,16 @@ Your browser does not support the audio tag.
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
 
-    classes = case node.style
+    case node.style
     when 'qanda'
-      ['qlist', 'qanda', node.role]
+      classes = ['qlist', 'qanda', node.role]
     when 'horizontal'
-      ['hdlist', node.role]
+      classes = ['hdlist', node.role]
     else
-      ['dlist', node.style, node.role]
-    end.compact
+      classes = ['dlist', node.style, node.role]
+    end
 
-    class_attribute = %( class="#{classes.join ' '}")
+    class_attribute = %( class="#{classes.compact.join ' '}")
 
     result << %(<div#{id_attribute}#{class_attribute}>)
     result << %(<div class="title">#{node.title}</div>) if node.title?
