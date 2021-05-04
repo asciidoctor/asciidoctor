@@ -579,12 +579,11 @@ Your browser does not support the audio tag.
         terms.each do |dt|
           result << %(<dt#{dt_style_attribute}>#{dt.text}</dt>)
         end
-        if dd
-          result << '<dd>'
-          result << %(<p>#{dd.text}</p>) if dd.text?
-          result << dd.content if dd.blocks?
-          result << '</dd>'
-        end
+        next unless dd
+        result << '<dd>'
+        result << %(<p>#{dd.text}</p>) if dd.text?
+        result << dd.content if dd.blocks?
+        result << '</dd>'
       end
       result << '</dl>'
     end
