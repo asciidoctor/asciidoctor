@@ -153,7 +153,7 @@ module SyntaxHighlighter
     end
 
     private
-    
+
     def registry
       raise ::NotImplementedError, %(#{Factory} subclass #{self.class} must implement the ##{__method__} method)
     end
@@ -167,7 +167,7 @@ module SyntaxHighlighter
     end
 
     private
-    
+
     def registry
       @registry
     end
