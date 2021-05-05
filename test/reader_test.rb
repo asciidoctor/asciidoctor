@@ -1246,6 +1246,41 @@ class ReaderTest < Minitest::Test
         assert_includes output, expected
       end
 
+      test 'include directive takes all lines except negated tags when value only contains negated tag' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class.rb[tags=!bark]
+        ----
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
+        class Dog
+          def initialize breed
+            @breed = breed
+          end
+        end
+        EOS
+        assert_includes output, expected
+      end
+
+      test 'include directive takes all lines except negated tags when value only contains negated tags' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class.rb[tags=!bark;!init]
+        ----
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
+        expected = <<~EOS.chop
+        class Dog
+        end
+        EOS
+        assert_includes output, expected
+      end
+
       test 'should recognize tag wildcard if not at head of list' do
         input = <<~'EOS'
         ----
