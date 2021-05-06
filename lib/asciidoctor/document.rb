@@ -90,7 +90,9 @@ class Document < AbstractBlock
   Footnote = ::Struct.new :index, :id, :text
 
   class AttributeEntry
-    attr_reader :name, :value, :negate
+    attr_reader :name
+    attr_reader :value
+    attr_reader :negate
 
     def initialize name, value, negate = nil
       @name = name

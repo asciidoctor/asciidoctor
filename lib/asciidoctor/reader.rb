@@ -6,7 +6,10 @@ class Reader
   include Logging
 
   class Cursor
-    attr_reader :file, :dir, :path, :lineno
+    attr_reader :file
+    attr_reader :dir
+    attr_reader :path
+    attr_reader :lineno
 
     def initialize file, dir = nil, path = nil, lineno = 1
       @file, @dir, @path, @lineno = file, dir, path, lineno
