@@ -362,10 +362,8 @@ class Table::Cell < AbstractBlock
   #
   # This method shouldn't be used for cells that have the AsciiDoc style.
   #
-  # Returns the new String text assigned to this Cell
-  def text= val
-    @text = val
-  end
+  # Returns nothing
+  attr_writer :text
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
   #
