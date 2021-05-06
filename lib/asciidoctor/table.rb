@@ -663,7 +663,7 @@ class Table::ParserContext
         # QUESTION is this right for cells that span columns?
         unless (column = @table.columns[@current_row.size])
           logger.error message_with_context 'dropping cell because it exceeds specified number of columns', source_location: @reader.cursor_before_mark
-          return
+          return nil
         end
       end
 
