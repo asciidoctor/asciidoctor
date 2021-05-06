@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+def trigger_build project, header, payload, host, path
+  require 'net/http'
+
+  (http = Net::HTTP.new host, 443).use_ssl = true
+  request = Net::HTTP::Post.new path, header
+  request.body = payload
+  response = http.request request
+  if /^20\d$/.match? response.code
+    puts %(Successfully triggered build on #{project} repository)
+  else
+    warn %(Unable to trigger build on #{project} repository: #{response.code} - #{response.message})
+  end
+end
+
+def parse_project project
+  org, name, branch = project.split '/', 3
+  branch ||= 'master'
+  [org, name, branch]
+end
+
 namespace :build do
   desc 'Trigger builds for dependent projects'
   task :dependents do
@@ -38,25 +58,5 @@ namespace :build do
       }.to_json
       trigger_build project, header, payload, 'api.github.com', %(/repos/#{org}/#{name}/dispatches)
     end if github_token
-  end
-
-  def trigger_build project, header, payload, host, path
-    require 'net/http'
-
-    (http = Net::HTTP.new host, 443).use_ssl = true
-    request = Net::HTTP::Post.new path, header
-    request.body = payload
-    response = http.request request
-    if /^20\d$/.match? response.code
-      puts %(Successfully triggered build on #{project} repository)
-    else
-      warn %(Unable to trigger build on #{project} repository: #{response.code} - #{response.message})
-    end
-  end
-
-  def parse_project project
-    org, name, branch = project.split '/', 3
-    branch ||= 'master'
-    [org, name, branch]
   end
 end
