@@ -758,8 +758,8 @@ Your browser does not support the audio tag.
       logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
       ''
     else
-        id_attr = node.id ? %( id="#{node.id}") : ''
-        title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
+      id_attr = node.id ? %( id="#{node.id}") : ''
+      title_el = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
       %(<div#{id_attr} class="openblock#{style && style != 'open' ? " #{style}" : ''}#{(role = node.role) ? " #{role}" : ''}">
 #{title_el}<div class="content">
 #{node.content}
