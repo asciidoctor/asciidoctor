@@ -290,8 +290,7 @@ class PathResolver
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
         root = DOT_SLASH
-      # else ex. sample/path
-      end
+      end # else ex. sample/path
     elsif root? posix_path
       # ex. //sample/path
       if unc? posix_path
@@ -306,8 +305,7 @@ class PathResolver
     # ex. ./sample/path
     elsif posix_path.start_with? DOT_SLASH
       root = DOT_SLASH
-    # else ex. sample/path
-    end
+    end # else ex. sample/path
 
     path_segments = (root ? (posix_path.slice root.length, posix_path.length) : posix_path).split SLASH
     # strip out all dot entries
