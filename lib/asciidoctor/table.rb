@@ -9,7 +9,9 @@ class Table < AbstractBlock
 
   # Public: A data object that encapsulates the collection of rows (head, foot, body) for a table
   class Rows
-    attr_accessor :head, :foot, :body
+    attr_accessor :head
+    attr_accessor :foot
+    attr_accessor :body
 
     def initialize head = [], foot = [], body = []
       @head = head
