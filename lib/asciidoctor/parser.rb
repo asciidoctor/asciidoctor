@@ -1576,12 +1576,6 @@ class Parser
     sect_style = attributes[1]
     sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
 
-    if sect_reftext
-      attributes['reftext'] = sect_reftext
-    else
-      sect_reftext = attributes['reftext']
-    end
-
     if sect_style
       if book && sect_style == 'abstract'
         sect_name, sect_level = 'chapter', 1
@@ -1600,6 +1594,7 @@ class Parser
       sect_name = 'section'
     end
 
+    attributes['reftext'] = sect_reftext if sect_reftext
     section = Section.new parent, sect_level
     section.id, section.title, section.sectname, section.source_location = sect_id, sect_title, sect_name, source_location
     if sect_special
