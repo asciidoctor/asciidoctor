@@ -1265,7 +1265,7 @@ class PreprocessorReader < Reader
   end
 
   def pop_include
-    if @include_stack.size > 0
+    unless @include_stack.empty?
       @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
       # FIXME kind of a hack
       #Document::AttributeEntry.new('infile', @file).save_to_next_block @document

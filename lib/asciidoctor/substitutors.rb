@@ -1489,14 +1489,13 @@ module Substitutors
         more_roles = []
       end
 
-      roles = segments[0].empty? ? [] : segments[0].split('.')
-      if roles.size > 1
-        roles.shift
+      if (roles = segments[0]).empty?
+        roles = []
+      else
+        (roles = roles.split '.').shift
       end
 
-      if more_roles.size > 0
-        roles.concat more_roles
-      end
+      roles.concat more_roles unless more_roles.empty?
 
       attrs = {}
       attrs['id'] = id if id
