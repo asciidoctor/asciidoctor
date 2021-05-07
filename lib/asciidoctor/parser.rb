@@ -421,9 +421,6 @@ class Parser
 
           (intro || section).blocks << new_block
           attributes.clear
-        #else
-        #  # don't clear attributes if we don't find a block because they may
-        #  # be trailing attributes that didn't get associated with a block
         end
       end
 
@@ -2482,14 +2479,12 @@ class Parser
       else
         return [nil, line]
       end
-    else # pos == :end
-      if (m = CellSpecEndRx.match line)
-        # NOTE return the line stripped of trailing whitespace if no cellspec is found in this case
-        return [{}, line.rstrip] if m[0].lstrip.empty?
-        rest = m.pre_match
-      else
-        return [{}, line]
-      end
+    elsif (m = CellSpecEndRx.match line) # when pos == :end
+      # NOTE return the line stripped of trailing whitespace if no cellspec is found in this case
+      return [{}, line.rstrip] if m[0].lstrip.empty?
+      rest = m.pre_match
+    else
+      return [{}, line]
     end
 
     spec = {}
