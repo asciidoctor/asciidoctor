@@ -1534,7 +1534,7 @@ module Substitutors
         case c
         when ','
           if quote_open
-            accum = accum + c
+            accum += c
           else
             values << accum.strip
             accum = ''
@@ -1542,7 +1542,7 @@ module Substitutors
         when '"'
           quote_open = !quote_open
         else
-          accum = accum + c
+          accum += c
         end
       end
       values << accum.strip
