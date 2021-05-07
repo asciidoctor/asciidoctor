@@ -2570,7 +2570,7 @@ class Parser
           accum = ''
           name = :option
         else
-          accum = accum + c
+          accum += c
         end
       end
 
@@ -2681,16 +2681,16 @@ class Parser
             if c == TAB
               # calculate how many spaces this tab represents, then replace tab with spaces
               if (offset = idx + spaces_added) % tab_size == 0
-                spaces_added += (tab_size - 1)
-                result = result + full_tab_space
+                spaces_added += tab_size - 1
+                result += full_tab_space
               else
                 unless (spaces = tab_size - offset % tab_size) == 1
-                  spaces_added += (spaces - 1)
+                  spaces_added += spaces - 1
                 end
-                result = result + (' ' * spaces)
+                result += ' ' * spaces
               end
             else
-              result = result + c
+              result += c
             end
             idx += 1
           end
