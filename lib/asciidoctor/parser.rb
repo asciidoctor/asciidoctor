@@ -2479,7 +2479,7 @@ class Parser
 
     if pos == :start
       if line.include? delimiter
-        spec_part, delimiter, rest = line.partition delimiter
+        spec_part, _, rest = line.partition delimiter
         if (m = CellSpecStartRx.match spec_part)
           return [{}, rest] if m[0].empty?
         else
