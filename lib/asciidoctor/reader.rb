@@ -961,11 +961,12 @@ class PreprocessorReader < Reader
         if no_target
           # the text in brackets must match a conditional expression
           if text && EvalExpressionRx =~ text.strip
-            lhs = resolve_expr_val $1
+            # NOTE assignments must happen before call to resolve_expr_val for compatiblity with Opal
+            lhs = $1
             # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
             op = $2
-            rhs = resolve_expr_val $3
-            skip = (lhs.send op, rhs) ? false : true rescue true
+            rhs = $3
+            skip = ((resolve_expr_val lhs).send op, (resolve_expr_val rhs)) ? false : true rescue true
           else
             logger.error message_with_context %(malformed preprocessor directive - #{text ? 'invalid expression' : 'missing expression'}: ifeval::[#{text}]), source_location: cursor
             return true
