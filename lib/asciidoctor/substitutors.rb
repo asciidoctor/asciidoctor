@@ -976,7 +976,7 @@ module Substitutors
         negate = true
       end
       if (delim = (entry.include? '..') ? '..' : ((entry.include? '-') ? '-' : nil))
-        from, delim, to = entry.partition delim
+        from, _, to = entry.partition delim
         to = (source.count LF) + 1 if to.empty? || (to = to.to_i) < 0
         if negate
           lines -= (from.to_i..to).to_a
