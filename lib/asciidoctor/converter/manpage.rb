@@ -588,7 +588,7 @@ allbox tab(:);'
     when :xref
       unless (text = node.text)
         refid = node.attributes['refid']
-        text = %([#{refid}]) unless AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid]) && (@resolving_xref ||= outer = true) && outer && (text = ref.xreftext node.attr 'xrefstyle', nil, true)
+        text = %([#{refid}]) unless AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid]) && (@resolving_xref ||= (outer = true)) && outer && (text = ref.xreftext node.attr 'xrefstyle', nil, true)
       end
       text
     when :ref, :bibref
