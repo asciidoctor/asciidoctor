@@ -289,7 +289,6 @@ class Document < AbstractBlock
         footnotes: [],
         links: [],
         images: [],
-        #indexterms: [],
         callouts: Callouts.new,
         includes: {},
       }
