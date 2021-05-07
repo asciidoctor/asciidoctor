@@ -1467,7 +1467,7 @@ class Parser
           elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
             buffer << this_line
           else
-            if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line }
+            if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
               within_nested_list = true
               if nested_list_type == :dlist && $3.nil_or_empty?
                 # get greedy again
@@ -1497,7 +1497,7 @@ class Parser
               # TODO any way to combine this with the check after skipping blank lines?
               if is_sibling_list_item?(this_line, list_type, sibling_trait)
                 break
-              elsif nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line }
+              elsif (nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line })
                 buffer << this_line
                 within_nested_list = true
                 if nested_list_type == :dlist && $3.nil_or_empty?
@@ -1527,7 +1527,7 @@ class Parser
           end
         else
           has_text = true unless this_line.empty?
-          if nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line }
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
               # get greedy again
