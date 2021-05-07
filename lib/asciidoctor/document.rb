@@ -1027,7 +1027,7 @@ class Document < AbstractBlock
   def docinfo location = :head, suffix = nil
     if safe < SafeMode::SECURE
       qualifier = %(-#{location}) unless location == :head
-      suffix = @outfilesuffix unless suffix
+      suffix ||= @outfilesuffix
 
       if (docinfo = @attributes['docinfo']).nil_or_empty?
         if @attributes.key? 'docinfo2'
