@@ -1,3 +1,4 @@
+= Document Title
 :doctype: book
 :sectnums:
 :noheader:

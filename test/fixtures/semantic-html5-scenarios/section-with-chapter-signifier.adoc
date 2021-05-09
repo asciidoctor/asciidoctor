@@ -1,7 +1,8 @@
+= Document Title
 :doctype: book
 :sectnums:
-:noheader:
 :chapter-signifier: Chapter
+:noheader:
 
 [chapter]
 = Part one
