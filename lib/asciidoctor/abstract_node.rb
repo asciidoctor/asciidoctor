@@ -543,8 +543,8 @@ class AbstractNode
         rescue
           logger.warn %(could not retrieve contents of #{opts[:label] || 'asset'} at URI: #{target}) if opts.fetch :warn_on_failure, true
         end
-      else
-        logger.warn %(cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled)) if opts.fetch :warn_on_failure, true
+      elsif opts.fetch :warn_on_failure, true
+        logger.warn %(cannot retrieve contents of #{opts[:label] || 'asset'} at URI: #{target} (allow-uri-read attribute not enabled))
       end
     else
       target = normalize_system_path target, opts[:start], nil, target_name: (opts[:label] || 'asset')
