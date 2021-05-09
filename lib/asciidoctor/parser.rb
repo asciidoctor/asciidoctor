@@ -824,8 +824,8 @@ class Parser
             if comma_idx > 0
               language = (language.slice 0, comma_idx).strip
               attributes['linenums'] = '' if comma_idx < ll - 4
-            else
-              attributes['linenums'] = '' if ll > 4
+            elsif ll > 4
+              attributes['linenums'] = ''
             end
           else
             language = language.lstrip
@@ -1445,13 +1445,62 @@ class Parser
       # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
       elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
         break
-      else
-        if continuation == :active && !this_line.empty?
-          # literal paragraphs have special considerations (and this is one of
-          # two entry points into one)
-          # if we don't process it as a whole, then a line in it that looks like a
-          # list item will throw off the exit from it
-          if LiteralParagraphRx.match? this_line
+      elsif continuation == :active && !this_line.empty?
+        # literal paragraphs have special considerations (and this is one of
+        # two entry points into one)
+        # if we don't process it as a whole, then a line in it that looks like a
+        # list item will throw off the exit from it
+        if LiteralParagraphRx.match? this_line
+          reader.unshift_line this_line
+          if dlist
+            # we may be in an indented list disguised as a literal paragraph
+            # so we need to make sure we don't slurp up a legitimate sibling
+            buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
+          else
+            buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true)
+          end
+          continuation = :inactive
+        # let block metadata play out until we find the block
+        elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
+          buffer << this_line
+        else
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
+            within_nested_list = true
+            if nested_list_type == :dlist && $3.nil_or_empty?
+              # get greedy again
+              has_text = false
+            end
+          end
+          buffer << this_line
+          continuation = :inactive
+        end
+      elsif prev_line && prev_line.empty?
+        # advance to the next line of content
+        if this_line.empty?
+          # stop reading if we reach eof
+          break unless (this_line = reader.skip_blank_lines && reader.read_line)
+          # stop reading if we hit a sibling list item
+          break if is_sibling_list_item? this_line, list_type, sibling_trait
+        end
+
+        if this_line == LIST_CONTINUATION
+          detached_continuation = buffer.size
+          buffer << this_line
+        elsif has_text # has_text only relevant for dlist, which is more greedy until it has text for an item; has_text is always true for all other lists
+          # in this block, we have to see whether we stay in the list
+          # TODO any way to combine this with the check after skipping blank lines?
+          if is_sibling_list_item?(this_line, list_type, sibling_trait)
+            break
+          elsif (nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line })
+            buffer << this_line
+            within_nested_list = true
+            if nested_list_type == :dlist && $3.nil_or_empty?
+              # get greedy again
+              has_text = false
+            end
+          # slurp up any literal paragraph offset by blank lines
+          # NOTE we have to check for indented list items first
+          elsif LiteralParagraphRx.match? this_line
             reader.unshift_line this_line
             if dlist
               # we may be in an indented list disguised as a literal paragraph
@@ -1460,80 +1509,25 @@ class Parser
             else
               buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true)
             end
-            continuation = :inactive
-          # let block metadata play out until we find the block
-          elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
-            buffer << this_line
           else
-            if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
-              within_nested_list = true
-              if nested_list_type == :dlist && $3.nil_or_empty?
-                # get greedy again
-                has_text = false
-              end
-            end
-            buffer << this_line
-            continuation = :inactive
+            break
           end
-        elsif prev_line && prev_line.empty?
-          # advance to the next line of content
-          if this_line.empty?
-            # stop reading if we reach eof
-            break unless (this_line = reader.skip_blank_lines && reader.read_line)
-            # stop reading if we hit a sibling list item
-            break if is_sibling_list_item? this_line, list_type, sibling_trait
-          end
-
-          if this_line == LIST_CONTINUATION
-            detached_continuation = buffer.size
-            buffer << this_line
-          else
-            # has_text is only relevant for dlist, which is more greedy until it has text for an item
-            # for all other lists, has_text is always true
-            # in this block, we have to see whether we stay in the list
-            if has_text
-              # TODO any way to combine this with the check after skipping blank lines?
-              if is_sibling_list_item?(this_line, list_type, sibling_trait)
-                break
-              elsif (nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line })
-                buffer << this_line
-                within_nested_list = true
-                if nested_list_type == :dlist && $3.nil_or_empty?
-                  # get greedy again
-                  has_text = false
-                end
-              # slurp up any literal paragraph offset by blank lines
-              # NOTE we have to check for indented list items first
-              elsif LiteralParagraphRx.match? this_line
-                reader.unshift_line this_line
-                if dlist
-                  # we may be in an indented list disguised as a literal paragraph
-                  # so we need to make sure we don't slurp up a legitimate sibling
-                  buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true) {|line| is_sibling_list_item? line, list_type, sibling_trait }
-                else
-                  buffer.concat reader.read_lines_until(preserve_last_line: true, break_on_blank_lines: true, break_on_list_continuation: true)
-                end
-              else
-                break
-              end
-            else # only dlist in need of item text, so slurp it up!
-              # pop the blank line so it's not interpretted as a list continuation
-              buffer.pop unless within_nested_list
-              buffer << this_line
-              has_text = true
-            end
-          end
-        else
-          has_text = true unless this_line.empty?
-          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
-            within_nested_list = true
-            if nested_list_type == :dlist && $3.nil_or_empty?
-              # get greedy again
-              has_text = false
-            end
-          end
+        else # only dlist in need of item text, so slurp it up!
+          # pop the blank line so it's not interpretted as a list continuation
+          buffer.pop unless within_nested_list
           buffer << this_line
+          has_text = true
         end
+      else
+        has_text = true unless this_line.empty?
+        if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
+          within_nested_list = true
+          if nested_list_type == :dlist && $3.nil_or_empty?
+            # get greedy again
+            has_text = false
+          end
+        end
+        buffer << this_line
       end
       this_line = nil
     end

@@ -544,9 +544,8 @@ class Converter::DocBook5Converter < Converter::Base
       %(<indexterm>
 <primary>#{node.text}</primary>#{rel}
 </indexterm>#{node.text})
-    else
-      if (numterms = (terms = node.attr 'terms').size) > 2
-        %(<indexterm>
+    elsif (numterms = (terms = node.attr 'terms').size) > 2
+      %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>#{rel}
 </indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
 <indexterm>
@@ -555,18 +554,17 @@ class Converter::DocBook5Converter < Converter::Base
 <indexterm>
 <primary>#{terms[2]}</primary>
 </indexterm>] : ''})
-      elsif numterms > 1
-        %(<indexterm>
+    elsif numterms > 1
+      %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>#{rel}
 </indexterm>#{(node.document.option  'indexterm-promotion') ? %[
 <indexterm>
 <primary>#{terms[1]}</primary>
 </indexterm>] : ''})
-      else
-        %(<indexterm>
+    else
+      %(<indexterm>
 <primary>#{terms[0]}</primary>#{rel}
 </indexterm>)
-      end
     end
   end
 
