@@ -87,14 +87,14 @@ class Converter::SemanticHtml5Converter < Converter::Base
     if node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
       if level < 2 && node.document.doctype == 'book'
         if node.sectname == 'chapter'
-          %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}<span class="section-numbering">#{node.sectnum}</span>)
+          %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum}</span>)
         elsif node.sectname == 'part'
-          %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}<span class="section-numbering">#{node.sectnum nil, ':'}</span>)
+          %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum nil, ':'}</span>)
         else
-          %(<span class="section-numbering">#{node.sectnum}</span>)
+          %(<span class="sectnum">#{node.sectnum}</span>)
         end
       else
-        %(<span class="section-numbering">#{node.sectnum}</span>)
+        %(<span class="sectnum">#{node.sectnum}</span>)
       end
     end
   end
