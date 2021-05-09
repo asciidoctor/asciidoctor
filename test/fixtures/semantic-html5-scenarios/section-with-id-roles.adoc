@@ -1,4 +1,4 @@
-[#exciting.lead.awesome]
+[#exciting.awesome.feature]
 == Section Title
 
 A normal paragraph.
