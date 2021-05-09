@@ -398,11 +398,11 @@ class Document < AbstractBlock
 
     # allow common attributes backend and doctype to be set using options hash, coerce values to string
     if (backend_val = options[:backend])
-      attr_overrides['backend'] = %(#{backend_val})
+      attr_overrides['backend'] = backend_val.to_s
     end
 
     if (doctype_val = options[:doctype])
-      attr_overrides['doctype'] = %(#{doctype_val})
+      attr_overrides['doctype'] = doctype_val.to_s
     end
 
     if @safe >= SafeMode::SERVER

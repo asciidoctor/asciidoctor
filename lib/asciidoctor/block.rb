@@ -67,8 +67,7 @@ class Block < AbstractBlock
         # subs attribute is not honored
         else
           @default_subs = nil
-          # interpolation is the fastest way to dup subs as a string
-          @attributes['subs'] = %(#{subs})
+          @attributes['subs'] = subs.to_s
         end
         # resolve the subs eagerly only if subs option is specified
         # QUESTION should we skip subsequent calls to commit_subs?
