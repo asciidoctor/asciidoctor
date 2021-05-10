@@ -19,12 +19,12 @@ You can simply replace the call to AsciiDoc.py (`asciidoc`) with the equivalent 
 
  $ asciidoctor document.adoc
 
-If you're document makes heavy use of the legacy AsciiDoc syntax supported by AsciiDoc.py, you may have better luck enabling compat mode:
+If your document makes heavy use of the legacy AsciiDoc syntax supported by AsciiDoc.py, you may have better luck enabling compat mode:
 
  $ asciidoctor -a compat-mode document.adoc
 
 However, compat mode is strictly a migration aid.
-You should only use it as an interim measure while your migrating your content.
+You should only use it as an interim measure while you're migrating your content.
 It's not something you want to rely on long term and is considered deprecated.
 
 == Default HTML backend
