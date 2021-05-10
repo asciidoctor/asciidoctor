@@ -16,7 +16,7 @@ Thanks to xref:asciidoctorj::index.adoc[AsciidoctorJ] and xref:asciidoctor.js::i
 That means you don't need a Ruby runtime installed on your machine after all.
 AsciidoctorJ uses JRuby internally, whereas Asciidoctor.js relies on a Ruby-like runtime written in JavaScript.
 
-Whether your working in Ruby, Java, or JavaScript, Asciidoctor is readily available for you to start using.
+Whether you're working in Ruby, Java, or JavaScript, Asciidoctor is readily available for you to start using.
 Only when you get into add-on converters and extensions do you need to install dependencies.
 
 == Quick wins
