@@ -208,6 +208,11 @@ See xref:asciidoc:document:title.adoc[].
 |Delimiter lines do not have to match in length.
 |The length of start and end delimiter lines must match exactly.
 |See xref:asciidoc:blocks:build-basic-block.adoc#delimited-blocks[Delimited blocks].
+
+|Default substitutions for passthrough blocks
+|Applies attributes and macros substitutions to passthrough blocks
+|Does not apply any substitutions to passthrough blocks
+|Add `[subs="attributes,macros"]` above block to restore behavior.
 |===
 
 === Substitutions
