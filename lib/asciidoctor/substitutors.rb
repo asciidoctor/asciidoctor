@@ -1471,25 +1471,21 @@ module Substitutors
     if (str = str.strip).empty?
       {}
     elsif (str.start_with? '.', '#') && Compliance.shorthand_property_syntax
-      segments = str.split '#', 2
-
-      if segments.size > 1
-        id, *more_roles = segments[1].split('.')
-      else
-        more_roles = []
-      end
-
-      if (roles = segments[0]).empty?
-        roles = []
-      else
-        (roles = roles.split '.').shift
-      end
-
-      roles.concat more_roles unless more_roles.empty?
-
+      before, _, after = str.partition '#'
       attrs = {}
-      attrs['id'] = id if id
-      attrs['role'] = roles.join ' ' unless roles.empty?
+      if after.empty?
+        attrs['role'] = (before.tr '.', ' ').lstrip if before.length > 1
+      else
+        id, _, roles = after.partition '.'
+        attrs['id'] = id unless id.empty?
+        if roles.empty?
+          attrs['role'] = (before.tr '.', ' ').lstrip if before.length > 1
+        elsif before.length > 1
+          attrs['role'] = ((before + '.' + roles).tr '.', ' ').lstrip
+        else
+          attrs['role'] = roles.tr '.', ' '
+        end
+      end
       attrs
     else
       { 'role' => str }

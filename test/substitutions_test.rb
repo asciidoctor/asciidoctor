@@ -565,9 +565,29 @@ context 'Substitutions' do
       assert_equal '<span id="bond" class="white red-background">007</span>', para.sub_quotes(para.source)
     end
 
+    test 'quoted text with id and role shorthand with roles before id' do
+      para = block_from_string(%q{[.white.red-background#bond]#007#})
+      assert_equal '<span id="bond" class="white red-background">007</span>', para.sub_quotes(para.source)
+    end
+
+    test 'quoted text with id and role shorthand with roles around id' do
+      para = block_from_string(%q{[.white#bond.red-background]#007#})
+      assert_equal '<span id="bond" class="white red-background">007</span>', para.sub_quotes(para.source)
+    end
+
     test 'quoted text with id and role shorthand using docbook backend' do
       para = block_from_string(%q{[#bond.white.red-background]#007#}, backend: 'docbook')
       assert_equal '<anchor xml:id="bond" xreflabel="007"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.source)
+    end
+
+    test 'should not assign role attribute if shorthand style has no roles' do
+      para = block_from_string '[#idname]*blah*'
+      assert_equal '<strong id="idname">blah</strong>', para.content
+    end
+
+    test 'should remove trailing spaces from role defined using shorthand' do
+      para = block_from_string '[.rolename ]*blah*'
+      assert_equal '<strong class="rolename">blah</strong>', para.content
     end
 
     test 'should ignore attributes after comma' do
@@ -590,16 +610,6 @@ context 'Substitutions' do
         para = block_from_string %([#{attrlist}]+pass+)
         assert_equal '<span id="idname" class="rolename">pass</span>', para.content
       end
-    end
-
-    test 'should not assign role attribute if shorthand style has no roles' do
-      para = block_from_string '[#idname]*blah*'
-      assert_equal '<strong id="idname">blah</strong>', para.content
-    end
-
-    test 'should remove trailing spaces from role defined using shorthand' do
-      para = block_from_string '[.rolename ]*blah*'
-      assert_equal '<strong class="rolename">blah</strong>', para.content
     end
   end
 
