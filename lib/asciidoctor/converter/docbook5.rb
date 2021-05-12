@@ -385,13 +385,13 @@ class Converter::DocBook5Converter < Converter::Base
       result << '<?dbfo keep-together="auto"?>'
     end
     result << %(<title>#{node.title}</title>) if tag_name == 'table'
-    col_width_key = if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
+    if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
       TABLE_PI_NAMES.each do |pi_name|
         result << %(<?#{pi_name} table-width="#{width}"?>)
       end
-      'colabswidth'
+      col_width_key = 'colabswidth'
     else
-      'colpcwidth'
+      col_width_key = 'colpcwidth'
     end
     result << %(<tgroup cols="#{node.attr 'colcount'}">)
     node.columns.each do |col|
