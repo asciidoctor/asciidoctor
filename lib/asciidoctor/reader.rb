@@ -580,8 +580,7 @@ class Reader
   # Returns A String Array of source lines. If the source data is an Array, this method returns a copy.
   def prepare_lines data, opts = {}
     if (normalize = opts[:normalize])
-      trim_end = normalize == :chomp ? false : true
-      ::Array === data ? (Helpers.prepare_source_array data, trim_end) : (Helpers.prepare_source_string data, trim_end)
+      ::Array === data ? (Helpers.prepare_source_array data, normalize != :chomp) : (Helpers.prepare_source_string data, normalize != :chomp)
     elsif ::Array === data
       data.drop 0
     elsif data
