@@ -313,7 +313,7 @@ class Document < AbstractBlock
         end
         attr_overrides[key.downcase] = val
       end
-      if (to_file = options[:to_file])
+      if ::String === (to_file = options[:to_file])
         attr_overrides['outfilesuffix'] = Helpers.extname to_file
       end
       # safely resolve the safe mode from const, int or string
