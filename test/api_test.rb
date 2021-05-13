@@ -158,6 +158,23 @@ context 'API' do
       assert_empty doc.blocks
     end
 
+    test 'should ignore :to_file option if value is truthy but not a string' do
+      sample_input_path = fixture_path 'sample.adoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: :safe, to_file: true
+      refute_nil doc
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal '.html', (doc.attr 'outfilesuffix')
+      assert_equal doc.convert, (Asciidoctor.convert_file sample_input_path, safe: :safe, to_file: false)
+    end
+
+    test 'should set outfilesuffix attribute to file extension of value of :to_file option if value is a string' do
+      sample_input_path = fixture_path 'sample.adoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: :safe, to_file: 'out.htm'
+      refute_nil doc
+      assert_equal 'Document Title', doc.doctitle
+      assert_equal '.htm', (doc.attr 'outfilesuffix')
+    end
+
     test 'should accept attributes as array' do
       # NOTE there's a tab character before idseparator
       doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
