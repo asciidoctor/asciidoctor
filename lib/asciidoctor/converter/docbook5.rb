@@ -557,7 +557,7 @@ class Converter::DocBook5Converter < Converter::Base
     elsif numterms > 1
       %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>#{rel}
-</indexterm>#{(node.document.option  'indexterm-promotion') ? %[
+</indexterm>#{(node.document.option 'indexterm-promotion') ? %[
 <indexterm>
 <primary>#{terms[1]}</primary>
 </indexterm>] : ''})
