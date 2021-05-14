@@ -222,6 +222,16 @@ context 'Manpage' do
       assert_equal '\\(co & \\(rg are translated to character references, but not the &.', output.lines.last.chomp
     end
 
+    test 'should replace numeric character reference for plus' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      A {plus} B
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal 'A + B', output.lines.last.chomp
+    end
+
     test 'should replace em dashes' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
