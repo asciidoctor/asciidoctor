@@ -359,9 +359,9 @@ class Document < AbstractBlock
       # sync embedded attribute with :standalone option value
       attr_overrides['embedded'] = ''
       if (attr_overrides.key? 'showtitle') && (attr_overrides.keys & %w(notitle showtitle))[-1] == 'showtitle'
-        attr_overrides['notitle'] = { nil => '', false => '@', '@' => false}[attr_overrides['showtitle']]
+        attr_overrides['notitle'] = { nil => '', false => '@', '@' => false }[attr_overrides['showtitle']]
       elsif attr_overrides.key? 'notitle'
-        attr_overrides['showtitle'] = { nil => '', false => '@', '@' => false}[attr_overrides['notitle']]
+        attr_overrides['showtitle'] = { nil => '', false => '@', '@' => false }[attr_overrides['notitle']]
       else
         attrs['notitle'] = ''
       end
