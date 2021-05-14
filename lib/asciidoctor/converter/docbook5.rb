@@ -8,9 +8,9 @@ class Converter::DocBook5Converter < Converter::Base
 
   # default represents variablelist
   (DLIST_TAGS = {
-    'qanda' => { list:  'qandaset', entry: 'qandaentry', label: 'question', term:  'simpara', item:  'answer' },
-    'glossary' => { list:  nil, entry: 'glossentry', term:  'glossterm', item:  'glossdef' },
-  }).default = { list:  'variablelist', entry: 'varlistentry', term: 'term', item:  'listitem' }
+    'qanda' => { list: 'qandaset', entry: 'qandaentry', label: 'question', term: 'simpara', item: 'answer' },
+    'glossary' => { list: nil, entry: 'glossentry', term: 'glossterm', item: 'glossdef' },
+  }).default = { list: 'variablelist', entry: 'varlistentry', term: 'term', item: 'listitem' }
 
   (QUOTE_TAGS = {
     monospaced:  ['<literal>', '</literal>'],
