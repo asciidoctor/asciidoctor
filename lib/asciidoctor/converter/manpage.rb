@@ -724,6 +724,7 @@ allbox tab(:);'
       .gsub('-', '\-')
       .gsub('&lt;', '<')
       .gsub('&gt;', '>')
+      .gsub('&#43;', '+')       # plus sign; alternately could use \c(pl
       .gsub('&#160;', '\~')     # non-breaking space
       .gsub('&#169;', '\(co')   # copyright sign
       .gsub('&#174;', '\(rg')   # registered sign
