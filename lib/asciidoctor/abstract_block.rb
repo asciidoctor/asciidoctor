@@ -480,7 +480,7 @@ class AbstractBlock < AbstractNode
           @header.find_by_internal selector, result, &block
         end
         @blocks.each do |b|
-          next if (context_selector == :section && b.context != :section) # optimization
+          next if context_selector == :section && b.context != :section # optimization
           b.find_by_internal selector, result, &block
         end
       end
@@ -505,7 +505,7 @@ class AbstractBlock < AbstractNode
       end
     else
       @blocks.each do |b|
-        next if (context_selector == :section && b.context != :section) # optimization
+        next if context_selector == :section && b.context != :section # optimization
         b.find_by_internal selector, result, &block
       end
     end
