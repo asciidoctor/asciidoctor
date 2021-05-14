@@ -13,14 +13,14 @@ class Converter::DocBook5Converter < Converter::Base
   }).default = { list: 'variablelist', entry: 'varlistentry', term: 'term', item: 'listitem' }
 
   (QUOTE_TAGS = {
-    monospaced:  ['<literal>', '</literal>'],
-    emphasis:    ['<emphasis>', '</emphasis>', true],
-    strong:      ['<emphasis role="strong">', '</emphasis>', true],
-    double:      ['<quote>', '</quote>', true],
-    single:      ['<quote>', '</quote>', true],
-    mark:        ['<emphasis role="marked">', '</emphasis>'],
+    monospaced: ['<literal>', '</literal>'],
+    emphasis: ['<emphasis>', '</emphasis>', true],
+    strong: ['<emphasis role="strong">', '</emphasis>', true],
+    double: ['<quote>', '</quote>', true],
+    single: ['<quote>', '</quote>', true],
+    mark: ['<emphasis role="marked">', '</emphasis>'],
     superscript: ['<superscript>', '</superscript>'],
-    subscript:   ['<subscript>', '</subscript>'],
+    subscript: ['<subscript>', '</subscript>'],
   }).default = ['', '', true]
 
   MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }

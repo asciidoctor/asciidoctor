@@ -7,19 +7,19 @@ class Converter::Html5Converter < Converter::Base
   register_for 'html5'
 
   (QUOTE_TAGS = {
-    monospaced:  ['<code>', '</code>', true],
-    emphasis:    ['<em>', '</em>', true],
-    strong:      ['<strong>', '</strong>', true],
-    double:      ['&#8220;', '&#8221;'],
-    single:      ['&#8216;', '&#8217;'],
-    mark:        ['<mark>', '</mark>', true],
+    monospaced: ['<code>', '</code>', true],
+    emphasis: ['<em>', '</em>', true],
+    strong: ['<strong>', '</strong>', true],
+    double: ['&#8220;', '&#8221;'],
+    single: ['&#8216;', '&#8217;'],
+    mark: ['<mark>', '</mark>', true],
     superscript: ['<sup>', '</sup>', true],
-    subscript:   ['<sub>', '</sub>', true],
-    asciimath:   ['\$', '\$'],
-    latexmath:   ['\(', '\)'],
+    subscript: ['<sub>', '</sub>', true],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\(', '\)'],
     # Opal can't resolve these constants when referenced here
-    #asciimath:  INLINE_MATH_DELIMITERS[:asciimath] + [false],
-    #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
+    #asciimath: INLINE_MATH_DELIMITERS[:asciimath] + [false],
+    #latexmath: INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
   DropAnchorRx = /<(?:a\b[^>]*|\/a)>/
