@@ -338,7 +338,7 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line) && !next_line.empty?
-      if (next_line.start_with? '//')
+      if next_line.start_with? '//'
         comment_lines << shift
       else
         break

@@ -1319,7 +1319,7 @@ class Parser
         if ordinal == 0 && !style
           # using list level makes more sense, but we don't track it
           # basing style on marker level is compliant with AsciiDoc.py
-          list_block.style = implicit_style || ((ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s)
+          list_block.style = implicit_style || (ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s
         end
         if item_text.start_with?('[[') && LeadingInlineAnchorRx =~ item_text
           catalog_inline_anchor $1, $2, list_item, reader
