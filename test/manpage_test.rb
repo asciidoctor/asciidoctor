@@ -232,6 +232,16 @@ context 'Manpage' do
       assert_equal 'A + B', output.lines.last.chomp
     end
 
+    test 'should replace numeric character reference for degree sign' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      0{deg} is freezing
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '0\(de is freezing', output.lines.last.chomp
+    end
+
     test 'should replace em dashes' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
