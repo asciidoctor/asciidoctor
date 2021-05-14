@@ -729,6 +729,7 @@ allbox tab(:);'
       .gsub('&#169;', '\(co')   # copyright sign
       .gsub('&#174;', '\(rg')   # registered sign
       .gsub('&#8482;', '\(tm')  # trademark sign
+      .gsub('&#176;', '\(de')   # degree sign
       .gsub('&#8201;', ' ')     # thin space
       .gsub('&#8211;', '\(en')  # en dash
       .gsub(EmDashCharRefRx, '\(em') # em dash
