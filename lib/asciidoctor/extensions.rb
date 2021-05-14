@@ -134,7 +134,7 @@ module Extensions
         if opts.fetch :numbered, (style == 'appendix')
           sect.numbered = true
         elsif !(opts.key? :numbered) && (doc.attr? 'sectnums', 'all')
-          sect.numbered = book && level == 1 ? :chapter : true
+          sect.numbered = (book && level == 1 ? :chapter : true)
         end
       elsif level > 0
         if opts.fetch :numbered, (doc.attr? 'sectnums')

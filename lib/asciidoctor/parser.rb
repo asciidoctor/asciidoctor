@@ -1594,7 +1594,7 @@ class Parser
       if sect_numbered
         section.numbered = true
       elsif document.attributes['sectnums'] == 'all'
-        section.numbered = book && sect_level == 1 ? :chapter : true
+        section.numbered = (book && sect_level == 1 ? :chapter : true)
       end
     elsif document.attributes['sectnums'] && sect_level > 0
       # NOTE a special section here is guaranteed to be nested in another section
