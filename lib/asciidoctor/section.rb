@@ -21,7 +21,6 @@ module Asciidoctor
 #   section.size
 #   => 1
 class Section < AbstractBlock
-
   # Public: Get/Set the 0-based index order of this section within the parent block
   attr_accessor :index
 

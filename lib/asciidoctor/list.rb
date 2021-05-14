@@ -3,7 +3,6 @@
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and description lists)
 class List < AbstractBlock
-
   # Public: Create alias for blocks
   alias items blocks
   # Public: Get the items in this list as an Array
@@ -38,7 +37,6 @@ class List < AbstractBlock
   def to_s
     %(#<#{self.class}@#{object_id} {context: #{@context.inspect}, style: #{@style.inspect}, items: #{items.size}}>)
   end
-
 end
 
 # Public: Methods for managing items for AsciiDoc olists, ulist, and dlists.
@@ -46,7 +44,6 @@ end
 # In a description list (dlist), each item is a tuple that consists of a 2-item Array of ListItem terms and a ListItem
 # description (i.e., [[term, term, ...], desc]. If a description is not set, then the second entry in the tuple is nil.
 class ListItem < AbstractBlock
-
   # A contextual alias for the list parent node; counterpart to the items alias on List
   alias list parent
 

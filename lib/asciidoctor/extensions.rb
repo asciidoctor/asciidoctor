@@ -24,7 +24,6 @@ module Asciidoctor
 # or added to a custom {Registry} instance and passed as an option to a single
 # Asciidoctor processor.
 module Extensions
-
   # Public: An abstract base class for document and syntax processors.
   #
   # This class provides access to a class-level Hash for holding default

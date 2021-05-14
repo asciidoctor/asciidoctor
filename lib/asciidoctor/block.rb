@@ -9,7 +9,6 @@ module Asciidoctor
 #   block.content
 #   => "<em>This</em> is a &lt;test&gt;"
 class Block < AbstractBlock
-
   (DEFAULT_CONTENT_MODEL = {
     # TODO should probably fill in all known blocks
     audio: :empty,

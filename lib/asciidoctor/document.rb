@@ -82,7 +82,6 @@ module Asciidoctor
 # Loading a document object is the first step in the conversion process. You
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
-
   ImageReference = ::Struct.new :target, :imagesdir do
     alias to_s target
   end
