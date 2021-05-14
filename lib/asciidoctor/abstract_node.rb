@@ -5,7 +5,8 @@ module Asciidoctor
 # node of AsciiDoc content. The state and methods on this class are common to
 # all content segments in an AsciiDoc document.
 class AbstractNode
-  include Substitutors, Logging
+  include Logging
+  include Substitutors
 
   # Public: Get the Hash of attributes for this node
   attr_reader :attributes

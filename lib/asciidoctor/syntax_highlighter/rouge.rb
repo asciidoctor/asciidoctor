@@ -134,7 +134,8 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   end
 
   extend Styles # exports static methods
-  include Loader, Styles # adds methods to instance
+  include Styles # adds methods to instance
+  include Loader # adds methods to instance
 
   CodeCellStartTagCs = '<td class="code">'
 

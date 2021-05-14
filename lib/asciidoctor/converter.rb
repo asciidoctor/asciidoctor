@@ -375,7 +375,8 @@ module Converter
   # An abstract base class for defining converters that can be used to convert {AbstractNode} objects in a parsed
   # AsciiDoc document to a backend format such as HTML or DocBook.
   class Base
-    include Converter, Logging
+    include Logging
+    include Converter
 
     # Public: Converts an {AbstractNode} by delegating to a method that matches the transform value.
     #
