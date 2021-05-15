@@ -404,7 +404,7 @@ class Table::Cell < AbstractBlock
   end
 
   def to_s
-    "#{super.to_s} - [text: #@text, colspan: #{@colspan || 1}, rowspan: #{@rowspan || 1}, attributes: #@attributes]"
+    "#{super} - [text: #@text, colspan: #{@colspan || 1}, rowspan: #{@rowspan || 1}, attributes: #@attributes]"
   end
 end
 
