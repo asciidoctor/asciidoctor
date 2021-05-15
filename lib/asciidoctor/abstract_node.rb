@@ -464,8 +464,8 @@ class AbstractNode
         start = doc.base_dir
       end
     else
-      start = doc.base_dir unless start
-      jail = doc.base_dir unless jail
+      start ||= doc.base_dir
+      jail ||= doc.base_dir
     end
     doc.path_resolver.system_path target, start, jail, opts
   end
