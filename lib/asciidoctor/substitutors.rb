@@ -37,7 +37,7 @@ module Substitutors
   }
 
   SUB_OPTIONS = {
-    block:  SUB_GROUPS.keys + NORMAL_SUBS + [:callouts],
+    block: SUB_GROUPS.keys + NORMAL_SUBS + [:callouts],
     inline: SUB_GROUPS.keys + NORMAL_SUBS,
   }
 
