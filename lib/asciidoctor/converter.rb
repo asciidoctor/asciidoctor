@@ -294,8 +294,8 @@ module Converter
     def registry
       @@registry
     end
-
     unless RUBY_ENGINE == 'opal' # the following block adds support for synchronization and lazy registration
+
       public
 
       def register converter, *backends
