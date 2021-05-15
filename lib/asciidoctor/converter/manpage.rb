@@ -743,7 +743,7 @@ allbox tab(:);'
       .gsub('&#8658;', '\(rA')  # rightwards double arrow
       .gsub('&#8203;', '\:')    # zero width space
       .gsub('&amp;', '&')       # literal ampersand (NOTE must take place after any other replacement that includes &)
-      .gsub('\'', '\*(Aq')      # apostrophe-quote
+      .gsub('\'', '\*(Aq')      # apostrophe / neutral single quote
       .gsub(MockMacroRx, '\1')  # mock boundary
       .gsub(ESC_BS, '\\')       # unescape troff backslash (NOTE update if more escapes are added)
       .gsub(ESC_FS, '.')        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
