@@ -1328,7 +1328,7 @@ module Extensions
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
       kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
       # style 1: specified as block
-      extension = if block_given?
+      if block_given?
         config = resolve_args args, 1
         (processor = kind_class.new config).singleton_class.enable_dsl
         if block.arity == 0
@@ -1340,7 +1340,7 @@ module Extensions
           raise ::ArgumentError, %(No block specified to process #{kind_name} extension at #{block.source_location})
         end
         processor.freeze
-        ProcessorExtension.new kind, processor
+        extension = ProcessorExtension.new kind, processor
       else
         processor, config = resolve_args args, 2
         # style 2: specified as Class or String class name
@@ -1350,12 +1350,12 @@ module Extensions
           end
           processor_instance = processor_class.new config
           processor_instance.freeze
-          ProcessorExtension.new kind, processor_instance
+          extension = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
           processor.freeze
-          ProcessorExtension.new kind, processor
+          extension = ProcessorExtension.new kind, processor
         else
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
