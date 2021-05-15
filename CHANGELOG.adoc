@@ -26,6 +26,7 @@ Bug Fixes::
   * Update default stylesheet to reenable styling of implicit lead role on first paragraph of preamble inside AsciiDoc table cell
   * Replace numeric character reference for plus in manpage output
   * Replace numeric character reference for degree sign in manpage output
+  * Convert apostrophe to the portable `\*(Aq` variable instead of the groff-specific escape `\(aq` (#4060) (*@felipec*)
 
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
