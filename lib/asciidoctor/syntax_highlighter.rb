@@ -183,8 +183,8 @@ module SyntaxHighlighter
     def registry
       @@registry
     end
-
     unless RUBY_ENGINE == 'opal'
+
       public
 
       def register syntax_highlighter, *names
