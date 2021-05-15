@@ -255,6 +255,16 @@ context 'Manpage' do
       assert_includes output, 'go\\(emto'
     end
 
+    test 'should replace quotes' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      'command'
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, '\*(Aqcommand\*(Aq'
+    end
+
     test 'should escape lone period' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
