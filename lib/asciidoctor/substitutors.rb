@@ -243,9 +243,9 @@ module Substitutors
         when 'drop-line'
           if (drop_line_severity ||= (opts[:drop_line_severity] || :info)) == :info
             logger.info { %(dropping line containing reference to missing attribute: #{key}) }
+          end
           #elsif drop_line_severity == :warn
           #  logger.warn %(dropping line containing reference to missing attribute: #{key})
-          end
           drop = drop_line = CAN
         when 'warn'
           logger.warn %(skipping reference to missing attribute: #{key})
