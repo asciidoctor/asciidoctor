@@ -22,6 +22,38 @@ class Converter::SemanticHtml5Converter < Converter::Base
     result.join LF
   end
 
+  def convert_section node
+    doc_attrs = node.document.attributes
+    if node.caption
+      title = node.captioned_title
+    else
+      if (section_numbering = generate_section_numbering node)
+        title = %(#{section_numbering} #{node.title})
+      else
+        title = node.title
+      end
+    end
+    id = node.id
+    if doc_attrs['sectlinks']
+      title = %(<a class="link" href="##{id}">#{title}</a>)
+    end
+    if doc_attrs['sectanchors']
+      if doc_attrs['sectanchors'] == 'after'
+        title = %(#{title}<a class="anchor" href="##{id}"></a>)
+      else
+        title = %(<a class="anchor" href="##{id}"></a>#{title})
+      end
+    end
+    attributes = common_html_attributes id, node.role
+    level = node.level
+    result = []
+    result << %(<section#{attributes}>)
+    result << %(<h#{level + 1}>#{title}</h#{level + 1}>)
+    result << node.content if node.blocks?
+    result << '</section>'
+    result.join LF
+  end
+
   def convert_paragraph node
     attributes = common_html_attributes node.id, node.role
     if node.title?
@@ -46,6 +78,24 @@ class Converter::SemanticHtml5Converter < Converter::Base
     else
       logger.warn %(unknown anchor type: #{node.type.inspect})
       nil
+    end
+  end
+
+  def generate_section_numbering node
+    level = node.level
+    doc_attrs = node.document.attributes
+    if node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
+      if level < 2 && node.document.doctype == 'book'
+        if node.sectname == 'chapter'
+          %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum}</span>)
+        elsif node.sectname == 'part'
+          %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum nil, ':'}</span>)
+        else
+          %(<span class="sectnum">#{node.sectnum}</span>)
+        end
+      else
+        %(<span class="sectnum">#{node.sectnum}</span>)
+      end
     end
   end
 
