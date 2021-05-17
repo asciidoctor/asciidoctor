@@ -1079,7 +1079,7 @@ class PreprocessorReader < Reader
           (split_delimited_value parsed_attrs['lines']).each do |linedef|
             if linedef.include? '..'
               from, _, to = linedef.partition '..'
-              inc_linenos += (to.empty? || (to = to.to_i) < 0) ? [from.to_i, 1.0/0.0] : (from.to_i..to).to_a
+              inc_linenos += (to.empty? || (to = to.to_i) < 0) ? [from.to_i, ::Float::INFINITY] : (from.to_i..to).to_a
             else
               inc_linenos << linedef.to_i
             end
