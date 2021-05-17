@@ -455,7 +455,7 @@ class Parser
     # of a section that need to get transfered to the next section
     # see "trailing block attributes transfer to the following section" in
     # test/attributes_test.rb for an example
-    [section != parent ? section : nil, attributes.merge]
+    [section == parent ? nil : section, attributes.merge]
   end
 
   # Public: Parse and return the next Block at the Reader's current location
