@@ -49,9 +49,9 @@ module Asciidoctor
 
     def print_report to = $stdout, subject = nil
       to.puts %(Input file: #{subject}) if subject
-      to.puts %(  Time to read and parse source: #{'%05.5f' % read_parse.to_f})
-      to.puts %(  Time to convert document: #{'%05.5f' % convert.to_f})
-      to.puts %(  Total time (read, parse and convert): #{'%05.5f' % read_parse_convert.to_f})
+      to.puts %(  Time to read and parse source: #{sprintf '%05.5f', read_parse.to_f})
+      to.puts %(  Time to convert document: #{sprintf '%05.5f', convert.to_f})
+      to.puts %(  Total time (read, parse and convert): #{sprintf '%05.5f', read_parse_convert.to_f})
     end
 
     private
