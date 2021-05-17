@@ -547,20 +547,20 @@ class Converter::DocBook5Converter < Converter::Base
     elsif (numterms = (terms = node.attr 'terms').size) > 2
       %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>#{rel}
-</indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
+</indexterm>#{(node.document.option? 'indexterm-promotion') ? %(
 <indexterm>
 <primary>#{terms[1]}</primary><secondary>#{terms[2]}</secondary>
 </indexterm>
 <indexterm>
 <primary>#{terms[2]}</primary>
-</indexterm>] : ''})
+</indexterm>) : ''})
     elsif numterms > 1
       %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>#{rel}
-</indexterm>#{(node.document.option 'indexterm-promotion') ? %[
+</indexterm>#{(node.document.option 'indexterm-promotion') ? %(
 <indexterm>
 <primary>#{terms[1]}</primary>
-</indexterm>] : ''})
+</indexterm>) : ''})
     else
       %(<indexterm>
 <primary>#{terms[0]}</primary>#{rel}
@@ -617,7 +617,7 @@ class Converter::DocBook5Converter < Converter::Base
 
   def common_attributes id, role = nil, reftext = nil
     if id
-      attrs = %( xml:id="#{id}"#{role ? %[ role="#{role}"] : ''})
+      attrs = %( xml:id="#{id}"#{role ? %( role="#{role}") : ''})
     elsif role
       attrs = %( role="#{role}")
     else

@@ -147,7 +147,7 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'icons', 'font'
       if node.attr? 'iconfont-remote'
-        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css]}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
@@ -419,9 +419,9 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     else
       %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
 <h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
-#{level == 1 ? %[<div class="sectionbody">
+#{level == 1 ? %(<div class="sectionbody">
 #{node.content}
-</div>] : node.content}
+</div>) : node.content}
 </div>)
     end
   end
@@ -660,7 +660,7 @@ Your browser does not support the audio tag.
         } : {}
         opts[:nowrap] = nowrap
       else
-        pre_open = %(<pre class="highlight#{nowrap ? ' nowrap' : ''}"><code#{lang ? %[ class="language-#{lang}" data-lang="#{lang}"] : ''}>)
+        pre_open = %(<pre class="highlight#{nowrap ? ' nowrap' : ''}"><code#{lang ? %( class="language-#{lang}" data-lang="#{lang}") : ''}>)
         pre_close = '</code></pre>'
       end
     else
@@ -725,7 +725,7 @@ Your browser does not support the audio tag.
 
     node.items.each do |item|
       if item.id
-        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+        result << %(<li id="#{item.id}"#{item.role ? %( class="#{item.role}") : ''}>)
       elsif item.role
         result << %(<li class="#{item.role}">)
       else
@@ -775,7 +775,7 @@ Your browser does not support the audio tag.
 
   def convert_paragraph node
     if node.role
-      attributes = %(#{node.id ? %[ id="#{node.id}"] : ''} class="paragraph #{node.role}")
+      attributes = %(#{node.id ? %( id="#{node.id}") : ''} class="paragraph #{node.role}")
     elsif node.id
       attributes = %( id="#{node.id}" class="paragraph")
     else
@@ -975,7 +975,7 @@ Your browser does not support the audio tag.
 
     node.items.each do |item|
       if item.id
-        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+        result << %(<li id="#{item.id}"#{item.role ? %( class="#{item.role}") : ''}>)
       elsif item.role
         result << %(<li class="#{item.role}">)
       else
