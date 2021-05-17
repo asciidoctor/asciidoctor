@@ -1,0 +1,14 @@
+= The Secret Manual
+:doctype: book
+:sectnums:
+:partnums:
+:noheader:
+:part-signifier: Component
+
+= Defensive Operations
+
+== An Introduction to DefenseOps
+
+= Managing Werewolves
+
+== Folk beliefs

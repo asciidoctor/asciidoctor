@@ -1,0 +1,4 @@
+[.mindful]
+== Abstract
+
+Documentation is a distillation of many long adventures.
