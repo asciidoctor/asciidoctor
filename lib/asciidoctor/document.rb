@@ -619,10 +619,17 @@ class Document < AbstractBlock
       # @reftexts is set eagerly to prevent nested lazy init
       (@reftexts = {}).tap {|accum| @catalog[:refs].each {|id, ref| accum[ref.xreftext] ||= id } }[text]
     else
-      # @reftexts is set eagerly to prevent nested lazy init
       resolved_id = nil
-      # NOTE short-circuit early since we're throwing away this table
-      (@reftexts = {}).tap {|accum| @catalog[:refs].each {|id, ref| (xreftext = ref.xreftext) == text ? (break (resolved_id = id)) : (accum[xreftext] ||= id) } }
+      # @reftexts is set eagerly to prevent nested lazy init
+      @reftexts = accum = {}
+      @catalog[:refs].each do |id, ref|
+        # NOTE short-circuit early since we're throwing away this table anyway
+        if (xreftext = ref.xreftext) == text
+          resolved_id = id
+          break
+        end
+        accum[xreftext] ||= id
+      end
       @reftexts = nil
       resolved_id
     end
