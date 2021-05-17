@@ -1,0 +1,33 @@
+= Built-in roles
+
+Here's the list of all the built-in roles used in the (new) modern HTML converter:
+
+[cols="1m,2",opts=header]
+|====
+|Name
+|Context
+
+|link
+|Section links
+
+|anchor
+|Section anchors
+
+|title
+|Paragraph title
+
+|sectnum
+|Section numbering
+
+|subtitle
+|Document subtitle
+
+|byline
+|Author(s) block
+
+|author
+|Author line
+
+|revision
+|Revision table
+|====

@@ -1,0 +1,5 @@
+:sectanchors: after
+
+== Section Title
+
+A normal paragraph.
