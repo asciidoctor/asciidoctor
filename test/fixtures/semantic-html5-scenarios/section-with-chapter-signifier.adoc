@@ -1,0 +1,18 @@
+= Document Title
+:doctype: book
+:sectnums:
+:chapter-signifier: Chapter
+:noheader:
+
+[chapter]
+= Part one
+
+== Introduction
+
+=== Background
+
+==== Problem
+
+== Literature Review
+
+=== Model

@@ -1,0 +1,4 @@
+[#exciting.awesome.feature]
+== Section Title
+
+A normal paragraph.
