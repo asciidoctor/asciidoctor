@@ -192,9 +192,7 @@ class Reader
   def read_lines
     lines = []
     # has_more_lines? triggers preprocessor
-    while has_more_lines?
-      lines << shift
-    end
+    lines << shift while has_more_lines?
     lines
   end
   alias readlines read_lines
