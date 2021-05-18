@@ -176,9 +176,9 @@ module SyntaxHighlighter
   module DefaultFactory
     include Factory
 
-    private
-
     @@registry = {}
+
+    private
 
     def registry
       @@registry
@@ -216,8 +216,6 @@ module SyntaxHighlighter
         'pygments' => %(#{__dir__}/syntax_highlighter/pygments),
         'rouge' => %(#{__dir__}/syntax_highlighter/rouge),
       }
-
-      private
 
       @@mutex = ::Mutex.new
     end
