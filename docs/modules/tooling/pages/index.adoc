@@ -6,7 +6,8 @@
 :url-asciidocfx-docs: https://www.asciidocfx.com/#truehow-to-install-asciidocfx
 :url-eclipse-marketplace: https://marketplace.eclipse.org/content/asciidoctor-editor
 :url-eclipse-plugin-github: https://github.com/de-jcup/eclipse-asciidoctor-editor
-:url-intellij-plugin: https://plugins.jetbrains.com/plugin/7391-asciidoc
+:url-intellij-plugin-quickstart: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/quick-start.html
+:url-intellij-plugin-features: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/features.html
 
 Since AsciiDoc syntax is just plain text, you can write an AsciiDoc document using any text editor.
 You don't need complex word processing programs like Microsoft Word or Google Docs.
@@ -57,7 +58,12 @@ Install the open source plugin `Asciidoctor Editor` from the {url-eclipse-market
 
 === IntelliJ IDEA
 
-Install the community plugin {url-intellij-plugin}[AsciiDoc^].
+The community AsciiDoc plugin adds support to edit AsciiDoc files in the IDE with syntax highlighting, auto-completion and a live preview.
+It includes support for Antora and Spring REST Docs and creates PDFs using Asciidoctor PDF.
+
+It works with the free community editions as well as with the paid editions of IntelliJ IDEA, CLion, PhpStorm, RubyMine, Android Studio etc.
+
+{url-intellij-plugin-quickstart}[Install the AsciiDoc plugin^] or {url-intellij-plugin-features}[learn more about its features^].
 
 === Visual Studio Code
 
