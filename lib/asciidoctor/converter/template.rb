@@ -40,13 +40,13 @@ class Converter::TemplateConverter < Converter::Base
     @caches = { scans: {}, templates: {} }
   end
 
-  def self.caches
-    @caches
-  end
+  class << self
+    attr_reader :caches
 
-  def self.clear_caches
-    @caches[:scans].clear if @caches[:scans]
-    @caches[:templates].clear if @caches[:templates]
+    def clear_caches
+      @caches[:scans].clear
+      @caches[:templates].clear
+    end
   end
 
   def initialize backend, template_dirs, opts = {}
