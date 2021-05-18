@@ -242,9 +242,9 @@ module SyntaxHighlighter
         if (lang = code.delete 'data-lang')
           code['data-lang'] = lang
         end
-        %(<pre#{pre.map {|k, v| %[ #{k}="#{v}"] }.join}><code#{code.map {|k, v| %[ #{k}="#{v}"] }.join}>#{node.content}</code></pre>)
+        %(<pre#{pre.map {|k, v| %( #{k}="#{v}") }.join}><code#{code.map {|k, v| %( #{k}="#{v}") }.join}>#{node.content}</code></pre>)
       else
-        %(<pre class="#{class_attr_val}"><code#{lang ? %[ data-lang="#{lang}"] : ''}>#{node.content}</code></pre>)
+        %(<pre class="#{class_attr_val}"><code#{lang ? %( data-lang="#{lang}") : ''}>#{node.content}</code></pre>)
       end
     end
   end

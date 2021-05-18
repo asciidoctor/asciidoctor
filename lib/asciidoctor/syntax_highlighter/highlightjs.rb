@@ -23,7 +23,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
       %(<link rel="stylesheet" href="#{base_url}/styles/#{doc.attr 'highlightjs-theme', 'github'}.min.css"#{opts[:self_closing_tag_slash]}>)
     else # :footer
       %(<script src="#{base_url}/highlight.min.js"></script>
-#{(doc.attr? 'highlightjs-languages') ? ((doc.attr 'highlightjs-languages').split ',').map {|lang| %[<script src="#{base_url}/languages/#{lang.lstrip}.min.js"></script>\n] }.join : ''}<script>
+#{(doc.attr? 'highlightjs-languages') ? ((doc.attr 'highlightjs-languages').split ',').map {|lang| %(<script src="#{base_url}/languages/#{lang.lstrip}.min.js"></script>\n) }.join : ''}<script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
   ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
