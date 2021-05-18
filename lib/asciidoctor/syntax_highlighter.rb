@@ -167,9 +167,7 @@ module SyntaxHighlighter
 
     private
 
-    def registry
-      @registry
-    end
+    attr_reader :registry
   end
 
   module DefaultFactory
