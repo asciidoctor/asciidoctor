@@ -411,34 +411,22 @@ class Reader
       break_on_list_continuation = options[:break_on_list_continuation]
     end
     skip_comments = options[:skip_line_comments]
-    complete = line_read = line_restored = nil
+    line_read = line_restored = nil
     shift if options[:skip_first_line]
-    while !complete && (line = read_line)
-      complete = while true
-        break true if terminator && line == terminator
-        # QUESTION: can we get away with line.empty? here?
-        break true if break_on_blank_lines && line.empty?
-        if break_on_list_continuation && line_read && line == LIST_CONTINUATION
-          options[:preserve_last_line] = true
-          break true
-        end
-        break true if block_given? && (yield line)
-        break false
-      end
-      if complete
-        if options[:read_last_line]
-          result << line
-          line_read = true
-        end
+    while (line = read_line)
+      if terminator ? line == terminator : ((break_on_blank_lines && line.empty?) ||
+          (break_on_list_continuation && line_read && line == LIST_CONTINUATION && (options[:preserve_last_line] = true)) ||
+          (block_given? && (yield line)))
+        result << line if options[:read_last_line]
         if options[:preserve_last_line]
           unshift line
           line_restored = true
         end
-      else
-        unless skip_comments && (line.start_with? '//') && !(line.start_with? '///')
-          result << line
-          line_read = true
-        end
+        break
+      end
+      unless skip_comments && (line.start_with? '//') && !(line.start_with? '///')
+        result << line
+        line_read = true
       end
     end
     if restore_process_lines
