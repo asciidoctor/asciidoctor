@@ -80,12 +80,8 @@ class ListItem < AbstractBlock
     @text && (apply_subs @text, @subs)
   end
 
-  # Public: Set the String text.
-  #
-  # Returns the new String text assigned to this ListItem
-  def text= val
-    @text = val
-  end
+  # Public: Set the String text assigned to this ListItem
+  attr_writer :text
 
   # Check whether this list item has simple content (no nested blocks aside from a single outline list).
   # Primarily relevant for outline lists.
