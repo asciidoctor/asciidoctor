@@ -179,26 +179,26 @@ context 'Converter' do
         caches = Asciidoctor::Converter::TemplateConverter.caches
         if defined? ::Concurrent::Map
           assert_kind_of ::Concurrent::Map, caches[:templates]
-          refute_empty caches[:templates]
-          paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
-          refute_nil paragraph_template_before
-
-          # should use cache
-          doc = Asciidoctor::Document.new [], template_dir: template_dir
-          template_converter = doc.converter.find_converter('paragraph')
-          paragraph_template_after = template_converter.templates['paragraph']
-          refute_nil paragraph_template_after
-          assert paragraph_template_before.eql?(paragraph_template_after)
-
-          # should not use cache
-          doc = Asciidoctor::Document.new [], template_dir: template_dir, template_cache: false
-          template_converter = doc.converter.find_converter('paragraph')
-          paragraph_template_after = template_converter.templates['paragraph']
-          refute_nil paragraph_template_after
-          refute paragraph_template_before.eql?(paragraph_template_after)
         else
-          assert_empty caches
+          assert_kind_of ::Hash, caches[:templates]
         end
+        refute_empty caches[:templates]
+        paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
+        refute_nil paragraph_template_before
+
+        # should use cache
+        doc = Asciidoctor::Document.new [], template_dir: template_dir
+        template_converter = doc.converter.find_converter('paragraph')
+        paragraph_template_after = template_converter.templates['paragraph']
+        refute_nil paragraph_template_after
+        assert paragraph_template_before.eql?(paragraph_template_after)
+
+        # should not use cache
+        doc = Asciidoctor::Document.new [], template_dir: template_dir, template_cache: false
+        template_converter = doc.converter.find_converter('paragraph')
+        paragraph_template_after = template_converter.templates['paragraph']
+        refute_nil paragraph_template_after
+        refute paragraph_template_before.eql?(paragraph_template_after)
       ensure
         # clean up
         Asciidoctor::Converter::TemplateConverter.clear_caches if defined? Asciidoctor::Converter::TemplateConverter
@@ -224,8 +224,8 @@ context 'Converter' do
         doc = Asciidoctor::Document.new [], template_dir: (fixture_path 'custom-backends/haml'), template_cache: false
         doc.converter
         caches = Asciidoctor::Converter::TemplateConverter.caches
-        assert caches.empty? || caches[:scans].empty?
-        assert caches.empty? || caches[:templates].empty?
+        assert_empty caches[:scans]
+        assert_empty caches[:templates]
       ensure
         # clean up
         Asciidoctor::Converter::TemplateConverter.clear_caches if defined? Asciidoctor::Converter::TemplateConverter
