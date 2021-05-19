@@ -337,7 +337,7 @@ module Substitutors
             end
             replacement.convert
           elsif replacement
-            logger.info %(expected substitution value for custom inline macro to be of type Inline; got #{replacement.class}: #{match})
+            logger.info { %(expected substitution value for custom inline macro to be of type Inline; got #{replacement.class}: #{match}) }
             replacement
           else
             ''
