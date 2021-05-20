@@ -366,10 +366,11 @@ module Converter
   # into - The Class into which the {Converter} module is being included.
   #
   # Returns nothing.
-  private_class_method def self.included into
+  def self.included into
     into.send :include, BackendTraits
     into.extend Config
-  end || :included
+  end
+  private_class_method :included # use separate declaration for Ruby 2.0.x
 
   # An abstract base class for defining converters that can be used to convert {AbstractNode} objects in a parsed
   # AsciiDoc document to a backend format such as HTML or DocBook.
