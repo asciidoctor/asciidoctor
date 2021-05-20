@@ -2651,9 +2651,9 @@ class Parser
     if tab_size > 0 && lines.any? {|line| line.include? TAB }
       full_tab_space = ' ' * tab_size
       lines.map! do |line|
-        if line.empty?
+        if line.empty? || (tab_idx = line.index TAB).nil?
           line
-        elsif (tab_idx = line.index TAB)
+        else
           if tab_idx == 0
             leading_tabs = 0
             line.each_byte do |b|
@@ -2685,8 +2685,6 @@ class Parser
             idx += 1
           end
           result
-        else
-          line
         end
       end
     end
