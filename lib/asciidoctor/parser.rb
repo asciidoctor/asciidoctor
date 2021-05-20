@@ -1867,13 +1867,12 @@ class Parser
         if explicit
           # rebuild implicit author names to reparse
           authors.each_with_index do |author, idx|
-            unless author
-              authors[idx] = [
-                author_metadata[%(firstname_#{name_idx = idx + 1})],
-                author_metadata[%(middlename_#{name_idx})],
-                author_metadata[%(lastname_#{name_idx})]
-              ].compact.map {|it| it.tr ' ', '_' }.join ' '
-            end
+            next if author
+            authors[idx] = [
+              author_metadata[%(firstname_#{name_idx = idx + 1})],
+              author_metadata[%(middlename_#{name_idx})],
+              author_metadata[%(lastname_#{name_idx})]
+            ].compact.map {|it| it.tr ' ', '_' }.join ' '
           end if sparse
           # process as names only
           author_metadata = process_authors authors, true, false
