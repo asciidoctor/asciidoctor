@@ -420,15 +420,7 @@ allbox tab(:);'
           end
           row_text[row_index] << %(T{#{LF}.sp#{LF})
           cell_halign = (cell.attr 'halign', 'left').chr
-          if tsec == :head
-            if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
-              row_header[row_index][cell_index] << %(#{cell_halign}tB)
-            else
-              row_header[row_index][cell_index + 1] ||= []
-              row_header[row_index][cell_index + 1] << %(#{cell_halign}tB)
-            end
-            row_text[row_index] << %(#{manify cell.text, whitespace: :normalize}#{LF})
-          elsif tsec == :body
+          if tsec == :body
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
               row_header[row_index][cell_index] << %(#{cell_halign}t)
             else
@@ -444,7 +436,7 @@ allbox tab(:);'
               cell_content = manify cell.content.join, whitespace: :normalize
             end
             row_text[row_index] << %(#{cell_content}#{LF})
-          elsif tsec == :foot
+          else # tsec == :head || tsec == :foot
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
               row_header[row_index][cell_index] << %(#{cell_halign}tB)
             else
