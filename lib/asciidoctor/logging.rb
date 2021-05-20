@@ -111,9 +111,10 @@ module Logging
   # into - The Class that includes the {Logging} module
   #
   # Returns nothing
-  private_class_method def self.included into
+  def self.included into
     into.extend Logging
-  end || :included
+  end
+  private_class_method :included # use separate declaration for Ruby 2.0.x
 
   def logger
     LoggerManager.logger

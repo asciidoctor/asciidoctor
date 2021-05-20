@@ -100,9 +100,10 @@ module SyntaxHighlighter
     raise ::NotImplementedError, %(#{SyntaxHighlighter} subclass #{self.class} must implement the ##{__method__} method since #write_stylesheet? returns true)
   end
 
-  private_class_method def self.included into
+  def self.included into
     into.extend Config
-  end || :included
+  end
+  private_class_method :included # use separate declaration for Ruby 2.0.x
 
   module Config
     # Public: Statically register the current class in the registry for the specified names.
