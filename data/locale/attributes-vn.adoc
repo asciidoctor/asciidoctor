@@ -1,0 +1,23 @@
+// Vietnamese translation, courtesy of Hoa Nguyen <ntthoa.uphcm@gmail.com>
+:appendix-caption: Phụ lục
+:appendix-refsig: {appendix-caption}
+:caution-caption: Cảnh báo
+:chapter-signifier: Chương
+:chapter-refsig: {chapter-signifier}
+:example-caption: Ví dụ
+:figure-caption: Hình
+:important-caption: Quan trọng
+:last-update-label: Cập nhật lần cuối
+ifdef::listing-caption[:listing-caption: Danh sách]
+ifdef::manname-title[:manname-title: Tên]
+:note-caption: Ghi chú
+:part-signifier: Phần
+:part-refsig: {part-signifier}
+ifdef::preface-title[:preface-title: Lời nói đầu]
+:section-refsig: Mục
+:table-caption: Bảng
+:tip-caption: Lời khuyên
+:toc-title: Mục lục
+:untitled-label: Không có tiêu đề
+:version-label: Phiên bản
+:warning-caption: Chú ý
