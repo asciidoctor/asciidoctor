@@ -29,6 +29,10 @@ Bug Fixes::
   * Replace numeric character reference for degree sign in manpage output
   * Convert apostrophe to the portable `\*(Aq` variable instead of the groff-specific escape `\(aq` (#4060) (*@felipec*)
 
+Improvements::
+
+  * Show safe modes in strictness order in CLI help (#4065)
+
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 

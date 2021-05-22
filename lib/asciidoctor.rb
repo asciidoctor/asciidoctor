@@ -100,7 +100,7 @@ module Asciidoctor
     end
 
     def self.names
-      @names_by_value.values
+      @names_by_value.sort.to_h.values
     end
   end
 
