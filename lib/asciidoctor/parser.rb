@@ -967,17 +967,12 @@ class Parser
       # special case for fenced code blocks
       if Compliance.markdown_syntax && (tip.start_with? '`')
         if tip_len == 4
-          if tip == '````'
-            return
-          elsif (tip = tip.chop) == '```'
-            line = tip
-            line_len = tip_len = 3
-          else
+          if tip == '````' || (tip = tip.chop) != '```'
             return
           end
-        elsif tip == '```'
-          # keep it
-        else
+          line = tip
+          line_len = tip_len = 3
+        elsif tip != '```'
           return
         end
       elsif tip_len == 3
