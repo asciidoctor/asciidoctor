@@ -302,13 +302,13 @@ class Converter::DocBook5Converter < Converter::Base
 </abstract>)
       end
     when 'partintro'
-      unless node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
-        logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
-        ''
-      else
+      if node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
         %(<partintro#{common_attributes node.id, node.role, node.reftext}>
 #{title_tag node}#{enclose_content node}
 </partintro>)
+      else
+        logger.error 'partintro block can only be used when doctype is book and must be a child of a book part. Excluding block content.'
+        ''
       end
     else
       reftext = node.reftext if (id = node.id)
