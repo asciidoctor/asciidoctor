@@ -88,7 +88,7 @@ module Asciidoctor
     # enforced)!
     #PARANOID = 100
 
-    @names_by_value = {}.tap {|accum| (constants false).each {|sym| accum[const_get sym, false] = sym.to_s.downcase } }
+    @names_by_value = (constants false).map {|sym| [(const_get sym), sym.to_s.downcase] }.sort {|(a), (b)| a <=> b }.to_h
 
     def self.value_for_name name
       const_get name.upcase, false
@@ -99,7 +99,7 @@ module Asciidoctor
     end
 
     def self.names
-      @names_by_value.sort.to_h.values
+      @names_by_value.values
     end
   end
 
