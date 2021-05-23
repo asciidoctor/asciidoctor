@@ -2056,6 +2056,7 @@ class Parser
         return true
       end
     end
+    nil
   end
 
   # Process consecutive attribute entry lines, ignoring adjacent line comments and comment blocks.
