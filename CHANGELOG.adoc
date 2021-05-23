@@ -32,6 +32,7 @@ Bug Fixes::
 Improvements::
 
   * Show safe modes in strictness order in CLI help (#4065)
+  * Add Vietnamese translation of built-in attributes (PR #4066) (*@nguyenhoa93*)
 
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
