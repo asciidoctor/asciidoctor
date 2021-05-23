@@ -121,7 +121,7 @@ module Asciidoctor
           end
           opts.on('--failure-level LEVEL', %w(warning WARNING error ERROR info INFO), 'set minimum logging level that triggers non-zero exit code: [WARN, ERROR, INFO] (default: FATAL)') do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
-            self[:failure_level] = ::Logger::Severity.const_get level, false
+            self[:failure_level] = ::Logger::Severity.const_get level
           end
           opts.on('-q', '--quiet', 'silence application log messages and script warnings (default: false)') do
             self[:verbose] = 0

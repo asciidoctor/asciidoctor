@@ -59,7 +59,7 @@ class MemoryLogger < ::Logger
   end
 
   def max_severity
-    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity], false }.max
+    empty? ? nil : @messages.map {|m| Severity.const_get m[:severity] }.max
   end
 end
 
