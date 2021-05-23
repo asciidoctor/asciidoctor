@@ -20,10 +20,10 @@ class Logger < ::Logger
   end
 
   class BasicFormatter < Formatter
-    SEVERITY_LABELS = { 'WARN' => 'WARNING', 'FATAL' => 'FAILED' }
+    SEVERITY_LABEL_SUBSTITUTES = { 'WARN' => 'WARNING', 'FATAL' => 'FAILED' }
 
     def call severity, _, progname, msg
-      %(#{progname}: #{SEVERITY_LABELS[severity] || severity}: #{::String === msg ? msg : msg.inspect}#{LF})
+      %(#{progname}: #{SEVERITY_LABEL_SUBSTITUTES[severity] || severity}: #{::String === msg ? msg : msg.inspect}#{LF})
     end
   end
 
@@ -35,7 +35,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  SEVERITY_LABELS = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h
+  SEVERITY_SYMBOL_BY_VALUE = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h
 
   attr_reader :messages
 
@@ -46,7 +46,7 @@ class MemoryLogger < ::Logger
 
   def add severity, message = nil, progname = nil
     message ||= block_given? ? yield : progname
-    @messages << { severity: SEVERITY_LABELS[severity || UNKNOWN], message: message }
+    @messages << { severity: SEVERITY_SYMBOL_BY_VALUE[severity || UNKNOWN], message: message }
     true
   end
 
