@@ -11,6 +11,14 @@ context 'Options' do
     end
   end
 
+  test 'should show safe modes in severity order' do
+    redirect_streams do |stdout, stderr|
+      exitval = Asciidoctor::Cli::Options.parse!(%w(-h))
+      assert_equal 0, exitval
+      assert_match(/unsafe, safe, server, secure/, stdout.string)
+    end
+  end
+
   test 'should print usage and return error code 0 when help flag is unknown' do
     exitval, output = redirect_streams do |out, _|
       [Asciidoctor::Cli::Options.parse!(%w(-h unknown)), out.string]
