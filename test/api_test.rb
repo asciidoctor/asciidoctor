@@ -249,7 +249,7 @@ context 'API' do
 
       doc = Asciidoctor.load('text', attributes: Hashish.new)
       assert_kind_of Hash, doc.attributes
-      assert doc.attributes.has_key?('toc')
+      assert doc.attributes.key?('toc')
     end
 
     test 'should not expand value of docdir attribute if specified via API' do
