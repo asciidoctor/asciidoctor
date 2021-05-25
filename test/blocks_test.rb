@@ -2651,7 +2651,7 @@ context 'Blocks' do
       output = doc.convert
       assert_xpath '//*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
       assert_xpath '//*[@class="imageblock"]/*[@class="title"][text()="Voila! The AsciiDoc Tiger"]', output, 1
-      refute doc.attributes.has_key?('figure-number')
+      refute doc.attributes.key?('figure-number')
     end
 
     test 'can align image in DocBook backend' do

@@ -400,9 +400,9 @@ context 'Document' do
     test 'convert methods on built-in converter are registered by default' do
       doc = document_from_string ''
       assert_equal 'html5', doc.attributes['backend']
-      assert doc.attributes.has_key? 'backend-html5'
+      assert doc.attributes.key? 'backend-html5'
       assert_equal 'html', doc.attributes['basebackend']
-      assert doc.attributes.has_key? 'basebackend-html'
+      assert doc.attributes.key? 'basebackend-html'
       converter = doc.converter
       assert_kind_of Asciidoctor::Converter::Html5Converter, converter
       BUILT_IN_ELEMENTS.each do |element|
@@ -414,9 +414,9 @@ context 'Document' do
       doc = document_from_string '', attributes: { 'backend' => 'docbook5' }
       converter = doc.converter
       assert_equal 'docbook5', doc.attributes['backend']
-      assert doc.attributes.has_key? 'backend-docbook5'
+      assert doc.attributes.key? 'backend-docbook5'
       assert_equal 'docbook', doc.attributes['basebackend']
-      assert doc.attributes.has_key? 'basebackend-docbook'
+      assert doc.attributes.key? 'basebackend-docbook'
       converter = doc.converter
       assert_kind_of Asciidoctor::Converter::DocBook5Converter, converter
       BUILT_IN_ELEMENTS.each do |element|
