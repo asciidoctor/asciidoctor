@@ -1469,7 +1469,7 @@ context 'API' do
 
     test 'should resolve :to_dir option correctly when both :to_dir and :to_file options are set to an absolute path' do
       begin
-        sample_input_path = fixture_path 'sample.adoc' 
+        sample_input_path = fixture_path 'sample.adoc'
         sample_output_file = Tempfile.new %w(out- .html)
         sample_output_path = sample_output_file.path
         sample_output_dir = File.dirname sample_output_path

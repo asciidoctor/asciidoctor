@@ -169,7 +169,7 @@ context 'Invoker' do
       warnings = nil
       redirect_streams do |out, err|
         invoke_cli_to_buffer(%w(-w -o /dev/null), '-') {
-          A_CONST = 10  
+          A_CONST = 10
           A_CONST = 20
         }
         warnings = err.string
