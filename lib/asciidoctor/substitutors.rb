@@ -945,12 +945,12 @@ module Substitutors
     highlight_lines = resolve_lines_to_highlight source, (attr 'highlight'), start_line_number if attr? 'highlight'
 
     highlighted, source_offset = syntax_hl.highlight self, source, (attr 'language'),
-      callouts: callout_marks,
-      css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
-      highlight_lines: highlight_lines,
-      number_lines: linenums_mode,
-      start_line_number: start_line_number,
-      style: doc_attrs[%(#{syntax_hl_name}-style)]
+        callouts: callout_marks,
+        css_mode: (doc_attrs[%(#{syntax_hl_name}-css)] || :class).to_sym,
+        highlight_lines: highlight_lines,
+        number_lines: linenums_mode,
+        start_line_number: start_line_number,
+        style: doc_attrs[%(#{syntax_hl_name}-style)]
 
     # fix passthrough placeholders that got caught up in syntax highlighting
     highlighted = highlighted.gsub HighlightedPassSlotRx, %(#{PASS_START}\\1#{PASS_END}) unless @passthroughs.empty?
