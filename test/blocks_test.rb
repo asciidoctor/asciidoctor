@@ -1304,7 +1304,7 @@ context 'Blocks' do
       ----
       EOS
 
-      expected = (input.lines.slice 4, 5).map {|l| l.sub '    ', ' '}.join.chop
+      expected = (input.lines.slice 4, 5).map {|l| l.sub '    ', ' ' }.join.chop
 
       output = convert_string_to_embedded input
       assert_css 'pre', output, 1
@@ -1404,7 +1404,7 @@ context 'Blocks' do
       EOS
 
       block = block_from_string input
-      assert_equal [:specialcharacters,:callouts,:quotes], block.subs
+      assert_equal [:specialcharacters, :callouts, :quotes], block.subs
       output = block.convert
       assert_includes output, 'Map&lt;String, String&gt; <strong>attributes</strong>;'
       assert_xpath '//pre/b[text()="(1)"]', output, 1
