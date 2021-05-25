@@ -2,16 +2,16 @@
 
 require_relative 'test_helper'
 
-context "Parser" do
-  test "is_section_title?" do
+context 'Parser' do
+  test 'is_section_title?' do
     assert Asciidoctor::Parser.is_section_title?('AsciiDoc Home Page', '==================')
     assert Asciidoctor::Parser.is_section_title?('=== AsciiDoc Home Page')
   end
 
   test 'sanitize attribute name' do
-    assert_equal 'foobar', Asciidoctor::Parser.sanitize_attribute_name("Foo Bar")
-    assert_equal 'foo', Asciidoctor::Parser.sanitize_attribute_name("foo")
-    assert_equal 'foo3-bar', Asciidoctor::Parser.sanitize_attribute_name("Foo 3^ # - Bar[")
+    assert_equal 'foobar', Asciidoctor::Parser.sanitize_attribute_name('Foo Bar')
+    assert_equal 'foo', Asciidoctor::Parser.sanitize_attribute_name('foo')
+    assert_equal 'foo3-bar', Asciidoctor::Parser.sanitize_attribute_name('Foo 3^ # - Bar[')
   end
 
   test 'store attribute with value' do
@@ -169,7 +169,7 @@ context "Parser" do
     assert_equal '', attributes['footer-option']
   end
 
-  test "parse author first" do
+  test 'parse author first' do
     metadata, _ = parse_header_metadata 'Stuart'
     assert_equal 5, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -178,7 +178,7 @@ context "Parser" do
     assert_equal 'S', metadata['authorinitials']
   end
 
-  test "parse author first last" do
+  test 'parse author first last' do
     metadata, _ = parse_header_metadata 'Yukihiro Matsumoto'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -189,7 +189,7 @@ context "Parser" do
     assert_equal 'YM', metadata['authorinitials']
   end
 
-  test "parse author first middle last" do
+  test 'parse author first middle last' do
     metadata, _ = parse_header_metadata 'David Heinemeier Hansson'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -201,7 +201,7 @@ context "Parser" do
     assert_equal 'DHH', metadata['authorinitials']
   end
 
-  test "parse author first middle last email" do
+  test 'parse author first middle last email' do
     metadata, _ = parse_header_metadata 'David Heinemeier Hansson <rails@ruby-lang.org>'
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -214,7 +214,7 @@ context "Parser" do
     assert_equal 'DHH', metadata['authorinitials']
   end
 
-  test "parse author first email" do
+  test 'parse author first email' do
     metadata, _ = parse_header_metadata 'Stuart <founder@asciidoc.org>'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -225,7 +225,7 @@ context "Parser" do
     assert_equal 'S', metadata['authorinitials']
   end
 
-  test "parse author first last email" do
+  test 'parse author first last email' do
     metadata, _ = parse_header_metadata 'Stuart Rackham <founder@asciidoc.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -237,7 +237,7 @@ context "Parser" do
     assert_equal 'SR', metadata['authorinitials']
   end
 
-  test "parse author with hyphen" do
+  test 'parse author with hyphen' do
     metadata, _ = parse_header_metadata 'Tim Berners-Lee <founder@www.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -249,7 +249,7 @@ context "Parser" do
     assert_equal 'TB', metadata['authorinitials']
   end
 
-  test "parse author with single quote" do
+  test 'parse author with single quote' do
     metadata, _ = parse_header_metadata 'Stephen O\'Grady <founder@redmonk.com>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -261,7 +261,7 @@ context "Parser" do
     assert_equal 'SO', metadata['authorinitials']
   end
 
-  test "parse author with dotted initial" do
+  test 'parse author with dotted initial' do
     metadata, _ = parse_header_metadata 'Heiko W. Rupp <hwr@example.de>'
     assert_equal 8, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -274,7 +274,7 @@ context "Parser" do
     assert_equal 'HWR', metadata['authorinitials']
   end
 
-  test "parse author with underscore" do
+  test 'parse author with underscore' do
     metadata, _ = parse_header_metadata 'Tim_E Fella'
     assert_equal 6, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -308,7 +308,7 @@ context "Parser" do
     assert_equal '李四', metadata['authorinitials']
   end
 
-  test "parse author condenses whitespace" do
+  test 'parse author condenses whitespace' do
     metadata, _ = parse_header_metadata 'Stuart       Rackham     <founder@asciidoc.org>'
     assert_equal 7, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -320,7 +320,7 @@ context "Parser" do
     assert_equal 'SR', metadata['authorinitials']
   end
 
-  test "parse invalid author line becomes author" do
+  test 'parse invalid author line becomes author' do
     metadata, _ = parse_header_metadata '   Stuart       Rackham, founder of AsciiDoc   <founder@asciidoc.org>'
     assert_equal 5, metadata.size
     assert_equal 1, metadata['authorcount']
@@ -425,7 +425,7 @@ context "Parser" do
     assert_equal 'team', doc.attributes['lastname']
   end
 
-  test "parse rev number date remark" do
+  test 'parse rev number date remark' do
     input = <<~'EOS'
     Ryan Waldron
     v0.0.7, 2013-12-18: The first release you can stand on
@@ -465,7 +465,7 @@ context "Parser" do
     assert_equal 'The one you can count on!', (doc.attr 'revremark')
   end
 
-  test "parse rev date" do
+  test 'parse rev date' do
     input = <<~'EOS'
     Ryan Waldron
     2013-12-18
@@ -499,7 +499,7 @@ context "Parser" do
   end
 
   # while compliant w/ AsciiDoc, this is just sloppy parsing
-  test "treats arbitrary text on rev line as revdate" do
+  test 'treats arbitrary text on rev line as revdate' do
     input = <<~'EOS'
     Ryan Waldron
     foobar
@@ -509,7 +509,7 @@ context "Parser" do
     assert_equal 'foobar', metadata['revdate']
   end
 
-  test "parse rev date remark" do
+  test 'parse rev date remark' do
     input = <<~'EOS'
     Ryan Waldron
     2013-12-18:  The first release you can stand on
@@ -520,7 +520,7 @@ context "Parser" do
     assert_equal 'The first release you can stand on', metadata['revremark']
   end
 
-  test "should not mistake attribute entry as rev remark" do
+  test 'should not mistake attribute entry as rev remark' do
     input = <<~'EOS'
     Joe Cool
     :page-layout: post
@@ -530,7 +530,7 @@ context "Parser" do
     refute metadata.key?('revdate')
   end
 
-  test "parse rev remark only" do
+  test 'parse rev remark only' do
     # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
     input = <<~EOS
     Joe Cool
@@ -541,7 +541,7 @@ context "Parser" do
     refute metadata.key?('revdate')
   end
 
-  test "skip line comments before author" do
+  test 'skip line comments before author' do
     input = <<~'EOS'
     // Asciidoctor
     // release artist
@@ -556,7 +556,7 @@ context "Parser" do
     assert_equal 'RW', metadata['authorinitials']
   end
 
-  test "skip block comment before author" do
+  test 'skip block comment before author' do
     input = <<~'EOS'
     ////
     Asciidoctor
@@ -573,7 +573,7 @@ context "Parser" do
     assert_equal 'RW', metadata['authorinitials']
   end
 
-  test "skip block comment before rev" do
+  test 'skip block comment before rev' do
     input = <<~'EOS'
     Ryan Waldron
     ////

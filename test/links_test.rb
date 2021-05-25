@@ -5,15 +5,15 @@ require_relative 'test_helper'
 context 'Links' do
 
   test 'qualified url inline with text' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'http://asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org.")
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'http://asciidoc.org']", convert_string('The AsciiDoc project is located at http://asciidoc.org.')
   end
 
   test 'qualified url with role inline with text' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org[role=project].")
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", convert_string('The AsciiDoc project is located at http://asciidoc.org[role=project].')
   end
 
   test 'qualified http url inline with hide-uri-scheme set' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org.", attributes: { 'hide-uri-scheme' => '' })
+    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'asciidoc.org']", convert_string('The AsciiDoc project is located at http://asciidoc.org.', attributes: { 'hide-uri-scheme' => '' })
   end
 
   test 'qualified file url inline with label' do
@@ -42,7 +42,7 @@ context 'Links' do
   end
 
   test 'qualified url with backslash label' do
-    assert_xpath "//a[@href='https://google.com'][text() = 'Google for \\']", convert_string("I advise you to https://google.com[Google for +\\+]")
+    assert_xpath "//a[@href='https://google.com'][text() = 'Google for \\']", convert_string('I advise you to https://google.com[Google for +\\+]')
   end
 
   test 'qualified url with label using link macro' do
@@ -201,7 +201,7 @@ context 'Links' do
   end
 
   test 'qualified url following smart apostrophe' do
-    output = convert_string_to_embedded("l&#8217;http://www.irit.fr[IRIT]")
+    output = convert_string_to_embedded 'l&#8217;http://www.irit.fr[IRIT]'
     assert_match(/l&#8217;<a href=/, output)
   end
 

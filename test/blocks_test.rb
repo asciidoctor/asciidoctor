@@ -140,7 +140,7 @@ context 'Blocks' do
       assert_xpath '//p', output, 2
     end
 
-    test "can convert with block comment at end of document with trailing newlines" do
+    test 'can convert with block comment at end of document with trailing newlines' do
       input = <<~'EOS'
       paragraph
 
@@ -154,7 +154,7 @@ context 'Blocks' do
       refute_match(/block comment/, output)
     end
 
-    test "trailing newlines after block comment at end of document does not create paragraph" do
+    test 'trailing newlines after block comment at end of document does not create paragraph' do
       input = <<~'EOS'
       paragraph
 
@@ -733,8 +733,8 @@ context 'Blocks' do
     end
   end
 
-  context "Example Blocks" do
-    test "can convert example block" do
+  context 'Example Blocks' do
+    test 'can convert example block' do
       input = <<~'EOS'
       ====
       This is an example of an example block.
@@ -1062,7 +1062,7 @@ context 'Blocks' do
     end
   end
 
-  context "Preformatted Blocks" do
+  context 'Preformatted Blocks' do
     test 'should separate adjacent paragraphs and listing into blocks' do
       input = <<~'EOS'
       paragraph 1
@@ -1617,8 +1617,8 @@ context 'Blocks' do
     end
   end
 
-  context "Open Blocks" do
-    test "can convert open block" do
+  context 'Open Blocks' do
+    test 'can convert open block' do
       input = <<~'EOS'
       --
       This is an open block.
@@ -1631,7 +1631,7 @@ context 'Blocks' do
       assert_xpath '//*[@class="openblock"]//p', output, 2
     end
 
-    test "open block can contain another block" do
+    test 'open block can contain another block' do
       input = <<~'EOS'
       --
       This is an open block.
@@ -2585,7 +2585,7 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//img[@src="images/lions-and-tigers.png"][@alt="lions and tigers"]', output, 1
     end
 
-    test "can convert block image with alt text and height and width" do
+    test 'can convert block image with alt text and height and width' do
       input = 'image::images/tiger.png[Tiger, 200, 300]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
@@ -2598,7 +2598,7 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@width]', output, 0
     end
 
-    test "can convert block image with link" do
+    test 'can convert block image with link' do
       input = <<~'EOS'
       image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
       EOS

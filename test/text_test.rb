@@ -2,14 +2,14 @@
 
 require_relative 'test_helper'
 
-context "Text" do
-  test "proper encoding to handle utf8 characters in document using html backend" do
+context 'Text' do
+  test 'proper encoding to handle utf8 characters in document using html backend' do
     output = example_document(:encoding).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
   end
 
-  test "proper encoding to handle utf8 characters in embedded document using html backend" do
+  test 'proper encoding to handle utf8 characters in embedded document using html backend' do
     output = example_document(:encoding, standalone: false).convert
     assert_xpath '//p', output, 4
     assert_xpath '//a', output, 1
@@ -30,7 +30,7 @@ context "Text" do
   # NOTE this test ensures we have the encoding line on block templates too
   test 'proper encoding to handle utf8 characters in arbitrary block' do
     input = []
-    input << "[verse]\n"
+    input << %([verse]\n)
     input += (File.readlines (sample_doc_path :encoding), mode: Asciidoctor::FILE_READ_MODE)
     doc = empty_document
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
@@ -52,8 +52,8 @@ context "Text" do
         convert_string('All your <em>inline</em> markup belongs to <strong>us</strong>!'))
   end
 
-  test "line breaks" do
-    assert_xpath "//br", convert_string("Well this is +\njust fine and dandy, isn't it?"), 1
+  test 'line breaks' do
+    assert_xpath '//br', convert_string("Well this is +\njust fine and dandy, isn't it?"), 1
   end
 
   test 'single- and double-quoted text' do
@@ -70,7 +70,7 @@ context "Text" do
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
         convert_inline_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), attributes: { 'compat-mode' => '' })
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
-        convert_inline_string(%q("`Our business is constantly changing`" or "`We need faster time to market.`"))
+        convert_inline_string('"`Our business is constantly changing`" or "`We need faster time to market.`"')
   end
 
   test 'horizontal rule' do
@@ -82,10 +82,10 @@ context "Text" do
     ...from this line.
     EOS
     output = convert_string_to_embedded input
-    assert_xpath "//hr", output, 1
-    assert_xpath "/*[@class='paragraph']", output, 2
-    assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
-    assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+    assert_xpath '//hr', output, 1
+    assert_xpath '/*[@class="paragraph"]', output, 2
+    assert_xpath '(/*[@class="paragraph"])[1]/following-sibling::hr', output, 1
+    assert_xpath '/hr/following-sibling::*[@class="paragraph"]', output, 1
   end
 
   test 'markdown horizontal rules' do
@@ -115,10 +115,10 @@ context "Text" do
         ...from this line.
         EOS
         output = convert_string_to_embedded input
-        assert_xpath "//hr", output, 1
-        assert_xpath "/*[@class='paragraph']", output, 2
-        assert_xpath "(/*[@class='paragraph'])[1]/following-sibling::hr", output, 1
-        assert_xpath "/hr/following-sibling::*[@class='paragraph']", output, 1
+        assert_xpath '//hr', output, 1
+        assert_xpath '/*[@class="paragraph"]', output, 2
+        assert_xpath '(/*[@class="paragraph"])[1]/following-sibling::hr', output, 1
+        assert_xpath '/hr/following-sibling::*[@class="paragraph"]', output, 1
       end
     end
   end
@@ -178,8 +178,8 @@ context "Text" do
     end
   end
 
-  test "emphasized text using underscore characters" do
-    assert_xpath "//em", convert_string("An _emphatic_ no")
+  test 'emphasized text using underscore characters' do
+    assert_xpath '//em', convert_string('An _emphatic_ no')
   end
 
   test 'emphasized text with single quote using apostrophe characters' do
@@ -193,7 +193,7 @@ context "Text" do
     assert_xpath %(//p[text()="It's 'Johnny's' phone"]), convert_string(%q(It\\'s 'Johnny\\'s' phone))
   end
 
-  test "escaped single quote is restored as single quote" do
+  test 'escaped single quote is restored as single quote' do
     assert_xpath "//p[contains(text(), \"Let's do it!\")]", convert_string("Let\\'s do it!")
   end
 
@@ -205,20 +205,20 @@ context "Text" do
     assert_xpath %(//p[text()="\\'single quoted string'"]), convert_string_to_embedded(%(\\'single quoted string'))
   end
 
-  test "emphasized text at end of line" do
-    assert_xpath "//em", convert_string("This library is _awesome_")
+  test 'emphasized text at end of line' do
+    assert_xpath '//em', convert_string('This library is _awesome_')
   end
 
-  test "emphasized text at beginning of line" do
-    assert_xpath "//em", convert_string("_drop_ it")
+  test 'emphasized text at beginning of line' do
+    assert_xpath '//em', convert_string('_drop_ it')
   end
 
-  test "emphasized text across line" do
-    assert_xpath "//em", convert_string("_check it_")
+  test 'emphasized text across line' do
+    assert_xpath '//em', convert_string('_check it_')
   end
 
-  test "unquoted text" do
-    refute_match(/#/, convert_string("An #unquoted# word"))
+  test 'unquoted text' do
+    refute_include '#', convert_string('An #unquoted# word')
   end
 
   test 'backticks and straight quotes in text' do
@@ -240,46 +240,46 @@ context "Text" do
     assert_match(/one&amp;#44;two/, convert_string_to_embedded('one++&#44;++two'))
   end
 
-  context "basic styling" do
+  context 'basic styling' do
     setup do
-      @output = convert_string("A *BOLD* word.  An _italic_ word.  A `mono` word.  ^superscript!^ and some ~subscript~.")
+      @output = convert_string 'A *BOLD* word.  An _italic_ word.  A `mono` word.  ^superscript!^ and some ~subscript~.'
     end
 
-    test "strong" do
-      assert_xpath "//strong", @output, 1
+    test 'strong' do
+      assert_xpath '//strong', @output, 1
     end
 
-    test "italic" do
-      assert_xpath "//em", @output, 1
+    test 'italic' do
+      assert_xpath '//em', @output, 1
     end
 
-    test "monospaced" do
-      assert_xpath "//code", @output, 1
+    test 'monospaced' do
+      assert_xpath '//code', @output, 1
     end
 
-    test "superscript" do
-      assert_xpath "//sup", @output, 1
+    test 'superscript' do
+      assert_xpath '//sup', @output, 1
     end
 
-    test "subscript" do
-      assert_xpath "//sub", @output, 1
+    test 'subscript' do
+      assert_xpath '//sub', @output, 1
     end
 
-    test "passthrough" do
-      assert_xpath "//code", convert_string("This is +passed through+."), 0
-      assert_xpath "//code", convert_string("This is +passed through and monospaced+.", attributes: { 'compat-mode' => '' }), 1
+    test 'passthrough' do
+      assert_xpath '//code', convert_string('This is +passed through+.'), 0
+      assert_xpath '//code', convert_string('This is +passed through and monospaced+.', attributes: { 'compat-mode' => '' }), 1
     end
 
-    test "nested styles" do
-      output = convert_string("Winning *big _time_* in the +city *boyeeee*+.", attributes: { 'compat-mode' => '' })
+    test 'nested styles' do
+      output = convert_string 'Winning *big _time_* in the +city *boyeeee*+.', attributes: { 'compat-mode' => '' }
 
-      assert_xpath "//strong/em", output
-      assert_xpath "//code/strong", output
+      assert_xpath '//strong/em', output
+      assert_xpath '//code/strong', output
 
-      output = convert_string("Winning *big _time_* in the `city *boyeeee*`.")
+      output = convert_string('Winning *big _time_* in the `city *boyeeee*`.')
 
-      assert_xpath "//strong/em", output
-      assert_xpath "//code/strong", output
+      assert_xpath '//strong/em', output
+      assert_xpath '//code/strong', output
     end
 
     test 'unconstrained quotes' do

@@ -442,7 +442,7 @@ context 'Invoker' do
   test 'should convert all files that matches a glob expression' do
     basic_outpath = fixture_path 'basic.html'
     begin
-      invoke_cli_to_buffer [], "ba*.adoc"
+      invoke_cli_to_buffer [], 'ba*.adoc'
       assert File.exist?(basic_outpath)
     ensure
       FileUtils.rm_f(basic_outpath)

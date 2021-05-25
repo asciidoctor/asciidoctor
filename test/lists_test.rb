@@ -2,9 +2,9 @@
 
 require_relative 'test_helper'
 
-context "Bulleted lists (:ulist)" do
-  context "Simple lists" do
-    test "dash elements with no blank lines" do
+context 'Bulleted lists (:ulist)' do
+  context 'Simple lists' do
+    test 'dash elements with no blank lines' do
       input = <<~'EOS'
       List
       ====
@@ -40,7 +40,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '//ul/li', output, 3
     end
 
-    test "dash elements separated by blank lines should merge lists" do
+    test 'dash elements separated by blank lines should merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -76,7 +76,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath %((//ul/li)[2]/p[text()="Boo\nmore text"]), output, 1
     end
 
-    test "dash elements separated by a line comment offset by blank lines should not merge lists" do
+    test 'dash elements separated by a line comment offset by blank lines should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -94,7 +94,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[2]/li', output, 1
     end
 
-    test "dash elements separated by a block title offset by a blank line should not merge lists" do
+    test 'dash elements separated by a block title offset by a blank line should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -112,7 +112,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
     end
 
-    test "dash elements separated by an attribute entry offset by a blank line should not merge lists" do
+    test 'dash elements separated by an attribute entry offset by a blank line should not merge lists' do
       input = <<~'EOS'
       == List
 
@@ -293,7 +293,7 @@ context "Bulleted lists (:ulist)" do
       refute_includes output, 'term:: def'
     end
 
-    test "a literal paragraph offset by blank lines in list content is appended as a literal block" do
+    test 'a literal paragraph offset by blank lines in list content is appended as a literal block' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       List
@@ -336,7 +336,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '((//li)[1]//pre)[2][text()="more <code>text</code>"]', output, 1
     end
 
-    test "a literal paragraph offset by a blank line in list content followed by line with continuation is appended as two blocks" do
+    test 'a literal paragraph offset by a blank line in list content followed by line with continuation is appended as two blocks' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       List
@@ -464,7 +464,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul/li)[2]/p[text()="list item 2"]', output, 1
     end
 
-    test "a literal paragraph with a line that appears as a list item that is followed by a continuation should create two blocks" do
+    test 'a literal paragraph with a line that appears as a list item that is followed by a continuation should create two blocks' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       * Foo
@@ -487,7 +487,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]/following-sibling::*[@class="paragraph"]/p[text()="para"]', output, 1
     end
 
-    test "consecutive literal paragraph offset by blank lines in list content are appended as a literal blocks" do
+    test 'consecutive literal paragraph offset by blank lines in list content are appended as a literal blocks' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       List
@@ -513,7 +513,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[2]//pre[text()='more\nliteral']", output, 1
     end
 
-    test "a literal paragraph without a trailing blank line consumes following list items" do
+    test 'a literal paragraph without a trailing blank line consumes following list items' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       List
@@ -534,7 +534,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[1]//pre[text() = '  literal\n- Boo\n- Blech']", output, 1
     end
 
-    test "asterisk elements with no blank lines" do
+    test 'asterisk elements with no blank lines' do
       input = <<~'EOS'
       List
       ====
@@ -595,7 +595,7 @@ context "Bulleted lists (:ulist)" do
       end
     end
 
-    test "asterisk elements separated by blank lines should merge lists" do
+    test 'asterisk elements separated by blank lines should merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -631,7 +631,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath %((//ul/li)[2]/p[text()="Boo\nmore text"]), output, 1
     end
 
-    test "asterisk elements separated by a line comment offset by blank lines should not merge lists" do
+    test 'asterisk elements separated by a line comment offset by blank lines should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -649,7 +649,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[2]/li', output, 1
     end
 
-    test "asterisk elements separated by a block title offset by a blank line should not merge lists" do
+    test 'asterisk elements separated by a block title offset by a blank line should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -667,7 +667,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
     end
 
-    test "asterisk elements separated by an attribute entry offset by a blank line should not merge lists" do
+    test 'asterisk elements separated by an attribute entry offset by a blank line should not merge lists' do
       input = <<~'EOS'
       == List
 
@@ -683,7 +683,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[2]/li', output, 1
     end
 
-    test "list should terminate before next lower section heading" do
+    test 'list should terminate before next lower section heading' do
       input = <<~'EOS'
       List
       ====
@@ -701,7 +701,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '//h2[text() = "Section"]', output, 1
     end
 
-    test "list should terminate before next lower section heading with implicit id" do
+    test 'list should terminate before next lower section heading with implicit id' do
       input = <<~'EOS'
       List
       ====
@@ -760,8 +760,8 @@ context "Bulleted lists (:ulist)" do
     end
   end
 
-  context "Lists with inline markup" do
-    test "quoted text" do
+  context 'Lists with inline markup' do
+    test 'quoted text' do
       input = <<~'EOS'
       List
       ====
@@ -778,7 +778,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul/li)[3]//code', output, 1
     end
 
-    test "attribute substitutions" do
+    test 'attribute substitutions' do
       input = <<~'EOS'
       List
       ====
@@ -794,7 +794,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul/li)[2]//p[text() = "Take me to a bar."]', output, 1
     end
 
-    test "leading dot is treated as text not block title" do
+    test 'leading dot is treated as text not block title' do
       input = <<~'EOS'
       * .first
       * .second
@@ -808,7 +808,7 @@ context "Bulleted lists (:ulist)" do
       end
     end
 
-    test "word ending sentence on continuing line not treated as a list item" do
+    test 'word ending sentence on continuing line not treated as a list item' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       A. This is the story about
@@ -885,8 +885,8 @@ context "Bulleted lists (:ulist)" do
     end
   end
 
-  context "Nested lists" do
-    test "asterisk element mixed with dash elements should be nested" do
+  context 'Nested lists' do
+    test 'asterisk element mixed with dash elements should be nested' do
       input = <<~'EOS'
       List
       ====
@@ -902,7 +902,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[1]/li//ul/li', output, 1
     end
 
-    test "dash element mixed with asterisks elements should be nested" do
+    test 'dash element mixed with asterisks elements should be nested' do
       input = <<~'EOS'
       List
       ====
@@ -918,7 +918,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[1]/li//ul/li', output, 1
     end
 
-    test "lines prefixed with alternating list markers separated by blank lines should be nested" do
+    test 'lines prefixed with alternating list markers separated by blank lines should be nested' do
       input = <<~'EOS'
       List
       ====
@@ -937,7 +937,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[1]/li//ul/li', output, 1
     end
 
-    test "nested elements (2) with asterisks" do
+    test 'nested elements (2) with asterisks' do
       input = <<~'EOS'
       List
       ====
@@ -953,7 +953,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ul)[1]/li//ul/li', output, 1
     end
 
-    test "nested elements (3) with asterisks" do
+    test 'nested elements (3) with asterisks' do
       input = <<~'EOS'
       List
       ====
@@ -970,7 +970,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(((//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
     end
 
-    test "nested elements (4) with asterisks" do
+    test 'nested elements (4) with asterisks' do
       input = <<~'EOS'
       List
       ====
@@ -989,7 +989,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '((((//ul)[1]/li//ul)[1]/li//ul)[1]/li//ul)[1]/li', output, 1
     end
 
-    test "nested elements (5) with asterisks" do
+    test 'nested elements (5) with asterisks' do
       input = <<~'EOS'
       List
       ====
@@ -1051,7 +1051,7 @@ context "Bulleted lists (:ulist)" do
       assert_includes output, '•'
     end
 
-    test "nested ordered elements (2)" do
+    test 'nested ordered elements (2)' do
       input = <<~'EOS'
       List
       ====
@@ -1067,7 +1067,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//ol)[1]/li//ol/li', output, 1
     end
 
-    test "nested ordered elements (3)" do
+    test 'nested ordered elements (3)' do
       input = <<~'EOS'
       List
       ====
@@ -1118,7 +1118,7 @@ context "Bulleted lists (:ulist)" do
       assert_equal 2, lists[3].level
     end
 
-    test "nested unordered inside ordered elements" do
+    test 'nested unordered inside ordered elements' do
       input = <<~'EOS'
       List
       ====
@@ -1134,7 +1134,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '((//ol)[1]/li//ul)[1]/li', output, 1
     end
 
-    test "nested ordered inside unordered elements" do
+    test 'nested ordered inside unordered elements' do
       input = <<~'EOS'
       List
       ====
@@ -1171,7 +1171,7 @@ context "Bulleted lists (:ulist)" do
       assert_css '.ulist > ul > li + li > p', output, 1
     end
 
-    test "lines with alternating markers of unordered and ordered list types separated by blank lines should be nested" do
+    test 'lines with alternating markers of unordered and ordered list types separated by blank lines should be nested' do
       input = <<~'EOS'
       List
       ====
@@ -1238,7 +1238,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '(//*[@class="ulist"])[1]/following-sibling::*[@class="literalblock"]/*[@class="title"]', output, 1
     end
 
-    test "lines with alternating markers of bulleted and description list types separated by blank lines should be nested" do
+    test 'lines with alternating markers of bulleted and description list types separated by blank lines should be nested' do
       input = <<~'EOS'
       List
       ====
@@ -1257,7 +1257,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '//ul[1]/li//dl[1]/dd', output, 1
     end
 
-    test "nested ordered with attribute inside unordered elements" do
+    test 'nested ordered with attribute inside unordered elements' do
       input = <<~'EOS'
       Blah
       ====
@@ -1275,8 +1275,8 @@ context "Bulleted lists (:ulist)" do
     end
   end
 
-  context "List continuations" do
-    test "adjacent list continuation line attaches following paragraph" do
+  context 'List continuations' do
+    test 'adjacent list continuation line attaches following paragraph' do
       input = <<~'EOS'
       Lists
       =====
@@ -1296,7 +1296,7 @@ context "Bulleted lists (:ulist)" do
       assert_xpath '//ul/li[1]/*[@class = "paragraph"]/p[text() = "Item one, paragraph two"]', output, 1
     end
 
-    test "adjacent list continuation line attaches following block" do
+    test 'adjacent list continuation line attaches following block' do
       input = <<~'EOS'
       Lists
       =====
@@ -1757,7 +1757,7 @@ context "Bulleted lists (:ulist)" do
 
     # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
 =begin
-    test "consecutive list continuation lines are folded" do
+    test 'consecutive list continuation lines are folded' do
       input = <<~'EOS'
       Lists
       =====
@@ -1802,9 +1802,9 @@ context "Bulleted lists (:ulist)" do
   end
 end
 
-context "Ordered lists (:olist)" do
-  context "Simple lists" do
-    test "dot elements with no blank lines" do
+context 'Ordered lists (:olist)' do
+  context 'Simple lists' do
+    test 'dot elements with no blank lines' do
       input = <<~'EOS'
       List
       ====
@@ -1931,7 +1931,7 @@ context "Ordered lists (:olist)" do
       assert_css '.olist ol.loweralpha', output, 1
     end
 
-    test "dot elements separated by blank lines should merge lists" do
+    test 'dot elements separated by blank lines should merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -1988,7 +1988,7 @@ context "Ordered lists (:olist)" do
       assert_xpath %((//ol/li)[2]/p[text()="Boo\nmore text"]), output, 1
     end
 
-    test "dot elements separated by line comment offset by blank lines should not merge lists" do
+    test 'dot elements separated by line comment offset by blank lines should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -2006,7 +2006,7 @@ context "Ordered lists (:olist)" do
       assert_xpath '(//ol)[2]/li', output, 1
     end
 
-    test "dot elements separated by a block title offset by a blank line should not merge lists" do
+    test 'dot elements separated by a block title offset by a blank line should not merge lists' do
       input = <<~'EOS'
       List
       ====
@@ -2024,7 +2024,7 @@ context "Ordered lists (:olist)" do
       assert_xpath '(//ol)[2]/preceding-sibling::*[@class = "title"][text() = "Also"]', output, 1
     end
 
-    test "dot elements separated by an attribute entry offset by a blank line should not merge lists" do
+    test 'dot elements separated by an attribute entry offset by a blank line should not merge lists' do
       input = <<~'EOS'
       == List
 
@@ -2105,8 +2105,8 @@ context "Ordered lists (:olist)" do
   end
 end
 
-context "Description lists (:dlist)" do
-  context "Simple lists" do
+context 'Description lists (:dlist)' do
+  context 'Simple lists' do
     test 'should not parse a bare dlist delimiter as a dlist' do
       input = '::'
       output = convert_string_to_embedded input
@@ -2129,7 +2129,7 @@ context "Description lists (:dlist)" do
       assert_css 'dl > dt:empty', output, 1
     end
 
-    test "single-line adjacent elements" do
+    test 'single-line adjacent elements' do
       input = <<~'EOS'
       term1:: def1
       term2:: def2
@@ -2170,7 +2170,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "def"]', output, 1
     end
 
-    test "single-line indented adjacent elements" do
+    test 'single-line indented adjacent elements' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1:: def1
@@ -2186,7 +2186,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "single-line indented adjacent elements with tabs" do
+    test 'single-line indented adjacent elements with tabs' do
       input = <<~EOS
       term1::\tdef1
       \tterm2::\tdef2
@@ -2201,7 +2201,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "single-line elements separated by blank line should create a single list" do
+    test 'single-line elements separated by blank line should create a single list' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2213,7 +2213,7 @@ context "Description lists (:dlist)" do
       assert_xpath '//dl/dt/following-sibling::dd', output, 2
     end
 
-    test "a line comment between elements should divide them into separate lists" do
+    test 'a line comment between elements should divide them into separate lists' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2228,7 +2228,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[2]/dt', output, 1
     end
 
-    test "a ruler between elements should divide them into separate lists" do
+    test 'a ruler between elements should divide them into separate lists' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2244,7 +2244,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[2]/dt', output, 1
     end
 
-    test "a block title between elements should divide them into separate lists" do
+    test 'a block title between elements should divide them into separate lists' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2259,7 +2259,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[2]/preceding-sibling::*[@class="title"][text() = "Some more"]', output, 1
     end
 
-    test "multi-line elements with paragraph content" do
+    test 'multi-line elements with paragraph content' do
       input = <<~'EOS'
       term1::
       def1
@@ -2276,7 +2276,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line elements with indented paragraph content" do
+    test 'multi-line elements with indented paragraph content' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -2294,7 +2294,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line elements with indented paragraph content that includes comment lines" do
+    test 'multi-line elements with indented paragraph content that includes comment lines' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -2315,7 +2315,7 @@ context "Description lists (:dlist)" do
       assert_xpath %((//dl/dt)[2]/following-sibling::dd/p[text() = "def2\ndef2 continued"]), output, 1
     end
 
-    test "should not strip comment line in literal paragraph block attached to list item" do
+    test 'should not strip comment line in literal paragraph block attached to list item' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -2373,7 +2373,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line element with multiple terms" do
+    test 'multi-line element with multiple terms' do
       input = <<~'EOS'
       term1::
       term2::
@@ -2405,7 +2405,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//varlistentry)[2]/listitem[normalize-space(text())=""]', output, 1
     end
 
-    test "multi-line elements with blank line before paragraph content" do
+    test 'multi-line elements with blank line before paragraph content' do
       input = <<~'EOS'
       term1::
 
@@ -2424,7 +2424,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line elements with paragraph and literal content" do
+    test 'multi-line elements with paragraph and literal content' do
       # blank line following literal paragraph is required or else it will gobble up the second term
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
@@ -2447,7 +2447,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "mixed single and multi-line adjacent elements" do
+    test 'mixed single and multi-line adjacent elements' do
       input = <<~'EOS'
       term1:: def1
       term2::
@@ -2483,7 +2483,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dt)[2]/a[@id="grays-peak"]', output, 1
     end
 
-    test "missing space before term does not produce description list" do
+    test 'missing space before term does not produce description list' do
       input = <<~'EOS'
       term1::def1
       term2::def2
@@ -2492,7 +2492,7 @@ context "Description lists (:dlist)" do
       assert_xpath '//dl', output, 0
     end
 
-    test "literal block inside description list" do
+    test 'literal block inside description list' do
       input = <<~'EOS'
       term::
       +
@@ -2511,7 +2511,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "literal block inside description list with trailing line continuation" do
+    test 'literal block inside description list with trailing line continuation' do
       input = <<~'EOS'
       term::
       +
@@ -2531,7 +2531,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "multiple listing blocks inside description list" do
+    test 'multiple listing blocks inside description list' do
       input = <<~'EOS'
       term::
       +
@@ -2556,7 +2556,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[2]/p[text() = "def"]', output, 1
     end
 
-    test "open block inside description list" do
+    test 'open block inside description list' do
       input = <<~'EOS'
       term::
       +
@@ -2572,7 +2572,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[1]//*[@class="openblock"]//p', output, 2
     end
 
-    test "paragraph attached by a list continuation on either side in a description list" do
+    test 'paragraph attached by a list continuation on either side in a description list' do
       input = <<~'EOS'
       term1:: def1
       +
@@ -2588,7 +2588,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[1]/p/following-sibling::*[@class="paragraph"]/p[text() = "more detail"]', output, 1
     end
 
-    test "paragraph attached by a list continuation on either side to a multi-line element in a description list" do
+    test 'paragraph attached by a list continuation on either side to a multi-line element in a description list' do
       input = <<~'EOS'
       term1::
       def1
@@ -2624,7 +2624,7 @@ context "Description lists (:dlist)" do
       assert_css 'dl > dt + dd > .paragraph', output, 1
     end
 
-    test "verse paragraph inside a description list" do
+    test 'verse paragraph inside a description list' do
       input = <<~'EOS'
       term1:: def
       +
@@ -2638,7 +2638,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl/dd)[1]/*[@class="verseblock"]/pre[text() = "la la la"]', output, 1
     end
 
-    test "list inside a description list" do
+    test 'list inside a description list' do
       input = <<~'EOS'
       term1::
       * level 1
@@ -2653,7 +2653,7 @@ context "Description lists (:dlist)" do
       assert_xpath '((//dl/dd)[1]//ul)[1]//ul', output, 1
     end
 
-    test "list inside a description list offset by blank lines" do
+    test 'list inside a description list offset by blank lines' do
       input = <<~'EOS'
       term1::
 
@@ -2670,7 +2670,7 @@ context "Description lists (:dlist)" do
       assert_xpath '((//dl/dd)[1]//ul)[1]//ul', output, 1
     end
 
-    test "should only grab one line following last item if item has no inline description" do
+    test 'should only grab one line following last item if item has no inline description' do
       input = <<~'EOS'
       term1::
 
@@ -2694,7 +2694,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//*[@class="dlist"]/following-sibling::*[@class="paragraph"])[2]/p[text() = "Another new paragraph"]', output, 1
     end
 
-    test "should only grab one literal line following last item if item has no inline description" do
+    test 'should only grab one literal line following last item if item has no inline description' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -2719,7 +2719,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//*[@class="dlist"]/following-sibling::*[@class="paragraph"])[2]/p[text() = "Another new paragraph"]', output, 1
     end
 
-    test "should append subsequent paragraph literals to list item as block content" do
+    test 'should append subsequent paragraph literals to list item as block content' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -2883,7 +2883,7 @@ context "Description lists (:dlist)" do
     end
   end
 
-  context "Nested lists" do
+  context 'Nested lists' do
     test 'should not parse a nested dlist delimiter without a term as a dlist' do
       input = <<~'EOS'
       t::
@@ -2906,7 +2906,7 @@ context "Description lists (:dlist)" do
       assert_xpath %(//dl/dd/p[text()="desc\n  ;;"]), output, 1
     end
 
-    test "single-line adjacent nested elements" do
+    test 'single-line adjacent nested elements' do
       input = <<~'EOS'
       term1:: def1
       label1::: detail1
@@ -2923,7 +2923,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "single-line adjacent maximum nested elements" do
+    test 'single-line adjacent maximum nested elements' do
       input = <<~'EOS'
       term1:: def1
       label1::: detail1
@@ -2936,7 +2936,7 @@ context "Description lists (:dlist)" do
       assert_xpath '//dl//dl//dl//dl', output, 1
     end
 
-    test "single-line nested elements seperated by blank line at top level" do
+    test 'single-line nested elements seperated by blank line at top level' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2955,7 +2955,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "single-line nested elements seperated by blank line at nested level" do
+    test 'single-line nested elements seperated by blank line at nested level' do
       input = <<~'EOS'
       term1:: def1
       label1::: detail1
@@ -2974,7 +2974,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "single-line adjacent nested elements with alternate delimiters" do
+    test 'single-line adjacent nested elements with alternate delimiters' do
       input = <<~'EOS'
       term1:: def1
       label1;; detail1
@@ -2991,7 +2991,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line adjacent nested elements" do
+    test 'multi-line adjacent nested elements' do
       input = <<~'EOS'
       term1::
       def1
@@ -3011,7 +3011,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line nested elements seperated by blank line at nested level repeated" do
+    test 'multi-line nested elements seperated by blank line at nested level repeated' do
       input = <<~'EOS'
       term1::
       def1
@@ -3034,7 +3034,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl//dl/dt)[2]/following-sibling::dd/p[text() = "detail2"]', output, 1
     end
 
-    test "multi-line element with indented nested element" do
+    test 'multi-line element with indented nested element' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1::
@@ -3058,7 +3058,7 @@ context "Description lists (:dlist)" do
       assert_xpath '((//dl)[1]/dt)[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "mixed single and multi-line elements with indented nested elements" do
+    test 'mixed single and multi-line elements with indented nested elements' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       term1:: def1
@@ -3077,7 +3077,7 @@ context "Description lists (:dlist)" do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test "multi-line elements with first paragraph folded to text with adjacent nested element" do
+    test 'multi-line elements with first paragraph folded to text with adjacent nested element' do
       input = <<~'EOS'
       term1:: def1
       continued
@@ -3297,7 +3297,7 @@ context "Description lists (:dlist)" do
         assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer > simpara", output, 1
         assert_xpath "/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']", output, 1
       end
-      assert_xpath "/qandaset/qandaentry[2]/answer/simpara/following-sibling::note", output, 1
+      assert_xpath '/qandaset/qandaentry[2]/answer/simpara/following-sibling::note', output, 1
     end
 
     test 'consecutive questions should share same question element in docbook' do

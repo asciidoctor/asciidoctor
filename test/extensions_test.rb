@@ -111,7 +111,7 @@ end
 
 class StripAttributesPostprocessor < Asciidoctor::Extensions::Postprocessor
   def process document, output
-    output.gsub(/<(\w+).*?>/m, "<\\1>")
+    output.gsub %r/<(\w+).*?>/m, '<\\1>'
   end
 end
 
@@ -1226,7 +1226,7 @@ context 'Extensions' do
             named :json
             match_format :short
             process do |parent, _, attrs|
-              create_inline_pass parent, %({ #{attrs.map {|k, v| %["#{k}": "#{v}"] }.join ', '} })
+              create_inline_pass parent, %({ #{attrs.map {|k, v| %("#{k}": "#{v}") }.join ', '} })
             end
           end
 
@@ -1234,7 +1234,7 @@ context 'Extensions' do
             named :data
             process do |parent, target, attrs|
               if target == 'json'
-                create_inline_pass parent, %({ #{attrs.map {|k, v| %["#{k}": "#{v}"] }.join ', '} })
+                create_inline_pass parent, %({ #{attrs.map {|k, v| %("#{k}": "#{v}") }.join ', '} })
               else
                 nil
               end

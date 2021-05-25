@@ -96,42 +96,42 @@ context 'Attributes' do
     end
 
     test 'should delete an attribute that ends with !' do
-      doc = document_from_string(":frog: Tanglefoot\n:frog!:")
+      doc = document_from_string %(:frog: Tanglefoot\n:frog!:)
       assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that ends with ! set via API' do
-      doc = document_from_string(":frog: Tanglefoot", attributes: { 'frog!' => '' })
+      doc = document_from_string ':frog: Tanglefoot', attributes: { 'frog!' => '' }
       assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that begins with !' do
-      doc = document_from_string(":frog: Tanglefoot\n:!frog:")
+      doc = document_from_string %(:frog: Tanglefoot\n:!frog:)
       assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute that begins with ! set via API' do
-      doc = document_from_string(":frog: Tanglefoot", attributes: { '!frog' => '' })
+      doc = document_from_string ':frog: Tanglefoot', attributes: { '!frog' => '' }
       assert_nil doc.attributes['frog']
     end
 
     test 'should delete an attribute set via API to nil value' do
-      doc = document_from_string(":frog: Tanglefoot", attributes: { 'frog' => nil })
+      doc = document_from_string ':frog: Tanglefoot', attributes: { 'frog' => nil }
       assert_nil doc.attributes['frog']
     end
 
-    test "doesn't choke when deleting a non-existing attribute" do
+    test 'should not choke when deleting a non-existing attribute' do
       doc = document_from_string(':frog!:')
       assert_nil doc.attributes['frog']
     end
 
-    test "replaces special characters in attribute value" do
-      doc = document_from_string(":xml-busters: <>&")
+    test 'replaces special characters in attribute value' do
+      doc = document_from_string ':xml-busters: <>&'
       assert_equal '&lt;&gt;&amp;', doc.attributes['xml-busters']
     end
 
-    test "performs attribute substitution on attribute value" do
-      doc = document_from_string(":version: 1.0\n:release: Asciidoctor {version}")
+    test 'performs attribute substitution on attribute value' do
+      doc = document_from_string %(:version: 1.0\n:release: Asciidoctor {version})
       assert_equal 'Asciidoctor 1.0', doc.attributes['release']
     end
 
@@ -267,14 +267,14 @@ context 'Attributes' do
       assert_equal 'Go /home!', output
     end
 
-    test "apply custom substitutions to text in passthrough macro and assign to attribute" do
-      doc = document_from_string(":xml-busters: pass:[<>&]")
+    test 'apply custom substitutions to text in passthrough macro and assign to attribute' do
+      doc = document_from_string ':xml-busters: pass:[<>&]'
       assert_equal '<>&', doc.attributes['xml-busters']
-      doc = document_from_string(":xml-busters: pass:none[<>&]")
+      doc = document_from_string ':xml-busters: pass:none[<>&]'
       assert_equal '<>&', doc.attributes['xml-busters']
-      doc = document_from_string(":xml-busters: pass:specialcharacters[<>&]")
+      doc = document_from_string ':xml-busters: pass:specialcharacters[<>&]'
       assert_equal '&lt;&gt;&amp;', doc.attributes['xml-busters']
-      doc = document_from_string(":xml-busters: pass:n,-c[<(C)>]")
+      doc = document_from_string ':xml-busters: pass:n,-c[<(C)>]'
       assert_equal '<&#169;>', doc.attributes['xml-busters']
     end
 
@@ -285,7 +285,7 @@ context 'Attributes' do
       end
     end
 
-    test "attribute is treated as defined until it's not" do
+    test 'attribute is treated as defined until it is unset' do
       input = <<~'EOS'
       :holygrail:
       ifdef::holygrail[]
@@ -619,8 +619,8 @@ context 'Attributes' do
 
   context 'Interpolation' do
 
-    test "convert properly with simple names" do
-      html = convert_string(":frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!")
+    test 'convert properly with simple names' do
+      html = convert_string %(:frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!)
       assert_xpath %(//p[text()="Yo, Tanglefoot!\nBeat Spiderman!"]), html, 1
     end
 
@@ -637,12 +637,12 @@ context 'Attributes' do
       assert_xpath '//p[text()="She-Ra: The Princess of Power"]', result, 1
     end
 
-    test "convert properly with single character name" do
-      html = convert_string(":r: Ruby\n\nR is for {r}!")
+    test 'convert properly with single character name' do
+      html = convert_string %(:r: Ruby\n\nR is for {r}!)
       assert_xpath %(//p[text()="R is for Ruby!"]), html, 1
     end
 
-    test "collapses spaces in attribute names" do
+    test 'collapses spaces in attribute names' do
       input = <<~'EOS'
       Main Header
       ===========
@@ -668,8 +668,8 @@ context 'Attributes' do
       assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
-    test "attribute value gets interpretted when converting" do
-      doc = document_from_string(":google: http://google.com[Google]\n\n{google}")
+    test 'attribute value gets interpretted when converting' do
+      doc = document_from_string %(:google: http://google.com[Google]\n\n{google})
       assert_equal 'http://google.com[Google]', doc.attributes['google']
       output = doc.convert
       assert_xpath '//a[@href="http://google.com"][text() = "Google"]', output, 1
@@ -751,13 +751,13 @@ context 'Attributes' do
       assert_xpath %(//p[text()="Line 1\nLine 2"]), output, 1
     end
 
-    test "substitutes inside unordered list items" do
-      html = convert_string(":foo: bar\n* snort at the {foo}\n* yawn")
+    test 'substitutes inside unordered list items' do
+      html = convert_string %(:foo: bar\n* snort at the {foo}\n* yawn)
       assert_xpath %(//li/p[text()="snort at the bar"]), html, 1
     end
 
     test 'substitutes inside section title' do
-      output = convert_string(":prefix: Cool\n\n== {prefix} Title\n\ncontent")
+      output = convert_string %(:prefix: Cool\n\n== {prefix} Title\n\ncontent)
       assert_xpath '//h2[text()="Cool Title"]', output, 1
       assert_css 'h2#_cool_title', output, 1
     end
@@ -899,12 +899,12 @@ context 'Attributes' do
     end
 
     test 'does not disturb attribute-looking things escaped with backslash' do
-      html = convert_string(":foo: bar\nThis is a \\{foo} day.")
+      html = convert_string %(:foo: bar\nThis is a \\{foo} day.)
       assert_xpath '//p[text()="This is a {foo} day."]', html, 1
     end
 
     test 'does not disturb attribute-looking things escaped with literals' do
-      html = convert_string(":foo: bar\nThis is a +++{foo}+++ day.")
+      html = convert_string %(:foo: bar\nThis is a +++{foo}+++ day.)
       assert_xpath '//p[text()="This is a {foo} day."]', html, 1
     end
 
@@ -967,14 +967,14 @@ context 'Attributes' do
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and no value' do
-      input = "{set:foo}\n{foo}yes"
+      input = %({set:foo}\n{foo}yes)
       output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
     end
 
     test 'assigns attribute defined in attribute reference with set prefix and empty value' do
-      input = "{set:foo:}\n{foo}yes"
+      input = %({set:foo:}\n{foo}yes)
       output = convert_string_to_embedded input
       assert_xpath '//p', output, 1
       assert_xpath '//p[normalize-space(text())="yes"]', output, 1
@@ -995,24 +995,24 @@ context 'Attributes' do
     end
   end
 
-  context "Intrinsic attributes" do
+  context 'Intrinsic attributes' do
 
-    test "substitute intrinsics" do
+    test 'substitute intrinsics' do
       Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
-        html = convert_string("Look, a {#{key}} is here")
+        html = convert_string %(Look, a {#{key}} is here)
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
         assert_match(/Look, a #{Regexp.escape(value)} is here/, html)
       end
     end
 
-    test "don't escape intrinsic substitutions" do
-      html = convert_string('happy{nbsp}together')
-      assert_match(/happy&#160;together/, html)
+    test 'do not escape intrinsic substitutions' do
+      html = convert_string 'happy{nbsp}together'
+      assert_match %r/happy&#160;together/, html
     end
 
-    test "escape special characters" do
-      html = convert_string('<node>&</node>')
-      assert_match(/&lt;node&gt;&amp;&lt;\/node&gt;/, html)
+    test 'escape special characters' do
+      html = convert_string '<node>&</node>'
+      assert_match %r/&lt;node&gt;&amp;&lt;\/node&gt;/, html
     end
 
     test 'creates counter' do
@@ -1531,7 +1531,7 @@ context 'Attributes' do
       assert_equal 'foo bar', (p.attr 'role')
     end
 
-    test "Attribute substitutions are performed on attribute list before parsing attributes" do
+    test 'Attribute substitutions are performed on attribute list before parsing attributes' do
       input = <<~'EOS'
       :lead: role="lead"
 
@@ -1770,7 +1770,7 @@ context 'Attributes' do
       assert_css 'article:root > section[xml|id="idname"]', output, 1
     end
 
-    test "Block attributes are additive" do
+    test 'Block attributes are additive' do
       input = <<~'EOS'
       [id='foo']
       [role='lead']
@@ -1782,7 +1782,7 @@ context 'Attributes' do
       assert_equal 'lead', para.attributes['role']
     end
 
-    test "Last wins for id attribute" do
+    test 'Last wins for id attribute' do
       input = <<~'EOS'
       [[bar]]
       [[foo]]
@@ -1801,7 +1801,7 @@ context 'Attributes' do
       assert_equal 'coolio', subsec.id
     end
 
-    test "trailing block attributes transfer to the following section" do
+    test 'trailing block attributes transfer to the following section' do
       input = <<~'EOS'
       [[one]]
 

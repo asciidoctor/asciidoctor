@@ -229,7 +229,7 @@ context 'Path Resolver' do
     test 'allows start path to be parent of jail if resolved target is inside jail' do
       assert_equal "#{JAIL}/foo/path", @resolver.system_path('foo/path', JAIL, "#{JAIL}/foo")
       @resolver.file_separator = '\\'
-      assert_equal "C:/dev/project/README.adoc", @resolver.system_path('project/README.adoc', 'C:/dev', 'C:/dev/project')
+      assert_equal 'C:/dev/project/README.adoc', @resolver.system_path('project/README.adoc', 'C:/dev', 'C:/dev/project')
     end
 
     test 'relocates target to jail if resolved value fails outside of jail' do

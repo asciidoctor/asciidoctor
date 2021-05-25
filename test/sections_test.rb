@@ -21,7 +21,7 @@ context 'Sections' do
     end
 
     test 'synthetic id removes non-word characters' do
-      sec = block_from_string("== We’re back!")
+      sec = block_from_string '== We’re back!'
       assert_equal '_were_back', sec.id
     end
 
@@ -46,7 +46,7 @@ context 'Sections' do
     end
 
     test 'synthetic id collapses repeating spaces' do
-      sec = block_from_string('== Go    Far')
+      sec = block_from_string '== Go    Far'
       assert_equal '_go_far', sec.id
     end
 
@@ -56,7 +56,7 @@ context 'Sections' do
     end
 
     test 'synthetic id replaces dots with separator' do
-      sec = block_from_string("== Section 1.1.1")
+      sec = block_from_string '== Section 1.1.1'
       assert_equal '_section_1_1_1', sec.id
     end
 
@@ -146,7 +146,7 @@ context 'Sections' do
     end
 
     test 'explicit id can be defined using an embedded anchor' do
-      sec = block_from_string("== Section One [[one]] ==")
+      sec = block_from_string '== Section One [[one]] =='
       assert_equal 'one', sec.id
       assert_equal 'Section One', sec.title
     end
@@ -163,7 +163,7 @@ context 'Sections' do
     end
 
     test 'explicit id can be defined using an embedded anchor with reftext' do
-      sec = block_from_string("== Section One [[one,Section Uno]] ==")
+      sec = block_from_string '== Section One [[one,Section Uno]] =='
       assert_equal 'one', sec.id
       assert_equal 'Section One', sec.title
       assert_equal 'Section Uno', (sec.attr 'reftext')
@@ -386,25 +386,25 @@ context 'Sections' do
 
   context 'Levels' do
     context 'Document Title (Level 0)' do
-      test "document title with multiline syntax" do
-        title = "My Title"
-        chars = "=" * title.length
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      test 'document title with multiline syntax' do
+        title = 'My Title'
+        chars = '=' * title.length
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars)
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars + "\n")
       end
 
-      test "document title with multiline syntax, give a char" do
-        title = "My Title"
-        chars = "=" * (title.length + 1)
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      test 'document title with multiline syntax, give a char' do
+        title = 'My Title'
+        chars = '=' * (title.length + 1)
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars)
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars + "\n")
       end
 
-      test "document title with multiline syntax, take a char" do
-        title = "My Title"
-        chars = "=" * (title.length - 1)
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars)
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string(title + "\n" + chars + "\n")
+      test 'document title with multiline syntax, take a char' do
+        title = 'My Title'
+        chars = '=' * (title.length - 1)
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars)
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string(title + "\n" + chars + "\n")
       end
 
       test 'document title with multiline syntax and unicode characters' do
@@ -421,9 +421,9 @@ context 'Sections' do
         assert_xpath '//h1[text()="AsciiDoc Writer’s Guide"]', result, 1
       end
 
-      test "not enough chars for a multiline document title" do
-        title = "My Title"
-        chars = "=" * (title.length - 2)
+      test 'not enough chars for a multiline document title' do
+        title = 'My Title'
+        chars = '=' * (title.length - 2)
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
@@ -435,9 +435,9 @@ context 'Sections' do
         end
       end
 
-      test "too many chars for a multiline document title" do
-        title = "My Title"
-        chars = "=" * (title.length + 2)
+      test 'too many chars for a multiline document title' do
+        title = 'My Title'
+        chars = '=' * (title.length + 2)
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
@@ -449,9 +449,9 @@ context 'Sections' do
         end
       end
 
-      test "document title with multiline syntax cannot begin with a dot" do
-        title = ".My Title"
-        chars = "=" * title.length
+      test 'document title with multiline syntax cannot begin with a dot' do
+        title = '.My Title'
+        chars = '=' * title.length
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
@@ -459,12 +459,12 @@ context 'Sections' do
         end
       end
 
-      test "document title with atx syntax" do
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title")
+      test 'document title with atx syntax' do
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string('= My Title')
       end
 
-      test "document title with symmetric syntax" do
-        assert_xpath "//h1[not(@id)][text() = 'My Title']", convert_string("= My Title =")
+      test 'document title with symmetric syntax' do
+        assert_xpath '//h1[not(@id)][text() = "My Title"]', convert_string('= My Title =')
       end
 
       test 'document title created from leveloffset shift defined in document' do
@@ -566,7 +566,7 @@ context 'Sections' do
     end
 
     context 'Level 1' do
-      test "with multiline syntax" do
+      test 'with multiline syntax' do
         assert_xpath "//h2[@id='_my_section'][text() = 'My Section']", convert_string("My Section\n-----------")
       end
 
@@ -616,9 +616,9 @@ context 'Sections' do
         assert_xpath '//h2', result, 1
       end
 
-      test "heading title with multiline syntax cannot begin with a dot" do
-        title = ".My Title"
-        chars = "-" * title.length
+      test 'heading title with multiline syntax cannot begin with a dot' do
+        title = '.My Title'
+        chars = '-' * title.length
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h2', output, 0
@@ -626,40 +626,40 @@ context 'Sections' do
         end
       end
 
-      test "with atx syntax" do
-        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title")
+      test 'with atx syntax' do
+        assert_xpath '//h2[@id="_my_title"][text() = "My Title"]', convert_string('== My Title')
       end
 
-      test "with atx symmetric syntax" do
-        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ==")
+      test 'with atx symmetric syntax' do
+        assert_xpath '//h2[@id="_my_title"][text() = "My Title"]', convert_string('== My Title ==')
       end
 
-      test "with atx non-matching symmetric syntax" do
-        assert_xpath "//h2[@id='_my_title'][text() = 'My Title ===']", convert_string("== My Title ===")
+      test 'with atx non-matching symmetric syntax' do
+        assert_xpath '//h2[@id="_my_title"][text() = "My Title ==="]', convert_string('== My Title ===')
       end
 
-      test "with XML entity" do
-        assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", convert_string("== What's new?")
+      test 'with XML entity' do
+        assert_xpath "//h2[@id='_whats_new'][text() = \"What#{decode_char 8217}s new?\"]", convert_string(%q(== What's new?))
       end
 
-      test "with non-word character" do
-        assert_xpath "//h2[@id='_whats_new'][text() = \"What’s new?\"]", convert_string("== What’s new?")
+      test 'with non-word character' do
+        assert_xpath '//h2[@id="_whats_new"][text() = "What’s new?"]', convert_string('== What’s new?')
       end
 
-      test "with sequential non-word characters" do
+      test 'with sequential non-word characters' do
         assert_xpath "//h2[@id='_what_the_is_this'][text() = 'What the \#@$ is this?']", convert_string('== What the #@$ is this?')
       end
 
-      test "with trailing whitespace" do
-        assert_xpath "//h2[@id='_my_title'][text() = 'My Title']", convert_string("== My Title ")
+      test 'with trailing whitespace' do
+        assert_xpath '//h2[@id="_my_title"][text() = "My Title"]', convert_string('== My Title ')
       end
 
-      test "with custom blank idprefix" do
-        assert_xpath "//h2[@id='my_title'][text() = 'My Title']", convert_string(":idprefix:\n\n== My Title ")
+      test 'with custom blank idprefix' do
+        assert_xpath '//h2[@id="my_title"][text() = "My Title"]', convert_string(%(:idprefix:\n\n== My Title ))
       end
 
-      test "with custom non-blank idprefix" do
-        assert_xpath "//h2[@id='ref_my_title'][text() = 'My Title']", convert_string(":idprefix: ref_\n\n== My Title ")
+      test 'with custom non-blank idprefix' do
+        assert_xpath '//h2[@id="ref_my_title"][text() = "My Title"]', convert_string(%(:idprefix: ref_\n\n== My Title ))
       end
 
       test 'with multibyte characters' do
@@ -693,17 +693,17 @@ context 'Sections' do
     end
 
     context 'Level 2' do
-      test "with multiline syntax" do
+      test 'with multiline syntax' do
         assert_xpath "//h3[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n~~~~~~~~~~~")
       end
 
-      test "with atx line syntax" do
+      test 'with atx line syntax' do
         assert_xpath "//h3[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n=== My Title")
       end
     end
 
     context 'Level 3' do
-      test "with multiline syntax" do
+      test 'with multiline syntax' do
         assert_xpath "//h4[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n^^^^^^^^^^")
       end
 
@@ -713,17 +713,17 @@ context 'Sections' do
     end
 
     context 'Level 4' do
-      test "with multiline syntax" do
+      test 'with multiline syntax' do
         assert_xpath "//h5[@id='_my_section'][text() = 'My Section']", convert_string(":fragment:\nMy Section\n++++++++++")
       end
 
-      test "with atx line syntax" do
+      test 'with atx line syntax' do
         assert_xpath "//h5[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n===== My Title")
       end
     end
 
     context 'Level 5' do
-      test "with atx line syntax" do
+      test 'with atx line syntax' do
         assert_xpath "//h6[@id='_my_title'][text() = 'My Title']", convert_string(":fragment:\n====== My Title")
       end
     end
@@ -2696,8 +2696,8 @@ context 'Sections' do
     end
   end
 
-  context "heading patterns in blocks" do
-    test "should not interpret a listing block as a heading" do
+  context 'heading patterns in blocks' do
+    test 'should not interpret a listing block as a heading' do
       input = <<~'EOS'
       Section
       -------
@@ -2709,10 +2709,10 @@ context 'Sections' do
       fin.
       EOS
       output = convert_string input
-      assert_xpath "//h2", output, 1
+      assert_xpath '//h2', output, 1
     end
 
-    test "should not interpret an open block as a heading" do
+    test 'should not interpret an open block as a heading' do
       input = <<~'EOS'
       Section
       -------
@@ -2724,10 +2724,10 @@ context 'Sections' do
       fin.
       EOS
       output = convert_string input
-      assert_xpath "//h2", output, 1
+      assert_xpath '//h2', output, 1
     end
 
-    test "should not interpret an attribute list as a heading" do
+    test 'should not interpret an attribute list as a heading' do
       input = <<~'EOS'
       Section
       =======
@@ -2743,7 +2743,7 @@ context 'Sections' do
       assert_xpath "//*[@class='admonitionblock tip']//p[text() = 'This should be a tip, not a heading.']", output, 1
     end
 
-    test "should not match a heading in a description list" do
+    test 'should not match a heading in a description list' do
       input = <<~'EOS'
       Section
       -------
@@ -2762,11 +2762,11 @@ context 'Sections' do
       fin.
       EOS
       output = convert_string input
-      assert_xpath "//h2", output, 1
-      assert_xpath "//dl", output, 1
+      assert_xpath '//h2', output, 1
+      assert_xpath '//dl', output, 1
     end
 
-    test "should not match a heading in a bulleted list" do
+    test 'should not match a heading in a bulleted list' do
       input = <<~'EOS'
       Section
       -------
@@ -2784,11 +2784,11 @@ context 'Sections' do
       fin.
       EOS
       output = convert_string input
-      assert_xpath "//h2", output, 1
-      assert_xpath "//ul", output, 1
+      assert_xpath '//h2', output, 1
+      assert_xpath '//ul', output, 1
     end
 
-    test "should not match a heading in a block" do
+    test 'should not match a heading in a block' do
       input = <<~'EOS'
       ====
 
@@ -2797,8 +2797,8 @@ context 'Sections' do
       ====
       EOS
       output = convert_string input
-      assert_xpath "//h2", output, 0
-      assert_xpath "//*[@class='exampleblock']//p[text() = '== not a heading']", output, 1
+      assert_xpath '//h2', output, 0
+      assert_xpath '//*[@class="exampleblock"]//p[text() = "== not a heading"]', output, 1
     end
   end
 
