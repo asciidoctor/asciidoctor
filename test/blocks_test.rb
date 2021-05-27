@@ -3348,7 +3348,6 @@ context 'Blocks' do
       assert_equal absolute_path, block.normalize_asset_path(absolute_path)
       assert_equal File.expand_path(File.join(basedir, '../../images')), block.normalize_asset_path('../../images')
     end
-
   end
 
   context 'Source code' do
