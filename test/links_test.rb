@@ -500,6 +500,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string '<<tigers#>>', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers#"][text() = "[tigers#]"]', doc.convert, 1
+      assert logger.empty?
     end
   end
 
@@ -594,6 +595,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string '<<tigers.adoc>>', standalone: false
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+      assert logger.empty?
     end
   end
 
@@ -611,6 +613,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string 'xref:tigers.adoc[]', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+      assert logger.empty?
     end
   end
 

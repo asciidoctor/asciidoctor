@@ -667,7 +667,7 @@ context 'Extensions' do
             target == 'include-file.adoc'
           end
 
-          process do |doc, reader, target, attributes|
+          process do |_doc, reader, target, attributes|
             # demonstrates that push_include normalizes newlines
             content = [
               %(found include target '#{target}' at line #{reader.cursor_at_prev_line.lineno}\r\n),
@@ -929,7 +929,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block :eval do |processor|
             processor.on_context :literal
-            processor.process do |parent, reader, attrs|
+            processor.process do |parent, reader, _attrs|
               create_paragraph parent, (eval reader.read_lines[0]), {}
             end
           end
@@ -955,7 +955,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block :custom do
             on_context :sidebar
-            process do |doc, reader, attrs|
+            process do |_doc, _reader, attrs|
               cloaked_context = attrs['cloaked-context']
               nil
             end
@@ -1045,7 +1045,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.register do
           block_macro :message do
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               create_paragraph parent, target.upcase, {}
             end
           end
@@ -1067,7 +1067,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block_macro do
             named 'custom-toc'
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               resolved_target = target
               create_pass_block parent, '<!-- custom toc goes here -->', {}, content_model: :raw
             end
@@ -1089,7 +1089,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block_macro do
             named 'illegal name'
-            process do |parent, target, attrs|
+            process do |_parent, _target, _attrs|
               nil
             end
           end
@@ -1382,7 +1382,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :say
-            process do |parent, target, attrs|
+            process do |_parent, target, _attrs|
               target
             end
           end
@@ -1403,7 +1403,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :say
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               create_inline parent, :quoted, %(*#{target}*), type: :emphasis
             end
           end
@@ -1421,7 +1421,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :say
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               create_inline_pass parent, %(*#{target}*), attributes: { 'subs' => :normal }
             end
           end
@@ -1439,7 +1439,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :say
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               create_inline_pass parent, %(*#{target}*), attributes: { 'subs' => [:specialchars, :quotes] }
             end
           end
@@ -1457,7 +1457,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro do
             named :say
-            process do |parent, target, attrs|
+            process do |parent, target, _attrs|
               create_inline_pass parent, %(*#{target}*), attributes: { 'subs' => 'specialchars,quotes' }
             end
           end
@@ -1498,7 +1498,7 @@ context 'Extensions' do
             named 'skip-me'
             on_context :paragraph
             parse_content_as :raw
-            process do |parent, reader, attrs|
+            process do |_parent, _reader, _attrs|
               nil
             end
           end
@@ -1528,7 +1528,7 @@ context 'Extensions' do
             named :ignore
             on_context :paragraph
             parse_content_as :skip
-            process do |parent, reader, attrs|
+            process do |_parent, _reader, _attrs|
               process_method_called = true
               nil
             end
@@ -1625,7 +1625,7 @@ context 'Extensions' do
           block do
             named :attrs
             on_context :open
-            process do |parent, reader, attrs|
+            process do |parent, reader, _attrs|
               parsed_attrs = parse_attributes parent, reader.read_line, positional_attributes: ['a', 'b']
               parsed_attrs.update parse_attributes parent, 'foo={foo}', sub_attributes: true
               nil
@@ -1656,7 +1656,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block_macro do
             named :sect
-            process do |parent, target, attrs|
+            process do |parent, _target, attrs|
               opts = (level = attrs.delete 'level') ? { level: level.to_i } : {}
               attrs['id'] = false if attrs['id'] == 'false'
               parent = parent.parent if parent.context == :preamble
@@ -1736,7 +1736,7 @@ context 'Extensions' do
           docinfo_processor MetaRobotsDocinfoProcessor, position: :>>
           docinfo_processor do
             at_location :footer
-            process do |doc|
+            process do |_doc|
               '<script><!-- analytics code --></script>'
             end
           end
@@ -1835,7 +1835,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.register do
           block_macro :no_alt do
-            process do |parent, target, attrs|
+            process do |parent, _target, _attrs|
               create_block parent, 'image', nil, { 'target' => 'picture.jpg' }
             end
           end
@@ -1853,7 +1853,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           inline_macro :no_alt do
             match_format :short
-            process do |parent, target, attrs|
+            process do |parent, _target, _attrs|
               create_inline parent, 'image', nil, target: 'picture.jpg'
             end
           end

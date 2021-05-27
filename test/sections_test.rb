@@ -590,6 +590,7 @@ context 'Sections' do
         using_memory_logger do |logger|
           result = convert_string_to_embedded input
           assert_css 'h2', result, 0
+          assert_message logger, :WARN, '<stdin>: line 2: unterminated listing block', Hash
         end
       end
 
@@ -602,6 +603,10 @@ context 'Sections' do
         using_memory_logger do |logger|
           result = convert_string_to_embedded input
           assert_css 'h2', result, 0
+          assert_messages logger, [
+            [:WARN, '<stdin>: line 1: unterminated quote block', Hash],
+            [:WARN, '<stdin>: line 2: unterminated listing block', Hash],
+          ]
         end
       end
 
@@ -1494,6 +1499,7 @@ context 'Sections' do
         output = convert_string input
         assert_xpath '//h1[text()="Part"]', output, 1
         assert_xpath '//h3[text()=".1. Out of Sequence Section"]', output, 1
+        assert_message logger, :WARN, '<stdin>: line 7: section title out of sequence: expected level 1, got level 2', Hash
       end
     end
 
@@ -1512,6 +1518,8 @@ context 'Sections' do
         output = convert_string input
         assert_xpath '//h1[text()="Part Title"]', output, 1
         assert_xpath '//h1[text()="Chapter Title"]', output, 1
+        # FIXME this prints 2 error messages instead of 1
+        assert_message logger, :ERROR, '<stdin>: line 7: invalid part, must have at least one section (e.g., chapter, appendix, etc.)', Hash, 0
       end
     end
 

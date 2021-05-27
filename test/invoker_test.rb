@@ -7,7 +7,7 @@ context 'Invoker' do
   test 'should parse source and convert to html5 article by default' do
     invoker = nil
     output = nil
-    redirect_streams do |out, err|
+    redirect_streams do |out|
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
@@ -141,7 +141,7 @@ context 'Invoker' do
     expected = %(Asciidoctor #{Asciidoctor::VERSION} [https://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
     ['--version', '-V'].each do |switch|
       actual = nil
-      redirect_streams do |out, err|
+      redirect_streams do |out|
         invoke_cli [switch]
         actual = out.string.rstrip
       end
@@ -156,7 +156,7 @@ context 'Invoker' do
     3. third
     EOS
     warnings = nil
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-o /dev/null), '-') { input }
       warnings = err.string
     end
@@ -167,7 +167,7 @@ context 'Invoker' do
     old_verbose, $VERBOSE = $VERBOSE, false
     begin
       warnings = nil
-      redirect_streams do |out, err|
+      redirect_streams do |_, err|
         invoke_cli_to_buffer(%w(-w -o /dev/null), '-') {
           A_CONST = 10
           A_CONST = 20
@@ -187,7 +187,7 @@ context 'Invoker' do
     3. third
     EOS
     warnings = nil
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-q -o /dev/null), '-') { input }
       warnings = err.string
     end
@@ -226,14 +226,14 @@ context 'Invoker' do
   end
 
   test 'should report usage if no input file given' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli [], nil
       assert_match(/Usage:/, err.string)
     end
   end
 
   test 'should report error if input file does not exist' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoker = invoke_cli [], 'missing_file.adoc'
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
@@ -241,7 +241,7 @@ context 'Invoker' do
   end
 
   test 'should treat extra arguments as files' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.adoc), nil
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
@@ -510,7 +510,7 @@ context 'Invoker' do
   test 'should output a trailing newline to stdout' do
     invoker = nil
     output = nil
-    redirect_streams do |out, err|
+    redirect_streams do |out|
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
@@ -555,7 +555,7 @@ context 'Invoker' do
 
   test 'should warn if doctype is inline and the first block is not a candidate for inline conversion' do
     ['== Section Title', 'image::tiger.png[]'].each do |input|
-      warnings = redirect_streams do |out, err|
+      warnings = redirect_streams do |_, err|
         invoke_cli_to_buffer(%w(-d inline), '-') { input }
         err.string
       end
@@ -564,7 +564,7 @@ context 'Invoker' do
   end
 
   test 'should not warn if doctype is inline and the document has no blocks' do
-    warnings = redirect_streams do |out, err|
+    warnings = redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-d inline), '-') { '// comment' }
       err.string
     end
@@ -572,7 +572,7 @@ context 'Invoker' do
   end
 
   test 'should not warn if doctype is inline and the document contains multiple blocks' do
-    warnings = redirect_streams do |out, err|
+    warnings = redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-d inline), '-') { %(paragraph one\n\nparagraph two\n\nparagraph three) }
       err.string
     end

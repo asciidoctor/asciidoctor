@@ -1037,7 +1037,7 @@ context 'API' do
       content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by(context: :section, id: 'subsection') {|sect| false }
+      result = doc.find_by(context: :section, id: 'subsection') { false }
       refute_nil result
       assert_equal 0, result.size
     end

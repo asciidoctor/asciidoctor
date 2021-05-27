@@ -5,7 +5,7 @@ require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli/options'
 
 context 'Options' do
   test 'should print usage and return error code 0 when help flag is present' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |stdout|
       exitval = Asciidoctor::Cli::Options.parse!(%w(-h))
       assert_equal 0, exitval
       assert_match(/^Usage:/, stdout.string)
@@ -13,7 +13,7 @@ context 'Options' do
   end
 
   test 'should show safe modes in severity order' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |stdout|
       exitval = Asciidoctor::Cli::Options.parse!(%w(-h))
       assert_equal 0, exitval
       assert_match(/unsafe, safe, server, secure/, stdout.string)
@@ -50,7 +50,7 @@ context 'Options' do
     old_manpage_path = ENV['ASCIIDOCTOR_MANPAGE_PATH']
     begin
       ENV['ASCIIDOCTOR_MANPAGE_PATH'] = (manpage_path = fixture_path 'no-such-file.1')
-      redirect_streams do |out, stderr|
+      redirect_streams do |_, stderr|
         exitval = Asciidoctor::Cli::Options.parse!(%w(-h manpage))
         assert_equal 1, exitval
         assert_equal %(asciidoctor: FAILED: manual page not found: #{manpage_path}), stderr.string.chomp
@@ -65,7 +65,7 @@ context 'Options' do
   end
 
   test 'should return error code 1 when invalid option present' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       exitval = Asciidoctor::Cli::Options.parse!(%w(--foobar))
       assert_equal 1, exitval
       assert_equal 'asciidoctor: invalid option: --foobar', stderr.string.chomp
@@ -73,7 +73,7 @@ context 'Options' do
   end
 
   test 'should return error code 1 when option has invalid argument' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       exitval = Asciidoctor::Cli::Options.parse!(%w(-d chapter input.ad)) # had to change for #320
       assert_equal 1, exitval
       assert_equal 'asciidoctor: invalid argument: -d chapter', stderr.string.chomp
@@ -81,7 +81,7 @@ context 'Options' do
   end
 
   test 'should return error code 1 when option is missing required argument' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       exitval = Asciidoctor::Cli::Options.parse!(%w(-b))
       assert_equal 1, exitval
       assert_equal 'asciidoctor: option missing argument: -b', stderr.string.chomp
@@ -89,7 +89,7 @@ context 'Options' do
   end
 
   test 'should emit warning when unparsed options remain' do
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       options = Asciidoctor::Cli::Options.parse!(%w(-b docbook - -))
       assert_kind_of Hash, options
       assert_match(/asciidoctor: WARNING: extra arguments .*/, stderr.string.chomp)
@@ -189,7 +189,7 @@ context 'Options' do
 
   test 'multiple -r flags requires specified libraries' do
     options = Asciidoctor::Cli::Options.new
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       exitval = options.parse! %w(-r foobar -r foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
@@ -199,7 +199,7 @@ context 'Options' do
 
   test '-r flag with multiple values requires specified libraries' do
     options = Asciidoctor::Cli::Options.new
-    redirect_streams do |stdout, stderr|
+    redirect_streams do |_, stderr|
       exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
