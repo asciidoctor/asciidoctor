@@ -1532,7 +1532,7 @@ context 'API' do
     test 'output should be relative to to_dir option' do
       sample_input_path = fixture_path('sample.adoc')
       output_dir = File.join(File.dirname(sample_input_path), 'test_output')
-      Dir.mkdir output_dir if !File.exist? output_dir
+      Dir.mkdir output_dir unless File.exist? output_dir
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: output_dir
@@ -1571,7 +1571,7 @@ context 'API' do
       base_dir = File.dirname(sample_input_path)
       sample_rel_output_path = File.join('test_output', 'result.html')
       output_dir = File.dirname(File.join(base_dir, sample_rel_output_path))
-      Dir.mkdir output_dir if !File.exist? output_dir
+      Dir.mkdir output_dir unless File.exist? output_dir
       sample_output_path = File.join(base_dir, sample_rel_output_path)
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: base_dir, to_file: sample_rel_output_path
