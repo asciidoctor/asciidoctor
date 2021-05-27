@@ -166,11 +166,11 @@ context 'Invoker' do
     old_verbose, $VERBOSE = $VERBOSE, false
     begin
       warnings = nil
-      redirect_streams do |out, err|
-        invoke_cli_to_buffer(%w(-w -o /dev/null), '-') {
+      redirect_streams do |_, err|
+        invoke_cli_to_buffer %w(-w -o /dev/null), '-' do
           A_CONST = 10
           A_CONST = 20
-        }
+        end
         warnings = err.string
       end
       assert_equal false, $VERBOSE
