@@ -208,31 +208,31 @@ context 'Options' do
 
   test '-I option appends paths to $LOAD_PATH' do
     options = Asciidoctor::Cli::Options.new
-    old_load_path = $LOAD_PATH.dup
+    old_load_path = $:.dup
     begin
       exitval = options.parse! %w(-I foobar -I foobaz test/fixtures/sample.adoc)
       refute_equal 1, exitval
-      assert_equal old_load_path.size + 2, $LOAD_PATH.size
-      assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
-      assert_equal File.expand_path('foobaz'), $LOAD_PATH[1]
+      assert_equal old_load_path.size + 2, $:.size
+      assert_equal File.expand_path('foobar'), $:[0]
+      assert_equal File.expand_path('foobaz'), $:[1]
       assert_equal ['foobar', 'foobaz'], options[:load_paths]
     ensure
-      ($LOAD_PATH.size - old_load_path.size).times { $LOAD_PATH.shift }
+      ($:.size - old_load_path.size).times { $:.shift }
     end
   end
 
   test '-I option appends multiple paths to $LOAD_PATH' do
     options = Asciidoctor::Cli::Options.new
-    old_load_path = $LOAD_PATH.dup
+    old_load_path = $:.dup
     begin
       exitval = options.parse! %W(-I foobar#{File::PATH_SEPARATOR}foobaz test/fixtures/sample.adoc)
       refute_equal 1, exitval
-      assert_equal old_load_path.size + 2, $LOAD_PATH.size
-      assert_equal File.expand_path('foobar'), $LOAD_PATH[0]
-      assert_equal File.expand_path('foobaz'), $LOAD_PATH[1]
+      assert_equal old_load_path.size + 2, $:.size
+      assert_equal File.expand_path('foobar'), $:[0]
+      assert_equal File.expand_path('foobaz'), $:[1]
       assert_equal ['foobar', 'foobaz'], options[:load_paths]
     ensure
-      ($LOAD_PATH.size - old_load_path.size).times { $LOAD_PATH.shift }
+      ($:.size - old_load_path.size).times { $:.shift }
     end
   end
 
