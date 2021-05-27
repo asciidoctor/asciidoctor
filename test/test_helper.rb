@@ -193,7 +193,7 @@ class Minitest::Test
   def xmldoc_from_string content
     if (content.start_with? '<?xml ') || (RE_XMLNS_ATTRIBUTE.match? content)
       Nokogiri::XML::Document.parse content
-    elsif !(RE_DOCTYPE =~ content)
+    elsif RE_DOCTYPE !~ content
       Nokogiri::HTML::DocumentFragment.parse content
     elsif $1.start_with? 'html'
       Nokogiri::HTML::Document.parse content
