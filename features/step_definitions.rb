@@ -12,24 +12,24 @@ require 'rspec/expectations'
 require 'tilt'
 require 'slim'
 
-Given /the AsciiDoc source/ do |source|
+Given %r/the AsciiDoc source/ do |source|
   @source = source
 end
 
-When /it is converted to html/ do
+When %r/it is converted to html/ do
   @output = Asciidoctor.convert @source
 end
 
-When /it is converted to docbook/ do
+When %r/it is converted to docbook/ do
   @output = Asciidoctor.convert @source, backend: :docbook
 end
 
-Then /the result should (match|contain) the (HTML|XML) source/ do |matcher, format, expected|
+Then %r/the result should (match|contain) the (HTML|XML) source/ do |matcher, _, expected|
   match_expectation = matcher == 'match' ? (eq expected) : (include expected)
   (expect @output).to match_expectation
 end
 
-Then /the result should (match|contain) the (HTML|XML) structure/ do |matcher, format, expected|
+Then %r/the result should (match|contain) the (HTML|XML) structure/ do |matcher, format, expected|
   result = @output
   if format == 'HTML'
     options = { format: :html, disable_escape: true, sort_attrs: false }
