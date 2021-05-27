@@ -863,7 +863,8 @@ class ReaderTest < Minitest::Test
 
       test 'unreadable file referenced by include directive is replaced by warning', unless: (windows? || Process.euid == 0) do
         include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
-        FileUtils.chmod 0000, include_file
+        old_mode = (File.stat include_file).mode
+        FileUtils.chmod 0o000, include_file
         input = <<~'EOS'
         include::fixtures/chapter-a.adoc[]
 
@@ -881,7 +882,7 @@ class ReaderTest < Minitest::Test
         rescue
           flunk 'include directive should not raise exception on missing file'
         ensure
-          FileUtils.chmod 0644, include_file
+          FileUtils.chmod old_mode, include_file
         end
       end
 
