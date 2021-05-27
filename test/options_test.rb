@@ -237,7 +237,7 @@ context 'Options' do
   end
 
   test 'should set failure level to FATAL by default' do
-    options = Asciidoctor::Cli::Options.parse! %W(test/fixtures/sample.adoc)
+    options = Asciidoctor::Cli::Options.parse! %w(test/fixtures/sample.adoc)
     assert_equal ::Logger::Severity::FATAL, options[:failure_level]
   end
 
@@ -257,7 +257,7 @@ context 'Options' do
 
   test 'should not allow failure level to be set to unknown value' do
     exit_code, messages = redirect_streams do |_, err|
-      [(Asciidoctor::Cli::Options.parse! %W(--failure-level=foobar test/fixtures/sample.adoc)), err.string]
+      [(Asciidoctor::Cli::Options.parse! %w(--failure-level=foobar test/fixtures/sample.adoc)), err.string]
     end
     assert_equal 1, exit_code
     assert_includes messages, 'invalid argument: --failure-level=foobar'

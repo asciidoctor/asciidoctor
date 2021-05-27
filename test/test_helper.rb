@@ -107,7 +107,7 @@ class Minitest::Test
     case type
     when :xpath
       namespaces = (doc.respond_to? :root) ? doc.root.namespaces : {}
-      results = doc.xpath %(#{path.sub '/', './'}), namespaces
+      results = doc.xpath (path.sub '/', './'), namespaces
     when :css
       results = doc.css path
     end
@@ -502,7 +502,7 @@ class Minitest::Test
     end
 
     def test_name name
-      %(test_#{((sanitize_name name).gsub %r/\s+/, '_')}).to_sym
+      %(test_#{(sanitize_name name).gsub %r/\s+/, '_'}).to_sym
     end
 
     def sanitize_name name

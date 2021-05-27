@@ -102,7 +102,7 @@ context 'Invoker' do
   end
 
   test 'should fail if input file matches resolved output file' do
-    invoker = invoke_cli_to_buffer %W(-a outfilesuffix=.adoc), 'sample.adoc'
+    invoker = invoke_cli_to_buffer %w(-a outfilesuffix=.adoc), 'sample.adoc'
     assert_match(/input file and output file cannot be the same/, invoker.read_error)
   end
 
