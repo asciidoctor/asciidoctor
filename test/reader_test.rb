@@ -1542,8 +1542,7 @@ class ReaderTest < Minitest::Test
       test 'should fall back to built-in include directive behavior when not handled by include processor' do
         input = 'include::fixtures/include-file.adoc[]'
         include_processor = Class.new do
-          def initialize document
-          end
+          def initialize document; end
 
           def handles? target
             false
