@@ -484,37 +484,37 @@ context 'Attributes' do
     end
 
     test 'attr should not retrieve attribute from document if not set on block' do
-      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'name' => 'value' }
       para = doc.blocks[0]
       assert_nil para.attr 'name'
     end
 
     test 'attr looks for attribute on document if fallback name is true' do
-      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'name' => 'value' }
       para = doc.blocks[0]
       assert_equal 'value', (para.attr 'name', nil, true)
     end
 
     test 'attr uses fallback name when looking for attribute on document' do
-      doc = document_from_string 'paragraph', :attributes => { 'alt-name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'alt-name' => 'value' }
       para = doc.blocks[0]
       assert_equal 'value', (para.attr 'name', nil, 'alt-name')
     end
 
     test 'attr? should not check for attribute on document if not set on block' do
-      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'name' => 'value' }
       para = doc.blocks[0]
       refute para.attr? 'name'
     end
 
     test 'attr? checks for attribute on document if fallback name is true' do
-      doc = document_from_string 'paragraph', :attributes => { 'name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'name' => 'value' }
       para = doc.blocks[0]
       assert para.attr? 'name', nil, true
     end
 
     test 'attr? checks for fallback name when looking for attribute on document' do
-      doc = document_from_string 'paragraph', :attributes => { 'alt-name' => 'value' }
+      doc = document_from_string 'paragraph', attributes: { 'alt-name' => 'value' }
       para = doc.blocks[0]
       assert para.attr? 'name', nil, 'alt-name'
     end
@@ -1246,7 +1246,7 @@ context 'Attributes' do
       {counter:foo:ignored} is not {foo}
       EOS
 
-      output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
+      output = convert_string_to_embedded input, attributes: { 'foo' => 'bar' }
       assert_xpath '//p[text()="bas is not bar"]', output, 1
     end
 
@@ -1255,7 +1255,7 @@ context 'Attributes' do
       {counter2:foo:ignored}{foo}
       EOS
 
-      output = convert_string_to_embedded input, :attributes => { 'foo' => 'bar' }
+      output = convert_string_to_embedded input, attributes: { 'foo' => 'bar' }
       assert_xpath '//p[text()="bar"]', output, 1
     end
 
