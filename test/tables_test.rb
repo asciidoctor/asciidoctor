@@ -2280,7 +2280,7 @@ context 'Tables' do
     end
 
     test 'should not drop trailing empty cell in TSV data when loaded from an include file' do
-      input  = <<~'EOS'
+      input = <<~'EOS'
       [%header,format=tsv]
       |===
       include::fixtures/data.tsv[]

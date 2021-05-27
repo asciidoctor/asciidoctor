@@ -409,10 +409,10 @@ class Minitest::Test
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
         elsif File.file?(resource_file = (File.join base_dir, resource))
-          mimetype = if (ext = File.extname(resource_file)[1..-1])
-            ext == 'adoc' ? 'text/plain' : %(image/#{ext})
+          if (ext = File.extname(resource_file)[1..-1])
+            mimetype = ext == 'adoc' ? 'text/plain' : %(image/#{ext})
           else
-            'text/plain'
+            mimetype = 'text/plain'
           end
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: #{mimetype}\r\n\r\n)
           File.open resource_file, Asciidoctor::FILE_READ_MODE do |fd|

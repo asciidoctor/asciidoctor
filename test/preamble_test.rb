@@ -115,36 +115,36 @@ context 'Preamble' do
   end
 
   test 'preamble in book doctype' do
-      input = <<~'EOS'
-      = Book
-      :doctype: book
+    input = <<~'EOS'
+    = Book
+    :doctype: book
 
-      Back then...
+    Back then...
 
-      = Chapter One
+    = Chapter One
 
-      [partintro]
-      It was a dark and stormy night...
+    [partintro]
+    It was a dark and stormy night...
 
-      == Scene One
+    == Scene One
 
-      Someone's gonna get axed.
+    Someone's gonna get axed.
 
-      = Chapter Two
+    = Chapter Two
 
-      [partintro]
-      They couldn't believe their eyes when...
+    [partintro]
+    They couldn't believe their eyes when...
 
-      == Scene One
+    == Scene One
 
-      The axe came swinging.
-      EOS
+    The axe came swinging.
+    EOS
 
-      d = document_from_string(input)
-      assert_equal 'book', d.doctype
-      output = d.convert
-      assert_xpath '//h1', output, 3
-      assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
+    d = document_from_string(input)
+    assert_equal 'book', d.doctype
+    output = d.convert
+    assert_xpath '//h1', output, 3
+    assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
   end
 
   test 'should output table of contents in preamble if toc-placement attribute value is preamble' do

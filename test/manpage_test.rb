@@ -294,10 +294,10 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       -x::
-	Ao gravar o commit, acrescente uma linha que diz "(cherry picked from commit
-	...)" à mensagem de commit original para indicar qual commit esta mudança
-	foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
-	EOS
+      Ao gravar o commit, acrescente uma linha que diz "(cherry picked from commit
+      ...)" à mensagem de commit original para indicar qual commit esta mudança
+      foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&...', output.lines[-3][0..4].chomp
     end
@@ -307,12 +307,12 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       -x::
-	Ao gravar o commit, acrescente uma linha que diz
-	"(cherry picked from commit...)" à mensagem de commit
-	 original para indicar qual commit esta mudança
-	foi escolhida. Isso é feito apenas para picaretas
-	de cereja sem conflitos.
-	EOS
+      Ao gravar o commit, acrescente uma linha que diz
+      "(cherry picked from commit...)" à mensagem de commit
+      original para indicar qual commit esta mudança
+      foi escolhida. Isso é feito apenas para picaretas
+      de cereja sem conflitos.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert(output.lines[-5].include? 'commit...')
     end

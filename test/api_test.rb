@@ -1264,8 +1264,8 @@ context 'API' do
 
     test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
       sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false,
-          safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+          standalone: true, to_file: false, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
       assert_css 'html:root > head > style', output, 1
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.content
@@ -1313,8 +1313,8 @@ context 'API' do
 
     test 'should resolve custom stylesheet to embed relative to stylesdir' do
       sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, standalone: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false,
-          attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+          standalone: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
       styles = stylenode.content
       refute_nil styles
@@ -1361,8 +1361,8 @@ context 'API' do
         sample_input_path = fixture_path 'sample.adoc'
         sample_output_path = File.join output_dir, 'sample.html'
         custom_stylesheet_output_path = File.join output_dir, 'stylesheets', 'custom.css'
-        Asciidoctor.convert_file sample_input_path, safe: :safe, to_dir: output_dir, mkdirs: true,
-            attributes: { 'stylesheet' => 'stylesheets/custom.css', 'linkcss' => '', 'copycss' => '' }
+        Asciidoctor.convert_file sample_input_path,
+            safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'stylesheets/custom.css', 'linkcss' => '', 'copycss' => '' }
         assert File.exist? sample_output_path
         assert File.exist? custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
@@ -1379,8 +1379,8 @@ context 'API' do
         sample_input_path = fixture_path 'sample.adoc'
         sample_output_path = File.join output_dir, 'sample.html'
         custom_stylesheet_output_path = File.join output_dir, 'custom.css'
-        Asciidoctor.convert_file sample_input_path, safe: :safe, to_dir: output_dir, mkdirs: true,
-            attributes: { 'stylesheet' => 'custom.css', 'linkcss' => true, 'copycss' => true }
+        Asciidoctor.convert_file sample_input_path,
+            safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'custom.css', 'linkcss' => true, 'copycss' => true }
         assert File.exist? sample_output_path
         assert File.exist? custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE

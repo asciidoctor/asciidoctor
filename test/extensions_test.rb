@@ -115,7 +115,8 @@ class StripAttributesPostprocessor < Asciidoctor::Extensions::Postprocessor
   end
 end
 
-class UppercaseBlock < Asciidoctor::Extensions::BlockProcessor; use_dsl
+class UppercaseBlock < Asciidoctor::Extensions::BlockProcessor
+  use_dsl
   named :yell
   on_context :paragraph
   name_positional_attributes 'chars'
@@ -143,7 +144,8 @@ class LegacyPosAttrsBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
   end
 end
 
-class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor; use_dsl
+class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor
+  use_dsl
   named :degrees
   resolve_attributes '1:units', 'precision=1'
   def process parent, target, attributes
@@ -167,7 +169,8 @@ class MetaRobotsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
   end
 end
 
-class MetaAppDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor; use_dsl
+class MetaAppDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
+  use_dsl
   at_location :head
 
   def process document
@@ -1754,10 +1757,7 @@ context 'Extensions' do
         end
         sample_input_path = fixture_path('basic.adoc')
 
-        output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                          standalone: true,
-                                          safe: Asciidoctor::SafeMode::SERVER,
-                                          attributes: { 'docinfo' => '' }
+        output = Asciidoctor.convert_file sample_input_path, to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
         refute_empty output
         assert_css 'script[src="modernizr.js"]', output, 1
         assert_css 'meta[name="robots"]', output, 1

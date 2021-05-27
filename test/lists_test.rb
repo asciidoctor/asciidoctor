@@ -1755,8 +1755,8 @@ context 'Bulleted lists (:ulist)' do
       end
     end
 
-    # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
 =begin
+    # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
     test 'consecutive list continuation lines are folded' do
       input = <<~'EOS'
       Lists
@@ -4070,8 +4070,8 @@ context 'Description lists redux' do
       assert_includes output, 'not a term::: def'
     end
 
-    # FIXME pending
 =begin
+    # FIXME pending
     test 'attached paragraph does not break on adjacent sibling description list term' do
       input = <<~'EOS'
       term1:: def
