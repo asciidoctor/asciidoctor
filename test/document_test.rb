@@ -2048,7 +2048,7 @@ context 'Document' do
     test 'should allow doctime to be overridden' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
-        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 01, 02, 3, 4, 5, '+06:00'), attributes: { 'doctime' => '10:00:00-0700' }
+        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 1, 2, 3, 4, 5, '+06:00'), attributes: { 'doctime' => '10:00:00-0700' }
         assert_equal '2019-01-02', (doc.attr 'docdate')
         assert_equal '2019', (doc.attr 'docyear')
         assert_equal '10:00:00-0700', (doc.attr 'doctime')
@@ -2061,7 +2061,7 @@ context 'Document' do
     test 'should allow docdate to be overridden' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
-        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 01, 02, 3, 4, 5, '+06:00'), attributes: { 'docdate' => '2015-01-01' }
+        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 1, 2, 3, 4, 5, '+06:00'), attributes: { 'docdate' => '2015-01-01' }
         assert_equal '2015-01-01', (doc.attr 'docdate')
         assert_equal '2015', (doc.attr 'docyear')
         assert_equal '2015-01-01 03:04:05 +0600', (doc.attr 'docdatetime')
