@@ -134,18 +134,18 @@ context 'Document' do
       sample_input_path = fixture_path('basic.adoc')
 
       cases = {
-        'docinfo'                => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
-        'docinfo=private'        => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
-        'docinfo1'               => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
-        'docinfo=shared'         => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
-        'docinfo2'               => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
-        'docinfo docinfo2'       => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo' => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo=private' => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo1' => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=shared' => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo2' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo docinfo2' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
         'docinfo=private,shared' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
-        'docinfo=private-head'   => { head_script: 1, meta: 0, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=private-head' => { head_script: 1, meta: 0, top_link: 0, footer_script: 0, navbar: 0 },
         'docinfo=private-header' => { head_script: 0, meta: 0, top_link: 0, footer_script: 0, navbar: 1 },
-        'docinfo=shared-head'    => { head_script: 0, meta: 1, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=shared-head' => { head_script: 0, meta: 1, top_link: 0, footer_script: 0, navbar: 0 },
         'docinfo=private-footer' => { head_script: 0, meta: 0, top_link: 0, footer_script: 1, navbar: 0 },
-        'docinfo=shared-footer'  => { head_script: 0, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=shared-footer' => { head_script: 0, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
         'docinfo=private-head\ ,\ shared-footer' => { head_script: 1, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
       }
 

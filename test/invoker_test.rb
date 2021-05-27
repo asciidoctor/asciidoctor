@@ -661,16 +661,10 @@ context 'Invoker' do
   end
 
   test 'should set safe mode to specified level' do
-    levels = {
-      'unsafe' => Asciidoctor::SafeMode::UNSAFE,
-      'safe'   => Asciidoctor::SafeMode::SAFE,
-      'server' => Asciidoctor::SafeMode::SERVER,
-      'secure' => Asciidoctor::SafeMode::SECURE,
-    }
-    levels.each do |name, const|
+    Asciidoctor::SafeMode.names.each do |name|
       invoker = invoke_cli_to_buffer %W(-S #{name} -o /dev/null)
       doc = invoker.document
-      assert_equal const, doc.safe
+      assert_equal (Asciidoctor::SafeMode.value_for_name name), doc.safe
     end
   end
 
