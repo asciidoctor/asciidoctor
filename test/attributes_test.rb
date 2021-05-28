@@ -1835,5 +1835,4 @@ context 'Attributes' do
       assert_equal 'classy', section_two.attr(:role)
     end
   end
-
 end

@@ -3484,9 +3484,7 @@ context 'Description lists (:dlist)' do
 end
 
 context 'Description lists redux' do
-
   context 'Label without text on same line' do
-
     test 'folds text from subsequent line' do
       input = <<~'EOS'
       == Lists
@@ -4192,7 +4190,6 @@ context 'Description lists redux' do
   end
 
   context 'Item with text inline' do
-
     test 'folds text from inline description and subsequent line' do
       input = <<~'EOS'
       == Lists

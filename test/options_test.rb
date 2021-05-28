@@ -298,5 +298,4 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.parse!(%w(test/fixtures/sample.adoc))
     assert_equal false, options[:timings]
   end
-
 end

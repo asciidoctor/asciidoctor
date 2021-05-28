@@ -263,7 +263,6 @@ class ReaderTest < Minitest::Test
         reader.read_lines
         assert_equal SAMPLE_DATA.join(::Asciidoctor::LF), reader.source
       end
-
     end
 
     context 'Line context' do
@@ -1794,7 +1793,7 @@ class ReaderTest < Minitest::Test
         EOS
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        result = reader.peek_lines 2, true
+        reader.peek_lines 2, true
         result = reader.peek_lines 2, false
         assert_equal ['The Asciidoctor', 'is in.'], result
       end

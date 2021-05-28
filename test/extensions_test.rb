@@ -8,10 +8,11 @@ class ExtensionsInitTest < Minitest::Test
     refute doc.extensions?, 'Extensions should not be enabled by default'
 
     begin
-      # NOTE trigger extensions to autoload by registering empty group
       Asciidoctor::Extensions.register do
+        # trigger extensions to autoload by registering empty group
       end
-    rescue; end
+    rescue
+    end
 
     doc = empty_document
     assert doc.extensions?, 'Extensions should be enabled after being autoloaded'
@@ -78,8 +79,6 @@ class BoilerplateTextIncludeProcessor < Asciidoctor::Extensions::IncludeProcesso
     when 'lorem-ipsum.txt'
       content = ["Lorem ipsum dolor sit amet...\n"]
       reader.push_include content, target, target, 1, attributes
-    else
-      nil
     end
   end
 end
@@ -291,6 +290,7 @@ context 'Extensions' do
     test 'should register extension block' do
       begin
         Asciidoctor::Extensions.register :sample do
+          # this space intentionally left blank
         end
         refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
@@ -421,7 +421,6 @@ context 'Extensions' do
       ensure
         Asciidoctor::Extensions.unregister_all
       end
-
     end
   end
 
@@ -581,6 +580,7 @@ context 'Extensions' do
     test 'should not activate global registry if :extensions option is false' do
       begin
         Asciidoctor::Extensions.register :sample do
+          # this space intentionally left blank
         end
         refute_nil Asciidoctor::Extensions.groups
         assert_equal 1, Asciidoctor::Extensions.groups.size
@@ -658,7 +658,8 @@ context 'Extensions' do
             target == 'skip-me.adoc'
           end
 
-          process do |doc, reader, target, attributes|
+          process do |_doc, _reader, _target, _attributes|
+            nil
           end
         end
 
@@ -1234,11 +1235,7 @@ context 'Extensions' do
           inline_macro do
             named :data
             process do |parent, target, attrs|
-              if target == 'json'
-                create_inline_pass parent, %({ #{attrs.map {|k, v| %("#{k}": "#{v}") }.join ', '} })
-              else
-                nil
-              end
+              create_inline_pass parent, %({ #{attrs.map {|k, v| %("#{k}": "#{v}") }.join ', '} }) if target == 'json'
             end
           end
         end
