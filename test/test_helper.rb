@@ -416,7 +416,7 @@ class Minitest::Test
           end
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: #{mimetype}\r\n\r\n)
           File.open resource_file, Asciidoctor::FILE_READ_MODE do |fd|
-            until fd.eof? do
+            until fd.eof?
               buffer = fd.read 256
               session.write buffer
             end
