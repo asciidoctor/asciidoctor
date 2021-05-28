@@ -364,9 +364,8 @@ class Minitest::Test
           ENV.replace old_env
         end
       elsif env.value? nil
-        env = env.reduce ENV.to_h do |accum, (key, val)|
+        env = env.each_with_object ENV.to_h do |(key, val), accum|
           val.nil? ? (accum.delete key) : (accum[key] = val)
-          accum
         end
         popen [env, cmd, *args, (opts.merge unsetenv_others: true)], &block
       else
