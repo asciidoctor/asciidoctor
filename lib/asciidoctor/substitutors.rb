@@ -730,8 +730,12 @@ module Substitutors
 
         attrs = {}
         if (refid = $1)
-          refid, text = refid.split ',', 2
-          text = text.lstrip if text
+          if refid.include? ','
+            refid, _, text = refid.partition ','
+            text = nil if (text = text.lstrip).empty?
+          else
+            text = nil
+          end
         else
           macro = true
           refid = $2
