@@ -1071,8 +1071,8 @@ context 'API' do
     test 'timings are recorded for each step when load and convert are called separately' do
       sample_input_path = fixture_path 'asciidoc_index.txt'
       (Asciidoctor.load_file sample_input_path, timings: (timings = Asciidoctor::Timings.new)).convert
-      refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
-      refute_equal '0.00000', '%05.5f' % timings.convert.to_f
+      refute_equal '0.00000', (sprintf '%05.5f', timings.read_parse)
+      refute_equal '0.00000', (sprintf '%05.5f', timings.convert)
       refute_equal timings.read_parse, timings.total
     end
 
@@ -1625,8 +1625,8 @@ context 'API' do
     test 'timings are recorded for each step' do
       sample_input_path = fixture_path 'asciidoc_index.txt'
       Asciidoctor.convert_file sample_input_path, timings: (timings = Asciidoctor::Timings.new), to_file: false
-      refute_equal '0.00000', '%05.5f' % timings.read_parse.to_f
-      refute_equal '0.00000', '%05.5f' % timings.convert.to_f
+      refute_equal '0.00000', (sprintf '%05.5f', timings.read_parse)
+      refute_equal '0.00000', (sprintf '%05.5f', timings.convert)
       refute_equal timings.read_parse, timings.total
     end
 
