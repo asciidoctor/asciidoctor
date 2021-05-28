@@ -1851,9 +1851,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'There is a holy grail!', (lines * ::Asciidoctor::LF)
       end
 
@@ -1867,9 +1865,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::LF)
       end
 
@@ -1878,9 +1874,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, safe: :safe, base_dir: DIRNAME
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'snippetA content', lines[0]
       end
 
@@ -1906,9 +1900,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'hardships' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * ::Asciidoctor::LF)
       end
 
@@ -1926,9 +1918,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
       end
 
@@ -1944,9 +1934,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -1964,9 +1952,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
       end
 
@@ -1986,9 +1972,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
       end
 
@@ -2008,9 +1992,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
       end
 
@@ -2024,9 +2006,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'swallow' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2040,9 +2020,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2056,9 +2034,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '', 'swallow' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2072,9 +2048,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2106,9 +2080,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2229,9 +2201,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::LF)
       end
 
@@ -2245,9 +2215,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'No foo for you!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2261,9 +2229,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2277,9 +2243,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2293,9 +2257,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2309,9 +2271,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2325,9 +2285,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2341,9 +2299,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'tilt' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
@@ -2357,9 +2313,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2373,9 +2327,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'Of course it\'s the same!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2389,9 +2341,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2405,9 +2355,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'rings' => '1' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 
@@ -2421,9 +2369,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'rings' => '1' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
       end
 

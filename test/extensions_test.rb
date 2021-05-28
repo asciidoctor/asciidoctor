@@ -688,9 +688,7 @@ context 'Extensions' do
       lines << reader.read_line
       assert_equal 'found include target \'include-file.adoc\' at line 4', lines.last
       assert_equal 'include-file.adoc: line 2', reader.line_info
-      while reader.has_more_lines?
-        lines << reader.read_line
-      end
+      lines << reader.read_line while reader.has_more_lines?
       source = lines * ::Asciidoctor::LF
       assert_match(/^found include target 'include-file.adoc' at line 4$/, source)
       assert_match(/^middle line$/, source)
