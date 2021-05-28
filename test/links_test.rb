@@ -486,6 +486,16 @@ context 'Links' do
     assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', convert_string(input), 1
   end
 
+  test 'xref should use title of target as link text when explicit link text is empty' do
+    input = <<~'EOS'
+    <<tigers,>>
+
+    [#tigers]
+    == Tigers
+    EOS
+    assert_xpath '//a[@href="#tigers"][text() = "Tigers"]', convert_string(input), 1
+  end
+
   test 'xref using angled bracket syntax with quoted label' do
     input = <<~'EOS'
     <<tigers,"About Tigers">>
