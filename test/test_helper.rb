@@ -232,7 +232,7 @@ class Minitest::Test
 
   def parse_header_metadata source, doc = nil
     reader = Asciidoctor::Reader.new source.split Asciidoctor::LF
-    [(Asciidoctor::Parser.parse_header_metadata reader, doc), reader]
+    Asciidoctor::Parser.parse_header_metadata reader, doc
   end
 
   def assign_default_test_options opts
