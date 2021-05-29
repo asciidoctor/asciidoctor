@@ -3,7 +3,6 @@
 require_relative 'test_helper'
 
 context 'Links' do
-
   test 'qualified url inline with text' do
     assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'http://asciidoc.org']", convert_string('The AsciiDoc project is located at http://asciidoc.org.')
   end

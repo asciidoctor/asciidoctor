@@ -618,7 +618,6 @@ context 'Attributes' do
   end
 
   context 'Interpolation' do
-
     test 'convert properly with simple names' do
       html = convert_string %(:frog: Tanglefoot\n:my_super-hero: Spiderman\n\nYo, {frog}!\nBeat {my_super-hero}!)
       assert_xpath %(//p[text()="Yo, Tanglefoot!\nBeat Spiderman!"]), html, 1
@@ -996,7 +995,6 @@ context 'Attributes' do
   end
 
   context 'Intrinsic attributes' do
-
     test 'substitute intrinsics' do
       Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
         html = convert_string %(Look, a {#{key}} is here)

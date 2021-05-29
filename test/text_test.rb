@@ -124,7 +124,6 @@ context 'Text' do
   end
 
   test 'markdown horizontal rules negative case' do
-
     bad_variants = [
       '- - - -',
       '* * * *',

@@ -627,8 +627,11 @@ context 'Converter' do
     end
 
     test 'should use catch all converter from custom factory only if no other converter matches' do
-      class FooConverter < Asciidoctor::Converter::Base; end
-      class CatchAllConverter < Asciidoctor::Converter::Base; end
+      class FooConverter < Asciidoctor::Converter::Base
+      end
+
+      class CatchAllConverter < Asciidoctor::Converter::Base
+      end
 
       factory = Asciidoctor::Converter::CustomFactory.new 'foo' => FooConverter, '*' => CatchAllConverter
       assert_equal FooConverter, (factory.for 'foo')
