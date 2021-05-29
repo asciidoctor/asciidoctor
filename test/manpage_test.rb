@@ -389,7 +389,7 @@ context 'Manpage' do
 
   context 'Backslash' do
     test 'should not escape spaces for empty manual or source fields' do
-      input = SAMPLE_MANPAGE_HEADER.lines.select {|l| !l.start_with?(':man ') }
+      input = SAMPLE_MANPAGE_HEADER.lines.reject {|l| l.start_with? ':man ' }
       output = Asciidoctor.convert input, backend: :manpage, standalone: true
       assert_match ' Manual: \ \&', output
       assert_match ' Source: \ \&', output
