@@ -538,11 +538,11 @@ context 'Converter' do
           end
 
           def document node
-            ['<!DOCTYPE html>', '<html>', '<body>', node.content, '</body>', '</html>'] * %(\n)
+            ['<!DOCTYPE html>', '<html>', '<body>', node.content, '</body>', '</html>'].join ?\n
           end
 
           def paragraph node
-            ['<div class="paragraph">', %(<p>#{node.content}</p>), '</div>'] * %(\n)
+            ['<div class="paragraph">', %(<p>#{node.content}</p>), '</div>'].join ?\n
           end
         end
 
@@ -575,11 +575,11 @@ context 'Converter' do
           alias handles? respond_to?
 
           def document node
-            ['<!DOCTYPE html>', '<html>', '<body>', node.content, '</body>', '</html>'] * %(\n)
+            ['<!DOCTYPE html>', '<html>', '<body>', node.content, '</body>', '</html>'].join ?\n
           end
 
           def paragraph node
-            ['<div class="paragraph">', %(<p>#{node.content}</p>), '</div>'] * %(\n)
+            ['<div class="paragraph">', %(<p>#{node.content}</p>), '</div>'].join ?\n
           end
         end
 
