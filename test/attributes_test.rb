@@ -1083,7 +1083,7 @@ context 'Attributes' do
       doc = document_from_string input, standalone: false
       output = doc.convert
       assert_equal 3, doc.attributes['mycounter']
-      assert_equal %w(1 2 3 3), output.lines.map {|l| l.rstrip }
+      assert_equal %w(1 2 3 3), output.lines.map(&:rstrip)
     end
 
     test 'increments counter with negative numeric value' do
@@ -1100,7 +1100,7 @@ context 'Attributes' do
       doc = document_from_string input, standalone: false
       output = doc.convert
       assert_equal 0, doc.attributes['mycounter']
-      assert_equal %w(-2 -1 0 0), output.lines.map {|l| l.rstrip }
+      assert_equal %w(-2 -1 0 0), output.lines.map(&:rstrip)
     end
 
     test 'increments counter with ASCII character value' do
@@ -1115,7 +1115,7 @@ context 'Attributes' do
       EOS
 
       output = convert_string_to_embedded input
-      assert_equal %w(A B C C), output.lines.map {|l| l.rstrip }
+      assert_equal %w(A B C C), output.lines.map(&:rstrip)
     end
 
     test 'increments counter with non-ASCII character value' do
@@ -1130,7 +1130,7 @@ context 'Attributes' do
       EOS
 
       output = convert_string_to_embedded input
-      assert_equal %w(é ê ë ë), output.lines.map {|l| l.rstrip }
+      assert_equal %w(é ê ë ë), output.lines.map(&:rstrip)
     end
 
     test 'increments counter with emoji character value' do
@@ -1145,7 +1145,7 @@ context 'Attributes' do
       EOS
 
       output = convert_string_to_embedded input
-      assert_equal %w(😋 😌 😍 😍), output.lines.map {|l| l.rstrip }
+      assert_equal %w(😋 😌 😍 😍), output.lines.map(&:rstrip)
     end
 
     test 'increments counter with multi-character value' do
@@ -1160,7 +1160,7 @@ context 'Attributes' do
       EOS
 
       output = convert_string_to_embedded input
-      assert_equal %w(1x 1y 1z 1z), output.lines.map {|l| l.rstrip }
+      assert_equal %w(1x 1y 1z 1z), output.lines.map(&:rstrip)
     end
 
     test 'counter uses 0 as seed value if seed attribute is nil' do
