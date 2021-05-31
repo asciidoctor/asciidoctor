@@ -98,7 +98,7 @@ context 'API' do
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
         tmp_output = tmp_input.path.sub '.adoc', '.html'
         Asciidoctor.convert_file tmp_input.path, safe: :safe, attributes: 'linkcss !copycss'
-        assert File.exist? tmp_output
+        assert_path_exists tmp_output
         output = File.binread tmp_output
         refute_empty output
         # force encoding to UTF-8 and we should see that the string is in fact UTF-8 encoded
@@ -1134,7 +1134,7 @@ context 'API' do
       [{ header_footer: false }, { header_footer: false, to_file: sample_output_path }].each do |opts|
         begin
           Asciidoctor.convert_file sample_input_path, opts
-          assert File.exist?(sample_output_path)
+          assert_path_exists sample_output_path
           output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
           refute_empty output
           assert_xpath '/html', output, 0
@@ -1363,8 +1363,8 @@ context 'API' do
         custom_stylesheet_output_path = File.join output_dir, 'stylesheets', 'custom.css'
         Asciidoctor.convert_file sample_input_path,
             safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'stylesheets/custom.css', 'linkcss' => '', 'copycss' => '' }
-        assert File.exist? sample_output_path
-        assert File.exist? custom_stylesheet_output_path
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         assert_xpath '/html/head/link[@rel="stylesheet"][@href="./stylesheets/custom.css"]', output, 1
         assert_xpath 'style', output, 0
@@ -1381,8 +1381,8 @@ context 'API' do
         custom_stylesheet_output_path = File.join output_dir, 'custom.css'
         Asciidoctor.convert_file sample_input_path,
             safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'custom.css', 'linkcss' => true, 'copycss' => true }
-        assert File.exist? sample_output_path
-        assert File.exist? custom_stylesheet_output_path
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         assert_xpath '/html/head/link[@rel="stylesheet"][@href="./custom.css"]', output, 1
         assert_xpath 'style', output, 0
@@ -1396,7 +1396,7 @@ context 'API' do
       sample_output_path = fixture_path('sample.html')
       begin
         Asciidoctor.convert_file sample_input_path
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
         output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
@@ -1433,7 +1433,7 @@ context 'API' do
       sample_output_path = fixture_path('result.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
         output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
@@ -1452,7 +1452,7 @@ context 'API' do
       fixture_dir = fixture_path('')
       begin
         Asciidoctor.convert_file sample_input_path, to_file: 'result.html', base_dir: fixture_dir
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
         output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_xpath '/html', output, 1
@@ -1475,7 +1475,7 @@ context 'API' do
         sample_output_dir = File.dirname sample_output_path
         sample_output_file.close
         doc = Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, to_dir: sample_output_dir, safe: :unsafe
-        assert File.exist? sample_output_path
+        assert_path_exists sample_output_path
         assert_equal sample_output_path, doc.options[:to_file]
         assert_equal sample_output_dir, doc.options[:to_dir]
       ensure
@@ -1488,7 +1488,7 @@ context 'API' do
       sample_output_path = fixture_path('result.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, in_place: true
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
       end
@@ -1499,7 +1499,7 @@ context 'API' do
       sample_output_path = fixture_path('sample.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: File.dirname(sample_output_path), in_place: true
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
       end
@@ -1510,7 +1510,7 @@ context 'API' do
       sample_output_path = fixture_path('result.htm')
       begin
         Asciidoctor.convert sample_input, to_file: sample_output_path
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
         output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
         refute_empty output
         assert_include '<p>.htm</p>', output
@@ -1524,7 +1524,7 @@ context 'API' do
       sample_output_path = fixture_path('sample.htm')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: (File.dirname sample_input_path), attributes: { 'outfilesuffix' => '.htm@' }
-        assert File.exist?(sample_output_path)
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path)
       end
@@ -1537,7 +1537,7 @@ context 'API' do
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: output_dir
-        assert File.exist? sample_output_path
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
         FileUtils.rmdir output_dir
@@ -1550,7 +1550,7 @@ context 'API' do
       sample_output_path = File.join(output_dir, 'sample.html')
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: output_dir, mkdirs: true
-        assert File.exist? sample_output_path
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
         FileUtils.rmdir output_dir
@@ -1576,7 +1576,7 @@ context 'API' do
       sample_output_path = File.join(base_dir, sample_rel_output_path)
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: base_dir, to_file: sample_rel_output_path
-        assert File.exist? sample_output_path
+        assert_path_exists sample_output_path
       ensure
         FileUtils.rm(sample_output_path) if File.exist? sample_output_path
         FileUtils.rmdir output_dir

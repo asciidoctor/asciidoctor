@@ -96,7 +96,7 @@ context 'Invoker' do
       assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
       assert doc.attr?('outfile')
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(sample_outpath)
     end
@@ -254,7 +254,7 @@ context 'Invoker' do
       invoker = invoke_cli
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
       output = File.read(sample_outpath, mode: Asciidoctor::FILE_READ_MODE)
       refute_empty output
       assert_xpath '/html', output, 1
@@ -277,7 +277,7 @@ context 'Invoker' do
       #invoker = invoke_cli %w(-D ../../test/test_output)
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rmdir(destination_path)
@@ -293,7 +293,7 @@ context 'Invoker' do
       FileUtils.mkdir_p(destination_path)
       invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
       assert File.directory?(destination_subdir_path)
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rmdir(destination_subdir_path)
@@ -307,7 +307,7 @@ context 'Invoker' do
       invoker = invoke_cli %W(-o #{sample_outpath})
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(sample_outpath)
     end
@@ -319,9 +319,9 @@ context 'Invoker' do
     coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
     begin
       invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay), 'source-block.adoc'
-      assert File.exist?(sample_outpath)
-      assert File.exist?(asciidoctor_stylesheet)
-      assert File.exist?(coderay_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists asciidoctor_stylesheet
+      assert_path_exists coderay_stylesheet
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(asciidoctor_stylesheet)
@@ -335,9 +335,9 @@ context 'Invoker' do
     coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
     begin
       invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay)
-      assert File.exist?(sample_outpath)
-      assert File.exist?(asciidoctor_stylesheet)
-      refute File.exist?(coderay_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists asciidoctor_stylesheet
+      refute_path_exists coderay_stylesheet
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(asciidoctor_stylesheet)
@@ -351,8 +351,8 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss!)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(default_stylesheet)
+      assert_path_exists sample_outpath
+      refute_path_exists default_stylesheet
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(default_stylesheet)
@@ -367,8 +367,8 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss=stylesheets/custom.css -a stylesdir=./styles -a stylesheet=custom.css)
       invoker.document
-      assert File.exist?(sample_outpath)
-      assert File.exist?(custom_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists custom_stylesheet
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(custom_stylesheet)
@@ -385,8 +385,8 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=./styles -a stylesheet=custom.css -a copycss!)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(custom_stylesheet)
+      assert_path_exists sample_outpath
+      refute_path_exists custom_stylesheet
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rm_f(custom_stylesheet)
@@ -402,8 +402,8 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=http://example.org/styles -a stylesheet=custom.css)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(stylesdir)
+      assert_path_exists sample_outpath
+      refute_path_exists stylesdir
     ensure
       FileUtils.rm_f(sample_outpath)
       FileUtils.rmdir(stylesdir) if File.directory? stylesdir
@@ -416,8 +416,8 @@ context 'Invoker' do
     sample_outpath = fixture_path 'sample.html'
     begin
       invoke_cli_with_filenames [], %w(basic.adoc sample.adoc)
-      assert File.exist?(basic_outpath)
-      assert File.exist?(sample_outpath)
+      assert_path_exists basic_outpath
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(basic_outpath)
       FileUtils.rm_f(sample_outpath)
@@ -430,8 +430,8 @@ context 'Invoker' do
     sample_outpath = File.join destination_path, 'sample.htm'
     begin
       invoke_cli_with_filenames %w(-D test/test_output -a outfilesuffix=.htm), %w(basic.adoc sample.adoc)
-      assert File.exist?(basic_outpath)
-      assert File.exist?(sample_outpath)
+      assert_path_exists basic_outpath
+      assert_path_exists sample_outpath
     ensure
       FileUtils.rm_f(basic_outpath)
       FileUtils.rm_f(sample_outpath)
@@ -443,7 +443,7 @@ context 'Invoker' do
     basic_outpath = fixture_path 'basic.html'
     begin
       invoke_cli_to_buffer [], 'ba*.adoc'
-      assert File.exist?(basic_outpath)
+      assert_path_exists basic_outpath
     ensure
       FileUtils.rm_f(basic_outpath)
     end
@@ -459,7 +459,7 @@ context 'Invoker' do
 
     begin
       invoke_cli_to_buffer [], glob
-      assert File.exist?(basic_outpath)
+      assert_path_exists basic_outpath
     ensure
       FileUtils.rm_f(basic_outpath)
     end
@@ -498,8 +498,8 @@ context 'Invoker' do
 
     begin
       invoke_cli(%W(-b manpage -o #{outfile_1}), '-') { input }
-      assert File.exist?(outfile_1)
-      assert File.exist?(outfile_2)
+      assert_path_exists outfile_1
+      assert_path_exists outfile_2
       assert_equal '.so eve.1', (File.read outfile_2, mode: Asciidoctor::FILE_READ_MODE).chomp
     ensure
       FileUtils.rm_f outfile_1
