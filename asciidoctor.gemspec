@@ -48,7 +48,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 12.3.0'
   # Asciidoctor supports Rouge >= 2
   s.add_development_dependency 'rouge', '~> 3.26.0'
-  s.add_development_dependency 'rspec-expectations', '~> 3.8.0'
   s.add_development_dependency 'slim', '~> 4.1.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'
 end
