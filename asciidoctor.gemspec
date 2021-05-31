@@ -43,7 +43,7 @@ Gem::Specification.new do |s|
   # erubi is needed for testing alternate eRuby impls
   s.add_development_dependency 'erubi', '~> 1.10.0'
   s.add_development_dependency 'haml', '~> 5.2.0'
-  s.add_development_dependency 'minitest', '~> 5.11.0'
+  s.add_development_dependency 'minitest', '~> 5.14.0'
   s.add_development_dependency 'nokogiri', '~> 1.10.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
   # Asciidoctor supports Rouge >= 2
