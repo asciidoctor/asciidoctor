@@ -365,7 +365,7 @@ context 'Converter' do
       doc = document_from_string input, converter: CustomHtmlConverterA
       assert_kind_of CustomHtmlConverterA, doc.converter
       assert_equal 'html', doc.attributes['filetype']
-      assert 'document', doc.convert
+      assert_equal 'document', doc.convert
     end
 
     test 'should use specified converter for specified backend' do
@@ -390,7 +390,7 @@ context 'Converter' do
       doc = document_from_string input, backend: 'text', converter: CustomTextConverterA
       assert_kind_of CustomTextConverterA, doc.converter
       assert_equal 'text', doc.attributes['filetype']
-      assert 'document', doc.convert
+      assert_equal 'document', doc.convert
     end
 
     test 'should get converter from specified converter factory' do
@@ -415,7 +415,7 @@ context 'Converter' do
       doc = document_from_string input, converter_factory: converter_factory
       assert_kind_of my_converter_class, doc.converter
       assert_equal 'html', doc.attributes['filetype']
-      assert 'document', doc.convert
+      assert_equal 'document', doc.convert
     end
 
     test 'should allow converter to set htmlsyntax when basebackend is html' do
@@ -453,7 +453,7 @@ context 'Converter' do
         assert converters.size == converters_before.size + 1
         assert converters['foobar'] == CustomConverterB
         output = convert_string input, backend: 'foobar'
-        assert 'foobar content', output
+        assert_equal 'foobar content', output
       ensure
         Asciidoctor::Converter.unregister_all
       end
@@ -620,7 +620,7 @@ context 'Converter' do
         assert_nil converters['*']
         assert_equal CustomConverterF, (Asciidoctor::Converter.send :catch_all)
         output = convert_string input, backend: 'foobaz'
-        assert 'foobaz content', output
+        assert_equal 'foobaz content', output
       ensure
         Asciidoctor::Converter.unregister_all
       end

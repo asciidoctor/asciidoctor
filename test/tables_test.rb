@@ -15,7 +15,7 @@ context 'Tables' do
       cells = [%w(A B C), %w(a b c), %w(1 2 3)]
       doc = document_from_string input, standalone: false
       table = doc.blocks[0]
-      assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
+      assert_equal 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
       assert_css 'table.tableblock.frame-all.grid-all.stretch', output, 1
@@ -2159,7 +2159,7 @@ context 'Tables' do
       EOS
       doc = document_from_string input, standalone: false
       table = doc.blocks[0]
-      assert 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
+      assert_equal 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col[style*="width: 14.2857"]', output, 6
