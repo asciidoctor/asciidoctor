@@ -1402,7 +1402,7 @@ context 'Document' do
     test 'should record imagesdir when image is registered with catalog' do
       doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
       doc.register :images, 'diagram.svg'
-      assert_equal doc.catalog[:images].size, 1
+      assert_equal 1, doc.catalog[:images].size
       assert_equal 'diagram.svg', doc.catalog[:images][0].target
       assert_equal 'img', doc.catalog[:images][0].imagesdir
     end
@@ -1421,7 +1421,7 @@ context 'Document' do
       images = doc.catalog[:images]
       refute_empty images
       assert_equal 2, images.size
-      assert_equal images.map(&:target), ['outer.png', 'inner.png']
+      assert_equal ['outer.png', 'inner.png'], images.map(&:target)
     end
   end
 

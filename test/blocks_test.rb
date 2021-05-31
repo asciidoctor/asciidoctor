@@ -3341,7 +3341,7 @@ context 'Blocks' do
       basedir = testdir
       block = block_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => basedir }
       doc = block.document
-      assert doc.safe == Asciidoctor::SafeMode::UNSAFE
+      assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
       absolute_path = "#{disk_root}etc/images"

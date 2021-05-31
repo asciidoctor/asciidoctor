@@ -75,7 +75,7 @@ context 'Converter' do
       selected = doc.converter.find_converter('paragraph')
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
       assert_kind_of Slim::Template, selected.templates['paragraph']
-      assert_equal true, selected.templates['paragraph'].options[:pretty]
+      assert selected.templates['paragraph'].options[:pretty]
     end
 
     test 'should support custom template engine options' do
@@ -84,8 +84,8 @@ context 'Converter' do
       selected = doc.converter.find_converter('paragraph')
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
       assert_kind_of Slim::Template, selected.templates['paragraph']
-      assert_equal false, selected.templates['paragraph'].options[:sort_attrs]
-      assert_equal true, selected.templates['paragraph'].options[:pretty]
+      refute selected.templates['paragraph'].options[:sort_attrs]
+      assert selected.templates['paragraph'].options[:pretty]
     end
   end
 
@@ -450,8 +450,8 @@ context 'Converter' do
         input = 'content'
         assert_equal CustomConverterB, (Asciidoctor::Converter.for 'foobar')
         converters = Asciidoctor::Converter.converters
-        assert converters.size == converters_before.size + 1
-        assert converters['foobar'] == CustomConverterB
+        assert_equal converters_before.size + 1, converters.size
+        assert_equal CustomConverterB, converters['foobar']
         output = convert_string input, backend: 'foobar'
         assert_equal 'foobar content', output
       ensure

@@ -1223,7 +1223,7 @@ context 'Sections' do
       EOS
 
       block = block_from_string input
-      assert_equal block.id, 'install'
+      assert_equal 'install', block.id
       assert_equal 'Install <a id="installation"></a>', block.title
     end
   end
@@ -2040,7 +2040,7 @@ context 'Sections' do
       assert_equal 'Appendix A: ', appendix.caption
       assert_equal 'A', appendix.numeral
       assert_equal 'A', appendix.number
-      assert_equal true, appendix.numbered
+      assert appendix.numbered
     end
 
     test 'should prefix appendix title by numbered label even when section numbering is disabled' do

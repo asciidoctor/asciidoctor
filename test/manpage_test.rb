@@ -314,7 +314,7 @@ context 'Manpage' do
       de cereja sem conflitos.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert(output.lines[-5].include? 'commit...')
+      assert_include 'commit...', output.lines[-5]
     end
 
     test 'should normalize whitespace in a paragraph' do

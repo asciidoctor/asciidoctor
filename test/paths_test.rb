@@ -275,11 +275,11 @@ context 'Path Resolver' do
     end
 
     test 'File.dirname preserves UNC path root on Windows', if: windows? do
-      assert_equal File.dirname('\\\\server\\docs\\file.html'), '\\\\server\\docs'
+      assert_equal '\\\\server\\docs', File.dirname('\\\\server\\docs\\file.html')
     end
 
     test 'File.dirname preserves posix-style UNC path root on Windows', if: windows? do
-      assert_equal File.dirname('//server/docs/file.html'), '//server/docs'
+      assert_equal '//server/docs', File.dirname('//server/docs/file.html')
     end
 
     test 'resolves UNC path if start is absolute and target is relative' do

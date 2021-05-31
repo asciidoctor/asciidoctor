@@ -100,7 +100,7 @@ context 'Options' do
     options = Asciidoctor::Cli::Options.parse!(%w(-w -v -e -d book test/fixtures/sample.adoc))
 
     assert_equal 2, options[:verbose]
-    assert_equal false, options[:standalone]
+    refute options[:standalone]
     assert_equal 'book', options[:attributes]['doctype']
     assert_equal 1, options[:input_files].size
     assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]
@@ -109,7 +109,7 @@ context 'Options' do
   test 'supports legacy option for no header footer' do
     options = Asciidoctor::Cli::Options.parse!(%w(-s test/fixtures/sample.adoc))
 
-    assert_equal false, options[:standalone]
+    refute options[:standalone]
     assert_equal 1, options[:input_files].size
     assert_equal 'test/fixtures/sample.adoc', options[:input_files][0]
   end
@@ -291,11 +291,11 @@ context 'Options' do
 
   test 'should enable timings when -t flag is specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-t test/fixtures/sample.adoc))
-    assert_equal true, options[:timings]
+    assert options[:timings]
   end
 
   test 'timings option is disable by default' do
     options = Asciidoctor::Cli::Options.parse!(%w(test/fixtures/sample.adoc))
-    assert_equal false, options[:timings]
+    refute options[:timings]
   end
 end

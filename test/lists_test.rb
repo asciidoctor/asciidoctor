@@ -3396,8 +3396,8 @@ context 'Description lists (:dlist)' do
       doc = document_from_string input
       ulists = doc.find_by context: :ulist
       assert_equal 2, ulists.size
-      assert_equal ulists[0].style, 'bibliography'
-      assert_equal ulists[1].style, 'bibliography'
+      assert_equal 'bibliography', ulists[0].style
+      assert_equal 'bibliography', ulists[1].style
     end
 
     test 'should not recognize bibliography anchor that begins with a digit' do
