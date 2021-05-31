@@ -903,10 +903,10 @@ context 'Substitutions' do
 
       using_memory_logger do |logger|
         sect = block_from_string input, attributes: { 'data-uri' => '', 'iconsdir' => 'fixtures', 'docdir' => testdir }, safe: :server, catalog_assets: true
-        assert 1, sect.document.catalog[:images].size
+        assert_equal 1, sect.document.catalog[:images].size
         assert_equal 'fixtures/dot.gif', sect.document.catalog[:images][0].to_s
         assert_nil sect.document.catalog[:images][0].imagesdir
-        assert logger.empty?
+        assert_empty logger
       end
     end
 
@@ -1147,7 +1147,7 @@ context 'Substitutions' do
         assert_css '#_footnotedef_1', output, 1
         assert_css 'p a[href="#_footnotedef_1"]', output, 3
         assert_css '#footnotes .footnote', output, 1
-        assert logger.empty?
+        assert_empty logger
       end
     end
 
@@ -1946,7 +1946,7 @@ context 'Substitutions' do
           input = 'asciimath:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
           para = block_from_string input, attributes: { 'attribute-missing' => 'warn' }
           assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
-          assert logger.empty?
+          assert_empty logger
         end
       end
 
@@ -2095,7 +2095,7 @@ context 'Substitutions' do
             input = 'stem:[x/x={(1,if x!=0),(text{undefined},if x=0):}]'
             para = block_from_string input, attributes: (attributes.merge 'attribute-missing' => 'warn')
             assert_equal '\$x/x={(1,if x!=0),(text{undefined},if x=0):}\$', para.content
-            assert logger.empty?
+            assert_empty logger
           end
         end
       end

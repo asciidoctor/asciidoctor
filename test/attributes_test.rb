@@ -1500,7 +1500,7 @@ context 'Attributes' do
 
       doc = document_from_string input
       p = doc.blocks.first
-      assert_equal [], p.roles
+      assert_empty p.roles
     end
 
     test 'roles does not return value of roles document attribute' do
@@ -1512,7 +1512,7 @@ context 'Attributes' do
 
       doc = document_from_string input
       p = doc.blocks.first
-      assert_equal [], p.roles
+      assert_empty p.roles
     end
 
     test 'roles= sets the role attribute on the node' do

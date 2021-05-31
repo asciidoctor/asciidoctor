@@ -222,7 +222,7 @@ context 'Invoker' do
       [invoke_cli(%w(-q --failure-level=WARN -o /dev/null), '-') { input }.code, err.string]
     end
     assert_equal 1, exit_code
-    assert messages.empty?
+    assert_empty messages
   end
 
   test 'should report usage if no input file given' do

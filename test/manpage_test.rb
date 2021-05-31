@@ -129,7 +129,7 @@ context 'Manpage' do
         assert_equal ['cmd'], doc.attr('mannames')
         assert_equal '.1', doc.attr('outfilesuffix')
         output = doc.convert
-        refute logger.messages.empty?
+        refute_empty logger.messages
         assert_includes output, 'Title: cmd'
         assert output.end_with?('garbage in')
       end

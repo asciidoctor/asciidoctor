@@ -97,7 +97,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'empty? should return true with empty data' do
-        assert Asciidoctor::Reader.new.empty?
+        assert_empty Asciidoctor::Reader.new
         assert Asciidoctor::Reader.new.eof?
       end
 
@@ -110,7 +110,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'peek_lines should return empty Array with empty data' do
-        assert_equal [], Asciidoctor::Reader.new.peek_lines(1)
+        assert_empty Asciidoctor::Reader.new.peek_lines(1)
       end
 
       test 'read_line should return nil with empty data' do
@@ -119,7 +119,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'read_lines should return empty Array with empty data' do
-        assert_equal [], Asciidoctor::Reader.new.read_lines
+        assert_empty Asciidoctor::Reader.new.read_lines
         #assert_equal [], Asciidoctor::Reader.new.get_lines
       end
     end
@@ -132,7 +132,7 @@ class ReaderTest < Minitest::Test
 
       test 'empty? should return false if there are lines remaining' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        refute reader.empty?
+        refute_empty reader
         refute reader.eof?
       end
 
@@ -471,7 +471,7 @@ class ReaderTest < Minitest::Test
         data = ['', ' ', '', ' ']
         doc = Asciidoctor::Document.new data
         reader = doc.reader
-        assert reader.lines.empty?
+        assert_empty reader.lines
       end
 
       test 'should clean CRLF from end of lines' do
@@ -652,7 +652,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
-        assert doc.catalog[:includes].empty?
+        assert_empty doc.catalog[:includes]
       end
 
       test 'include directive should resolve file with spaces in name' do
@@ -1731,8 +1731,8 @@ class ReaderTest < Minitest::Test
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
           reader.skip_comment_lines
-          assert reader.empty?
-          assert logger.empty?
+          assert_empty reader
+          assert_empty logger
         end
       end
     end

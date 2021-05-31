@@ -3718,7 +3718,7 @@ context 'Blocks' do
 
       doc = document_from_string input
       block = doc.blocks.first
-      assert_equal [], block.subs
+      assert_empty block.subs
     end
 
     test 'should be able to append subs to default block substitution list' do

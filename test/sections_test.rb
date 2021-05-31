@@ -427,11 +427,11 @@ context 'Sections' do
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
-          refute logger.empty?
+          refute_empty logger
           logger.clear
           output = convert_string(title + "\n" + chars + "\n")
           assert_xpath '//h1', output, 0
-          refute logger.empty?
+          refute_empty logger
         end
       end
 
@@ -441,11 +441,11 @@ context 'Sections' do
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
-          refute logger.empty?
+          refute_empty logger
           logger.clear
           output = convert_string(title + "\n" + chars + "\n")
           assert_xpath '//h1', output, 0
-          refute logger.empty?
+          refute_empty logger
         end
       end
 
@@ -455,7 +455,7 @@ context 'Sections' do
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h1', output, 0
-          refute logger.empty?
+          refute_empty logger
         end
       end
 
@@ -627,7 +627,7 @@ context 'Sections' do
         using_memory_logger do |logger|
           output = convert_string(title + "\n" + chars)
           assert_xpath '//h2', output, 0
-          refute logger.empty?
+          refute_empty logger
         end
       end
 
@@ -804,7 +804,7 @@ context 'Sections' do
 
       using_memory_logger do |logger|
         convert_string_to_embedded input, attributes: { 'fragment' => '' }
-        assert logger.empty?
+        assert_empty logger
       end
     end
 
@@ -1281,7 +1281,7 @@ context 'Sections' do
       output = nil
       using_memory_logger do |logger|
         output = convert_string input
-        assert logger.empty?
+        assert_empty logger
       end
 
       assert_match(/Master document written by Doc Writer/, output)
@@ -3764,7 +3764,7 @@ context 'Sections' do
       output = nil
       using_memory_logger do |logger|
         output = convert_string input, backend: 'docbook'
-        assert logger.empty?
+        assert_empty logger
       end
       assert_xpath '/book/preface', output, 1
       assert_xpath '/book/preface/section', output, 1
