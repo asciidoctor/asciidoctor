@@ -284,7 +284,7 @@ module Asciidoctor
     '====' => [:example, ['admonition'].to_set],
     '****' => [:sidebar, ::Set.new],
     '____' => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ['stem', 'latexmath', 'asciimath'].to_set],
+    '++++' => [:pass, ['stem', 'latexmath', 'asciimath', 'katexmath'].to_set],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
@@ -343,11 +343,13 @@ module Asciidoctor
   BLOCK_MATH_DELIMITERS = {
     asciimath: ['\$', '\$'],
     latexmath: ['\[', '\]'],
+    katexmath: ['', ''],
   }
 
   INLINE_MATH_DELIMITERS = {
     asciimath: ['\$', '\$'],
     latexmath: ['\(', '\)'],
+    katexmath: ['', ''],
   }
 
   (STEM_TYPE_ALIASES = {

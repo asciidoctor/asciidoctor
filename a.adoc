@@ -1,0 +1,46 @@
+= bla
+:stem:
+
+stem: stem:[sqrt(1+1) = 2]
+
+asciimath: asciimath:[sqrt(1+1) = 2]
+
+latexmath: latexmath:[\sqrt{1+1} = 2]
+
+katexmath: katexmath:[\sqrt{1+1} = 2]
+
+stem: stem:[[[a,b\],[c,d\]\]]
+
+asciimath asciimath:[[[a,b\],[c,d\]\]]
+
+latexmath: latexmath:[\begin{bmatrix}a & b\\c & d\end{bmatrix}]
+
+katexmath: katexmath:[\begin{bmatrix}a & b\\c & d\end{bmatrix}]
+
+stem:
+
+[stem]
+++++
+sqrt(1+1) = 2
+++++
+
+asciimath:
+
+[asciimath]
+++++
+sqrt(1+1) = 2
+++++
+
+latexmath:
+
+[latexmath]
+++++
+\sqrt{1+1} = 2
+++++
+
+katexmath:
+
+[katexmath]
+++++
+\sqrt{1+1} = 2
+++++
