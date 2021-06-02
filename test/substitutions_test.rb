@@ -2125,7 +2125,7 @@ context 'Substitutions' do
           ['stem:[+\infty-(+\infty)]', '\$\infty-(\infty)\$'],
           ['stem:[+++\infty-(+\infty)++]', '\$+\infty-(+\infty)\$'],
         ].each do |input, expected|
-          para = block_from_string input, attributes: { 'stem' => '', }
+          para = block_from_string input, attributes: { 'stem' => '' }
           assert_equal expected, para.content
         end
       end
@@ -2135,7 +2135,7 @@ context 'Substitutions' do
           ['stem:[\+] and stem:[+]', '\$+\$ and \$+\$'],
           ['stem:[\+1+]', '\$+1+\$'],
         ].each do |input, expected|
-          para = block_from_string input, attributes: { 'stem' => '', }
+          para = block_from_string input, attributes: { 'stem' => '' }
           assert_equal expected, para.content
         end
       end

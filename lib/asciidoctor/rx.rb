@@ -341,7 +341,7 @@ module Asciidoctor
     '::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::)(?:$|[ \t]+(#{CC_ANY}*)$)),
     ':::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(:::)(?:$|[ \t]+(#{CC_ANY}*)$)),
     '::::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::::)(?:$|[ \t]+(#{CC_ANY}*)$)),
-    ';;' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$))
+    ';;' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$)),
   }
 
   # Matches a callout list item.
@@ -574,7 +574,7 @@ module Asciidoctor
   # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
   InlinePassRx = {
     false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
-    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m]
+    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m],
   }
 
   # Matches an inline plus passthrough spanning multiple lines, but only when it occurs directly

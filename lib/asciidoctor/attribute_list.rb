@@ -31,13 +31,13 @@ class AttributeList
   BoundaryRx = {
     QUOT => /.*?[^\\](?=")/,
     APOS => /.*?[^\\](?=')/,
-    ',' => /.*?(?=[ \t]*(,|$))/
+    ',' => /.*?(?=[ \t]*(,|$))/,
   }
 
   # Public: Regular expressions for unescaping quoted characters
   EscapedQuotes = {
     QUOT => '\\"',
-    APOS => '\\\''
+    APOS => '\\\'',
   }
 
   # Public: A regular expression for an attribute name (approx. name token from XML)
@@ -47,9 +47,7 @@ class AttributeList
   BlankRx = /[ \t]+/
 
   # Public: Regular expressions for skipping delimiters
-  SkipRx = {
-    ',' => /[ \t]*(,|$)/
-  }
+  SkipRx = { ',' => /[ \t]*(,|$)/ }
 
   def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source

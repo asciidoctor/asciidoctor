@@ -232,13 +232,11 @@ module Asciidoctor
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
     'html' => 'html5',
-    'docbook' => 'docbook5'
+    'docbook' => 'docbook5',
   }
 
   # Default page widths for calculating absolute widths
-  DEFAULT_PAGE_WIDTHS = {
-    'docbook' => 425
-  }
+  DEFAULT_PAGE_WIDTHS = { 'docbook' => 425 }
 
   # Default extensions for the respective base backends
   DEFAULT_EXTENSIONS = {
@@ -247,7 +245,7 @@ module Asciidoctor
     'pdf' => '.pdf',
     'epub' => '.epub',
     'manpage' => '.man',
-    'asciidoc' => '.adoc'
+    'asciidoc' => '.adoc',
   }
 
   # A map of file extensions that are recognized as AsciiDoc documents
@@ -258,7 +256,7 @@ module Asciidoctor
     '.asc' => true,
     '.ad' => true,
     # TODO .txt should be deprecated
-    '.txt' => true
+    '.txt' => true,
   }
 
   SETEXT_SECTION_LEVELS = {
@@ -266,7 +264,7 @@ module Asciidoctor
     '-' => 1,
     '~' => 2,
     '^' => 3,
-    '+' => 4
+    '+' => 4,
   }
 
   ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
@@ -290,7 +288,7 @@ module Asciidoctor
     ':===' => [:table, ::Set.new],
     '!===' => [:table, ::Set.new],
     '////' => [:comment, ::Set.new],
-    '```' => [:fenced_code, ::Set.new]
+    '```' => [:fenced_code, ::Set.new],
   }
 
   DELIMITED_BLOCK_HEADS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k.slice 0, 2] = true } }
@@ -301,13 +299,13 @@ module Asciidoctor
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
-    '<' => :page_break
+    '<' => :page_break,
   }
 
   MARKDOWN_THEMATIC_BREAK_CHARS = {
     '-' => :thematic_break,
     '*' => :thematic_break,
-    '_' => :thematic_break
+    '_' => :thematic_break,
   }
 
   HYBRID_LAYOUT_BREAK_CHARS = LAYOUT_BREAK_CHARS.merge MARKDOWN_THEMATIC_BREAK_CHARS
@@ -326,7 +324,7 @@ module Asciidoctor
     'lowerroman' => 'i',
     #'lowergreek' => 'a',
     'upperalpha' => 'A',
-    'upperroman' => 'I'
+    'upperroman' => 'I',
   }
 
   ATTR_REF_HEAD = '{'
@@ -353,7 +351,7 @@ module Asciidoctor
   (STEM_TYPE_ALIASES = {
     'latexmath' => 'latexmath',
     'latex' => 'latexmath',
-    'tex' => 'latexmath'
+    'tex' => 'latexmath',
   }).default = 'asciimath'
 
   FONT_AWESOME_VERSION = '4.7.0'
@@ -421,7 +419,7 @@ module Asciidoctor
     'cpp' => 'C&#43;&#43;',
     'amp' => '&',
     'lt' => '<',
-    'gt' => '>'
+    'gt' => '>',
   }
 
   # Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)

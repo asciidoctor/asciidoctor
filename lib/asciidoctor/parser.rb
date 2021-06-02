@@ -49,7 +49,7 @@ class Parser
   TableCellHorzAlignments = {
     '<' => 'left',
     '>' => 'right',
-    '^' => 'center'
+    '^' => 'center',
   }
 
   # Internal: A Hash mapping vertical alignment abbreviations to alignments
@@ -57,7 +57,7 @@ class Parser
   TableCellVertAlignments = {
     '<' => 'top',
     '>' => 'bottom',
-    '^' => 'middle'
+    '^' => 'middle',
   }
 
   # Internal: A Hash mapping styles abbreviations to styles that can be applied
@@ -69,7 +69,7 @@ class Parser
     'm' => :monospaced,
     'h' => :header,
     'l' => :literal,
-    'a' => :asciidoc
+    'a' => :asciidoc,
   }
 
   # Hide the default constructor to make sure this class doesn't get instantiated.

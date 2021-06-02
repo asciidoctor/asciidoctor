@@ -1679,7 +1679,7 @@ context 'Extensions' do
           'style=glossary,alt' => ['glossary', 1, true, :chapter, '_section_title', { 'sectnums' => 'all' }],
           'style=abstract' => ['chapter', 1, false, true, '_section_title'],
           'id=section-title' => ['chapter', 1, false, true, 'section-title'],
-          'id=false' => ['chapter', 1, false, true, nil]
+          'id=false' => ['chapter', 1, false, true, nil],
         }.each do |attrlist, (expect_sectname, expect_level, expect_special, expect_numbered, expect_id, extra_attrs)|
           input = input_tpl % attrlist
           document_from_string input, safe: :server, attributes: extra_attrs

@@ -47,14 +47,14 @@ namespace :build do
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/vnd.github.everest-preview+json',
-        'Authorization' => %(token #{github_token})
+        'Authorization' => %(token #{github_token}),
       }
       payload = {
         'event_type' => 'test_upstream',
         'client_payload' => {
           'branch' => branch,
-          'message' => %(Build triggered by Asciidoctor#{commit_memo})
-        }
+          'message' => %(Build triggered by Asciidoctor#{commit_memo}),
+        },
       }.to_json
       trigger_build project, header, payload, 'api.github.com', %(/repos/#{org}/#{name}/dispatches)
     end if github_token
