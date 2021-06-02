@@ -12,7 +12,7 @@ class Inline < AbstractNode
   # Public: Get/Set the target (e.g., uri) of this inline element
   attr_accessor :target
 
-  def initialize(parent, context, text = nil, opts = {})
+  def initialize parent, context, text = nil, opts = {}
     super(parent, context, opts)
     @node_name = %(inline_#{context})
     @text = text

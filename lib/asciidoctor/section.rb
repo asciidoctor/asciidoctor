@@ -109,7 +109,7 @@ class Section < AbstractBlock
   #   # => 1,1,1
   #
   # Returns the section number as a String
-  def sectnum(delimiter = '.', append = nil)
+  def sectnum delimiter = '.', append = nil
     append ||= (append == false ? '' : delimiter)
     @level > 1 && Section === @parent ? %(#{@parent.sectnum(delimiter, delimiter)}#{@numeral}#{append}) : %(#{@numeral}#{append})
   end

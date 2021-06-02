@@ -816,7 +816,7 @@ class Document < AbstractBlock
   end
 
   # Public: Replay attribute assignments at the block level
-  def playback_attributes(block_attributes)
+  def playback_attributes block_attributes
     if block_attributes.key? :attribute_entries
       block_attributes[:attribute_entries].each do |entry|
         name = entry.name
@@ -876,7 +876,7 @@ class Document < AbstractBlock
   # name  - the String attribute name
   #
   # returns true if the attribute was deleted, false if it was not because it's locked
-  def delete_attribute(name)
+  def delete_attribute name
     if attribute_locked?(name)
       false
     else
@@ -891,7 +891,7 @@ class Document < AbstractBlock
   # key - The attribute key to check
   #
   # Returns true if the attribute is locked, false otherwise
-  def attribute_locked?(name)
+  def attribute_locked? name
     @attribute_overrides.key?(name)
   end
 
@@ -1079,7 +1079,7 @@ class Document < AbstractBlock
     end
   end
 
-  def docinfo_processors?(location = :head)
+  def docinfo_processors? location = :head
     if @docinfo_processor_extensions.key?(location)
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
@@ -1164,7 +1164,7 @@ class Document < AbstractBlock
   end
 
   # Internal: Delete any attributes stored for playback
-  def clear_playback_attributes(attributes)
+  def clear_playback_attributes attributes
     attributes.delete(:attribute_entries)
   end
 

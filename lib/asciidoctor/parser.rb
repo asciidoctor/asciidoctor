@@ -89,7 +89,7 @@ class Parser
   # options  - a Hash of options to control processing
   #
   # returns the Document object
-  def self.parse(reader, document, options = {})
+  def self.parse reader, document, options = {}
     block_attributes = parse_document_header(reader, document)
 
     # NOTE don't use a postfix conditional here as it's known to confuse JRuby in certain circumstances
@@ -118,7 +118,7 @@ class Parser
   # which are automatically removed by the reader.
   #
   # returns the Hash of orphan block attributes captured above the header
-  def self.parse_document_header(reader, document)
+  def self.parse_document_header reader, document
     # capture lines of block-level metadata and plow away comment lines that precede first block
     block_attrs = reader.skip_blank_lines ? (parse_block_metadata_lines reader, document) : {}
     doc_attrs = document.attributes
@@ -193,7 +193,7 @@ class Parser
   # Public: Parses the manpage header of the AsciiDoc source read from the Reader
   #
   # returns Nothing
-  def self.parse_manpage_header(reader, document, block_attributes)
+  def self.parse_manpage_header reader, document, block_attributes
     if ManpageTitleVolnumRx =~ (doc_attrs = document.attributes)['doctitle']
       doc_attrs['manvolnum'] = manvolnum = $2
       doc_attrs['mantitle'] = (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle).downcase
@@ -480,7 +480,7 @@ class Parser
   #
   # Returns a Block object built from the parsed content of the processed
   # lines, or nothing if no block is found.
-  def self.next_block(reader, parent, attributes = {}, options = {})
+  def self.next_block reader, parent, attributes = {}, options = {}
     # skip ahead to the block content; bail if we've reached the end of the reader
     return unless (skipped = reader.skip_blank_lines)
 
@@ -990,7 +990,7 @@ class Parser
   # whether a block supports compound content should be a config setting
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
-  def self.build_block(block_context, content_model, terminator, parent, reader, attributes, options = {})
+  def self.build_block block_context, content_model, terminator, parent, reader, attributes, options = {}
     if content_model == :skip
       skip_processing, parse_as_content_model = true, :simple
     elsif content_model == :raw
@@ -1070,7 +1070,7 @@ class Parser
   # parent - The parent Block to which to attach the parsed blocks
   #
   # Returns nothing.
-  def self.parse_blocks(reader, parent, attributes = nil)
+  def self.parse_blocks reader, parent, attributes = nil
     if attributes
       while ((block = next_block reader, parent, attributes.merge) && parent.blocks << block) || reader.has_more_lines?; end
     else
@@ -1109,7 +1109,7 @@ class Parser
   # document - The current document in which the callouts are stored
   #
   # Returns A Boolean indicating whether callouts were found
-  def self.catalog_callouts(text, document)
+  def self.catalog_callouts text, document
     found = false
     autonum = 0
     text.scan CalloutScanRx do
@@ -1269,7 +1269,7 @@ class Parser
   # style         - The block style assigned to this list (optional, default: nil)
   #
   # Returns the next ListItem or [[ListItem], ListItem] pair (description list) for the parent list Block.
-  def self.parse_list_item(reader, list_block, match, sibling_trait, style = nil)
+  def self.parse_list_item reader, list_block, match, sibling_trait, style = nil
     if (list_type = list_block.context) == :dlist
       dlist = true
       list_term = ListItem.new(list_block, (term_text = match[1]))
@@ -1375,7 +1375,7 @@ class Parser
   # has_text        - Whether the list item has text defined inline (always true except for description lists)
   #
   # Returns an Array of lines belonging to the current list item.
-  def self.read_lines_for_list_item(reader, list_type, sibling_trait = nil, has_text = true)
+  def self.read_lines_for_list_item reader, list_type, sibling_trait = nil, has_text = true
     buffer = []
 
     # three states for continuation: :inactive, :active & :frozen
@@ -1619,7 +1619,7 @@ class Parser
   # attributes - a Hash of attributes collected above the current line
   #
   # Returns the Integer section level if the Reader is positioned at a section title or nil otherwise
-  def self.is_next_line_section?(reader, attributes)
+  def self.is_next_line_section? reader, attributes
     return if (style = attributes[1]) && (style == 'discrete' || style == 'float')
     if Compliance.underline_style_section_titles
       next_lines = reader.peek_lines 2, style && style == 'comment'
@@ -1650,7 +1650,7 @@ class Parser
   # line2 - [String] candidate underline (default: nil).
   #
   # Returns the [Integer] section level if these lines are a section title, otherwise nothing.
-  def self.is_section_title?(line1, line2 = nil)
+  def self.is_section_title? line1, line2 = nil
     atx_section_title?(line1) || (line2.nil_or_empty? ? nil : setext_section_title?(line1, line2))
   end
 
@@ -1724,7 +1724,7 @@ class Parser
   # Returns an 5-element [Array] containing the id (String), reftext (String),
   # title (String), level (Integer), and flag (Boolean) indicating whether an
   # atx section title was matched, or nothing.
-  def self.parse_section_title(reader, document, sect_id = nil)
+  def self.parse_section_title reader, document, sect_id = nil
     sect_reftext = nil
     line1 = reader.read_line
 
@@ -1767,7 +1767,7 @@ class Parser
   #  parse_header_metadata(Reader.new data, nil, normalize: true)
   #  # => { 'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.' }
-  def self.parse_header_metadata(reader, document = nil)
+  def self.parse_header_metadata reader, document = nil
     doc_attrs = document && document.attributes
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
@@ -2154,7 +2154,7 @@ class Parser
   # validate   - Whether to validate the value of the marker
   #
   # Returns the String 0-index marker for this list item
-  def self.resolve_list_marker(list_type, marker, ordinal = 0, validate = false, reader = nil)
+  def self.resolve_list_marker list_type, marker, ordinal = 0, validate = false, reader = nil
     if list_type == :ulist
       marker
     elsif list_type == :olist
@@ -2190,7 +2190,7 @@ class Parser
   #
   # Returns a tuple that contains the String of the first marker in this number
   # series and the implicit list style, if applicable
-  def self.resolve_ordered_list_marker(marker, ordinal = 0, validate = false, reader = nil)
+  def self.resolve_ordered_list_marker marker, ordinal = 0, validate = false, reader = nil
     return [marker] if marker.start_with? '.'
     # NOTE case statement is guaranteed to match one of the conditions
     case (style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker })
@@ -2256,7 +2256,7 @@ class Parser
   # attributes   - attributes captured from above this Block
   #
   # returns an instance of Asciidoctor::Table parsed from the provided reader
-  def self.parse_table(table_reader, parent, attributes)
+  def self.parse_table table_reader, parent, attributes
     table = Table.new(parent, attributes)
 
     if (attributes.key? 'cols') && !(colspecs = parse_colspecs attributes['cols']).empty?
@@ -2455,7 +2455,7 @@ class Parser
   #
   # returns the Hash of attributes that indicate how to layout
   # and style this cell in the table.
-  def self.parse_cellspec(line, pos = :end, delimiter = nil)
+  def self.parse_cellspec line, pos = :end, delimiter = nil
     m, rest = nil, ''
 
     if pos == :start
@@ -2729,7 +2729,7 @@ class Parser
   #
   #   sanitize_attribute_name('Foo 3 #-Billy')
   #   => 'foo3-billy'
-  def self.sanitize_attribute_name(name)
+  def self.sanitize_attribute_name name
     name.gsub(InvalidAttributeNameCharsRx, '').downcase
   end
 end

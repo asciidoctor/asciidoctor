@@ -155,7 +155,7 @@ class Table < AbstractBlock
   # by the options on the table
   #
   # returns nothing
-  def partition_header_footer(attrs)
+  def partition_header_footer attrs
     # set rowcount before splitting up body rows
     num_body_rows = @attributes['rowcount'] = (body = @rows.body).size
 
@@ -503,7 +503,7 @@ class Table::ParserContext
   # used by this table.
   #
   # returns true if the line starts with the delimiter, false otherwise
-  def starts_with_delimiter?(line)
+  def starts_with_delimiter? line
     line.start_with? @delimiter
   end
 
@@ -511,14 +511,14 @@ class Table::ParserContext
   # used by this table.
   #
   # returns Regexp MatchData if the line contains the delimiter, false otherwise
-  def match_delimiter(line)
+  def match_delimiter line
     @delimiter_rx.match(line)
   end
 
   # Public: Skip past the matched delimiter because it's inside quoted text.
   #
   # Returns nothing
-  def skip_past_delimiter(pre)
+  def skip_past_delimiter pre
     @buffer = %(#{@buffer}#{pre}#{@delimiter})
     nil
   end
@@ -526,7 +526,7 @@ class Table::ParserContext
   # Public: Skip past the matched delimiter because it's escaped.
   #
   # Returns nothing
-  def skip_past_escaped_delimiter(pre)
+  def skip_past_escaped_delimiter pre
     @buffer = %(#{@buffer}#{pre.chop}#{@delimiter})
     nil
   end
@@ -562,7 +562,7 @@ class Table::ParserContext
   # stack is used to carry over the spec to the next cell.
   #
   # returns nothing
-  def push_cellspec(cellspec = {})
+  def push_cellspec cellspec = {}
     # this shouldn't be nil, but we check anyway
     @cellspecs << (cellspec || {})
     nil
@@ -605,7 +605,7 @@ class Table::ParserContext
   # by the next cell.
   #
   # returns nothing
-  def close_open_cell(next_cellspec = {})
+  def close_open_cell next_cellspec = {}
     push_cellspec next_cellspec
     close_cell(true) if cell_open?
     advance
@@ -617,7 +617,7 @@ class Table::ParserContext
   # row has been met, close the row and begin a new one.
   #
   # returns nothing
-  def close_cell(eol = false)
+  def close_cell eol = false
     if @format == 'psv'
       cell_text = @buffer
       @buffer = ''
@@ -706,7 +706,7 @@ class Table::ParserContext
   # determining the effective number of cells in the current row.
   #
   # returns nothing
-  def activate_rowspan(rowspan, colspan)
+  def activate_rowspan rowspan, colspan
     1.upto(rowspan - 1) {|i| @active_rowspans[i] = (@active_rowspans[i] || 0) + colspan }
     nil
   end

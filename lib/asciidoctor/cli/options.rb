@@ -7,7 +7,7 @@ module Asciidoctor
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash
-      def initialize(options = {})
+      def initialize options = {}
         self[:attributes] = options[:attributes] || {}
         self[:input_files] = options[:input_files]
         self[:output_file] = options[:output_file]
@@ -30,11 +30,11 @@ module Asciidoctor
         self[:timings] = false
       end
 
-      def self.parse!(args)
+      def self.parse! args
         Options.new.parse! args
       end
 
-      def parse!(args)
+      def parse! args
         opts_parser = ::OptionParser.new do |opts|
           # NOTE don't use squiggly heredoc to maintain compatibility with Ruby < 2.3
           opts.banner = <<-'EOS'.gsub '          ', ''

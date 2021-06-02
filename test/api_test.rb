@@ -243,7 +243,7 @@ context 'API' do
           @table.keys
         end
 
-        def [](key)
+        def [] key
           @table[key]
         end
       end

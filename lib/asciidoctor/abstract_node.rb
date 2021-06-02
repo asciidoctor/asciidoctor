@@ -319,7 +319,7 @@ class AbstractNode
   #                the image is located (default: 'imagesdir')
   #
   # Returns A String reference or data URI for the target image
-  def image_uri(target_image, asset_dir_key = 'imagesdir')
+  def image_uri target_image, asset_dir_key = 'imagesdir'
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
           (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
@@ -347,7 +347,7 @@ class AbstractNode
   #                 the media is located (default: 'imagesdir')
   #
   # Returns A String reference for the target media
-  def media_uri(target, asset_dir_key = 'imagesdir')
+  def media_uri target, asset_dir_key = 'imagesdir'
     normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
   end
 
@@ -363,7 +363,7 @@ class AbstractNode
   #                the image is located (default: nil)
   #
   # Returns A String data URI containing the content of the target image
-  def generate_data_uri(target_image, asset_dir_key = nil)
+  def generate_data_uri target_image, asset_dir_key = nil
     if (ext = Helpers.extname target_image, nil)
       mimetype = ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length})
     else
@@ -427,7 +427,7 @@ class AbstractNode
   #
   # Delegates to normalize_system_path, with the start path set to the value of
   # the base_dir instance variable on the Document object.
-  def normalize_asset_path(asset_ref, asset_name = 'path', autocorrect = true)
+  def normalize_asset_path asset_ref, asset_name = 'path', autocorrect = true
     normalize_system_path(asset_ref, @document.base_dir, nil, target_name: asset_name, recover: autocorrect)
   end
 
@@ -479,7 +479,7 @@ class AbstractNode
   # preserve_uri_target - a Boolean indicating whether target should be preserved if contains a URI (default: true)
   #
   # Returns the resolved [String] path
-  def normalize_web_path(target, start = nil, preserve_uri_target = true)
+  def normalize_web_path target, start = nil, preserve_uri_target = true
     if preserve_uri_target && (Helpers.uriish? target)
       Helpers.encode_spaces_in_uri target
     else
