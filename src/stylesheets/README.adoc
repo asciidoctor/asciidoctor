@@ -1,0 +1,24 @@
+= Default Stylesheet Build
+
+This directory contains the source and build for the default stylesheet used by the built-in HTML converter.
+
+== Overview
+
+The stylesheet is written in plain CSS.
+The build minifies the stylesheet using PostCSS + cssnano and writes it to the data/stylesheets directory.
+
+== Usage
+
+To regenerate the default stylesheet, first install the npm packages using the `npm` command:
+
+ $ npm i
+
+Next, run the npm script named `build`:
+
+ $ npm run build
+
+If there are any changes to the [.path]_data/stylesheets/asciidoctor-default.css_ file, commit this file.
+
+To validate the syntax of the CSS source, run the npm script named `lint`:
+
+ $ npm run lint
