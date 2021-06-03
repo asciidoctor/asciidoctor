@@ -933,7 +933,7 @@ context 'Sections' do
           [:ERROR, '<stdin>: line 14: colophon sections do not support nested sections', Hash],
           [:ERROR, '<stdin>: line 21: dedication sections do not support nested sections', Hash],
           [:ERROR, '<stdin>: line 50: glossary sections do not support nested sections', Hash],
-          [:ERROR, '<stdin>: line 57: bibliography sections do not support nested sections', Hash]
+          [:ERROR, '<stdin>: line 57: bibliography sections do not support nested sections', Hash],
         ]
       end
     end

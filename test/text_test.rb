@@ -95,14 +95,14 @@ context 'Text' do
       '***',
       '* * *',
       '___',
-      '_ _ _'
+      '_ _ _',
     ]
 
     offsets = [
       '',
       ' ',
       '  ',
-      '   '
+      '   ',
     ]
 
     variants.each do |variant|
@@ -127,14 +127,14 @@ context 'Text' do
     bad_variants = [
       '- - - -',
       '* * * *',
-      '_ _ _ _'
+      '_ _ _ _',
     ]
 
     good_offsets = [
       '',
       ' ',
       '  ',
-      '   '
+      '   ',
     ]
 
     bad_variants.each do |variant|
@@ -154,12 +154,12 @@ context 'Text' do
     good_variants = [
       '- - -',
       '* * *',
-      '_ _ _'
+      '_ _ _',
     ]
 
     bad_offsets = [
-      "\t",
-      '    '
+      ?\t,
+      '    ',
     ]
 
     good_variants.each do |variant|

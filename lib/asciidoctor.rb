@@ -465,7 +465,7 @@ module Asciidoctor
       # ^superscript^
       [:superscript, :unconstrained, /\\?(?:\[([^\]]+)\])?\^(\S+?)\^/],
       # ~subscript~
-      [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/]
+      [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/],
     ]
 
     accum[true] = compat = normal.drop 0
@@ -513,7 +513,7 @@ module Asciidoctor
     # left double arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z][a-zA-Z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-fA-F][\da-fA-F][\da-fA-F]{0,3});)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z][a-zA-Z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-fA-F][\da-fA-F][\da-fA-F]{0,3});)/, '', :bounding],
   ]
 
   # Internal: Automatically load the Asciidoctor::Extensions module.

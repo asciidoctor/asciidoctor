@@ -673,7 +673,7 @@ context 'Extensions' do
             content = [
               %(found include target '#{target}' at line #{reader.cursor_at_prev_line.lineno}\r\n),
               %(\r\n),
-              %(middle line\r\n)
+              %(middle line\r\n),
             ]
             reader.push_include content, target, target, 1, attributes
           end

@@ -2221,7 +2221,7 @@ context 'Substitutions' do
         %(It's Mary`'s little lamb.),
         %(consecutive single quotes '' are not modified),
         %(he is 6' tall),
-        %(\\`')
+        %(\\`'),
       ]
       expected = [
         %(&#8217;Twas the night),
@@ -2233,7 +2233,7 @@ context 'Substitutions' do
         %(It&#8217;s Mary&#8217;s little lamb.),
         %(consecutive single quotes '' are not modified),
         %(he is 6' tall),
-        %(`')
+        %(`'),
       ]
       given.size.times do |i|
         para = block_from_string given[i]

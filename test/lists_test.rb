@@ -4931,7 +4931,7 @@ context 'Callout lists' do
       assert_xpath '//ol/li', output, 2
       assert_messages logger, [
         [:WARN, '<stdin>: line 8: callout list item index: expected 2, got 3', Hash],
-        [:WARN, '<stdin>: line 8: no callout found for <2>', Hash]
+        [:WARN, '<stdin>: line 8: no callout found for <2>', Hash],
       ]
     end
   end
