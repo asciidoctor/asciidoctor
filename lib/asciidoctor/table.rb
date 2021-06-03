@@ -533,7 +533,7 @@ class Table::ParserContext
   #
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
-  def buffer_has_unclosed_quotes? append = nil, q = '"'
+  def buffer_has_unclosed_quotes? append = nil, q = '"' # rubocop:disable Naming/MethodParameterName
     if (record = append ? (@buffer + append).strip : @buffer.strip) == q
       true
     elsif record.start_with? q

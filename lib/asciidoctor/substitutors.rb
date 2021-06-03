@@ -785,7 +785,7 @@ module Substitutors
           else
             fragment = refid
           end
-        else
+        else # rubocop:disable Lint/DuplicateBranch
           fragment = refid
         end
 
@@ -917,7 +917,7 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_callouts text
-    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
+    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx # rubocop:disable Naming/MethodName
     autonum = 0
     text.gsub callout_rx do
       # honor the escape
@@ -1351,7 +1351,7 @@ module Substitutors
     callout_marks = {}
     autonum = lineno = 0
     last_lineno = nil
-    callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
+    callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx # rubocop:disable Naming/MethodName
     # extract callout marks, indexed by line number
     source = (source.split LF, -1).map do |line|
       lineno += 1
@@ -1452,8 +1452,8 @@ module Substitutors
   # Internal: Substitute replacement text for matched location
   #
   # returns The String text with the replacement characters substituted
-  def do_replacement m, replacement, restore
-    if (captured = m[0]).include? RS
+  def do_replacement match, replacement, restore
+    if (captured = match[0]).include? RS
       # we have to use sub since we aren't sure it's the first char
       captured.sub RS, ''
     else
@@ -1461,9 +1461,9 @@ module Substitutors
       when :none
         replacement
       when :bounding
-        m[1] + replacement + m[2]
+        match[1] + replacement + match[2]
       else # :leading
-        m[1] + replacement
+        match[1] + replacement
       end
     end
   end

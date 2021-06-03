@@ -132,7 +132,7 @@ module Asciidoctor
           end
         end
         @code = 1 if (logger.respond_to? :max_severity) && logger.max_severity && logger.max_severity >= opts[:failure_level]
-      rescue ::Exception => e
+      rescue ::Exception => e # rubocop:disable Lint/RescueException
         if ::SignalException === e
           @code = e.signo
           # add extra newline if Ctrl+C is used

@@ -158,7 +158,7 @@ class AbstractNode
   # name - the String name of the option
   #
   # Returns nothing
-  def set_option name
+  def set_option name # rubocop:disable Naming/AccessorMethodName
     @attributes[%(#{name}-option)] = ''
     nil
   end

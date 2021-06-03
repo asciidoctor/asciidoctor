@@ -83,7 +83,7 @@ module Asciidoctor
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
   ImageReference = ::Struct.new :target, :imagesdir do
-    alias to_s target
+    alias to_s target # rubocop:disable Style/Alias
   end
 
   Footnote = ::Struct.new :index, :id, :text
