@@ -157,7 +157,7 @@ module Asciidoctor
               stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
               # NOTE don't warn if src can't be read and dest already exists (see #2323)
               if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
-                  warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
+                warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
                 if (stylesheet_outdir = ::File.dirname stylesheet_dest) != stylesoutdir && !(::File.directory? stylesheet_outdir)
                   if mkdirs
                     Helpers.mkdir_p stylesheet_outdir

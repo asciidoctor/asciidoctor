@@ -49,7 +49,7 @@ context 'Text' do
 
   test 'escaped text markup' do
     assert_match(/All your &lt;em&gt;inline&lt;\/em&gt; markup belongs to &lt;strong&gt;us&lt;\/strong&gt;!/,
-        convert_string('All your <em>inline</em> markup belongs to <strong>us</strong>!'))
+      convert_string('All your <em>inline</em> markup belongs to <strong>us</strong>!'))
   end
 
   test 'line breaks' do
@@ -68,9 +68,9 @@ context 'Text' do
 
   test 'multiple double-quoted text on a single line' do
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
-        convert_inline_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), attributes: { 'compat-mode' => '' })
+      convert_inline_string(%q(``Our business is constantly changing'' or ``We need faster time to market.''), attributes: { 'compat-mode' => '' })
     assert_equal '&#8220;Our business is constantly changing&#8221; or &#8220;We need faster time to market.&#8221;',
-        convert_inline_string('"`Our business is constantly changing`" or "`We need faster time to market.`"')
+      convert_inline_string('"`Our business is constantly changing`" or "`We need faster time to market.`"')
   end
 
   test 'horizontal rule' do

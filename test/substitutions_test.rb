@@ -793,13 +793,13 @@ context 'Substitutions' do
     test 'a single-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
       para = block_from_string('image:tiger.png[Tiger, 200, 100]')
       assert_equal '<span class="image"><img src="tiger.png" alt="Tiger" width="200" height="100"></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'a single-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions in docbook' do
       para = block_from_string 'image:tiger.png[Tiger, 200, 100]', backend: 'docbook'
       assert_equal '<inlinemediaobject><imageobject><imagedata fileref="tiger.png" contentwidth="200" contentdepth="100"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should pass through role on image macro to DocBook output' do
@@ -811,67 +811,67 @@ context 'Substitutions' do
     test 'a single-line image macro with text and link should be interpreted as a linked image with alt text' do
       para = block_from_string('image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]')
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'rel=noopener should be added to an image with a link that targets the _blank window' do
       para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]'
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" target="_blank" rel="noopener"><img src="tiger.png" alt="Tiger"></a></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'rel=noopener should be added to an image with a link that targets a named window when the noopener option is set' do
       para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=name,opts=noopener]'
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" target="name" rel="noopener"><img src="tiger.png" alt="Tiger"></a></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'rel=nofollow should be added to an image with a link when the nofollow option is set' do
       para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,opts=nofollow]'
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" rel="nofollow"><img src="tiger.png" alt="Tiger"></a></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'a multi-line image macro with text and dimensions should be interpreted as an image with alt text and dimensions' do
       para = block_from_string(%(image:tiger.png[Another\nAwesome\nTiger, 200,\n100]))
       assert_equal '<span class="image"><img src="tiger.png" alt="Another Awesome Tiger" width="200" height="100"></span>',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an inline image macro with a url target should be interpreted as an image' do
       para = block_from_string %(Beware of the image:http://example.com/images/tiger.png[tiger].)
       assert_equal 'Beware of the <span class="image"><img src="http://example.com/images/tiger.png" alt="tiger"></span>.',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an inline image macro with a float attribute should be interpreted as a floating image' do
       para = block_from_string %(image:http://example.com/images/tiger.png[tiger, float="right"] Beware of the tigers!)
       assert_equal '<span class="image right"><img src="http://example.com/images/tiger.png" alt="tiger"></span> Beware of the tigers!',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should prepend value of imagesdir attribute to inline image target if target is relative path' do
       para = block_from_string %(Beware of the image:tiger.png[tiger].), attributes: { 'imagesdir' => './images' }
       assert_equal 'Beware of the <span class="image"><img src="./images/tiger.png" alt="tiger"></span>.',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should not prepend value of imagesdir attribute to inline image target if target is absolute path' do
       para = block_from_string %(Beware of the image:/tiger.png[tiger].), attributes: { 'imagesdir' => './images' }
       assert_equal 'Beware of the <span class="image"><img src="/tiger.png" alt="tiger"></span>.',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should not prepend value of imagesdir attribute to inline image target if target is url' do
       para = block_from_string %(Beware of the image:http://example.com/images/tiger.png[tiger].), attributes: { 'imagesdir' => './images' }
       assert_equal 'Beware of the <span class="image"><img src="http://example.com/images/tiger.png" alt="tiger"></span>.',
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should match an inline image macro if target contains a space character' do
       para = block_from_string(%(Beware of the image:big cats.png[] around here.))
       assert_equal %(Beware of the <span class="image"><img src="big%20cats.png" alt="big cats"></span> around here.),
-          para.sub_macros(para.source).gsub(/>\s+</, '><')
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'should not match an inline image macro if target contains a newline character' do
