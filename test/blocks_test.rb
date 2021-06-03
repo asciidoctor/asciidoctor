@@ -1571,7 +1571,7 @@ context 'Blocks' do
       matches = (document_from_string input).find_by context: :listing
       assert_equal 1, matches.length
       assert_equal 'listing', matches[0].style
-      assert_nil (matches[0].attr 'language')
+      assert_nil matches[0].attr 'language'
     end
 
     test 'listing block with an explicit style should not be promoted to a source block if source-language is set' do
@@ -1586,7 +1586,7 @@ context 'Blocks' do
       matches = (document_from_string input).find_by context: :listing
       assert_equal 1, matches.length
       assert_equal 'listing', matches[0].style
-      assert_nil (matches[0].attr 'language')
+      assert_nil matches[0].attr 'language'
     end
 
     test 'source block with no title or language should generate screen element in docbook' do

@@ -1491,7 +1491,7 @@ context 'Tables' do
       result = convert_string_to_embedded input, attributes: { 'sectids' => nil }
       headings = xmlnodes_at_css 'h2', result
       assert_equal 3, headings.size
-      headings.each {|heading| assert_nil (heading.attr :id) }
+      headings.each {|heading| assert_nil heading.attr :id }
     end
 
     test 'showtitle can be enabled in AsciiDoc table cell if unset in parent document' do
