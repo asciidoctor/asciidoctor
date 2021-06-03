@@ -905,7 +905,7 @@ class Parser
     # FIXME title and caption should be assigned when block is constructed (though we need to handle all cases)
     if attributes['title']
       block.title = block_title = attributes.delete 'title'
-      block.assign_caption (attributes.delete 'caption') if CAPTION_ATTRIBUTE_NAMES[block.context]
+      block.assign_caption attributes.delete 'caption' if CAPTION_ATTRIBUTE_NAMES[block.context]
     end
     # TODO eventually remove the style attribute from the attributes hash
     #block.style = attributes.delete 'style'
