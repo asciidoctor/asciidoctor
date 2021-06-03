@@ -178,7 +178,7 @@ context 'API' do
 
     test 'should accept attributes as array' do
       # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-))
+      doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-)) # rubocop:disable Layout/SpaceInsideArrayPercentLiteral
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')

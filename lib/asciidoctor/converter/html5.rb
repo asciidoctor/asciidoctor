@@ -1070,12 +1070,12 @@ Your browser does not support the audio tag.
 
       # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
       target, list = (node.attr 'target').split '/', 2
-      if (list ||= (node.attr 'list'))
+      if (list ||= node.attr 'list') # rubocop:disable Style/ParenthesesAroundCondition
         list_param = %(&amp;list=#{list})
       else
         # parse dynamic playlist syntax: video_id1,video_id2,...
         target, playlist = target.split ',', 2
-        if (playlist ||= (node.attr 'playlist'))
+        if (playlist ||= node.attr 'playlist') # rubocop:disable Style/ParenthesesAroundCondition
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
           list_param = %(&amp;playlist=#{playlist})
         else

@@ -174,7 +174,7 @@ context 'Invoker' do
         end
         warnings = err.string
       end
-      assert_equal false, $VERBOSE
+      assert_equal false, $VERBOSE # rubocop:disable Minitest/RefuteFalse
       refute_empty warnings
     ensure
       $VERBOSE = old_verbose

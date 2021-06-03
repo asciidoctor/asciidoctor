@@ -158,7 +158,7 @@ module Asciidoctor
                   return 1
                 end
               # Ruby 2.3 requires the extra brackets around the ::File.join method call
-              elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
+              elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1')) # rubocop:disable Lint/ParenthesesAsGroupedExpression
                 $stdout.puts ::File.read manpage_path
               else
                 manpage_path = %x(man -w asciidoctor).chop rescue ''
@@ -174,7 +174,7 @@ module Asciidoctor
               end
             when 'syntax'
               # Ruby 2.3 requires the extra brackets around the ::File.join method call
-              if ::File.exist? (syntax_path = (::File.join ROOT_DIR, 'data', 'reference', 'syntax.adoc'))
+              if ::File.exist? (syntax_path = (::File.join ROOT_DIR, 'data', 'reference', 'syntax.adoc')) # rubocop:disable Lint/ParenthesesAsGroupedExpression
                 $stdout.puts ::File.read syntax_path
               else
                 $stderr.puts 'asciidoctor: FAILED: syntax page not found; visit https://asciidoctor.org/docs'
@@ -227,7 +227,7 @@ module Asciidoctor
         end
 
         infiles.reject {|file| file == '-' }.each do |file|
-          begin
+          begin # rubocop:disable Style/RedundantBegin
             fstat = ::File.stat file
             if fstat.file? || fstat.pipe?
               unless fstat.readable?
@@ -270,7 +270,7 @@ module Asciidoctor
         if (requires = self[:requires])
           requires.uniq!
           requires.each do |path|
-            begin
+            begin # rubocop:disable Style/RedundantBegin
               require path
             rescue ::LoadError
               raise $! if self[:trace]

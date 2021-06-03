@@ -809,7 +809,7 @@ context 'Extensions' do
             end
           end
 
-          prefer (tree_processor do
+          prefer (tree_processor do # rubocop:disable Lint/ParenthesesAsGroupedExpression
             process do |doc|
               doc << (create_paragraph doc, 'a', {})
               nil
@@ -926,7 +926,7 @@ context 'Extensions' do
           block :eval do |processor|
             processor.on_context :literal
             processor.process do |parent, reader, _attrs|
-              create_paragraph parent, (eval reader.read_lines[0]), {}
+              create_paragraph parent, (eval reader.read_lines[0]), {} # rubocop:disable Security/Eval
             end
           end
         end

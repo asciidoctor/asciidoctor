@@ -99,8 +99,8 @@ module LoggerManager
 
     def memoize_logger
       class << self
-        alias logger logger # suppresses warning from CRuby
-        attr_reader :logger
+        alias logger logger # suppresses warning from CRuby # rubocop:disable Style/Alias
+        attr_reader :logger # rubocop:disable Lint/DuplicateMethods
       end
     end
   end

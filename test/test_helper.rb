@@ -197,7 +197,7 @@ class Minitest::Test
       Nokogiri::HTML::DocumentFragment.parse content
     elsif $1.start_with? 'html'
       Nokogiri::HTML::Document.parse content
-    else
+    else # rubocop:disable Lint/DuplicateBranch
       Nokogiri::XML::Document.parse content
     end
   end

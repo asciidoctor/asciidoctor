@@ -522,7 +522,7 @@ class Parser
             block_context = style.to_sym
           elsif delimited_block.masq.include?('admonition') && ADMONITION_STYLES.include?(style)
             block_context = :admonition
-          elsif block_extensions && extensions.registered_for_block?(style, block_context)
+          elsif block_extensions && extensions.registered_for_block?(style, block_context) # rubocop:disable Lint/DuplicateBranch
             block_context = style.to_sym
           else
             logger.debug message_with_context %(unknown style for #{block_context} block: #{style}), source_location: reader.cursor_at_mark if logger.debug?
@@ -537,7 +537,7 @@ class Parser
     # this loop is used for flow control; it only executes once, and only when delimited_block is not set
     # break once a block is found or at end of loop
     # returns nil if the line should be dropped
-    while true
+    while true # rubocop:disable Lint/UnreachableLoop
       # process lines verbatim
       if style && Compliance.strict_verbatim_paragraphs && (VERBATIM_STYLES.include? style)
         block_context = style.to_sym
@@ -712,7 +712,7 @@ class Parser
           reader.unshift_line this_line
           # advance to block parsing =>
           break
-        elsif block_extensions && extensions.registered_for_block?(style, :paragraph)
+        elsif block_extensions && extensions.registered_for_block?(style, :paragraph) # rubocop:disable Lint/DuplicateBranch
           block_context = style.to_sym
           cloaked_context = :paragraph
           reader.unshift_line this_line
@@ -781,7 +781,7 @@ class Parser
           attribution, citetitle = (block.apply_subs credit_line).split ', ', 2
           attributes['attribution'] = attribution if attribution
           attributes['citetitle'] = citetitle if citetitle
-        else
+        else # rubocop:disable Lint/DuplicateBranch
           # if [normal] is used over an indented paragraph, shift content to left margin
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
           adjust_indentation! lines if indented && style == 'normal'
@@ -981,7 +981,7 @@ class Parser
     end
     # NOTE line matches the tip when delimiter is minimum length or fenced code
     context, masq = DELIMITED_BLOCKS[tip]
-    if context && (line_len == tip_len || (uniform? (line.slice 1, line_len), DELIMITED_BLOCK_TAILS[tip], (line_len - 1)))
+    if context && (line_len == tip_len || (uniform? (line.slice 1, line_len), DELIMITED_BLOCK_TAILS[tip], (line_len - 1))) # rubocop:disable Style/GuardClause
       return_match_data ? (BlockMatchData.new context, masq, tip, line) : true
     end
   end
@@ -2029,7 +2029,7 @@ class Parser
           return true
         end
       elsif !normal || (next_line.start_with? '/')
-        if next_line == '//'
+        if next_line == '//' # rubocop:disable Style/GuardClause
           return true
         elsif normal && (uniform? next_line, '/', (ll = next_line.length))
           unless ll == 3
@@ -2366,7 +2366,7 @@ class Parser
       end
 
       # NOTE cell may already be closed if table format is csv or dsv
-      if parser_ctx.cell_open?
+      if parser_ctx.cell_open? # rubocop:disable Style/GuardClause
         parser_ctx.close_cell true unless table_reader.has_more_lines?
       else
         table_reader.skip_blank_lines || break
