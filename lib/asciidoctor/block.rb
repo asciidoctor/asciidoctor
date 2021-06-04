@@ -54,13 +54,14 @@ class Block < AbstractBlock
       # FIXME feels funky; we have to be defensive to get commit_subs to honor override
       # FIXME does not resolve substitution groups inside Array (e.g., [:normal])
       if (subs = opts[:subs])
-        # e.g., subs: :defult
+        case subs
+        # e.g., subs: :default
         # subs attribute is honored; falls back to opts[:default_subs], then built-in defaults based on context
-        if subs == :default
+        when :default
           @default_subs = opts[:default_subs]
         # e.g., subs: [:quotes]
         # subs attribute is not honored
-        elsif ::Array === subs
+        when ::Array
           @default_subs = subs.drop 0
           @attributes.delete 'subs'
         # e.g., subs: :normal or subs: 'normal'

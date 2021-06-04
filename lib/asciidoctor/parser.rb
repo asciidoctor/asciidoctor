@@ -991,9 +991,10 @@ class Parser
   # if terminator is false, that means the all the lines in the reader should be parsed
   # NOTE could invoke filter in here, before and after parsing
   def self.build_block block_context, content_model, terminator, parent, reader, attributes, options = {}
-    if content_model == :skip
+    case content_model
+    when :skip
       skip_processing, parse_as_content_model = true, :simple
-    elsif content_model == :raw
+    when :raw
       skip_processing, parse_as_content_model = false, :simple
     else
       skip_processing, parse_as_content_model = false, content_model
@@ -1022,14 +1023,15 @@ class Parser
       block_reader = Reader.new reader.read_lines_until(terminator: terminator, skip_processing: skip_processing, context: block_context, cursor: :at_mark), block_cursor
     end
 
-    if content_model == :verbatim
+    case content_model
+    when :verbatim
       tab_size = (attributes['tabsize'] || parent.document.attributes['tabsize']).to_i
       if (indent = attributes['indent'])
         adjust_indentation! lines, indent.to_i, tab_size
       elsif tab_size > 0
         adjust_indentation! lines, -1, tab_size
       end
-    elsif content_model == :skip
+    when :skip
       # QUESTION should we still invoke process method if extension is specified?
       return
     end
@@ -1290,7 +1292,8 @@ class Parser
       has_text = true
       list_item = ListItem.new(list_block, (item_text = match[2]))
       list_item.source_location = reader.cursor if list_block.document.sourcemap
-      if list_type == :ulist
+      case list_type
+      when :ulist
         list_item.marker = sibling_trait
         if item_text.start_with?('[')
           if style && style == 'bibliography'
@@ -1308,7 +1311,7 @@ class Parser
             list_item.text = item_text.slice(4, item_text.length)
           end
         end
-      elsif list_type == :olist
+      when :olist
         sibling_trait, implicit_style = resolve_ordered_list_marker(sibling_trait, (ordinal = list_block.items.size), true, reader)
         list_item.marker = sibling_trait
         if ordinal == 0 && !style
@@ -2155,9 +2158,10 @@ class Parser
   #
   # Returns the String 0-index marker for this list item
   def self.resolve_list_marker list_type, marker, ordinal = 0, validate = false, reader = nil
-    if list_type == :ulist
+    case list_type
+    when :ulist
       marker
-    elsif list_type == :olist
+    when :olist
       resolve_ordered_list_marker(marker, ordinal, validate, reader)[0]
     else # :colist
       '<1>'
@@ -2482,10 +2486,11 @@ class Parser
       colspec, rowspec = m[1].split '.'
       colspec = colspec.nil_or_empty? ? 1 : colspec.to_i
       rowspec = rowspec.nil_or_empty? ? 1 : rowspec.to_i
-      if m[2] == '+'
+      case m[2]
+      when '+'
         spec['colspan'] = colspec unless colspec == 1
         spec['rowspan'] = rowspec unless rowspec == 1
-      elsif m[2] == '*'
+      when '*'
         spec['repeatcol'] = colspec unless colspec == 1
       end
     end

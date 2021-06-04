@@ -1236,9 +1236,10 @@ module Substitutors
   #
   # Returns a Symbol Array of substitutions to pass to apply_subs or nil if no substitutions were resolved.
   def expand_subs subs, subject = nil
-    if ::Symbol === subs
+    case subs
+    when ::Symbol
       subs == :none ? nil : SUB_GROUPS[subs] || [subs]
-    elsif ::Array === subs
+    when ::Array
       expanded_subs = []
       subs.each do |key|
         unless key == :none
