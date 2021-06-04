@@ -1037,10 +1037,11 @@ class PreprocessorReader < Reader
 
       parsed_attrs = doc.parse_attributes attrlist, [], sub_input: true
       inc_path, target_type, relpath = resolve_include_path expanded_target, attrlist, parsed_attrs
-      if target_type == :file
+      case target_type
+      when :file
         reader = ::File.method :open
         read_mode = FILE_READ_MODE
-      elsif target_type == :uri
+      when :uri
         reader = ::OpenURI.method :open_uri
         read_mode = URI_READ_MODE
       else

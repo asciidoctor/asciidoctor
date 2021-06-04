@@ -48,43 +48,44 @@ class Converter::Html5Converter < Converter::Base
   end
 
   def convert node, transform = node.node_name, opts = nil
-    if transform == 'inline_quoted'; convert_inline_quoted node
-    elsif transform == 'paragraph'; convert_paragraph node
-    elsif transform == 'inline_anchor'; convert_inline_anchor node
-    elsif transform == 'section'; convert_section node
-    elsif transform == 'listing'; convert_listing node
-    elsif transform == 'literal'; convert_literal node
-    elsif transform == 'ulist'; convert_ulist node
-    elsif transform == 'olist'; convert_olist node
-    elsif transform == 'dlist'; convert_dlist node
-    elsif transform == 'admonition'; convert_admonition node
-    elsif transform == 'colist'; convert_colist node
-    elsif transform == 'embedded'; convert_embedded node
-    elsif transform == 'example'; convert_example node
-    elsif transform == 'floating_title'; convert_floating_title node
-    elsif transform == 'image'; convert_image node
-    elsif transform == 'inline_break'; convert_inline_break node
-    elsif transform == 'inline_button'; convert_inline_button node
-    elsif transform == 'inline_callout'; convert_inline_callout node
-    elsif transform == 'inline_footnote'; convert_inline_footnote node
-    elsif transform == 'inline_image'; convert_inline_image node
-    elsif transform == 'inline_indexterm'; convert_inline_indexterm node
-    elsif transform == 'inline_kbd'; convert_inline_kbd node
-    elsif transform == 'inline_menu'; convert_inline_menu node
-    elsif transform == 'open'; convert_open node
-    elsif transform == 'page_break'; convert_page_break node
-    elsif transform == 'preamble'; convert_preamble node
-    elsif transform == 'quote'; convert_quote node
-    elsif transform == 'sidebar'; convert_sidebar node
-    elsif transform == 'stem'; convert_stem node
-    elsif transform == 'table'; convert_table node
-    elsif transform == 'thematic_break'; convert_thematic_break node
-    elsif transform == 'verse'; convert_verse node
-    elsif transform == 'video'; convert_video node
-    elsif transform == 'document'; convert_document node
-    elsif transform == 'toc'; convert_toc node
-    elsif transform == 'pass'; convert_pass node
-    elsif transform == 'audio'; convert_audio node
+    case transform
+    when 'inline_quoted' then convert_inline_quoted node
+    when 'paragraph' then convert_paragraph node
+    when 'inline_anchor' then convert_inline_anchor node
+    when 'section' then convert_section node
+    when 'listing' then convert_listing node
+    when 'literal' then convert_literal node
+    when 'ulist' then convert_ulist node
+    when 'olist' then convert_olist node
+    when 'dlist' then convert_dlist node
+    when 'admonition' then convert_admonition node
+    when 'colist' then convert_colist node
+    when 'embedded' then convert_embedded node
+    when 'example' then convert_example node
+    when 'floating_title' then convert_floating_title node
+    when 'image' then convert_image node
+    when 'inline_break' then convert_inline_break node
+    when 'inline_button' then convert_inline_button node
+    when 'inline_callout' then convert_inline_callout node
+    when 'inline_footnote' then convert_inline_footnote node
+    when 'inline_image' then convert_inline_image node
+    when 'inline_indexterm' then convert_inline_indexterm node
+    when 'inline_kbd' then convert_inline_kbd node
+    when 'inline_menu' then convert_inline_menu node
+    when 'open' then convert_open node
+    when 'page_break' then convert_page_break node
+    when 'preamble' then convert_preamble node
+    when 'quote' then convert_quote node
+    when 'sidebar' then convert_sidebar node
+    when 'stem' then convert_stem node
+    when 'table' then convert_table node
+    when 'thematic_break' then convert_thematic_break node
+    when 'verse' then convert_verse node
+    when 'video' then convert_video node
+    when 'document' then convert_document node
+    when 'toc' then convert_toc node
+    when 'pass' then convert_pass node
+    when 'audio' then convert_audio node
     else; super
     end
   end
@@ -350,9 +351,10 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         stitle = section.captioned_title
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
-          if section.sectname == 'chapter'
+          case section.sectname
+          when 'chapter'
             stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
-          elsif section.sectname == 'part'
+          when 'part'
             stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
           else
             stitle = %(#{section.sectnum} #{section.title})
@@ -383,9 +385,10 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       title = node.captioned_title
     elsif node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
       if level < 2 && node.document.doctype == 'book'
-        if node.sectname == 'chapter'
+        case node.sectname
+        when 'chapter'
           title = %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{node.sectnum} #{node.title})
-        elsif node.sectname == 'part'
+        when 'part'
           title = %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{node.sectnum nil, ':'} #{node.title})
         else
           title = %(#{node.sectnum} #{node.title})

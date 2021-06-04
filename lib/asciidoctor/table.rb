@@ -259,7 +259,8 @@ class Table::Cell < AbstractBlock
         cell_style = attributes['style'] || cell_style unless in_header_row
         update_attributes attributes
       end
-      if cell_style == :asciidoc
+      case cell_style
+      when :asciidoc
         asciidoc = true
         inner_document_cursor = opts[:cursor]
         if (cell_text = cell_text.rstrip).start_with? LF
@@ -270,7 +271,7 @@ class Table::Cell < AbstractBlock
         else
           cell_text = cell_text.lstrip
         end
-      elsif cell_style == :literal
+      when :literal
         literal = true
         cell_text = cell_text.rstrip
         # QUESTION should we use same logic as :asciidoc cell? strip leading space if text doesn't start with newline?

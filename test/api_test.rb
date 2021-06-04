@@ -841,10 +841,10 @@ context 'API' do
       EOS
       doc = Asciidoctor.load input
       result = doc.find_by do |candidate|
-        ctx = candidate.context
-        if ctx == :example
+        case candidate.context
+        when :example
           :reject
-        elsif ctx == :paragraph
+        when :paragraph
           true
         end
       end
