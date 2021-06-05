@@ -1220,8 +1220,8 @@ class Document < AbstractBlock
       end
     end
 
-    if (@compat_mode = attrs.key? 'compat-mode')
-      attrs['source-language'] = attrs['language'] if attrs.key? 'language'
+    if (@compat_mode = attrs.key? 'compat-mode') && (attrs.key? 'language')
+      attrs['source-language'] = attrs['language']
     end
 
     unless @parent_document

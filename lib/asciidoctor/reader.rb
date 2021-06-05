@@ -793,10 +793,8 @@ class PreprocessorReader < Reader
     result = super
 
     # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
-    if @document && @document.attributes['skip-front-matter']
-      if (front_matter = skip_front_matter! result)
-        @document.attributes['front-matter'] = front_matter.join LF
-      end
+    if @document && @document.attributes['skip-front-matter'] && (front_matter = skip_front_matter! result)
+      @document.attributes['front-matter'] = front_matter.join LF
     end
 
     if opts.fetch :condense, true
