@@ -1776,7 +1776,7 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      assert_equal %w(checklist interactive).to_set, block.enabled_options
+      assert_equal Set['checklist', 'interactive'], block.enabled_options
     end
 
     test 'should append option to existing options' do
@@ -1815,7 +1815,7 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      assert_equal %w(compact reversed).to_set, block.enabled_options
+      assert_equal Set['compact', 'reversed'], block.enabled_options
     end
 
     test 'table column should not be a block or inline' do

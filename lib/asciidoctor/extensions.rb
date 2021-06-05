@@ -535,11 +535,11 @@ module Extensions
       # assign fallbacks
       case @config[:contexts]
       when ::NilClass
-        @config[:contexts] ||= [:open, :paragraph].to_set
+        @config[:contexts] ||= ::Set[:open, :paragraph]
       when ::Symbol
-        @config[:contexts] = [@config[:contexts]].to_set
-      else
-        @config[:contexts] = @config[:contexts].to_set
+        @config[:contexts] = ::Set[@config[:contexts]]
+      when ::Array
+        @config[:contexts] = ::Set.new @config[:contexts]
       end
       # QUESTION should the default content model be raw??
       @config[:content_model] ||= :compound
@@ -554,7 +554,7 @@ module Extensions
     include SyntaxProcessorDsl
 
     def contexts *value
-      option :contexts, value.flatten.to_set
+      option :contexts, (::Set.new value.flatten)
     end
     alias on_contexts contexts
     alias on_context contexts

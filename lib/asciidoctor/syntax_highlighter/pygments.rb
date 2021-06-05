@@ -104,7 +104,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     end
 
     def style_available? style
-      (((@@available_styles ||= ::Pygments.styles.to_set).include? style) rescue nil) && style
+      (((@@available_styles ||= (::Set.new ::Pygments.styles)).include? style) rescue nil) && style
     end
 
     @@base_style_cache = ::Hash.new do |cache, key|

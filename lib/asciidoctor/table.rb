@@ -424,7 +424,7 @@ class Table::ParserContext
   # Public: An Array of String keys that represent the table formats in AsciiDoc
   #--
   # QUESTION should we recognize !sv as a valid format value?
-  FORMATS = ['psv', 'csv', 'dsv', 'tsv'].to_set
+  FORMATS = ::Set['psv', 'csv', 'dsv', 'tsv']
 
   # Public: A Hash mapping the AsciiDoc table formats to default delimiters
   DELIMITERS = {

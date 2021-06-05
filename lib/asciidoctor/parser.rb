@@ -42,7 +42,7 @@ class Parser
 
   NoOp = nil
 
-  AuthorKeys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
+  AuthorKeys = ::Set['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
 
   # Internal: A Hash mapping horizontal alignment abbreviations to alignments
   # that can be applied to a table cell (or to all cells in a column)

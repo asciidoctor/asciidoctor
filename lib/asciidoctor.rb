@@ -225,7 +225,7 @@ module Asciidoctor
   # The backend determines the format of the converted output, default to html5
   DEFAULT_BACKEND = 'html5'
 
-  DEFAULT_STYLESHEET_KEYS = ['', 'DEFAULT'].to_set
+  DEFAULT_STYLESHEET_KEYS = ::Set['', 'DEFAULT']
 
   DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
 
@@ -267,22 +267,22 @@ module Asciidoctor
     '+' => 4,
   }
 
-  ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
+  ADMONITION_STYLES = ::Set['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
-  ADMONITION_STYLE_HEADS = ::Set.new.tap {|accum| ADMONITION_STYLES.each {|s| accum << s.chr } }
+  ADMONITION_STYLE_HEADS = ::Set.new(ADMONITION_STYLES.map {|it| it.chr })
 
-  PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
+  PARAGRAPH_STYLES = ::Set['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro']
 
-  VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
+  VERBATIM_STYLES = ::Set['literal', 'listing', 'source', 'verse']
 
   DELIMITED_BLOCKS = {
-    '--' => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
-    '----' => [:listing, ['literal', 'source'].to_set],
-    '....' => [:literal, ['listing', 'source'].to_set],
-    '====' => [:example, ['admonition'].to_set],
+    '--' => [:open, ::Set['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro']],
+    '----' => [:listing, ::Set['literal', 'source']],
+    '....' => [:literal, ::Set['listing', 'source']],
+    '====' => [:example, ::Set['admonition']],
     '****' => [:sidebar, ::Set.new],
-    '____' => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ['stem', 'latexmath', 'asciimath'].to_set],
+    '____' => [:quote, ::Set['verse']],
+    '++++' => [:pass, ::Set['stem', 'latexmath', 'asciimath']],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
