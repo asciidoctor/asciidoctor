@@ -747,7 +747,7 @@ context 'API' do
       assert_equal 'a', first_head_cell.source
       assert_equal ['a'], first_head_cell.lines
       assert_equal %(1\none), first_body_cell.source
-      assert_equal ['1', 'one'], first_body_cell.lines
+      assert_equal %w(1 one), first_body_cell.lines
       result = doc.find_by context: :table_cell, style: :asciidoc
       assert_equal 1, result.size
       assert_kind_of Asciidoctor::Table::Cell, result[0]
@@ -1062,7 +1062,7 @@ context 'API' do
         dlist = (Asciidoctor.load input).blocks[0]
         dlist.items.each do |item|
           assert_equal 2, item.size
-          assert_kind_of ::Array, item[0]
+          assert_kind_of Array, item[0]
           assert_kind_of Asciidoctor::ListItem, item[1] if item[1]
         end
       end
@@ -1838,7 +1838,7 @@ context 'API' do
       EOS
 
       cell = (document_from_string input).blocks[0].rows.body[0][0]
-      assert_kind_of ::Asciidoctor::AbstractBlock, cell
+      assert_kind_of Asciidoctor::AbstractBlock, cell
       assert cell.block?
       refute cell.inline?
     end

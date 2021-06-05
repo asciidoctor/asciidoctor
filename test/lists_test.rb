@@ -582,7 +582,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'should represent block style as style class' do
-      ['disc', 'square', 'circle'].each do |style|
+      %w(disc square circle).each do |style|
         input = <<~EOS
         [#{style}]
         * a

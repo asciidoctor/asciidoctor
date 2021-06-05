@@ -25,7 +25,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should remove UTF-8 BOM from first line of String data' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = String.new %(\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
@@ -35,7 +35,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should remove UTF-8 BOM from first line of Array data' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = SAMPLE_DATA.drop 0
           data[0] = String.new %(\xef\xbb\xbf#{data.first}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
@@ -46,7 +46,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding(start_encoding)
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
@@ -56,7 +56,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           # NOTE can't split a UTF-16LE string using .lines when encoding is set to UTF-8
           data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
@@ -69,7 +69,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding(start_encoding)
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
@@ -79,7 +79,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
           data = data.map {|line| (line.encode 'UTF-16BE').force_encoding start_encoding }
@@ -1493,7 +1493,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'include directive ignores tags attribute when empty' do
-        ['tag', 'tags'].each do |attr_name|
+        %w(tag tags).each do |attr_name|
           input = <<~EOS
           ++++
           include::fixtures/include-file.xml[#{attr_name}=]

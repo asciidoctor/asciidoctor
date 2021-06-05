@@ -1038,7 +1038,7 @@ class Document < AbstractBlock
 
       if (docinfo = @attributes['docinfo']).nil_or_empty?
         if @attributes.key? 'docinfo2'
-          docinfo = ['private', 'shared']
+          docinfo = %w(private shared)
         elsif @attributes.key? 'docinfo1'
           docinfo = ['shared']
         else

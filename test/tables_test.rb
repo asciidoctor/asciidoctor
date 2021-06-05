@@ -1794,12 +1794,12 @@ context 'Tables' do
       result = convert_string_to_embedded input, backend: 'docbook'
       conums = xmlnodes_at_xpath '//co', result
       assert_equal 3, conums.size
-      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |conum, idx|
+      %w(CO1-1 CO2-1 CO3-1).each_with_index do |conum, idx|
         assert_equal conum, conums[idx].attribute('xml:id').value
       end
       callouts = xmlnodes_at_xpath '//callout', result
       assert_equal 3, callouts.size
-      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |callout, idx|
+      %w(CO1-1 CO2-1 CO3-1).each_with_index do |callout, idx|
         assert_equal callout, callouts[idx].attribute('arearefs').value
       end
     end

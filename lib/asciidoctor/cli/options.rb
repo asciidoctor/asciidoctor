@@ -50,7 +50,7 @@ module Asciidoctor
             'additional backends are supported via extended converters (e.g., pdf, epub3)') do |backend|
             self[:attributes]['backend'] = backend
           end
-          opts.on('-d', '--doctype DOCTYPE', ['article', 'book', 'manpage', 'inline'],
+          opts.on('-d', '--doctype DOCTYPE', %w(article book manpage inline),
             'document type to use when converting document: [article, book, manpage, inline] (default: article)') do |doctype|
             self[:attributes]['doctype'] = doctype
           end
@@ -77,7 +77,7 @@ module Asciidoctor
           opts.on('-n', '--section-numbers', 'auto-number section titles in the HTML backend; disabled by default') do
             self[:attributes]['sectnums'] = ''
           end
-          opts.on('--eruby ERUBY', ['erb', 'erubi', 'erubis'],
+          opts.on('--eruby ERUBY', %w(erb erubi erubis),
             'specify eRuby implementation to use when rendering custom ERB templates: [erb, erubi, erubis] (default: erb)') do |eruby|
             self[:eruby] = eruby
           end

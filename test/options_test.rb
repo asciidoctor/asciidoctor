@@ -184,7 +184,7 @@ context 'Options' do
 
   test 'multiple template directory assignments' do
     options = Asciidoctor::Cli::Options.parse!(%w(-T custom-backend -T custom-backend-hacks test/fixtures/sample.adoc))
-    assert_equal ['custom-backend', 'custom-backend-hacks'], options[:template_dirs]
+    assert_equal %w(custom-backend custom-backend-hacks), options[:template_dirs]
   end
 
   test 'multiple -r flags requires specified libraries' do
@@ -193,7 +193,7 @@ context 'Options' do
       exitval = options.parse! %w(-r foobar -r foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
-      assert_equal ['foobar', 'foobaz'], options[:requires]
+      assert_equal %w(foobar foobaz), options[:requires]
     end
   end
 
@@ -203,7 +203,7 @@ context 'Options' do
       exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.adoc)
       assert_match(%(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string)
       assert_equal 1, exitval
-      assert_equal ['foobar', 'foobaz'], options[:requires]
+      assert_equal %w(foobar foobaz), options[:requires]
     end
   end
 
@@ -216,7 +216,7 @@ context 'Options' do
       assert_equal old_load_path.size + 2, $:.size
       assert_equal File.expand_path('foobar'), $:[0]
       assert_equal File.expand_path('foobaz'), $:[1]
-      assert_equal ['foobar', 'foobaz'], options[:load_paths]
+      assert_equal %w(foobar foobaz), options[:load_paths]
     ensure
       ($:.size - old_load_path.size).times { $:.shift }
     end
@@ -231,7 +231,7 @@ context 'Options' do
       assert_equal old_load_path.size + 2, $:.size
       assert_equal File.expand_path('foobar'), $:[0]
       assert_equal File.expand_path('foobaz'), $:[1]
-      assert_equal ['foobar', 'foobaz'], options[:load_paths]
+      assert_equal %w(foobar foobaz), options[:load_paths]
     ensure
       ($:.size - old_load_path.size).times { $:.shift }
     end

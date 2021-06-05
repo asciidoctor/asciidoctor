@@ -419,7 +419,7 @@ module Substitutors
         elsif $&.start_with? 'icon:'
           type, posattrs = 'icon', ['size']
         else
-          type, posattrs = 'image', ['alt', 'width', 'height']
+          type, posattrs = 'image', %w(alt width height)
         end
         target = $1
         attrs = parse_attributes $2, posattrs, unescape_input: true

@@ -1492,7 +1492,7 @@ context 'Attributes' do
 
       doc = document_from_string input
       p = doc.blocks.first
-      assert_equal ['story', 'lead'], p.roles
+      assert_equal %w(story lead), p.roles
     end
 
     test 'roles returns empty array if role attribute is not set' do

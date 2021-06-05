@@ -24,7 +24,7 @@ class Converter::DocBook5Converter < Converter::Base
   }).default = ['', '', true]
 
   MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
-  TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
+  TABLE_PI_NAMES = %w(dbhtml dbfo dblatex)
 
   CopyrightRx = /^(#{CC_ANY}+?)(?: ((?:\d{4}-)?\d{4}))?$/
   ImageMacroRx = /^image::?(\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
@@ -378,7 +378,7 @@ class Converter::DocBook5Converter < Converter::Base
     pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
     frame = 'topbot' if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
     grid = node.attr 'grid', nil, 'table-grid'
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{%w(none cols).include?(grid) ? 0 : 1}" colsep="#{%w(none rows).include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
     if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
     elsif node.option? 'breakable'
@@ -747,7 +747,7 @@ class Converter::DocBook5Converter < Converter::Base
         attrlist = $2
         cover_image = doc.image_uri $1
         if attrlist
-          attrs = (AttributeList.new attrlist).parse ['alt', 'width', 'height']
+          attrs = (AttributeList.new attrlist).parse %w(alt width height)
           if attrs.key? 'scaledwidth'
             # NOTE scalefit="1" is the default in this case
             width_attr = %( width="#{attrs['scaledwidth']}")

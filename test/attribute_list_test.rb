@@ -259,7 +259,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first, second one, third, fourth'
     expected = { 1 => 'first', 2 => 'second one', 3 => 'third', 4 => 'fourth', 'a' => 'first', 'b' => 'second one', 'c' => 'third' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes, ['a', 'b', 'c'])
+    Asciidoctor::AttributeList.new(line).parse_into(attributes, %w(a b c))
     assert_equal expected, attributes
   end
 
@@ -274,7 +274,7 @@ context 'AttributeList' do
   test 'rekey positional attributes' do
     attributes = { 1 => 'source', 2 => 'java' }
     expected = { 1 => 'source', 2 => 'java', 'style' => 'source', 'language' => 'java' }
-    Asciidoctor::AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+    Asciidoctor::AttributeList.rekey(attributes, %w(style language linenums))
     assert_equal expected, attributes
   end
 end

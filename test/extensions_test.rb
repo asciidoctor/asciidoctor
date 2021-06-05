@@ -137,7 +137,7 @@ class SnippetMacro < Asciidoctor::Extensions::BlockMacroProcessor
 end
 
 class LegacyPosAttrsBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
-  option :pos_attrs, ['target', 'format']
+  option :pos_attrs, %w(target format)
   def process parent, _, attrs
     create_image_block parent, { 'target' => %(#{attrs['target']}.#{attrs['format']}) }
   end
@@ -1119,7 +1119,7 @@ context 'Extensions' do
       begin
         Asciidoctor::Extensions.register do
           block_macro :diag do
-            option :pos_attrs, ['target', 'format']
+            option :pos_attrs, %w(target format)
             process do |parent, _, attrs|
               create_image_block parent, { 'target' => %(#{attrs['target']}.#{attrs['format']}) }
             end
@@ -1621,7 +1621,7 @@ context 'Extensions' do
             named :attrs
             on_context :open
             process do |parent, reader, _attrs|
-              parsed_attrs = parse_attributes parent, reader.read_line, positional_attributes: ['a', 'b']
+              parsed_attrs = parse_attributes parent, reader.read_line, positional_attributes: %w(a b)
               parsed_attrs.update parse_attributes parent, 'foo={foo}', sub_attributes: true
               nil
             end

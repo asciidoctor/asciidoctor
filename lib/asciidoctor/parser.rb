@@ -581,11 +581,11 @@ class Parser
               if blk_attrs
                 case blk_ctx
                 when :video
-                  posattrs = ['poster', 'width', 'height']
+                  posattrs = %w(poster width height)
                 when :audio
                   posattrs = []
                 else # :image
-                  posattrs = ['alt', 'width', 'height']
+                  posattrs = %w(alt width height)
                 end
                 block.parse_attributes blk_attrs, posattrs, sub_input: true, into: attributes
               end
