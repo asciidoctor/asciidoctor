@@ -162,6 +162,7 @@ To specify which file(s) you want to apply, set the `docinfo` attribute to any c
 * `private-footer`
 * `private` (alias for `private-head,private-header,private-footer`)
 * `shared-head`
+* `shared-header`
 * `shared-footer`
 * `shared` (alias for `shared-head,shared-header,shared-footer`)
 
