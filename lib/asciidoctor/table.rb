@@ -652,7 +652,7 @@ class Table::ParserContext
       end
     end
 
-    1.upto(repeat) do |i|
+    1.upto repeat do |i|
       # TODO make column resolving an operation
       if @colcount == -1
         @table.columns << (column = Table::Column.new(@table, @table.columns.size + i - 1))
