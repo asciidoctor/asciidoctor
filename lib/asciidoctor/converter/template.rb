@@ -261,7 +261,7 @@ class Converter::TemplateConverter < Converter::Base
       [::Tilt::ErubiTemplate, {}]
     elsif name == 'erubis'
       Helpers.require_library 'erubis' unless defined? ::Erubis::FastEruby
-      [::Tilt::ErubisTemplate, { engine_class: ::Erubis::FastEruby }]
+      [::Tilt::ErubisTemplate, engine_class: ::Erubis::FastEruby]
     else
       raise ::ArgumentError, %(Unknown ERB implementation: #{name})
     end
