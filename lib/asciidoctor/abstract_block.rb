@@ -91,7 +91,7 @@ class AbstractBlock < AbstractNode
   #
   # context - the context Symbol context to assign to this block
   #
-  # Returns the new context Symbol assigned to this block
+  # Returns the specified Symbol context
   def context= context
     @node_name = (@context = context).to_s
   end
@@ -297,7 +297,7 @@ class AbstractBlock < AbstractNode
 
   # Public: Set the String block title.
   #
-  # Returns the new String title assigned to this Block
+  # Returns the specified String title
   def title= val
     @converted_title = nil
     @title = val
