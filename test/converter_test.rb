@@ -677,8 +677,17 @@ context 'Converter' do
 
     test 'should delegate to method on HTML 5 converter with convert_ prefix if called without prefix' do
       doc = document_from_string 'paragraph'
+      assert_respond_to doc.converter, :paragraph
       result = doc.converter.paragraph doc.blocks[0]
       assert_css 'p', result, 1
+    end
+
+    test 'should not delegate unprefixed method on HTML 5 converter if converter does not handle transform' do
+      doc = document_from_string 'paragraph'
+      refute_respond_to doc.converter, :sentence
+      assert_raises NoMethodError do
+        doc.converter.sentence doc.blocks[0]
+      end
     end
 
     test 'can call read_svg_contents on built-in HTML5 converter; should remove markup prior the root svg element' do

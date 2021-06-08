@@ -1332,8 +1332,12 @@ Your browser does not support the video tag.
   end
 
   # NOTE adapt to older converters that relied on unprefixed method names
-  def method_missing id, *params
-    !((name = id.to_s).start_with? 'convert_') && (handles? name) ? (send %(convert_#{name}), *params) : super
+  def method_missing id, *args
+    !((name = id.to_s).start_with? 'convert_') && (handles? name) ? (send %(convert_#{name}), *args) : super
+  end
+
+  def respond_to_missing? id, *options
+    !((name = id.to_s).start_with? 'convert_') && (handles? name)
   end
 end
 end
