@@ -66,7 +66,7 @@ class AbstractNode
   #
   # parent - The Block to set as the parent of this Block
   #
-  # Returns the value of the parent argument
+  # Returns the the specified Block parent
   def parent= parent
     @parent, @document = parent, parent.document
   end
@@ -156,7 +156,7 @@ class AbstractNode
   #
   # name - the String name of the option
   #
-  # Returns Nothing
+  # Returns nothing
   def set_option name
     @attributes[%(#{name}-option)] = ''
     nil
@@ -221,7 +221,7 @@ class AbstractNode
   #
   # names - A single role name, a space-separated String of role names, or an Array of role names
   #
-  # Returns the value of the names argument
+  # Returns the specified String role name or Array of role names
   def role= names
     @attributes['role'] = (::Array === names) ? (names.join ' ') : names
   end

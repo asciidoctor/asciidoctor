@@ -89,6 +89,7 @@ module LoggerManager
       @logger ||= (@logger_class.new pipe)
     end
 
+    # Returns the specified Logger
     def logger= new_logger
       @logger = new_logger || (@logger_class.new $stderr)
     end
