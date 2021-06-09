@@ -810,15 +810,11 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 1, doc.blocks.size
-            assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on unresolved target'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 1, doc.blocks.size
+          assert_equal ['trailing content'], doc.blocks[0].lines
+          assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
         end
       end
 
@@ -829,15 +825,11 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 1, doc.blocks.size
-            assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 1, doc.blocks.size
+          assert_equal ['trailing content'], doc.blocks[0].lines
+          assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
         end
       end
 
@@ -848,16 +840,12 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 2, doc.blocks.size
-            assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
-            assert_equal ['trailing content'], doc.blocks[1].lines
-            assert_message logger, :ERROR, '~<stdin>: line 1: include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 2, doc.blocks.size
+          assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
+          assert_equal ['trailing content'], doc.blocks[1].lines
+          assert_message logger, :ERROR, '~<stdin>: line 1: include file not found', Hash
         end
       end
 
@@ -879,8 +867,6 @@ class ReaderTest < Minitest::Test
             assert_equal ['trailing content'], doc.blocks[1].lines
             assert_message logger, :ERROR, '~<stdin>: line 1: include file not readable', Hash
           end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
         ensure
           FileUtils.chmod old_mode, include_file
         end
@@ -972,16 +958,12 @@ class ReaderTest < Minitest::Test
         include::#{include_url}[]
         ....
         EOS
-        begin
-          using_memory_logger do |logger|
-            result = using_test_webserver do
-              convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
-            end
-            assert_includes result, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
-            assert_message logger, :ERROR, %(#{include_url}: line 1: include uri not readable: http://#{resolve_localhost}:9876/fixtures/#{nested_include_url}), Hash
+        using_memory_logger do |logger|
+          result = using_test_webserver do
+            convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
           end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+          assert_includes result, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
+          assert_message logger, :ERROR, %(#{include_url}: line 1: include uri not readable: http://#{resolve_localhost}:9876/fixtures/#{nested_include_url}), Hash
         end
       end
 
@@ -1014,17 +996,13 @@ class ReaderTest < Minitest::Test
         ....
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            output = using_test_webserver do
-              convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
-            end
-            refute_nil output
-            assert_match(/Unresolved directive/, output)
-            assert_message logger, :ERROR, %(<stdin>: line 2: include uri not readable: #{url}), Hash
+        using_memory_logger do |logger|
+          output = using_test_webserver do
+            convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
           end
-        rescue
-          flunk 'include directive should not raise exception on inaccessible uri'
+          refute_nil output
+          assert_match(/Unresolved directive/, output)
+          assert_message logger, :ERROR, %(<stdin>: line 2: include uri not readable: #{url}), Hash
         end
       end
 

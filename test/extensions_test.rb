@@ -7,11 +7,8 @@ class ExtensionsInitTest < Minitest::Test
     doc = empty_document
     refute doc.extensions?, 'Extensions should not be enabled by default'
 
-    begin
-      Asciidoctor::Extensions.register do
-        # trigger extensions to autoload by registering empty group
-      end
-    rescue
+    Asciidoctor::Extensions.register do
+      # trigger extensions to autoload by registering empty group
     end
 
     doc = empty_document

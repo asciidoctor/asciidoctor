@@ -315,11 +315,8 @@ context 'API' do
       options = { safe: Asciidoctor::SafeMode::SAFE }
       options.freeze
       sample_input_path = fixture_path('sample.adoc')
-      begin
-        Asciidoctor.load_file sample_input_path, options
-      rescue
-        flunk %(options argument should not be modified)
-      end
+      doc = Asciidoctor.load_file sample_input_path, options
+      refute_same options, doc.options
     end
 
     test 'should not modify attributes Hash argument' do
@@ -330,11 +327,9 @@ context 'API' do
         attributes: attributes,
       }
       sample_input_path = fixture_path('sample.adoc')
-      begin
-        Asciidoctor.load_file sample_input_path, options
-      rescue
-        flunk %(attributes argument should not be modified)
-      end
+      doc = Asciidoctor.load_file sample_input_path, options
+      refute_same attributes, doc.options[:attributes]
+      refute_same attributes, doc.attributes
     end
 
     test 'should be able to restore header attributes after call to convert' do
@@ -1460,8 +1455,6 @@ context 'API' do
         assert_xpath '/html/body', output, 1
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
-      rescue => e
-        flunk e.message
       ensure
         FileUtils.rm(sample_output_path, force: true)
       end
@@ -1584,17 +1577,15 @@ context 'API' do
     end
 
     test 'should not modify options argument' do
+      output = StringIO.new
       options = {
         safe: Asciidoctor::SafeMode::SAFE,
-        to_file: false,
+        to_file: output,
       }
       options.freeze
       sample_input_path = fixture_path('sample.adoc')
-      begin
-        Asciidoctor.convert_file sample_input_path, options
-      rescue
-        flunk %(options argument should not be modified)
-      end
+      doc = Asciidoctor.convert_file sample_input_path, options
+      refute_same options, doc.options
     end
 
     test 'should set to_dir option to parent directory of specified output file' do

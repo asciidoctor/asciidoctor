@@ -1487,7 +1487,7 @@ context 'Document' do
       assert_equal '<hr>', result
     end
 
-    test 'should close all short tags when htmlsyntax is xml' do
+    test 'wip should close all short tags when htmlsyntax is xml' do
       input = <<~'EOS'
       = Document Title
       Author Name
@@ -1539,8 +1539,8 @@ context 'Document' do
         Nokogiri::XML::Document.parse(result) do |config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
         end
-      rescue => e
-        flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
+      rescue
+        flunk "xhtml5 backend did not generate well-formed XML: #{$!.message}\n#{result}"
       end
     end
 
