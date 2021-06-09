@@ -176,7 +176,7 @@ context 'Invoker' do
       end
       assert_equal false, $VERBOSE
       refute_empty warnings
-    rescue
+    ensure
       $VERBOSE = old_verbose
     end
   end
