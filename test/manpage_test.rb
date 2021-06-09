@@ -1173,13 +1173,12 @@ context 'Manpage' do
     end
 
     test 'should fail if SOURCE_DATE_EPOCH is malformed' do
-      old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+      old_source_date_epoch = ENV['SOURCE_DATE_EPOCH']
       begin
         ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
-        assert false
-      rescue
-        assert true
+        assert_raises do
+          Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
+        end
       ensure
         if old_source_date_epoch
           ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch

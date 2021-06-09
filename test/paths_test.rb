@@ -114,18 +114,14 @@ context 'Path Resolver' do
     end
 
     test 'raises security error if jail is not an absolute path' do
-      begin
+      assert_raises SecurityError do
         @resolver.system_path('images/tiger.png', '/etc', 'foo')
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
       end
     end
 
     #test 'raises security error if jail is not a canoncial path' do
-    #  begin
+    #  assert_raises SecurityError do
     #    @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
-    #    flunk 'Expecting SecurityError to be raised'
-    #  rescue SecurityError
     #  end
     #end
 
@@ -146,10 +142,8 @@ context 'Path Resolver' do
     end
 
     test 'throws exception for illegal path access if recover is false' do
-      begin
+      assert_raises SecurityError do
         @resolver.system_path('../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
       end
     end
 
@@ -245,16 +239,11 @@ context 'Path Resolver' do
     end
 
     test 'raises security error if start is not contained within jail and recover is disabled' do
-      begin
+      assert_raises SecurityError do
         @resolver.system_path('images/tiger.png', '/etc', JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
       end
-
-      begin
+      assert_raises SecurityError do
         @resolver.system_path('.', '/etc', JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
       end
     end
 

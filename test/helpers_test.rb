@@ -73,39 +73,31 @@ context 'Helpers' do
     end
 
     test 'should raise exception if cannot find class for name' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'InvalidModule::InvalidClass'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message
       end
+      assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', ex.message
     end
 
     test 'should raise exception if constant name is invalid' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'foobar'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_equal 'Could not resolve class for name: foobar', e.message
       end
+      assert_equal 'Could not resolve class for name: foobar', ex.message
     end
 
     test 'should raise exception if class not found in scope' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions::String'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
       end
+      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
     end
 
     test 'should raise exception if name resolves to module' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions', e.message
       end
+      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions', ex.message
     end
 
     test 'should resolve class if class is given' do
@@ -121,12 +113,10 @@ context 'Helpers' do
     end
 
     test 'should not resolve class if not in scope' do
-      begin
+      ex = assert_raises do
         Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
       end
+      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
     end
   end
 end

@@ -69,11 +69,8 @@ context 'Document' do
     end
 
     test 'safe model level cannot be modified' do
-      doc = empty_document
-      begin
-        doc.safe = Asciidoctor::SafeMode::UNSAFE
-        flunk 'safe mode property of Asciidoctor::Document should not be writable!'
-      rescue
+      assert_raises NoMethodError, 'safe mode property of Asciidoctor::Document should not be writable!' do
+        empty_document.safe = Asciidoctor::SafeMode::UNSAFE
       end
     end
 
