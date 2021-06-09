@@ -1176,7 +1176,7 @@ context 'Manpage' do
       old_source_date_epoch = ENV['SOURCE_DATE_EPOCH']
       begin
         ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-        assert_raises do
+        assert_raises ArgumentError do
           Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
         end
       ensure

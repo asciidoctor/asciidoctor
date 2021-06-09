@@ -113,7 +113,7 @@ context 'Helpers' do
     end
 
     test 'should not resolve class if not in scope' do
-      ex = assert_raises do
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
       end
       assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
