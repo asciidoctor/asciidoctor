@@ -337,6 +337,12 @@ context 'Converter' do
   end
 
   context 'Custom converters' do
+    test 'should not expose included method on Converter class' do
+      refute Asciidoctor::Converter.methods.include? :included
+      assert Asciidoctor::Converter.private_methods.include? :included
+      refute Asciidoctor::Converter.respond_to? :included
+    end
+
     test 'should derive backend traits for the given backend' do
       expected = { basebackend: 'dita', filetype: 'dita', outfilesuffix: '.dita' }
       actual = Asciidoctor::Converter.derive_backend_traits 'dita2'
