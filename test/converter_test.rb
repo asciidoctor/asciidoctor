@@ -337,9 +337,9 @@ context 'Converter' do
 
   context 'Custom converters' do
     test 'should not expose included method on Converter class' do
-      refute Asciidoctor::Converter.methods.include? :included
-      assert Asciidoctor::Converter.private_methods.include? :included
-      refute Asciidoctor::Converter.respond_to? :included
+      refute_includes Asciidoctor::Converter.methods, :included
+      assert_includes Asciidoctor::Converter.private_methods, :included
+      refute_respond_to Asciidoctor::Converter, :included
     end
 
     test 'should derive backend traits for the given backend' do
