@@ -1,0 +1,13 @@
+[listing#asciidoctor-gemfile.ruby.definition]
+----
+GEM
+  remote: https://rubygems.org/
+  specs:
+    asciidoctor (2.0.12)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  asciidoctor (~> 2.0.12)
+----
