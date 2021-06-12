@@ -109,7 +109,7 @@ class PathResolver
   SLASH = '/'
   BACKSLASH = '\\'
   DOUBLE_SLASH = '//'
-  WindowsRootRx = /^(?:[a-zA-Z]:)?[\\\/]/
+  WindowsRootRx = %r(^(?:[a-zA-Z]:)?[\\/])
 
   attr_accessor :file_separator
   attr_accessor :working_dir
