@@ -29,7 +29,7 @@ jobs:
           ruby: '3.0'
         include:
         - os: ubuntu-latest
-          ruby: truffleruby-20.2.0
+          ruby: truffleruby-21.1.0
         - os: ubuntu-latest
           ruby: jruby-9.1.17.0
           pygments-version: ~
