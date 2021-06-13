@@ -2521,7 +2521,7 @@ class Parser
   # Public: Parse the first positional attribute and assign named attributes
   #
   # Parse the first positional attribute to extract the style, role and id
-  # parts, assign the values to their cooresponding attribute keys and return
+  # parts, assign the values to their corresponding attribute keys and return
   # the parsed style from the first positional attribute.
   #
   # attributes - The Hash of attributes to process and update
