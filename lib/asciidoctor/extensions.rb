@@ -1199,7 +1199,7 @@ module Extensions
     # name - the String or Symbol (coersed to a Symbol) macro name
     #
     # Returns the [Extension] object stored in the registry that proxies the
-    # cooresponding BlockMacroProcessor or nil if a match is not found.
+    # corresponding BlockMacroProcessor or nil if a match is not found.
     def find_block_macro_extension name
       @block_macro_extensions[name.to_sym]
     end
@@ -1286,7 +1286,7 @@ module Extensions
     # name - the String or Symbol (coersed to a Symbol) macro name
     #
     # Returns the [Extension] object stored in the registry that proxies the
-    # cooresponding InlineMacroProcessor or nil if a match is not found.
+    # corresponding InlineMacroProcessor or nil if a match is not found.
     def find_inline_macro_extension name
       @inline_macro_extensions[name.to_sym]
     end
