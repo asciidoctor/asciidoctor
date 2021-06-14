@@ -536,7 +536,7 @@ module Substitutors
         # NOTE if $4 is set, we're looking at a formal macro (e.g., https://example.org[])
         if $4
           prefix = '' if prefix == 'link:'
-          link_text = $4
+          link_text = nil if (link_text = $4).empty?
         else
           # invalid macro syntax (link: prefix w/o trailing square brackets or enclosed in double quotes)
           # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
@@ -544,7 +544,6 @@ module Substitutors
           when 'link:', ?", ?'
             next $&
           end
-          link_text = ''
           case $3
           when ')', '?', '!'
             target = target.chop
@@ -584,27 +583,37 @@ module Substitutors
         end
 
         attrs, link_opts = nil, { type: :link }
-        unless link_text.empty?
-          link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
+
+        if link_text
+          new_link_text = link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
           if !doc.compat_mode && (link_text.include? '=')
             # NOTE if an equals sign (=) is present, extract attributes from link text
             link_text, attrs = extract_attributes_from_text link_text, ''
+            new_link_text = link_text
             link_opts[:id] = attrs['id']
           end
 
           if link_text.end_with? '^'
-            link_text = link_text.chop
+            new_link_text = link_text = link_text.chop
             if attrs
               attrs['window'] ||= '_blank'
             else
               attrs = { 'window' => '_blank' }
             end
           end
-        end
 
-        if link_text.empty?
+          if new_link_text && new_link_text.empty?
+            # NOTE it's not possible for the URI scheme to be bare in this case
+            link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+            bare = true
+          end
+        else
           # NOTE it's not possible for the URI scheme to be bare in this case
           link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+          bare = true
+        end
+
+        if bare
           if attrs
             attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
           else
