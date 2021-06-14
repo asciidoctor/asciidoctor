@@ -469,31 +469,31 @@ module Substitutors
           end
           (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
         else
-          text = $3
+          encl_text = $3
           # honor the escape
           if $&.start_with? RS
             # escape concealed index term, but process nested flow index term
-            if (text.start_with? '(') && (text.end_with? ')')
-              text = text.slice 1, text.length - 2
+            if (encl_text.start_with? '(') && (encl_text.end_with? ')')
+              encl_text = encl_text.slice 1, encl_text.length - 2
               visible, before, after = true, '(', ')'
             else
               next $&.slice 1, $&.length
             end
           else
             visible = true
-            if text.start_with? '('
-              if text.end_with? ')'
-                text, visible = (text.slice 1, text.length - 2), false
+            if encl_text.start_with? '('
+              if encl_text.end_with? ')'
+                encl_text, visible = (encl_text.slice 1, encl_text.length - 2), false
               else
-                text, before, after = (text.slice 1, text.length), '(', ''
+                encl_text, before, after = (encl_text.slice 1, encl_text.length), '(', ''
               end
-            elsif text.end_with? ')'
-              text, before, after = text.chop, '', ')'
+            elsif encl_text.end_with? ')'
+              encl_text, before, after = encl_text.chop, '', ')'
             end
           end
           if visible
             # ((Tigers))
-            if (term = normalize_text text, true).include? ';&'
+            if (term = normalize_text encl_text, true).include? ';&'
               if term.include? ' &gt;&gt; '
                 term, _, see = term.partition ' &gt;&gt; '
                 attrs = { 'see' => see }
@@ -506,7 +506,7 @@ module Substitutors
           else
             # (((Tigers,Big cats)))
             attrs = {}
-            if (terms = normalize_text text, true).include? ';&'
+            if (terms = normalize_text encl_text, true).include? ';&'
               if terms.include? ' &gt;&gt; '
                 terms, _, see = terms.partition ' &gt;&gt; '
                 attrs['see'] = see
@@ -535,7 +535,7 @@ module Substitutors
         # NOTE if $4 is set, we're looking at a formal macro (e.g., https://example.org[])
         if $4
           prefix = '' if prefix == 'link:'
-          text = $4
+          link_text = $4
         else
           # invalid macro syntax (link: prefix w/o trailing square brackets or enclosed in double quotes)
           # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
@@ -543,7 +543,7 @@ module Substitutors
           when 'link:', ?", ?'
             next $&
           end
-          text = ''
+          link_text = ''
           case $3
           when ')', '?', '!'
             target = target.chop
@@ -583,16 +583,16 @@ module Substitutors
         end
 
         attrs, link_opts = nil, { type: :link }
-        unless text.empty?
-          text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-          if !doc.compat_mode && (text.include? '=')
-            # NOTE if an equals sign (=) is present, extract attributes from text
-            text, attrs = extract_attributes_from_text text, ''
+        unless link_text.empty?
+          link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
+          if !doc.compat_mode && (link_text.include? '=')
+            # NOTE if an equals sign (=) is present, extract attributes from link text
+            link_text, attrs = extract_attributes_from_text link_text, ''
             link_opts[:id] = attrs['id']
           end
 
-          if text.end_with? '^'
-            text = text.chop
+          if link_text.end_with? '^'
+            link_text = link_text.chop
             if attrs
               attrs['window'] ||= '_blank'
             else
@@ -601,9 +601,9 @@ module Substitutors
           end
         end
 
-        if text.empty?
+        if link_text.empty?
           # NOTE it's not possible for the URI scheme to be bare in this case
-          text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+          link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
           if attrs
             attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
           else
@@ -613,7 +613,7 @@ module Substitutors
 
         doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
-        %(#{prefix}#{(Inline.new self, :anchor, text, link_opts).convert}#{suffix})
+        %(#{prefix}#{(Inline.new self, :anchor, link_text, link_opts).convert}#{suffix})
       end
     end
 
@@ -629,12 +629,12 @@ module Substitutors
           target = $2
         end
         attrs, link_opts = nil, { type: :link }
-        unless (text = $3).empty?
-          text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
+        unless (link_text = $3).empty?
+          link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
           if mailto
-            if !doc.compat_mode && (text.include? ',')
-              # NOTE if a comma (,) is present, extract attributes from text
-              text, attrs = extract_attributes_from_text text, ''
+            if !doc.compat_mode && (link_text.include? ',')
+              # NOTE if a comma (,) is present, extract attributes from link text
+              link_text, attrs = extract_attributes_from_text link_text, ''
               link_opts[:id] = attrs['id']
               if attrs.key? 2
                 if attrs.key? 3
@@ -644,14 +644,14 @@ module Substitutors
                 end
               end
             end
-          elsif !doc.compat_mode && (text.include? '=')
-            # NOTE if an equals sign (=) is present, extract attributes from text
-            text, attrs = extract_attributes_from_text text, ''
+          elsif !doc.compat_mode && (link_text.include? '=')
+            # NOTE if an equals sign (=) is present, extract attributes from link text
+            link_text, attrs = extract_attributes_from_text link_text, ''
             link_opts[:id] = attrs['id']
           end
 
-          if text.end_with? '^'
-            text = text.chop
+          if link_text.end_with? '^'
+            link_text = link_text.chop
             if attrs
               attrs['window'] ||= '_blank'
             else
@@ -660,17 +660,17 @@ module Substitutors
           end
         end
 
-        if text.empty?
+        if link_text.empty?
           # mailto is a special case, already processed
           if mailto
-            text = mailto_text
+            link_text = mailto_text
           else
             if doc_attrs.key? 'hide-uri-scheme'
-              if (text = target.sub UriSniffRx, '').empty?
-                text = target
+              if (link_text = target.sub UriSniffRx, '').empty?
+                link_text = target
               end
             else
-              text = target
+              link_text = target
             end
             if attrs
               attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
@@ -683,7 +683,7 @@ module Substitutors
         # QUESTION should a mailto be registered as an e-mail address?
         doc.register :links, (link_opts[:target] = target)
         link_opts[:attributes] = attrs if attrs
-        Inline.new(self, :anchor, text, link_opts).convert
+        Inline.new(self, :anchor, link_text, link_opts).convert
       end
     end
 
@@ -731,18 +731,16 @@ module Substitutors
         attrs = {}
         if (refid = $1)
           if refid.include? ','
-            refid, _, text = refid.partition ','
-            text = nil if (text = text.lstrip).empty?
-          else
-            text = nil
+            refid, _, link_text = refid.partition ','
+            link_text = nil if (link_text = link_text.lstrip).empty?
           end
         else
           macro = true
           refid = $2
-          if (text = $3)
-            text = text.gsub ESC_R_SB, R_SB if text.include? R_SB
-            # NOTE if an equals sign (=) is present, extract attributes from text
-            text, attrs = extract_attributes_from_text text if !doc.compat_mode && (text.include? '=')
+          if (link_text = $3)
+            link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
+            # NOTE if an equals sign (=) is present, extract attributes from link text
+            link_text, attrs = extract_attributes_from_text link_text if !doc.compat_mode && (link_text.include? '=')
           end
         end
 
@@ -821,7 +819,7 @@ module Substitutors
         attrs['path'] = path
         attrs['fragment'] = fragment
         attrs['refid'] = refid
-        Inline.new(self, :anchor, text, type: :xref, target: target, attributes: attrs).convert
+        Inline.new(self, :anchor, link_text, type: :xref, target: target, attributes: attrs).convert
       end
     end
 
@@ -833,7 +831,7 @@ module Substitutors
         # footnoteref
         if $1
           if $3
-            id, text = $3.split ',', 2
+            id, content = $3.split ',', 2
             logger.warn %(found deprecated footnoteref macro: #{$&}; use footnote macro with target instead) unless doc.compat_mode
           else
             next $&
@@ -841,31 +839,31 @@ module Substitutors
         # footnote
         else
           id = $2
-          text = $3
+          content = $3
         end
 
         if id
           if (footnote = doc.footnotes.find {|candidate| candidate.id == id })
-            index, text = footnote.index, footnote.text
+            index, content = footnote.index, footnote.text
             type, target, id = :xref, id, nil
-          elsif text
-            text = restore_passthroughs(normalize_text text, true, true)
+          elsif content
+            content = restore_passthroughs(normalize_text content, true, true)
             index = doc.counter('footnote-number')
-            doc.register(:footnotes, Document::Footnote.new(index, id, text))
+            doc.register(:footnotes, Document::Footnote.new(index, id, content))
             type, target = :ref, nil
           else
             logger.warn %(invalid footnote reference: #{id})
-            type, target, text, id = :xref, id, id, nil
+            type, target, content, id = :xref, id, id, nil
           end
-        elsif text
-          text = restore_passthroughs(normalize_text text, true, true)
+        elsif content
+          content = restore_passthroughs(normalize_text content, true, true)
           index = doc.counter('footnote-number')
-          doc.register(:footnotes, Document::Footnote.new(index, id, text))
+          doc.register(:footnotes, Document::Footnote.new(index, id, content))
           type = target = nil
         else
           next $&
         end
-        Inline.new(self, :footnote, text, attributes: { 'index' => index }, id: id, target: target, type: type).convert
+        Inline.new(self, :footnote, content, attributes: { 'index' => index }, id: id, target: target, type: type).convert
       end
     end
 
