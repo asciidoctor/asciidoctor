@@ -15,7 +15,7 @@ NOTE: This documentation specifically covers migration from AsciiDoc.py 8.6.
 == Processor call
 
 The Asciidoctor processor is a drop-in replacement for AsciiDoc.py.
-You can simply replace the call to AsciiDoc.py (`asciidoc`) with the equivalent call to Asciidoctor (`asciidoctor`).
+You can replace the call to AsciiDoc.py (`asciidoc`) with the equivalent call to Asciidoctor (`asciidoctor`).
 
  $ asciidoctor document.adoc
 
