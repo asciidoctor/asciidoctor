@@ -1429,15 +1429,12 @@ class Parser
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
       if (match = is_delimited_block?(this_line, true))
-        if continuation == :active
-          buffer << this_line
-          # grab all the lines in the block, leaving the delimiters in place
-          # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.read_lines_until(terminator: match.terminator, read_last_line: true, context: nil)
-          continuation = :inactive
-        else
-          break
-        end
+        break unless continuation == :active
+        buffer << this_line
+        # grab all the lines in the block, leaving the delimiters in place
+        # we're being more strict here about the terminator, but I think that's a good thing
+        buffer.concat reader.read_lines_until(terminator: match.terminator, read_last_line: true, context: nil)
+        continuation = :inactive
       # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
       # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
       # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])

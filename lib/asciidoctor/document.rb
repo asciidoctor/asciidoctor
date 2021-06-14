@@ -817,16 +817,15 @@ class Document < AbstractBlock
 
   # Public: Replay attribute assignments at the block level
   def playback_attributes block_attributes
-    if block_attributes.key? :attribute_entries
-      block_attributes[:attribute_entries].each do |entry|
-        name = entry.name
-        if entry.negate
-          @attributes.delete name
-          @compat_mode = false if name == 'compat-mode'
-        else
-          @attributes[name] = entry.value
-          @compat_mode = true if name == 'compat-mode'
-        end
+    return unless block_attributes.key? :attribute_entries
+    block_attributes[:attribute_entries].each do |entry|
+      name = entry.name
+      if entry.negate
+        @attributes.delete name
+        @compat_mode = false if name == 'compat-mode'
+      else
+        @attributes[name] = entry.value
+        @compat_mode = true if name == 'compat-mode'
       end
     end
   end
@@ -849,24 +848,23 @@ class Document < AbstractBlock
   #
   # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
-    unless attribute_locked? name
-      value = apply_attribute_value_subs value unless value.empty?
-      # NOTE if @header_attributes is set, we're beyond the document header
-      if @header_attributes
-        @attributes[name] = value
+    return if attribute_locked? name
+    value = apply_attribute_value_subs value unless value.empty?
+    # NOTE if @header_attributes is set, we're beyond the document header
+    if @header_attributes
+      @attributes[name] = value
+    else
+      case name
+      when 'backend'
+        update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
+      when 'doctype'
+        update_doctype_attributes value
       else
-        case name
-        when 'backend'
-          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
-        when 'doctype'
-          update_doctype_attributes value
-        else
-          @attributes[name] = value
-        end
-        @attributes_modified << name
+        @attributes[name] = value
       end
-      value
+      @attributes_modified << name
     end
+    value
   end
 
   # Public: Delete the specified attribute from the document if the name is not locked

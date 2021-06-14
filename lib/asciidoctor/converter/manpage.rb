@@ -657,31 +657,29 @@ allbox tab(:);'
   end
 
   def self.write_alternate_pages mannames, manvolnum, target
-    if mannames && mannames.size > 1
-      mannames.shift
-      manvolext = %(.#{manvolnum})
-      dir, basename = ::File.split target
-      mannames.each do |manname|
-        ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
-      end
+    return if mannames.nil_or_empty?
+    mannames.shift
+    manvolext = %(.#{manvolnum})
+    dir, basename = ::File.split target
+    mannames.each do |manname|
+      ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
     end
   end
 
   private
 
   def append_footnotes result, node
-    if node.footnotes? && !(node.attr? 'nofootnotes')
-      result << '.SH "NOTES"'
-      node.footnotes.each do |fn|
-        result << %(.IP [#{fn.index}])
-        # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
-        if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
-          text = (manify %(#{text.gsub MalformedEscapedMacroRx, %(\\1#{LF}\\2)} ), whitespace: :normalize).chomp ' '
-        else
-          text = manify text, whitespace: :normalize
-        end
-        result << text
+    return unless node.footnotes? && !(node.attr? 'nofootnotes')
+    result << '.SH "NOTES"'
+    node.footnotes.each do |fn|
+      result << %(.IP [#{fn.index}])
+      # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
+      if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
+        text = (manify %(#{text.gsub MalformedEscapedMacroRx, %(\\1#{LF}\\2)} ), whitespace: :normalize).chomp ' '
+      else
+        text = manify text, whitespace: :normalize
       end
+      result << text
     end
   end
 

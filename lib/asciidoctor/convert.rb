@@ -159,11 +159,8 @@ module Asciidoctor
               if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
                 warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
                 if (stylesheet_outdir = ::File.dirname stylesheet_dest) != stylesoutdir && !(::File.directory? stylesheet_outdir)
-                  if mkdirs
-                    Helpers.mkdir_p stylesheet_outdir
-                  else
-                    raise ::IOError, %(target stylesheet directory does not exist: #{stylesheet_outdir} (hint: set :mkdirs option))
-                  end
+                  raise ::IOError, %(target stylesheet directory does not exist: #{stylesheet_outdir} (hint: set :mkdirs option)) unless mkdirs
+                  Helpers.mkdir_p stylesheet_outdir
                 end
                 ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
               end

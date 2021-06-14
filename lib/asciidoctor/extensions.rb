@@ -64,12 +64,11 @@ module Extensions
       #
       # Returns self
       def enable_dsl
-        if const_defined? :DSL
-          if singleton_class?
-            include const_get :DSL
-          else
-            extend const_get :DSL
-          end
+        return unless const_defined? :DSL
+        if singleton_class?
+          include const_get :DSL
+        else
+          extend const_get :DSL
         end
       end
       alias use_dsl enable_dsl
@@ -1015,13 +1014,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def docinfo_processors location = nil
-      if @docinfo_processor_extensions
-        if location
-          @docinfo_processor_extensions.select {|ext| ext.config[:location] == location }
-        else
-          @docinfo_processor_extensions
-        end
-      end
+      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : @docinfo_processor_extensions
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to

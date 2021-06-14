@@ -235,15 +235,14 @@ module Helpers
 
   # Internal: Make a directory, ensuring all parent directories exist.
   def mkdir_p dir
-    unless ::File.directory? dir
-      unless (parent_dir = ::File.dirname dir) == '.'
-        mkdir_p parent_dir
-      end
-      begin
-        ::Dir.mkdir dir
-      rescue ::SystemCallError
-        raise unless ::File.directory? dir
-      end
+    return if ::File.directory? dir
+    unless (parent_dir = ::File.dirname dir) == '.'
+      mkdir_p parent_dir
+    end
+    begin
+      ::Dir.mkdir dir
+    rescue ::SystemCallError
+      raise unless ::File.directory? dir
     end
   end
 

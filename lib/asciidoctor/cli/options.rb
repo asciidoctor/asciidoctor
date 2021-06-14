@@ -194,12 +194,9 @@ module Asciidoctor
         opts_parser.parse! args
 
         if args.empty?
-          if self[:verbose] == 2 # -v flag was specified
-            return print_version $stdout
-          else
-            $stderr.puts opts_parser
-            return 1
-          end
+          return print_version $stdout if self[:verbose] == 2 # -v flag was specified
+          $stderr.puts opts_parser
+          return 1
         end
 
         infiles = []

@@ -182,12 +182,11 @@ class AbstractBlock < AbstractNode
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
   def next_adjacent_block
-    unless @context == :document
-      if (p = @parent).context == :dlist && @context == :list_item
-        (sib = p.items[(p.items.find_index {|terms, desc| (terms.include? self) || desc == self }) + 1]) ? sib : p.next_adjacent_block
-      else
-        (sib = p.blocks[(p.blocks.find_index self) + 1]) ? sib : p.next_adjacent_block
-      end
+    return if @context == :document
+    if (p = @parent).context == :dlist && @context == :list_item
+      (sib = p.items[(p.items.find_index {|terms, desc| (terms.include? self) || desc == self }) + 1]) ? sib : p.next_adjacent_block
+    else
+      (sib = p.blocks[(p.blocks.find_index self) + 1]) ? sib : p.next_adjacent_block
     end
   end
 

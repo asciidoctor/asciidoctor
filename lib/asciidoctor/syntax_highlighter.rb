@@ -146,11 +146,10 @@ module SyntaxHighlighter
     #
     # Returns a [SyntaxHighlighter] instance for the specified name.
     def create name, backend = 'html5', opts = {}
-      if (syntax_hl = self.for name)
-        syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
-        raise ::NameError, %(#{syntax_hl.class} must specify a value for `name') unless syntax_hl.name
-        syntax_hl
-      end
+      return unless (syntax_hl = self.for name)
+      syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
+      raise ::NameError, %(#{syntax_hl.class} must specify a value for `name') unless syntax_hl.name
+      syntax_hl
     end
 
     private

@@ -283,12 +283,9 @@ class Reader
     num_skipped = 0
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if next_line.empty?
-        shift
-        num_skipped += 1
-      else
-        return num_skipped
-      end
+      return num_skipped unless next_line.empty?
+      shift
+      num_skipped += 1
     end
   end
 
@@ -309,18 +306,12 @@ class Reader
     return if empty?
 
     while (next_line = peek_line) && !next_line.empty?
-      if next_line.start_with? '//'
-        if next_line.start_with? '///'
-          if (ll = next_line.length) > 3 && next_line == '/' * ll
-            read_lines_until terminator: next_line, skip_first_line: true, read_last_line: true, skip_processing: true, context: :comment
-          else
-            break
-          end
-        else
-          shift
-        end
+      break unless next_line.start_with? '//'
+      if next_line.start_with? '///'
+        break unless (ll = next_line.length) > 3 && next_line == '/' * ll
+        read_lines_until terminator: next_line, skip_first_line: true, read_last_line: true, skip_processing: true, context: :comment
       else
-        break
+        shift
       end
     end
 
@@ -336,11 +327,8 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line) && !next_line.empty?
-      if next_line.start_with? '//'
-        comment_lines << shift
-      else
-        break
-      end
+      break unless next_line.start_with? '//'
+      comment_lines << shift
     end
 
     comment_lines
@@ -533,12 +521,11 @@ class Reader
 
   # Internal: Restore the state of the reader at cursor
   def restore_save
-    if @saved
-      @saved.each do |name, val|
-        instance_variable_set name, val
-      end
-      @saved = nil
+    return unless @saved
+    @saved.each do |name, val|
+      instance_variable_set name, val
     end
+    @saved = nil
   end
 
   # Internal: Discard a previous saved state
@@ -575,11 +562,8 @@ class Reader
       []
     end
   rescue
-    if (::Array === data ? data.join : data.to_s).valid_encoding?
-      raise
-    else
-      raise ::ArgumentError, 'source is either binary or contains invalid Unicode data'
-    end
+    raise if (::Array === data ? data.join : data.to_s).valid_encoding?
+    raise ::ArgumentError, 'source is either binary or contains invalid Unicode data'
   end
 
   # Internal: Processes a previously unvisited line
@@ -1253,14 +1237,13 @@ class PreprocessorReader < Reader
   end
 
   def pop_include
-    unless @include_stack.empty?
-      @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
-      # FIXME kind of a hack
-      #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-      #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
-      @look_ahead = 0
-      nil
-    end
+    return if @include_stack.empty?
+    @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
+    # FIXME kind of a hack
+    #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
+    #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
+    @look_ahead = 0
+    nil
   end
 
   # Private: Split delimited value on comma (if found), otherwise semi-colon
