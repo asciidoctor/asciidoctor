@@ -79,6 +79,6 @@ It is activated by prefixing the backend value with `x` (e.g., `xhtml` or `xhtml
 This hint implicitly assigns the `htmlsyntax` attribute to the value `xml`, which normally has the value `html`.
 
 For all other converters, the `htmlsyntax` attribute is not set explicitly.
-If you want a converter template that's written in Slim or Haml to output XHTML instead of the default HTML, you simply need to set the `htmlsyntax` attribute to `xml` explicitly.
+If you want a converter template that's written in Slim or Haml to output XHTML instead of the default HTML, you need to set the `htmlsyntax` attribute to `xml` explicitly.
 Asciidoctor will pass on this preference to the Slim or Haml template engine by setting the `:format` option to `:html5`.
 ****
