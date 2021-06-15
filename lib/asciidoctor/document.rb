@@ -1082,7 +1082,7 @@ class Document < AbstractBlock
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
     elsif @extensions && @document.extensions.docinfo_processors?(location)
-      !!(@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location))
+      (@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location)) ? true : false
     else
       @docinfo_processor_extensions[location] = false
     end
