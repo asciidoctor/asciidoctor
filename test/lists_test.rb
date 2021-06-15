@@ -1755,8 +1755,8 @@ context 'Bulleted lists (:ulist)' do
       end
     end
 
-=begin
-    # NOTE this is not consistent w/ AsciiDoc output, but this is some screwy input anyway
+    # NOTE this is not consistent w/ AsciiDoc.py, but this is some screwy input anyway
+    # FIXME one list continuation is left behind
     test 'consecutive list continuation lines are folded' do
       input = <<~'EOS'
       Lists
@@ -1772,15 +1772,15 @@ context 'Bulleted lists (:ulist)' do
       +
       +
       EOS
-      output = convert_string input
+      output = convert_string_to_embedded input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 2
       assert_xpath '//ul/li[1]/p', output, 1
-      assert_xpath '//ul/li[1]//p', output, 2
+      assert_xpath '//ul/li[1]/div/p', output, 1
       assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph one"]', output, 1
-      assert_xpath '//ul/li[1]//p[text() = "Item one, paragraph two"]', output, 1
+      # NOTE this is a negative assertion
+      assert_xpath %(//ul/li[1]//p[text() = "+\nItem one, paragraph two"]), output, 1
     end
-=end
 
     test 'should warn if unterminated block is detected in list item' do
       input = <<~'EOS'
