@@ -1292,108 +1292,106 @@ class Document < AbstractBlock
   #
   # Returns the resolved String backend if updated, nothing otherwise.
   def update_backend_attributes new_backend, init = nil
-    if init || new_backend != @backend
-      current_backend = @backend
-      current_basebackend = (attrs = @attributes)['basebackend']
-      current_doctype = @doctype
-      actual_backend, _, new_backend = new_backend.partition ':' if new_backend.include? ':'
-      if new_backend.start_with? 'xhtml'
-        attrs['htmlsyntax'] = 'xml'
-        new_backend = new_backend.slice 1, new_backend.length
-      elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] ||= 'html'
-      end
-      new_backend = BACKEND_ALIASES[new_backend] || new_backend
-      new_backend, delegate_backend = actual_backend, new_backend if actual_backend
-      if current_doctype
-        if current_backend
-          attrs.delete %(backend-#{current_backend})
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-        end
-        attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
-        attrs[%(doctype-#{current_doctype})] = ''
-      elsif current_backend
-        attrs.delete %(backend-#{current_backend})
-      end
-      attrs[%(backend-#{new_backend})] = ''
-      # QUESTION should we defer the @backend assignment until after the converter is created?
-      @backend = attrs['backend'] = new_backend
-      # (re)initialize converter
-      if Converter::BackendTraits === (converter = create_converter new_backend, delegate_backend)
-        new_basebackend = converter.basebackend
-        new_filetype = converter.filetype
-        if (htmlsyntax = converter.htmlsyntax)
-          attrs['htmlsyntax'] = htmlsyntax
-        end
-        if init
-          attrs['outfilesuffix'] ||= converter.outfilesuffix
-        else
-          attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
-        end
-      elsif converter
-        backend_traits = Converter.derive_backend_traits new_backend
-        new_basebackend = backend_traits[:basebackend]
-        new_filetype = backend_traits[:filetype]
-        if init
-          attrs['outfilesuffix'] ||= backend_traits[:outfilesuffix]
-        else
-          attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
-        end
-      else
-        # NOTE ideally we shouldn't need the converter before the converter phase, but we do
-        raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
-      end
-      @converter = converter
-      if (current_filetype = attrs['filetype'])
-        attrs.delete %(filetype-#{current_filetype})
-      end
-      attrs['filetype'] = new_filetype
-      attrs[%(filetype-#{new_filetype})] = ''
-      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
-        attrs['pagewidth'] = page_width
-      else
-        attrs.delete 'pagewidth'
-      end
-      if new_basebackend != current_basebackend
-        if current_doctype
-          if current_basebackend
-            attrs.delete %(basebackend-#{current_basebackend})
-            attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          end
-          attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
-        elsif current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend})
-        end
-        attrs[%(basebackend-#{new_basebackend})] = ''
-        attrs['basebackend'] = new_basebackend
-      end
-      new_backend
+    return unless init || new_backend != @backend
+    current_backend = @backend
+    current_basebackend = (attrs = @attributes)['basebackend']
+    current_doctype = @doctype
+    actual_backend, _, new_backend = new_backend.partition ':' if new_backend.include? ':'
+    if new_backend.start_with? 'xhtml'
+      attrs['htmlsyntax'] = 'xml'
+      new_backend = new_backend.slice 1, new_backend.length
+    elsif new_backend.start_with? 'html'
+      attrs['htmlsyntax'] ||= 'html'
     end
+    new_backend = BACKEND_ALIASES[new_backend] || new_backend
+    new_backend, delegate_backend = actual_backend, new_backend if actual_backend
+    if current_doctype
+      if current_backend
+        attrs.delete %(backend-#{current_backend})
+        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+      end
+      attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+      attrs[%(doctype-#{current_doctype})] = ''
+    elsif current_backend
+      attrs.delete %(backend-#{current_backend})
+    end
+    attrs[%(backend-#{new_backend})] = ''
+    # QUESTION should we defer the @backend assignment until after the converter is created?
+    @backend = attrs['backend'] = new_backend
+    # (re)initialize converter
+    if Converter::BackendTraits === (converter = create_converter new_backend, delegate_backend)
+      new_basebackend = converter.basebackend
+      new_filetype = converter.filetype
+      if (htmlsyntax = converter.htmlsyntax)
+        attrs['htmlsyntax'] = htmlsyntax
+      end
+      if init
+        attrs['outfilesuffix'] ||= converter.outfilesuffix
+      else
+        attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+      end
+    elsif converter
+      backend_traits = Converter.derive_backend_traits new_backend
+      new_basebackend = backend_traits[:basebackend]
+      new_filetype = backend_traits[:filetype]
+      if init
+        attrs['outfilesuffix'] ||= backend_traits[:outfilesuffix]
+      else
+        attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
+      end
+    else
+      # NOTE ideally we shouldn't need the converter before the converter phase, but we do
+      raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
+    end
+    @converter = converter
+    if (current_filetype = attrs['filetype'])
+      attrs.delete %(filetype-#{current_filetype})
+    end
+    attrs['filetype'] = new_filetype
+    attrs[%(filetype-#{new_filetype})] = ''
+    if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
+      attrs['pagewidth'] = page_width
+    else
+      attrs.delete 'pagewidth'
+    end
+    if new_basebackend != current_basebackend
+      if current_doctype
+        if current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend})
+          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+        end
+        attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
+      elsif current_basebackend
+        attrs.delete %(basebackend-#{current_basebackend})
+      end
+      attrs[%(basebackend-#{new_basebackend})] = ''
+      attrs['basebackend'] = new_basebackend
+    end
+    new_backend
   end
 
   # Internal: Update the doctype and backend attributes to reflect a change in the active doctype.
   #
   # Returns the String doctype if updated, nothing otherwise.
   def update_doctype_attributes new_doctype
-    if new_doctype && new_doctype != @doctype
-      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
-      if current_doctype
-        attrs.delete %(doctype-#{current_doctype})
-        if current_backend
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-          attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
-        end
-        if current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
-        end
-      else
-        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
-        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
+    return unless new_doctype && new_doctype != @doctype
+    current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
+    if current_doctype
+      attrs.delete %(doctype-#{current_doctype})
+      if current_backend
+        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
       end
-      attrs[%(doctype-#{new_doctype})] = ''
-      @doctype = attrs['doctype'] = new_doctype
+      if current_basebackend
+        attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
+      end
+    else
+      attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
+      attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
     end
+    attrs[%(doctype-#{new_doctype})] = ''
+    @doctype = attrs['doctype'] = new_doctype
   end
 end
 end

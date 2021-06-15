@@ -2066,22 +2066,21 @@ class Parser
   end
 
   def self.process_attribute_entry reader, document, attributes = nil, match = nil
-    if match || (match = reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil)
-      if (value = match[2]).nil_or_empty?
-        value = ''
-      elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
-        con, value = (value.slice value.length - 2, 2), (value.slice 0, value.length - 2).rstrip
-        while reader.advance && !(next_line = reader.peek_line || '').empty?
-          next_line = next_line.lstrip
-          next_line = (next_line.slice 0, next_line.length - 2).rstrip if (keep_open = next_line.end_with? con)
-          value = %(#{value}#{(value.end_with? HARD_LINE_BREAK) ? LF : ' '}#{next_line})
-          break unless keep_open
-        end
+    return unless match || (match = reader.has_more_lines? ? (AttributeEntryRx.match reader.peek_line) : nil)
+    if (value = match[2]).nil_or_empty?
+      value = ''
+    elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
+      con, value = (value.slice value.length - 2, 2), (value.slice 0, value.length - 2).rstrip
+      while reader.advance && !(next_line = reader.peek_line || '').empty?
+        next_line = next_line.lstrip
+        next_line = (next_line.slice 0, next_line.length - 2).rstrip if (keep_open = next_line.end_with? con)
+        value = %(#{value}#{(value.end_with? HARD_LINE_BREAK) ? LF : ' '}#{next_line})
+        break unless keep_open
       end
-
-      store_attribute match[1], value, document, attributes
-      true
     end
+
+    store_attribute match[1], value, document, attributes
+    true
   end
 
   # Public: Store the attribute in the document and register attribute entry if accessible
@@ -2460,16 +2459,10 @@ class Parser
     m, rest = nil, ''
 
     if pos == :start
-      if line.include? delimiter
-        spec_part, _, rest = line.partition delimiter
-        if (m = CellSpecStartRx.match spec_part)
-          return [{}, rest] if m[0].empty?
-        else
-          return [nil, line]
-        end
-      else
-        return [nil, line]
-      end
+      return [nil, line] unless line.include? delimiter
+      spec_part, _, rest = line.partition delimiter
+      return [nil, line] unless (m = CellSpecStartRx.match spec_part)
+      return [{}, rest] if m[0].empty?
     elsif (m = CellSpecEndRx.match line) # when pos == :end
       # NOTE return the line stripped of trailing whitespace if no cellspec is found in this case
       return [{}, line.rstrip] if m[0].lstrip.empty?
