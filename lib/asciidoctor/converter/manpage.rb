@@ -656,13 +656,12 @@ allbox tab(:);'
   end
 
   def self.write_alternate_pages mannames, manvolnum, target
-    if mannames && mannames.size > 1
-      mannames.shift
-      manvolext = %(.#{manvolnum})
-      dir, basename = ::File.split target
-      mannames.each do |manname|
-        ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
-      end
+    return unless mannames && mannames.size > 1
+    mannames.shift
+    manvolext = %(.#{manvolnum})
+    dir, basename = ::File.split target
+    mannames.each do |manname|
+      ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
     end
   end
 
