@@ -657,7 +657,7 @@ allbox tab(:);'
   end
 
   def self.write_alternate_pages mannames, manvolnum, target
-    return if mannames.nil_or_empty?
+    return unless mannames && mannames.size > 1
     mannames.shift
     manvolext = %(.#{manvolnum})
     dir, basename = ::File.split target
