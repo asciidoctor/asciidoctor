@@ -229,7 +229,7 @@ module Extensions
     def parse_attributes block, attrlist, opts = {}
       return {} if attrlist ? attrlist.empty? : true
       attrlist = block.sub_attributes attrlist if opts[:sub_attributes] && (attrlist.include? ATTR_REF_HEAD)
-      (AttributeList.new attrlist).parse (opts[:positional_attributes] || [])
+      (AttributeList.new attrlist).parse opts[:positional_attributes] || []
     end
 
     # TODO fill out remaining methods
