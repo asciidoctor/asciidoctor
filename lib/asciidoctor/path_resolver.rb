@@ -400,14 +400,11 @@ class PathResolver
     if jail && (recheck = !(descends_from? start, jail)) && @file_separator == BACKSLASH
       start_segments, start_root = partition_path start
       jail_segments, jail_root = partition_path jail
-      if start_root != jail_root
-        if opts.fetch :recover, true
-          logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root; recovering automatically)
-          start_segments = jail_segments
-          recheck = false
-        else
-          raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode))
-        end
+      unless start_root == jail_root
+        raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode)) unless opts.fetch :recover, true
+        logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root; recovering automatically)
+        start_segments = jail_segments
+        recheck = false
       end
     else
       start_segments, jail_root = partition_path start

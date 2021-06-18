@@ -344,9 +344,8 @@ class Table::Cell < AbstractBlock
 
   def catalog_inline_anchor cell_text = @text, cursor = nil
     cursor, @cursor = @cursor, nil unless cursor
-    if (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
-      Parser.catalog_inline_anchor $1, $2, self, cursor, @document
-    end
+    return unless (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
+    Parser.catalog_inline_anchor $1, $2, self, cursor, @document
   end
 
   # Public: Get the String text of this cell with substitutions applied.

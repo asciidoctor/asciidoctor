@@ -879,24 +879,23 @@ class Parser
         attributes.clear
         return
       else
-        if block_extensions && (extension = extensions.registered_for_block? block_context, cloaked_context)
-          unless (content_model = (ext_config = extension.config)[:content_model]) == :skip
-            unless (positional_attrs = ext_config[:positional_attrs] || ext_config[:pos_attrs]).nil_or_empty?
-              AttributeList.rekey(attributes, [nil] + positional_attrs)
-            end
-            if (default_attrs = ext_config[:default_attrs])
-              default_attrs.each {|k, v| attributes[k] ||= v }
-            end
-            # QUESTION should we clone the extension for each cloaked context and set in config?
-            attributes['cloaked-context'] = cloaked_context
-          end
-          unless (block = build_block block_context, content_model, terminator, parent, reader, attributes, extension: extension)
-            attributes.clear
-            return
-          end
-        else
+        unless block_extensions && (extension = extensions.registered_for_block? block_context, cloaked_context)
           # this should only happen if there's a misconfiguration
           raise %(Unsupported block type #{block_context} at #{reader.cursor})
+        end
+        unless (content_model = (ext_config = extension.config)[:content_model]) == :skip
+          unless (positional_attrs = ext_config[:positional_attrs] || ext_config[:pos_attrs]).nil_or_empty?
+            AttributeList.rekey(attributes, [nil] + positional_attrs)
+          end
+          if (default_attrs = ext_config[:default_attrs])
+            default_attrs.each {|k, v| attributes[k] ||= v }
+          end
+          # QUESTION should we clone the extension for each cloaked context and set in config?
+          attributes['cloaked-context'] = cloaked_context
+        end
+        unless (block = build_block block_context, content_model, terminator, parent, reader, attributes, extension: extension)
+          attributes.clear
+          return
         end
       end
     end
@@ -1039,17 +1038,14 @@ class Parser
     if (extension = options[:extension])
       # QUESTION do we want to delete the style?
       attributes.delete('style')
-      if (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge])
-        attributes.replace block.attributes
-        # FIXME if the content model is set to compound, but we only have simple in this context, then
-        # forcefully set the content_model to simple to prevent parsing blocks from children
-        # TODO document this behavior!!
-        if block.content_model == :compound && !(lines = block.lines).empty?
-          content_model = :compound
-          block_reader = Reader.new lines
-        end
-      else
-        return
+      return unless (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge])
+      attributes.replace block.attributes
+      # FIXME if the content model is set to compound, but we only have simple in this context, then
+      # forcefully set the content_model to simple to prevent parsing blocks from children
+      # TODO document this behavior!!
+      if block.content_model == :compound && !(lines = block.lines).empty?
+        content_model = :compound
+        block_reader = Reader.new lines
       end
     else
       block = Block.new(parent, block_context, content_model: content_model, source: lines, attributes: attributes)
@@ -1484,9 +1480,8 @@ class Parser
         elsif has_text # has_text only relevant for dlist, which is more greedy until it has text for an item; has_text is always true for all other lists
           # in this block, we have to see whether we stay in the list
           # TODO any way to combine this with the check after skipping blank lines?
-          if is_sibling_list_item?(this_line, list_type, sibling_trait)
-            break
-          elsif (nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line })
+          break if is_sibling_list_item?(this_line, list_type, sibling_trait)
+          if (nested_list_type = NESTABLE_LIST_CONTEXTS.find {|ctx| ListRxMap[ctx] =~ this_line })
             buffer << this_line
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
