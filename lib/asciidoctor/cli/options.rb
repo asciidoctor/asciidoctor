@@ -113,11 +113,11 @@ module Asciidoctor
           end
           opts.on '-IDIRECTORY', '--load-path DIRECTORY', 'add a directory to the $LOAD_PATH',
             'may be specified more than once' do |path|
-            (self[:load_paths] ||= []).concat(path.split ::File::PATH_SEPARATOR)
+            (self[:load_paths] ||= []).concat path.split ::File::PATH_SEPARATOR
           end
           opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
             'may be specified more than once' do |path|
-            (self[:requires] ||= []).concat(path.split ',')
+            (self[:requires] ||= []).concat path.split ','
           end
           opts.on '--failure-level LEVEL', %w(warning WARNING error ERROR info INFO), 'set minimum logging level that triggers non-zero exit code: [WARN, ERROR, INFO] (default: FATAL)' do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
@@ -158,7 +158,7 @@ module Asciidoctor
                   return 1
                 end
               # Ruby 2.3 requires the extra brackets around the ::File.join method call
-              elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1')) # rubocop:disable Lint/ParenthesesAsGroupedExpression
+              elsif ::File.exist? (manpage_path = (::File.join ROOT_DIR, 'man', 'asciidoctor.1'))
                 $stdout.puts ::File.read manpage_path
               else
                 manpage_path = %x(man -w asciidoctor).chop rescue ''
@@ -174,7 +174,7 @@ module Asciidoctor
               end
             when 'syntax'
               # Ruby 2.3 requires the extra brackets around the ::File.join method call
-              if ::File.exist? (syntax_path = (::File.join ROOT_DIR, 'data', 'reference', 'syntax.adoc')) # rubocop:disable Lint/ParenthesesAsGroupedExpression
+              if ::File.exist? (syntax_path = (::File.join ROOT_DIR, 'data', 'reference', 'syntax.adoc'))
                 $stdout.puts ::File.read syntax_path
               else
                 $stderr.puts 'asciidoctor: FAILED: syntax page not found; visit https://asciidoctor.org/docs'

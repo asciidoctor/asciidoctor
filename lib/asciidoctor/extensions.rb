@@ -191,7 +191,7 @@ module Extensions
       unless (target = attrs['target'])
         raise ::ArgumentError, 'Unable to create an image block, target attribute is required'
       end
-      attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
+      attrs['alt'] ||= (attrs['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
       title = (attrs.key? 'title') ? (attrs.delete 'title') : nil
       block = create_block parent, :image, nil, attrs, opts
       if title
@@ -1307,7 +1307,7 @@ module Extensions
     # of this processor.
     def prefer *args, &block
       extension = ProcessorExtension === (arg0 = args.shift) ? arg0 : (send arg0, *args, &block)
-      extensions_store = instance_variable_get(%(@#{extension.kind}_extensions).to_sym)
+      extensions_store = instance_variable_get %(@#{extension.kind}_extensions).to_sym
       extensions_store.unshift extensions_store.delete extension
       extension
     end

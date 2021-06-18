@@ -13,7 +13,7 @@ class Inline < AbstractNode
   attr_accessor :target
 
   def initialize parent, context, text = nil, opts = {}
-    super(parent, context, opts)
+    super parent, context, opts
     @node_name = %(inline_#{context})
     @text = text
     @id = opts[:id]

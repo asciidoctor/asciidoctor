@@ -189,7 +189,7 @@ class Converter::DocBook5Converter < Converter::Base
 
     mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri(node.attr 'target')}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
+<imagedata fileref="#{node.image_uri node.attr 'target'}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
@@ -378,7 +378,7 @@ class Converter::DocBook5Converter < Converter::Base
     pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
     frame = 'topbot' if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
     grid = node.attr 'grid', nil, 'table-grid'
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{%w(none cols).include?(grid) ? 0 : 1}" colsep="#{%w(none rows).include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{(%w(none cols).include? grid) ? 0 : 1}" colsep="#{(%w(none rows).include? grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
     if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
     elsif node.option? 'breakable'

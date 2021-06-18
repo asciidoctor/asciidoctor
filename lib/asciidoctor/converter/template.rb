@@ -154,12 +154,13 @@ class Converter::TemplateConverter < Converter::Base
     engine = @engine
     @template_dirs.each do |template_dir|
       # FIXME need to think about safe mode restrictions here
-      next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
+      # Ruby 2.3 requires the extra brackets around the path_resolver.system_path method call
+      next unless ::File.directory? (template_dir = (path_resolver.system_path template_dir))
 
       if engine
         file_pattern = %(*.#{engine})
         # example: templates/haml
-        if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
+        if ::File.directory? (engine_dir = %(#{template_dir}/#{engine}))
           template_dir = engine_dir
         end
       else
@@ -168,7 +169,7 @@ class Converter::TemplateConverter < Converter::Base
       end
 
       # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
-      if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
+      if ::File.directory? (backend_dir = %(#{template_dir}/#{backend}))
         template_dir = backend_dir
       end
 
@@ -240,7 +241,7 @@ class Converter::TemplateConverter < Converter::Base
       end
       result[name] = template
     end
-    if helpers || ::File.file?(helpers = %(#{template_dir}/helpers.rb))
+    if helpers || (::File.file? (helpers = %(#{template_dir}/helpers.rb)))
       require helpers
     end
     result

@@ -86,16 +86,16 @@ module Asciidoctor
         # QUESTION should the jail be the working_dir or doc.base_dir???
         jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
         if to_dir
-          outdir = doc.normalize_system_path(to_dir, working_dir, jail, target_name: 'to_dir', recover: false)
+          outdir = doc.normalize_system_path to_dir, working_dir, jail, target_name: 'to_dir', recover: false
           if to_file
-            outfile = doc.normalize_system_path(to_file, outdir, nil, target_name: 'to_dir', recover: false)
+            outfile = doc.normalize_system_path to_file, outdir, nil, target_name: 'to_dir', recover: false
             # reestablish outdir as the final target directory (in the case to_file had directory segments)
             outdir = ::File.dirname outfile
           else
             outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
           end
         elsif to_file
-          outfile = doc.normalize_system_path(to_file, working_dir, jail, target_name: 'to_dir', recover: false)
+          outfile = doc.normalize_system_path to_file, working_dir, jail, target_name: 'to_dir', recover: false
           # establish outdir as the final target directory (in the case to_file had directory segments)
           outdir = ::File.dirname outfile
         end
