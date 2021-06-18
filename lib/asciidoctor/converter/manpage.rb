@@ -557,7 +557,7 @@ allbox tab(:);'
     result << (node.title? ? %(.sp
 .B #{manify node.title}
 .br) : '.sp')
-    result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
+    result << %(<#{node.media_uri node.attr 'target'}#{start_param}#{end_param}> (video))
     result.join LF
   end
 

@@ -221,7 +221,7 @@ class PathResolver
         path.slice offset, path.length
       else
         begin
-          (Pathname.new path).relative_path_from(Pathname.new base).to_s
+          ((Pathname.new path).relative_path_from Pathname.new base).to_s
         rescue
           path
         end

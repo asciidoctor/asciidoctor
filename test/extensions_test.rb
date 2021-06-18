@@ -809,7 +809,7 @@ context 'Extensions' do
             end
           end
 
-          prefer (tree_processor do # rubocop:disable Lint/ParenthesesAsGroupedExpression
+          prefer (tree_processor do
             process do |doc|
               doc << (create_paragraph doc, 'a', {})
               nil
