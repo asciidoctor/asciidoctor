@@ -73,7 +73,7 @@ module Asciidoctor
     # document, in additional to all the security features of SafeMode::SERVER.
     # For instance, this level disallows use of the include::[] directive and the
     # embedding of binary content (data uri), stylesheets and JavaScripts
-    # referenced by the document.(Asciidoctor and trusted extensions may still
+    # referenced by the document. (Asciidoctor and trusted extensions may still
     # be allowed to embed trusted content into the document).
     #
     # Since Asciidoctor is aiming for wide adoption, this level is the default
