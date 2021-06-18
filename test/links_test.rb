@@ -205,12 +205,12 @@ context 'Links' do
   end
 
   test 'should convert qualified url as macro enclosed in double quotes' do
-    output = convert_string_to_embedded('"https://asciidoctor.org[]"')
+    output = convert_string_to_embedded '"https://asciidoctor.org[]"'
     assert_include '"<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>"', output
   end
 
   test 'should convert qualified url as macro enclosed in single quotes' do
-    output = convert_string_to_embedded('\'https://asciidoctor.org[]\'')
+    output = convert_string_to_embedded '\'https://asciidoctor.org[]\''
     assert_include '\'<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>\'', output
   end
 

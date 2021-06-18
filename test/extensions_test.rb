@@ -209,19 +209,19 @@ def create_santa_list_block_macro
       process do |parent, target|
         list = create_list parent, target
         guillaume = (create_list_item list, 'Guillaume')
-        guillaume.add_role('friendly')
+        guillaume.add_role 'friendly'
         guillaume.id = 'santa-list-guillaume'
         list << guillaume
         robert = (create_list_item list, 'Robert')
-        robert.add_role('kind')
-        robert.add_role('contributor')
-        robert.add_role('java')
+        robert.add_role 'kind'
+        robert.add_role 'contributor'
+        robert.add_role 'java'
         list << robert
         pepijn = (create_list_item list, 'Pepijn')
         pepijn.id = 'santa-list-pepijn'
         list << pepijn
         dan = (create_list_item list, 'Dan')
-        dan.add_role('naughty')
+        dan.add_role 'naughty'
         dan.id = 'santa-list-dan'
         list << dan
         sarah = (create_list_item list, 'Sarah')
@@ -1553,7 +1553,7 @@ context 'Extensions' do
             parse_content_as :raw
             process do |parent, reader, attrs|
               original_attrs = attrs.dup
-              attrs.delete('title')
+              attrs.delete 'title'
               create_paragraph parent, reader.read_lines, original_attrs.merge('id' => 'value')
             end
           end
@@ -1747,7 +1747,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           docinfo_processor MetaRobotsDocinfoProcessor
         end
-        sample_input_path = fixture_path('basic.adoc')
+        sample_input_path = fixture_path 'basic.adoc'
 
         output = Asciidoctor.convert_file sample_input_path, to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
         refute_empty output
@@ -1801,7 +1801,7 @@ context 'Extensions' do
       doc = document_from_string input, standalone: false, extension_registry: create_cat_in_sink_block_macro
       image = doc.blocks[0]
       assert_equal 'cat in sink (yes)', (image.attr 'alt')
-      refute(image.attr? 'default-alt')
+      refute image.attr? 'default-alt'
       output = doc.convert
       assert_includes output, '<img src="cat-in-sink-day-30.png" alt="cat in sink (yes)">'
     end

@@ -2558,7 +2558,7 @@ context 'Blocks' do
 
       doc = document_from_string input
       img = doc.blocks[0]
-      refute(img.attributes.key? 'style')
+      refute img.attributes.key? 'style'
       assert_nil img.style
     end
 
@@ -3574,8 +3574,8 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 0
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 2
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 2
     end
 
     test 'should accept partintro on open block with title' do
@@ -3601,9 +3601,9 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 1
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text()="Intro title"]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 1
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="title"][text()="Intro title"]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 1
     end
 
     test 'should exclude partintro if not a child of part' do
@@ -3805,7 +3805,7 @@ context 'Blocks' do
       doc = document_from_string input
       block = doc.blocks.first
       assert_nil block.id
-      assert_nil(block.attr 'reftext')
+      assert_nil block.attr 'reftext'
       refute doc.catalog[:refs].key? 'illegal$id'
     end
 

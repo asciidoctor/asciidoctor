@@ -262,7 +262,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
@@ -280,7 +280,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
     end
 
@@ -298,7 +298,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//p[@class="tableblock"]', output, 1)
+      result = xmlnodes_at_xpath '/table//p[@class="tableblock"]', output, 1
       assert_equal %(<p class="tableblock">one\n  two\nthree</p>), result.to_s
     end
 

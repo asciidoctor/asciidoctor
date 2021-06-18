@@ -406,7 +406,7 @@ context 'Paragraphs' do
     end
 
     test 'verse paragraph' do
-      output = convert_string("[verse]\nFamous verse.")
+      output = convert_string "[verse]\nFamous verse."
       assert_xpath '//*[@class = "verseblock"]', output, 1
       assert_xpath '//*[@class = "verseblock"]/pre', output, 1
       assert_xpath '//*[@class = "verseblock"]//p', output, 0
