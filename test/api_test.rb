@@ -233,7 +233,7 @@ context 'API' do
     end
 
     test 'should accept attributes if hash like' do
-      class Hashish
+      class Hashlike
         def initialize
           @table = { 'toc' => '' }
         end
@@ -247,7 +247,7 @@ context 'API' do
         end
       end
 
-      doc = Asciidoctor.load('text', attributes: Hashish.new)
+      doc = Asciidoctor.load 'text', attributes: Hashlike.new
       assert_kind_of Hash, doc.attributes
       assert doc.attributes.key?('toc')
     end
