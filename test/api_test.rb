@@ -5,7 +5,7 @@ require_relative 'test_helper'
 context 'API' do
   context 'Load' do
     test 'should load input file' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       doc = File.open(sample_input_path, Asciidoctor::FILE_READ_MODE) {|file| Asciidoctor.load file, safe: Asciidoctor::SafeMode::SAFE }
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
@@ -14,8 +14,8 @@ context 'API' do
     end
 
     test 'should load input file from filename' do
-      sample_input_path = fixture_path('sample.adoc')
-      doc = Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
+      sample_input_path = fixture_path 'sample.adoc'
+      doc = Asciidoctor.load_file sample_input_path, safe: Asciidoctor::SafeMode::SAFE
       assert_equal 'Document Title', doc.doctitle
       assert_equal File.expand_path(sample_input_path), doc.attr('docfile')
       assert_equal File.expand_path(File.dirname(sample_input_path)), doc.attr('docdir')
@@ -75,9 +75,9 @@ context 'API' do
     end
 
     test 'should not load invalid file' do
-      sample_input_path = fixture_path('hello-asciidoctor.pdf')
+      sample_input_path = fixture_path 'hello-asciidoctor.pdf'
       exception = assert_raises ArgumentError do
-        Asciidoctor.load_file(sample_input_path, safe: Asciidoctor::SafeMode::SAFE)
+        Asciidoctor.load_file sample_input_path, safe: Asciidoctor::SafeMode::SAFE
       end
       expected_message = 'Failed to load AsciiDoc document - source is either binary or contains invalid Unicode data'
       assert_include expected_message, exception.message
@@ -121,7 +121,7 @@ context 'API' do
 
       preamble
       EOS
-      doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load input, safe: Asciidoctor::SafeMode::SAFE
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -134,7 +134,7 @@ context 'API' do
 
       preamble
       EOS
-      doc = Asciidoctor.load(input, safe: Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load input, safe: Asciidoctor::SafeMode::SAFE
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -147,7 +147,7 @@ context 'API' do
 
       preamble
       EOS
-      doc = Asciidoctor.load(input.lines, safe: Asciidoctor::SafeMode::SAFE)
+      doc = Asciidoctor.load input.lines, safe: Asciidoctor::SafeMode::SAFE
       assert_equal 'Document Title', doc.doctitle
       refute doc.attr?('docfile')
       assert_equal doc.base_dir, doc.attr('docdir')
@@ -178,7 +178,7 @@ context 'API' do
 
     test 'should accept attributes as array' do
       # NOTE there's a tab character before idseparator
-      doc = Asciidoctor.load('text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-)) # rubocop:disable Layout/SpaceInsideArrayPercentLiteral
+      doc = Asciidoctor.load 'text', attributes: %w(toc sectnums   source-highlighter=coderay idprefix	idseparator=-) # rubocop:disable Layout/SpaceInsideArrayPercentLiteral
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('toc')
       assert_equal '', doc.attr('toc')
@@ -193,7 +193,7 @@ context 'API' do
     end
 
     test 'should accept attributes as empty array' do
-      doc = Asciidoctor.load('text', attributes: [])
+      doc = Asciidoctor.load 'text', attributes: []
       assert_kind_of Hash, doc.attributes
     end
 
@@ -213,7 +213,7 @@ context 'API' do
     end
 
     test 'should accept values containing spaces in attributes string' do
-      doc = Asciidoctor.load('text', attributes: %(idprefix idseparator=-   note-caption=Note\\ to\\\tself toc))
+      doc = Asciidoctor.load 'text', attributes: %(idprefix idseparator=-   note-caption=Note\\ to\\\tself toc)
       assert_kind_of Hash, doc.attributes
       assert doc.attr?('idprefix')
       assert_equal '', doc.attr('idprefix')
@@ -224,12 +224,12 @@ context 'API' do
     end
 
     test 'should accept attributes as empty string' do
-      doc = Asciidoctor.load('text', attributes: '')
+      doc = Asciidoctor.load 'text', attributes: ''
       assert_kind_of Hash, doc.attributes
     end
 
     test 'should accept attributes as nil' do
-      doc = Asciidoctor.load('text', attributes: nil)
+      doc = Asciidoctor.load 'text', attributes: nil
       assert_kind_of Hash, doc.attributes
     end
 
@@ -314,7 +314,7 @@ context 'API' do
     test 'should not modify options argument' do
       options = { safe: Asciidoctor::SafeMode::SAFE }
       options.freeze
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       doc = Asciidoctor.load_file sample_input_path, options
       refute_same options, doc.options
     end
@@ -326,7 +326,7 @@ context 'API' do
         safe: Asciidoctor::SafeMode::SAFE,
         attributes: attributes,
       }
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       doc = Asciidoctor.load_file sample_input_path, options
       refute_same attributes, doc.options[:attributes]
       refute_same attributes, doc.attributes
@@ -990,7 +990,7 @@ context 'API' do
       content
       EOS
       doc = Asciidoctor.load input
-      result = doc.find_by(context: :section, id: 'subsection')
+      result = doc.find_by context: :section, id: 'subsection'
       refute_nil result
       assert_equal 1, result.size
       assert_equal :section, result[0].context
@@ -1011,7 +1011,7 @@ context 'API' do
       EOS
       doc = Asciidoctor.load input
       visited_last = false
-      result = doc.find_by(id: 'subsection') do |candidate|
+      result = doc.find_by id: 'subsection' do |candidate|
         visited_last = true if candidate.id == 'last'
         true
       end
@@ -1123,25 +1123,25 @@ context 'API' do
     end
 
     test 'should convert source document to embedded document when header_footer is false' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('sample.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.html'
 
       [{ header_footer: false }, { header_footer: false, to_file: sample_output_path }].each do |opts|
         begin
           Asciidoctor.convert_file sample_input_path, opts
           assert_path_exists sample_output_path
-          output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+          output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
           refute_empty output
           assert_xpath '/html', output, 0
           assert_css '#preamble', output, 1
         ensure
-          FileUtils.rm(sample_output_path)
+          FileUtils.rm sample_output_path
         end
       end
     end
 
     test 'should convert source document to standalone document string when to_file is false and standalone is true' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
 
       output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       refute_empty output
@@ -1153,7 +1153,7 @@ context 'API' do
     end
 
     test 'should convert source document to standalone document string when to_file is false and header_footer is true' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
 
       output = Asciidoctor.convert_file sample_input_path, header_footer: true, to_file: false
       refute_empty output
@@ -1165,29 +1165,29 @@ context 'API' do
     end
 
     test 'lines in output should be separated by line feed' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
 
       output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       refute_empty output
-      lines = output.split("\n")
+      lines = output.split "\n"
       assert_equal lines.size, output.split(/\r\n|\r|\n/).size
       assert_equal lines.map(&:length), lines.map(&:rstrip).map(&:length)
     end
 
     test 'should accept attributes as array' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       output = Asciidoctor.convert_file sample_input_path, attributes: %w(sectnums idprefix idseparator=-), to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should accept attributes as string' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       output = Asciidoctor.convert_file sample_input_path, attributes: 'sectnums idprefix idseparator=-', to_file: false
       assert_css '#section-a', output, 1
     end
 
     test 'should link to default stylesheet by default when safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
       output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       assert_css 'html:root > head > link[rel="stylesheet"][href^="https://fonts.googleapis.com"]', output, 1
       assert_css 'html:root > head > link[rel="stylesheet"][href="./asciidoctor.css"]', output, 1
@@ -1258,7 +1258,7 @@ context 'API' do
     end
 
     test 'should embed default stylesheet if safe mode is less than SECURE and linkcss is unset from API' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
       output = Asciidoctor.convert_file sample_input_path,
         standalone: true, to_file: false, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'linkcss!' => '' }
       assert_css 'html:root > head > style', output, 1
@@ -1307,7 +1307,7 @@ context 'API' do
     end
 
     test 'should resolve custom stylesheet to embed relative to stylesdir' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
       output = Asciidoctor.convert_file sample_input_path,
         standalone: true, safe: Asciidoctor::SafeMode::SAFE, to_file: false, attributes: { 'stylesheet' => 'custom.css', 'stylesdir' => './stylesheets', 'linkcss!' => '' }
       stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
@@ -1387,12 +1387,12 @@ context 'API' do
     end
 
     test 'should convert source file and write result to adjacent file by default' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('sample.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.html'
       begin
         Asciidoctor.convert_file sample_input_path
         assert_path_exists sample_output_path
-        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1400,7 +1400,7 @@ context 'API' do
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
@@ -1424,12 +1424,12 @@ context 'API' do
     end
 
     test 'should convert source file and write to specified file' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('result.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'result.html'
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert_path_exists sample_output_path
-        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1437,18 +1437,18 @@ context 'API' do
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
     test 'should convert source file and write to specified file in base_dir' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('result.html')
-      fixture_dir = fixture_path('')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'result.html'
+      fixture_dir = fixture_path ''
       begin
         Asciidoctor.convert_file sample_input_path, to_file: 'result.html', base_dir: fixture_dir
         assert_path_exists sample_output_path
-        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         refute_empty output
         assert_xpath '/html', output, 1
         assert_xpath '/html/head', output, 1
@@ -1456,7 +1456,7 @@ context 'API' do
         assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
-        FileUtils.rm(sample_output_path, force: true)
+        FileUtils.rm sample_output_path, force: true
       end
     end
 
@@ -1477,75 +1477,75 @@ context 'API' do
     end
 
     test 'in_place option is ignored when to_file is specified' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('result.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'result.html'
       begin
         Asciidoctor.convert_file sample_input_path, to_file: sample_output_path, in_place: true
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rm sample_output_path if File.exist? sample_output_path
       end
     end
 
     test 'in_place option is ignored when to_dir is specified' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('sample.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.html'
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: File.dirname(sample_output_path), in_place: true
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rm sample_output_path if File.exist? sample_output_path
       end
     end
 
     test 'should set outfilesuffix to match file extension of target file' do
       sample_input = '{outfilesuffix}'
-      sample_output_path = fixture_path('result.htm')
+      sample_output_path = fixture_path 'result.htm'
       begin
         Asciidoctor.convert sample_input, to_file: sample_output_path
         assert_path_exists sample_output_path
-        output = File.read(sample_output_path, mode: Asciidoctor::FILE_READ_MODE)
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         refute_empty output
         assert_include '<p>.htm</p>', output
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
     test 'should respect outfilesuffix soft set from API' do
-      sample_input_path = fixture_path('sample.adoc')
-      sample_output_path = fixture_path('sample.htm')
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.htm'
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: (File.dirname sample_input_path), attributes: { 'outfilesuffix' => '.htm@' }
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
     test 'output should be relative to to_dir option' do
-      sample_input_path = fixture_path('sample.adoc')
-      output_dir = File.join(File.dirname(sample_input_path), 'test_output')
+      sample_input_path = fixture_path 'sample.adoc'
+      output_dir = File.join File.dirname(sample_input_path), 'test_output'
       Dir.mkdir output_dir unless File.exist? output_dir
-      sample_output_path = File.join(output_dir, 'sample.html')
+      sample_output_path = File.join output_dir, 'sample.html'
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: output_dir
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rm sample_output_path if File.exist? sample_output_path
         FileUtils.rmdir output_dir
       end
     end
 
     test 'missing directories should be created if mkdirs is enabled' do
-      sample_input_path = fixture_path('sample.adoc')
-      output_dir = File.join(File.join(File.dirname(sample_input_path), 'test_output'), 'subdir')
-      sample_output_path = File.join(output_dir, 'sample.html')
+      sample_input_path = fixture_path 'sample.adoc'
+      output_dir = File.join File.join(File.dirname(sample_input_path), 'test_output'), 'subdir'
+      sample_output_path = File.join output_dir, 'sample.html'
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: output_dir, mkdirs: true
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rm sample_output_path if File.exist? sample_output_path
         FileUtils.rmdir output_dir
         FileUtils.rmdir File.dirname(output_dir)
       end
@@ -1553,7 +1553,7 @@ context 'API' do
 
     # TODO need similar test for when to_dir is specified
     test 'should raise exception if an attempt is made to overwrite input file' do
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
 
       assert_raises IOError do
         Asciidoctor.convert_file sample_input_path, attributes: { 'outfilesuffix' => '.adoc' }
@@ -1561,17 +1561,17 @@ context 'API' do
     end
 
     test 'to_file should be relative to to_dir when both given' do
-      sample_input_path = fixture_path('sample.adoc')
-      base_dir = File.dirname(sample_input_path)
-      sample_rel_output_path = File.join('test_output', 'result.html')
-      output_dir = File.dirname(File.join(base_dir, sample_rel_output_path))
+      sample_input_path = fixture_path 'sample.adoc'
+      base_dir = File.dirname sample_input_path
+      sample_rel_output_path = File.join 'test_output', 'result.html'
+      output_dir = File.dirname File.join(base_dir, sample_rel_output_path)
       Dir.mkdir output_dir unless File.exist? output_dir
-      sample_output_path = File.join(base_dir, sample_rel_output_path)
+      sample_output_path = File.join base_dir, sample_rel_output_path
       begin
         Asciidoctor.convert_file sample_input_path, to_dir: base_dir, to_file: sample_rel_output_path
         assert_path_exists sample_output_path
       ensure
-        FileUtils.rm(sample_output_path) if File.exist? sample_output_path
+        FileUtils.rm sample_output_path if File.exist? sample_output_path
         FileUtils.rmdir output_dir
       end
     end
@@ -1583,7 +1583,7 @@ context 'API' do
         to_file: output,
       }
       options.freeze
-      sample_input_path = fixture_path('sample.adoc')
+      sample_input_path = fixture_path 'sample.adoc'
       doc = Asciidoctor.convert_file sample_input_path, options
       refute_same options, doc.options
     end
@@ -1595,7 +1595,7 @@ context 'API' do
         doc = Asciidoctor.convert_file sample_input_path, to_file: sample_output_path
         assert_equal File.dirname(sample_output_path), doc.options[:to_dir]
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
@@ -1609,7 +1609,7 @@ context 'API' do
         doc = Asciidoctor.convert_file sample_input_path, to_dir: fixture_parent_path, to_file: sample_output_relpath
         assert_equal fixture_base_path, doc.options[:to_dir]
       ensure
-        FileUtils.rm(sample_output_path)
+        FileUtils.rm sample_output_path
       end
     end
 
@@ -1753,7 +1753,7 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      block.set_option('reversed')
+      block.set_option 'reversed'
       assert block.option? 'reversed'
       assert_equal '', block.attributes['reversed-option']
     end
@@ -1779,7 +1779,7 @@ context 'API' do
       EOS
 
       block = (document_from_string input).blocks[0]
-      block.set_option('reversed')
+      block.set_option 'reversed'
       assert block.option? 'fancy'
       assert block.option? 'reversed'
     end

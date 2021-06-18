@@ -34,7 +34,7 @@ context 'Text' do
     input += (File.readlines (sample_doc_path :encoding), mode: Asciidoctor::FILE_READ_MODE)
     doc = empty_document
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
-    block = Asciidoctor::Parser.next_block(reader, doc)
+    block = Asciidoctor::Parser.next_block reader, doc
     assert_xpath '//pre', block.convert.gsub(/^\s*\n/, ''), 1
   end
 
@@ -42,7 +42,7 @@ context 'Text' do
     input = 'include::fixtures/encoding.adoc[tags=romé]'
     doc = empty_safe_document base_dir: testdir
     reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
-    block = Asciidoctor::Parser.next_block(reader, doc)
+    block = Asciidoctor::Parser.next_block reader, doc
     output = block.convert
     assert_css '.paragraph', output, 1
   end
@@ -57,11 +57,11 @@ context 'Text' do
   end
 
   test 'single- and double-quoted text' do
-    output = convert_string_to_embedded(%q(``Where?,'' she said, flipping through her copy of `The New Yorker.'), attributes: { 'compat-mode' => '' })
+    output = convert_string_to_embedded %q(``Where?,'' she said, flipping through her copy of `The New Yorker.'), attributes: { 'compat-mode' => '' }
     assert_match(/&#8220;Where\?,&#8221;/, output)
     assert_match(/&#8216;The New Yorker.&#8217;/, output)
 
-    output = convert_string_to_embedded(%q("`Where?,`" she said, flipping through her copy of '`The New Yorker.`'))
+    output = convert_string_to_embedded %q("`Where?,`" she said, flipping through her copy of '`The New Yorker.`')
     assert_match(/&#8220;Where\?,&#8221;/, output)
     assert_match(/&#8216;The New Yorker.&#8217;/, output)
   end
@@ -275,20 +275,20 @@ context 'Text' do
       assert_xpath '//strong/em', output
       assert_xpath '//code/strong', output
 
-      output = convert_string('Winning *big _time_* in the `city *boyeeee*`.')
+      output = convert_string 'Winning *big _time_* in the `city *boyeeee*`.'
 
       assert_xpath '//strong/em', output
       assert_xpath '//code/strong', output
     end
 
     test 'unconstrained quotes' do
-      output = convert_string('**B**__I__++M++[role]++M++', attributes: { 'compat-mode' => '' })
+      output = convert_string '**B**__I__++M++[role]++M++', attributes: { 'compat-mode' => '' }
       assert_xpath '//strong', output, 1
       assert_xpath '//em', output, 1
       assert_xpath '//code[not(@class)]', output, 1
       assert_xpath '//code[@class="role"]', output, 1
 
-      output = convert_string('**B**__I__``M``[role]``M``')
+      output = convert_string '**B**__I__``M``[role]``M``'
       assert_xpath '//strong', output, 1
       assert_xpath '//em', output, 1
       assert_xpath '//code[not(@class)]', output, 1
