@@ -1106,16 +1106,18 @@ class PreprocessorReader < Reader
       elsif inc_tags
         inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
+          select = base_select = inc_tags.delete '**'
           if inc_tags.key? '*'
-            select = base_select = inc_tags.delete '**'
             wildcard = inc_tags.delete '*'
-          else
-            select = base_select = wildcard = inc_tags.delete '**'
+          elsif !select && inc_tags.values.first == false
+            wildcard = true
           end
-        elsif (wildcard = inc_tags.delete '*').nil?
-          select = base_select = !(inc_tags.value? true)
+        elsif inc_tags.key? '*'
+          select = base_select = inc_tags.keys.first == '*' ?
+            !(wildcard = inc_tags.delete '*') :
+            ((wildcard = inc_tags.delete '*') ? false : false)
         else
-          select = base_select = !wildcard
+          select = base_select = !(inc_tags.value? true)
         end
         begin
           reader.call inc_path, read_mode do |f|
@@ -1166,7 +1168,7 @@ class PreprocessorReader < Reader
         end
         shift
         if inc_offset
-          parsed_attrs['partial-option'] = '' unless base_select && wildcard && inc_tags.empty?
+          parsed_attrs['partial-option'] = '' unless base_select && wildcard != false && inc_tags.empty?
           # FIXME not accounting for skipped lines in reader line numbering
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
