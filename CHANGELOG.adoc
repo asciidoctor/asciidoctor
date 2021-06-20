@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 Bug Fixes::
 
   * Include all lines outside of specified tagged region when tag filter on include directive is a single negated tag (#4048)
+  * Only interpret negated wildcard in tag filter on include directive as implicit globstar if it precedes other tags (#4086)
   * Change ifeval directive to resolve to false if comparison operation cannot be performed (#4046)
   * Don't crash if :to_file option is passed to load or load_file and value is not a string (#4055)
   * Use automatic link text if ID in shorthand xref is followed by dangling comma (e.g., `+<<idname,>>+`)
