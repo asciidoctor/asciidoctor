@@ -1502,7 +1502,7 @@ class ReaderTest < Minitest::Test
             end
           end
           EOS
-        assert_includes output, %(<pre>#{expected}</pre>)
+          assert_includes output, %(<pre>#{expected}</pre>)
         end
       end
 
