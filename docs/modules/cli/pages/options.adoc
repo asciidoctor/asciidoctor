@@ -60,10 +60,9 @@ This option may be specified more than once.
   This name is also used to build the full path to the custom converter templates.
   If a template engine is not specified, it will be auto-detected based on the file extension of the custom converter templates found.
 
-*-e, --eruby*::
-  Specifies the eRuby implementation to use for executing the custom converter templates written in ERB.
-  Supported values are _erb_ and _erubis_.
-  Defaults to _erb_.
+*-e, --embedded*::
+  Output an embeddable document, which excludes the header, the footer, and everything outside the body of the document.
+  This option is useful for producing documents that can be inserted into an external template.
 
 *-I, --load-path*=_DIRECTORY_::
   Add the specified directory to the load path, so that _-r_ can load extensions from outside the default Ruby load path.
