@@ -36,10 +36,10 @@ Alternately, you can set an artificial document directory by passing an absolute
 Try both approaches to determine which one suits your needs better.
 
 When piping source from STDIN to STDOUT through the `asciidoctor` command, you often just want the converted body (i.e., embeddable HTML).
-To produce that variant, add the `-s` flag:
+To produce that variant, add the `-e` flag, short for `--embedded` (previously the `-s` flag):
 
- $ echo 'content' | asciidoctor -s -
+ $ echo 'content' | asciidoctor -e -
 
 Or perhaps you want to include the doctitle as well:
 
- $ echo -e '= Document Title\n\ncontent' | asciidoctor -s -a showtitle -
+ $ echo -e '= Document Title\n\ncontent' | asciidoctor -e -a showtitle -
