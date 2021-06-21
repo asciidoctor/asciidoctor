@@ -1125,9 +1125,12 @@ class PreprocessorReader < Reader
             wildcard = true
           end
         elsif inc_tags.key? '*'
-          select = base_select = inc_tags.keys.first == '*' ?
-            !(wildcard = inc_tags.delete '*') :
-            ((wildcard = inc_tags.delete '*') ? false : false)
+          if inc_tags.keys.first == '*'
+            select = base_select = !(wildcard = inc_tags.delete '*')
+          else
+            select = base_select = false
+            wildcard = inc_tags.delete '*'
+          end
         else
           select = base_select = !(inc_tags.value? true)
         end
