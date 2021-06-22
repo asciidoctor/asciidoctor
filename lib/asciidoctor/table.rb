@@ -533,12 +533,13 @@ class Table::ParserContext
   #
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
-  def buffer_has_unclosed_quotes? append = nil
-    if (record = append ? (@buffer + append).strip : @buffer.strip) == '"'
+  def buffer_has_unclosed_quotes? append = nil, q = '"'
+    if (record = append ? (@buffer + append).strip : @buffer.strip) == q
       true
-    elsif record.start_with? '"'
-      if ((trailing_quote = record.end_with? '"') && (record.end_with? '""')) || (record.start_with? '""')
-        ((record = record.gsub '""', '').start_with? '"') && !(record.end_with? '"')
+    elsif record.start_with? q
+      qq = q + q
+      if ((trailing_quote = record.end_with? q) && (record.end_with? qq)) || (record.start_with? qq)
+        ((record = record.gsub qq, '').start_with? q) && !(record.end_with? q)
       else
         !trailing_quote
       end
@@ -631,20 +632,20 @@ class Table::ParserContext
       @buffer = ''
       cellspec = nil
       repeat = 1
-      if @format == 'csv' && !cell_text.empty? && cell_text.include?('"')
+      if @format == 'csv' && !cell_text.empty? && (cell_text.include? (q = '"'))
         # this may not be perfect logic, but it hits the 99%
-        if cell_text.start_with?('"') && cell_text.end_with?('"')
+        if (cell_text.start_with? q) && (cell_text.end_with? q)
           # unquote
           if (cell_text = cell_text.slice(1, cell_text.length - 2))
             # trim whitespace and collapse escaped quotes
-            cell_text = cell_text.strip.squeeze('"')
+            cell_text = cell_text.strip.squeeze q
           else
             logger.error message_with_context 'unclosed quote in CSV data; setting cell to empty', source_location: @reader.cursor_at_prev_line
             cell_text = ''
           end
         else
           # collapse escaped quotes
-          cell_text = cell_text.squeeze('"')
+          cell_text = cell_text.squeeze q
         end
       end
     end
