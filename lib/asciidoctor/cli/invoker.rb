@@ -88,7 +88,6 @@ module Asciidoctor
         end
 
         if outfile == '-'
-          # NOTE set_encoding returns nil on JRuby 9.1
           (tofile = @out) || ((tofile = $stdout).set_encoding UTF_8)
         elsif outfile
           opts[:mkdirs] = true
