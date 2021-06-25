@@ -154,6 +154,7 @@ class Converter::TemplateConverter < Converter::Base
     engine = @engine
     @template_dirs.each do |template_dir|
       # FIXME need to think about safe mode restrictions here
+      # Ruby 2.3 requires the extra brackets around the path_resolver.system_path method call
       next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
 
       if engine
