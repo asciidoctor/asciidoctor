@@ -113,11 +113,11 @@ module Asciidoctor
           end
           opts.on '-IDIRECTORY', '--load-path DIRECTORY', 'add a directory to the $LOAD_PATH',
             'may be specified more than once' do |path|
-            (self[:load_paths] ||= []).concat(path.split ::File::PATH_SEPARATOR)
+            (self[:load_paths] ||= []).concat path.split ::File::PATH_SEPARATOR
           end
           opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
             'may be specified more than once' do |path|
-            (self[:requires] ||= []).concat(path.split ',')
+            (self[:requires] ||= []).concat path.split ','
           end
           opts.on '--failure-level LEVEL', %w(warning WARNING error ERROR info INFO), 'set minimum logging level that triggers non-zero exit code: [WARN, ERROR, INFO] (default: FATAL)' do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
@@ -227,7 +227,7 @@ module Asciidoctor
         end
 
         infiles.reject {|file| file == '-' }.each do |file|
-          begin
+          begin # rubocop:disable Style/RedundantBegin
             fstat = ::File.stat file
             if fstat.file? || fstat.pipe?
               unless fstat.readable?
@@ -270,7 +270,7 @@ module Asciidoctor
         if (requires = self[:requires])
           requires.uniq!
           requires.each do |path|
-            begin
+            begin # rubocop:disable Style/RedundantBegin
               require path
             rescue ::LoadError
               raise $! if self[:trace]

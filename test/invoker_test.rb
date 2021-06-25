@@ -74,7 +74,7 @@ context 'Invoker' do
     begin
       old_stdin = $stdin
       $stdin = StringIO.new 'paragraph'
-      invoker = invoke_cli_to_buffer(%w(-e), '-')
+      invoker = invoke_cli_to_buffer %w(-e), '-'
       assert_equal 0, invoker.code
       assert_equal 1, invoker.document.blocks.size
     ensure
@@ -98,7 +98,7 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -174,7 +174,7 @@ context 'Invoker' do
         end
         warnings = err.string
       end
-      assert_equal false, $VERBOSE
+      assert_equal false, $VERBOSE # rubocop:disable Minitest/RefuteFalse
       refute_empty warnings
     ensure
       $VERBOSE = old_verbose
@@ -255,7 +255,7 @@ context 'Invoker' do
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
       assert_path_exists sample_outpath
-      output = File.read(sample_outpath, mode: Asciidoctor::FILE_READ_MODE)
+      output = File.read sample_outpath, mode: Asciidoctor::FILE_READ_MODE
       refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -263,7 +263,7 @@ context 'Invoker' do
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -271,7 +271,7 @@ context 'Invoker' do
     destination_path = File.join testdir, 'test_output'
     sample_outpath = File.join destination_path, 'sample.html'
     begin
-      FileUtils.mkdir_p(destination_path)
+      FileUtils.mkdir_p destination_path
       # QUESTION should -D be relative to working directory or source directory?
       invoker = invoke_cli %w(-D test/test_output)
       #invoker = invoke_cli %w(-D ../../test/test_output)
@@ -279,8 +279,8 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_path
     end
   end
 
@@ -290,14 +290,14 @@ context 'Invoker' do
     destination_subdir_path = File.join destination_path, 'subdir'
     sample_outpath = File.join destination_subdir_path, 'index.html'
     begin
-      FileUtils.mkdir_p(destination_path)
+      FileUtils.mkdir_p destination_path
       invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
       assert File.directory?(destination_subdir_path)
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_subdir_path)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_subdir_path
+      FileUtils.rmdir destination_path
     end
   end
 
@@ -309,7 +309,7 @@ context 'Invoker' do
       assert_equal sample_outpath, doc.attr('outfile')
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -323,9 +323,9 @@ context 'Invoker' do
       assert_path_exists asciidoctor_stylesheet
       assert_path_exists coderay_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(asciidoctor_stylesheet)
-      FileUtils.rm_f(coderay_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f asciidoctor_stylesheet
+      FileUtils.rm_f coderay_stylesheet
     end
   end
 
@@ -339,9 +339,9 @@ context 'Invoker' do
       assert_path_exists asciidoctor_stylesheet
       refute_path_exists coderay_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(asciidoctor_stylesheet)
-      FileUtils.rm_f(coderay_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f asciidoctor_stylesheet
+      FileUtils.rm_f coderay_stylesheet
     end
   end
 
@@ -354,8 +354,8 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       refute_path_exists default_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(default_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f default_stylesheet
     end
   end
 
@@ -370,10 +370,10 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       assert_path_exists custom_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(custom_stylesheet)
-      FileUtils.rmdir(stylesdir)
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f custom_stylesheet
+      FileUtils.rmdir stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -388,10 +388,10 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       refute_path_exists custom_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(custom_stylesheet)
-      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f custom_stylesheet
+      FileUtils.rmdir stylesdir if File.directory? stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -405,9 +405,9 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       refute_path_exists stylesdir
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir stylesdir if File.directory? stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -419,8 +419,8 @@ context 'Invoker' do
       assert_path_exists basic_outpath
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f basic_outpath
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -433,9 +433,9 @@ context 'Invoker' do
       assert_path_exists basic_outpath
       assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f basic_outpath
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_path
     end
   end
 
@@ -445,7 +445,7 @@ context 'Invoker' do
       invoke_cli_to_buffer [], 'ba*.adoc'
       assert_path_exists basic_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f basic_outpath
     end
   end
 
@@ -461,7 +461,7 @@ context 'Invoker' do
       invoke_cli_to_buffer [], glob
       assert_path_exists basic_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f basic_outpath
     end
   end
 
@@ -620,7 +620,7 @@ context 'Invoker' do
     doc = invoker.document
     assert_equal 'Note to self:', doc.attr('note-caption')
     output = invoker.read_output
-    assert_xpath %(//*[#{contains_class('admonitionblock')}]//*[@class='title'][text() = 'Note to self:']), output, 1
+    assert_xpath %(//*[#{contains_class 'admonitionblock'}]//*[@class='title'][text() = 'Note to self:']), output, 1
   end
 
   test 'should not set attribute ending in @ if defined in document' do

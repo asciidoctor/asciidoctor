@@ -138,7 +138,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   LinenoSpanTagCs = '<span class="lineno">\1 </span>'
   PreTagCs = '<pre>\1</pre>'
   StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
-  StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>)
+  StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>) # rubocop:disable Lint/MixedRegexpCaptureTypes
   WRAPPER_CLASS = 'lineno' # doesn't appear in output; Pygments appends "table" to this value to make nested table class
   # NOTE <pre> has style attribute when pygments-css=style
   # NOTE <div> has trailing newline when pygments-linenums-mode=table

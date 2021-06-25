@@ -110,7 +110,7 @@ class Block < AbstractBlock
     when :compound
       super
     when :simple
-      apply_subs((@lines.join LF), @subs)
+      apply_subs (@lines.join LF), @subs
     when :verbatim, :raw
       # QUESTION could we use strip here instead of popping empty lines?
       # maybe apply_subs can know how to strip whitespace?

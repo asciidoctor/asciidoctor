@@ -115,7 +115,7 @@ context 'Path Resolver' do
 
     test 'raises security error if jail is not an absolute path' do
       assert_raises SecurityError do
-        @resolver.system_path('images/tiger.png', '/etc', 'foo')
+        @resolver.system_path 'images/tiger.png', '/etc', 'foo'
       end
     end
 
@@ -143,7 +143,7 @@ context 'Path Resolver' do
 
     test 'throws exception for illegal path access if recover is false' do
       assert_raises SecurityError do
-        @resolver.system_path('../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false)
+        @resolver.system_path '../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false
       end
     end
 
@@ -240,10 +240,10 @@ context 'Path Resolver' do
 
     test 'raises security error if start is not contained within jail and recover is disabled' do
       assert_raises SecurityError do
-        @resolver.system_path('images/tiger.png', '/etc', JAIL, recover: false)
+        @resolver.system_path 'images/tiger.png', '/etc', JAIL, recover: false
       end
       assert_raises SecurityError do
-        @resolver.system_path('.', '/etc', JAIL, recover: false)
+        @resolver.system_path '.', '/etc', JAIL, recover: false
       end
     end
 
@@ -285,14 +285,14 @@ context 'Path Resolver' do
     end
 
     test 'resolves relative target relative to current directory if start is empty' do
-      pwd = File.expand_path(Dir.pwd)
+      pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do
-      pwd = File.expand_path(Dir.pwd)
+      pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', '')
       assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', nil)
     end
@@ -329,7 +329,7 @@ context 'Path Resolver' do
     end
 
     test 'should calculate relative path' do
-      filename = @resolver.system_path('part1/chapter1/section1.adoc', nil, JAIL)
+      filename = @resolver.system_path 'part1/chapter1/section1.adoc', nil, JAIL
       assert_equal "#{JAIL}/part1/chapter1/section1.adoc", filename
       assert_equal 'part1/chapter1/section1.adoc', @resolver.relative_path(filename, JAIL)
     end

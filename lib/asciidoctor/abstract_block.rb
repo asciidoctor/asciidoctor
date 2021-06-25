@@ -284,7 +284,7 @@ class AbstractBlock < AbstractNode
   # Returns the converted String title for this Block, or nil if the source title is falsy
   def title
     # prevent substitutions from being applied to title multiple times
-    @converted_title ||= @title && (apply_title_subs @title)
+    @converted_title ||= @title && (apply_title_subs @title) # rubocop:disable Naming/MemoizedInstanceVariableName
   end
 
   # Public: A convenience method that checks whether the title of this block is defined.
@@ -384,7 +384,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns nothing.
   def assign_caption value, caption_context = @context
-    unless @caption || !@title || (@caption = value || @document.attributes['caption'])
+    unless @caption || !@title || (@caption = value || @document.attributes['caption']) # rubocop:disable Style/GuardClause
       if (attr_name = CAPTION_ATTRIBUTE_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
         @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
         nil

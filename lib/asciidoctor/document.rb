@@ -83,7 +83,7 @@ module Asciidoctor
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
   ImageReference = ::Struct.new :target, :imagesdir do
-    alias to_s target
+    alias to_s target # rubocop:disable Style/Alias
   end
 
   Footnote = ::Struct.new :index, :id, :text
@@ -114,10 +114,10 @@ class Document < AbstractBlock
 
     def initialize val, opts = {}
       # TODO separate sanitization by type (:cdata for HTML/XML, :plain_text for non-SGML, false for none)
-      if (@sanitized = opts[:sanitize]) && val.include?('<')
+      if (@sanitized = opts[:sanitize]) && (val.include? '<')
         val = val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
       end
-      if (sep = opts[:separator] || ':').empty? || !val.include?(sep = %(#{sep} ))
+      if (sep = opts[:separator] || ':').empty? || !(val.include? (sep = %(#{sep} )))
         @main = val
         @subtitle = nil
       else
@@ -413,7 +413,7 @@ class Document < AbstractBlock
       attr_overrides['source-highlighter'] ||= nil
       attr_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
-      if !parent_doc && attr_overrides.key?('docfile')
+      if !parent_doc && (attr_overrides.key? 'docfile')
         attr_overrides['docfile'] = attr_overrides['docfile'][(attr_overrides['docdir'].length + 1)..-1]
       end
       attr_overrides['docdir'] = ''
@@ -723,7 +723,7 @@ class Document < AbstractBlock
 
     if (separator = opts[:partition])
       Title.new val, opts.merge({ separator: (separator == true ? @attributes['title-separator'] : separator) })
-    elsif opts[:sanitize] && val.include?('<')
+    elsif opts[:sanitize] && (val.include? '<')
       val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
     else
       val
@@ -875,10 +875,10 @@ class Document < AbstractBlock
   #
   # returns true if the attribute was deleted, false if it was not because it's locked
   def delete_attribute name
-    if attribute_locked?(name)
+    if attribute_locked? name
       false
     else
-      @attributes.delete(name)
+      @attributes.delete name
       @attributes_modified << name
       true
     end
@@ -890,7 +890,7 @@ class Document < AbstractBlock
   #
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked? name
-    @attribute_overrides.key?(name)
+    @attribute_overrides.key? name
   end
 
   # Public: Assign a value to the specified attribute in the document header.
@@ -994,7 +994,7 @@ class Document < AbstractBlock
 
   def content
     # NOTE per AsciiDoc-spec, remove the title before converting the body
-    @attributes.delete('title')
+    @attributes.delete 'title'
     super
   end
 
@@ -1059,11 +1059,11 @@ class Document < AbstractBlock
   end
 
   def docinfo_processors? location = :head
-    if @docinfo_processor_extensions.key?(location)
+    if @docinfo_processor_extensions.key? location
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
-    elsif @extensions && @document.extensions.docinfo_processors?(location)
-      (@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location)) ? true : false
+    elsif @extensions && (@document.extensions.docinfo_processors? location)
+      (@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors location) ? true : false
     else
       @docinfo_processor_extensions[location] = false
     end
@@ -1144,7 +1144,7 @@ class Document < AbstractBlock
 
   # Internal: Delete any attributes stored for playback
   def clear_playback_attributes attributes
-    attributes.delete(:attribute_entries)
+    attributes.delete :attribute_entries
   end
 
   # Internal: Branch the attributes so that the original state can be restored
@@ -1229,8 +1229,8 @@ class Document < AbstractBlock
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
-        if @attribute_overrides.key?(name) && @attribute_overrides[name]
-          @attribute_overrides.delete(name)
+        if (@attribute_overrides.key? name) && @attribute_overrides[name]
+          @attribute_overrides.delete name
         end
       end
     end

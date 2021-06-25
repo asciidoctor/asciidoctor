@@ -158,7 +158,7 @@ class AbstractNode
   # name - the String name of the option
   #
   # Returns nothing
-  def set_option name
+  def set_option name # rubocop:disable Naming/AccessorMethodName
     @attributes[%(#{name}-option)] = ''
     nil
   end
@@ -348,7 +348,7 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri target, asset_dir_key = 'imagesdir'
-    normalize_web_path target, (asset_dir_key ? @document.attr(asset_dir_key) : nil)
+    normalize_web_path target, (asset_dir_key ? (@document.attr asset_dir_key) : nil)
   end
 
   # Public: Generate a data URI that can be used to embed an image in the output document
@@ -371,9 +371,9 @@ class AbstractNode
     end
 
     if asset_dir_key
-      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
+      image_path = normalize_system_path target_image, (@document.attr asset_dir_key), nil, target_name: 'image'
     else
-      image_path = normalize_system_path(target_image)
+      image_path = normalize_system_path target_image
     end
 
     if ::File.readable? image_path
@@ -428,7 +428,7 @@ class AbstractNode
   # Delegates to normalize_system_path, with the start path set to the value of
   # the base_dir instance variable on the Document object.
   def normalize_asset_path asset_ref, asset_name = 'path', autocorrect = true
-    normalize_system_path(asset_ref, @document.base_dir, nil, target_name: asset_name, recover: autocorrect)
+    normalize_system_path asset_ref, @document.base_dir, nil, target_name: asset_name, recover: autocorrect
   end
 
   # Public: Resolve and normalize a secure path from the target and start paths

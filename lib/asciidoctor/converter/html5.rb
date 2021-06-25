@@ -125,7 +125,7 @@ class Converter::Html5Converter < Converter::Base
     end
     result << %(<title>#{node.doctitle sanitize: true, use_fallback: true}</title>)
 
-    if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
+    if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
         result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
       end
@@ -138,7 +138,7 @@ class Converter::Html5Converter < Converter::Base
       end
     elsif node.attr? 'stylesheet'
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir', '')}"#{slash}>)
       else
         result << %(<style>
 #{node.read_contents (node.attr 'stylesheet'), start: (node.attr 'stylesdir'), warn_on_failure: true, label: 'stylesheet'}
@@ -467,7 +467,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
+<audio src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
 Your browser does not support the audio tag.
 </audio>
 </div>
@@ -632,7 +632,7 @@ Your browser does not support the audio tag.
       if svg
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif obj
-        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+        fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
         img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
       end
     end
@@ -799,7 +799,7 @@ Your browser does not support the audio tag.
   alias convert_pass content_only
 
   def convert_preamble node
-    if (doc = node.document).attr?('toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
+    if ((doc = node.document).attr? 'toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
       toc = %(
 <div id="toc" class="#{doc.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{doc.attr 'toc-title'}</div>
@@ -925,7 +925,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_toc node
-    unless (doc = node.document).attr?('toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
+    unless ((doc = node.document).attr? 'toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
       return '<!-- toc disabled -->'
     end
 
@@ -1070,12 +1070,12 @@ Your browser does not support the audio tag.
 
       # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
       target, list = (node.attr 'target').split '/', 2
-      if (list ||= (node.attr 'list'))
+      if (list ||= node.attr 'list') # rubocop:disable Style/ParenthesesAroundCondition
         list_param = %(&amp;list=#{list})
       else
         # parse dynamic playlist syntax: video_id1,video_id2,...
         target, playlist = target.split ',', 2
-        if (playlist ||= (node.attr 'playlist'))
+        if (playlist ||= node.attr 'playlist') # rubocop:disable Style/ParenthesesAroundCondition
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
           list_param = %(&amp;playlist=#{playlist})
         else
@@ -1097,7 +1097,7 @@ Your browser does not support the audio tag.
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
@@ -1158,7 +1158,7 @@ Your browser does not support the video tag.
     if node.document.attr? 'icons', 'font'
       %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
-      src = node.icon_uri("callouts/#{node.text}")
+      src = node.icon_uri %(callouts/#{node.text})
       %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
     elsif ::Array === (guard = node.attributes['guard'])
       %(&lt;!--<b class="conum">(#{node.text})</b>--&gt;)
@@ -1202,7 +1202,7 @@ Your browser does not support the video tag.
         if svg
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
-          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri(node.attr 'fallback')}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
+          fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
         end
       end
