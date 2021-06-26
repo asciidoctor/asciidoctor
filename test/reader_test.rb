@@ -636,7 +636,7 @@ class ReaderTest < Minitest::Test
         assert doc.catalog[:includes]['fixtures/include-file']
       end
 
-      test 'strips BOM from include file' do
+      test 'should strip BOM from include file' do
         input = %(:showtitle:\ninclude::fixtures/file-with-utf8-bom.adoc[])
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
         assert_css '.paragraph', output, 0
@@ -777,7 +777,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should ignore encoding attribute if value is not an valid encoding' do
+      test 'should ignore encoding attribute if value is not a valid encoding' do
         input = <<~'EOS'
         ....
         include::fixtures/encoding.adoc[tag=romé,encoding=iso-1000-1]
@@ -818,7 +818,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'missing file referenced by include directive is skipped when optional option is set' do
+      test 'should skip include directive that references missing file if optional option is set' do
         input = <<~'EOS'
         include::fixtures/no-such-file.adoc[opts=optional]
 
@@ -833,7 +833,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'missing file referenced by include directive is replaced by warning' do
+      test 'should replace include directive that references missing file with message' do
         input = <<~'EOS'
         include::fixtures/no-such-file.adoc[]
 
@@ -849,7 +849,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'unreadable file referenced by include directive is replaced by warning', unless: (windows? || Process.euid == 0) do
+      test 'should replace include directive that references unreadable file with message', unless: (windows? || Process.euid == 0) do
         include_file = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
         old_mode = (File.stat include_file).mode
         FileUtils.chmod 0o000, include_file
