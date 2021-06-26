@@ -985,7 +985,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'tag filtering is supported for remote includes' do
+      test 'should support tag filtering for remote includes' do
         url = %(http://#{resolve_localhost}:9876/fixtures/tagged-class.rb)
         input = <<~EOS
         [source,ruby]
@@ -1006,7 +1006,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, expected
       end
 
-      test 'inaccessible uri referenced by include directive does not crash processor' do
+      test 'should not crash if include directive references inaccessible uri' do
         url = %(http://#{resolve_localhost}:9876/no_such_file)
         input = <<~EOS
         ....
@@ -1042,7 +1042,21 @@ class ReaderTest < Minitest::Test
         assert_match(/last line of included content/, output)
       end
 
-      test 'include directive supports line ranges specified in quoted attribute value' do
+      test 'include directive supports line ranges separated by commas in quoted attribute value' do
+        input = 'include::fixtures/include-file.adoc[lines="1,3..4,6..-1"]'
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        assert_match(/first line/, output)
+        refute_match(/second line/, output)
+        assert_match(/third line/, output)
+        assert_match(/fourth line/, output)
+        refute_match(/fifth line/, output)
+        assert_match(/sixth line/, output)
+        assert_match(/seventh line/, output)
+        assert_match(/eighth line/, output)
+        assert_match(/last line of included content/, output)
+      end
+
+      test 'include directive ignores spaces between line ranges in quoted attribute value' do
         input = 'include::fixtures/include-file.adoc[lines="1, 3..4 , 6 .. -1"]'
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
         assert_match(/first line/, output)
@@ -1070,7 +1084,7 @@ class ReaderTest < Minitest::Test
         assert_match(/last line of included content/, output)
       end
 
-      test 'include directive ignores empty lines attribute' do
+      test 'include directive ignores lines attribute if empty' do
         input = <<~'EOS'
         ++++
         include::fixtures/include-file.adoc[lines=]
@@ -1130,7 +1144,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'include directive supports selecting tagged lines in file that has CRLF line endings' do
+      test 'include directive supports selecting lines by tag in file that has CRLF line endings' do
         begin
           tmp_include = Tempfile.new %w(include- .adoc)
           tmp_include_dir, tmp_include_path = File.split tmp_include.path
@@ -1181,7 +1195,7 @@ class ReaderTest < Minitest::Test
         assert_equal expected, output
       end
 
-      test 'include directive skips lines marked with negated tags' do
+      test 'include directive skips lines inside tag which is negated' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class-enclosed.rb[tags=all;!bark]
@@ -1200,7 +1214,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines without tag directives when value is double asterisk' do
+      test 'include directive selects all lines without a tag directive when value is double asterisk' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**]
@@ -1227,7 +1241,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines except negated tags when value contains double asterisk' do
+      test 'include directive selects all lines except lines inside tag which is negated when value starts with double asterisk' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**;!bark]
@@ -1246,7 +1260,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines including nested tags except negated tags when value contains double asterisk' do
+      test 'include directive selects all lines, including lines inside nested tags, except lines inside tag which is negated when value starts with double asterisk' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**;!init]
@@ -1270,7 +1284,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines outside of tags when value is double asterisk followed by negated wildcard' do
+      test 'include directive selects all lines outside of tags when value is double asterisk followed by negated wildcard' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**;!*]
@@ -1285,8 +1299,20 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
+      test 'include directive skips all tagged regions when value of tags attribute is negated wildcard' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class.rb[tags=!*]
+        ----
+        EOS
+
+        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+        expected = %(class Dog\nend)
+        assert_includes output, %(<pre>#{expected}</pre>)
+      end
+
       # FIXME this is a weird one since we'd expect it to only select the specified tags; but it's always been this way
-      test 'include directive takes all lines except for lines containing tag directive if value is globstar followed by nested tag names' do
+      test 'include directive selects all lines except for lines containing tag directive if value is double asterisk followed by nested tag names' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**;bark-beagle;bark-all]
@@ -1314,7 +1340,7 @@ class ReaderTest < Minitest::Test
       end
 
       # FIXME this is a weird one since we'd expect it to only select the specified tags; but it's always been this way
-      test 'include directive takes all lines except for lines containing tag directive when value is globstar followed by outer tag name' do
+      test 'include directive selects all lines except for lines containing tag directive when value is double asterisk followed by outer tag name' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=**;bark]
@@ -1341,7 +1367,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines inside unspecified tags when value is negated globstar followed by negated tags' do
+      test 'include directive selects all lines inside unspecified tags when value is negated double asterisk followed by negated tags' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!**;!init]
@@ -1361,10 +1387,10 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines except negated tags when value only contains negated tag' do
+      test 'include directive selects all lines except tag which is negated when value only contains negated tag' do
         input = <<~'EOS'
         ----
-        include::fixtures/tagged-class.rb[tags=!bark]
+        include::fixtures/tagged-class.rb[tag=!bark]
         ----
         EOS
 
@@ -1380,7 +1406,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive takes all lines except negated tags when value only contains negated tags' do
+      test 'include directive selects all lines except tags which are negated when value only contains negated tags' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!bark;!init]
@@ -1395,7 +1421,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'should recognize tag wildcard if not at head of list' do
+      test 'should recognize tag wildcard if not at start of tags list' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=init;**;*;!bark-other]
@@ -1420,7 +1446,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive selects lines for all tags when value of tags attribute is wildcard' do
+      test 'include directive selects lines between tags when value of tags attribute is wildcard' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=*]
@@ -1444,7 +1470,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive selects lines for all tags when value of tags attribute is wildcard and tag enclosed content' do
+      test 'include directive selects lines inside tags when value of tags attribute is wildcard and tag surrounds content' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class-enclosed.rb[tags=*]
@@ -1471,7 +1497,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive selects lines for all tags except exclusions when value of tags attribute is wildcard' do
+      test 'include directive selects lines inside all tags except tag which is negated when value of tags attribute is wildcard followed by negated tag' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class-enclosed.rb[tags=*;!init]
@@ -1495,19 +1521,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive skips all tagged regions when value of tags attribute is negated wildcard' do
-        input = <<~'EOS'
-        ----
-        include::fixtures/tagged-class.rb[tags=!*]
-        ----
-        EOS
-
-        output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        expected = %(class Dog\nend)
-        assert_includes output, %(<pre>#{expected}</pre>)
-      end
-
-      test 'include directive skips all tagged regions except ones enabled when value of tags attribute is negated wildcard' do
+      test 'include directive skips all tagged regions except ones reenabled when value of tags attribute is negated wildcard followed by tag name' do
         ['!*;init', '**;!*;init'].each do |pattern|
           input = <<~EOS
           ----
@@ -1528,7 +1542,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'include directive includes regions outside tags and specified tags when value begins with negated wildcard' do
+      test 'include directive includes regions outside tags and inside specified tags when value begins with negated wildcard' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!*;bark]
@@ -1547,7 +1561,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive includes tag except for nested tags when tag is followed by negated wildcard' do
+      test 'include directive includes lines inside tag except for lines inside nested tags when tag is followed by negated wildcard' do
         ['bark;!*', '!**;bark;!*', '!**;!*;bark'].each do |pattern|
           input = <<~EOS
           ----
@@ -1564,7 +1578,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'include directive includes tag except for nested tags when tag is preceded by negated globstar and negated star' do
+      test 'include directive selects lines inside tag except for lines inside nested tags when tag is preceded by negated double asterisk and negated wildcard' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!**;!*;bark]
@@ -1579,7 +1593,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive does not include tag that has been included then excluded' do
+      test 'include directive does not select lines inside tag that has been included then excluded' do
         input = <<~'EOS'
         ----
         include::fixtures/tagged-class.rb[tags=!*;init;!init]
@@ -1594,7 +1608,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive only includes lines inside specified tag, even if proceeded by negated globstar' do
+      test 'include directive only selects lines inside specified tag, even if proceeded by negated double asterisk' do
         ['bark', '!**;bark'].each do |pattern|
           input = <<~EOS
           ----
@@ -1616,7 +1630,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'include directive selects specified tagged lines and ignores the other tag directives' do
+      test 'include directive selects lines inside specified tag and ignores lines inside a negated tag' do
         input = <<~'EOS'
         [indent=0]
         ----
