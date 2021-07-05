@@ -3,19 +3,14 @@
 ////
 API introduction for Asciidoctor
 included in the user-manual Quickstarts, Using the Ruby API
-doc-asciidoctorj is now url-asciidoctorj-docs but! that means I need to fix docref: link:/docs and doc-asciidoctorj: {docref}/asciidoctorj
 ////
 
-In addition to its CLI, Asciidoctor provides a Ruby API.
-The API is intended for integration with other Ruby software, such as Rails, GitHub, and GitLab, as well as other languages, such as Java (via AsciidoctorJ) and JavaScript (via Asciidoctor.js).
-
-Asciidoctor also has a Java API that mirrors the Ruby API.
-The Java API calls through to the Ruby API using an embedded JRuby runtime.
-See the xref:asciidoctorj::index.adoc[AsciidoctorJ documentation] for more information.
+In addition to its CLI, Asciidoctor provides a {url-api}[Ruby API^] named `Asciidoctor`.
+This API is intended for integration with other Ruby software, such as Rails, GitHub, and GitLab, as well as other languages, such as Java (via xref:asciidoctorj::index.adoc[AsciidoctorJ]) and JavaScript (via xref:asciidoctor.js::index.adoc[Asciidoctor.js]).
 
 == Load and convert a document using the API
 
-To use Asciidoctor in your application, you first need to require the gem:
+To use the Asciidoctor API in your application, you first need to require the gem:
 
 [source,ruby]
 require 'asciidoctor'
