@@ -5,7 +5,7 @@ API introduction for Asciidoctor
 included in the user-manual Quickstarts, Using the Ruby API
 ////
 
-In addition to its CLI, Asciidoctor provides a {url-api}[Ruby API^] named `Asciidoctor`.
+In addition to a CLI, Asciidoctor provides a {url-api}[Ruby API^] named `Asciidoctor`.
 This API is intended for integration with other Ruby software, such as Rails, GitHub, and GitLab, as well as other languages, such as Java (via xref:asciidoctorj::index.adoc[AsciidoctorJ]) and JavaScript (via xref:asciidoctor.js::index.adoc[Asciidoctor.js]).
 
 == Load and convert a document using the API
@@ -17,7 +17,7 @@ require 'asciidoctor'
 
 This one statement makes all of the {url-api}[public APIs in Asciidoctor^] available to your script or application.
 Now you can start processing AsciiDoc documents.
-The main entry points in the Asciidoctor API are the static methods to load or convert AsciiDoc documents, which we'll cover on this page.
+The main entry points in the Asciidoctor API are the static methods on the `Asciidoctor` module to load or convert AsciiDoc documents, which we'll cover on this page.
 
 To parse a file into an `Asciidoctor::Document` object:
 
