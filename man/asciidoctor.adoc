@@ -22,6 +22,7 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 == OPTIONS
 
+// tag::options[]
 === Security Settings
 
 *-B, --base-dir*=_DIR_::
@@ -154,6 +155,7 @@ Matching templates found in subsequent directories override ones previously disc
   Print program version number.
 +
 *-v* can also be used if no source files are specified.
+// end::options[]
 
 == ENVIRONMENT
 
