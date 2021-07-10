@@ -35,8 +35,6 @@ Gem::Specification.new do |s|
 
   # asciimath is needed for testing AsciiMath in DocBook backend
   s.add_development_dependency 'asciimath', '~> 2.0.0'
-  # coderay is needed for testing syntax highlighting
-  s.add_development_dependency 'coderay', '~> 1.1.0'
   # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
   s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
   s.add_development_dependency 'cucumber', '~> 3.1.0'
@@ -46,8 +44,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.14.0'
   s.add_development_dependency 'nokogiri', '~> 1.10.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
-  # Asciidoctor supports Rouge >= 2
-  s.add_development_dependency 'rouge', '~> 3.26.0'
   s.add_development_dependency 'slim', '~> 4.1.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'
 end
