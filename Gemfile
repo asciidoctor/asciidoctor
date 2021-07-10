@@ -7,9 +7,12 @@ gemspec
 
 group :development do
   gem 'asciimath', ENV['ASCIIMATH_VERSION'] if ENV.key? 'ASCIIMATH_VERSION'
+  # coderay is needed for testing syntax highlighting
+  gem 'coderay', '~> 1.1.0'
   gem 'haml', '~> 4.0' if RUBY_ENGINE == 'truffleruby'
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
-  gem 'rouge', ENV['ROUGE_VERSION'] if ENV.key? 'ROUGE_VERSION'
+  # Asciidoctor supports Rouge >= 2
+  gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '~> 3.0')
 end
 
 group :docs do
