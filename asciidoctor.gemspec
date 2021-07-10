@@ -33,8 +33,6 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   #s.test_files = files.grep %r/^(?:features|test)\/.+$/
 
-  # asciimath is needed for testing AsciiMath in DocBook backend
-  s.add_development_dependency 'asciimath', '~> 2.0.0'
   # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
   s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
   s.add_development_dependency 'cucumber', '~> 3.1.0'
