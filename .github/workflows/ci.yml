@@ -52,7 +52,6 @@ jobs:
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
-      COVERAGE: ${{ matrix.primary }}
       BUNDLE_WITHOUT: docs
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
@@ -64,6 +63,9 @@ jobs:
     - name: Configure Nokogiri installation (Linux, macOS)
       if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
       run: echo 'BUNDLE_BUILD__NOKOGIRI=--use-system-libraries' >> $GITHUB_ENV
+    - name: Enable coverage
+      if: matrix.primary
+      run: echo 'COVERAGE=true' >> $GITHUB_ENV
     - name: Set AsciiMath version
       if: matrix.asciimath-version
       run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
@@ -77,6 +79,8 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
+        # NOTE lock bundler version due to https://github.com/rubygems/rubygems/issues/4748
+        bundler: '2.2.22'
         bundler-cache: ${{ github.event_name != 'schedule' }}
     - name: Install dependencies (scheduled build only)
       if: github.event_name == 'schedule'
