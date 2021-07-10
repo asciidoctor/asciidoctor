@@ -6,12 +6,14 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'asciimath', ENV['ASCIIMATH_VERSION'] if ENV.key? 'ASCIIMATH_VERSION'
-  # coderay is needed for testing syntax highlighting
+  # asciimath is needed for testing AsciiMath in DocBook backend; Asciidoctor supports asciimath >= 1.0.0
+  gem 'asciimath', (ENV.fetch 'ASCIIMATH_VERSION', '~> 2.0')
+  # coderay is needed for testing source highlighting
   gem 'coderay', '~> 1.1.0'
   gem 'haml', '~> 4.0' if RUBY_ENGINE == 'truffleruby'
+  # pygments.rb is needed for testing source highlighting; Asciidoctor supports pygments.rb >= 1.2.0
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
-  # Asciidoctor supports Rouge >= 2
+  # rouge is needed for testing source highlighting; Asciidoctor supports rouge >= 2
   gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '~> 3.0')
 end
 
