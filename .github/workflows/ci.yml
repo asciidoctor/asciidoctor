@@ -101,8 +101,22 @@ jobs:
           git diff
           exit 1
         fi
+  build-dependents:
+    name: build:dependents
+    if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+        # NOTE lock bundler version due to https://github.com/rubygems/rubygems/issues/4748
+        bundler: '2.2.22'
+        bundler-cache: true
     - name: Build dependents
-      if: matrix.primary && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
       env:
         GITHUB_API_TOKEN: ${{ secrets._GITHUB_API_TOKEN }}
       run: bundle exec rake build:dependents
