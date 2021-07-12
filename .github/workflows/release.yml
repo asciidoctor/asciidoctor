@@ -1,14 +1,14 @@
 name: Release
 on:
   push:
-    tags:
-    - 'v*'
+    tags: ['v*']
 jobs:
   activate:
     if: github.repository == 'asciidoctor/asciidoctor'
     runs-on: ubuntu-latest
     steps:
-    - run: echo ok go
+    - name: Proceed
+      run: echo ok go
   build:
     needs: activate
     runs-on: ubuntu-latest
@@ -19,6 +19,8 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.0'
+        # NOTE lock bundler version due to https://github.com/rubygems/rubygems/issues/4748
+        bundler: '2.2.22'
     - name: Configure Bundler
       run: |
         bundle config --local path .bundle/gems
