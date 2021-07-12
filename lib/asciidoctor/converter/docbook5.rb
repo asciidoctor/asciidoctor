@@ -471,7 +471,35 @@ class Converter::DocBook5Converter < Converter::Base
     blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
   end
 
-  alias convert_video skip
+  def convert_video node
+    # See https://tdg.docbook.org/tdg/5.1/videodata.html
+    if node.attr? 'scale'
+      scale_attribute = %( scale="#{node.attr 'scale'}")
+    else
+      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
+      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
+      scale_attribute = ''
+    end
+    align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
+    autoplay_attribute = (node.option? 'autoplay') ?%( autoplay="true") : ''
+    media_uri = node.video_uri(node.attr('target'), true)
+    mediaobject = %(<mediaobject>
+<videoobject>
+<videodata fileref="#{media_uri}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}#{autoplay_attribute}/>
+</videoobject>
+</mediaobject>)
+
+    if node.title?
+      %(<figure#{common_attributes node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{mediaobject}
+</figure>)
+    else
+      %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
+#{mediaobject}
+</informalfigure>)
+    end
+  end
 
   def convert_inline_anchor node
     case node.type

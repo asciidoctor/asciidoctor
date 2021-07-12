@@ -2966,6 +2966,12 @@ context 'Blocks' do
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
     end
 
+    test 'should detect and convert video macro for docbook backend' do
+      input = 'video::cats-vs-dogs.avi[]'
+      output = convert_string_to_embedded input, backend: 'docbook5'
+      assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
+    end
+
     test 'should detect and convert video macro with positional attributes for poster and dimensions' do
       input = 'video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]'
       output = convert_string_to_embedded input
@@ -3079,6 +3085,20 @@ context 'Blocks' do
       assert_css 'iframe[src="https://www.youtube.com/embed/SCZF6I-Rc4I?rel=0&start=60&autoplay=1&playlist=AsKGOeonbIs,HwrPhOp6-aM"]', output, 1
       assert_css 'iframe[width="640"]', output, 1
       assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'should encode entities when constructing the video uri and entity_encode is true' do
+      input = 'video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=autoplay]'
+      block = block_from_string input
+
+      assert_equal 'https://www.youtube.com/embed/SCZF6I-Rc4I?rel=0&amp;start=60&amp;autoplay=1&amp;playlist=AsKGOeonbIs,HwrPhOp6-aM', block.video_uri(block.attr('target'), true)
+    end
+
+    test 'should not encode entities when constructing the video uri' do
+      input = 'video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=autoplay]'
+      block = block_from_string input
+
+      assert_equal 'https://www.youtube.com/embed/SCZF6I-Rc4I?rel=0&start=60&autoplay=1&playlist=AsKGOeonbIs,HwrPhOp6-aM', block.video_uri(block.attr 'target')
     end
 
     test 'should detect and convert audio macro' do
