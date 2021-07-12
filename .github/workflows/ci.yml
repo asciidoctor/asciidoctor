@@ -105,5 +105,4 @@ jobs:
       if: matrix.primary && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
       env:
         GITHUB_API_TOKEN: ${{ secrets._GITHUB_API_TOKEN }}
-        TRAVIS_API_TOKEN: ${{ secrets.TRAVIS_API_TOKEN }}
       run: bundle exec rake build:dependents
