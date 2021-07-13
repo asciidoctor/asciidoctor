@@ -4,7 +4,7 @@ on:
     tags: ['v*']
 jobs:
   activate:
-    if: github.repository == 'asciidoctor/asciidoctor'
+    if: github.repository_owner == 'asciidoctor'
     runs-on: ubuntu-latest
     steps:
     - name: Proceed
