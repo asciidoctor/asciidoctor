@@ -2220,6 +2220,22 @@ context 'Blocks' do
         assert_message logger, :DEBUG, '<stdin>: line 2: unknown style for open block: foo', Hash
       end
     end
+
+    test 'should return false when sections? is called on anything that isn\'t itself a section' do
+      input = <<~'EOS'
+      .Title
+      ====
+      I'm not section!
+      ====
+
+      [NOTE]
+      I'm not a section either!
+      EOS
+
+      doc = document_from_string input
+      assert_equal false, doc.blocks[0].sections?
+      assert_equal false, doc.blocks[1].sections?
+    end
   end
 
   context 'Metadata' do

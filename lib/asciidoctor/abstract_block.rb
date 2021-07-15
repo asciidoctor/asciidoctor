@@ -134,7 +134,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns A [Boolean] to indicate whether this block has child Section objects
   def sections?
-    @next_section_index > 0
+    @next_section_index != nil && @next_section_index > 0
   end
 
   # Deprecated: Legacy property to get the String or Integer numeral of this section.
