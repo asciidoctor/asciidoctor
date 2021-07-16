@@ -52,7 +52,7 @@ namespace :build do
       payload = {
         'event_type' => 'test_upstream',
         'client_payload' => {
-          'branch' => branch,
+          'branch' => (ENV['GITHUB_REF'].sub 'refs/heads/', ''),
           'message' => %(Build triggered by Asciidoctor#{commit_memo}),
         },
       }.to_json
