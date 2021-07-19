@@ -16,6 +16,9 @@ The following information should be output in your terminal:
 
 [subs=attributes+]
  Asciidoctor {release-version} [https://asciidoctor.org]
+ Runtime Environment ({ruby-description}) (lc:UTF-8 fs:UTF-8 in:UTF-8 ex:UTF-8)
+
+The runtime environment information will vary based on the version of Ruby you are using and the encoding settings of your operating system.
 
 To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
