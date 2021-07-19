@@ -163,3 +163,5 @@ Asciidoctor.convert_file 'document.adoc', safe: :safe
 ----
 
 Now Asciidoctor is using your custom installation of Pygments instead of the one bundled with the pygments.rb gem.
+
+Alternately, you can xref:custom.adoc#extend[extend the adapter for Pygments] and put this logic inside that adapter.
