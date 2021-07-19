@@ -3,6 +3,7 @@
 
 You can integrate additional syntax highlighters by implementing a syntax highlighter adapter.
 
+[#new]
 == Create a new adapter
 
 To implement a new adapter, you must create a class that extends the `Asciidoctor::SyntaxHighlighter::Base` class, register the adapter for a value of the `source-highlighter` attribute, and implement the required methods depending on whether the highlight step runs in the converter or in the client (i.e., browser).
@@ -23,6 +24,7 @@ Then, require this file when invoking Asciidoctor and set the source-highlighter
 
 You can also define an adapter for a syntax highlighter that runs during conversion.
 
+[#extend]
 == Extend an existing adapter
 
 Instead of creating a new adapter, you can customize a built-in adapter by extending it and overriding its behavior.
