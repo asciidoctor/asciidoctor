@@ -1,5 +1,5 @@
 = Process AsciiDoc Using the CLI
-:url-manpage: https://github.com/asciidoctor/asciidoctor/blob/master/man/asciidoctor.adoc
+:url-manpage: https://github.com/asciidoctor/asciidoctor/blob/v{release-version}/man/asciidoctor.adoc
 
 ////
 command-line-usage.adoc
@@ -25,8 +25,12 @@ This will use the built-in defaults for options and create a new file in the sam
 
 The xref:options.adoc[] describes the available Asciidoctor CLI options and parameters.
 
-Full help is provided in the {url-manpage}[Asciidoctor man page^] or via:
+You can output the usage for the `asciidoctor` command by appending the `--help` option:
 
  $ asciidoctor --help
 
-//There is also an `asciidoctor-safe` command, which turns on safe mode by default, preventing access to files outside the parent directory of the source file.
+You can generate the full documentation (i.e., man page) for the `asciidoctor` command by passing the `manpage` argument to the `--help` option, which you can then pipe to the `man` pager for viewing:
+
+ $ asciidoctor --help manpage | man -l -
+
+You can find the AsciiDoc source for the {url-manpage}[Asciidoctor man page^] online in the Asciidoctor repository, which you can preview in a browser.
