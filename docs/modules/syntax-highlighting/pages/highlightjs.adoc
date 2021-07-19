@@ -34,7 +34,7 @@ Let's set the `highlightjs-languages` attribute so the HTML converter loads supp
 The `highlightjs-languages` attribute only applies when generating a standalone HTML document (i.e., backend: html, standalone: true).
 It does not work when generating embedded HTML, which is used by site generator integrations such as Antora.
 
-== Using a custom highlight.js library
+== Use a custom highlight.js library
 
 If you'd rather use a personal copy of highlight.js instead of the one hosted on the CDN, follow these steps:
 

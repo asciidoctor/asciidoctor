@@ -17,7 +17,7 @@ include::example$prism-syntax-highlighter.rb[]
 ----
 
 Save this code to a file named [.path]_prism-syntax-highlighter.rb_.
-Then require this file when invoking Asciidoctor and set the source-highlighter to prism to activate it:
+Then, require this file when invoking Asciidoctor and set the source-highlighter to prism to activate it:
 
  $ asciidoctor -r ./prism-syntax-highlighter -a source-highlighter=prism document.adoc
 
@@ -31,6 +31,7 @@ To extend an adapter, you need to look up a reference to the built-in adapter by
 
 Let's override the adapter for Pygments to prevent it adding a stylesheet to the HTML (presumably because the styles will be provided by a different stylesheet).
 
+.Extended syntax highlighter adapter for Pygments
 [,ruby]
 ----
 include::example$extended-pygments-syntax-highlighter.rb[]
