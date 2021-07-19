@@ -115,7 +115,7 @@ If you discover that the call is failing to complete within this timeout period,
 
 Now the call to Pygments (via pygments.rb 1.x) will be allocated up to 30 seconds to complete.
 
-== Using a custom Pygments installation
+== Use a custom Pygments installation
 
 If you already have Pygments installed on your system, you want to use your own fork, or you want to customize how Pygments is configured, you can get Asciidoctor to use a custom version of Pygments instead of the one bundled with the pygments.rb gem.
 
