@@ -7,18 +7,18 @@ Command line usage quick start for Asciidoctor
 included in the install-toolchain and user-manual documents
 ////
 
-When the Asciidoctor gem is installed successfully, the Asciidoctor command line interface (CLI) will be available on your PATH.
-To confirm that Asciidoctor is available, execute:
+When the Asciidoctor gem is installed successfully, the Asciidoctor command line interface (CLI) named `asciidoctor` will be available on your PATH.
+To confirm that the CLI is available, execute the following command in your terminal application:
 
  $ asciidoctor --version
 
-The following information should be output in your terminal:
+If this command completes successfully, information about Asciidoctor and the runtime environment will be printed to the standard output of your terminal:
 
 [subs=attributes+]
  Asciidoctor {release-version} [https://asciidoctor.org]
  Runtime Environment ({ruby-description}) (lc:UTF-8 fs:UTF-8 in:UTF-8 ex:UTF-8)
 
-The runtime environment information will vary based on the version of Ruby you are using and the encoding settings of your operating system.
+The runtime environment information varies based on the version of Ruby you're using and the encoding settings of your operating system.
 
 To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
