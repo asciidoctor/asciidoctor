@@ -13,13 +13,13 @@ This library runs in the browser, so the methods focus on loading the library.
 .Syntax highlighter adapter for Prism.js
 [,ruby]
 ----
-include::example$syntax-highlighter-prism.rb[]
+include::example$prism-syntax-highlighter.rb[]
 ----
 
-Save this code to a file named [.path]_syntax-highlighter-prism.rb_.
+Save this code to a file named [.path]_prism-syntax-highlighter.rb_.
 Then require this file when invoking Asciidoctor and set the source-highlighter to prism to activate it:
 
- $ asciidoctor -r ./syntax-highlighter-prism -a source-highlighter=prism document.adoc
+ $ asciidoctor -r ./prism-syntax-highlighter -a source-highlighter=prism document.adoc
 
 You can also define an adapter for a syntax highlighter that runs during conversion.
 
