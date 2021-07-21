@@ -189,7 +189,7 @@ That covers the basics of loading and converting AsciiDoc using the API.
 
 * xref:convert-strings.adoc#embedded-output[Generating embedded vs standalone output]
 * xref:convert-strings.adoc#convert-inline-markup-only[Convert inline markup only]
-* xref:generate-html-doc[Generate an HTML TOC]
+* xref:generate-html-toc.adoc[Generate an HTML TOC]
 * xref:load-templates.adoc[Load custom templates]
 * xref:extensions:index.adoc[Create extensions]
 * xref:options.adoc[API options]
