@@ -711,15 +711,8 @@ class PreprocessorReader < Reader
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
       if attributes.key? 'leveloffset'
-        @lines.unshift ''
-        @lines.unshift %(:leveloffset: #{attributes['leveloffset']})
-        @lines << ''
-        if (old_leveloffset = @document.attr 'leveloffset')
-          @lines << %(:leveloffset: #{old_leveloffset})
-        else
-          @lines << ':leveloffset!:'
-        end
-        # compensate for these extra lines
+        @lines = [%(:leveloffset: #{attributes['leveloffset']}), ''] + @lines + ['', ((leveloffset = @document.attr 'leveloffset') ? %(:leveloffset: #{leveloffset}) : ':leveloffset!:')]
+        # compensate for these extra lines at the top
         @lineno -= 2
       end
 
