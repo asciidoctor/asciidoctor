@@ -11,10 +11,6 @@ asciidoc:
     url-ruby: https://www.ruby-lang.org
     url-rubygem: https://rubygems.org/gems
     url-rvm: https://rvm.io
-    url-foundation: https://foundation.zurb.com
-    url-jruby: https://jruby.org
-    url-gradle-plugin: https://github.com/asciidoctor/asciidoctor-gradle-plugin
-    url-maven-plugin: https://github.com/asciidoctor/asciidoctor-maven-plugin
 nav:
 - modules/ROOT/nav-top.adoc
 - modules/install/nav.adoc
