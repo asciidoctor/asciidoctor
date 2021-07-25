@@ -239,7 +239,6 @@ class Reader
   # Returns nothing.
   def unshift_lines lines_to_restore
     unshift_all lines_to_restore
-    nil
   end
   alias restore_lines unshift_lines
 
@@ -453,6 +452,7 @@ class Reader
     @lineno -= 1
     @look_ahead += 1
     @lines.unshift line
+    nil
   end
 
   # Internal: Restore the lines to the stack and decrement the lineno
@@ -460,6 +460,7 @@ class Reader
     @lineno -= lines.size
     @look_ahead += lines.size
     @lines.unshift(*lines)
+    nil
   end
 
   def cursor
