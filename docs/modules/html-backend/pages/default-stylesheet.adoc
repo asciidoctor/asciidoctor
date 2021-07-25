@@ -154,9 +154,12 @@ Instead of writing a custom stylesheet from scratch, you can import the default 
 This is also a good way to use the default stylesheet, but load web fonts from a different CDN.
 
 Let's again change the color of headings (and other heading-like titles) to match the color of paragraph text.
-Start by creating a stylesheet named [.path]_my-asciidoctor.css_ and adding an `@import` declaration that references the default stylesheet and the web fonts it uses (which are not included in the source of the default stylesheet).
-We'll use a CDN to pull it directly out of the repository, but you can put it anywhere the browser can access it.
-Then add your overrides below those declarations.
+Start by creating a stylesheet named [.path]_my-asciidoctor.css_.
+Next, add an `@import` declaration to import the default stylesheet.
+We use a CDN here to pull the default stylesheet directly out of the repository, but you can put it anywhere the browser can access it.
+Then, add another `@import` declaration to import the web fonts the default stylesheet uses (which are not imported by the default stylesheet).
+Finally, add your overrides below those `@import` directives.
+Here's how that looks altogether.
 
 [source,css,subs=attributes+]
 ----
@@ -176,7 +179,7 @@ Now tell Asciidoctor to use your custom stylesheet instead of the default one:
 Asciidoctor will now embed the contents of your custom stylesheet instead of the default one.
 However, Asciidoctor will not embed the contents of the default stylesheet.
 Instead, the browser will fetch it from the location specified by the `@import` directive.
-You can avoid this network call by putting the default stylesheet in the same directory as your custom stylesheet and linking to it using `@import "asciidoctor.css".
+You can avoid this network call by putting the default stylesheet in the same directory as your custom stylesheet and linking to it using `@import "asciidoctor.css"`.
 
 To get the default stylesheet, you can either https://github.com/asciidoctor/asciidoctor/blob/master/data/stylesheets/asciidoctor-default.css[download it^] from the source repository, or you can use the following `asciidoctor` command (or equivalent) to write it to the current directory:
 
