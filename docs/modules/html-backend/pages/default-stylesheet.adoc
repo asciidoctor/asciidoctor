@@ -1,13 +1,13 @@
 = Default Stylesheet
 
-When you use the HTML converter to generate a standalone HTML document, Asciidoctor includes a default stylesheet to ensure the HTML it produces look great right out of the box.
-This, in turn, gets you up and running quickly by giving you a result to preview or publish without having to do any additional work.
+When you use the HTML converter to generate a standalone HTML document, Asciidoctor includes a default stylesheet to ensure the HTML looks presentable right out of the box.
+This feature gets you up and running quickly by giving you a result you can preview or publish without having to do any additional work.
 
 This page covers why the default is necessary, how to apply it, and how to build on it so you don't have to create a stylesheet from scratch.
 
 NOTE: The default stylesheet that Asciidoctor provides is just that, _a default_.
-If you prefer a different style, you can customize it or replace it with a different one.
-When replacing the default stylesheet, it's important to understand that it's providing support for numerous features in AsciiDoc, as covered in the next section.
+If you prefer a different style, you can customize it, extend it, or replace it with an entirely different one.
+When replacing the default stylesheet, it's important to understand that it does provide support for numerous features in AsciiDoc, as covered in the next section.
 You'll need to include these required styles when developing your own stylesheet if you want these features to continue to work.
 
 // TODO: we probably need a page to defines what styles any stylesheet must provide to be fully compatible with AsciiDoc
@@ -60,18 +60,25 @@ Loading and preferring these web fonts ensures everyone sees the same result.
 == Usage
 
 When generating HTML, there's nothing special you need to do to apply the default stylesheet.
-Asciidoctor automatically embeds it in the `<head>` of the generated HTML when you run the `asciidoctor` command.
+Asciidoctor automatically embeds the default stylesheet into the `<head>` of the generated HTML when you run the `asciidoctor` command.
 
  $ asciidoctor document.adoc
 
-Since no stylesheet is specified, Asciidoctor uses the stylesheet (located at [.path]_data/stylesheets/asciidoctor.css_ inside the installed gem).
+Since no stylesheet is specified, Asciidoctor uses the default stylesheet (which is located at [.path]_data/stylesheets/asciidoctor.css_ inside the installed gem).
+
 When you view the generated HTML file, [.path]_document.html_, you'll see styled HTML, as shown here:
 
 image::default-stylesheet.png[]
 
-When using the API, Asciidoctor links to the stylesheet by default instead of embedding it (due to the safe mode).
-Yet, it does not copy the stylesheet to the output directory (it needs to be placed there separately).
-If it's not already there, the browser will not be able to find the stylesheet.
+If you want Asciidoctor to generate HTML that links to the default stylesheet instead of embedding it in the HTML, you can instruct it to do so by setting the `linkcss` and `copycss` attributes as follows:
+
+ $ asciidoctor -a linkcss -a copycss document.adoc
+
+When using the API, Asciidoctor already links to the stylesheet by default instead of embedding it (due to the default safe mode).
+However, Asciidoctor does not copy the stylesheet to the output directory.
+You would have to put it there yourself.
+Otherwise, the browser will not be able to find the stylesheet.
+
 To solve this problem, set the safe mode to server or lower (e.g., server, safe, or unsafe) and Asciidoctor will embed the default stylesheet, like when using the `asciidoctor` command.
 
 [source,ruby]
@@ -166,8 +173,23 @@ Now tell Asciidoctor to use your custom stylesheet instead of the default one:
 
  $ asciidoctor -a stylesheet=my-asciidoctor.css document.adoc
 
-Asciidoctor will embed the contents of your custom stylesheet instead of the default one.
-However, it will not embed the contents of the default stylesheet, so the browser is still going to go out and fetch it.
+Asciidoctor will now embed the contents of your custom stylesheet instead of the default one.
+However, Asciidoctor will not embed the contents of the default stylesheet.
+Instead, the browser will fetch it from the location specified by the `@import` directive.
+You can avoid this network call by putting the default stylesheet in the same directory as your custom stylesheet and linking to it using `@import "asciidoctor.css".
+
+To get the default stylesheet, you can either https://github.com/asciidoctor/asciidoctor/blob/master/data/stylesheets/asciidoctor-default.css[download it^] from the source repository, or you can use the following `asciidoctor` command (or equivalent) to write it to the current directory:
+
+ $ echo | asciidoctor -o $TMPDIR/out.html -a linkcss -a copycss - && cp $TMPDIR/asciidoctor.css .
+
+Alternately, you can use this script to write the default stylesheet to the working directory:
+
+[,ruby]
+----
+require 'asciidoctor'
+
+Asciidoctor::Stylesheets.instance.write_primary_stylesheet '.'
+----
 
 To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
 
