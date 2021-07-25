@@ -139,7 +139,7 @@ class Reader
       # FIXME the problem with this approach is that we aren't
       # retaining the modified line (hence the @unescape_next_line tweak)
       # perhaps we need a stack of proxied lines
-      (line = process_line @lines[0]) ? line : peek_line
+      (process_line @lines[0]) || peek_line
     end
   end
 
