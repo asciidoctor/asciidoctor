@@ -1017,6 +1017,69 @@ context 'Manpage' do
     end
   end
 
+  context 'xrefs' do
+    test 'should populate automatic link text for internal xref' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      You can access this information using the options listed under <<_generic_program_information>>.
+
+      == Options
+
+      === Generic Program Information
+
+      --help:: Output a usage message and exit.
+
+      -V, --version:: Output the version number of grep and exit.
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert_includes output, 'You can access this information using the options listed under Generic Program Information.'
+    end
+
+    test 'should populate automatic link text for each occurrence of internal xref' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      You can access this information using the options listed under <<_generic_program_information>>.
+
+      The options listed in <<_generic_program_information>> should always be used by themselves.
+
+      == Options
+
+      === Generic Program Information
+
+      --help:: Output a usage message and exit.
+
+      -V, --version:: Output the version number of grep and exit.
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert_includes output, 'You can access this information using the options listed under Generic Program Information.'
+      assert_includes output, 'The options listed in Generic Program Information should always be used by themselves.'
+    end
+
+    test 'should uppercase the reftext for level-2 section titles if the reftext matches the secton title' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      If you read nothing else, read the <<_foo_bar>> section.
+
+      === Options
+
+      --foo-bar _foobar_::
+      Puts the foo in your bar.
+      See <<_foo_bar>> section for details.
+
+      == Foo Bar
+
+      Foo goes with bar, not baz.
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage, attributes: { 'experimental' => '' }
+      assert_includes output, 'If you read nothing else, read the FOO BAR section.'
+      assert_includes output, 'See FOO BAR section for details.'
+    end
+  end
+
   context 'Footnotes' do
     test 'should generate list of footnotes using numbered list with numbers enclosed in brackets' do
       [true, false].each do |standalone|

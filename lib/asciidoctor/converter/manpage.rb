@@ -580,8 +580,16 @@ allbox tab(:);'
       %(#{ESC_BS}c#{LF}#{ESC_FS}#{macro} "#{target}" "#{text}" )
     when :xref
       unless (text = node.text)
-        refid = node.attributes['refid']
-        text = %([#{refid}]) unless AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid]) && (@resolving_xref ||= (outer = true)) && outer && (text = ref.xreftext node.attr 'xrefstyle', nil, true)
+        if AbstractNode === (ref = (@refs ||= node.document.catalog[:refs])[refid = node.attributes['refid']] || (refid.nil_or_empty? ? (top = get_root_document node) : nil))
+          if (@resolving_xref ||= (outer = true)) && outer && (text = ref.xreftext node.attr 'xrefstyle', nil, true)
+            text = uppercase_pcdata text if ref.context === :section && ref.level < 2 && text == ref.title
+          else
+            text = top ? '[^top]' : %([#{refid}])
+          end
+          @resolving_xref = nil if outer
+        else
+          text = %([#{refid}])
+        end
       end
       text
     when :ref, :bibref
@@ -747,6 +755,13 @@ allbox tab(:);'
 
   def enclose_content node
     node.content_model == :compound ? node.content : %(.sp#{LF}#{manify node.content, whitespace: :normalize})
+  end
+
+  def get_root_document node
+    while (node = node.document).nested?
+      node = node.parent_document
+    end
+    node
   end
 end
 end
