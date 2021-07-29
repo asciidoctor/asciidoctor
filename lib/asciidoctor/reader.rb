@@ -454,12 +454,26 @@ class Reader
     nil
   end
 
-  # Internal: Restore the lines to the stack and decrement the lineno
-  def unshift_all lines
-    @lineno -= lines.size
-    @look_ahead += lines.size
-    @lines.push(*lines.reverse)
-    nil
+  if ::RUBY_ENGINE == 'jruby'
+    # Internal: Restore the lines to the stack and decrement the lineno
+    def unshift_all lines_to_restore
+      @lineno -= lines_to_restore.size
+      @look_ahead += lines_to_restore.size
+      if lines_to_restore.respond_to? :reverse
+        @lines.push(*lines_to_restore.reverse)
+      else
+        lines_to_restore.reverse_each {|it| @lines.push it }
+      end
+      nil
+    end
+  else
+    # Internal: Restore the lines to the stack and decrement the lineno
+    def unshift_all lines_to_restore
+      @lineno -= lines_to_restore.size
+      @look_ahead += lines_to_restore.size
+      @lines.push(*lines_to_restore.reverse)
+      nil
+    end
   end
 
   def cursor
