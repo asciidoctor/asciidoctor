@@ -1,0 +1,23 @@
+// Thai translation
+:appendix-caption: อ้างอิง
+:appendix-refsig: {appendix-caption}
+:caution-caption: ระวัง
+:chapter-signifier: บท
+:chapter-refsig: {chapter-signifier}
+:example-caption: ตัวอย่าง
+:figure-caption: คำอธิบายลักษณะจำลอง
+:important-caption: สำคัญ
+:last-update-label: ตัวอัพเดตล่าสุด
+ifdef::listing-caption[:listing-caption: รายการ]
+ifdef::manname-title[:manname-title: ซื่อ]
+:note-caption: บันทึก
+:part-signifier: ส่วน
+:part-refsig: {part-signifier}
+ifdef::preface-title[:preface-title: คำนำ]
+:section-refsig: รายการย่อย
+:table-caption: ตาราง
+:tip-caption: เคล็ดลับ
+:toc-title: สารบัญ
+:untitled-label: ยังไม่มีชื่อ
+:version-label: เวอร์ชัน
+:warning-caption: คำเตือน
