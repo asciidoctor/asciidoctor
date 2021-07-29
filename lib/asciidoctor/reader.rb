@@ -59,8 +59,7 @@ class Reader
       end
       @lineno = cursor.lineno || 1
     end
-    @lines = prepare_lines data, opts
-    @source_lines = @lines.drop 0
+    @lines = (@source_lines = prepare_lines data, opts).reverse
     @mark = nil
     @look_ahead = 0
     @process_lines = true
@@ -127,7 +126,7 @@ class Reader
   # Returns nothing if there is no more data.
   def peek_line direct = false
     if direct || @look_ahead > 0
-      @unescape_next_line ? ((line = @lines[0]).slice 1, line.length) : @lines[0]
+      @unescape_next_line ? ((line = @lines[-1]).slice 1, line.length) : @lines[-1]
     elsif @lines.empty?
       @look_ahead = 0
       nil
@@ -135,7 +134,7 @@ class Reader
       # FIXME the problem with this approach is that we aren't
       # retaining the modified line (hence the @unescape_next_line tweak)
       # perhaps we need a stack of proxied lines
-      (process_line @lines[0]) || peek_line
+      (process_line @lines[-1]) || peek_line
     end
   end
 
@@ -444,14 +443,14 @@ class Reader
   def shift
     @lineno += 1
     @look_ahead -= 1 unless @look_ahead == 0
-    @lines.shift
+    @lines.pop
   end
 
   # Internal: Restore the line to the stack and decrement the lineno
   def unshift line
     @lineno -= 1
     @look_ahead += 1
-    @lines.unshift line
+    @lines.push line
     nil
   end
 
@@ -459,7 +458,7 @@ class Reader
   def unshift_all lines
     @lineno -= lines.size
     @look_ahead += lines.size
-    @lines.unshift(*lines)
+    @lines.push(*lines.reverse)
     nil
   end
 
@@ -503,12 +502,12 @@ class Reader
   #
   # Returns A copy of the String Array of lines remaining in this Reader
   def lines
-    @lines.drop 0
+    @lines.reverse
   end
 
   # Public: Get a copy of the remaining lines managed by this Reader joined as a String
   def string
-    @lines.join LF
+    @lines.reverse.join LF
   end
 
   # Public: Get the source lines for this Reader joined as a String
@@ -711,9 +710,11 @@ class PreprocessorReader < Reader
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
       if attributes.key? 'leveloffset'
-        @lines = [%(:leveloffset: #{attributes['leveloffset']}), ''] + @lines + ['', ((leveloffset = @document.attr 'leveloffset') ? %(:leveloffset: #{leveloffset}) : ':leveloffset!:')]
+        @lines = [((leveloffset = @document.attr 'leveloffset') ? %(:leveloffset: #{leveloffset}) : ':leveloffset!:'), ''] + @lines.reverse + ['', %(:leveloffset: #{attributes['leveloffset']})]
         # compensate for these extra lines at the top
         @lineno -= 2
+      else
+        @lines.reverse!
       end
 
       # FIXME kind of a hack
