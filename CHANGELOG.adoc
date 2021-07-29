@@ -35,6 +35,7 @@ Bug Fixes::
 
 Improvements::
 
+  * Use queue to iterate over lines in reader instead of stack (#4106)
   * Uppercase automatic reftext for level-2 section titles in manpage output if reftext matches section title (#4110)
   * Show safe modes in strictness order in CLI help (#4065)
   * Add Vietnamese translation of built-in attributes (PR #4066) (*@nguyenhoa93*)
