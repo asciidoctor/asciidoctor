@@ -27,6 +27,6 @@ end
 #end
 
 group :ci do
-  gem 'simplecov', '~> 0.16.0'
   gem 'json', '~> 2.2.0' if RUBY_ENGINE == 'truffleruby'
+  gem 'simplecov', '~> 0.16.0'
 end
