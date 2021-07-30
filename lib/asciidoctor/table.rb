@@ -360,11 +360,9 @@ class Table::Cell < AbstractBlock
     apply_subs @text, @subs
   end
 
-  # Public: Set the String text.
+  # Public: Set the String text for this cell.
   #
   # This method shouldn't be used for cells that have the AsciiDoc style.
-  #
-  # Returns nothing
   attr_writer :text
 
   # Public: Handles the body data (tbody, tfoot), applying styles and partitioning into paragraphs
