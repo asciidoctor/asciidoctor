@@ -1191,7 +1191,11 @@ Your browser does not support the video tag.
       img = %([#{node.alt}])
     else
       target = node.target
-      attrs = ['width', 'height', 'title'].map {|name| (node.attr? name) ? %( #{name}="#{node.attr name}") : '' }.join
+      attrs = []
+      attrs << %( width="#{node.attr 'width'}") if node.attr? 'width'
+      attrs << %( height="#{node.attr 'height'}") if node.attr? 'height'
+      attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
+      attrs = attrs.empty? ? '' : attrs.join
       if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) &&
           node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
         if svg
