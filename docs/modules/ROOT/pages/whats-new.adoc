@@ -362,7 +362,7 @@ _**Release date:** 2019.03.22_
 * Fold the default converter factory into the Converter module (#2891)
 * Add a default implementation for `Converter#convert` in the Base converter (#2891)
 * Rename `Converter::BackendInfo` to `Converter::BackendTraits`; map `backend_info` to new `backend_traits` method (#2891)
-* Allow built-in converter classes to be resolved using `Converter#for` and instantiated using `Converter#create` (#2891)
+* Allow built-in converter classes to be resolved using `Converter.for` and instantiated using `Converter.create` (#2891)
 * Allow converter factory to be passed using `:converter_factory` API option (#2891)
 * Honor `htmlsyntax` if defined on converter (#2891)
 * Add `backend_traits_source` keyword argument to `CompositeConverter` constructor (#2891)
