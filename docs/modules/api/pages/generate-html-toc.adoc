@@ -1,33 +1,71 @@
 = Generate an HTML TOC
 
-Asciidoctor's HTML 5 converter has built-in support for generating a TOC.
+Asciidoctor's HTML5 converter has a built-in method for generating an HTML TOC.
 This TOC generator can also be used as a general purpose API.
-This logic is available via the `outline` method on the HTML5 converter.
+This logic is available via the `convert_outline` method (which is the convert method for the `outline` node) on the HTML5 converter.
 
-The `outline` method excepts a Document object and an optional Hash of options, and returns an HTML string.
-It can be resolved and invoked from anywhere using the following:
+== Usage
 
-[source,ruby]
+The `convert_outline` method accepts a Document object and an optional Hash of options and it returns HTML.
+It can be resolved and invoked as a general purpose method using the following snippet of code:
+
+[,ruby]
 ----
-html_toc = (Asciidoctor::Converter.for 'html5').outline document
+document = Asciidoctor.load_file 'document-with-sections.adoc', safe: :safe
+html_toc = (Asciidoctor::Converter.create 'html5').convert_outline document
+puts html_toc
 ----
 
-The method can also be executed from inside a converter template (e.g., Slim, Haml, or ERB).
-When using a composite converter, this call will be run through the converter chain.
+Here's an example of what this method produces:
 
-[source,ruby]
+[.output,html]
+----
+<ul class="sectlevel1">
+<li><a href="#_section_a">Section A</a></li>
+<li><a href="#_section_b">Section B</a>
+<ul class="sectlevel2">
+<li><a href="#_subsection">Subsection</a></li>
+</ul>
+</li>
+<li><a href="#_section_c">Section C</a></li>
+</ul>
+----
+
+You can also access the `convert_outline` method on the converter instance by way of the Document API:
+
+[,ruby]
+----
+document = Asciidoctor.load_file 'document-with-sections.adoc', safe: :safe
+html_toc = document.converter.convert_outline document
+----
+
+If you're using a composite converter, you can use the generic `convert` method to ensure the call is run through the converter chain.
+To do so, invoke the `convert` method and pass in the Document object and the node name `outline`.
+This, in turn, will call `convert_outline` on the converter in the chain that responds to this method.
+
+[,ruby]
+----
+document = Asciidoctor.load_file 'document-with-sections.adoc', safe: :safe
+html_doc = document.converter.convert document, 'outline'
+----
+
+You can also use this method inside any converter template (e.g., Slim, Haml, or ERB) to generate and embed a TOC:
+
+[,ruby]
 ----
 = converter.convert document, 'outline'
 ----
 
-The method is also available through the Document API:
+== Options
 
-[source,ruby]
-----
-html_doc = document.converter.convert document, 'outline'
-----
-
-The `outline` method accepts the following options:
+The `convert_outline` method accepts the following options:
 
 sectnumlevels:: the number of section levels to number (defaults to the value of the `sectnumlevels` attribute.
-toclevels:: the depth of the toc (defaults to the value of the `toclevels` attribute)
+toclevels:: the depth of the TOC (defaults to the value of the `toclevels` attribute)
+
+Here's an example of how you can generate an HTML TOC with the depth limited to 1 for the previously loaded document:
+
+[,ruby]
+----
+html_toc = document.converter.convert_outline document, toclevels: 1
+----
