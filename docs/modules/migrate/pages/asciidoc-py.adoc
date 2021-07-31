@@ -100,6 +100,12 @@ Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 |See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[]. +
 Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
+|Inline role
+|pass:[[role\]#text#] or pass:[[role1 role2\]#text#]
+|pass:[[.role\]#text#] or pass:[[.role1.role2\]#text#]
+|See xref:asciidoc:text:text-span-built-in-roles.adoc[]. +
+While Asciidoctor still recognizes the bare, space-separated syntax for inline roles, the shorthand-style with the leading dot is preferred.
+
 |Sizes and overline
 |`big`, `small`, `overline`
 |user-specified `+[.<role-name>]+` and associated formatting in stylesheet
