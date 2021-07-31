@@ -451,7 +451,7 @@ GitHub上のAsciidoctorのorganization:: {uri-org}
 
 == ライセンス
 
-Copyright (C) 2012-2021 Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
+Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 本ソフトウェアはMITライセンスのもとで使用できます.
 
 ライセンスの詳細については {uri-license}[LICENSE] ファイルを参照してください.
