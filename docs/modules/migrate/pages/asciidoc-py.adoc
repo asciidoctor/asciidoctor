@@ -71,32 +71,34 @@ This section outlines those improvements and how they different from the legacy 
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
 |_italic text_
-|pass:['italic text']
+|pass:['italic text'] or pass:[_italic text_]
 |pass:[_italic text_]
-|Allowed with `compat-mode`.
-See xref:asciidoc:text:italic.adoc[].
+|See xref:asciidoc:text:italic.adoc[]. +
+Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
 |`monospace text`
 |pass:[+monospace text+]
-|pass:[`monospace text`]
-|Allowed with `compat-mode`.
-See xref:asciidoc:text:monospace.adoc[].
+|pass:[`monospace text`] or pass:[[x-\]+monospace text+]
+|See xref:asciidoc:text:monospace.adoc[]. +
+Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
-|`+literal monospace text+`
+|`literal monospace text`
 |pass:[`literal monospace text`]
-|pass:[`+literal monospace text+`]
-|Allowed with `compat-mode`.
-See xref:asciidoc:text:monospace.adoc#literal-monospace[Literal monospace].
+|pass:[`+literal monospace text+`] or pass:[[x-\]`literal monospace text`]
+|See xref:asciidoc:text:monospace.adoc#literal-monospace[Literal monospace]. +
+Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
 |Curved "`double quotes`"
 |pass:[``double quotes'']
-|pass:["`double quotes`"], editor keybinding, or Unicode character in numeric character reference form
-|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
+|pass:["`double quotes`"]
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[]. +
+Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
 |Curved '`single quotes`'
 |pass:[`single quotes']
-|pass:['`single quotes`'], editor keybinding, or Unicode character in numeric character reference form
-|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[].
+|pass:['`single quotes`']
+|See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[]. +
+Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
 |Sizes and overline
 |`big`, `small`, `overline`
@@ -142,20 +144,13 @@ See xref:asciidoc:text:monospace.adoc#literal-monospace[Literal monospace].
 |===
 |Feature |AsciiDoc.py |Asciidoctor |Notes
 
-|Implicit document title attribute
-|First content line at document top is set as title
-|`= Title`
-|Allowed with `compat-mode`.
-See xref:asciidoc:document:title.adoc[].
-
 |Two-line style (setext) document title
 |`Title` +
 `+=====+`
 |`= Title`
-|Asciidoctor accepts the two-line heading style to set the document title.
-But, by using it, `compat-mode` is implicitly set.
-To use the new syntax, use `= Title` or explicitly unset `compat-mode`.
-See xref:asciidoc:document:title.adoc[].
+|See xref:asciidoc:document:title.adoc[]. +
+When Asciidoctor detects the two-line style document title, it switches to compat mode by implicitly setting `compat-mode`.
+To revert this behavior, explicitly unset `compat-mode`.
 
 |Underlined section titles
 |Underline length must match title length +/- 2 characters.
