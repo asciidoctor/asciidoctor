@@ -148,7 +148,7 @@ context 'Paragraphs' do
       Here is an index entry for ((tigers)).
       indexterm:[Big cats,Tigers,Siberian Tiger]
       Here is an index entry for indexterm2:[Linux].
-      (((Operating Systems,Linux,Fedora)))
+      (((Operating Systems,Linux)))
       Note that multi-entry terms generate separate index entries.
       EOS
 
@@ -180,27 +180,34 @@ context 'Paragraphs' do
       assert_equal %(<indexterm>\n<primary>Linux</primary>\n</indexterm>), term5.to_s
       assert term5.next.content.start_with?('Linux')
 
-      assert_xpath '(//indexterm)[6]/*', output, 3
-      assert_xpath '(//indexterm)[7]/*', output, 2
-      assert_xpath '(//indexterm)[8]/*', output, 1
+      assert_xpath '(//indexterm)[6]/*', output, 2
+      assert_xpath '(//indexterm)[7]/*', output, 1
     end
 
     test 'does not automatically promote index terms in DocBook output if indexterm-promotion-option is not set' do
       input = <<~'EOS'
       The Siberian Tiger is one of the biggest living cats.
       indexterm:[Big cats,Tigers,Siberian Tiger]
+      Note that multi-entry terms generate separate index entries.
+      (((Operating Systems,Linux)))
       EOS
 
       output = convert_string_to_embedded input, backend: 'docbook'
 
-      assert_css 'indexterm', output, 1
+      assert_css 'indexterm', output, 2
 
-      term1 = xmlnodes_at_css 'indexterm', output, 1
+      terms = xmlnodes_at_css 'indexterm', output, 2
+      term1 = terms[0]
       term1_elements = term1.elements
       assert_equal 3, term1_elements.size
       assert_equal '<primary>Big cats</primary>', term1_elements[0].to_s
       assert_equal '<secondary>Tigers</secondary>', term1_elements[1].to_s
       assert_equal '<tertiary>Siberian Tiger</tertiary>', term1_elements[2].to_s
+      term2 = terms[1]
+      term2_elements = term2.elements
+      assert_equal 2, term2_elements.size
+      assert_equal '<primary>Operating Systems</primary>', term2_elements[0].to_s
+      assert_equal '<secondary>Linux</secondary>', term2_elements[1].to_s
     end
 
     test 'normal paragraph should honor explicit subs list' do
