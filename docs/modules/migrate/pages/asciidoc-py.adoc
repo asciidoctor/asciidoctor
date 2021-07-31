@@ -100,26 +100,23 @@ Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 |See xref:asciidoc:text:quotation-marks-and-apostrophes.adoc[]. +
 Reverts to AsciiDoc.py syntax when `compat-mode` is enabled.
 
-|Inline role
+|Inline role(s)
 |pass:[[role\]#text#] or pass:[[role1 role2\]#text#]
 |pass:[[.role\]#text#] or pass:[[.role1.role2\]#text#]
 |See xref:asciidoc:text:text-span-built-in-roles.adoc[]. +
 While Asciidoctor still recognizes the bare, space-separated syntax for inline roles, the shorthand-style with the leading dot is preferred.
 
-|Sizes and overline
-|`big`, `small`, `overline`
-|user-specified `+[.<role-name>]+` and associated formatting in stylesheet
-|See xref:asciidoc:text:custom-inline-styles.adoc[].
+|Font size roles
+|`big`, `small`
+|user-specified role (e.g., `+[.details]+`) with corresponding CSS rules provided by stylesheet
+|See xref:asciidoc:text:custom-inline-styles.adoc[]. +
+The default stylesheet in Asciidoctor still provides CSS for these built-in roles, but they are considered deprecated.
 
-|Underline and line-through
-|`underline`, `line-through`
-|`+[.underline]+`, `+[.line-through]+`
-|See xref:asciidoc:text:custom-inline-styles.adoc[].
-
-|Colors
-|Name of color
-|user-specified `+[.<role-name>]+` and associated formatting in stylesheet
-|See xref:asciidoc:text:custom-inline-styles.adoc[].
+|Color roles
+|`aqua`, `aqua-background`, etc.
+|user-specified role `+[.brand-primary]+` with corresponding CSS rules provided by stylesheet
+|See xref:asciidoc:text:custom-inline-styles.adoc[]. +
+The default stylesheet in Asciidoctor still provides CSS for these built-in roles, but they are considered deprecated.
 |===
 
 === Table of contents
