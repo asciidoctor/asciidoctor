@@ -1279,7 +1279,7 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        # NOTE :literal with listparagraph-option gets folded into text of list item later
+        # NOTE block with :literal context and listparagraph-option gets folded into text of list item later
         default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
       when :raw
         # TODO make pass subs a compliance setting; AsciiDoc.py performs :attributes and :macros on a pass block

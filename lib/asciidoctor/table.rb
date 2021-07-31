@@ -239,7 +239,7 @@ class Table::Cell < AbstractBlock
     super column, :table_cell
     @cursor = @reinitialize_args = nil
     @source_location = opts[:cursor].dup if @document.sourcemap
-    # NOTE: column is always set when parsing; may not be set when building table from the API
+    # NOTE column is always set when parsing; may not be set when building table from the API
     if column
       if (in_header_row = column.table.header_row?)
         if in_header_row == :implicit && (cell_style = column.style || (attributes && attributes['style']))

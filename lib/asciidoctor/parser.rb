@@ -2263,7 +2263,7 @@ class Parser
     if attributes['header-option']
       table.has_header_option = true
     elsif skipped == 0 && !attributes['noheader-option']
-      # NOTE: assume table has header until we know otherwise; if it doesn't (nil), cells in first row get reprocessed
+      # NOTE assume table has header until we know otherwise; if it doesn't (nil), cells in first row get reprocessed
       table.has_header_option = :implicit
       implicit_header = true
     end

@@ -1476,7 +1476,7 @@ context 'Extensions' do
         end
 
         output = convert_string_to_embedded 'attrs:[A,foo=bar]', doctype: :inline
-        # note that default attributes aren't considered when mapping positional attributes
+        # NOTE default attributes aren't considered when mapping positional attributes
         assert_equal 'a=A,2=b,b=nil,foo=bar', output
       ensure
         Asciidoctor::Extensions.unregister_all

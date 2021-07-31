@@ -74,8 +74,8 @@ module Asciidoctor
         end
       end
 
-      # NOTE :to_dir is always set when outputting to a file
-      # NOTE :to_file option only passed if assigned an explicit path
+      # NOTE the :to_dir option is always set when outputting to a file
+      # NOTE the :to_file option is only passed if assigned an explicit path
       doc = load input, options
 
       if sibling_path # write to file in same directory
