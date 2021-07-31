@@ -92,7 +92,7 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       refute_match(/line comment/, output)
       assert_xpath '//p', output, 1
-      assert_xpath "//p[1][text()='first line\nsecond line']", output, 1
+      assert_xpath %(//p[1][text()='first line\nsecond line']), output, 1
     end
 
     test 'comment block between paragraphs offset by blank lines' do
@@ -337,7 +337,7 @@ context 'Blocks' do
       ****
       EOS
       result = convert_string input
-      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+      assert_xpath '//*[@class="sidebarblock"]//p', result, 1
     end
   end
 

@@ -193,7 +193,7 @@ context 'Text' do
   end
 
   test 'escaped single quote is restored as single quote' do
-    assert_xpath "//p[contains(text(), \"Let's do it!\")]", convert_string("Let\\'s do it!")
+    assert_xpath %q(//p[contains(text(), "Let's do it!")]), convert_string(%q(Let\\'s do it!))
   end
 
   test 'unescape escaped single quote emphasis in compat mode only' do
