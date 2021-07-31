@@ -148,7 +148,7 @@ context 'Logger' do
     test 'including Logging gives instance methods on module access to logging infrastructure' do
       module SampleModuleA
         include Asciidoctor::Logging
-        def get_logger
+        def retrieve_logger
           logger
         end
       end
@@ -156,42 +156,42 @@ context 'Logger' do
       class SampleClassA
         include SampleModuleA
       end
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.retrieve_logger
       assert SampleClassA.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on module access to logging infrastructure' do
       module SampleModuleB
         include Asciidoctor::Logging
-        def self.get_logger
+        def self.retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleModuleB.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleModuleB.retrieve_logger
     end
 
     test 'including Logging gives instance methods on class access to logging infrastructure' do
       class SampleClassC
         include Asciidoctor::Logging
-        def get_logger
+        def retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.retrieve_logger
       assert SampleClassC.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on class access to logging infrastructure' do
       class SampleClassD
         include Asciidoctor::Logging
-        def self.get_logger
+        def self.retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassD.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassD.retrieve_logger
     end
 
     test 'can create an auto-formatting message with context' do

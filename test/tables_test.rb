@@ -29,7 +29,7 @@ context 'Tables' do
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td", output, row.size
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td > p", output, row.size
         row.each_with_index do |cell, celli|
-          assert_xpath "(//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']", output, 1
+          assert_xpath %((//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']), output, 1
         end
       end
     end
@@ -262,7 +262,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
@@ -280,7 +280,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
     end
 
@@ -298,7 +298,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//p[@class="tableblock"]', output, 1)
+      result = xmlnodes_at_xpath '/table//p[@class="tableblock"]', output, 1
       assert_equal %(<p class="tableblock">one\n  two\nthree</p>), result.to_s
     end
 
@@ -1037,7 +1037,7 @@ context 'Tables' do
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 4
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 4
       assert_css 'table > tbody > tr:nth-child(3) > td', output, 4
-      assert_xpath "/table/tbody/tr[1]/td[4]/p[text()='Worked out MSHR (max sustainable heart rate) by going hard\nfor this interval.']", output, 1
+      assert_xpath %(/table/tbody/tr[1]/td[4]/p[text()='Worked out MSHR (max sustainable heart rate) by going hard\nfor this interval.']), output, 1
       assert_css 'table > tbody > tr:nth-child(3) > td:nth-child(4) > p', output, 2
       assert_xpath '/table/tbody/tr[3]/td[4]/p[2][text()="I am getting in shape!"]', output, 1
     end

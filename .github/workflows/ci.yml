@@ -90,6 +90,9 @@ jobs:
         bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
+    - name: Run linter
+      if: matrix.primary
+      run: bundle exec rake lint
     - name: Check default stylesheet
       if: matrix.primary
       run: |

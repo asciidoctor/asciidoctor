@@ -92,7 +92,7 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       refute_match(/line comment/, output)
       assert_xpath '//p', output, 1
-      assert_xpath "//p[1][text()='first line\nsecond line']", output, 1
+      assert_xpath %(//p[1][text()='first line\nsecond line']), output, 1
     end
 
     test 'comment block between paragraphs offset by blank lines' do
@@ -337,7 +337,7 @@ context 'Blocks' do
       ****
       EOS
       result = convert_string input
-      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+      assert_xpath '//*[@class="sidebarblock"]//p', result, 1
     end
   end
 
@@ -2558,7 +2558,7 @@ context 'Blocks' do
 
       doc = document_from_string input
       img = doc.blocks[0]
-      refute(img.attributes.key? 'style')
+      refute img.attributes.key? 'style'
       assert_nil img.style
     end
 
@@ -3574,8 +3574,8 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 0
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 2
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 2
     end
 
     test 'should accept partintro on open block with title' do
@@ -3601,9 +3601,9 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 1
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text()="Intro title"]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 1
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="title"][text()="Intro title"]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 1
     end
 
     test 'should exclude partintro if not a child of part' do
@@ -3805,7 +3805,7 @@ context 'Blocks' do
       doc = document_from_string input
       block = doc.blocks.first
       assert_nil block.id
-      assert_nil(block.attr 'reftext')
+      assert_nil block.attr 'reftext'
       refute doc.catalog[:refs].key? 'illegal$id'
     end
 

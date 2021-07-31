@@ -7,7 +7,7 @@ BUILT_IN_ELEMENTS = %w(admonition audio colist dlist document embedded example f
 context 'Document' do
   context 'Example document' do
     test 'document title' do
-      doc = example_document(:asciidoc_index)
+      doc = example_document :asciidoc_index
       assert_equal 'AsciiDoc Home Page', doc.doctitle
       assert_equal 'AsciiDoc Home Page', doc.name
       refute_nil doc.header
@@ -79,8 +79,8 @@ context 'Document' do
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
       result = doc.convert
-      assert_match('<?asciidoc-toc?>', result)
-      assert_match('<?asciidoc-numbered?>', result)
+      assert_match '<?asciidoc-toc?>', result
+      assert_match '<?asciidoc-numbered?>', result
     end
 
     test 'maxdepth attribute should be set on asciidoc-toc and asciidoc-numbered processing instructions in DocBook backend' do
@@ -88,8 +88,8 @@ context 'Document' do
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
       result = doc.convert
-      assert_match('<?asciidoc-toc maxdepth="1"?>', result)
-      assert_match('<?asciidoc-numbered maxdepth="1"?>', result)
+      assert_match '<?asciidoc-toc maxdepth="1"?>', result
+      assert_match '<?asciidoc-numbered maxdepth="1"?>', result
     end
 
     test 'should be able to disable toc and sectnums in document header in DocBook backend' do
@@ -127,7 +127,7 @@ context 'Document' do
 
   context 'Docinfo files' do
     test 'should include docinfo files for html backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       cases = {
         'docinfo' => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
@@ -159,7 +159,7 @@ context 'Document' do
     end
 
     test 'should include docinfo header even if noheader attribute is set' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
       refute_empty output
@@ -168,7 +168,7 @@ context 'Document' do
     end
 
     test 'should include docinfo footer even if nofooter attribute is set' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
       refute_empty output
@@ -187,7 +187,7 @@ context 'Document' do
     end
 
     test 'should include docinfo files for html backend with custom docinfodir' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
@@ -215,7 +215,7 @@ context 'Document' do
     end
 
     test 'should include docinfo files in docbook backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -253,7 +253,7 @@ context 'Document' do
     end
 
     test 'should include docinfo footer files for html backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -275,7 +275,7 @@ context 'Document' do
     end
 
     test 'should include docinfo footer files in DocBook backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
@@ -306,7 +306,7 @@ context 'Document' do
       begin
         $VERBOSE = nil # disable warnings since we have to modify constants
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
-        sample_input_path = fixture_path('basic.adoc')
+        sample_input_path = fixture_path 'basic.adoc'
         output = Asciidoctor.convert_file sample_input_path,
           to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private,shared' }
         refute_empty output
@@ -323,7 +323,7 @@ context 'Document' do
     end
 
     test 'should not include docinfo files by default' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER
@@ -339,7 +339,7 @@ context 'Document' do
     end
 
     test 'should not include docinfo files if safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       output = Asciidoctor.convert_file sample_input_path,
         to_file: false, standalone: true, attributes: { 'docinfo2' => '' }
@@ -385,10 +385,10 @@ context 'Document' do
   context 'MathJax' do
     test 'should add MathJax script to HTML head if stem attribute is set' do
       output = convert_string '', attributes: { 'stem' => '' }
-      assert_match('<script type="text/x-mathjax-config">', output)
-      assert_match('inlineMath: [["\\\\(", "\\\\)"]]', output)
-      assert_match('displayMath: [["\\\\[", "\\\\]"]]', output)
-      assert_match('delimiters: [["\\\\$", "\\\\$"]]', output)
+      assert_match '<script type="text/x-mathjax-config">', output
+      assert_match 'inlineMath: [["\\\\(", "\\\\)"]]', output
+      assert_match 'displayMath: [["\\\\[", "\\\\]"]]', output
+      assert_match 'delimiters: [["\\\\$", "\\\\$"]]', output
     end
   end
 
@@ -436,7 +436,7 @@ context 'Document' do
 
   context 'Structure' do
     test 'document with no doctitle' do
-      doc = document_from_string('Snorf')
+      doc = document_from_string 'Snorf'
       assert_nil doc.doctitle
       assert_nil doc.name
       refute doc.has_header?
@@ -452,7 +452,7 @@ context 'Document' do
       EOS
 
       doc = document_from_string input
-      assert(doc.attr? 'compat-mode')
+      assert doc.attr? 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 1
     end
@@ -467,7 +467,7 @@ context 'Document' do
       EOS
 
       doc = document_from_string input
-      assert_nil(doc.attr 'compat-mode')
+      assert_nil doc.attr 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 0
     end
@@ -481,8 +481,8 @@ context 'Document' do
       EOS
 
       doc = document_from_string input, attributes: { 'compat-mode' => nil }
-      assert(doc.attribute_locked? 'compat-mode')
-      assert_nil(doc.attr 'compat-mode')
+      assert doc.attribute_locked? 'compat-mode'
+      assert_nil doc.attr 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 0
     end
@@ -828,9 +828,9 @@ context 'Document' do
 
       output = convert_string input
       assert_xpath '/html/head/title[text()="Document Title"]', output, 1
-      nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output)
+      nodes = xmlnodes_at_xpath '//*[@id="header"]/h1', output
       assert_equal 1, nodes.size
-      assert_match('<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output)
+      assert_match '<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output
     end
 
     test 'should not choke on empty source' do
@@ -1424,7 +1424,7 @@ context 'Document' do
 
   context 'Backends and Doctypes' do
     test 'html5 backend doctype article' do
-      result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5' })
+      result = convert_string "= Title\n\nparagraph", attributes: { 'backend' => 'html5' }
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
@@ -1432,7 +1432,7 @@ context 'Document' do
     end
 
     test 'html5 backend doctype book' do
-      result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5', 'doctype' => 'book' })
+      result = convert_string "= Title\n\nparagraph", attributes: { 'backend' => 'html5', 'doctype' => 'book' }
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
@@ -1536,7 +1536,7 @@ context 'Document' do
       EOS
       result = convert_string input, safe: :safe, backend: :xhtml
       begin
-        Nokogiri::XML::Document.parse(result) do |config|
+        Nokogiri::XML::Document.parse result do |config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
         end
       rescue
@@ -1574,9 +1574,9 @@ context 'Document' do
 
       section body
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5' }
       assert_xpath '/xmlns:article', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:article', result, 1)
+      doc = xmlnodes_at_xpath '/xmlns:article', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:article[@version="5.0"]', result, 1
@@ -1587,7 +1587,7 @@ context 'Document' do
     end
 
     test 'should set doctype to article by default for document with no title when converting to DocBook' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook' })
+      result = convert_string 'text', attributes: { 'backend' => 'docbook' }
       assert_xpath '/article', result, 1
       assert_xpath '/article/info/title', result, 1
       assert_xpath '/article/info/title[text()="Untitled"]', result, 1
@@ -1612,9 +1612,9 @@ context 'Document' do
 
       section body
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
       assert_xpath '/xmlns:refentry', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:refentry', result, 1)
+      doc = xmlnodes_at_xpath '/xmlns:refentry', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
@@ -1643,7 +1643,7 @@ context 'Document' do
 
       some text
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
     end
@@ -1659,9 +1659,9 @@ context 'Document' do
 
       chapter body
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'book' }
       assert_xpath '/xmlns:book', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:book', result, 1)
+      doc = xmlnodes_at_xpath '/xmlns:book', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:book[@version="5.0"]', result, 1
@@ -1672,7 +1672,7 @@ context 'Document' do
     end
 
     test 'should be able to set doctype to book for document with no title when converting to DocBook' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
+      result = convert_string 'text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' }
       assert_xpath '/book', result, 1
       assert_xpath '/book/info/date', result, 1
       # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
@@ -1994,19 +1994,19 @@ context 'Document' do
   context 'Timing report' do
     test 'print_report does not lose precision' do
       timings = Asciidoctor::Timings.new
-      log = timings.instance_variable_get(:@log)
+      log = timings.instance_variable_get :@log
       log[:read] = 0.00001
       log[:parse] = 0.00003
       log[:convert] = 0.00005
-      timings.print_report(sink = StringIO.new)
+      timings.print_report sink = StringIO.new
       expect = ['0.00004', '0.00005', '0.00009']
       result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
       assert_equal expect, result
     end
 
     test 'print_report should print 0 for untimed phases' do
-      Asciidoctor::Timings.new.print_report(sink = StringIO.new)
-      expect = [].fill('0.00000', 0..2)
+      Asciidoctor::Timings.new.print_report sink = StringIO.new
+      expect = [].fill '0.00000', 0..2
       result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
       assert_equal expect, result
     end

@@ -406,7 +406,7 @@ context 'Paragraphs' do
     end
 
     test 'verse paragraph' do
-      output = convert_string("[verse]\nFamous verse.")
+      output = convert_string "[verse]\nFamous verse."
       assert_xpath '//*[@class = "verseblock"]', output, 1
       assert_xpath '//*[@class = "verseblock"]/pre', output, 1
       assert_xpath '//*[@class = "verseblock"]//p', output, 0
@@ -438,19 +438,19 @@ context 'Paragraphs' do
   context 'special' do
     test 'note multiline syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\nThis is a winner.")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%([#{style}]\nThis is a winner.))
       end
     end
 
     test 'note block syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\n====\nThis is a winner.\n====")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%([#{style}]\n====\nThis is a winner.\n====))
       end
     end
 
     test 'note inline syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("#{style}: This is important, fool!")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%(#{style}: This is important, fool!))
       end
     end
 

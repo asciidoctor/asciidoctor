@@ -376,7 +376,7 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  # FIXME: The reason this method is so complicated is because we are not
+  # FIXME The reason this method is so complicated is because we are not
   # receiving empty(marked) cells when there are colspans or rowspans. This
   # method has to create a map of all cells and in the case of rowspans
   # create empty cells as placeholders of the span.
@@ -557,7 +557,7 @@ allbox tab(:);'
     result << (node.title? ? %(.sp
 .B #{manify node.title}
 .br) : '.sp')
-    result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
+    result << %(<#{node.media_uri node.attr 'target'}#{start_param}#{end_param}> (video))
     result.join LF
   end
 

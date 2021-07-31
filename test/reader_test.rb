@@ -47,7 +47,7 @@ class ReaderTest < Minitest::Test
 
       test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
         %w(UTF-8 ASCII-8BIT).each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding(start_encoding)
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -70,7 +70,7 @@ class ReaderTest < Minitest::Test
 
       test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
         %w(UTF-8 ASCII-8BIT).each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding(start_encoding)
+          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -896,7 +896,7 @@ class ReaderTest < Minitest::Test
         end
 
         refute_nil output
-        assert_match(expect, output)
+        assert_match expect, output
       end
 
       test 'nested include directives are resolved relative to current file' do
@@ -1921,7 +1921,7 @@ class ReaderTest < Minitest::Test
         doc = empty_safe_document base_dir: DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
         reader.read_line
-        result = reader.read_lines_until(terminator: '////', skip_processing: true)
+        result = reader.read_lines_until terminator: '////', skip_processing: true
         assert_equal lines.map(&:chomp)[1..1], result
       end
 

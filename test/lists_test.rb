@@ -141,7 +141,7 @@ context 'Bulleted lists (:ulist)' do
       output = convert_string input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li[1]/*', output, 1
-      assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
+      assert_xpath %(//ul/li[1]/p[text() = 'Foo\nwrapped content']), output, 1
     end
 
     test 'a non-indented wrapped line that resembles a block title is folded into text of list item' do
@@ -156,7 +156,7 @@ context 'Bulleted lists (:ulist)' do
       output = convert_string_to_embedded input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li[1]/*', output, 1
-      assert_xpath "//ul/li[1]/p[text() = 'Foo\n.wrapped content']", output, 1
+      assert_xpath %(//ul/li[1]/p[text() = 'Foo\n.wrapped content']), output, 1
     end
 
     test 'a non-indented wrapped line that resembles an attribute entry is folded into text of list item' do
@@ -171,7 +171,7 @@ context 'Bulleted lists (:ulist)' do
       output = convert_string_to_embedded input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li[1]/*', output, 1
-      assert_xpath "//ul/li[1]/p[text() = 'Foo\n:foo: bar']", output, 1
+      assert_xpath %(//ul/li[1]/p[text() = 'Foo\n:foo: bar']), output, 1
     end
 
     test 'a list item with a nested marker terminates non-indented paragraph for text of list item' do
@@ -221,7 +221,7 @@ context 'Bulleted lists (:ulist)' do
       output = convert_string input
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li[1]/*', output, 1
-      assert_xpath "//ul/li[1]/p[text() = 'Foo\nwrapped content']", output, 1
+      assert_xpath %(//ul/li[1]/p[text() = 'Foo\nwrapped content']), output, 1
     end
 
     test 'wrapped list item with hanging indent followed by non-indented line' do
@@ -267,7 +267,7 @@ context 'Bulleted lists (:ulist)' do
       output = convert_string_to_embedded input
       assert_css 'ul', output, 1
       assert_css 'ul li', output, 1
-      assert_xpath "//ul/li/p[text()='first item\n*. normal text']", output, 1
+      assert_xpath %(//ul/li/p[text()='first item\n*. normal text']), output, 1
     end
 
     test 'a list item for a different list terminates indented paragraph for text of list item' do
@@ -510,7 +510,7 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]', output, 2
       assert_xpath '(//ul/li)[1]/p/following-sibling::*[@class="literalblock"]', output, 2
       assert_xpath '((//ul/li)[1]/*[@class="literalblock"])[1]//pre[text()="literal"]', output, 1
-      assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[2]//pre[text()='more\nliteral']", output, 1
+      assert_xpath %(((//ul/li)[1]/*[@class='literalblock'])[2]//pre[text()='more\nliteral']), output, 1
     end
 
     test 'a literal paragraph without a trailing blank line consumes following list items' do
@@ -531,7 +531,7 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '(//ul/li)[1]/p[text() = "Foo"]', output, 1
       assert_xpath '(//ul/li)[1]/*[@class="literalblock"]', output, 1
       assert_xpath '(//ul/li)[1]/p/following-sibling::*[@class="literalblock"]', output, 1
-      assert_xpath "((//ul/li)[1]/*[@class='literalblock'])[1]//pre[text() = '  literal\n- Boo\n- Blech']", output, 1
+      assert_xpath %(((//ul/li)[1]/*[@class='literalblock'])[1]//pre[text() = '  literal\n- Boo\n- Blech']), output, 1
     end
 
     test 'asterisk elements with no blank lines' do
@@ -590,8 +590,8 @@ context 'Bulleted lists (:ulist)' do
         * c
         EOS
         output = convert_string_to_embedded input
-        assert_css ".ulist.#{style}", output, 1
-        assert_css ".ulist.#{style} ul.#{style}", output, 1
+        assert_css %(.ulist.#{style}), output, 1
+        assert_css %(.ulist.#{style} ul.#{style}), output, 1
       end
     end
 
@@ -804,7 +804,7 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '//ul', output, 1
       assert_xpath '//ul/li', output, 3
       %w(.first .second .third).each_with_index do |text, index|
-        assert_xpath "(//ul/li)[#{index + 1}]//p[text() = '#{text}']", output, 1
+        assert_xpath %((//ul/li)[#{index + 1}]//p[text() = '#{text}']), output, 1
       end
     end
 
@@ -1715,9 +1715,9 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '((//ul/li)[1]/*)[2]/self::div/ol', output, 1
       assert_xpath '((//ul/li)[1]/*)[2]/self::div/ol/li', output, 2
       (1..2).each do |idx|
-        assert_xpath "(((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*", output, 2
-        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[1]/self::p", output, 1
-        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[2]/self::div[@class=\"paragraph\"]", output, 1
+        assert_xpath %((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*), output, 2
+        assert_xpath %(((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[1]/self::p), output, 1
+        assert_xpath %(((((//ul/li)[1]/*)[2]/self::div/ol/li)[#{idx}]/*)[2]/self::div[@class="paragraph"]), output, 1
       end
     end
 
@@ -1749,9 +1749,9 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '((//ul/li)[1]/*)[2]/self::div/dl/dt', output, 2
       assert_xpath '((//ul/li)[1]/*)[2]/self::div/dl/dd', output, 2
       (1..2).each do |idx|
-        assert_xpath "(((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*", output, 2
-        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[1]/self::p", output, 1
-        assert_xpath "((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[2]/self::div[@class=\"paragraph\"]", output, 1
+        assert_xpath %((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*), output, 2
+        assert_xpath %(((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[1]/self::p), output, 1
+        assert_xpath %(((((//ul/li)[1]/*)[2]/self::div/dl/dd)[#{idx}]/*)[2]/self::div[@class="paragraph"]), output, 1
       end
     end
 
@@ -3266,13 +3266,13 @@ context 'Description lists (:dlist)' do
       assert_css '.qanda > ol', output, 1
       assert_css '.qanda > ol > li', output, 2
       (1..2).each do |idx|
-        assert_css ".qanda > ol > li:nth-child(#{idx}) > p", output, 2
-        assert_css ".qanda > ol > li:nth-child(#{idx}) > p:first-child > em", output, 1
-        assert_xpath "/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[1]/em[normalize-space(text()) = 'Question #{idx}']", output, 1
-        assert_css ".qanda > ol > li:nth-child(#{idx}) > p:last-child > *", output, 0
-        assert_xpath "/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[2][normalize-space(text()) = 'Answer #{idx}.']", output, 1
+        assert_css %(.qanda > ol > li:nth-child(#{idx}) > p), output, 2
+        assert_css %(.qanda > ol > li:nth-child(#{idx}) > p:first-child > em), output, 1
+        assert_xpath %(/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[1]/em[normalize-space(text()) = 'Question #{idx}']), output, 1
+        assert_css %(.qanda > ol > li:nth-child(#{idx}) > p:last-child > *), output, 0
+        assert_xpath %(/*[@class = 'qlist qanda']/ol/li[#{idx}]/p[2][normalize-space(text()) = 'Answer #{idx}.']), output, 1
       end
-      assert_xpath "/*[@class = 'qlist qanda']/ol/li[2]/p[2]/following-sibling::div[@class='admonitionblock note']", output, 1
+      assert_xpath '/*[@class = "qlist qanda"]/ol/li[2]/p[2]/following-sibling::div[@class="admonitionblock note"]', output, 1
     end
 
     test 'should convert qanda list in DocBook with proper semantics' do
@@ -3290,12 +3290,12 @@ context 'Description lists (:dlist)' do
       assert_css 'qandaset', output, 1
       assert_css 'qandaset > qandaentry', output, 2
       (1..2).each do |idx|
-        assert_css "qandaset > qandaentry:nth-child(#{idx}) > question", output, 1
-        assert_css "qandaset > qandaentry:nth-child(#{idx}) > question > simpara", output, 1
-        assert_xpath "/qandaset/qandaentry[#{idx}]/question/simpara[normalize-space(text()) = 'Question #{idx}']", output, 1
-        assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer", output, 1
-        assert_css "qandaset > qandaentry:nth-child(#{idx}) > answer > simpara", output, 1
-        assert_xpath "/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']", output, 1
+        assert_css %(qandaset > qandaentry:nth-child(#{idx}) > question), output, 1
+        assert_css %(qandaset > qandaentry:nth-child(#{idx}) > question > simpara), output, 1
+        assert_xpath %(/qandaset/qandaentry[#{idx}]/question/simpara[normalize-space(text()) = 'Question #{idx}']), output, 1
+        assert_css %(qandaset > qandaentry:nth-child(#{idx}) > answer), output, 1
+        assert_css %(qandaset > qandaentry:nth-child(#{idx}) > answer > simpara), output, 1
+        assert_xpath %(/qandaset/qandaentry[#{idx}]/answer/simpara[normalize-space(text()) = 'Answer #{idx}.']), output, 1
       end
       assert_xpath '/qandaset/qandaentry[2]/answer/simpara/following-sibling::note', output, 1
     end

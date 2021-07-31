@@ -768,7 +768,7 @@ class PreprocessorReader < Reader
     if ::String === file
       dir = ::File.dirname file
     elsif RUBY_ENGINE_OPAL
-      dir = ::File.dirname(file = file.to_s)
+      dir = ::File.dirname (file = file.to_s)
     else
       dir = (dir = ::File.dirname file.path) == '' ? '/' : dir
       file = file.to_s
@@ -808,7 +808,7 @@ class PreprocessorReader < Reader
     end
 
     # NOTE highly optimized
-    if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
+    if (line.end_with? ']') && !(line.start_with? '[') && (line.include? '::')
       if (line.include? 'if') && ConditionalDirectiveRx =~ line
         # if escaped, mark as processed and return line unescaped
         if $1 == '\\'
@@ -915,7 +915,7 @@ class PreprocessorReader < Reader
           skip = target.split('+', -1).any? {|name| !@document.attributes.key? name }
         else
           # if the attribute is undefined, then skip
-          skip = !@document.attributes.key?(target)
+          skip = !(@document.attributes.key? target)
         end
       when 'ifndef'
         if no_target
@@ -931,7 +931,7 @@ class PreprocessorReader < Reader
           skip = target.split('+', -1).all? {|name| @document.attributes.key? name }
         else
           # if the attribute is defined, then skip
-          skip = @document.attributes.key?(target)
+          skip = @document.attributes.key? target
         end
       when 'ifeval'
         if no_target

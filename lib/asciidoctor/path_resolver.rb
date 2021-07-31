@@ -221,7 +221,7 @@ class PathResolver
         path.slice offset, path.length
       else
         begin
-          (Pathname.new path).relative_path_from(Pathname.new base).to_s
+          ((Pathname.new path).relative_path_from Pathname.new base).to_s
         rescue
           path
         end
@@ -378,7 +378,7 @@ class PathResolver
     end
 
     if target_segments.empty?
-      if start.nil_or_empty?
+      if start.nil_or_empty? # rubocop:disable Style/GuardClause
         return jail || @working_dir
       elsif root? start
         return expand_path start unless jail

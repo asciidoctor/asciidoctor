@@ -197,7 +197,7 @@ class Minitest::Test
       Nokogiri::HTML::DocumentFragment.parse content
     elsif $1.start_with? 'html'
       Nokogiri::HTML::Document.parse content
-    else
+    else # rubocop:disable Lint/DuplicateBranch
       Nokogiri::XML::Document.parse content
     end
   end
@@ -407,7 +407,7 @@ class Minitest::Test
         if resource == '/name/asciidoctor'
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
-        elsif File.file?(resource_file = (File.join base_dir, resource))
+        elsif File.file? resource_file = (File.join base_dir, resource)
           if (ext = File.extname(resource_file)[1..-1])
             mimetype = ext == 'adoc' ? 'text/plain' : %(image/#{ext})
           else

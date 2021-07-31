@@ -188,7 +188,7 @@ class Table::Column < AbstractNode
     attributes['width'] ||= 1
     attributes['halign'] ||= 'left'
     attributes['valign'] ||= 'top'
-    update_attributes(attributes)
+    update_attributes attributes
   end
 
   # Public: An alias to the parent block (which is always a Table)
@@ -239,7 +239,7 @@ class Table::Cell < AbstractBlock
     super column, :table_cell
     @cursor = @reinitialize_args = nil
     @source_location = opts[:cursor].dup if @document.sourcemap
-    # NOTE: column is always set when parsing; may not be set when building table from the API
+    # NOTE column is always set when parsing; may not be set when building table from the API
     if column
       if (in_header_row = column.table.header_row?)
         if in_header_row == :implicit && (cell_style = column.style || (attributes && attributes['style']))
@@ -295,7 +295,7 @@ class Table::Cell < AbstractBlock
     if asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
-      parent_doctitle = @document.attributes.delete('doctitle')
+      parent_doctitle = @document.attributes.delete 'doctitle'
       # NOTE we need to process the first line of content as it may not have been processed
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
@@ -459,7 +459,7 @@ class Table::ParserContext
     @table = table
 
     if attributes.key? 'format'
-      if FORMATS.include?(xsv = attributes['format'])
+      if FORMATS.include? (xsv = attributes['format'])
         if xsv == 'tsv'
           # NOTE tsv is just an alias for csv with a tab separator
           @format = 'csv'
@@ -510,7 +510,7 @@ class Table::ParserContext
   #
   # returns Regexp MatchData if the line contains the delimiter, false otherwise
   def match_delimiter line
-    @delimiter_rx.match(line)
+    @delimiter_rx.match line
   end
 
   # Public: Skip past the matched delimiter because it's inside quoted text.
@@ -533,7 +533,7 @@ class Table::ParserContext
   #
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
-  def buffer_has_unclosed_quotes? append = nil, q = '"'
+  def buffer_has_unclosed_quotes? append = nil, q = '"' # rubocop:disable Naming/MethodParameterName
     if (record = append ? (@buffer + append).strip : @buffer.strip) == q
       true
     elsif record.start_with? q
@@ -606,7 +606,7 @@ class Table::ParserContext
   # returns nothing
   def close_open_cell next_cellspec = {}
     push_cellspec next_cellspec
-    close_cell(true) if cell_open?
+    close_cell true if cell_open?
     advance
     nil
   end
@@ -636,7 +636,7 @@ class Table::ParserContext
         # this may not be perfect logic, but it hits the 99%
         if (cell_text.start_with? q) && (cell_text.end_with? q)
           # unquote
-          if (cell_text = cell_text.slice(1, cell_text.length - 2))
+          if (cell_text = cell_text.slice 1, cell_text.length - 2)
             # trim whitespace and collapse escaped quotes
             cell_text = cell_text.strip.squeeze q
           else
@@ -653,7 +653,7 @@ class Table::ParserContext
     1.upto repeat do |i|
       # TODO make column resolving an operation
       if @colcount == -1
-        @table.columns << (column = Table::Column.new(@table, @table.columns.size + i - 1))
+        @table.columns << (column = Table::Column.new @table, @table.columns.size + i - 1)
         if cellspec && (cellspec.key? 'colspan') && (extra_cols = cellspec['colspan'].to_i - 1) > 0
           offset = @table.columns.size
           extra_cols.times do |j|
@@ -668,7 +668,7 @@ class Table::ParserContext
         end
       end
 
-      cell = Table::Cell.new(column, cell_text, cellspec, cursor: @reader.cursor_before_mark)
+      cell = Table::Cell.new column, cell_text, cellspec, cursor: @reader.cursor_before_mark
       @reader.mark
       unless !cell.rowspan || cell.rowspan == 1
         activate_rowspan(cell.rowspan, (cell.colspan || 1))

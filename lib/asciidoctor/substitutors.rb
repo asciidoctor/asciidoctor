@@ -232,7 +232,7 @@ module Substitutors
         else # 'counter'
           @document.counter(*args)
         end
-      elsif doc_attrs.key?(key = $2.downcase)
+      elsif doc_attrs.key? (key = $2.downcase)
         doc_attrs[key]
       elsif (value = INTRINSIC_ATTRIBUTES[key])
         value
@@ -384,7 +384,7 @@ module Substitutors
           menu = $1
           if (items = $2)
             items = items.gsub ESC_R_SB, R_SB if items.include? R_SB
-            if (delim = items.include?('&gt;') ? '&gt;' : (items.include?(',') ? ',' : nil))
+            if (delim = (items.include? '&gt;') ? '&gt;' : ((items.include? ',') ? ',' : nil))
               submenus = items.split(delim).map {|it| it.strip }
               menuitem = submenus.pop
             else
@@ -427,7 +427,7 @@ module Substitutors
           doc.register :images, target
           attrs['imagesdir'] = doc_attrs['imagesdir']
         end
-        attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
+        attrs['alt'] ||= (attrs['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
         Inline.new(self, :image, nil, type: type, target: target, attributes: attrs).convert
       end
     end
@@ -704,9 +704,9 @@ module Substitutors
 
         target = 'mailto:' + (address = $&)
         # QUESTION should this be registered as an e-mail address?
-        doc.register(:links, target)
+        doc.register :links, target
 
-        Inline.new(self, :anchor, address, type: :link, target: target).convert
+        (Inline.new self, :anchor, address, type: :link, target: target).convert
       end
     end
 
@@ -714,7 +714,7 @@ module Substitutors
       text = text.sub(InlineBiblioAnchorRx) { (Inline.new self, :anchor, $2, type: :bibref, id: $1).convert }
     end
 
-    if (found_square_bracket && text.include?('[[')) || (found_macroish && text.include?('or:'))
+    if (found_square_bracket && (text.include? '[[')) || (found_macroish && (text.include? 'or:'))
       text = text.gsub InlineAnchorRx do
         # honor the escape
         next $&.slice 1, $&.length if $1
@@ -785,7 +785,7 @@ module Substitutors
           else
             fragment = refid
           end
-        else
+        else # rubocop:disable Lint/DuplicateBranch
           fragment = refid
         end
 
@@ -857,18 +857,18 @@ module Substitutors
             index, content = footnote.index, footnote.text
             type, target, id = :xref, id, nil
           elsif content
-            content = restore_passthroughs(normalize_text content, true, true)
-            index = doc.counter('footnote-number')
-            doc.register(:footnotes, Document::Footnote.new(index, id, content))
+            content = restore_passthroughs normalize_text content, true, true
+            index = doc.counter 'footnote-number'
+            doc.register :footnotes, (Document::Footnote.new index, id, content)
             type, target = :ref, nil
           else
             logger.warn %(invalid footnote reference: #{id})
             type, target, content, id = :xref, id, id, nil
           end
         elsif content
-          content = restore_passthroughs(normalize_text content, true, true)
-          index = doc.counter('footnote-number')
-          doc.register(:footnotes, Document::Footnote.new(index, id, content))
+          content = restore_passthroughs normalize_text content, true, true
+          index = doc.counter 'footnote-number'
+          doc.register :footnotes, (Document::Footnote.new index, id, content)
           type = target = nil
         else
           next $&
@@ -908,7 +908,7 @@ module Substitutors
   #
   # Returns the substituted source
   def sub_source source, process_callouts
-    process_callouts ? sub_callouts(sub_specialchars source) : (sub_specialchars source)
+    process_callouts ? (sub_callouts sub_specialchars source) : (sub_specialchars source)
   end
 
   # Public: Substitute callout source references
@@ -917,7 +917,7 @@ module Substitutors
   #
   # Returns the converted String text
   def sub_callouts text
-    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx
+    callout_rx = (attr? 'line-comment') ? CalloutSourceRxMap[attr 'line-comment'] : CalloutSourceRx # rubocop:disable Naming/MethodName
     autonum = 0
     text.gsub callout_rx do
       # honor the escape
@@ -998,7 +998,7 @@ module Substitutors
         end
       elsif negate
         lines.delete entry.to_i
-      elsif !lines.include?(line = entry.to_i)
+      elsif !(lines.include? (line = entry.to_i))
         lines << line
       end
     end
@@ -1142,14 +1142,14 @@ module Substitutors
     passthrus = @passthroughs
     text.gsub PassSlotRx do
       if (pass = passthrus[$1.to_i])
-        subbed_text = apply_subs(pass[:text], pass[:subs])
+        subbed_text = apply_subs pass[:text], pass[:subs]
         if (type = pass[:type])
           if (attributes = pass[:attributes])
             id = attributes['id']
           end
-          subbed_text = Inline.new(self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
+          subbed_text = (Inline.new self, :quoted, subbed_text, type: type, id: id, attributes: attributes).convert
         end
-        subbed_text.include?(PASS_START) ? restore_passthroughs(subbed_text) : subbed_text
+        (subbed_text.include? PASS_START) ? (restore_passthroughs subbed_text) : subbed_text
       else
         logger.error %(unresolved passthrough detected: #{text})
         '??pass??'
@@ -1279,7 +1279,7 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        # NOTE :literal with listparagraph-option gets folded into text of list item later
+        # NOTE block with :literal context and listparagraph-option gets folded into text of list item later
         default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
       when :raw
         # TODO make pass subs a compliance setting; AsciiDoc.py performs :attributes and :macros on a pass block
@@ -1325,9 +1325,9 @@ module Substitutors
     # substitutions are only performed on attribute values if block is not nil
     block = self if opts[:sub_result]
     if (into = opts[:into])
-      AttributeList.new(attrlist, block).parse_into(into, posattrs)
+      (AttributeList.new attrlist, block).parse_into into, posattrs
     else
-      AttributeList.new(attrlist, block).parse(posattrs)
+      (AttributeList.new attrlist, block).parse posattrs
     end
   end
 
@@ -1351,7 +1351,7 @@ module Substitutors
     callout_marks = {}
     autonum = lineno = 0
     last_lineno = nil
-    callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx
+    callout_rx = (attr? 'line-comment') ? CalloutExtractRxMap[attr 'line-comment'] : CalloutExtractRx # rubocop:disable Naming/MethodName
     # extract callout marks, indexed by line number
     source = (source.split LF, -1).map do |line|
       lineno += 1
@@ -1452,8 +1452,8 @@ module Substitutors
   # Internal: Substitute replacement text for matched location
   #
   # returns The String text with the replacement characters substituted
-  def do_replacement m, replacement, restore
-    if (captured = m[0]).include? RS
+  def do_replacement match, replacement, restore
+    if (captured = match[0]).include? RS
       # we have to use sub since we aren't sure it's the first char
       captured.sub RS, ''
     else
@@ -1461,9 +1461,9 @@ module Substitutors
       when :none
         replacement
       when :bounding
-        m[1] + replacement + m[2]
+        match[1] + replacement + match[2]
       else # :leading
-        m[1] + replacement
+        match[1] + replacement
       end
     end
   end

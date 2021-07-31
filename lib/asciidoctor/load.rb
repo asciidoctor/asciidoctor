@@ -49,7 +49,7 @@ module Asciidoctor
         end
       elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])
         # coerce attrs to a real Hash
-        attrs = {}.tap {|accum| attrs.keys.each {|k| accum[k] = attrs[k] } }
+        attrs = {}.tap {|accum| attrs.keys.each {|k| accum[k] = attrs[k] } } # rubocop:disable Style/HashEachMethods
       else
         raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
       end
