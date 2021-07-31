@@ -59,8 +59,8 @@ There are similar attributes to control how additional resources are resolved.
 
 == Updated and deprecated AsciiDoc syntax
 
-Asciidoctor has improved the AsciiDoc syntax to make it more consistent and, in some cases, more concise.
-This section outlines those improvements and how they different from the legacy AsciiDoc supported by AsciiDoc.py.
+As the steward of the AsciiDoc language, Asciidoctor reworked some of the AsciiDoc syntax originally introduced by AsciiDoc.py in an effort to make it more consistent, easier to learn, and, in some cases, more concise.
+This section outlines those improvements to the modern AsciiDoc syntax and how it differs from the legacy AsciiDoc recognized by AsciiDoc.py.
 
 *If a feature or attribute isn't mentioned in the following tables, than it works in Asciidoctor just like it worked in AsciiDoc.py.*
 
@@ -283,6 +283,49 @@ This feature isn't implemented in Asciidoctor, but you can send remarks to the o
  ++++
  endif::[]
 ----
+
+== Compatibility mode
+
+We want to continue to evolve and refine the AsciiDoc syntax, but we also recognize that compatibility is very important.
+That's why Asciidoctor provides a compatibility mode (aka compat mode) with AsciiDoc.py (as well as some inline transitional syntax).
+
+Compat mode will help you either stay with or transition away from the legacy AsciiDoc syntax recognized by AsciiDoc.py to the modern AsciiDoc syntax recognized by Asciidoctor.
+This mode should only be used as a tool to assist with migration, not as a long-term strategy.
+
+If you can't migrate right now, you can activate compat mode by setting the `compat-mode` document attribute in the document header or by passing it to the processor:
+
+ $ asciidoctor -a compat-mode document.adoc
+
+You can also enable compat mode implicitly by beginning the document with an setext-style (i.e., two-line) document title:
+
+[,asciidoc]
+----
+Compat Mode
+===========
+
+ifdef::compat-mode[Compat mode is on!]
+----
+
+When compat mode is enabled, Asciidoctor adapts some of its behavior and its interpretation of AsciiDoc to more closely align with AsciiDoc.py.
+The most noticable difference is that backticks now only indicate monospace text as oppossed to literal monospace.
+Literal monospace is signified using a compound markup that combines an inline passthrough with monospace formatting.
+
+[cols=3*,width=75%]
+|===
+| Feature | Source | Result
+
+| Monospace
+| pass:[`1...10`]
+| `1...10`
+
+| Literal monospace
+| pass:[`+1...10+`]
+| `+1...10+`
+|===
+
+To learn more about the adaptations that are activated by compat mode, refer to <<inline-formatting,inline formatting>>.
+
+If you've written content to be processed with AsciiDoc.py, and you aren't yet ready to migrate, or need to ease into that migration, Asciidoctor's compatibility mode will help ensure that your existing content will continue to work (to the extent possible).
 
 == Configuration files
 
