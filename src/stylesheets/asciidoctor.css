@@ -1161,7 +1161,7 @@ details > summary:first-of-type {
   cursor: pointer;
   display: list-item;
   outline: none;
-  margin-bottom: 0.75em;
+  margin-bottom: 0.625rem;
 }
 
 .admonitionblock td.content > .title,
@@ -2219,7 +2219,8 @@ h1,
 h2,
 p,
 td.content,
-span.alt {
+span.alt,
+summary {
   letter-spacing: -0.01em;
 }
 
@@ -2233,7 +2234,8 @@ p,
 blockquote,
 dt,
 td.content,
-span.alt {
+span.alt,
+summary {
   font-size: 1.0625rem;
 }
 
