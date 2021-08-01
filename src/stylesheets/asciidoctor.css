@@ -202,8 +202,6 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Noto Serif", "DejaVu Serif", serif;
-  font-weight: 400;
-  font-style: normal;
   line-height: 1;
   position: relative;
   cursor: auto;
@@ -344,9 +342,6 @@ a img {
 }
 
 p {
-  font-family: inherit;
-  font-weight: 400;
-  font-size: 1em;
   line-height: 1.6;
   margin-bottom: 1.25em;
   text-rendering: optimizeLegibility;
@@ -445,7 +440,6 @@ code {
 ul,
 ol,
 dl {
-  font-size: 1em;
   line-height: 1.6;
   margin-bottom: 1.25em;
   list-style-position: outside;
@@ -461,7 +455,6 @@ ul li ul,
 ul li ol {
   margin-left: 1.25em;
   margin-bottom: 0;
-  font-size: 1em;
 }
 
 ul.square li ul,
