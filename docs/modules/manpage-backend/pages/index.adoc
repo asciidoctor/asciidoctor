@@ -4,18 +4,66 @@
 :url-docbook-refmisc: https://tdg.docbook.org/tdg/5.0/refmiscinfo.html
 :url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
 
-== Manual page converter
+The AsciiDoc language defines a doctype named `manpage` for composing manual pages (man pages) in AsciiDoc.
+Asciidoctor provides a converter that converts this AsciiDoc structure into a roff-formatted man page.
 
-Asciidoctor's built-in man page converter generates {url-man7}[roff-formatted^] manual pages from AsciiDoc documents.
-
-`manpage`::
-The man page converter generates manual pages for software used on Unix and Unix-like operating systems.
-To use the man page converter, assign `manpage` to the `backend` option.
+This page introduces man pages, examines the AsciiDoc structure of a man page, and shows how to convert it to roff-formatted man page and other formats using Asciidoctor.
 
 == What is a manual page?
 
-A manual page, often abbreviated to man page, is a form of software documentation found on Unix-based operating systems.
-The formalized structure of its content allows the `man` command to present the manual page as a formatted document in a terminal pager.
+A manual page, often abbreviated [.term]_man page_, is a form of software documentation that typically accompanies software on Unix-like operating systems.
+Its formalized structure allows the `man` command to present the man page as a formatted document in a terminal pager.
+
+The benefit of compose a man page in AsciiDoc is that you can convert it to other output formats as well, including HTML and PDF.
+That makes the source of the man page reusable.
+
+[#doctype]
+== manpage doctype
+
+The `manpage` doctype has the following required parts:
+
+Document Header::
+In a man page, the document header is mandatory.
+The doctitle consists of the program name (i.e., progname) followed by the manual volume number in round brackets (e.g., `progname(1)`).
+The doctitle must not contain spaces.
+The volume number is a single digit optionally followed by a single character.
+
+Document Attributes::
+There are several built-in document attributes that impact how the source is parsed and converted when the manpage doctype is in use.
+Refer to the <<document-attributes>> section.
+
+The NAME Section::
+The first section is mandatory, must be titled "`NAME`" (or "`Name`") and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command purpose by a dash character.
+The dash must have at least one space character on either side.
+
+The SYNOPSIS Section::
+The second section is recommended and, if present, must be titled "`SYNOPSIS`" (or "`Synopsis`").
+
+Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`BUGS REPORTS`", "`AUTHORS`" and "`COPYRIGHT`".
+
+Here's an example man page composed in AsciiDoc for the `eve` command.
+Notice that it declares the `manpage` doctype and adheres to the aforementioned structure.
+
+.progname.adoc
+[,asciidoc]
+----
+include::example$manpage.adoc[]
+----
+
+Although the source document is named [.path]_progname.adoc_, you can name it whatever you like.
+The output filename is determined by the `manname` and `manvolnum` attributes implicitly defined by the doctitle.
+In this example, the output filename is [.path]_eve.1_.
+
+== manpage backend and converter
+
+Asciidoctor provides a built-in manpage converter to generate {url-man7}[roff-formatted^] man pages from AsciiDoc documents that declare and adhere to the manpage doctype.
+This converter is bound to the `manpage` backend (not to be confused with the `manpage` document).
+
+The manpage converter is typically used to generate man pages that accompanies software on Unix-like operating systems.
+In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated this way from {url-manpage-raw}[this AsciiDoc source].
+
+To use the manpage converter, assign `manpage` to the `backend` option.
+The manpage converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document (e.g., `progname(1)`).
 
 == Generate a man page with the manpage converter
 
@@ -23,28 +71,22 @@ Before running Asciidoctor, make sure your source document adheres to the <<doct
 
 To generate a man page, run:
 
- $ asciidoctor -b manpage source.adoc
-
-The manpage converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document.
+ $ asciidoctor -b manpage progname.adoc
 
 When converting to the man page format, Asciidoctor uppercases the titles of all level-0 and level-1 sections.
-This saves you from having to type section titles in all uppercase.
-It also makes the document portable to other output formats since this style is only needed in the man page output to align with conventions.
+This saves you from having to type section titles in all uppercase in the source document.
+It also makes the document portable to other output formats since this style is only used for the man page output to align with conventions.
+If the titles are uppercased in the source, that casing ends up getting used in all output formats.
 
-CAUTION: If you're using Ruby 2.4 or greater, Asciidoctor will uppercase any letter in the title that is recognized by the Unicode specification as having an uppercase equivalent (which includes non-Latin letters).
-Prior to Ruby 2.4, Ruby could only uppercase Latin letters.
+CAUTION: Prior to Ruby 2.4, Ruby could only uppercase Latin letters.
+If you're using Ruby 2.4 or greater, Asciidoctor will uppercase any letter in the title that's recognized by the Unicode specification as having an uppercase equivalent, which extends beyond Latin letters.
 
-Asciidoctor can also produce HTML and PDF versions similar to the `manpage` output for viewing in other contexts.
-To see the man page in HTML, run:
+Recall that you're not limited to using the manpage converter to convert an AsciiDoc document that uses the `manpage` doctype.
+You can just as well convert it to HTML, as shown here.
 
- $ asciidoctor source.adoc
+ $ asciidoctor progname.adoc
 
-Here is an example man page composed in AsciiDoc for the `eve` command:
-
-[source,asciidoc]
-----
-include::example$manpage.adoc[]
-----
+The structure of the source document is still enforced, but the output document will look like the output of any other AsciiDoc document.
 
 == Convert the man page to PostScript or PDF
 
@@ -59,7 +101,11 @@ Alternately, you can redirect the output of the `man` command to `ps2pdf` to fur
 
  $ man -t ./progname.1 | ps2pdf - progname.pdf
 
-Using these same commands, you can convert Asciidoctor's own man page to PDF:
+Let's now convert the example from earlier to PDF in this way:
+
+ $ man -t ./eve.1 | ps2pdf - eve.pdf
+
+Using the same sequence of commands, you can convert Asciidoctor's own man page to PDF:
 
  $ asciidoctor -h manpage | man -t -l - | ps2pdf - asciidoctor.pdf
 
@@ -67,28 +113,10 @@ In this case, the `-l -` reads the man page content generated by the help mode o
 
 Keep in mind that the files in this section are not generated using Asciidoctor.
 If you want to generate PDF files directly from Asciidoctor, you may be interested in checking out https://github.com/asciidoctor/asciidoctor-pdf[Asciidoctor PDF^].
+Another approach is to convert the AsciiDoc document to DocBook using the built-in DocBook converter (e.g., `-b docbook`), then convert that document to PDF using the DocBook toolchain.
 
-[#doctype]
-== Man page doctype
-
-The `manpage` doctype has the following required parts:
-
-Document Header::
-A manpage document header is mandatory.
-The title line contains the man page name followed immediately by the manual section number in round brackets.
-The title name should not contain white space.
-The manual section number is a single digit optionally followed by a single character.
-
-The NAME Section::
-The first manpage section is mandatory, must be titled "`NAME`" and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command purpose by a dash character.
-The dash must have at least one white space character on either side.
-
-The SYNOPSIS Section::
-The second manpage section is mandatory and must be titled "`SYNOPSIS`".
-
-Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`BUGS REPORTS`", "`AUTHORS`" and "`COPYRIGHT`".
-
-== Man page attributes
+[#document-attributes]
+== manpage document attributes
 
 Several built-in document attributes only affect man pages.
 These attributes must be set in the document header.
@@ -118,7 +146,7 @@ These attributes must be set in the document header.
 |Style the links in the manpage output.
 A valid link format sequence.
 // Needs a reference to this.
-|blue R <>
+|[.pre-wrap]#blue R < >#
 
 |`mansource`
 |The source to which the manpage pertains.
@@ -130,7 +158,7 @@ When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^]
 Defaults to revnumber if not specified.
 When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^] attribute and appears in the footer.
 Not used by Asciidoctor.
-|1.5.4
+|{release-version}
 
 |`manmanual`
 |Manual name.
@@ -138,6 +166,8 @@ When producing DocBook, it becomes a DocBook {url-docbook-refmisc}[refmiscinfo^]
 |Asciidoctor Manual
 |===
 
+== See also
+
 Refer to {url-manpage-raw}[the AsciiDoc source of the Asciidoctor man page^] to see a complete example.
-The manual page for Asciidoctor is produced using the `manpage` converter.
-The manual pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.
+The man page for Asciidoctor is produced using the `manpage` converter.
+The man pages for git are also produced from AsciiDoc documents, so you can use those as another example to follow.
