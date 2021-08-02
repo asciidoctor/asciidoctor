@@ -3,7 +3,8 @@
   "description": "Compiles the default stylesheet for the built-in HTML converter.",
   "dependencies": {
     "cssnano": "~5.0",
-    "postcss": "~8.2",
+    "package.json": "^2.0.1",
+    "postcss": "~8.3",
     "postcss-cli": "~8.3",
     "stylelint": "~13.13",
     "stylelint-config-standard": "~22.0"
