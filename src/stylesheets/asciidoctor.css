@@ -3,7 +3,6 @@
 /* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
 html {
   font-family: sans-serif;
-  -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -178,8 +177,6 @@ table {
 *,
 ::before,
 ::after {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -631,7 +628,6 @@ h6 strong {
   padding: 0.1em 0.5ex;
   word-spacing: -0.15em;
   background: #f7f7f8;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   line-height: 1.45;
   text-rendering: optimizeSpeed;
@@ -681,9 +677,7 @@ kbd {
   line-height: 1.45;
   background: #f7f7f7;
   border: 1px solid #ccc;
-  -webkit-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em #fff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em #fff inset;
   margin: 0 0.15em;
   padding: 0.2em 0.5em;
@@ -811,11 +805,7 @@ body.toc2 #header > h1:nth-last-child(2) {
   padding-bottom: 0.25em;
   padding-left: 0.25em;
   color: rgba(0, 0, 0, 0.6);
-  display: -ms-flexbox;
-  display: -webkit-flex;
   display: flex;
-  -ms-flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
 }
 
@@ -995,7 +985,6 @@ body.toc2 #header > h1:nth-last-child(2) {
   margin-bottom: 1.25em;
   padding: 1.25em;
   background: #f8f8f7;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
 }
 
@@ -1245,7 +1234,6 @@ table.tableblock.fit-content > caption.title {
   margin-bottom: 1.25em;
   padding: 1.25em;
   background: #fff;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
 }
 
@@ -1262,7 +1250,6 @@ table.tableblock.fit-content > caption.title {
   margin-bottom: 1.25em;
   padding: 1.25em;
   background: #f3f3f2;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
 }
 
@@ -1293,7 +1280,6 @@ table.tableblock.fit-content > caption.title {
 
 .literalblock pre,
 .listingblock > .content > pre {
-  -webkit-border-radius: 4px;
   border-radius: 4px;
   overflow-x: auto;
   padding: 1em;
@@ -1364,7 +1350,6 @@ table.tableblock.fit-content > caption.title {
 
 .listingblock pre.highlightjs > code {
   padding: 1em;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
 }
 
@@ -1767,11 +1752,7 @@ ul.checklist > li > p:first-child > input[type=checkbox]:first-child {
 }
 
 ul.inline {
-  display: -ms-flexbox;
-  display: -webkit-box;
   display: flex;
-  -ms-flex-flow: row wrap;
-  -webkit-flex-flow: row wrap;
   flex-flow: row wrap;
   list-style: none;
   margin: 0 0 0.625em -1.25em;
@@ -1864,7 +1845,6 @@ td.hdlist2 {
   line-height: 0;
   display: inline-block;
   border: 4px solid #fff;
-  -webkit-box-shadow: 0 0 0 1px #ddd;
   box-shadow: 0 0 0 1px #ddd;
 }
 
@@ -2176,7 +2156,6 @@ a span.icon > .fa {
   display: inline-block;
   color: #fff !important;
   background: rgba(0, 0, 0, 0.8);
-  -webkit-border-radius: 50%;
   border-radius: 50%;
   text-align: center;
   font-size: 0.75em;
@@ -2258,7 +2237,6 @@ p.tableblock {
 .exampleblock > .content {
   background: #fffef7;
   border-color: #e0e0dc;
-  -webkit-box-shadow: 0 1px 4px #e0e0dc;
   box-shadow: 0 1px 4px #e0e0dc;
 }
 
@@ -2272,7 +2250,6 @@ p.tableblock {
 
 @media print {
   * {
-    -webkit-box-shadow: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
   }
