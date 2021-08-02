@@ -1,5 +1,6 @@
 module.exports = (ctx) => ({
   plugins: {
+    autoprefixer: true,
     cssnano: {
       // refer to https://cssnano.co/docs/optimisations to understand this preset
       preset: [

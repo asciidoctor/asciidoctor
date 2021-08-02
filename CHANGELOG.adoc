@@ -49,6 +49,7 @@ Improvements::
 Infrastructure::
 
   * Import source of default stylesheet into this repository; use PostCSS with cssnano to minify (#4062)
+  * Use autoprefixer to manage browser prefixes in default stylesheet (#4118)
 
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
