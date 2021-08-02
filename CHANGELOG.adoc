@@ -26,6 +26,7 @@ Bug Fixes::
   * Use automatic link text if ID in shorthand xref is followed by dangling comma (e.g., `+<<idname,>>+`)
   * Update default stylesheet to indent blocks attached to list item in checklist (#2550)
   * Update default stylesheet to reenable styling of implicit lead role on first paragraph of preamble inside AsciiDoc table cell
+  * Update default stylesheet to fix conflict between text decoration and bottom border on abbr[title] element
   * Change invalid font family "sans" in default stylesheet to "sans-serif"
   * Fix missing automatic reftext for internal xrefs in manpage output (#4110)
   * Replace numeric character reference for plus in manpage output
