@@ -25,13 +25,19 @@ h1 {
   margin: 0.67em 0;
 }
 
-abbr[title] {
-  border-bottom: 1px dotted;
-}
-
 b,
 strong {
   font-weight: bold;
+}
+
+abbr {
+  font-size: 0.9em;
+}
+
+abbr[title] {
+  cursor: help;
+  border-bottom: 1px dotted #dddddf;
+  text-decoration: none;
 }
 
 dfn {
@@ -474,19 +480,6 @@ dl dt {
 
 dl dd {
   margin-bottom: 1.25em;
-}
-
-abbr,
-acronym {
-  text-transform: uppercase;
-  font-size: 90%;
-  color: rgba(0, 0, 0, 0.8);
-  border-bottom: 1px dotted #ddd;
-  cursor: help;
-}
-
-abbr {
-  text-transform: none;
 }
 
 blockquote {
@@ -2305,6 +2298,10 @@ p.tableblock {
     display: inline-block;
     font-size: 0.875em;
     padding-left: 0.25em;
+  }
+
+  abbr[title] {
+    border-bottom: 1px dotted;
   }
 
   abbr[title]::after {
