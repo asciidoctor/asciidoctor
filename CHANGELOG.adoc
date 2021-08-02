@@ -46,6 +46,10 @@ Improvements::
   * Add Vietnamese translation of built-in attributes (PR #4066) (*@nguyenhoa93*)
   * Add Thai translation of built-in attributes (PR #4113) (*@ammaneena*)
 
+Infrastructure::
+
+  * Import source of default stylesheet into this repository; use PostCSS with cssnano to minify (#4062)
+
 // tag::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 
