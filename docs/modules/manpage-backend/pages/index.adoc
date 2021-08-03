@@ -2,7 +2,7 @@
 :navtitle: Generate Manual Pages
 :url-man7: https://man7.org/linux/man-pages/man7/roff.7.html
 :url-docbook-refmisc: https://tdg.docbook.org/tdg/5.0/refmiscinfo.html
-:url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/man/asciidoctor.adoc
+:url-manpage-raw: https://raw.githubusercontent.com/asciidoctor/asciidoctor/v{release-version}/man/asciidoctor.adoc
 
 The AsciiDoc language defines a doctype named `manpage` for composing manual pages (man pages) in AsciiDoc.
 Asciidoctor provides a converter that converts this AsciiDoc structure into a roff-formatted man page.
