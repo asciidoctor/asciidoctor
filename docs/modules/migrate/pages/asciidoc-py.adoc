@@ -2,7 +2,6 @@
 :url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-manpage: {url-project}/man/asciidoctor
-//:uri-diffs: {uri-home}/docs/asciidoc-asciidoctor-diffs/
 
 AsciiDoc.py is the original and legacy Python-based processor for the AsciiDoc language.
 It has been superseded by Asciidoctor.
