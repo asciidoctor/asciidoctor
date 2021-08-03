@@ -200,11 +200,11 @@ In source listings, is the callout the last thing on the line?
 |#book-parts-and-chapters#
 
 |<docname> malformed manpage title
-|Invalid manpage document structure.
+|Document does not conform to the structure required by the declared manpage doctype.
 |#man-pages#
 
 |<docname> malformed name section body
-|Invalid manpage document structure.
+|Document does not conform to the structure required by the declared manpage doctype.
 |#man-pages#
 
 |<docname> maximum include depth of 64 exceeded
@@ -216,11 +216,11 @@ In source listings, is the callout the last thing on the line?
 |#ifdef-directive#
 
 |<docname> name section expected
-|Invalid manpage document structure.
+|Document does not conform to the structure required by the declared manpage doctype.
 |#man-pages#
 
 |<docname> name section title must be at level 1
-|Invalid manpage document structure.
+|Document does not conform to the structure required by the declared manpage doctype.
 |#man-pages#
 
 |<docname> only book doctypes can contain level 0 sections

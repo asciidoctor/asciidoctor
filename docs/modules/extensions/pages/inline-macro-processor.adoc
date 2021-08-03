@@ -2,7 +2,7 @@
 :navtitle: Inline Macro Processor
 
 Purpose::
-Create an inline macro named `man` that links to a manpage.
+Create an inline macro named `man` that links to another man page.
 
 == sample-with-man-link.adoc
 

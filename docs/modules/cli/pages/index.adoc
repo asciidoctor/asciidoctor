@@ -1,5 +1,5 @@
 = Process AsciiDoc Using the CLI
-:url-manpage: https://github.com/asciidoctor/asciidoctor/blob/v{release-version}/man/asciidoctor.adoc
+:url-asciidoctor-1: https://github.com/asciidoctor/asciidoctor/blob/v{release-version}/man/asciidoctor.adoc
 
 ////
 command-line-usage.adoc
@@ -36,4 +36,4 @@ You can generate the full documentation (i.e., man page) for the `asciidoctor` c
 
  $ asciidoctor --help manpage | man -l -
 
-You can find the AsciiDoc source for the {url-manpage}[Asciidoctor man page^] online in the Asciidoctor repository, which you can preview in a browser.
+You can find the AsciiDoc source for the {url-asciidoctor-1}[Asciidoctor man page^] online in the Asciidoctor repository, which you can preview in a browser.

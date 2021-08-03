@@ -26,7 +26,7 @@ _**Release date:** 2021.04.27_
 
 == Improvements
 
-* Format keyboard references in monospace in manpage output
+* Format keyboard references in monospace in man page output
 
 == Build and infrastructure
 
@@ -70,20 +70,20 @@ _**Release date:** 2021.04.10_
 * Honor list of tags following negated wildcard on include directive (#3932)
 * Update default stylesheet to remove the dash in front of cite on nested quote block (#3847)
 * Don't mangle formatting macros when uppercasing section titles in man page output (#3892)
-* Don't escape hyphen in `manname` in manpage output
-* Remove extra `.sp` line before content of verse block in manpage output
-* Fix layout of footnotes in manpage output (#3989)
-* Fix formatting of footnote text with URL in manpage output (#3988)
+* Don't escape hyphen in `manname` in man page output
+* Remove extra `.sp` line before content of verse block in man page output
+* Fix layout of footnotes in man page output (#3989)
+* Fix formatting of footnote text with URL in man page output (#3988)
 * Remove redundant trailing space on URL followed by non-adjacent text in man page output (#4004)
-* Use `.bp` macro at location of page break in manpage output (#3992)
+* Use `.bp` macro at location of page break in man page output (#3992)
 
 == Improvements
 
 * Extract method to create lexer and formatter in Rouge adapter (#3953) (*@Oblomov*)
 * Add support for pygments.rb 2.x (#3969) (*@slonopotamus*)
 * Allow `NullLogger` to be enabled by setting the `:logger` option to a falsy value (#3982)
-* Substitute attributes in manpurpose part of NAME section in manpage doctype (#4000)
-* Output all mannames in name section of HTML output for manpage doctype (#3757)
+* Substitute attributes in manpurpose part of NAME section in man page doctype (#4000)
+* Output all mannames in name section of HTML output for man page doctype (#3757)
 
 == Build and infrastructure
 
@@ -137,7 +137,7 @@ _**Release date:** 2020.11.02_
 == Bug fixes
 
 * Fix infinite loop when callout list with obsolete syntax is found inside list item (#3472)
-* Fix infinite loop when xreftext contains a circular reference path in HTML and manpage converters (#3543)
+* Fix infinite loop when xreftext contains a circular reference path in HTML and man page converters (#3543)
 * Apply text formatting to table cells in implicit header row when column has the `a` or `l` style (#3760)
 * Fix errant reference warning for valid reference when running in compat mode (#3555)
 * Initialize backend traits for converter (if not previously initialized) using assigned basebackend; mimics Asciidoctor < 2 behavior (#3341)
@@ -153,14 +153,14 @@ _**Release date:** 2020.11.02_
 * Remove excess hard line break in multi-line AsciiMath blocks (#3407)
 * Only strip trailing spaces from lines of AsciiDoc include file (#3436)
 * Remove errant optional flag in regexp for menu macro that breaks Asciidoctor.js (#3433)
-* Preserve repeating backslashes when generating manpage output (#3456)
+* Preserve repeating backslashes when generating man page output (#3456)
 * Honor percentage width specified on macro of inline SVG (#3464)
 * Removing leading and trailing blank lines in AsciiDoc include file to match assumption of parser (#3470)
 * Activate extensions when `:extensions` option is set, even if Extensions API is not yet loaded (#3570)
 * Don't activate global extensions if `:extensions` option is `false` (#3570)
-* Escape ellipsis at start of line in manpage output (#3645) (*@jnavila*)
+* Escape ellipsis at start of line in man page output (#3645) (*@jnavila*)
 * Don't register footnote with ID if a footnote is already registered with that ID (#3690)
-* Honor `start` attribute on ordered list in manpage output (#3714)
+* Honor `start` attribute on ordered list in man page output (#3714)
 * Warn instead of crashing if SVG to inline is empty (#3638) (*@mogztter*)
 * Compute highlight line ranges on source block relative to value of `start` attribute (#3519) (*@mogztter*)
 * Prevent collapsible block from incrementing example number by assigning an empty caption (#3639)
@@ -189,7 +189,7 @@ _**Release date:** 2020.11.02_
 * Allow `nobreak` and `nowrap` roles to be used on any inline element (#3544)
 * Add CSS class to support `pre-wrap` role to preserve leading, trailing, and repeating spaces in phrase (#3815)
 * Preserve guard around XML-style callout when icons are not enabled (#3319)
-* Use `.fam C` command to switch font family for verbatim blocks to monospaced text in manpage output (#3561)
+* Use `.fam C` command to switch font family for verbatim blocks to monospaced text in man page output (#3561)
 * Remove redundant test for `halign` and `valign` attributes on table cell in DocBook converter
 * Allow encoding of include file to be specified using `encoding` attribute (#3248)
 * Allow template to be used to override outline by only specifying the outline template (#3491)
@@ -393,7 +393,7 @@ _**Release date:** 2019.03.22_
 * If the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
 * Never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
 * Encode characters in URI to comply with RFC-3986
-* Implement full support for styled xreftext in manpage converter (#3077)
+* Implement full support for styled xreftext in man page converter (#3077)
 * Allow the `id` and `role` properties to be set on a list item of ordered and unordered lists via the API (#2840)
 * Yield processor instance to registration block for document processor if block has non-zero arity (i.e., has parameters)
 * Add `Document#parsed?` method to check whether document has been parsed
