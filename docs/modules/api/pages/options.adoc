@@ -18,9 +18,9 @@ String: +
 `'name=value'`
 
 |`:backend`
-|Selects the converter to use.
+|Selects converter to use.
 |`html5`
-|`html5`, `docbook5`, `manpage`, or a backend registered through an active converter
+|`html5`, `docbook5`, `manpage`, or a backend mapped to an available converter
 
 |`:base_dir`
 |Sets the base (aka working) directory containing the document and resources.
