@@ -1,7 +1,7 @@
 = Migrate from AsciiDoc.py
 :url-tests: {url-org}/asciidoctor/tree/master/test
 :url-doctest: {url-org}/asciidoctor-doctest
-:url-manpage: {url-project}/man/asciidoctor
+:url-asciidoctor-1: {url-project}/man/asciidoctor
 
 AsciiDoc.py is the original and legacy Python-based processor for the AsciiDoc language.
 It has been superseded by Asciidoctor.
@@ -392,7 +392,7 @@ If you want to view the plaintext version with Asciidoctor, you can route the ou
 
  $ asciidoctor --help manpage | man -l - | col -bx
 
-Alternately, you can view the manpage for Asciidoctor online at {url-manpage}[asciidoctor(1)].
+Alternately, you can view the man page for Asciidoctor online at {url-asciidoctor-1}[asciidoctor(1)].
 
 ////
 This content needs to be move to the specific subject docs pages if applicable
