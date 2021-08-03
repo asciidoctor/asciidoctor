@@ -15,7 +15,8 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
-== Unreleased
+// tag::compact[]
+== 2.0.16 (2021-08-03) - @mojavelinux
 
 Bug Fixes::
 
@@ -51,7 +52,7 @@ Build / Infrastructure::
   * Import source of default stylesheet into this repository; use PostCSS with cssnano to minify (#4062)
   * Use autoprefixer to manage browser prefixes in default stylesheet (#4118)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 
 Bug Fixes::
@@ -72,7 +73,6 @@ Build / Infrastructure::
 
   * Get remaining invoker tests working on JRuby 9.1 for Windows
 
-// end::compact[]
 == 2.0.14 (2021-04-19) - @mojavelinux
 
 Bug Fixes::
