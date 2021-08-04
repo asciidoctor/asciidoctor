@@ -37,13 +37,14 @@ There are several built-in document attributes that impact how the source is par
 Refer to the <<document-attributes>> section.
 
 The NAME Section::
-The first section is mandatory, must be titled "`NAME`" (or "`Name`") and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command purpose by a dash character (e.g., `progname - does stuff`).
+The first section is mandatory, must be titled "`Name`" (or "`NAME`") and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command purpose by a dash character (e.g., `progname - does stuff`).
 The dash must have at least one space character on either side.
 
 The SYNOPSIS Section::
-The second section is recommended and, if present, must be titled "`SYNOPSIS`" (or "`Synopsis`").
+The second section is recommended and, if present, must be titled "`Synopsis`" (or "`SYNOPSIS`").
 
-Subsequent sections are optional, but typical sections include "`SEE ALSO`", "`BUGS REPORTS`", "`AUTHORS`" and "`COPYRIGHT`".
+Subsequent sections are optional, but typical sections include "`Description`", "`Options`", "`Bugs`", "`See Also`", "`Copyright`", and "`Author`".
+You can write the section titles in all uppercase, but it's better to let the man page converter handle that for you.
 
 TIP: Since the structure required by the `manpage` doctype is standard AsciiDoc, you can opt to declare the `manpage` doctype at runtime.
 When the `doctype` attribute is not set, Asciidoctor will parse the document as an article and not give it any special treatment.
