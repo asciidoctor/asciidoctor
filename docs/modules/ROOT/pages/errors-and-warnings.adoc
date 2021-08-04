@@ -1,23 +1,15 @@
 = Errors and Warnings
 
-////
-um anchor: appendix#app-messages
-
-Only includes the CLI. asciidoctorj and the asciidoctor API are not included.
-When there are enough documented, maybe add another table for them. Although these users are programmers-wouldn't they just run it in the debugger?
-
-Testing was carried out with
-Asciidoctor 1.5.5 [https://asciidoctor.org]
-Runtime Environment (ruby 2.3.1p112 (2016-04-26) [i386-linux-gnu]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
-////
-
-All warning, error, and failure messages emitted by the Asciidoctor CLI are written to the console via stderr (i.e., standard error).
-Most messages also apply to the API, but they're written directly to stderr.
+All application messages (i.e., info, warning, error, or failure) emitted by Asciidoctor a written to the logger.
+When using the CLI, the logger routes messages to the console via stderr (i.e., standard error).
 
 == Notification types
 
+<<info,INFO>>::
+Info messages do not stop conversion, but they indicate possible problems, and the output may not be what you were expecting.
+
 <<warning,WARNING>>::
-Warnings do not stop conversion, but they indicate possible problems, and the output may not be what you were expecting.
+Warnings do not stop conversion, but they indicate likely problems, and the output probably won't be what you were expecting.
 
 <<error,ERROR>>::
 Errors do not stop conversion, but the output document will almost certainly be wrong.
@@ -34,10 +26,23 @@ Represents the basename of the source file being processed (e.g., `sample.adoc`)
 Represents a path to the input file or other referenced file.
 
 <uri>::
-Represents a URI being referenced.
+Represents a URI (i.e., URL) being referenced.
 
 <x> or <y>::
 Placeholders for other contextual information in the message.
+
+[#info]
+== Info messages
+
+[cols=2*]
+|===
+|Message |Troubleshooting
+
+|possible invalid reference: <x>
+|The processor could not validate the internal reference named <x>.
+This message doesn't definitively indicate a missing reference.
+Rather, it indicates the reference (i.e., anchor) is not in a location where the reference can be validated.
+|===
 
 [#warning]
 == Warning messages
@@ -50,13 +55,15 @@ Placeholders for other contextual information in the message.
 |Invalid book document structure.
 
 |cannot retrieve contents of <x> at URI: <uri> (allow-uri-read attribute not enabled)
-|Reading from a URI is only allowed in certain safe modes and the allow-uri-read attribute must be passed to the application.
+|Reading from a URI is only allowed if the allow-uri-read attribute is set from the CLI or API.
 
 |could not retrieve contents of <x> at URI: <uri>
 |Web address not found.
 
 |could not retrieve image data from URI: <uri>
-|Web address not found. Only occurs with `allow-uri-read` and `data-uri`. Check the URI.
+|Web address not found.
+Only occurs with `allow-uri-read` and `data-uri`.
+Check the URI.
 
 |dropping line containing reference to missing attribute: <x>
 |An attribute cannot be resolved and the `attribute-missing` attribute is set to `drop-line`.
@@ -64,11 +71,11 @@ Placeholders for other contextual information in the message.
 |file does not exist or cannot be read: <file>
 |You specified a stylesheet (`-a stylesheet=<file>`) but <file> does not exist or is not readable.
 
-|gem 'thread_safe' is not installed. This gem is recommended when registering custom converters.
-|You have registered a custom converter, and you have not installed the thread_safe gem.
+|gem 'concurrent-ruby' is not installed. This gem is recommended when registering custom converters.
+|You have registered a custom converter, and you have not installed the concurrent-ruby gem.
 
-|gem 'thread_safe' is not installed. This gem is recommended when using custom backend templates.
-|You are using custom templates (`-T <template_dir>`), but you have not installed the thread_safe gem.
+|gem 'concurrent-ruby' is not installed. This gem is recommended when using custom backend templates.
+|You are using custom templates (`-T <template_dir>`), but you have not installed the concurrent-ruby gem.
 
 |image to embed not found or not readable: <file>
 |You used `:data-uri:` but the file could not be found.
@@ -80,10 +87,10 @@ Placeholders for other contextual information in the message.
 |The path is not a file (perhaps it is a socket or a block device).
 
 |optional gem 'asciimath' is not installed. Functionality disabled.
-|asciimath is one of the libraries used for equations.
+|asciimath is a required library when converting AsciiMath expressions in AsciiDoc to DocBook.
 
-|optional gem 'coderay' is not installed. Functionality disabled.
-|CodeRay is used for source code highlighting.
+|optional gem 'rouge' is not installed. Functionality disabled.
+|Rouge is used for source code highlighting when `source-highlighter` is set to `rouge`.
 
 |skipping reference to missing attribute: <x>
 |An attribute cannot be resolved and the `attribute-missing` attribute is set to `skip`.
@@ -106,7 +113,8 @@ If you don't see the problem in <docname>, check that the duplicate ID isn't com
 If it is a URI and `-a allow-uri-read` is set, does it exist?
 
 |<docname> include file not found: <file>
-|Probably a typo or missing file. If not, make sure you understand the search process.
+|Probably a typo or missing file.
+If not, make sure you understand the search process.
 
 |<docname> invalid empty <x> detected in style attribute
 |The first positional attribute in the block attributes could not be parsed.
@@ -118,7 +126,8 @@ If it is a URI and `-a allow-uri-read` is set, does it exist?
 |You have a line `[<name-of-style>]` before a paragraph, but `name-of-style` isn't a recognized built-in style.
 
 |<docname> list item index: expected <x>, got <y>
-|You gave explicit numbers on an ordered list, but they were not sequential. Asciidoctor renumbers them for you, and gives this warning.
+|You gave explicit numbers on an ordered list, but they were not sequential.
+Asciidoctor renumbers them for you, and gives this warning.
 
 |<docname> multiple ids detected in style attribute
 |Multiple IDs cannot be specified in the block style (e.g., `[#cat#dog]`).
@@ -128,7 +137,8 @@ If it is a URI and `-a allow-uri-read` is set, does it exist?
 In source listings, is the callout the last thing on the line?
 
 |<docname> section title out of sequence
-|Invalid document structure. Check section levels.
+|Invalid document structure.
+Check section levels.
 |===
 
 [#error]
@@ -202,7 +212,7 @@ In source listings, is the callout the last thing on the line?
 //|
 
 |'tilt' could not be loaded
-|You must have the tilt gem installed (`gem install tilt`) to use custom backend templates
+|You must have the tilt gem installed (`gem install tilt`) to use custom templates.
 |===
 
 ////
