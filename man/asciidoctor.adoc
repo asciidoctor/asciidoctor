@@ -4,7 +4,6 @@ Dan Allen; Sarah White; Ryan Waldron
 :release-version: 2.0.16
 :man manual: Asciidoctor Manual
 :man source: Asciidoctor {release-version}
-:page-layout: base
 
 == NAME
 
