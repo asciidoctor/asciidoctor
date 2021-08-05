@@ -192,5 +192,5 @@ Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/ascii
 
 == COPYING
 
-Copyright \(C) 2012-present Dan Allen, Ryan Waldron, and the Asciidoctor Project.
-Free use of this software is granted under the terms of the MIT License.
+Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
+Use of this software is granted under the terms of the MIT License.
