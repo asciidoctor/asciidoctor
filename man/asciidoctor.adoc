@@ -185,13 +185,15 @@ Jason Porter wrote the first implementation of the CLI interface provided by thi
 
 == RESOURCES
 
-*Project web site:* https://asciidoctor.org
+*Project website:* https://asciidoctor.org
 
-*Git source repository on GitHub:* https://github.com/asciidoctor/asciidoctor
+*Project documentation:* https://docs.asciidoctor.org
 
-*GitHub organization:* https://github.com/asciidoctor
+*Source repository:* https://github.com/asciidoctor/asciidoctor
 
-*Discussion list / forum:* http://discuss.asciidoctor.org
+*Community chat:* https://asciidoctor.zulipchat.com
+
+*Discussion list:* https://discuss.asciidoctor.org
 
 == COPYING
 
