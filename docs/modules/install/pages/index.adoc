@@ -9,7 +9,7 @@ In addition to running on Ruby, Asciidoctor can be executed on a JVM using xref:
 Asciidoctor can be installed using:
 
 * package managers for popular Linux distributions,
-* Homebrew for macOS,
+* Homebrew or MacPorts for macOS,
 * the `gem install` command (recommended for Windows users or if you'll be installing additional gems),
 * the Asciidoctor Docker image, or
 * Bundler.
