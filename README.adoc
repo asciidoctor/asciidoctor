@@ -200,9 +200,10 @@ To install the package, open a terminal and type:
 
 ==== Homebrew
 
-You can use Homebrew, the macOS package manager, to install Asciidoctor.
-If you don’t have Homebrew on your computer, complete the installation instructions at https://brew.sh/[brew.sh] first.
-Once Homebrew is installed, you’re ready to install the `asciidoctor` gem.
+You can use https://brew.sh[Homebrew], the macOS package manager, to install Asciidoctor.
+If you don't have Homebrew on your computer, complete the https://brew.sh[installation instructions] first.
+
+Once Homebrew is installed, you're ready to install the `asciidoctor` gem.
 Open a terminal and type:
 
  $ brew install asciidoctor
@@ -211,7 +212,11 @@ Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independ
 
 ==== MacPorts
 
-Asciidoctor is also available on https://ports.macports.org/port/asciidoctor/[MacPorts]:
+You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.
+If you don't have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.
+
+Once MacPorts is installed, you're ready to install the `asciidoctor` gem via the https://ports.macports.org/port/asciidoctor/[Asciidoctor port].
+Open a terminal and type:
 
  $ sudo port install asciidoctor
 
@@ -303,6 +308,13 @@ To upgrade the gem, use:
 
  $ brew update
  $ brew upgrade asciidoctor
+ 
+=== MacPorts (macOS)
+
+To upgrade the gem, use:
+
+ $ sudo port selfupdate
+ $ sudo port upgrade asciidoctor
 
 === gem install
 
@@ -315,13 +327,6 @@ When you install a new version of the gem using `gem install`, you end up with m
 Use the following command to remove the old versions:
 
  $ gem cleanup asciidoctor
- 
-=== MacPorts (macOS)
-
-To upgrade the gem, use:
-
- $ sudo port selfupdate
- $ sudo port upgrade asciidoctor
 
 == Usage
 
