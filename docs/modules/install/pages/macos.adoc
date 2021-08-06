@@ -1,7 +1,10 @@
 = Install on macOS
 :url-homebrew: https://brew.sh/
+:url-macports: https://ports.macports.org/port/asciidoctor/
 
-== Install with Homebrew
+== Homebrew
+
+=== Install
 
 You can use Homebrew, the macOS package manager, to install Asciidoctor.
 If you don't have Homebrew on your computer, complete the installation instructions at {url-homebrew}[brew.sh^] first.
@@ -15,9 +18,24 @@ Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independ
 
 include::partial$success.adoc[]
 
-== Upgrade with Homebrew
+=== Upgrade
 
 To upgrade the gem, open a terminal and type:
 
  $ brew update
  $ brew upgrade asciidoctor
+
+== MacPorts
+
+Asciidoctor is also available on {url-macports}[MacPorts]:
+
+ $ sudo port install asciidoctor
+
+include::partial$success.adoc[]
+
+=== Upgrade
+
+To upgrade the gem, open a terminal and type:
+
+ $ sudo port selfupdate
+ $ sudo port upgrade asciidoctor

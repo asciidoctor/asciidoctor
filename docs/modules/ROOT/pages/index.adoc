@@ -16,7 +16,7 @@ When we say Asciidoctor in this section of the documentation, we're specifically
 
 To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}/asciidoctor[RubyGem named asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
-Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew).
+Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew and MacPorts).
 
 Asciidoctor is open source software available under the terms of the MIT license and {url-org}[hosted on GitHub^].
 

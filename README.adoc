@@ -154,7 +154,7 @@ Asciidoctor works best when you use UTF-8 everywhere.
 
 Asciidoctor is packaged and distributed to RubyGems.org as a RubyGem (aka gem) named {url-rubygem}[asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
-Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew).
+Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew and MacPorts).
 
 === Linux package managers
 
@@ -196,7 +196,9 @@ To install the package, open a terminal and type:
 
  $ sudo dnf install -y asciidoctor
 
-=== Homebrew (macOS)
+=== macOS
+
+==== Homebrew
 
 You can use Homebrew, the macOS package manager, to install Asciidoctor.
 If you don’t have Homebrew on your computer, complete the installation instructions at https://brew.sh/[brew.sh] first.
@@ -206,6 +208,12 @@ Open a terminal and type:
  $ brew install asciidoctor
 
 Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
+
+==== MacPorts
+
+Asciidoctor is also available on https://ports.macports.org/port/asciidoctor/[MacPorts]:
+
+ $ sudo port install asciidoctor
 
 === Windows
 
@@ -307,6 +315,13 @@ When you install a new version of the gem using `gem install`, you end up with m
 Use the following command to remove the old versions:
 
  $ gem cleanup asciidoctor
+ 
+=== MacPorts (macOS)
+
+To upgrade the gem, use:
+
+ $ sudo port selfupdate
+ $ sudo port upgrade asciidoctor
 
 == Usage
 
