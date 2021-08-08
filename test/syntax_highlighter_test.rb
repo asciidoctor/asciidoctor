@@ -1255,32 +1255,34 @@ context 'Syntax Highlighter' do
       assert_css 'pre:not([style])', output, 2
     end
 
-    test 'should replace inline styles on lineno spans with class and preserve trailing space when linenums are enabled and source-highlighter is pygments' do
-      input = <<~'EOS'
-      :source-highlighter: pygments
-      :pygments-css: inline
-      :pygments-linenums-mode: inline
+    test 'should add lineno spans with class and trim trailing space when linenums are enabled and source-highlighter is pygments' do
+      %w(class style).each do |css_mode|
+        input = <<~EOS
+        :source-highlighter: pygments
+        :pygments-css: #{css_mode}
+        :pygments-linenums-mode: inline
 
-      [source%linenums,ruby]
-      ----
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      puts 'Hello, World!'
-      exit 0
-      ----
-      EOS
+        [source%linenums,ruby]
+        ----
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        puts 'Hello, World!'
+        exit 0
+        ----
+        EOS
 
-      output = convert_string_to_embedded input, safe: :safe
-      assert_css 'table.linenotable', output, 0
-      assert_css 'pre', output, 1
-      assert_includes output, '<span class="lineno"> 1 </span>'
-      assert_includes output, '<span class="lineno">10 </span>'
+        output = convert_string_to_embedded input, safe: :safe
+        assert_css 'table.linenotable', output, 0
+        assert_css 'pre', output, 1
+        assert_includes output, '<span class="linenos"> 1</span>'
+        assert_includes output, '<span class="linenos">10</span>'
+      end
     end
 
     test 'should line highlight specified lines' do

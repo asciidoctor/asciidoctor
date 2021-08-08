@@ -1399,22 +1399,16 @@ table.linenotable td.code {
   padding-left: 0.75em;
 }
 
-table.linenotable td.linenos {
+table.linenotable td.linenos,
+pre.pygments .linenos {
   border-right: 1px solid;
   opacity: 0.35;
   padding-right: 0.5em;
 }
 
-pre.pygments .lineno {
-  border-right: 1px solid;
-  opacity: 0.35;
+pre.pygments span.linenos {
   display: inline-block;
   margin-right: 0.75em;
-}
-
-pre.pygments .lineno::before {
-  content: "";
-  margin-right: -0.125em;
 }
 
 .quoteblock {
