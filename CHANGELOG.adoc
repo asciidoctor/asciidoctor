@@ -17,6 +17,10 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
+Bug Fixes::
+
+  * Remove unnamespaced selectors in Pygments stylesheet
+
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 

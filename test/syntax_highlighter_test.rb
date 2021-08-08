@@ -1126,6 +1126,30 @@ context 'Syntax Highlighter' do
       assert_equal 'head', style_node.parent.name
     end
 
+    test 'should embed stylesheet for pygments style' do
+      input = <<~'EOS'
+      :source-highlighter: pygments
+      :pygments-style: monokai
+
+      [source,python]
+      ----
+      from pygments import highlight
+      from pygments.lexers import PythonLexer
+      from pygments.formatters import HtmlFormatter
+
+      source = 'print "Hello World"'
+      print(highlight(source, PythonLexer(), HtmlFormatter()))
+      ----
+      EOS
+      output = convert_string input, safe: :safe, linkcss_default: false
+      assert_css 'style', output, 2
+      style_nodes = xmlnodes_at_xpath '//style[contains(text(), "pre.pygments")]', output
+      assert_equal 2, style_nodes.size
+      pygments_styles = style_nodes[1].to_s
+      assert_match %r/^pre\.pygments *\{/, pygments_styles
+      refute_match %r/^pre *\{/, pygments_styles
+    end
+
     test 'should gracefully fallback to default style if specified style not recognized' do
       input = <<~'EOS'
       :source-highlighter: pygments

@@ -115,6 +115,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     end
     @@stylesheet_cache = ::Hash.new do |cache, key|
       if (stylesheet = ::Pygments.css BASE_SELECTOR, classprefix: TOKEN_CLASS_PREFIX, style: key)
+        stylesheet = stylesheet.slice (stylesheet.index BASE_SELECTOR), stylesheet.length unless stylesheet.start_with? BASE_SELECTOR
         @@stylesheet_cache = cache.merge key => stylesheet
         stylesheet
       end
