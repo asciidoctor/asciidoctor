@@ -918,21 +918,21 @@ context 'Syntax Highlighter' do
 
     test 'should line highlight specified lines relative to start value' do
       input = <<~EOS
-        :source-highlighter: rouge
+      :source-highlighter: rouge
 
-        [source%linenums,ruby,start=5,highlight=6]
-        ----
-        get {
-          render "Hello, World!"
-        }
-        ----
+      [source%linenums,ruby,start=5,highlight=6]
+      ----
+      get {
+        render "Hello, World!"
+      }
+      ----
       EOS
 
       expected = <<~EOS.chop
-        <span class="n">get</span> <span class="p">{</span>
-        <span class="hll">  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-        </span><span class="p">}</span>
-        </pre>
+      <span class="n">get</span> <span class="p">{</span>
+      <span class="hll">  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      </span><span class="p">}</span>
+      </pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -941,21 +941,21 @@ context 'Syntax Highlighter' do
 
     test 'should ignore start attribute when the value is 0' do
       input = <<~EOS
-        :source-highlighter: rouge
+      :source-highlighter: rouge
 
-        [source%linenums,ruby,start=0,highlight=6]
-        ----
-        get {
-          render "Hello, World!"
-        }
-        ----
+      [source%linenums,ruby,start=0,highlight=6]
+      ----
+      get {
+        render "Hello, World!"
+      }
+      ----
       EOS
 
       expected = <<~EOS.chop
-        <span class="n">get</span> <span class="p">{</span>
-          <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-        <span class="p">}</span>
-        </pre>
+      <span class="n">get</span> <span class="p">{</span>
+        <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      <span class="p">}</span>
+      </pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -964,21 +964,21 @@ context 'Syntax Highlighter' do
 
     test 'should not line highlight when the start attribute is greater than highlight' do
       input = <<~EOS
-        :source-highlighter: rouge
+      :source-highlighter: rouge
 
-        [source%linenums,ruby,start=7,highlight=6]
-        ----
-        get {
-          render "Hello, World!"
-        }
-        ----
+      [source%linenums,ruby,start=7,highlight=6]
+      ----
+      get {
+        render "Hello, World!"
+      }
+      ----
       EOS
 
       expected = <<~EOS.chop
-        <span class="n">get</span> <span class="p">{</span>
-          <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-        <span class="p">}</span>
-        </pre>
+      <span class="n">get</span> <span class="p">{</span>
+        <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      <span class="p">}</span>
+      </pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
