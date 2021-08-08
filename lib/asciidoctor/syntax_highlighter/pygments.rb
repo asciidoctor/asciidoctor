@@ -36,7 +36,13 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
         node.sub_source source, false # handles nil response from ::Pygments::Lexer#highlight
       end
     elsif (highlighted = lexer.highlight source, options: highlight_opts)
-      highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs if linenos && noclasses
+      if linenos
+        if noclasses
+          highlighted = highlighted.gsub StyledLinenoSpanTagRx, LinenoSpanTagCs
+        elsif highlighted.include? LegacyLinenoSpanStartTagCs
+          highlighted = highlighted.gsub LegacyLinenoSpanTagRx, LinenoSpanTagCs
+        end
+      end
       highlighted.sub WrapperTagRx, '\1'
     else
       node.sub_source source, false # handles nil response from ::Pygments::Lexer#highlight
@@ -123,7 +129,6 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     DEFAULT_STYLE = 'default'
     BASE_SELECTOR = 'pre.pygments'
     TOKEN_CLASS_PREFIX = 'tok-'
-
     BaseStyleRx = /^#{BASE_SELECTOR.gsub '.', '\\.'} +\{([^}]+?)\}/
 
     private_constant :BASE_SELECTOR, :TOKEN_CLASS_PREFIX, :BaseStyleRx
@@ -134,8 +139,10 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   include Loader # adds methods to instance
 
   CodeCellStartTagCs = '<td class="code">'
+  LegacyLinenoSpanStartTagCs = '<span class="lineno">'
+  LegacyLinenoSpanTagRx = %r(#{LegacyLinenoSpanStartTagCs}( *\d+) ?</span>)
   LinenoColumnStartTagsCs = '<td class="linenos"><div class="linenodiv"><pre>'
-  LinenoSpanTagCs = '<span class="lineno">\1 </span>'
+  LinenoSpanTagCs = '<span class="linenos">\1</span>'
   PreTagCs = '<pre>\1</pre>'
   StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
   StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>)
@@ -145,6 +152,6 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   # NOTE initial <span></span> preserves leading blank lines
   WrapperTagRx = %r(<div class="#{WRAPPER_CLASS}"><pre\b[^>]*?>(.*)</pre></div>\n*)m
 
-  private_constant :CodeCellStartTagCs, :LinenoColumnStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
+  private_constant :CodeCellStartTagCs, :LegacyLinenoSpanStartTagCs, :LegacyLinenoSpanTagRx, :LinenoColumnStartTagsCs, :LinenoSpanTagCs, :PreTagCs, :StyledLinenoColumnStartTagsRx, :StyledLinenoSpanTagRx, :WrapperTagRx, :WRAPPER_CLASS
 end
 end
