@@ -17,6 +17,10 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
+Enhancements::
+
+  * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
+
 Bug Fixes::
 
   * Remove unnamespaced selectors in Pygments stylesheet
