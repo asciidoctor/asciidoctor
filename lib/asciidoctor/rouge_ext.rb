@@ -28,9 +28,9 @@ module RougeExt
       end
 
       def stream tokens
-        lineno = 0
-        token_lines tokens do |tokens_in_line|
-          yield (@lines.include? lineno += 1) ? %(<span class="hll">#{@delegate.format tokens_in_line}#{LF}</span>) : %(#{@delegate.format tokens_in_line}#{LF})
+        (token_lines tokens).with_index 1 do |tokens_in_line, lineno|
+          formatted_line = (@delegate.format tokens_in_line) + LF
+          yield (@lines.include? lineno) ? %(<span class="hll">#{formatted_line}</span>) : formatted_line
         end
       end
     end
