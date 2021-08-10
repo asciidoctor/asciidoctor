@@ -6,10 +6,6 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  background: none;
-}
-
 a:focus {
   outline: thin dotted;
 }
@@ -17,16 +13,6 @@ a:focus {
 a:active,
 a:hover {
   outline: 0;
-}
-
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-
-b,
-strong {
-  font-weight: bold;
 }
 
 abbr {
@@ -43,10 +29,6 @@ dfn {
   font-style: italic;
 }
 
-hr {
-  height: 0;
-}
-
 mark {
   background: #ff0;
   color: #000;
@@ -60,16 +42,13 @@ samp {
   font-size: 1em;
 }
 
-pre {
-  white-space: pre-wrap;
-}
-
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
 }
 
 small {
-  font-size: 80%;
+  font-size: 60%;
+  line-height: inherit;
 }
 
 sub,
@@ -89,6 +68,7 @@ sub {
 }
 
 img {
+  -ms-interpolation-mode: bicubic;
   border: 0;
 }
 
@@ -165,13 +145,10 @@ input::-moz-focus-inner {
 }
 
 textarea {
+  height: auto;
+  min-height: 50px;
   overflow: auto;
   vertical-align: top;
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
 }
 
 *,
@@ -216,10 +193,6 @@ embed {
   height: 100%;
 }
 
-img {
-  -ms-interpolation-mode: bicubic;
-}
-
 .left {
   float: left !important;
 }
@@ -253,11 +226,6 @@ object,
 svg {
   display: inline-block;
   vertical-align: middle;
-}
-
-textarea {
-  height: auto;
-  min-height: 50px;
 }
 
 select {
@@ -316,6 +284,7 @@ td {
 }
 
 a {
+  background: none;
   color: #2156a5;
   text-decoration: underline;
   line-height: inherit;
@@ -332,7 +301,7 @@ a img {
 
 p {
   line-height: 1.6;
-  margin-bottom: 1.25em;
+  margin-bottom: 1.25rem;
   text-rendering: optimizeLegibility;
 }
 
@@ -357,7 +326,8 @@ h6 {
   text-rendering: optimizeLegibility;
   margin-top: 1em;
   margin-bottom: 0.5em;
-  line-height: 1.0125em;
+  line-height: 1.2;
+  word-spacing: -0.05em;
 }
 
 h1 small,
@@ -368,7 +338,6 @@ h3 small,
 h4 small,
 h5 small,
 h6 small {
-  font-size: 60%;
   color: #e99b8f;
   line-height: 0;
 }
@@ -400,6 +369,7 @@ hr {
   border: solid #dddddf;
   border-width: 1px 0 0;
   clear: both;
+  height: 0;
   margin: 1.25em 0 1.1875em;
 }
 
@@ -412,11 +382,6 @@ i {
 strong,
 b {
   font-weight: bold;
-  line-height: inherit;
-}
-
-small {
-  font-size: 60%;
   line-height: inherit;
 }
 
@@ -475,10 +440,6 @@ dl dt {
   font-weight: bold;
 }
 
-dl dd {
-  margin-bottom: 1.25em;
-}
-
 blockquote {
   margin: 0 0 1.25em;
   padding: 0.5625em 1.25em 0 1.1875em;
@@ -492,17 +453,6 @@ blockquote p {
 }
 
 @media screen and (min-width: 768px) {
-  h1,
-  h2,
-  h3,
-  #toctitle,
-  .sidebarblock > .content > .title,
-  h4,
-  h5,
-  h6 {
-    line-height: 1.2;
-  }
-
   h1 {
     font-size: 2.75em;
   }
@@ -524,8 +474,10 @@ blockquote p {
 
 table {
   background: #fff;
-  margin-bottom: 1.25em;
   border: 1px solid #dedede;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 1.25em;
   word-wrap: normal;
 }
 
@@ -562,18 +514,6 @@ table tbody tr td,
 table tr td,
 table tfoot tr td {
   line-height: 1.6;
-}
-
-h1,
-h2,
-h3,
-#toctitle,
-.sidebarblock > .content > .title,
-h4,
-h5,
-h6 {
-  line-height: 1.2;
-  word-spacing: -0.05em;
 }
 
 h1 strong,
@@ -638,6 +578,7 @@ pre {
   font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   line-height: 1.45;
   text-rendering: optimizeSpeed;
+  white-space: pre-wrap;
 }
 
 pre code,
@@ -775,6 +716,7 @@ p a > code:hover {
 
 #content {
   margin-top: 1.25em;
+  margin-bottom: 0.625em;
 }
 
 #content::before {
@@ -1007,10 +949,6 @@ body.toc2 #header > h1:nth-last-child(2) {
   line-height: 1.44;
 }
 
-#content {
-  margin-bottom: 0.625em;
-}
-
 .sect1 {
   padding-bottom: 0.625em;
 }
@@ -1230,11 +1168,12 @@ table.tableblock.fit-content > caption.title {
 }
 
 .exampleblock > .content {
-  border: 1px solid #e6e6e6;
+  border: 1px solid #e0e0dc;
   margin-bottom: 1.25em;
   padding: 1.25em;
-  background: #fff;
+  background: #fffef7;
   border-radius: 4px;
+  box-shadow: 0 1px 4px #e0e0dc;
 }
 
 .exampleblock > .content > :first-child {
@@ -1692,6 +1631,7 @@ ul li ol {
 
 dl dd {
   margin-left: 1.125em;
+  margin-bottom: 1.25em;
 }
 
 dl dd:last-child,
@@ -2220,21 +2160,11 @@ summary {
   font-size: 1.0625rem;
 }
 
-p {
-  margin-bottom: 1.25rem;
-}
-
 .sidebarblock p,
 .sidebarblock dt,
 .sidebarblock td.content,
 p.tableblock {
   font-size: 1em;
-}
-
-.exampleblock > .content {
-  background: #fffef7;
-  border-color: #e0e0dc;
-  box-shadow: 0 1px 4px #e0e0dc;
 }
 
 .print-only {
