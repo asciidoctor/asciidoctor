@@ -1,18 +1,75 @@
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
 /* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
 html {
-  font-family: sans-serif;
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #fff;
+  color: rgba(0, 0, 0, 0.8);
+  padding: 0;
+  margin: 0;
+  font-family: "Noto Serif", "DejaVu Serif", serif;
+  font-size: inherit;
+  line-height: 1;
+  position: relative;
+  cursor: auto;
+  tab-size: 4;
+  word-wrap: anywhere;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  background: none;
+  color: #2156a5;
+  text-decoration: underline;
+  line-height: inherit;
+}
+
+a:active,
+a:hover {
+  cursor: pointer;
+  outline: 0;
 }
 
 a:focus {
   outline: thin dotted;
 }
 
-a:active,
-a:hover {
-  outline: 0;
+a:hover,
+a:focus {
+  color: #1d4b8f;
 }
 
 abbr {
@@ -25,8 +82,56 @@ abbr[title] {
   text-decoration: none;
 }
 
+b,
+strong {
+  font-weight: bold;
+  line-height: inherit;
+}
+
+strong strong {
+  font-weight: 400;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  font-size: 1em;
+}
+
+code {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+pre {
+  color: rgba(0, 0, 0, 0.9);
+  line-height: 1.45;
+  text-rendering: optimizeSpeed;
+  white-space: pre-wrap;
+}
+
 dfn {
   font-style: italic;
+}
+
+em,
+i {
+  font-style: italic;
+  line-height: inherit;
+}
+
+em em {
+  font-style: normal;
+}
+
+hr {
+  border: solid #dddddf;
+  border-width: 1px 0 0;
+  clear: both;
+  height: 0;
+  margin: 1.25em 0 1.1875em;
 }
 
 mark {
@@ -34,12 +139,10 @@ mark {
   color: #000;
 }
 
-code,
-kbd,
-pre,
-samp {
-  font-family: monospace;
-  font-size: 1em;
+p {
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  text-rendering: optimizeLegibility;
 }
 
 q {
@@ -68,8 +171,15 @@ sub {
 }
 
 img {
-  -ms-interpolation-mode: bicubic;
   border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+img,
+object,
+svg {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 svg:not(:root) {
@@ -145,40 +255,7 @@ input::-moz-focus-inner {
 }
 
 textarea {
-  height: auto;
-  min-height: 50px;
   overflow: auto;
-  vertical-align: top;
-}
-
-*,
-::before,
-::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  font-size: 100%;
-}
-
-body {
-  background: #fff;
-  color: rgba(0, 0, 0, 0.8);
-  padding: 0;
-  margin: 0;
-  font-family: "Noto Serif", "DejaVu Serif", serif;
-  line-height: 1;
-  position: relative;
-  cursor: auto;
-  tab-size: 4;
-  word-wrap: anywhere;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-}
-
-a:hover {
-  cursor: pointer;
 }
 
 img,
@@ -221,13 +298,6 @@ embed {
   display: none;
 }
 
-img,
-object,
-svg {
-  display: inline-block;
-  vertical-align: middle;
-}
-
 select {
   width: 100%;
 }
@@ -256,53 +326,6 @@ table.tableblock > .title,
   font-weight: 400;
   margin-top: 0;
   margin-bottom: 0.25em;
-}
-
-div,
-dl,
-dt,
-dd,
-ul,
-ol,
-li,
-h1,
-h2,
-h3,
-#toctitle,
-.sidebarblock > .content > .title,
-h4,
-h5,
-h6,
-pre,
-form,
-p,
-blockquote,
-th,
-td {
-  margin: 0;
-  padding: 0;
-}
-
-a {
-  background: none;
-  color: #2156a5;
-  text-decoration: underline;
-  line-height: inherit;
-}
-
-a:hover,
-a:focus {
-  color: #1d4b8f;
-}
-
-a img {
-  border: 0;
-}
-
-p {
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-  text-rendering: optimizeLegibility;
 }
 
 p aside {
@@ -365,32 +388,6 @@ h6 {
   font-size: 1em;
 }
 
-hr {
-  border: solid #dddddf;
-  border-width: 1px 0 0;
-  clear: both;
-  height: 0;
-  margin: 1.25em 0 1.1875em;
-}
-
-em,
-i {
-  font-style: italic;
-  line-height: inherit;
-}
-
-strong,
-b {
-  font-weight: bold;
-  line-height: inherit;
-}
-
-code {
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.9);
-}
-
 ul,
 ol,
 dl {
@@ -438,6 +435,11 @@ ol li ol {
 dl dt {
   margin-bottom: 0.3125em;
   font-weight: bold;
+}
+
+dl dd {
+  margin-bottom: 1.25em;
+  margin-left: 1.125em;
 }
 
 blockquote {
@@ -540,7 +542,7 @@ h6 strong {
 .clearfix::after,
 .float-group::before,
 .float-group::after {
-  content: " ";
+  content: "";
   display: table;
 }
 
@@ -573,14 +575,6 @@ h6 strong {
   text-rendering: optimizeSpeed;
 }
 
-pre {
-  color: rgba(0, 0, 0, 0.9);
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-  line-height: 1.45;
-  text-rendering: optimizeSpeed;
-  white-space: pre-wrap;
-}
-
 pre code,
 pre pre {
   color: inherit;
@@ -598,20 +592,11 @@ pre.nowrap pre {
   word-wrap: normal;
 }
 
-em em {
-  font-style: normal;
-}
-
-strong strong {
-  font-weight: 400;
-}
-
 .keyseq {
   color: rgba(51, 51, 51, 0.8);
 }
 
 kbd {
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   display: inline-block;
   color: rgba(0, 0, 0, 0.8);
   font-size: 0.65em;
@@ -703,7 +688,7 @@ p a > code:hover {
 #footnotes::after,
 #footer::before,
 #footer::after {
-  content: " ";
+  content: "";
   display: table;
 }
 
@@ -1627,11 +1612,6 @@ ol {
 
 ul li ol {
   margin-left: 1.5em;
-}
-
-dl dd {
-  margin-left: 1.125em;
-  margin-bottom: 1.25em;
 }
 
 dl dd:last-child,
