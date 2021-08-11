@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 autoload :Date, 'date' unless RUBY_ENGINE == 'opal'
 
 module Asciidoctor
@@ -26,12 +27,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     doc_attrs = node.document.attributes
     if node.caption
       title = node.captioned_title
+    elsif (section_numbering = generate_section_numbering node)
+      title = %(#{section_numbering} #{node.title})
     else
-      if (section_numbering = generate_section_numbering node)
-        title = %(#{section_numbering} #{node.title})
-      else
-        title = node.title
-      end
+      title = node.title
     end
     id = node.id
     if doc_attrs['sectlinks']
@@ -84,44 +83,46 @@ class Converter::SemanticHtml5Converter < Converter::Base
   def generate_section_numbering node
     level = node.level
     doc_attrs = node.document.attributes
-    if node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
-      if level < 2 && node.document.doctype == 'book'
-        if node.sectname == 'chapter'
-          %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum}</span>)
-        elsif node.sectname == 'part'
-          %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum nil, ':'}</span>)
-        else
-          %(<span class="sectnum">#{node.sectnum}</span>)
-        end
+
+    return unless node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
+
+    if level < 2 && node.document.doctype == 'book'
+      case node.sectname
+      when 'chapter'
+        %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum}</span>)
+      when 'part'
+        %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}<span class="sectnum">#{node.sectnum nil, ':'}</span>)
       else
         %(<span class="sectnum">#{node.sectnum}</span>)
       end
+    else
+      %(<span class="sectnum">#{node.sectnum}</span>)
     end
   end
 
   def generate_header node
-    if node.header? && !node.noheader
-      result = ['<header>']
-      if (doctitle = generate_document_title node)
-        result << doctitle
-      end
-      if (authors = generate_authors node)
-        result << authors
-      end
-      if (revision = generate_revision node)
-        result << revision
-      end
-      result << '</header>'
-      result.join LF
+    return unless node.header? && !node.noheader
+
+    result = ['<header>']
+    if (doctitle = generate_document_title node)
+      result << doctitle
     end
+    if (authors = generate_authors node)
+      result << authors
+    end
+    if (revision = generate_revision node)
+      result << revision
+    end
+    result << '</header>'
+    result.join LF
   end
 
   def generate_document_title node
-    unless node.notitle
-      doctitle = node.doctitle partition: true, sanitize: true
-      attributes = common_html_attributes node.id, node.role
-      %(<h1#{attributes}>#{doctitle.main}#{doctitle.subtitle? ? %( <small class="subtitle">#{doctitle.subtitle}</small>) : ''}</h1>)
-    end
+    return if node.notitle
+
+    doctitle = node.doctitle partition: true, sanitize: true
+    attributes = common_html_attributes node.id, node.role
+    %(<h1#{attributes}>#{doctitle.main}#{doctitle.subtitle? ? %( <small class="subtitle">#{doctitle.subtitle}</small>) : ''}</h1>)
   end
 
   def generate_authors node
@@ -145,19 +146,19 @@ class Converter::SemanticHtml5Converter < Converter::Base
     return unless (node.attr? 'revnumber') || (node.attr? 'revdate') || (node.attr? 'revremark')
 
     revision_date = if (revdate = node.attr 'revdate')
-      date = ::Date._parse revdate
-      if (date.has_key? :year) || (date.has_key? :mon) || (date.has_key? :mday)
-        date_parts = []
-        date_parts << "#{date[:year]}" if date.has_key? :year
-        date_parts << "#{date[:mon].to_s.rjust 2, '0'}" if date.has_key? :mon
-        date_parts << "#{date[:mday].to_s.rjust 2, '0'}" if date.has_key? :mday
-        %(<time datetime="#{date_parts.join '-'}">#{revdate}</time>)
-      else
-        revdate
-      end
-    else
-      ''
-    end
+                      date = ::Date._parse revdate
+                      if (date.key? :year) || (date.key? :mon) || (date.key? :mday)
+                        date_parts = []
+                        date_parts << (date[:year]).to_s if date.key? :year
+                        date_parts << (date[:mon].to_s.rjust 2, '0').to_s if date.key? :mon
+                        date_parts << (date[:mday].to_s.rjust 2, '0').to_s if date.key? :mday
+                        %(<time datetime="#{date_parts.join '-'}">#{revdate}</time>)
+                      else
+                        revdate
+                      end
+                    else
+                      ''
+                    end
     %(<table class="revision">
 <thead>
 <tr>
@@ -192,7 +193,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
   def common_html_attributes id, role, default_role = nil
     roles = default_role ? [default_role] : []
     roles << role if role
-    %(#{id ? %( id="#{id}") : ''}#{roles.empty? ? '' : %( class="#{roles.join(' ')}") })
+    %(#{id ? %( id="#{id}") : ''}#{roles.empty? ? '' : %( class="#{roles.join ' '}")})
   end
 
   def append_link_constraint_attrs node, attrs = []
@@ -201,7 +202,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
     link_types << 'nofollow' if node.option? 'nofollow'
     if (window = node.attributes['window'])
       attrs << %( target="#{window}")
-      link_types << "noopener" if window == '_blank' || (node.option? 'noopener')
+      link_types << 'noopener' if window == '_blank' || (node.option? 'noopener')
     end
     attrs << %( rel="#{link_types.join ' '}") unless link_types.empty?
     attrs
