@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Semantic HTML 5 converter' do
@@ -8,8 +9,8 @@ context 'Semantic HTML 5 converter' do
     input_filename = File.absolute_path input_filename
     output_filename = File.absolute_path %(#{input_stem}.html)
     test scenario_name do
-      input = IO.read input_filename, mode: 'r:UTF-8', newline: :universal
-      expected = (IO.read output_filename, mode: 'r:UTF-8', newline: :universal).chomp
+      input = File.read input_filename, mode: 'r:UTF-8', newline: :universal
+      expected = (File.read output_filename, mode: 'r:UTF-8', newline: :universal).chomp
       result = (convert_string_to_embedded input, backend: 'semantic-html5').chomp
       assert_equal expected, result
     end
