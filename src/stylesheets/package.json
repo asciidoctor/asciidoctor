@@ -11,8 +11,8 @@
     "stylelint-config-standard": "~22.0"
   },
   "scripts": {
-    "build": "postcss asciidoctor.css -o ../../data/stylesheets/asciidoctor-default.css",
-    "lint": "stylelint asciidoctor.css"
+    "build": "postcss asciidoctor.css -o ../../data/stylesheets/asciidoctor-default.css && postcss coderay-asciidoctor.css -o ../../data/stylesheets/coderay-asciidoctor.css",
+    "lint": "stylelint *.css"
   },
   "browserslist": [
     "defaults"
