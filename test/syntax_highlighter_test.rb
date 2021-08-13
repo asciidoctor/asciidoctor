@@ -809,12 +809,12 @@ context 'Syntax Highlighter' do
       assert_css 'code span.gp', output, 1
     end
 
-    test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
+    test 'should number lines using table layout if linenums option is enabled and linenums mode is not set' do
       input = <<~'EOS'
       [source%linenums,ruby]
       ----
-      puts 'Hello, World!'
-      puts 'Goodbye, World!'
+      puts 'Hello, world!'
+      puts 'Goodbye, world!'
       ----
       EOS
       output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
@@ -824,6 +824,25 @@ context 'Syntax Highlighter' do
       assert_css 'table.linenotable td.code', output, 1
       assert_css 'table.linenotable td.code pre:not([class])', output, 1
       assert_xpath %(//pre[@class="lineno"][text()="1\n2\n"]), output, 1
+    end
+
+    test 'should number lines using inline element if linenums option is enabled and linenums mode is inline' do
+      input = <<~'EOS'
+      :rouge-linenums-mode: inline
+
+      [source%linenums,ruby]
+      ----
+      puts 'Hello, world!'
+      puts 'Goodbye, world!'
+      ----
+      EOS
+      expected = <<~EOS.chop
+      <span class="linenos">1</span><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
+      <span class="linenos">2</span><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>
+      EOS
+      output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'table.linenotable', output, 0
+      assert_includes output, expected
     end
 
     test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
