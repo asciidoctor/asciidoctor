@@ -22,6 +22,10 @@ Bug Fixes::
   * Remove unnamespaced selectors in Pygments stylesheet
   * Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
 
+Improvements::
+
+  * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments and coderay) (#4128)
+
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 
