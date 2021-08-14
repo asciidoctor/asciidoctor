@@ -1405,6 +1405,7 @@ pre.rouge .linenos {
   border-right: 1px solid;
   opacity: 0.35;
   padding-right: 0.5em;
+  user-select: none;
 }
 
 pre.pygments span.linenos,
