@@ -1,5 +1,5 @@
 = Process AsciiDoc Using the API
-:url-api: https://www.rubydoc.info/gems/asciidoctor
+:url-api: {url-api-gems}/asciidoctor/{release-version}
 
 In addition to a CLI, Asciidoctor provides a {url-api}[Ruby API^] named `Asciidoctor` for parsing, analyzing, and converting AsciiDoc content.
 This API is intended for use in scripts, integration with other Ruby software, such as Rails, GitHub, and GitLab, and by other languages, such as Java (via xref:asciidoctorj::index.adoc[AsciidoctorJ]) and JavaScript (via xref:asciidoctor.js::index.adoc[Asciidoctor.js]).

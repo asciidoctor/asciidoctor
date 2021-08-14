@@ -1,7 +1,8 @@
 = Custom Syntax Highlighter Adapter
 :navtitle: Custom Adapter
-:apidoc-syntax-highlighter-base: https://www.rubydoc.info/github/asciidoctor/asciidoctor/Asciidoctor/SyntaxHighlighter/Base
-:apidoc-syntax-highlighter-for: https://www.rubydoc.info/github/asciidoctor/asciidoctor/Asciidoctor/SyntaxHighlighter/Factory#for-instance_method
+:apidoc-syntax-highlighter: {url-api-gems}/asciidoctor/{release-version}/Asciidoctor
+:apidoc-syntax-highlighter-base: {apidoc-syntax-highlighter}/Base
+:apidoc-syntax-highlighter-for: {apidoc-syntax-highlighter}/Factory#for-instance_method
 
 You can integrate additional syntax highlighters into Asciidoctor by implementing and registering a syntax highlighter adapter.
 You can either write a new adapter from scratch or you can extend and even replace one of the built-in adapters.
