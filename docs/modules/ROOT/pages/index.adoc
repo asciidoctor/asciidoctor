@@ -1,7 +1,7 @@
 = Asciidoctor Documentation
 :navtitle: Introduction
 :url-cli: https://github.com/asciidoctor/asciidoctor/blob/master/man/asciidoctor.adoc
-:url-api: https://www.rubydoc.info/gems/asciidoctor
+:url-api: {url-api-gems}/asciidoctor/{release-version}
 
 This is the documentation for the Ruby-based AsciiDoc processor, Asciidoctor.
 Asciidoctor currently serves as the reference implementation for how to interpret the AsciiDoc language.
