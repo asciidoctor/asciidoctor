@@ -1,15 +1,20 @@
 = Custom Syntax Highlighter Adapter
 :navtitle: Custom Adapter
+:apidoc-syntax-highlighter-base: https://www.rubydoc.info/github/asciidoctor/asciidoctor/Asciidoctor/SyntaxHighlighter/Base
+:apidoc-syntax-highlighter-for: https://www.rubydoc.info/github/asciidoctor/asciidoctor/Asciidoctor/SyntaxHighlighter/Factory#for-instance_method
 
-You can integrate additional syntax highlighters by implementing a syntax highlighter adapter.
+You can integrate additional syntax highlighters into Asciidoctor by implementing and registering a syntax highlighter adapter.
+You can either write a new adapter from scratch or you can extend and even replace one of the built-in adapters.
 
 [#new]
 == Create a new adapter
 
-To implement a new adapter, you must create a class that extends the `Asciidoctor::SyntaxHighlighter::Base` class, register the adapter for a value of the `source-highlighter` attribute, and implement the required methods depending on whether the highlight step runs in the converter or in the client (i.e., browser).
+To implement a new adapter, you must create a class that extends the {apidoc-syntax-highlighter-base}[Asciidoctor::SyntaxHighlighter::Base] class, register the adapter for a value of the `source-highlighter` attribute, and implement the required methods.
+Which methods are required depends on whether the adapter is for a client-side (runs in the browser) or build-time (runs when the document is converted) syntax highlighter.
 
 Here's an example of how to write and register a syntax highlighter adapter for the Prism.js syntax highlighting library.
-This library runs in the browser, so the methods focus on loading the library.
+Prism.js is a client-side syntax highlighter, meaning it runs in the browser.
+That means the adapter only has to implement methods that pertain to client-side syntax highlighting, which include `format`, `docinfo?`, and `docinfo`.
 
 .Syntax highlighter adapter for Prism.js
 [,ruby]
@@ -18,20 +23,21 @@ include::example$prism-syntax-highlighter.rb[]
 ----
 
 Save this code to a file named [.path]_prism-syntax-highlighter.rb_.
-Then, require this file when invoking Asciidoctor and set the source-highlighter to prism to activate it:
+Then, require this file when invoking Asciidoctor and set `source-highlighter=prism` to activate it:
 
  $ asciidoctor -r ./prism-syntax-highlighter -a source-highlighter=prism document.adoc
 
 You can also define an adapter for a syntax highlighter that runs during conversion.
+We'll look at doing that while also extending a built-in adapter.
 
 [#extend]
 == Extend an existing adapter
 
-Instead of creating a new adapter, you can customize a built-in adapter by extending it and overriding its behavior.
+Instead of creating a new adapter, you can customize a built-in adapter by extending it, overriding its behavior, and optionally replacing it.
 
-To extend an adapter, you need to look up a reference to the built-in adapter by name using the `Asciidoctor::SyntaxHighlighter.for` method, create a class that extends it, reregister the adapter with the same name (or a unique one), and override any methods that provide the behavior you want to modify.
+To extend an adapter, you need to look up a reference to the built-in adapter by name using the {apidoc-syntax-highlighter-for}[Asciidoctor::SyntaxHighlighter.for] method, create a class that extends it, register the adapter with a unique name (or the same name, if you want to replace it), and override any methods that provide the behavior you want to modify.
 
-Let's override the adapter for Pygments to prevent it adding a stylesheet to the HTML (presumably because the styles will be provided by a different stylesheet).
+Let's override the adapter for Pygments to prevent it from adding a stylesheet to the HTML (presumably because the styles will be provided by a different stylesheet).
 
 .Extended syntax highlighter adapter for Pygments
 [,ruby]
@@ -40,13 +46,13 @@ include::example$extended-pygments-syntax-highlighter.rb[]
 ----
 
 Save this code to a file named [.path]_extended-pygments-syntax-highlighter.rb_.
-Then, require this file when invoking Asciidoctor, setting `source-highlighter=pygments` to activate it as you would normally do:
+Then, require this file when invoking Asciidoctor, setting `source-highlighter=pygments` to activate it, as you would normally do:
 
  $ asciidoctor -r ./extended-pygments-syntax-highlighter.rb -a source-highlighter=pygments document.adoc
 
-If you want to decorate built-in behavior instead, you can invoke the `super` method to delegate to the behavior provided by the built-in adapter.
+If you want to decorate built-in behavior, you can invoke the `super` method anywhere inside the method to delegate to the behavior provided by the built-in adapter.
 
-Let's say you always want lines to be numbered.
+Let's say you always want lines to be numbered, regardless of the setting in the document.
 You can do so by overriding the `highlight` method, setting the `:number_lines` key on the `opts` argument, then delegating back to the built-in adapter using `super`.
 
 [,ruby]
@@ -54,4 +60,4 @@ You can do so by overriding the `highlight` method, setting the `:number_lines` 
 include::example$always-number-lines.rb[]
 ----
 
-To understand where the logic is located you might want to override, browse the code for the https://github.com/asciidoctor/asciidoctor/tree/master/lib/asciidoctor/syntax_highlighter[built-in syntax highlighter adapters].
+To study the logic you may be interesting in overridding, browse the code for the https://github.com/asciidoctor/asciidoctor/tree/master/lib/asciidoctor/syntax_highlighter[built-in syntax highlighter adapters].
