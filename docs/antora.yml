@@ -10,7 +10,7 @@ asciidoc:
     ruby-version: '3.0'
     url-api-gems: https://www.rubydoc.info/gems
     url-ruby: https://www.ruby-lang.org
-    url-rubygem: https://rubygems.org/gems
+    url-rubygems: https://rubygems.org/gems
     url-rvm: https://rvm.io
 nav:
 - modules/ROOT/nav-top.adoc

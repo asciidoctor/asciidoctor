@@ -6,7 +6,7 @@
 The DocBook toolchain has some support for STEM processing, though it varies depending on which DocBook pipeline you're using and which integrations you have enabled.
 But there's one thing we know for sure.
 The DocBook toolchain does not understand AsciiMath.
-That's where the {url-rubygem}/asciimath[AsciiMath gem^] comes in.
+That's where the {url-rubygems}/asciimath[AsciiMath gem^] comes in.
 
 == AsciiMath and DocBook
 
