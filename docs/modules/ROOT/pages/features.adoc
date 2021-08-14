@@ -6,7 +6,7 @@ This page covers the features of Asciidoctor that make it a great choice for pro
 
 Asciidoctor is written in Ruby, which means it must be run on a Ruby language runtime (including JRuby).
 But that's its only requirement.
-Asciidoctor is packaged and distributed as a {url-rubygem}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
+Asciidoctor is packaged and distributed as a {url-rubygems}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
 The gem can be installed on *any operating system* Ruby supports using Ruby's package management tools (gem or bundle).
 Asciidoctor itself has no dependencies.
 

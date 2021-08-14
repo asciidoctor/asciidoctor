@@ -14,7 +14,7 @@ This Ruby library is often referred to as Asciidoctor core.
 That's because Asciidoctor is also the name of the family of projects that contribute extensions and tools for processing AsciiDoc.
 When we say Asciidoctor in this section of the documentation, we're specifically referring to Asciidoctor core.
 
-To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygem}/asciidoctor[RubyGem named asciidoctor^].
+To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygems}/asciidoctor[RubyGem named asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
 Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew and MacPorts).
 
