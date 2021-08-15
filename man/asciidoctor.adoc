@@ -6,21 +6,21 @@ Dan Allen; Sarah White
 :man source: Asciidoctor {release-version}
 ifdef::backend-manpage[:!author:]
 
-== NAME
+== Name
 
 asciidoctor - converts AsciiDoc source files to HTML, DocBook, and other formats
 
-== SYNOPSIS
+== Synopsis
 
 *asciidoctor* [_OPTION_]... _FILE_...
 
-== DESCRIPTION
+== Description
 
 The asciidoctor(1) command converts the AsciiDoc source file(s) _FILE_ to HTML5, DocBook 5, man(ual) page, and other custom output formats.
 
 If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
-== OPTIONS
+== Options
 
 // tag::options[]
 === Security Settings
@@ -157,13 +157,13 @@ Matching templates found in subsequent directories override ones previously disc
 *-v* can also be used if no source files are specified.
 // end::options[]
 
-== ENVIRONMENT
+== Environment
 
 *Asciidoctor* honors the *SOURCE_DATE_EPOCH* environment variable.
 If this variable is assigned an integer value, that value is used as the epoch of all input documents and as the local date and time.
 See https://reproducible-builds.org/specs/source-date-epoch/ for more information about this environment variable.
 
-== EXIT STATUS
+== Exit Status
 
 *0*::
   Success.
@@ -171,11 +171,11 @@ See https://reproducible-builds.org/specs/source-date-epoch/ for more informatio
 *1*::
   Failure (syntax or usage error; configuration error; document processing failure; unexpected error).
 
-== BUGS
+== Bugs
 
 Refer to the *Asciidoctor* issue tracker at https://github.com/asciidoctor/asciidoctor/issues?q=is%3Aopen.
 
-== AUTHORS
+== Authors
 
 *Asciidoctor* is led and maintained by Dan Allen and Sarah White and has received contributions from many individuals in the Asciidoctor community.
 The project was started in 2012 by Ryan Waldron based on a prototype written by Nick Hengeveld for the Git website.
@@ -183,7 +183,7 @@ Jason Porter wrote the first implementation of the CLI interface provided by thi
 
 *AsciiDoc.py* was created by Stuart Rackham and has received contributions from many individuals in the AsciiDoc.py community.
 
-== RESOURCES
+== Resources
 
 *Project website:* https://asciidoctor.org
 
@@ -195,7 +195,7 @@ Jason Porter wrote the first implementation of the CLI interface provided by thi
 
 *Discussion list:* https://discuss.asciidoctor.org
 
-== COPYING
+== Copying
 
 Copyright \(C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individual contributors to Asciidoctor.
 Use of this software is granted under the terms of the MIT License.
