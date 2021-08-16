@@ -1,25 +1,44 @@
 = Available Converters
 
-Asciidoctor parses AsciiDoc documents and then uses a converter to generate the output format of your choice, such as HTML, DocBook, or PDF.
+Asciidoctor parses an AsciiDoc document, then uses a converter to generate the output format of your choice, such as HTML, DocBook, or PDF.
 
-== What's a converter?
+== What is a converter?
 
-A converter takes AsciiDoc and transforms it into another format.
+A converter takes AsciiDoc and transforms it into a different format.
+More specifically, it processes each node in a parsed AsciiDoc document in document order and returns a converted fragment, which the processor combines to create the output document.
 Each converter produces a specific output format, such as HTML or DocBook XML.
 
-Asciidoctor provides several built-in converters and the ability to add on other converters.
-In addition to generating traditional articles and books from AsciiDoc documents, you can also use Asciidoctor to create HTML-based slide decks, static websites, and documentation sites.
-When using these add-on converters, you may need to add some additional structure rules to a document.
-However, nothing in this structure restricts you from still being able to publish the content as a normal document, too.
+Asciidoctor provides several built-in converters and a facility for adding additional converters.
 
-Each converter is mapped to a name that you specify using the `-b` (`--backend`) command line option or `backend` API option.
+In addition to generating traditional articles and books from AsciiDoc documents, you can also use Asciidoctor to create HTML-based slide decks, static websites, and documentation sites.
+When using these add-on converters, you may need to include some additional structure rules to a document.
+However, nothing in this structure restricts you from being able to publish the content as a normal document, too.
+
+== What is a backend?
+
+Each converter is correlated with an output format using a backend identifier.
+From the user's perspective, the backend represents the desired output format.
+A converter will register itself with a backend identifier to claim that it produces that output format.
+For example, the backend identifier for the built-in HTML 5 converter is `html5`.
+Thus, from the processor's perspective, the backend is the value it uses to identify which converter to use.
+
+NOTE: The term `backend` is often used interchangeably with the name of a converter.
+For example, you might hear "`the html5 backend`" when someone is talking about the HTML 5 converter.
+However, there's an important distinction between these terms.
+
+Alternate converter implementations can reclaim a backend identifier.
+Therefore, the backend doesn't universally reference a single converter.
+Instead, it tells you which converter is currently registered to handle that identifier.
+
+The user selects which converter to use to convert a document by specifying the `backend` document attribute, `-b` (`--backend`) command line option, or `backend` API option (e.g., `--backend=docbook5`).
+The `html5` and `docbook5` backends can be referred to using the aliases `html` and `docbook`, respectively.
 
 == Built-in converters
 
 These built-in converters are bundled with Asciidoctor.
 
 xref:html-backend:index.adoc[HTML]::
-The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
+The HTML 5 converter (backend: `html` or `html5`) generates HTML 5 styled with CSS3.
 This is the converter Asciidoctor uses by default.
 
 xref:html-backend:index.adoc#xhtml[XHTML]::
@@ -39,11 +58,11 @@ To use the man page converter, assign `manpage` to the `backend` option.
 You can use add-on converters, which plug into Asciidoctor by adding the appropriate library to the runtime path (e.g., `-r asciidoctor-pdf`).
 
 PDF::
-The PDF converter (`pdf`) generates a portable document format.
+The PDF converter (backend: `pdf`) generates a portable document format.
 Requires the https://rubygems.org/gems/asciidoctor-pdf[asciidoctor-pdf^] gem.
 
 EPUB3::
-The EPUB3 converter (`epub3`) generates a distribution and interchange format standard for digital publications and documents.
+The EPUB3 converter (backend: `epub3`) generates a distribution and interchange format standard for digital publications and documents.
 Requires the https://rubygems.org/gems/asciidoctor-epub3[asciidoctor-epub3^] gem.
 
 Reveal.js::
