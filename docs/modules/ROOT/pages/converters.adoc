@@ -33,6 +33,12 @@ Instead, it tells you which converter is currently registered to handle that ide
 The user selects which converter to use to convert a document by specifying the `backend` document attribute, `-b` (`--backend`) command line option, or `backend` API option (e.g., `--backend=docbook5`).
 The `html5` and `docbook5` backends can be referred to using the aliases `html` and `docbook`, respectively.
 
+In summary, a converter is a software component that handles the conversion from a parsed AsciiDoc document to a publishable output format.
+The backend represents the user's intent to transform the AsciiDoc document to a given format (e.g., `html5` for HTML 5).
+That backend also serves as an identifier that tells the processor which converter to use.
+More than one converter can bind to (i.e., stake claim to) the same backend in order to provide the user with alternatives for generating a given output format.
+The last converter that registers itself with a backend wins.
+
 == Built-in converters
 
 These built-in converters are bundled with Asciidoctor.
