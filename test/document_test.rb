@@ -1487,7 +1487,7 @@ context 'Document' do
       assert_equal '<hr>', result
     end
 
-    test 'wip should close all short tags when htmlsyntax is xml' do
+    test 'should close all short tags when htmlsyntax is xml' do
       input = <<~'EOS'
       = Document Title
       Author Name
