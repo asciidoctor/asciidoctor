@@ -31,8 +31,8 @@ module RougeExt
 
       def stream tokens
         formatted_lines = (@delegate.to_enum :stream, tokens).map.with_index(@start_line) {|line, lineno| [lineno.to_s, line] }
-        return unless (last_lineno = (formatted_lines[-1] || [])[0])
-        lineno_width = last_lineno.length
+        return if (last_idx = formatted_lines.length - 1) < 0
+        lineno_width = formatted_lines[last_idx][0].length
         formatted_lines.each {|(lineno, line)| yield %(<span class="linenos">#{lineno.rjust lineno_width}</span>#{line}) }
       end
     end
@@ -44,11 +44,11 @@ module RougeExt
       end
 
       def stream tokens
-        formatted_lines = (@delegate.to_enum :stream, tokens).with_index(@start_line).with_object({}) {|(line, lineno), accum| accum[lineno.to_s] = line }
-        return unless (last_lineno = formatted_lines.keys[-1])
-        lineno_width = last_lineno.length
-        formatted_linenos = formatted_lines.keys.map {|lineno| (lineno.rjust lineno_width) + LF }
-        yield %(<table class="linenotable"><tbody><tr><td class="linenos gl"><pre class="lineno">#{formatted_linenos.join}</pre></td><td class="code"><pre>#{formatted_lines.values.join}</pre></td></tr></tbody></table>)
+        return if (last_idx = (formatted_lines = (@delegate.to_enum :stream, tokens).to_a).length - 1) < 0
+        formatted_lines.each_with_index do |line, idx|
+          tr = %(<tr><td class="linenos"><pre>#{idx + @start_line}</pre></td><td class="code"><pre>#{line}</pre></td></tr>)
+          yield (idx == 0 ? %(<table class="linenotable"><tbody>#{tr}) : (idx == last_idx ? %(#{tr}</tbody></table>) : tr))
+        end
       end
     end
 
