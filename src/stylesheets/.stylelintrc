@@ -3,6 +3,5 @@
   "rules": {
     "comment-empty-line-before": null,
     "no-descending-specificity": null,
-    "no-duplicate-selectors": null,
   }
 }

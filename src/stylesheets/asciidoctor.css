@@ -1,32 +1,75 @@
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
 /* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
 html {
-  font-family: sans-serif;
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: #fff;
+  color: rgba(0, 0, 0, 0.8);
+  padding: 0;
+  margin: 0;
+  font-family: "Noto Serif", "DejaVu Serif", serif;
+  font-size: inherit;
+  line-height: 1;
+  position: relative;
+  cursor: auto;
+  tab-size: 4;
+  word-wrap: anywhere;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
 }
 
 a {
   background: none;
+  color: #2156a5;
+  text-decoration: underline;
+  line-height: inherit;
+}
+
+a:active,
+a:hover {
+  cursor: pointer;
+  outline: 0;
 }
 
 a:focus {
   outline: thin dotted;
 }
 
-a:active,
-a:hover {
-  outline: 0;
-}
-
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-
-b,
-strong {
-  font-weight: bold;
+a:hover,
+a:focus {
+  color: #1d4b8f;
 }
 
 abbr {
@@ -39,12 +82,56 @@ abbr[title] {
   text-decoration: none;
 }
 
+b,
+strong {
+  font-weight: bold;
+  line-height: inherit;
+}
+
+strong strong {
+  font-weight: 400;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
+  font-size: 1em;
+}
+
+code {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.9);
+}
+
+pre {
+  color: rgba(0, 0, 0, 0.9);
+  line-height: 1.45;
+  text-rendering: optimizeSpeed;
+  white-space: pre-wrap;
+}
+
 dfn {
   font-style: italic;
 }
 
+em,
+i {
+  font-style: italic;
+  line-height: inherit;
+}
+
+em em {
+  font-style: normal;
+}
+
 hr {
+  border: solid #dddddf;
+  border-width: 1px 0 0;
+  clear: both;
   height: 0;
+  margin: 1.25em 0 1.1875em;
 }
 
 mark {
@@ -52,16 +139,10 @@ mark {
   color: #000;
 }
 
-code,
-kbd,
-pre,
-samp {
-  font-family: monospace;
-  font-size: 1em;
-}
-
-pre {
-  white-space: pre-wrap;
+p {
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  text-rendering: optimizeLegibility;
 }
 
 q {
@@ -69,7 +150,8 @@ q {
 }
 
 small {
-  font-size: 80%;
+  font-size: 60%;
+  line-height: inherit;
 }
 
 sub,
@@ -90,6 +172,14 @@ sub {
 
 img {
   border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+img,
+object,
+svg {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 svg:not(:root) {
@@ -166,42 +256,6 @@ input::-moz-focus-inner {
 
 textarea {
   overflow: auto;
-  vertical-align: top;
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-*,
-::before,
-::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  font-size: 100%;
-}
-
-body {
-  background: #fff;
-  color: rgba(0, 0, 0, 0.8);
-  padding: 0;
-  margin: 0;
-  font-family: "Noto Serif", "DejaVu Serif", serif;
-  line-height: 1;
-  position: relative;
-  cursor: auto;
-  tab-size: 4;
-  word-wrap: anywhere;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-}
-
-a:hover {
-  cursor: pointer;
 }
 
 img,
@@ -214,10 +268,6 @@ embed {
 object,
 embed {
   height: 100%;
-}
-
-img {
-  -ms-interpolation-mode: bicubic;
 }
 
 .left {
@@ -246,18 +296,6 @@ img {
 
 .hide {
   display: none;
-}
-
-img,
-object,
-svg {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-textarea {
-  height: auto;
-  min-height: 50px;
 }
 
 select {
@@ -290,52 +328,6 @@ table.tableblock > .title,
   margin-bottom: 0.25em;
 }
 
-div,
-dl,
-dt,
-dd,
-ul,
-ol,
-li,
-h1,
-h2,
-h3,
-#toctitle,
-.sidebarblock > .content > .title,
-h4,
-h5,
-h6,
-pre,
-form,
-p,
-blockquote,
-th,
-td {
-  margin: 0;
-  padding: 0;
-}
-
-a {
-  color: #2156a5;
-  text-decoration: underline;
-  line-height: inherit;
-}
-
-a:hover,
-a:focus {
-  color: #1d4b8f;
-}
-
-a img {
-  border: 0;
-}
-
-p {
-  line-height: 1.6;
-  margin-bottom: 1.25em;
-  text-rendering: optimizeLegibility;
-}
-
 p aside {
   font-size: 0.875em;
   line-height: 1.35;
@@ -357,7 +349,8 @@ h6 {
   text-rendering: optimizeLegibility;
   margin-top: 1em;
   margin-bottom: 0.5em;
-  line-height: 1.0125em;
+  line-height: 1.2;
+  word-spacing: -0.05em;
 }
 
 h1 small,
@@ -368,7 +361,6 @@ h3 small,
 h4 small,
 h5 small,
 h6 small {
-  font-size: 60%;
   color: #e99b8f;
   line-height: 0;
 }
@@ -394,36 +386,6 @@ h5 {
 
 h6 {
   font-size: 1em;
-}
-
-hr {
-  border: solid #dddddf;
-  border-width: 1px 0 0;
-  clear: both;
-  margin: 1.25em 0 1.1875em;
-}
-
-em,
-i {
-  font-style: italic;
-  line-height: inherit;
-}
-
-strong,
-b {
-  font-weight: bold;
-  line-height: inherit;
-}
-
-small {
-  font-size: 60%;
-  line-height: inherit;
-}
-
-code {
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.9);
 }
 
 ul,
@@ -477,6 +439,7 @@ dl dt {
 
 dl dd {
   margin-bottom: 1.25em;
+  margin-left: 1.125em;
 }
 
 blockquote {
@@ -492,17 +455,6 @@ blockquote p {
 }
 
 @media screen and (min-width: 768px) {
-  h1,
-  h2,
-  h3,
-  #toctitle,
-  .sidebarblock > .content > .title,
-  h4,
-  h5,
-  h6 {
-    line-height: 1.2;
-  }
-
   h1 {
     font-size: 2.75em;
   }
@@ -524,8 +476,10 @@ blockquote p {
 
 table {
   background: #fff;
-  margin-bottom: 1.25em;
   border: 1px solid #dedede;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 1.25em;
   word-wrap: normal;
 }
 
@@ -564,18 +518,6 @@ table tfoot tr td {
   line-height: 1.6;
 }
 
-h1,
-h2,
-h3,
-#toctitle,
-.sidebarblock > .content > .title,
-h4,
-h5,
-h6 {
-  line-height: 1.2;
-  word-spacing: -0.05em;
-}
-
 h1 strong,
 h2 strong,
 h3 strong,
@@ -600,7 +542,7 @@ h6 strong {
 .clearfix::after,
 .float-group::before,
 .float-group::after {
-  content: " ";
+  content: "";
   display: table;
 }
 
@@ -633,13 +575,6 @@ h6 strong {
   text-rendering: optimizeSpeed;
 }
 
-pre {
-  color: rgba(0, 0, 0, 0.9);
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-  line-height: 1.45;
-  text-rendering: optimizeSpeed;
-}
-
 pre code,
 pre pre {
   color: inherit;
@@ -657,20 +592,11 @@ pre.nowrap pre {
   word-wrap: normal;
 }
 
-em em {
-  font-style: normal;
-}
-
-strong strong {
-  font-weight: 400;
-}
-
 .keyseq {
   color: rgba(51, 51, 51, 0.8);
 }
 
 kbd {
-  font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   display: inline-block;
   color: rgba(0, 0, 0, 0.8);
   font-size: 0.65em;
@@ -762,7 +688,7 @@ p a > code:hover {
 #footnotes::after,
 #footer::before,
 #footer::after {
-  content: " ";
+  content: "";
   display: table;
 }
 
@@ -775,6 +701,7 @@ p a > code:hover {
 
 #content {
   margin-top: 1.25em;
+  margin-bottom: 0.625em;
 }
 
 #content::before {
@@ -1007,10 +934,6 @@ body.toc2 #header > h1:nth-last-child(2) {
   line-height: 1.44;
 }
 
-#content {
-  margin-bottom: 0.625em;
-}
-
 .sect1 {
   padding-bottom: 0.625em;
 }
@@ -1230,11 +1153,12 @@ table.tableblock.fit-content > caption.title {
 }
 
 .exampleblock > .content {
-  border: 1px solid #e6e6e6;
+  border: 1px solid #e0e0dc;
   margin-bottom: 1.25em;
   padding: 1.25em;
-  background: #fff;
+  background: #fffef7;
   border-radius: 4px;
+  box-shadow: 0 1px 4px #e0e0dc;
 }
 
 .exampleblock > .content > :first-child {
@@ -1688,10 +1612,6 @@ ol {
 
 ul li ol {
   margin-left: 1.5em;
-}
-
-dl dd {
-  margin-left: 1.125em;
 }
 
 dl dd:last-child,
@@ -2220,21 +2140,11 @@ summary {
   font-size: 1.0625rem;
 }
 
-p {
-  margin-bottom: 1.25rem;
-}
-
 .sidebarblock p,
 .sidebarblock dt,
 .sidebarblock td.content,
 p.tableblock {
   font-size: 1em;
-}
-
-.exampleblock > .content {
-  background: #fffef7;
-  border-color: #e0e0dc;
-  box-shadow: 0 1px 4px #e0e0dc;
 }
 
 .print-only {
