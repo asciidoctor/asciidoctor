@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 Enhancements::
 
   * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
+  * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) *@rpavlik*
 
 Bug Fixes::
 

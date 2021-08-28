@@ -105,8 +105,8 @@ class Converter::Html5Converter < Converter::Base
     result << %(<head>
 <meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
-<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
+<meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>)
+    result << %(<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>) unless node.attr? 'reproducible'
     result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
     result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
     result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
