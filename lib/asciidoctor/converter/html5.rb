@@ -106,7 +106,7 @@ class Converter::Html5Converter < Converter::Base
 <meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>)
-    result << %(<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>) unless node.attr? 'reproducible'
+    result << %(<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>) unless (reproducible = node.attr? 'reproducible')
     result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
     result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
     result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
@@ -243,7 +243,7 @@ class Converter::Html5Converter < Converter::Base
       result << %(<div id="footer"#{max_width_attr}>)
       result << '<div id="footer-text">'
       result << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br}) if node.attr? 'revnumber'
-      result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if (node.attr? 'last-update-label') && !(node.attr? 'reproducible')
+      result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if (node.attr? 'last-update-label') && !reproducible
       result << '</div>'
       result << '</div>'
     end

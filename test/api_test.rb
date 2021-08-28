@@ -303,7 +303,7 @@ context 'API' do
       assert_xpath '//div[@id="footer-text" and contains(string(.//text()), "Last updated")]', result, 0
     end
 
-    test 'should not output HTML meta generator tag if reproducible attribute is set in HTML 5' do
+    test 'should not output meta generator tag in HTML 5 if reproducible attribute is set' do
       doc = document_from_string 'text', backend: :html5, attributes: { 'reproducible' => '' }
       result = doc.convert
       assert doc.attr?('reproducible')
