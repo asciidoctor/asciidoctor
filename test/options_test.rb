@@ -294,8 +294,18 @@ context 'Options' do
     assert options[:timings]
   end
 
-  test 'timings option is disable by default' do
+  test 'timings option is disabled by default' do
     options = Asciidoctor::Cli::Options.parse! %w(test/fixtures/sample.adoc)
     refute options[:timings]
+  end
+
+  test 'should enable sourcemap when --sourcemap flag is specified' do
+    options = Asciidoctor::Cli::Options.parse! %w(--sourcemap test/fixtures/sample.adoc)
+    assert options[:sourcemap]
+  end
+
+  test 'sourcemap option is disabled by default' do
+    options = Asciidoctor::Cli::Options.parse! %w(test/fixtures/sample.adoc)
+    refute options[:sourcemap]
   end
 end

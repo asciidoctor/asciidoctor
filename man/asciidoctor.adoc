@@ -113,6 +113,10 @@ This option may be specified more than once.
   Output an embeddable document, which excludes the header, the footer, and everything outside the body of the document.
   This option is useful for producing documents that can be inserted into an external template.
 
+*--sourcemap*::
+    Enable the sourcemap option on the parser, which instructs the parser to add source location information to each parsed block.
+    The sourcemap information is useful for extensions that need access to the file and line number of blocks in the source document.
+
 *-T, --template-dir*=_DIR_::
   A directory containing custom converter templates that override one or more templates from the built-in set.
   (requires _tilt_ gem)

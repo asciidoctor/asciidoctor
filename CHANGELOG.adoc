@@ -21,6 +21,7 @@ Enhancements::
 
   * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
   * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) *@rpavlik*
+  * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) *@hackingotter*
 
 Bug Fixes::
 
