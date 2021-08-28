@@ -40,9 +40,8 @@ class AttributeList
     APOS => '\\\'',
   }
 
-  # Public: A regular expression for an attribute name (approx. name token from XML)
-  # TODO named attributes cannot contain dash characters
-  NameRx = /#{CG_WORD}[#{CC_WORD}\-.]*/
+  # Public: A regular expression for an attribute name (matches syntax of a document attribute)
+  NameRx = /#{CG_WORD}[#{CC_WORD}-]*/
 
   BlankRx = /[ \t]+/
 
