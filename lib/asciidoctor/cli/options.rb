@@ -71,6 +71,9 @@ module Asciidoctor
               'disables potentially dangerous macros in source files, such as include::[]') do |name|
             self[:safe] = SafeMode.value_for_name name
           end
+          opts.on('--sourcemap', 'add source location information to each parsed block (default: false)') do
+            self[:sourcemap] = true
+          end
           opts.on('-s', '--no-header-footer', 'suppress enclosing document structure and output an embedded document (default: false)') do
             self[:standalone] = false
           end
