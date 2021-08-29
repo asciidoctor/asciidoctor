@@ -86,7 +86,7 @@ Default: `table`.
 :source-highlighter: coderay
 :coderay-linenums-mode: inline
 
-[source,ruby,linenums]
+[source%linenums,ruby]
 ----
 ORDERED_LIST_KEYWORDS = {
   'loweralpha' => 'a',
