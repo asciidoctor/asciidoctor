@@ -130,6 +130,11 @@ context 'Sections' do
       assert_equal 'one', sec.id
     end
 
+    test 'empty id in block attributes above section title prevents assignment of synthetic id' do
+      sect = block_from_string %([id=]\n== Section One)
+      assert_nil sect.id
+    end
+
     test 'explicit id set using shorthand in style above section title overrides synthetic id' do
       sec = block_from_string "[#one]\n== Section One"
       assert_equal 'one', sec.id
@@ -238,6 +243,24 @@ context 'Sections' do
       output = doc.convert standalone: false
       assert_xpath '//a[@href="#explicit"][text()="Section baz"]', output, 1
       assert_xpath '//h2[@id="explicit"][text()="Section baz"]', output, 1
+    end
+
+    test 'should not apply substititons to title with attribute references when parsing section with empty ID' do
+      input = <<~'EOS'
+      = Document Title
+      :attribute-missing: warn
+
+      [id=]
+      == Section {missing}
+
+      That's all, folks!
+      EOS
+
+      using_memory_logger do |logger|
+        doc = document_from_string input
+        assert_empty doc.catalog[:refs]
+        assert_empty logger.messages
+      end
     end
 
     test 'title substitutions are applied before generating id' do
