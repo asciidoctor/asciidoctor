@@ -129,11 +129,13 @@ class AbstractBlock < AbstractNode
 
   # Public: Check whether this block has any child Section objects.
   #
-  # Only applies to Document and Section instances
+  # Acts an an abstract method that always returns false unless this block is an
+  # instance of Document or Section.
+  # Both Document and Section provide overrides for this method.
   #
-  # Returns A [Boolean] to indicate whether this block has child Section objects
+  # Returns false
   def sections?
-    @next_section_index > 0
+    false
   end
 
   # Deprecated: Legacy property to get the String or Integer numeral of this section.

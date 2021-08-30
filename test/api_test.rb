@@ -1891,5 +1891,59 @@ context 'API' do
       doc = document_from_string input
       assert_equal doc.blocks[0].items[1], doc.blocks[0].items[0][1].blocks[0].next_adjacent_block
     end
+
+    test 'should return true when sections? is called on a document or section that has sections' do
+      input = <<~'EOS'
+      = Document Title
+
+      == First Section
+
+      === First subsection
+
+      content
+      EOS
+
+      doc = document_from_string input
+      assert doc.sections?
+      assert doc.blocks[0].sections?
+    end
+
+    test 'should return false when sections? is called on a document with no sections' do
+      input = <<~'EOS'
+      = Document Title
+
+      content
+      EOS
+
+      doc = document_from_string input
+      refute doc.sections?
+    end
+
+    test 'should return false when sections? is called on a section with no sections' do
+      input = <<~'EOS'
+      = Document Title
+
+      == First Section
+      EOS
+
+      doc = document_from_string input
+      refute doc.blocks[0].sections?
+    end
+
+    test 'should return false when sections? is called on anything that is not a section' do
+      input = <<~'EOS'
+      .Title
+      ====
+      I'm not section!
+      ====
+
+      [NOTE]
+      I'm not a section either!
+      EOS
+
+      doc = document_from_string input
+      refute doc.blocks[0].sections?
+      refute doc.blocks[1].sections?
+    end
   end
 end

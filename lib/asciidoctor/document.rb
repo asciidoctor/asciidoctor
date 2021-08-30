@@ -631,6 +631,13 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: Check whether this Document has any child Section objects.
+  #
+  # Returns A [Boolean] to indicate whether this Document has child Section objects
+  def sections?
+    @next_section_index > 0
+  end
+
   def footnotes?
     @catalog[:footnotes].empty? ? false : true
   end

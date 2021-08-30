@@ -21,6 +21,7 @@ Bug Fixes::
 
   * Remove unnamespaced selectors in Pygments stylesheet
   * Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
+  * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) *@mogztter*
 
 Improvements::
 
