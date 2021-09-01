@@ -26,7 +26,7 @@ To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
 This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the `.html` extension.
 
-xref:man1/asciidoctor.1.adoc#options[CLI Options] describes the available options and parameters for the Asciidoctor CLI.
+xref:man1/asciidoctor.adoc#options[CLI Options] describes the available options and parameters for the Asciidoctor CLI.
 
 You can output the usage for the `asciidoctor` command by appending the `--help` option:
 
