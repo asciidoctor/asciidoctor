@@ -4,3 +4,4 @@
 ** xref:io-piping.adoc[]
 ** xref:set-safe-mode.adoc[]
 ** xref:options.adoc[]
+** xref:man1/asciidoctor.1.adoc[]
