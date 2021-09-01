@@ -1,0 +1,2 @@
+:page-toclevels: 1
+include::partial$man-asciidoctor.adoc[]
