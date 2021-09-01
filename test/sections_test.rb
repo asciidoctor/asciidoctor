@@ -194,6 +194,51 @@ context 'Sections' do
       assert_equal 'Section One <a id="one"></a>', sec.title
     end
 
+    test 'should apply substititons to title with attribute references when registering section with auto-generated ID' do
+      input = <<~'EOS'
+      = Document Title
+      :foo: bar
+
+      See <<_section_baz>>.
+
+      :foo: baz
+
+      == Section {foo}
+
+      That's all, folks!
+      EOS
+
+      doc = document_from_string input
+      ref = doc.catalog[:refs]['_section_baz']
+      refute_nil ref
+      output = doc.convert standalone: false
+      assert_xpath '//a[@href="#_section_baz"][text()="Section baz"]', output, 1
+      assert_xpath '//h2[@id="_section_baz"][text()="Section baz"]', output, 1
+    end
+
+    test 'should apply substititons to title with attribute references when registering section with explicit ID' do
+      input = <<~'EOS'
+      = Document Title
+      :foo: bar
+
+      See <<explicit>>.
+
+      :foo: baz
+
+      [#explicit]
+      == Section {foo}
+
+      That's all, folks!
+      EOS
+
+      doc = document_from_string input
+      ref = doc.catalog[:refs]['explicit']
+      refute_nil ref
+      output = doc.convert standalone: false
+      assert_xpath '//a[@href="#explicit"][text()="Section baz"]', output, 1
+      assert_xpath '//h2[@id="explicit"][text()="Section baz"]', output, 1
+    end
+
     test 'title substitutions are applied before generating id' do
       sec = block_from_string("== Section{sp}One\n")
       assert_equal '_section_one', sec.id
