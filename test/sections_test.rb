@@ -593,9 +593,25 @@ context 'Sections' do
         assert_xpath '//a[text()="Reference Manual"]', output, 1
       end
 
-      test 'should discard style, role and options shorthand attributes defined on document title' do
+      test 'should not interpret level-0 section as document title if it has a style' do
         input = <<~'EOS'
-        [style#idname.rolename%optionname]
+        [glossary]
+        = Document Title
+
+        content
+        EOS
+        using_memory_logger do |logger|
+          doc = document_from_string input
+          assert_message logger, :ERROR, '<stdin>: line 2: level 0 sections can only be used when doctype is book', Hash
+          refute doc.header?
+          assert_nil doc.attributes['title']
+          assert_equal 'glossary', doc.blocks[0].attributes['style']
+        end
+      end
+
+      test 'should discard role and options shorthand attributes defined on document title' do
+        input = <<~'EOS'
+        [#idname.rolename%optionname]
         = Document Title
 
         content
@@ -2086,6 +2102,24 @@ context 'Sections' do
       assert_equal 'A', appendix.numeral
       assert_equal 'A', appendix.number
       assert appendix.numbered
+    end
+
+    test 'should not promote level-0 special section in book doctype to document title' do
+      input = <<~'EOS'
+      :doctype: book
+
+      [appendix]
+      = Installation
+
+      Installation details here.
+      EOS
+
+      doc = document_from_string input
+      refute doc.header?
+      assert_nil doc.attributes['title']
+      appendix = doc.blocks[0]
+      assert_equal 'appendix', appendix.sectname
+      assert_equal 'Appendix A: ', appendix.caption
     end
 
     test 'should prefix appendix title by numbered label even when section numbering is disabled' do

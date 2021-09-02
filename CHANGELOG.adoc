@@ -23,6 +23,10 @@ Enhancements::
   * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) *@rpavlik*
   * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) *@hackingotter*
 
+Compliance::
+
+  * Don't promote level-0 special section at start of document to document title (#4151)
+
 Bug Fixes::
 
   * Remove unnamespaced selectors in Pygments stylesheet
