@@ -1594,12 +1594,18 @@ class Parser
     end
 
     # generate an ID if one was not embedded or specified as anchor above section title
-    if (id = section.id || (section.id = (document.attributes.key? 'sectids') ? (generated_id = Section.generate_id section.title, document) : nil))
-      # convert title to resolve attributes while in scope
-      section.title unless generated_id || !(sect_title.include? ATTR_REF_HEAD)
-      unless document.register :refs, [id, section]
-        logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
+    if (id = section.id)
+      if id.empty?
+        section.id = id = nil
+      elsif sect_title.include? ATTR_REF_HEAD
+        # convert title to resolve attributes while in scope
+        section.title
       end
+    elsif document.attributes.key? 'sectids'
+      section.id = id = Section.generate_id section.title, document
+    end
+    if id && !(document.register :refs, [id, section])
+      logger.warn message_with_context %(id assigned to section already in use: #{id}), source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
     end
 
     section.update_attributes attributes
