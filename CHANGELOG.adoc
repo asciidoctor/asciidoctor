@@ -35,6 +35,7 @@ Bug Fixes::
 
 Improvements::
 
+  * Use width attribute to set table and column width instead of inline style (#4160)
   * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments, rouge, and coderay) (#4128)
   * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
   * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them

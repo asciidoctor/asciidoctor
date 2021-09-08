@@ -550,9 +550,9 @@ Your browser does not support the audio tag.
       result << '<table>'
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result << '<colgroup>'
-        col_style_attribute = (node.attr? 'labelwidth') ? %( style="width: #{(node.attr 'labelwidth').chomp '%'}%;") : ''
+        col_style_attribute = (node.attr? 'labelwidth') ? %( width="#{(node.attr 'labelwidth').chomp '%'}%") : ''
         result << %(<col#{col_style_attribute}#{slash}>)
-        col_style_attribute = (node.attr? 'itemwidth') ? %( style="width: #{(node.attr 'itemwidth').chomp '%'}%;") : ''
+        col_style_attribute = (node.attr? 'itemwidth') ? %( width="#{(node.attr 'itemwidth').chomp '%'}%") : ''
         result << %(<col#{col_style_attribute}#{slash}>)
         result << '</colgroup>'
       end
@@ -860,13 +860,13 @@ Your browser does not support the audio tag.
     if (stripes = node.attr 'stripes', nil, 'table-stripes')
       classes << %(stripes-#{stripes})
     end
-    style_attribute = ''
+    width_attribute = ''
     if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
       classes << 'fit-content'
     elsif (tablewidth = node.attr 'tablepcwidth') == 100
       classes << 'stretch'
     else
-      style_attribute = %( style="width: #{tablewidth}%;")
+      width_attribute = %( width="#{tablewidth}%")
     end
     classes << (node.attr 'float') if node.attr? 'float'
     if (role = node.role)
@@ -874,7 +874,7 @@ Your browser does not support the audio tag.
     end
     class_attribute = %( class="#{classes.join ' '}")
 
-    result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
+    result << %(<table#{id_attribute}#{class_attribute}#{width_attribute}>)
     result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
     if (node.attr 'rowcount') > 0
       slash = @void_element_slash
@@ -883,7 +883,7 @@ Your browser does not support the audio tag.
         result += (Array.new node.columns.size, %(<col#{slash}>))
       else
         node.columns.each do |col|
-          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>))
+          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col width="#{col.attr 'colpcwidth'}%"#{slash}>))
         end
       end
       result << '</colgroup>'

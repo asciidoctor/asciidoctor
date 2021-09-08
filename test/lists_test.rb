@@ -3165,8 +3165,8 @@ context 'Description lists (:dlist)' do
       assert_css 'table', output, 1
       assert_css 'table > colgroup', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_xpath '(//table/colgroup/col)[1][@style="width: 25%;"]', output, 1
-      assert_xpath '(//table/colgroup/col)[2][@style="width: 75%;"]', output, 1
+      assert_xpath '(//table/colgroup/col)[1][@width="25%"]', output, 1
+      assert_xpath '(//table/colgroup/col)[2][@width="75%"]', output, 1
     end
 
     test 'should set col widths of item and label in docbook if specified' do
