@@ -363,7 +363,7 @@ context 'Tables' do
       end
       output = doc.convert standalone: false
       assert_css 'table', output, 1
-      assert_css 'table[style*="width: 50%;"]', output, 1
+      assert_css 'table[style*="width: 50%"]', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 0
     end
@@ -1025,10 +1025,10 @@ context 'Tables' do
       assert_css 'table[style*="width: 80%"]', output, 1
       assert_xpath '/table/caption[@class="title"][text()="Table 1. Horizontal and vertical source data"]', output, 1
       assert_css 'table > colgroup > col', output, 4
-      assert_css 'table > colgroup > col:nth-child(1)[@style*="width: 17.647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(2)[@style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(3)[@style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(4)[@style*="width: 58.8236%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(1)[style*="width: 17.647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(2)[style*="width: 11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(3)[style*="width: 11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(4)[style*="width: 58.8236%"]', output, 1
       assert_css 'table > thead', output, 1
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > thead > tr > th', output, 4
@@ -2161,7 +2161,7 @@ context 'Tables' do
       assert_equal 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 14.2857"]', output, 6
+      assert_css 'table > colgroup > col[style*="width: 14.2857%"]', output, 6
       assert_css 'table > colgroup > col:last-of-type[style*="width: 14.2858%"]', output, 1
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '//tr[4]/td[5]/p/text()', output, 0
