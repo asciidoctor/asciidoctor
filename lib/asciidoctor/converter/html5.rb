@@ -859,20 +859,19 @@ Your browser does not support the audio tag.
     if (stripes = node.attr 'stripes', nil, 'table-stripes')
       classes << %(stripes-#{stripes})
     end
-    styles = []
+    style_attribute = ''
     if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
       classes << 'fit-content'
     elsif (tablewidth = node.attr 'tablepcwidth') == 100
       classes << 'stretch'
     else
-      styles << %(width: #{tablewidth}%;)
+      style_attribute = %( style="width: #{tablewidth}%;")
     end
     classes << (node.attr 'float') if node.attr? 'float'
     if (role = node.role)
       classes << role
     end
     class_attribute = %( class="#{classes.join ' '}")
-    style_attribute = styles.empty? ? '' : %( style="#{styles.join ' '}")
 
     result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
     result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
