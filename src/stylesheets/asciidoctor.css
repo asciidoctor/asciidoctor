@@ -1877,6 +1877,10 @@ sup.footnoteref a:active {
   width: 99%;
 }
 
+div.page-break {
+  display: none;
+}
+
 div.unbreakable {
   page-break-inside: avoid;
 }
@@ -2286,6 +2290,11 @@ p.tableblock {
 
   .listingblock code[data-lang]::before {
     display: block;
+  }
+
+  div.page-break {
+    display: block;
+    page-break-after: always;
   }
 
   #footer {

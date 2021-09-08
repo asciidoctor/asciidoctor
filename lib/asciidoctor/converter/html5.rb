@@ -773,7 +773,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_page_break node
-    '<div style="page-break-after: always;"></div>'
+    '<div class="page-break"></div>'
   end
 
   def convert_paragraph node

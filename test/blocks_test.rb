@@ -63,9 +63,9 @@ context 'Blocks' do
 
     test 'page break' do
       output = convert_string_to_embedded %(page 1\n\n<<<\n\npage 2)
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]', output, 1
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/preceding-sibling::div/p[text()="page 1"]', output, 1
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/following-sibling::div/p[text()="page 2"]', output, 1
+      assert_xpath '/*[@class="page-break"]', output, 1
+      assert_xpath '/*[@class="page-break"]/preceding-sibling::div/p[text()="page 1"]', output, 1
+      assert_xpath '/*[@class="page-break"]/following-sibling::div/p[text()="page 2"]', output, 1
     end
   end
 

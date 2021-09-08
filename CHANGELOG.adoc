@@ -35,6 +35,7 @@ Improvements::
   * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments, rouge, and coderay) (#4128)
   * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
   * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
+  * Use CSS class instead of inline style to apply page break behavior (#4051)
 
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
