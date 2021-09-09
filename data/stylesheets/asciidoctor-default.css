@@ -312,6 +312,7 @@ sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
 #content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
 .gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
 .gist .file-data>table td.line-data{width:99%}
+div.page-break{display:none}
 div.unbreakable{page-break-inside:avoid}
 .big{font-size:larger}
 .small{font-size:smaller}
@@ -396,6 +397,7 @@ body.book #header .details br+span::before{content:none!important}
 body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
 body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
 .listingblock code[data-lang]::before{display:block}
+div.page-break{display:block;page-break-after:always}
 #footer{padding:0 .9375em}
 .hide-on-print{display:none!important}
 .print-only{display:block!important}
