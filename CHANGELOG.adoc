@@ -24,6 +24,7 @@ Bug Fixes::
   * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) *@mogztter*
   * Hide built-in marker on HTML summary element in Safari when using default stylesheet (#4162)
   * Hide outline around HTML summary when activated in Safari (#4162)
+  * Include primary video in value of `playlist` attribute when embeddding YouTube video (#4156)
 
 Improvements::
 
