@@ -1076,7 +1076,7 @@ Your browser does not support the audio tag.
         target, playlist = target.split ',', 2
         if (playlist ||= node.attr 'playlist') # rubocop:disable Style/ParenthesesAroundCondition
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
-          list_param = %(&amp;playlist=#{playlist})
+          list_param = %(&amp;playlist=#{target},#{playlist})
         else
           # NOTE for loop to work, playlist must be specified; use VIDEO_ID if there's no explicit playlist
           list_param = has_loop_param ? %(&amp;playlist=#{target}) : ''
