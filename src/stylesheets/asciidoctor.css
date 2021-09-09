@@ -1328,6 +1328,10 @@ table.linenotable td.code {
   padding-left: 0.75em;
 }
 
+table.linenotable td.linenos {
+  width: 0.01%;
+}
+
 table.linenotable td.linenos,
 pre.pygments .linenos,
 pre.rouge .linenos {
