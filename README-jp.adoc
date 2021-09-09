@@ -69,7 +69,7 @@ Asciidoctorプロジェクトは {uri-repo}[GitHubにホスティング] され�
 
 インストールをシンプルにするため, AsciidoctorはRubyGem（gem）パッケージとして, {uri-rubygem}[RubyGems.org] で配布されています.
 さらに, Asciidoctorは主要なLinuxディストリビューション用およびmacOS用パッケージとしても配布されています.
-AsciidctorはRubyで動作するだけでなく, {uri-asciidoctorj}[AsciidoctorJ]としてJVM上でも動作します. また, {uri-asciidoctorjs}[Asciidoctor.js]としてどのようなJavaScript環境（ブラウザを含む）でも実行できます.
+AsciidoctorはRubyで動作するだけでなく, {uri-asciidoctorj}[AsciidoctorJ]としてJVM上でも動作します. また, {uri-asciidoctorjs}[Asciidoctor.js]としてどのようなJavaScript環境（ブラウザを含む）でも実行できます.
 
 ifndef::env-site,env-yard[]
 このドキュメントには以下の言語版が存在します: +
