@@ -1128,7 +1128,12 @@ details > summary {
   position: relative;
   line-height: 1.6;
   margin-bottom: 0.625rem;
+  outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
 }
 
 details > summary::before {
