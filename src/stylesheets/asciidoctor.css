@@ -667,35 +667,20 @@ p a > code:hover {
   color: rgba(0, 0, 0, 0.9);
 }
 
-#header,
-#content,
-#footnotes,
-#footer {
-  width: 100%;
+body > div[id] {
   margin: 0 auto;
   max-width: 62.5em;
-  *zoom: 1;
   position: relative;
   padding-left: 0.9375em;
   padding-right: 0.9375em;
+  width: 100%;
 }
 
-#header::before,
-#header::after,
-#content::before,
-#content::after,
-#footnotes::before,
-#footnotes::after,
-#footer::before,
-#footer::after {
+body > div[id]::before,
+body > div[id]::after,
+#content #footnotes::before {
   content: "";
   display: table;
-}
-
-#header::after,
-#content::after,
-#footnotes::after,
-#footer::after {
   clear: both;
 }
 
@@ -2238,10 +2223,7 @@ p.tableblock {
     page-break-after: avoid;
   }
 
-  #header,
-  #content,
-  #footnotes,
-  #footer {
+  body > div[id] {
     max-width: none;
   }
 
@@ -2351,10 +2333,7 @@ p.tableblock {
 }
 
 @media amzn-kf8 {
-  #header,
-  #content,
-  #footnotes,
-  #footer {
+  body > div[id] {
     padding: 0;
   }
 }
