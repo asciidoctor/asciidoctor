@@ -1,4 +1,6 @@
 = Default Stylesheet
+:url-default-stylesheet: https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@{page-component-version}/data/stylesheets/asciidoctor-default.css
+:url-default-stylesheet-source: https://github.com/asciidoctor/asciidoctor/blob/v{page-component-version}.x/src/stylesheets/asciidoctor.css
 
 When you use the HTML converter to generate a standalone HTML document, Asciidoctor includes a default stylesheet to ensure the HTML looks presentable right out of the box.
 This feature gets you up and running quickly by giving you a result you can preview or publish without having to do any additional work.
@@ -164,7 +166,7 @@ Here's how that looks altogether.
 [source,css,subs=attributes+]
 ----
 @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
-@import "https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor@{page-component-version}/data/stylesheets/asciidoctor-default.css";
+@import "{url-default-stylesheet}";
 
 h1, h2, h3, h4, h5, h6, #toctitle,
 .sidebarblock > .content > .title {
@@ -181,7 +183,7 @@ However, Asciidoctor will not embed the contents of the default stylesheet.
 Instead, the browser will fetch it from the location specified by the `@import` directive.
 You can avoid this network call by putting the default stylesheet in the same directory as your custom stylesheet and linking to it using `@import "asciidoctor.css"`.
 
-To get the default stylesheet, you can either https://github.com/asciidoctor/asciidoctor/blob/master/data/stylesheets/asciidoctor-default.css[download it^] from the source repository, or you can use the following `asciidoctor` command (or equivalent) to write it to the current directory:
+To obtain the compiled default stylesheet, you can either {url-default-stylesheet}[download it^] from the source repository, or you can use the following `asciidoctor` command (or equivalent) to write it to the current directory:
 
  $ echo | asciidoctor -o $TMPDIR/out.html -a linkcss -a copycss - && cp $TMPDIR/asciidoctor.css .
 
@@ -194,6 +196,8 @@ require 'asciidoctor'
 Asciidoctor::Stylesheets.instance.write_primary_stylesheet '.'
 ----
 
+You can also download the {url-default-stylesheet-source}[source of the default stylesheet^] if you want to use it as a starting point for developing a custom stylesheet.
+
 To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
 
 == Are there different themes?
@@ -201,5 +205,6 @@ To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet
 The default stylesheet does not provide different themes.
 However, you can find stylesheets with different themes in the https://github.com/darshandsoni/asciidoctor-skins[Asciidoctor Skins^] project.
 These stylesheets take the approach of loading the default stylesheet (from a CDN), then overlaying additional styles to create a variety of themes.
+You also have the option of downloading the {url-default-stylesheet-source}[source of the default stylesheet^] and customizing it to suit your needs.
 
 To learn how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
