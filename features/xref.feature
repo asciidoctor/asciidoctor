@@ -901,6 +901,33 @@ Feature: Cross References
           a< href='#Section One' [Section One]
       """
 
+    Scenario: Does not process a natural cross reference if sectids is not set
+    Given the AsciiDoc source
+      """
+      :!sectids:
+
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to <<Section One>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2 Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#Section One' [Section One]
+      """
+
     Scenario: Parses text of xref macro as attributes if attribute signature found
     Given the AsciiDoc source
       """
