@@ -44,7 +44,6 @@ input[type=checkbox],input[type=radio]{padding:0}
 button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
 textarea{overflow:auto}
 img,object{max-width:100%;height:auto}
-object{height:100%}
 .left{float:left!important}
 .right{float:right!important}
 .text-left{text-align:left!important}

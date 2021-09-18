@@ -264,10 +264,6 @@ object {
   height: auto;
 }
 
-object {
-  height: 100%;
-}
-
 .left {
   float: left !important;
 }
