@@ -259,7 +259,8 @@ textarea {
 }
 
 img,
-object {
+object,
+svg {
   max-width: 100%;
   height: auto;
 }
