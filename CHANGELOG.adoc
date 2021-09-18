@@ -42,6 +42,8 @@ Improvements::
   * Use CSS class instead of inline style to apply page break behavior (#4051)
   * Set width of line number table column of source block to 0.01% to restrict width and force table to span available width (#4137)
   * Consolidate styles applied to primary containers (`#header`, `#content`, `#footnotes`, `#footer`) in default stylesheet (#4169)
+  * Constrain width of `<svg>` element to container in default stylesheet
+  * Target `<object>` element with image more accurately in default stylesheet
 
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux

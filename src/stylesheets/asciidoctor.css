@@ -170,16 +170,22 @@ sub {
   bottom: -0.25em;
 }
 
+img,
+object[type^="image/"],
+svg {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
 img {
   border: 0;
   -ms-interpolation-mode: bicubic;
 }
 
-img,
-object,
-svg {
-  display: inline-block;
-  vertical-align: middle;
+object {
+  max-width: 100%;
 }
 
 svg:not(:root) {
@@ -256,13 +262,6 @@ input::-moz-focus-inner {
 
 textarea {
   overflow: auto;
-}
-
-img,
-object,
-svg {
-  max-width: 100%;
-  height: auto;
 }
 
 .left {
