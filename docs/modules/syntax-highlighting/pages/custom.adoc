@@ -1,6 +1,7 @@
 = Custom Syntax Highlighter Adapter
 :navtitle: Custom Adapter
-:apidoc-syntax-highlighter: {url-api-gems}/asciidoctor/{release-version}/Asciidoctor
+:apidoc-base: {url-api-gems}/asciidoctor/{release-version}/Asciidoctor
+:apidoc-syntax-highlighter: {apidoc-base}/SyntaxHighlighter
 :apidoc-syntax-highlighter-base: {apidoc-syntax-highlighter}/Base
 :apidoc-syntax-highlighter-for: {apidoc-syntax-highlighter}/Factory#for-instance_method
 
