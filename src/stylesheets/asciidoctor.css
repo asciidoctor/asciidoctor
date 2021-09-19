@@ -2197,10 +2197,6 @@ p.tableblock {
     display: table-header-group;
   }
 
-  svg {
-    max-width: 100%;
-  }
-
   p,
   blockquote,
   dt,
