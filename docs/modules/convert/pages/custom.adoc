@@ -26,7 +26,7 @@ The advantage of writing the converter in Ruby is that you can use the same code
 That's the best strategy if you plan to share the converter with the community.
 
 When creating a custom converter, you can either write one from scratch or you can extend a built-in converter.
-You can then register that converter with a xref:ROOT:converters.adoc#built-in-converters[known backend] to replace the previously registered converter, or you can register it with a new backend to create a new output target.
+You can then register that converter with a xref:available.adoc[known backend] to replace the previously registered converter, or you can register it with a new backend to create a new output target.
 If you don't want to register the converter with a backend, you can pass the converter class or instance to the API using the `:converter` option.
 
 .Producing non-SGML output formats
