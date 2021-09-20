@@ -1,4 +1,4 @@
-= Built-in Convertible Contexts
+= Convertible Contexts
 
 When Asciidoctor converters a document, it delegates to the converter to convert each node (block or inline element) in the document as it visits each node in document order (though it's the `#content` method on a block that continues the traversal of its child nodes).
 Asciidoctor then combines the result of all those calls to produce the output document.
