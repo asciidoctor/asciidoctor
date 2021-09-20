@@ -105,8 +105,6 @@ When it does, Ruby will define the `MyHtml5Converter` class.
 While defining the class, it will call the `register_for` method, which will register the class with the `html5` backend (replacing the built-in converter).
 This means Asciidoctor is now using your custom converter.
 
- $ asciidoctor -r ./my-html5-converter.rb doc.adoc
-
 Now that you've configured Asciidoctor to use your custom converter, it's time to get it to do something different.
 Let's say that you want to simplify the HTML that the built-in converter produces for a paragraph down to a single `<p>` element.
 A custom converter is exactly the tool you need to accomplish this goal.
@@ -135,7 +133,11 @@ end
 <1> The base converter automatically includes the Logging module, which gives your converter access to Asciidoctor's logger.
 
 So far, all we've done is print an intent to convert a paragraph, then delegate back to the super method (i.e., the original implementation).
-If you run Asciidoctor as before, you should now see the following message in your terminal window.
+If you run Asciidoctor as before:
+
+ $ asciidoctor -r ./my-html5-converter.rb doc.adoc
+
+you should now see the following message in your terminal window:
 
 ....
 asciidoctor: WARNING: Converting a paragraph...
