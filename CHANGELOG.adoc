@@ -31,6 +31,10 @@ Improvements::
 
   * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments and coderay) (#4128)
 
+== Documentation
+
+  * Document how to extend an existing converter or create a new converter (#4136)
+
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 

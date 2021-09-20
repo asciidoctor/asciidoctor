@@ -16,7 +16,7 @@ nav:
 - modules/ROOT/nav-top.adoc
 - modules/install/nav.adoc
 - modules/get-started/nav.adoc
-- modules/ROOT/nav-converters.adoc
+- modules/convert/nav.adoc
 - modules/html-backend/nav.adoc
 - modules/docbook-backend/nav.adoc
 - modules/manpage-backend/nav.adoc
