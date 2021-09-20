@@ -114,7 +114,7 @@ A custom converter is exactly the tool you need to accomplish this goal.
 In this case, we'll be overriding the `convert_paragraph` method.
 When extending a built-in converter (or any converter that extends {apidoc-converter-base}[`Asciidoctor::Converter::Base`]), the name of the convert method for a node in the parsed document model is the context of the node (e.g., `paragraph`) prefixed with `convert_`.
 That's how we arrive at the method name `convert_paragraph` for a paragraph.
-You can find a list of all such methods in <<built-in-convertible-contexts>>.
+You can find a list of all such methods in xref:contexts-ref.adoc[].
 
 The converter method accepts the node as the first parameter.
 For blocks, the node is an instance of {apidoc-block}[`Asciidoctor::Block`].
@@ -289,7 +289,7 @@ If you don't call this method, the child nodes will be skipped.
 
 As you can see, having to write a switch statement to handle each type of node is more clumsy than the discrete methods we were writing when extending a built-in converter.
 If we change the definition of our converter class to extend {apidoc-converter-base}[`Asciidoctor::Converter::Base`], Asciidoctor will handle this dispatching for us.
-One noticeable difference is that we now either have to provide a handler for every <<built-in-convertible-contexts,convertible context>>, or implement a `method_missing` method as a catch all.
+One noticeable difference is that we now either have to provide a handler for every xref:contexts-ref.adoc[convertible context], or implement a `method_missing` method as a catch all.
 Here's how that looks:
 
 [,ruby]
@@ -355,146 +355,3 @@ Here's an example of the output you will get:
 ----
 
 To write a fully-functional converter, you'll need to provide a convert method for all convertible contexts (or provide a fallback for contexts the converter does not handle).
-
-[#built-in-convertible-contexts]
-== Built-in convertible contexts
-
-When Asciidoctor converters a document, it calls on the converter to convert each node (block or inline element) in the document as it visits each node in document order, then combines the result of all those calls to produce the output document.
-Recall that calling the `#content` method on a block is what continues the traversal of its child nodes.
-
-To convert a node, Asciidoctor calls the `convert` method on the converter and passes in the node.
-In some cases, it also passes in an extra transform value to differentiate between different uses cases for a node of the same type.
-When using a converter that extends {apidoc-converter-base}[`Asciidoctor::Converter::Base`], the base converter will delegate to a method whose name starts with `convert_` and is followed by the context of the node (e.g., `convert_paragraph`).
-
-The following table lists the contexts for all the built-in nodes that Asciidoctor converts, along when the name of the method the base converter will look for.
-Extensions can introduce additional contexts.
-
-.Convert methods for built-in contexts
-|===
-|Context |Convert method
-
-|:admonition
-|convert_admonition
-
-|:audio
-|convert_audio
-
-|:colist
-|convert_colist
-
-|:dlist
-|convert_dlist
-
-|:document
-|convert_document
-
-|:embedded
-|convert_embedded
-
-|:example
-|convert_example
-
-|:floating_title
-|convert_floating_title
-
-|:image
-|convert_image
-
-|:inline_anchor
-|convert_inline_anchor
-
-|:inline_break
-|convert_inline_break
-
-|:inline_button
-|convert_inline_button
-
-|:inline_callout
-|convert_inline_callout
-
-|:inline_footnote
-|convert_inline_footnote
-
-|:inline_image
-|convert_inline_image
-
-|:inline_indexterm
-|convert_inline_indexterm
-
-|:inline_kbd
-|convert_inline_kbd
-
-|:inline_menu
-|convert_inline_menu
-
-|:inline_quoted
-|convert_inline_quoted
-
-|:listing
-|convert_listing
-
-|:literal
-|convert_literal
-
-|:olist
-|convert_olist
-
-|:open
-|convert_open
-
-|:outline
-|convert_outline
-
-|:page_break
-|convert_page_break
-
-|:paragraph
-|convert_paragraph
-
-|:preamble
-|convert_preamble
-
-|:quote
-|convert_quote
-
-|:section
-|convert_section
-
-|:sidebar
-|convert_sidebar
-
-|:stem
-|convert_stem
-
-|:table
-|convert_table
-
-|:thematic_break
-|convert_thematic_break
-
-|:toc
-|convert_toc
-
-|:ulist
-|convert_ulist
-
-|:verse
-|convert_verse
-
-|:video
-|convert_video
-|===
-
-The converter is not called to handle nodes with the `:list_item` or `:table_cell` contexts.
-Instead, it's up to the converter to access these nodes from the parent node and convert them directly.
-
-When a method to convert a block is called, the inline markup has not yet been parsed.
-That parsing and subsequent conversion happens when the `#content` method is called on the node.
-This is also what triggers the processor to visit the child nodes of that block.
-
-Some methods for converting blocks have to handle the specialized behavior as indicated by the style.
-For example, the `convert_listing` method also handles source blocks (listing blocks with the source style).
-And `convert_dlist` handles qanda lists (dlist blocks with the qanda style).
-
-`:embedded` is not a true context, but rather a transform of the `:document` context.
-It's convert method is called instead of the one for `:document` when the document is loaded in embedded mode (i.e., the `:standalone` option on the processor is `false`).
