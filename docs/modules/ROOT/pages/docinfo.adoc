@@ -30,7 +30,7 @@ The docinfo file for HTML output may contain valid elements to populate the HTML
 
 CAUTION: Use of the `<title>` element is not recommend as it's already emitted by the converter.
 
-You do not need to include the enclosing `<head>` tag as it's assumed to be the envelope.
+You do not need to include the enclosing `<head>` element as it's assumed to be the envelope.
 
 Here's an example:
 

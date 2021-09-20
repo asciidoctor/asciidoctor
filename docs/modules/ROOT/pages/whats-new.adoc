@@ -215,10 +215,10 @@ _**Release date:** 2020.11.02_
 == Compliance
 
 * Add support for `muted` option to self-hosted video (#3408)
-* Move `style` tag for convert-time syntax highlighters (coderay, rouge, pygments) into head (#3462)
-* Move `style` tag for client-side syntax highlighters (highlight.js, prettify) into head (#3503)
+* Move `<style>` element for convert-time syntax highlighters (coderay, rouge, pygments) into head (#3462)
+* Move `<style>` element for client-side syntax highlighters (highlight.js, prettify) into head (#3503)
 * Define entry point API methods (`load`, `convert`, `load_file`, `convert_file`) as class methods instead of `module_function` to avoid conflict with `Kernel.load` (#3625)
-* Retain attribute order on HTML `code` tag for source block to remain consistent with output from Asciidoctor 1.5.x (#3786)
+* Retain attribute order on HTML `code` element for source block to remain consistent with output from Asciidoctor 1.5.x (#3786)
 * Correct language code for Korean language file from `kr` to `ko` (#3807) (*@jnavila*)
 
 == Improvements
