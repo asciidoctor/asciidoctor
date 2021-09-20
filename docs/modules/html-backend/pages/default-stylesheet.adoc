@@ -92,7 +92,7 @@ Asciidoctor.convert_file 'document.adoc', safe: :safe
 
 == Disable or modify the web fonts
 
-When the default stylesheet is used, the converter adds a `<link rel="stylesheet">` tag to load web fonts from Google Fonts.
+When the default stylesheet is used, the converter adds a `<link>` element specialized by the attribute `rel="stylesheet"` to load web fonts from Google Fonts.
 You can disable this link by unsetting the `webfonts` document attribute from the CLI, API, or document header.
 
  $ asciidoctor -a webfonts! document.adoc
@@ -127,10 +127,10 @@ Another way is to create a custom stylesheet, but import the default stylesheet 
 
 Adding auxiliary styles is a great use case for xref:ROOT:docinfo.adoc[docinfo].
 The docinfo feature in AsciiDoc allows you to inject auxiliary content from a file into various places in the HTML output.
-In this case, we're interested in the "head" position, which injects content at the bottom of the `<head>` tag.
+In this case, we're interested in the "head" position, which injects content at the bottom of the `<head>` element.
 
 Let's say you want to change the color of headings (and other heading-like titles) to match the color of paragraph text.
-Start by creating a file named [.path]_docinfo.html_ (head is the default location) and populate it with a `<style>` tag with the necessary styles.
+Start by creating a file named [.path]_docinfo.html_ (head is the default location) and populate it with a `<style>` element with the necessary styles.
 
 .docinfo.html
 [source,html]
@@ -147,7 +147,7 @@ Now tell Asciidoctor to look for and load the docinfo file using the `docinfo` a
 
  $ asciidoctor -a docinfo=shared document.adoc
 
-The `<style>` tag in your docinfo file will be inserted directly below the default stylesheet in the generated HTML.
+The `<style>` element in your docinfo file will be inserted directly below the default stylesheet in the generated HTML.
 
 [#customize-extend]
 === Extend the default stylesheet

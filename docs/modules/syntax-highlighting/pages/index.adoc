@@ -37,7 +37,7 @@ Unfortunately, Asciidoctor does not process callout numbers in the source block 
 A [.term]*build-time syntax highlighter* performs syntax highlighting during AsciiDoc conversion.
 Asciidoctor does invoke the syntax highlighter in this case.
 It also takes care of hiding the callout numbers from the syntax highlighter, ensuring they are put back in the proper place afterwards.
-What Asciidoctor emits into the output is the result produced by the syntax highlighter, which are the tokens wrapped in `<span>` tags to apply color and other formatting (either inline or via CSS classes).
+What Asciidoctor emits into the output is the result produced by the syntax highlighter, which are the tokens enclosed in `<span>` elements to apply color and other formatting (either inline or via CSS classes).
 These syntax highlighters tend to support more features because Asciidoctor has greater control over the process.
 
 === Client-side vs build-time
@@ -80,7 +80,7 @@ h|Client-side
 
 Asciidoctor does not apply syntax highlighting when generating DocBook.
 The assumption is that this is a task the DocBook toolchain can handle.
-The DocBook converter generates a `<programlisting>` tag for the source block and passes through the source language as specified in the AsciiDoc.
+The DocBook converter generates a `<programlisting>` element for the source block and passes through the source language as specified in the AsciiDoc.
 It's then up to the DocBook toolchain to apply syntax highlighting to the contents of that tag.
 
 You can explore these integrations in depth on the xref:highlightjs.adoc[], xref:rouge.adoc[], xref:pygments.adoc[], and xref:coderay.adoc[] pages.

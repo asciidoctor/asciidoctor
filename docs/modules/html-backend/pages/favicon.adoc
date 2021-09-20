@@ -15,7 +15,7 @@ By default, the processor will add a link reference of type "icon" that refers t
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 ----
 
-This reference gets added inside the HTML `<head>` tag (which explains why this feature is not available when generating an embeddable HTML document).
+This reference gets added inside the HTML `<head>` element (which explains why this feature is not available when generating an embeddable HTML document).
 
 To modify the name or location of the icon file, simply assign a value to the favicon attribute:
 
@@ -25,7 +25,7 @@ To modify the name or location of the icon file, simply assign a value to the fa
 :favicon: ./images/favicon/favicon.png
 ----
 
-This will now produce the following HTML tag:
+This will now produce the following HTML element:
 
 [source,html]
 ----
