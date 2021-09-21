@@ -204,7 +204,7 @@ To revert this behavior, explicitly unset `compat-mode`.
 |Block delimiters
 |Delimiter lines do not have to match in length.
 |The length of start and end delimiter lines must match exactly.
-|See xref:asciidoc:blocks:build-basic-block.adoc#delimited-blocks[Delimited blocks].
+|See xref:asciidoc:blocks:delimited.adoc[].
 
 |Default substitutions for passthrough blocks
 |Applies attributes and macros substitutions to passthrough blocks
