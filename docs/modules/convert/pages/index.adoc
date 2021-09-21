@@ -12,7 +12,7 @@ This page explains that difference while also providing more background on how c
 == What is a converter?
 
 A converter takes AsciiDoc and transforms it into a different format.
-More specifically, it processes each node in a parsed AsciiDoc document in document order and returns a converted fragment, which the processor combines to create the output document.
+More specifically, it processes each node (i.e., block or inline element) in a parsed AsciiDoc document in document order and returns a converted fragment, which the processor combines to create the output document.
 Each converter produces a specific output format, such as HTML or DocBook XML.
 
 Asciidoctor provides several built-in converters and a facility for adding additional converters.

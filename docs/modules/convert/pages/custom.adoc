@@ -33,7 +33,7 @@ If you don't want to register the converter with a backend, you can pass the con
 ****
 An important point to keep in mind is that converters (and, in general, AsciiDoc processors like Asciidoctor) are biased towards creating SGML output (e.g., XML and HTML).
 This means that when producing other output formats, you'll need to decode XML character references and employ techniques that preserve the expected behavior of the processor.
-One such technique is to use temporary XML tags around boundaries of inline nodes such as formatted text so the processor can still recognize those boundaries when performing inline substitutions.
+One such technique is to use temporary XML tags around boundaries of inline elements such as formatted text so the processor can still recognize those boundaries when performing inline substitutions.
 The https://github.com/asciidoctor/asciidoctor/blob/HEAD/lib/asciidoctor/converter/manpage.rb[built-in man page converter] provides a good example of these techniques.
 ****
 
@@ -43,7 +43,7 @@ A converter in Asciidoctor is not designed to be reused from one conversion to t
 Implementing a custom converter consists of the following steps:
 
 . Write a Ruby class that includes the {apidoc-converter}[`Asciidoctor::Converter`] module or extends a class that does.
-. Implement one or more handler methods to convert the nodes in the document to the target output format.
+. Implement a callback method to convert the nodes (i.e., block or inline elements) in the parsed document to the target output format.
 . Optionally register the converter with one or more backend names.
 . Require (i.e., load) the Ruby file containing the converter class.
 . Activate the converter by setting the backend on the document if the converter is registered with a backend, otherwise passing the converter class or instance to the API using the `:converter` option
@@ -110,7 +110,7 @@ Let's say that you want to simplify the HTML that the built-in converter produce
 A custom converter is exactly the tool you need to accomplish this goal.
 
 In this case, we'll be overriding the `convert_paragraph` method.
-When extending a built-in converter (or any converter that extends {apidoc-converter-base}[`Asciidoctor::Converter::Base`]), the name of the convert method for a node in the parsed document model is the context of the node (e.g., `paragraph`) prefixed with `convert_`.
+When extending a built-in converter (or any converter that extends {apidoc-converter-base}[`Asciidoctor::Converter::Base`]), the name of the convert method for a node (i.e., block or inline element) in the parsed document model is the context of the node (e.g., `paragraph`) prefixed with `convert_`.
 That's how we arrive at the method name `convert_paragraph` for a paragraph.
 You can find a list of all such methods in xref:contexts-ref.adoc[].
 
@@ -252,15 +252,15 @@ class DitaConverter
     outfilesuffix '.dita'
   end
 
-  def convert node, transform = node.node_name, opts = nil
-    case transform <1>
+  def convert node, transform = node.node_name, opts = nil <1>
+    case transform <2>
     when 'document'
       <<~EOS.chomp
       <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
       <topic>
       <title>#{node.doctitle}</title>
       <body>
-      #{node.content} <2>
+      #{node.content} <3>
       </body>
       </topic>
       EOS
@@ -268,7 +268,7 @@ class DitaConverter
       <<~EOS.chomp
       <section id="#{node.id}">
       <title>#{node.title}</title>
-      #{node.content} <2>
+      #{node.content} <3>
       </section>
       EOS
     when 'paragraph'
@@ -279,8 +279,9 @@ class DitaConverter
   end
 end
 ----
-<1> The `transform` parameter is only set in special cases, such as for an embedded document.
-<2> Calling `node.content` on a block continues the traversal of the document structure from that node.
+<1> The `node_name` method returns the node's context as a string.
+<2> The `transform` parameter is only set in special cases, such as for an embedded document.
+<3> Calling `node.content` on a block continues the traversal of the document structure from that node.
 
 IMPORTANT: The `#content` method controls whether a block is traversed, not the processor.
 Thus, when converting a block element, the converter should invoke the `#content` method on the node (e.g., `node.content`).
@@ -354,6 +355,16 @@ Here's an example of the output you will get:
 </section>
 </body>
 </topic>
+----
+
+If you don't register the converter with a backend, you can pass the converter class (or instance) using the `:converter` option of the xref:api:index.adoc[Asciidoctor API], as shown in the following code snippet:
+
+[,rb]
+----
+require 'asciidoctor'
+require_relative 'dita-converter.rb'
+
+Asciidoctor.convert_file 'doc.adoc', safe: :safe, backend: 'dita', converter: DitaConverter
 ----
 
 To write a fully-functional converter, you'll need to provide a convert method for all convertible contexts (or provide a fallback for contexts the converter does not handle).
