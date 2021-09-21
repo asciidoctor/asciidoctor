@@ -38,9 +38,9 @@ _(Experimental)._
 |_Boolean_
 
 |`:converter`
-|Specifies a user-supplied `Asciidoctor::Converter` instance, used in place of the converter that is automatically resolved from the `backend` value.
+|Specifies a user-supplied converter class or instance, used in place of the converter that is automatically resolved from the `backend` value.
 |_not set_
-|`Asciidoctor::Converter` instance
+|`Asciidoctor::Converter` class or instance
 
 |`:doctype`
 |Sets the document type.
