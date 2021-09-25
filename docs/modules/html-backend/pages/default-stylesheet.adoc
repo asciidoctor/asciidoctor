@@ -149,6 +149,26 @@ Now tell Asciidoctor to look for and load the docinfo file using the `docinfo` a
 
 The `<style>` element in your docinfo file will be inserted directly below the default stylesheet in the generated HTML.
 
+[#customize-targets]
+=== Make more elements addressable from CSS
+
+If you want to style specific elements in your content, you need to make them addressable from CSS.
+In other words, it must be possible to target them using a CSS selector.
+There are two mechanisms in AsciiDoc that enable you to do this:
+
+id:: You can add an ID to almost any element in AsciiDoc using the xref:asciidoc:attributes:ids.adoc[ID attribute].
+The ID attribute in AsciiDoc translates to the `id` attribute in HTML.
+You can then target that element (and only that element) from CSS in order to modify its style using the syntax `#<id>`, where `<id>` is the value you specify.
+Each ID can only be used once in a document.
+
+role:: You can add a role to almost any element in AsciiDoc using the xref:asciidoc:attributes:role.adoc[role attribute].
+The role attribute in AsciiDoc translates to the `class` attribute in HTML.
+You can then target that element (and any other elements that share the same role) from CSS in order to modify its style using the syntax `.<role>`, where `<role>` is the value you specify.
+A role can be used many times in the document.
+You can even target different elements that share the same role individually in the stylesheet by adding the element name (e.g., `span.appname`) or additional roles (e.g., `.varname.global`).
+
+For any ID or role you introduce, you must provide custom styles for it in order for it to have any visual effect.
+
 [#customize-extend]
 === Extend the default stylesheet
 
