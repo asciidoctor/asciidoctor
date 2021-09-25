@@ -168,6 +168,16 @@ To revert this behavior, explicitly unset `compat-mode`.
 |See xref:asciidoc:sections:numbers.adoc[].
 |===
 
+Asciidoctor is more careful when deriving automatic IDs for sections from the section title to avoid generating obscure IDs.
+
+* Asciidoctor removes any start and end HTML/XML tags, whereas AsciiDoc.py does not.
+* Asciidoctor removes any character references (e.g., `\&copy;`), whereas AsciiDoc.py does not (see next rule).
+* Asciidoctor removes any invalid characters (e.g., `$`), whereas AsciiDoc.py replaces these characters with the value of the `idseparator` attribute.
+* Asciidoctor automatically generates IDs for discrete headings, whereas AsciiDoc.py does not.
+
+To ensure your IDs have maximum portability, it's best to define them explicitly if the section title contains special characters or formatting.
+
+
 === Tables
 
 [cols="~,~,~,~"]
