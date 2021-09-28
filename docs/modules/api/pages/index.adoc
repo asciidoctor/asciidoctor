@@ -1,21 +1,49 @@
 = Process AsciiDoc Using the API
 :url-api: {url-api-gems}/asciidoctor/{release-version}
 
-In addition to a CLI, Asciidoctor provides a {url-api}[Ruby API^] named `Asciidoctor` for parsing, analyzing, and converting AsciiDoc content.
-This API is intended for use in scripts, integration with other Ruby software, such as Rails, GitHub, and GitLab, and by other languages, such as Java (via xref:asciidoctorj::index.adoc[AsciidoctorJ]) and JavaScript (via xref:asciidoctor.js::index.adoc[Asciidoctor.js]).
+Asciidoctor provides a Ruby {url-api}[API^] named `Asciidoctor` for parsing, analyzing, and converting AsciiDoc content.
+This API is intended for use in applications, scripts, integrations with other Ruby software, such as Rails, GitHub, and GitLab, and by other languages, such as Java (via xref:asciidoctorj::index.adoc[AsciidoctorJ]) and JavaScript (via xref:asciidoctor.js::index.adoc[Asciidoctor.js]).
 
-This page covers how to get started with the Asciidoctor API, introduces its primary entry points, and explains where to get more information so you can use the API for more advanced use cases.
+This page examines the purpose of the API and how it can be used, shows how to get started with it, introduces its primary entry points, and links to where you can find more information to start putting it into practice.
 
-== Use require to get started
+[#when-to-use]
+== When to use the API
+
+If all you want to do is convert an AsciiDoc file to a publishable format such as HTML, then the xref:cli:index.adoc[`asciidoctor`] CLI should suit your needs.
+In contrast, what the API enables you to do is break down that processing into smaller steps to either give you more control over the processing, capture the result of a single step, analyze the parsed document, or interface with the document model in an extension.
+
+When using the API, we talk about two main steps:
+
+load:: In this step, the AsciiDoc content is parsed into a document object model.
+This model represents an in-memory hierarchy of the AsciiDoc content as a tree of Ruby objects.
+These objects represent the elements in the AsciiDoc document, down to the block level, along with any metadata, such as document and block attributes.
+
+convert:: In this step, the previously prepared document object model is converted into the specified output format using a converter.
+In coordination with the converter, the processor passes each node in the document object model to the converter to be converted.
+The result is then combined and either returned or written to a file, depending on the options passed to the API.
+
+You can use the API to perform these two steps together (like the CLI) using `convert` and `convert_file`, or separately using `load` and `load_file` followed by calling `#convert` on the document object.
+The API can load and convert AsciiDoc files (`load_file` and `convert_file`) or strings (`load` and `convert`).
+The <<API entrypoints>> section introduces these methods in more detail.
+
+The API is the main way to interface with Asciidoctor in an application or integration library.
+By using the API, you avoid having to invoke Asciidoctor using a subprocess.
+You'll find that it also gives you a lot more control over the processing than what the CLI affords.
+The API is also a useful tool in scripts, where you may need to dive deeper into the document model beyond where extensions allow you to go.
+It is also instrumental in the development of extensions.
+
+Let's learn how to get started with the API by requiring the Asciidoctor library.
+
+[#require]
+== Start with `require`
 
 To get started with the Asciidoctor API, you first need to xref:install:index.adoc[install the gem].
-The gem provides both the CLI and the Ruby API.
+The gem provides both the CLI and the API.
 In fact, the CLI uses the API to handle AsciiDoc conversion.
 
-Whereas with the CLI, you interact with Asciidoctor using the `asciidoctor` command, when using the API, you require the `asciidoctor` gem using Ruby's `require` function.
-From there, you interact with the `Asciidoctor` API.
+Whereas with the CLI, you interact with Asciidoctor using the `asciidoctor` command, when using the API, you interact with Asciidoctor using methods on the `Asciidoctor` module.
 
-To start using the Asciidoctor API in your application or script, you first need to require the gem as show here:
+In order to make the `Asciidoctor` module available in a Ruby script or application, you must require the `asciidoctor` gem using Ruby's `require` function:
 
 [,ruby]
 ----
@@ -33,9 +61,10 @@ puts Asciidoctor::VERSION
 
 If the `require` statement fails, check to make sure that you have the gem installed (and available on the GEM_PATH).
 
+[#entrypoints]
 == API entrypoints
 
-The CLI is focused on converting AsciiDoc to various output formats.
+The CLI is primarily intended for converting AsciiDoc.
 While the API can do that as well, it can do so much more.
 Instead of just converting AsciiDoc, the API allows you to load the AsciiDoc into a document model.
 From there, you can either convert the document model to an output format, or you can pause to analyze or modify its structure.
@@ -58,135 +87,13 @@ However, these defaults can be changed using the options (e.g., `:to_file`).
 When calling Asciidoctor using the API, you can access xref:options.adoc[additional options that control processing] which are not available when using the CLI.
 For example, you can pass in extensions, parse only the header, enable the sourcemap, or catalog assets.
 
-In addition to the main entrypoints, the API also provides a mechanism to register extensions via the `Asciidoctor::Extensions` API.
+In addition to the main entrypoints, the API also provides a mechanism to register and develop extensions.
 To learn more about extensions, see xref:extensions:index.adoc[].
-
-== Load AsciiDoc using the API
-
-When you load AsciiDoc using the API, you're telling Asciidoctor to parse the document (down to the block level) and return an `Asciidoctor::Document` object.
-This object contains the full block structure of the AsciiDoc document.
-
-CAUTION: Loading a document currently does not parse the inline content.
-That processing is deferred until the parsed document is converted.
-
-Let's assume we're working with the following AsciiDoc document:
-
-._document.adoc_
-[,asciidoc]
-----
-= Document Title
-
-The main content.
-----
-
-To parse this source file into an `Asciidoctor::Document` object, use the following API call:
-
-[,ruby]
-----
-doc = Asciidoctor.load_file 'document.adoc', safe: :safe
-----
-
-Using the object assigned to the `doc` variable, you can get information about the document, such as the document title.
-
-[,ruby]
-----
-puts doc.doctitle
-# => "Document Title"
-----
-
-You can also inspect all the document attributes:
-
-[,ruby]
-----
-pp doc.attributes
-----
-
-Going deeper, you can find blocks in the document, such as all the paragraph blocks, using the `find_by` method:
-
-[,ruby]
-----
-puts doc.find_by context: :paragraph
-# => #<Asciidoctor::Block@1001 {context: :paragraph, content_model: :simple, style: nil, lines: 1}>
-----
-
-If you're starting with a source String instead of a source file, you'd use the `load` method instead:
-
-[,ruby]
-----
-asciidoc = File.read 'document.adoc', mode: 'r:utf-8'
-doc = Asciidoctor.load asciidoc, safe: :safe
-----
-
-Once you have loaded the document, you can convert it by calling the convert method:
-
-[,ruby]
------
-doc.convert
------
-
-However, if you're only interested in converting the AsciiDoc source when using the API, then it's better to use a convert entrypoint.
-
-== Convert AsciiDoc using the API
-
-When you convert AsciiDoc using the API, you're telling Asciidoctor to parse and convert the document to the output format determined by the specified backend.
-If you don't specify a backend, like with the CLI, Asciidoctor will produce HTML.
-
-Let's again assume we're working with the following AsciiDoc document:
-
-._document.adoc_
-[,asciidoc]
-----
-= Document Title
-
-The main content.
-----
-
-To convert this source file to HTML5, use the following API call:
-
-[,ruby]
-----
-Asciidoctor.convert_file 'document.adoc', safe: :safe
-----
-
-The command will output HTML to the file [.path]_my-sample.html_ in the same directory.
-If you want Asciidoctor to output to a different file, you can specify it using the `:to_file` option:
-
-[,ruby]
-----
-Asciidoctor.convert_file 'document.adoc', safe: :safe, to_file: 'out.html'
-----
-
-You can convert the file to DocBook by setting the `:backend` option to `'docbook'`:
-
-[,ruby]
-----
-Asciidoctor.convert_file 'document.adoc', safe: :safe, backend: 'docbook'
-----
-
-In this case, Asciidoctor will output DocBook to the file [.path]_my-sample.xml_ in the same directory.
-As before, you can use the `:to_file` option to control the output file.
-
-If you're starting with a source String instead of a source file, you'd use the `convert` method instead:
-
-[,ruby]
-----
-asciidoc = File.read 'document.adoc', mode: 'r:utf-8'
-html = Asciidoctor.convert asciidoc, safe: :safe
-----
-
-In this case, embedded HTML is returned.
-To instruct Asciidoctor to write standalone HTML to a file instead, the `:to_file` option is mandatory. 
-
-[,ruby]
-----
-asciidoc = File.read 'document.adoc', mode: 'r:utf-8'
-Asciidoctor.convert asciidoc, safe: :safe, to_file: 'out.html'
-----
-
-That covers the basics of loading and converting AsciiDoc using the API.
 
 == Next steps
 
+* xref:convert-files.adoc[Load and convert AsciiDoc from a file]
+* xref:convert-strings.adoc[Load and convert AsciiDoc from a string]
 * xref:convert-strings.adoc#embedded-output[Generating embedded vs standalone output]
 * xref:convert-strings.adoc#convert-inline-markup-only[Convert inline markup only]
 * xref:generate-html-toc.adoc[Generate an HTML TOC]

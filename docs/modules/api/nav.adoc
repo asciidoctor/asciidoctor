@@ -1,4 +1,5 @@
 * xref:index.adoc[]
+** xref:convert-files.adoc[]
 ** xref:convert-strings.adoc[]
 ** xref:generate-html-toc.adoc[]
 ** xref:load-templates.adoc[]
