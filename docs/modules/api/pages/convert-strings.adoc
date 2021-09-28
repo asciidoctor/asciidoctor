@@ -1,12 +1,36 @@
 = Load and Convert Strings Using the API
 :navtitle: Load and Convert Strings
 
+This page explains how to load and convert AsciiDoc-formatted strings using the API.
+A string is the bare AsciiDoc content (often the contents of a file).
+
+== Load an AsciiDoc string
+
 To parse an AsciiDoc-formatted string into a document object model, use:
 
 [source,ruby]
 ----
 doc = Asciidoctor.load '*This* is Asciidoctor.'
 ----
+
+You can also read AsciiDoc from a file and pass it to the `load` method:
+
+[,ruby]
+----
+asciidoc = File.read 'document.adoc', mode: 'r:utf-8'
+doc = Asciidoctor.load asciidoc, safe: :safe
+----
+
+Once you have loaded the document, you can convert it by calling the convert method:
+
+[,ruby]
+-----
+doc.convert
+-----
+
+However, if you're only interested in converting the AsciiDoc source when using the API, then it's better to use a convert entrypoint.
+
+== Convert an AsciiDoc string
 
 To convert the AsciiDoc-formatted string directly to HTML, use:
 
@@ -24,8 +48,16 @@ Here's the output you will see:
 </div>
 ----
 
-When converting a string, Asciidoctor does not output a standalone document by default.
-Instead, it generates embeddable output.
+You can also read AsciiDoc from a file and pass it to the `convert` method:
+
+[,ruby]
+----
+asciidoc = File.read 'document.adoc', mode: 'r:utf-8'
+html = Asciidoctor.convert asciidoc, safe: :safe
+----
+
+When converting a string, Asciidoctor _does not_ output a standalone document by default.
+Instead, it generates embedded output.
 Let's learn why that is and how to control it.
 
 == Embedded output
@@ -55,6 +87,7 @@ puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
 Now you will see a full HTML file.
 
 When the input or output is a file, the `standalone` option is enabled by default.
+Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDoc string, the `:to_file` option is mandatory. 
 
 [source,ruby]
 ----
@@ -81,7 +114,7 @@ In this mode, Asciidoctor will only process the first block (e.g., paragraph) in
 == Convert to DocBook
 
 You can produce DocBook 5.0 by setting the `backend` option to `'docbook'`.
-Since embeddable DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `standalone` option to `true`.
+Since embedded DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `standalone` option to `true`.
 
 [source,ruby]
 ----
