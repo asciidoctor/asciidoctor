@@ -1,0 +1,101 @@
+= Load and Convert Files Using the API
+:navtitle: Load and Convert Files
+
+This page explains how to load and convert AsciiDoc-formatted files using the API.
+
+== Load an AsciiDoc file
+
+When you load AsciiDoc using the API, you're telling Asciidoctor to parse the document (down to the block level) and return an `Asciidoctor::Document` object.
+This object contains the full block structure of the AsciiDoc document.
+
+CAUTION: Loading a document currently does not parse the inline content.
+That processing is deferred until the parsed document is converted.
+
+Let's assume we're working with the following AsciiDoc document:
+
+._document.adoc_
+[,asciidoc]
+----
+= Document Title
+
+The main content.
+----
+
+To parse this source file into an `Asciidoctor::Document` object, use the following API call:
+
+[,ruby]
+----
+doc = Asciidoctor.load_file 'document.adoc', safe: :safe
+----
+
+Using the object assigned to the `doc` variable, you can get information about the document, such as the document title.
+
+[,ruby]
+----
+puts doc.doctitle
+# => "Document Title"
+----
+
+You can also inspect all the document attributes:
+
+[,ruby]
+----
+pp doc.attributes
+----
+
+Going deeper, you can find blocks in the document, such as all the paragraph blocks, using the `find_by` method:
+
+[,ruby]
+----
+puts doc.find_by context: :paragraph
+# => #<Asciidoctor::Block@1001 {context: :paragraph, content_model: :simple, style: nil, lines: 1}>
+----
+
+However, if you're only interested in converting the AsciiDoc source when using the API, then it's better to use the `convert_file` entrypoint.
+
+== Convert an AsciiDoc file
+
+When you convert AsciiDoc using the API, you're telling Asciidoctor to parse and convert the document to the output format determined by the specified backend.
+If you don't specify a backend, like with the CLI, Asciidoctor will produce HTML.
+
+Let's again assume we're working with the following AsciiDoc document:
+
+._document.adoc_
+[,asciidoc]
+----
+= Document Title
+
+The main content.
+----
+
+To convert this source file to HTML5, use the following API call:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'document.adoc', safe: :safe
+----
+
+The command will output HTML to the file [.path]_my-sample.html_ in the same directory.
+If you want Asciidoctor to output to a different file, you can specify it using the `:to_file` option:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'document.adoc', safe: :safe, to_file: 'out.html'
+----
+
+You can convert the file to DocBook by setting the `:backend` option to `'docbook'`:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'document.adoc', safe: :safe, backend: 'docbook'
+----
+
+In this case, Asciidoctor will output DocBook to the file [.path]_my-sample.xml_ in the same directory.
+As before, you can use the `:to_file` option to control the output file.
+
+[,ruby]
+----
+Asciidoctor.convert_file 'document.adoc', safe: :safe, backend: 'docbook', to_file: 'out.html'
+----
+
+That covers the basics of loading and converting AsciiDoc using the API.
