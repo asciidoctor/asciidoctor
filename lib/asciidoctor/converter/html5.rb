@@ -1034,12 +1034,14 @@ Your browser does not support the audio tag.
       end
       start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
       delimiter = ['?']
+      target, hash = (node.attr 'target').split '/', 2
+      hash_param = (hash ||= node.attr 'hash') ? %(#{delimiter.pop || '&amp;'}h=#{hash}) : ''
       autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoplay=1) : ''
       loop_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}loop=1) : ''
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{node.attr 'target'}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{target}#{hash_param}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     when 'youtube'
