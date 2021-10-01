@@ -3061,6 +3061,26 @@ context 'Blocks' do
       assert_css 'iframe[height="300"]', output, 1
     end
 
+    test 'video macro should allow hash for vimeo video to be specified in video ID' do
+      input = 'video::67480300/123456789[vimeo, 400, 300, options=loop]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?h=123456789&loop=1"]', output, 1
+      assert_css 'iframe[width="400"]', output, 1
+      assert_css 'iframe[height="300"]', output, 1
+    end
+
+    test 'video macro should allow hash for vimeo video to be specified using hash attribute' do
+      input = 'video::67480300[vimeo, 400, 300, options=loop, hash=123456789]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?h=123456789&loop=1"]', output, 1
+      assert_css 'iframe[width="400"]', output, 1
+      assert_css 'iframe[height="300"]', output, 1
+    end
+
     test 'video macro should output custom HTML with iframe for youtube service' do
       input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]'
       output = convert_string_to_embedded input

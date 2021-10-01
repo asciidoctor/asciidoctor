@@ -44,6 +44,7 @@ Improvements::
   * Consolidate styles applied to primary containers (`#header`, `#content`, `#footnotes`, `#footer`) in default stylesheet (#4169)
   * Constrain width of `<svg>` element to container in default stylesheet
   * Target `<object>` element with image more accurately in default stylesheet
+  * Allow hash to be specified for Vimeo video either in video ID or using `hash` attribute (#4176)
 
 == Documentation
 
