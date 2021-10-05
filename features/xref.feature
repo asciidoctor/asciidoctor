@@ -772,7 +772,7 @@ Feature: Cross References
     """
     table.tableblock.frame-all.grid-all.stretch
       colgroup
-        col style='width: 100%;'
+        col width="100%"
       tbody
         tr
           td.tableblock.halign-left.valign-top

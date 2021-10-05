@@ -19,8 +19,8 @@ context 'Tables' do
       output = doc.convert
       assert_css 'table', output, 1
       assert_css 'table.tableblock.frame-all.grid-all.stretch', output, 1
-      assert_css 'table > colgroup > col[style*="width: 33.3333%"]', output, 2
-      assert_css 'table > colgroup > col:last-of-type[style*="width: 33.3334%"]', output, 1
+      assert_css 'table > colgroup > col[width="33.3333%"]', output, 2
+      assert_css 'table > colgroup > col:last-of-type[width="33.3334%"]', output, 1
       assert_css 'table tr', output, 3
       assert_css 'table > tbody > tr', output, 3
       assert_css 'table td', output, 9
@@ -342,8 +342,8 @@ context 'Tables' do
       output = doc.convert standalone: false
       assert_css 'table', output, 1
       assert_css 'table colgroup col', output, 4
-      assert_css 'table colgroup col[style]', output, 1
-      assert_css 'table colgroup col[style*="width: 15%"]', output, 1
+      assert_css 'table colgroup col[width]', output, 1
+      assert_css 'table colgroup col[width="15%"]', output, 1
     end
 
     test 'can assign autowidth to all columns even when table has a width' do
@@ -364,7 +364,7 @@ context 'Tables' do
       end
       output = doc.convert standalone: false
       assert_css 'table', output, 1
-      assert_css 'table[style*="width: 50%"]', output, 1
+      assert_css 'table[width="50%"]', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 0
     end
@@ -417,7 +417,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table[style*="width"]', output, 1
+      assert_css 'table[width]', output, 1
       assert_css 'table colgroup col', output, 3
       assert_css 'table colgroup col[style*="width"]', output, 0
     end
@@ -503,8 +503,8 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 25%;"]', output, 1
-      assert_css 'col[style="width: 75%;"]', output, 1
+      assert_css 'col[width="25%"]', output, 1
+      assert_css 'col[width="75%"]', output, 1
       assert_xpath '(//td)[1]//strong', output, 1
       assert_xpath '(//td)[2]//code', output, 1
     end
@@ -519,7 +519,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -534,7 +534,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -549,7 +549,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -1023,13 +1023,13 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table[style*="width: 80%"]', output, 1
+      assert_css 'table[width="80%"]', output, 1
       assert_xpath '/table/caption[@class="title"][text()="Table 1. Horizontal and vertical source data"]', output, 1
       assert_css 'table > colgroup > col', output, 4
-      assert_css 'table > colgroup > col:nth-child(1)[style*="width: 17.647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(2)[style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(3)[style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(4)[style*="width: 58.8236%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(1)[width="17.647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(2)[width="11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(3)[width="11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(4)[width="58.8236%"]', output, 1
       assert_css 'table > thead', output, 1
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > thead > tr > th', output, 4
@@ -1052,8 +1052,8 @@ context 'Tables' do
 
       output = convert_string_to_embedded input
       assert_xpath '/table/colgroup/col', output, 2
-      assert_xpath '(/table/colgroup/col)[1][@style="width: 10%;"]', output, 1
-      assert_xpath '(/table/colgroup/col)[2][@style="width: 90%;"]', output, 1
+      assert_xpath '(/table/colgroup/col)[1][@width="10%"]', output, 1
+      assert_xpath '(/table/colgroup/col)[2][@width="90%"]', output, 1
     end
 
     test 'spans, alignments and styles' do
@@ -1068,7 +1068,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 25%"]', output, 4
+      assert_css 'table > colgroup > col[width="25%"]', output, 4
       assert_css 'table > tbody > tr', output, 4
       assert_css 'table > tbody > tr > td', output, 10
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 4
@@ -2162,8 +2162,8 @@ context 'Tables' do
       assert_equal 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 14.2857%"]', output, 6
-      assert_css 'table > colgroup > col:last-of-type[style*="width: 14.2858%"]', output, 1
+      assert_css 'table > colgroup > col[width="14.2857%"]', output, 6
+      assert_css 'table > colgroup > col:last-of-type[width="14.2858%"]', output, 1
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '//tr[4]/td[5]/p/text()', output, 0
       assert_xpath '//tr[3]/td[5]/p[text()="MySQL:Server"]', output, 1
@@ -2310,7 +2310,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 20%"]', output, 5
+      assert_css 'table > colgroup > col[width="20%"]', output, 5
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1
