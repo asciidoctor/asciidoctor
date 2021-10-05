@@ -1,4 +1,5 @@
 * xref:index.adoc[]
 ** xref:available.adoc[]
 ** xref:custom.adoc[]
+** xref:templates.adoc[]
 ** xref:contexts-ref.adoc[]
