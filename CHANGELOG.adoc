@@ -1037,7 +1037,7 @@ Compliance::
 
   * retain block content in items of callout list when converting to HTML and man page (#1478)
   * only substitute specialchars for content in literal table cells (#1912)
-  * fix operator logic for ifndef directive with multiple attributes (#1983)
+  * fix operator logic for ifndef directive with multiple attributes to align with behavior of AsciiDoc.py; when attributes are separated by commas, content is only included if none of the attributes listed are set; when attributes are separated by pluses, content is included if at least one of the attributes is not set (#1983)
   * only recognize uniform underline for setext section title (#2083)
   * don't match headings with mixed leading characters (#2074)
   * fix layout break from matching lines it shouldn't
