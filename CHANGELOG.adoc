@@ -24,6 +24,10 @@ Enhancements::
   * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) *@hackingotter*
   * Allow section ID to be unset by assigning an empty value to the `id` block attribute (#4139)
 
+Compliance::
+
+  * Don't promote level-0 special section at start of document to document title (#4151)
+
 Bug Fixes::
 
   * Remove unnamespaced selectors in Pygments stylesheet

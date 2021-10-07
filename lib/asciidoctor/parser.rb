@@ -123,9 +123,9 @@ class Parser
     block_attrs = reader.skip_blank_lines ? (parse_block_metadata_lines reader, document) : {}
     doc_attrs = document.attributes
 
-    # special case, block title is not allowed above document title,
+    # special cases, block style or title is not allowed above document title,
     # carry attributes over to the document body
-    if (implicit_doctitle = is_next_line_doctitle? reader, block_attrs, doc_attrs['leveloffset']) && block_attrs['title']
+    if (implicit_doctitle = is_next_line_doctitle? reader, block_attrs, doc_attrs['leveloffset']) && (block_attrs['title'] || block_attrs['style'])
       return document.finalize_header block_attrs, false
     end
 
