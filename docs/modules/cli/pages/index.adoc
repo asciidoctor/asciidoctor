@@ -36,4 +36,4 @@ You can generate the full documentation (i.e., man page) for the `asciidoctor` c
  $ asciidoctor --help manpage | man -l -
 
 You can also find the man page for the `asciidoctor` command rendered as HTML in this documentation, which you can view in a browser instead.
-See xref:man1/asciidoctor.org[asciidoctor(1)].
+See xref:man1/asciidoctor.adoc[asciidoctor(1)].
