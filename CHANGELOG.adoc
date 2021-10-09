@@ -32,7 +32,7 @@ Improvements::
   * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments and coderay) (#4128)
   * Allow hash to be specified for Vimeo video either in video ID or using `hash` attribute (#4176)
 
-== Documentation
+Documentation::
 
   * Document how to extend an existing converter or create a new converter (#4136)
 
