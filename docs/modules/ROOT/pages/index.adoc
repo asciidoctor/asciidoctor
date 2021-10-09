@@ -1,7 +1,5 @@
 = Asciidoctor Documentation
 :navtitle: Introduction
-:url-cli: https://github.com/asciidoctor/asciidoctor/blob/master/man/asciidoctor.adoc
-:url-api: {url-api-gems}/asciidoctor/{release-version}
 
 This is the documentation for the Ruby-based AsciiDoc processor, Asciidoctor.
 Asciidoctor currently serves as the reference implementation for how to interpret the AsciiDoc language.
@@ -27,7 +25,7 @@ If you're using AsciiDoc.py, follow xref:migrate:asciidoc-py.adoc[] to learn how
 
 == Basic usage
 
-Asciidoctor provides two interfaces for processing AsciiDoc documents, a {url-cli}[CLI^] named `asciidoctor` and a {url-api}[Ruby API^] named `Asciidoctor`.
+Asciidoctor provides two interfaces for processing AsciiDoc documents, a xref:cli:index.adoc[CLI] named `asciidoctor` and a xref:api:index.adoc[Ruby API] named `Asciidoctor`.
 The following table gives you an idea of how to use these interfaces.
 
 |===
