@@ -345,6 +345,42 @@ context 'Manpage' do
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
+    test 'should drop principal text of list item in ulist if empty' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      * {empty}
+      +
+      the main text
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .\}
+      the main text
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should drop principal text of list item in olist if empty' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      . {empty}
+      +
+      the main text
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .\}
+      the main text
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
     test 'should honor start attribute on ordered list' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}

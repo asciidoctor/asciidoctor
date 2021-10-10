@@ -300,9 +300,12 @@ r lw(\n(.lu*75u/100u).'
 .el \\{\\
 .  sp -1
 .  IP " #{numeral}." 4.2
-.\\}
-#{manify item.text, whitespace: :normalize})
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text})
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
@@ -518,9 +521,12 @@ allbox tab(:);'
 .el \\{\\
 .  sp -1
 .  IP \\(bu 2.3
-.\\}
-#{manify item.text, whitespace: :normalize}]
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text}]
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
