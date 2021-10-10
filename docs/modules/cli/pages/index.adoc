@@ -7,6 +7,9 @@ included in the install-toolchain and user-manual documents
 ////
 
 When the Asciidoctor gem is installed successfully, the Asciidoctor command line interface (CLI) named `asciidoctor` will be available on your PATH.
+
+== Version and runtime
+
 To confirm that the CLI is available, execute the following command in your terminal application:
 
  $ asciidoctor --version
@@ -19,6 +22,8 @@ If this command completes successfully, information about Asciidoctor and the ru
 
 The runtime environment information varies based on the version of Ruby you're using and the encoding settings of your operating system.
 
+== Convert an AsciiDoc file
+
 To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
  $ asciidoctor <asciidoc-file>
@@ -27,13 +32,28 @@ This will use the built-in defaults for options and create a new file in the sam
 
 xref:man1/asciidoctor.adoc#options[CLI Options] describes the available options and parameters for the Asciidoctor CLI.
 
-You can output the usage for the `asciidoctor` command by appending the `--help` option:
+== Help topics
+
+The `--help` option provides self-describing documentation for the `asciidoctor` command, grouped by topic.
+If you don't specify a topic, the `--help` option prints the usage statement for the `asciidoctor` command:
 
  $ asciidoctor --help
 
-You can generate the full documentation (i.e., man page) for the `asciidoctor` command by passing the `manpage` argument to the `--help` option, which you can then pipe to the `man` pager for viewing:
+You can generate the full documentation (i.e., man page) for the `asciidoctor` command by passing the `manpage` topic to the `--help` option.
+You can pipe that output to the `man` pager to view it:
 
  $ asciidoctor --help manpage | man -l -
 
 You can also find the man page for the `asciidoctor` command rendered as HTML in this documentation, which you can view in a browser instead.
 See xref:man1/asciidoctor.adoc[asciidoctor(1)].
+
+You can print an AsciiDoc syntax crib sheet by passing the `syntax` topic to the `--help` option.
+
+ $ asciidoctor --help syntax
+
+The crib sheet itself is composed in AsciiDoc.
+You can convert it to HTML by piping the output back into the `asciidoctor` command.
+
+ $ asciidoctor --help syntax | asciidoctor -o syntax.html -
+
+Navigate to the [.path]_syntax.html_ file in your browser to see what the examples in the crib sheet look like when converted to HTML.

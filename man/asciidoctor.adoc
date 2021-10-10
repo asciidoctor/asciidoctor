@@ -154,6 +154,7 @@ Matching templates found in subsequent directories override ones previously disc
   Print a help message.
   Show the command usage if _TOPIC_ is not specified or recognized.
   Dump the Asciidoctor man page (in troff/groff format) if _TOPIC_ is _manpage_.
+  Print an AsciiDoc syntax crib sheet (in AsciiDoc) if _TOPIC_ is _syntax_.
 
 *-V, --version*::
   Print program version number.
