@@ -17,9 +17,6 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
-Compliance::
-  * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
-
 Enhancements::
 
   * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
@@ -30,6 +27,7 @@ Enhancements::
 Compliance::
 
   * Don't promote level-0 special section at start of document to document title (#4151)
+  * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
 
 Bug Fixes::
 
