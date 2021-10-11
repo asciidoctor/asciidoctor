@@ -308,7 +308,7 @@ To upgrade the gem, use:
 
  $ brew update
  $ brew upgrade asciidoctor
- 
+
 === MacPorts (macOS)
 
 To upgrade the gem, use:
