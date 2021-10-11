@@ -381,6 +381,25 @@ context 'Manpage' do
       assert output.end_with? expected_coda
     end
 
+    test 'should not add extra space before block content if dlist item has no text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      term::
+      +
+      description
+      EOS
+      expected_coda = <<~'EOS'.chop
+      term
+      .RS 4
+      description
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
     test 'should honor start attribute on ordered list' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
