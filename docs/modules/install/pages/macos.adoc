@@ -27,6 +27,12 @@ To upgrade the gem, open a terminal and type:
  $ brew update
  $ brew upgrade asciidoctor
 
+=== Uninstall
+
+To uninstall the gem, open a terminal and type:
+
+ $ brew uninstall asciidoctor
+
 == MacPorts
 
 You can also use {url-macports}[MacPorts^], another package manager for macOS, to install Asciidoctor.
@@ -45,3 +51,9 @@ To upgrade the gem, open a terminal and type:
 
  $ sudo port selfupdate
  $ sudo port upgrade asciidoctor
+
+=== Uninstall
+
+To uninstall the gem, open a terminal and type:
+
+ $ sudo port uninstall asciidoctor

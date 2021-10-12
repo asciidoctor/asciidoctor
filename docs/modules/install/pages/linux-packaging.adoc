@@ -59,7 +59,7 @@ To install the gem on Arch-based distributions, open a terminal and type:
 include::partial$success.adoc[]
 
 [#upgrade]
-== Upgrading on Linux
+== Upgrade on Linux
 
 Some Linux distributions may not have the latest stable version of Asciidoctor packaged immediately after a release of a new gem.
 If you need to upgrade to the latest version immediately, use xref:ruby-packaging.adoc[gem install] instead of the package manager.
@@ -87,3 +87,30 @@ On Fedora and other RPM-based distributions, you can update the package using:
 On Alpine Linux, update the Asciidoctor package using:
 
  $ sudo apk add -u asciidoctor
+
+[#uninstall]
+== Uninstall on Linux
+
+To uninstall (i.e., remove) Asciidoctor using Linux packaging, you request your package manager to remove the Asciidoctor package.
+The package manager will take care of removing all the necessary application files.
+
+[#uninstall-apt]
+=== APT
+
+On Debian and Debian-based distributions, uninstall the Asciidoctor package using:
+
+ $ sudo apt-get remove -y asciidoctor
+
+[#uninstall-dnf]
+=== DNF
+
+On Fedora and other RPM-based distributions, you can uninstall the package using:
+
+ $ sudo dnf remove -y asciidoctor
+
+[#uninstall-apk]
+=== apk (Alpine Linux)
+
+On Alpine Linux, uninstall the Asciidoctor package using:
+
+ $ sudo apk del asciidoctor
