@@ -284,6 +284,7 @@ li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-
 ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
 ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
 ul.unstyled,ol.unstyled{margin-left:0}
+li>p:empty:only-child::before{content:"";display:inline-block}
 ul.checklist>li>p:first-child{margin-left:-1em}
 ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
 ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}

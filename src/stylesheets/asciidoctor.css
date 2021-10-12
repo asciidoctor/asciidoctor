@@ -1734,6 +1734,11 @@ ol.unstyled {
   margin-left: 0;
 }
 
+li > p:empty:only-child::before {
+  content: "";
+  display: inline-block;
+}
+
 ul.checklist > li > p:first-child {
   margin-left: -1em;
 }

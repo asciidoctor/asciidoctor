@@ -26,6 +26,7 @@ Bug Fixes::
   * Hide outline around HTML summary when activated in Safari (#4162)
   * Include primary video in value of `playlist` attribute when embeddding YouTube video (#4156)
   * Honor stripes=none on nested table (#4165)
+  * Update default stylesheet to fix spacing around empty list item (#4184)
 
 Improvements::
 
