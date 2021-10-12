@@ -1,7 +1,7 @@
 = Supported Platforms and System Requirements
 :navtitle: Supported Platforms
 
-Asciidoctor operates on Linux, macOS and Windows and requires one of the supported Ruby implementations listed in the next section.
+Asciidoctor operates on Linux, macOS, and Windows and requires one of the supported Ruby implementations listed in the next section.
 
 Our general policy is to align Asciidoctor's support of a platform version with the upstream project's lifecycle schedule for that version.
 When a platform version reaches the end of active support by its maintainers or its end of life--which ever comes first--Asciidoctor no longer supports it.
