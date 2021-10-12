@@ -1,19 +1,24 @@
 = Install and Update
 
-To simplify installation, Asciidoctor is packaged and distributed as a {url-rubygems}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
+To simplify installation, Asciidoctor is packaged and published as a {url-rubygems}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
 It's also distributed as a package for popular Linux distributions and macOS.
-In addition to running on Ruby, Asciidoctor can be executed on a JVM using xref:asciidoctorj::index.adoc[AsciidoctorJ] or in any JavaScript environment (including the browser) using xref:asciidoctor.js::index.adoc[Asciidoctor.js].
+
+TIP: In addition to running on Ruby, Asciidoctor can be executed on a JVM using xref:asciidoctorj::index.adoc[AsciidoctorJ] or in any JavaScript environment (including the browser) using xref:asciidoctor.js::index.adoc[Asciidoctor.js].
 
 == Installation methods
 
 Asciidoctor can be installed using:
 
-* package managers for popular Linux distributions,
+* Bundler,
+* the package manager for popular Linux distributions,
 * Homebrew or MacPorts for macOS,
-* the `gem install` command (recommended for Windows users or if you'll be installing additional gems),
-* the Asciidoctor Docker image, or
-* Bundler.
+* the `gem install` command (recommended for Windows users), or
+* the Asciidoctor Docker image
 
-The benefit of using your operating system's package manager to install the gem is that it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+Bundler is the preferred method of installation as it keeps the gems scoped to your project or workspace.
+However, it does not make the `asciidoctor` command globally available in your terminal.
+That's when a package manager is more appropriate.
+The benefit of using your operating system's package manager to install the gem is that it adds the `asciidoctor` command to your PATH and it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+On the other hand, if you're familiar with Docker, using the Asciidoctor Docker image gives you the best isolation from your system.
 
 You should use the same method to update Asciidoctor as you use to install it.
