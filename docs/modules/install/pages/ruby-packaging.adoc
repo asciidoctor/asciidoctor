@@ -14,11 +14,14 @@ Once you've installed Ruby using RVM, and you have activated it using `rvm use {
 include::partial$success.adoc[]
 
 [#pre-release]
-=== Install a pre-release version
+=== Install a prerelease version
 
-To install a pre-release version of Asciidoctor (e.g., a release candidate), open a terminal and type:
+To install a prerelease version of Asciidoctor (e.g., a release candidate), include the `--pre` option when running the `gem install` command:
 
  $ gem install asciidoctor --pre
+
+The `--pre` option will select the prerelease version of Asciidoctor instead of the latest stable version.
+Note that it's possible that the prerelease version is older than the latest stable version if no recent prerelease version is available.
 
 == Bundler
 
