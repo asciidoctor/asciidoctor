@@ -21,4 +21,4 @@ That's when a package manager is more appropriate.
 The benefit of using your operating system's package manager to install the gem is that it adds the `asciidoctor` command to your PATH and it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
 On the other hand, if you're familiar with Docker, using the Asciidoctor Docker image gives you the best isolation from your system.
 
-You should use the same method to update Asciidoctor as you use to install it.
+You should use the same method to update and uninstall Asciidoctor as you use to install it.
