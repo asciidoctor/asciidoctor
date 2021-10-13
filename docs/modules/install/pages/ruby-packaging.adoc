@@ -69,3 +69,27 @@ To remove the older version, use the following `gem` command:
 
  $ gem cleanup asciidoctor
 ====
+
+[#gem-uninstall]
+== Uninstall using gem uninstall
+
+You can uninstall Asciidoctor using the gem `uninstall` command:
+
+ $ gem uninstall -x asciidoctor
+
+The `-x` option silences the confirmation to remove the `asciidoctor` executable, instead removing it automatically.
+In other words, it enables a complete uninstall.
+
+If you have multiple versions of Asciidoctor installed, you will be prompted to specify which version you want to uninstall.
+
+[.output]
+....
+Select gem to uninstall:
+ 1. asciidoctor-2.0.15
+ 2. asciidoctor-2.0.16
+ 3. All versions
+>
+....
+
+You can uninstall a specific version, or all versions.
+Type one of the numbers at the prompt (`>`) and press kbd:[Enter].
