@@ -1,4 +1,5 @@
 = Converter Templates
+:page-aliases: api:load-templates.adoc
 :apidoc-root: {url-api-gems}/asciidoctor/{release-version}/Asciidoctor
 :apidoc-abstract-node: {apidoc-root}/AbstractNode
 :apidoc-block: {apidoc-root}/Block
