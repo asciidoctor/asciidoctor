@@ -507,7 +507,7 @@ Refer to the https://github.com/pry/pry/wiki[Pry wiki^] for details about how to
 
 Now that you know what templates are and how to make them, let's look at how to use them in Asciidoctor.
 
-=== Template directories
+=== Organize your templates
 
 You should group templates for a specific backend together in a single folder.
 In that folder, each template file should be named using the pattern `<context><output-ext><template-ext>`, where `context` is the name of a xref:contexts-ref.adoc[convertible context], `output-ext` is the file extension of the output file, and `template-ext` is the file extension for the template language (e.g., [.path]_paragraph.html.slim_).
@@ -533,7 +533,7 @@ If you're only targeting a single backend, you can simply name the folder [.path
   📄 paragraph.html.slim
 ----
 
-Recall that the backend is a moniker for the expected output format, and thus the converter that produces it.
+Recall that the backend is a moniker for the expected output format, and in turn, the converter that produces it.
 
 === Install the template engine
 
@@ -572,7 +572,7 @@ You only need to tell Asciidoctor where the templates are located and which temp
 (Technically, you don't need to specify the template engine.
 But, by doing so, it makes the scan more efficient and deterministic.)
 
-If you're using the CLI, you specify the template directory using the `-T` option and the template engine using the `-E` option.
+If you're using the CLI, you specify the template directory using the `-T` option (longhand: `--template-dir`) and the template engine using the `-E` option (longhand: `--template-engine`).
 
  $ asciidoctor -T /path/to/templates -E slim doc.adoc
 
@@ -587,6 +587,25 @@ Asciidoctor.convert_file 'doc.adoc', safe: :safe,
 Notice that we didn't specify the segment [.path]_html5_ in the path where the templates are located.
 That's because Asciidoctor automatically looks for a folder that matches the backend name when scanning for templates (e.g., [.path]_/path/to/templates/html5_).
 However, you can include the segment for the backend in the path if you prefer.
+
+=== Use multiple template directories
+
+You can distribute templates for a single backend across multiple directories.
+For example, you may have a set of common templates for all projects (e.g., [.path]_/path/to/common-templates_) and a set of specialized templates that supplement and/or override those templates for a particular project (e.g., [.path]_/path/to/specialized-templates_).
+
+To load templates from multiple directories when using the CLI, you can pass each directory to Asciidoctor by specifying the `-T` option multiple times:
+
+ $ asciidoctor -T /path/to/common-templates -T /path/to/specialized-templates -E slim doc.adoc
+
+When using the API, you add all the template directories to the array value of the `:templates_dir` option:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'doc.adoc', safe: :safe,
+  template_dirs: ['/path/to/common-templates', '/path/to/specialized-templates'], template_engine: 'slim'
+----
+
+In both cases, if the same template is found in more than one location, the template discovered in the directory listed later in the list will be used.
 
 == Tutorial: Your first converter template
 
