@@ -209,8 +209,12 @@ r lw(\n(.lu*75u/100u).'
 .RS 4)
       end
       if dd
-        result << (manify dd.text, whitespace: :normalize) if dd.text?
-        result << dd.content if dd.blocks?
+        result << (manify dd.text, whitespace: :normalize) if (has_text = dd.text?)
+        if dd.blocks?
+          dd_content = dd.content
+          dd_content = dd_content.slice 4, dd_content.length if !has_text && (dd_content.start_with? %(.sp\n))
+          result << dd_content
+        end
       end
       result << '.RE'
     end
@@ -300,9 +304,12 @@ r lw(\n(.lu*75u/100u).'
 .el \\{\\
 .  sp -1
 .  IP " #{numeral}." 4.2
-.\\}
-#{manify item.text, whitespace: :normalize})
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text})
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
@@ -518,9 +525,12 @@ allbox tab(:);'
 .el \\{\\
 .  sp -1
 .  IP \\(bu 2.3
-.\\}
-#{manify item.text, whitespace: :normalize}]
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text}]
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
