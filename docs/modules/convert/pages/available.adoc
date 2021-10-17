@@ -1,8 +1,9 @@
 = Available Converters
 
-This page lists the converters, and their associated backends, which are either built into Asciidoctor or distributed separately by the Asciidoctor project.
+This page lists the converters, along with their associated backends and output formats, which are either built into Asciidoctor or distributed separately by the Asciidoctor project.
 There are additional "`unofficial`" converters for Asciidoctor which are not listed on this page.
 
+[#built-in]
 == Built-in converters
 
 These built-in converters are bundled with Asciidoctor.
@@ -23,6 +24,7 @@ xref:manpage-backend:index.adoc[Man page]::
 The man page converter generates manual pages for software used on Unix and Unix-like operating systems.
 To use the man page converter, assign `manpage` to the `backend` option.
 
+[#add-on]
 == Add-on converters
 
 You can use add-on converters, which plug into Asciidoctor by adding the appropriate library to the runtime path (e.g., `-r asciidoctor-pdf`).
