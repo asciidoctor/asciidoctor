@@ -2,9 +2,9 @@
 :page-aliases: ROOT:converters.adoc
 
 After Asciidoctor parses an AsciiDoc document, it uses a converter to generate the output format of your choice, such as HTML, DocBook, or PDF.
-Asciidoctor includes a handful of built-in converters.
-The Asciidoctor project provides additional converters that you can add on, which are distributed separately.
-You also have the option of creating your own converter or using one published by a third party.
+Asciidoctor includes a handful of xref:available.adoc#built-in[built-in converters].
+The Asciidoctor project provides xref:available.adoc#add-on[additional converters] that you can add on, which are distributed separately.
+You also have the option to xref:custom.adoc[create your own converter] or to use one published by a third party.
 
 When working with converters, it's important to understand the distinction between a converter and a backend.
 This page explains that difference while also providing more background on how converters function.
