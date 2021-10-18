@@ -62,4 +62,4 @@ You can do so by overriding the `highlight` method, setting the `:number_lines` 
 include::example$always-number-lines.rb[]
 ----
 
-To study the logic you may be interesting in overridding, browse the code for the https://github.com/asciidoctor/asciidoctor/tree/master/lib/asciidoctor/syntax_highlighter[built-in syntax highlighter adapters].
+To study the logic you may be interesting in overridding, browse the code for the https://github.com/asciidoctor/asciidoctor/tree/{page-origin-refname}/lib/asciidoctor/syntax_highlighter[built-in syntax highlighter adapters].

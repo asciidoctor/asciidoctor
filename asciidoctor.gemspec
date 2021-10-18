@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   #s.required_ruby_version = '>= 2.3.0'
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
-    'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/master/CHANGELOG.adoc',
+    'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
     'mailing_list_uri' => 'http://discuss.asciidoctor.org',
     'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
   }

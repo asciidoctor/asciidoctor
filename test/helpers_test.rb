@@ -20,18 +20,18 @@ context 'Helpers' do
 
   context 'URIs and Paths' do
     test 'rootname should return file name without extension' do
-      assert_equal 'master', Asciidoctor::Helpers.rootname('master.adoc')
-      assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master.adoc')
+      assert_equal 'main', Asciidoctor::Helpers.rootname('main.adoc')
+      assert_equal 'docs/main', Asciidoctor::Helpers.rootname('docs/main.adoc')
     end
 
     test 'rootname should file name if it has no extension' do
-      assert_equal 'master', Asciidoctor::Helpers.rootname('master')
-      assert_equal 'docs/master', Asciidoctor::Helpers.rootname('docs/master')
+      assert_equal 'main', Asciidoctor::Helpers.rootname('main')
+      assert_equal 'docs/main', Asciidoctor::Helpers.rootname('docs/main')
     end
 
     test 'rootname should ignore dot not in last segment' do
-      assert_equal 'include.d/master', Asciidoctor::Helpers.rootname('include.d/master')
-      assert_equal 'include.d/master', Asciidoctor::Helpers.rootname('include.d/master.adoc')
+      assert_equal 'include.d/main', Asciidoctor::Helpers.rootname('include.d/main')
+      assert_equal 'include.d/main', Asciidoctor::Helpers.rootname('include.d/main.adoc')
     end
 
     test 'extname? should return whether path contains an extname' do
