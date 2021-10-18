@@ -54,14 +54,13 @@ endif::[]
 :uri-convert-doc: {uri-docs}/convert-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
-:uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
 :uri-foundation: https://foundation.zurb.com
 :uri-opal: https://opalrb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://www.ruby-lang.org
 // images:
-:image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
+:image-uri-screenshot: https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/screenshot.png
 
 {uri-project}[Asciidoctor]は, {uri-what-is-asciidoc}[AsciiDoc] で書かれたコンテンツをHTML5, DocBook, PDFなどのフォーマットに変換する, _高速で_ {uri-license}[オープンソース] のテキストプロセッサおよびパブリッシングツールチェインです.
 AsciidoctorはRubyで書かれており, すべての主要オペレーティングシステムで動作します.
@@ -93,8 +92,7 @@ ifdef::status[]
 image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={uri-gem}]
 image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
 image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build Status (GitHub Actions),link={uri-repo}/actions]
-image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
-image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[project chat,link=https://asciidoctor.zulipchat.com/]
+image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[Project Chat,link={uri-chat}]
 endif::[]
 
 == スポンサー
@@ -459,7 +457,7 @@ Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individ
 == 作者
 
 *Asciidoctor* は https://github.com/mojavelinux[Dan Allen] と https://github.com/graphitefriction[Sarah White] がリードし, Asciidoctorの素晴らしきコミュニティの {uri-contributors}[数多くのメンバ] からコントリビューションを受けてきました．
-このプロジェクトは https://github.com/nickh[Nick Hengeveld] の {uri-prototype}[プロトタイプ] をベースに https://github.com/erebor[Ryan Waldron] により2012年から創始されました.
+このプロジェクトは https://github.com/nickh[Nick Hengeveld] のプロトタイプをベースに https://github.com/erebor[Ryan Waldron] により2012年から創始されました.
 
 *AsciiDoc* は Stuart Rackham により創始され, AsciiDocコミュニティの数多くのメンバからコントリビューションを受けてきました.
 

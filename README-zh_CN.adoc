@@ -51,13 +51,12 @@ endif::[]
 :uri-render-doc: {uri-docs}/render-documents
 :uri-themes-doc: {uri-docs}/produce-custom-themes-using-asciidoctor-stylesheet-factory
 :uri-gitscm-repo: https://github.com/git/git-scm.com
-:uri-prototype: {uri-gitscm-repo}/commits/master/lib/asciidoc.rb
 :uri-freesoftware: https://www.gnu.org/philosophy/free-sw.html
 :uri-foundation: https://foundation.zurb.com
 :uri-tilt: https://github.com/rtomayko/tilt
 :uri-ruby: https://ruby-lang.org
 // images:
-:image-uri-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
+:image-uri-screenshot: https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/screenshot.png
 
 {uri-project}/[Asciidoctor] 是一个 _快速_ 文本处理器和发布工具链，它可以将 {uri-what-is-asciidoc}[AsciiDoc] 文档转化成 HTML 5、 DocBook 5 以及其他格式。
 Asciidoctor 由 Ruby 编写，打包成 RubyGem，然后发布到 {uri-rubygem}[RubyGems.org] 上。
@@ -81,8 +80,7 @@ ifdef::status[]
 image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={uri-gem}]
 image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
 image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build Status (GitHub Actions),link={uri-repo}/actions]
-image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Inline docs,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
-image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[project chat,link=https://asciidoctor.zulipchat.com/]
+image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[Project Chat,link={uri-chat}]
 endif::[]
 
 .Ruby 所至， Asciidoctor 相随
@@ -419,7 +417,7 @@ Copyright (C) 2012-present Dan Allen, Sarah White, Ryan Waldron, and the individ
 == 作者
 
 *Asciidoctor* 由 https://github.com/mojavelinux[Dan Allen] 和 https://github.com/graphitefriction[Sarah White] 领导，并从 Asciidoctor 社区的 {uri-contributors}[很多其他独立开发者] 上收到了很多贡献。
-项目最初由 https://github.com/erebor[Ryan Waldron] 于 2012年基于 https://github.com/nickh[Nick Hengeveld] 的 {uri-prototype}[原型] 创建。
+项目最初由 https://github.com/erebor[Ryan Waldron] 于 2012年基于 https://github.com/nickh[Nick Hengeveld] 的原型创建。
 
 *AsciiDoc* 由 Stuart Rackham 启动，并从 AsciiDoc 社区的其他独立开发者上收到很多贡献。
 

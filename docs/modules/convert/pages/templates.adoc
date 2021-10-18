@@ -5,6 +5,7 @@
 :apidoc-block: {apidoc-root}/Block
 :url-pry: http://pry.github.io
 :url-slim: http://slim-lang.com
+:url-tilt: https://github.com/rtomayko/tilt
 :!listing-caption:
 
 All output produced by Asciidoctor is customizable.
@@ -110,7 +111,7 @@ However, in Asciidoctor, the result of the template isn't output to a file.
 Instead, it is combined with the rest of the output of the converter.
 But the file extension should still match the file extension of the output file that Asciidoctor produces.
 
-You can find a list of template engines that Tilt supports, along with any required libraries, in the https://github.com/rtomayko/tilt/blob/master/README.md[Tilt README^].
+You can find a list of template engines that Tilt supports, along with any required libraries, in the {url-tilt}#readme[Tilt README^].
 The most popular template engines for this purpose are {url-slim}[Slim^], Haml, and ERB.
 We strongly recommend using Slim.
 ERB is also a solid choice since it's built into the Ruby language and thus doesn't have any dependencies.

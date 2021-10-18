@@ -50,9 +50,8 @@ endif::[]
 :url-opal: https://opalrb.com
 :url-tilt: https://github.com/rtomayko/tilt
 :url-ruby: https://www.ruby-lang.org
-//:url-prototype: https://github.com/git/git-scm.com/commits/master/lib/asciidoc.rb This page doesn't exist anymore.
 // images:
-:image-url-screenshot: https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/screenshot.png
+:image-url-screenshot: https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/screenshot.png
 
 {url-project}[Asciidoctor] is a fast, open source, Ruby-based text processor for parsing AsciiDoc(R) into a document model and converting it to output formats such as HTML 5, DocBook 5, manual pages, PDF, EPUB 3, and other formats.
 
@@ -82,9 +81,6 @@ ifdef::status[]
 image:https://img.shields.io/gem/v/asciidoctor.svg[Latest Release, link={url-rubygem}]
 image:https://img.shields.io/badge/rubydoc.info-{release-version}-blue.svg[library (API) docs,link=https://www.rubydoc.info/gems/asciidoctor/{release-version}]
 image:https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg[Build Status (GitHub Actions),link={url-repo}/actions]
-//image:https://img.shields.io/coveralls/asciidoctor/asciidoctor/master.svg[Code Coverage,link=https://coveralls.io/r/asciidoctor/asciidoctor]
-//image:https://codeclimate.com/github/asciidoctor/asciidoctor/badges/gpa.svg[Code Climate,link=https://codeclimate.com/github/asciidoctor/asciidoctor]
-//image:https://inch-ci.org/github/asciidoctor/asciidoctor.svg?branch=master[Docs Coverage,link=https://inch-ci.org/github/asciidoctor/asciidoctor]
 image:https://img.shields.io/badge/zulip-join_chat-brightgreen.svg[Project Chat (Zulip),link={url-chat}]
 endif::[]
 
@@ -471,7 +467,7 @@ Asciidoctor organization on GitHub:: {url-org}
 
 == Code of Conduct
 
-The core Asciidoctor project is governed by the https://github.com/asciidoctor/.github/blob/main/CODE-OF-CONDUCT.md[Code of Conduct] for the Asciidoctor community of projects.
+The core Asciidoctor project is governed by the https://github.com/asciidoctor/.github/blob/HEAD/CODE-OF-CONDUCT.md[Code of Conduct] for the Asciidoctor community of projects.
 By participating, you're agreeing to honor this code.
 Let's work together to make this a welcoming, professional, inclusive, and safe environment for everyone.
 
@@ -493,7 +489,7 @@ See the {url-license}[LICENSE] for the full license text.
 *Asciidoctor* is led by https://github.com/mojavelinux[Dan Allen] and https://github.com/graphitefriction[Sarah White] and has received contributions from {url-contributors}[many individuals] in Asciidoctor's awesome community.
 The project was initiated in 2012 by https://github.com/erebor[Ryan Waldron] based on a prototype written by https://github.com/nickh[Nick Hengeveld] for the Git website.
 
-*AsciiDoc.py* was started and maintained by Stuart Rackham from https://github.com/asciidoc-py/asciidoc-py2/blob/master/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc-py/asciidoc-py2/graphs/contributors[AsciiDoc.py community].
+*AsciiDoc.py* was started and maintained by Stuart Rackham from https://github.com/asciidoc-py/asciidoc-py2/blob/HEAD/CHANGELOG.txt[2002 to 2013] and has received contributions from many individuals in the https://github.com/asciidoc-py/asciidoc-py2/graphs/contributors[AsciiDoc.py community].
 
 == Trademarks
 
