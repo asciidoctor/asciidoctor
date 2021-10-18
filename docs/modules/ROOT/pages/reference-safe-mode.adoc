@@ -30,7 +30,7 @@ Allow the include directive to import a file from a URI.
 
 Example:
 
- include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/README.adoc[]
+ include::https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/README.adoc[]
 
 To be secure by default, the allow-uri-read attribute must be set in the API or CLI (not document) for this feature to be enabled. It's also completely disabled if the safe mode is SECURE or greater.
 Since this is a potentially dangerous feature, it’s disabled if the safe mode is SECURE or greater. Assuming the safe mode is less than SECURE, you must also set the allow-uri-read attribute to permit Asciidoctor to read content from a URI.

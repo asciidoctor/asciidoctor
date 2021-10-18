@@ -15,7 +15,7 @@ TIP: Asciidoctor supports including content from a URI out of the box if you set
 .Gemfile
 [source,ruby]
 ----
-\include::https://raw.githubusercontent.com/asciidoctor/asciidoctor/master/Gemfile[]
+\include::https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/Gemfile[]
 ----
 ....
 

@@ -1,4 +1,4 @@
-// converted to AsciiDoc from https://github.com/gettalong/kramdown/blob/master/benchmark/mdbasics.text
+// converted to AsciiDoc from https://github.com/gettalong/kramdown/blob/HEAD/benchmark/mdbasics.text
 # Markdown: Basics
 John Gruber
 :s: link:/projects/markdown/syntax

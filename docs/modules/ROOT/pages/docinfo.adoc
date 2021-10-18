@@ -1,6 +1,6 @@
 = Docinfo Files
 :url-docbook-info-ref: https://tdg.docbook.org/tdg/5.0/info.html
-:url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/master/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
+:url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/HEAD/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
 // um anchor: docinfo-file
 
 You can add custom content to the head, header or footer of an output document using docinfo files.

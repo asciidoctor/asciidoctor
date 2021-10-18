@@ -1,7 +1,7 @@
 = Rouge
 :url-rouge: http://rouge.jneen.net
 :url-rouge-gem: https://rubygems.org/gems/rouge
-:url-rouge-repo: https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/themes
+:url-rouge-repo: https://github.com/rouge-ruby/rouge/tree/HEAD/lib/rouge/themes
 
 {url-rouge}[Rouge^] is an extendable code highlighter written in Ruby that supports a vast array of languages.
 

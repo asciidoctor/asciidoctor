@@ -395,7 +395,7 @@ discussion group thread] for details.
   http://groups.google.com/group/asciidoc/browse_thread/thread/a60f67cbbaf862aa/d214bf7fa2d538c4?lnk=gst&q=book#d214bf7fa2d538c4
 - 'Ramaze Manual' +
   http://book.ramaze.net/ +
-  http://github.com/manveru/ramaze-book/tree/master
+  http://github.com/manveru/ramaze-book
 - Some documentation about git by Nico Schottelius (in German)
   http://nico.schotteli.us/papers/linux/git-firmen/.
 - The http://www.netpromi.com/kirbybase_ruby.html[KirbyBase for Ruby]

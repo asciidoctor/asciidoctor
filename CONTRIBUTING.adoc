@@ -80,7 +80,7 @@ As Asciidoctor is built using Ruby some basic knowledge of Ruby, RubyGems and Mi
 * http://guides.rubygems.org/what-is-a-gem/[What is a Gem?]
 * http://blog.teamtreehouse.com/short-introduction-minitest[How to use Minitest]
 * http://www.rubyinside.com/a-minitestspec-tutorial-elegant-spec-style-testing-that-comes-with-ruby-5354.html[Minitest spec tutorial]
-* https://github.com/seattlerb/minitest/blob/master/README.rdoc[Minitest Project Documentation]
+* https://github.com/seattlerb/minitest#readme[Minitest Project Documentation]
 
 While these resources don't cover everything needed they serve as a good starting off point for beginners.
 

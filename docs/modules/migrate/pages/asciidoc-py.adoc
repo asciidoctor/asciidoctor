@@ -1,5 +1,5 @@
 = Migrate from AsciiDoc.py
-:url-tests: {url-org}/asciidoctor/tree/master/test
+:url-writing-tests: https://github.com/asciidoctor/asciidoctor/blob/HEAD/CONTRIBUTING.adoc#writing-and-executing-tests
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-asciidoctor-1: {url-project}/man/asciidoctor
 
@@ -380,7 +380,7 @@ Depending on the Asciidoctor processor you choose, you can re-write your xref:ex
 == Doctest
 
 AsciiDoc.py `--doctest` ran its unit tests.
-See the {url-tests}[test suite^] for how to run the Asciidoctor unit tests.
+See the {url-writing-tests}[contributing guide^] to learn how to run the Asciidoctor unit tests.
 Asciidoctor also has a {url-doctest}[doctest tool^] which you can use when creating custom HTML or XML-based converters.
 
 == Help topics
