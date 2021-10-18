@@ -8,7 +8,7 @@
 Asciidoctor supports custom converters.
 If you want to produce an output format that's not supported by a built-in converter or any of the available converters in the ecosystem, you can create and use your own converter.
 You may also decide to create a custom converter to customize the output of a supported output format or to take an entirely different approach.
-Asciidoctor gives you that ability.
+A custom converter gives you that ability, offering a more formal alternative to xref:templates.adoc[converter templates].
 
 On this page, you'll learn how to create a custom converter in Ruby, register it, then make use of it.
 After a brief overview, we'll begin by extending and replacing a registered converter.
