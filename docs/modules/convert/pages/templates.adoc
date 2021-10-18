@@ -8,7 +8,7 @@
 :!listing-caption:
 
 All output produced by Asciidoctor is customizable.
-One way to customize the output is to use a custom converter.
+One way to customize the output is to use a xref:custom.adoc[custom converter].
 Converter templates offer a simpler way.
 
 The built-in converters, and others that have the `supports_templates` trait enabled, allow you to replace the convert handler for any convertible context with a template.
