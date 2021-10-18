@@ -416,7 +416,7 @@ context 'API' do
       assert_equal 'sample.adoc', list_items[2].file
       assert_equal 30, list_items[2].lineno
 
-      doc = Asciidoctor.load_file fixture_path('master.adoc'), sourcemap: true, safe: :safe
+      doc = Asciidoctor.load_file fixture_path('main.adoc'), sourcemap: true, safe: :safe
 
       section_1 = doc.sections[0]
       assert_equal 'Chapter A', section_1.title

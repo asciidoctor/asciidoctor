@@ -711,7 +711,7 @@ Enhancements::
   * register document in catalog if id is set; assign reftext to document attributes if specified in a block attribute line (#2301, PR #2428)
   * allow automatic width to be applied to individual columns in a table using the special value `~` (#1844)
   * use the quote element in DocBook converter to represent smart quotes (#2272, PR #2356) (@bk2204)
-  * parse and pass all manpage names to output document master (i.e., shadow man pages) (#1811, #2543, PR #2414)
+  * parse and pass all manpage names to output (i.e., shadow man pages) (#1811, #2543, PR #2414)
   * parse credit line of shorthand quote block as block attributes; apply normal subs to credit line in shorthand quote blocks (#1667, PR #2452)
   * populate copyright element in DocBook output from value of copyright attribute (#2728)
   * preserve directories if source dir and destination dir are set (#1394, PR #2421)

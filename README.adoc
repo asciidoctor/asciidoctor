@@ -35,8 +35,8 @@ ifdef::env-site[:url-project: link:]
 :url-rel-file-base: link:
 :url-rel-tree-base: link:
 ifdef::env-site,env-yard[]
-:url-rel-file-base: {url-repo}/blob/master/
-:url-rel-tree-base: {url-repo}/tree/master/
+:url-rel-file-base: {url-repo}/blob/HEAD/
+:url-rel-tree-base: {url-repo}/tree/HEAD/
 endif::[]
 :url-changelog: {url-rel-file-base}CHANGELOG.adoc
 :url-contribute: {url-rel-file-base}CONTRIBUTING.adoc

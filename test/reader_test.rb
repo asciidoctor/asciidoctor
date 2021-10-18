@@ -685,7 +685,7 @@ class ReaderTest < Minitest::Test
 
       test 'include directive should resolve file relative to current include' do
         input = 'include::fixtures/parent-include.adoc[]'
-        pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+        pseudo_docfile = File.join DIRNAME, 'main.adoc'
         fixtures_dir = File.join DIRNAME, 'fixtures'
         parent_include_docfile = File.join fixtures_dir, 'parent-include.adoc'
         child_include_docfile = File.join fixtures_dir, 'child-include.adoc'
@@ -696,7 +696,7 @@ class ReaderTest < Minitest::Test
 
         assert_equal pseudo_docfile, reader.file
         assert_equal DIRNAME, reader.dir
-        assert_equal 'include-master.adoc', reader.path
+        assert_equal 'main.adoc', reader.path
 
         assert_equal 'first line of parent', reader.read_line
 
@@ -1789,9 +1789,9 @@ class ReaderTest < Minitest::Test
       end
 
       test 'leveloffset attribute entries should be added to content if leveloffset attribute is specified' do
-        input = 'include::fixtures/master.adoc[]'
+        input = 'include::fixtures/main.adoc[]'
         expected = <<~'EOS'.split ::Asciidoctor::LF
-        = Master Document
+        = Main Document
 
         preamble
 
@@ -1911,7 +1911,7 @@ class ReaderTest < Minitest::Test
       test 'include directive should be disabled if max include depth has been exceeded' do
         input = 'include::fixtures/parent-include.adoc[depth=1]'
         using_memory_logger do |logger|
-          pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+          pseudo_docfile = File.join DIRNAME, 'main.adoc'
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), normalize: true
           lines = reader.readlines
@@ -1923,7 +1923,7 @@ class ReaderTest < Minitest::Test
       test 'include directive should be disabled if max include depth set in nested context has been exceeded' do
         input = 'include::fixtures/parent-include-restricted.adoc[depth=3]'
         using_memory_logger do |logger|
-          pseudo_docfile = File.join DIRNAME, 'include-master.adoc'
+          pseudo_docfile = File.join DIRNAME, 'main.adoc'
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, input, Asciidoctor::Reader::Cursor.new(pseudo_docfile), normalize: true
           lines = reader.readlines

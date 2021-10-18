@@ -1270,16 +1270,16 @@ context 'Sections' do
   context 'Level offset' do
     test 'should print error if standalone document is included without level offset' do
       input = <<~'EOS'
-      = Master Document
+      = Main Document
       Doc Writer
 
-      text in master
+      text in main document
 
       // begin simulated include::[]
       = Standalone Document
       :author: Junior Writer
 
-      text in standalone
+      text in standalone document
 
       // end simulated include::[]
       EOS
@@ -1292,10 +1292,10 @@ context 'Sections' do
 
     test 'should add level offset to section level' do
       input = <<~'EOS'
-      = Master Document
+      = Main Document
       Doc Writer
 
-      Master document written by {author}.
+      Main document written by {author}.
 
       :leveloffset: 1
 
@@ -1312,9 +1312,9 @@ context 'Sections' do
 
       :leveloffset!:
 
-      == Section in Master
+      == Section in Main
 
-      Master section text.
+      Main section text.
       EOS
 
       output = nil
@@ -1323,16 +1323,16 @@ context 'Sections' do
         assert logger.empty?
       end
 
-      assert_match(/Master document written by Doc Writer/, output)
+      assert_match(/Main document written by Doc Writer/, output)
       assert_match(/Standalone document written by Junior Writer/, output)
       assert_xpath '//*[@class="sect1"]/h2[text() = "Standalone Document"]', output, 1
       assert_xpath '//*[@class="sect2"]/h3[text() = "Section in Standalone"]', output, 1
-      assert_xpath '//*[@class="sect1"]/h2[text() = "Section in Master"]', output, 1
+      assert_xpath '//*[@class="sect1"]/h2[text() = "Section in Main"]', output, 1
     end
 
     test 'level offset should be added to discrete heading' do
       input = <<~'EOS'
-      = Master Document
+      = Main Document
       Doc Writer
 
       :leveloffset: 1
@@ -1347,10 +1347,10 @@ context 'Sections' do
 
     test 'should be able to reset level offset' do
       input = <<~'EOS'
-      = Master Document
+      = Main Document
       Doc Writer
 
-      Master preamble.
+      Main preamble.
 
       :leveloffset: 1
 
@@ -1370,10 +1370,10 @@ context 'Sections' do
 
     test 'should add relative offset value to current leveloffset' do
       input = <<~'EOS'
-      = Master Document
+      = Main Document
       Doc Writer
 
-      Master preamble.
+      Main preamble.
 
       :leveloffset: 1
 

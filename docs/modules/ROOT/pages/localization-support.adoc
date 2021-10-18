@@ -1,7 +1,7 @@
 = Localization Support
 :keywords: translations, labels, l10n, internationalization, i18n
 :url-docbook-i8n: http://www.sagehill.net/docbookxsl/Localizations.html
-:url-lang-attributes: {url-org}/asciidoctor/blob/master/data/locale/attributes.adoc
+:url-lang-attributes: {url-org}/asciidoctor/blob/{page-origin-refname}/data/locale/attributes.adoc
 
 Asciidoctor is not restricted to working with English-only content.
 Asciidoctor can process the full range of the UTF-8 character set.
