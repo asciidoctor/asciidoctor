@@ -1,6 +1,6 @@
 = Docinfo Files
 :url-docbook-info-ref: https://tdg.docbook.org/tdg/5.0/info.html
-:url-richfaces-docinfo: https://github.com/richfaces/richfaces-docs/blob/HEAD/Developer_Guide/src/main/docbook/en-US/Developer_Guide-docinfo.xml
+:url-docinfo-example: https://github.com/clojure-cookbook/clojure-cookbook/blob/master/book-docinfo.xml
 // um anchor: docinfo-file
 
 You can add custom content to the head, header or footer of an output document using docinfo files.
@@ -85,7 +85,7 @@ The following example shows some of the content a docinfo file for DocBook might
 Docinfo files for DocBook output must be saved with the `.xml` file extension.
 See <<naming>> for more details.
 
-To see a real-world example of a docinfo file for DocBook, checkout the {url-richfaces-docinfo}[RichFaces Developer Guide docinfo file^].
+You can find a real-world example of a docinfo file for DocBook in the source of the {url-docinfo-example}[Clojure Cookbook^].
 
 [#header]
 == Header docinfo files
