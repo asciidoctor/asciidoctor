@@ -9,8 +9,33 @@ This page examines the purpose of the API and how it can be used, shows how to g
 [#when-to-use]
 == When to use the API
 
-If all you want to do is convert an AsciiDoc file to a publishable format such as HTML, then the xref:cli:index.adoc[`asciidoctor`] CLI should suit your needs.
-In contrast, what the API enables you to do is break down that processing into smaller steps to either give you more control over the processing, capture the result of a single step, analyze the parsed document, or interface with the document model in an extension.
+If all you need to do is convert an AsciiDoc file to a publishable format such as HTML, then the xref:cli:index.adoc[`asciidoctor`] CLI should suit your needs.
+Here's an example showing how to convert an AsciiDoc document to HTML using the CLI:
+
+ $ asciidoctor -d book -n -a toc=left -a source-highlighter=highlight.js document.adoc
+
+Here's the same example showing how to convert the document to HTML using the API:
+
+[,ruby]
+----
+require 'asciidoctor'
+
+Asciidoctor.convert_file 'document.adoc', doctype: :book, safe: :unsafe,
+  attributes: { 'toc' => 'left', 'sectnums' => '', 'source-highlighter' => 'highlight.js' }
+----
+
+This API call can be abbreviated by declaring the document attributes using shorthand form:
+
+[,ruby]
+----
+require 'asciidoctor'
+
+Asciidoctor.convert_file 'document.adoc', doctype: :book, safe: :unsafe,
+  attributes: 'toc=left sectnums source-highlighter=highlight.js'
+----
+
+In contrast to the CLI, the API enables you to break down the processing into smaller steps.
+By doing so, you can capture the result of a single step, analyze the parsed document, interface with the document model in an extension, or just gain more control over the processing in general.
 
 When using the API, we talk about two main steps:
 
