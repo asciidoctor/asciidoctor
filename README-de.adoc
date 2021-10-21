@@ -212,10 +212,7 @@ Um Asciidoctor unter Windows zu installieren, gibt es zwei einfache Möglichkeit
 
 Wenn Sie bereits https://chocolatey.org[chocolatey] verwenden, können Sie folgenden Befehl verwenden:
 
-[source]
-----
-choco install ruby
-----
+ choco install ruby
 
 Danach folgen Sie der <<gem-install,Gem Installation>>.
 

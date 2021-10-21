@@ -218,10 +218,7 @@ WindowsでAsciidoctorを使う場合は, 簡単な方法が2つあります.
 
 すでにお使いのマシンで https://chocolatey.org[chocolatey] を使用しているなら, 以下の方法を使用することができます:
 
-[source]
-----
-choco install ruby
-----
+ choco install ruby
 
 そのあとは <<gem-install,gemのインストール方法>> に従ってください.
 
