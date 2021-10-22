@@ -89,10 +89,10 @@ class Parser
   #
   # returns the Document object
   def self.parse(reader, document, options = {})
-    block_attributes = parse_document_header(reader, document)
+    block_attributes = parse_document_header(reader, document, (header_only = options[:header_only]))
 
     # NOTE don't use a postfix conditional here as it's known to confuse JRuby in certain circumstances
-    unless options[:header_only]
+    unless header_only
       while reader.has_more_lines?
         new_section, block_attributes = next_section(reader, document, block_attributes)
         if new_section
@@ -117,7 +117,7 @@ class Parser
   # which are automatically removed by the reader.
   #
   # returns the Hash of orphan block attributes captured above the header
-  def self.parse_document_header(reader, document)
+  def self.parse_document_header(reader, document, header_only = false)
     # capture lines of block-level metadata and plow away comment lines that precede first block
     block_attrs = reader.skip_blank_lines ? (parse_block_metadata_lines reader, document) : {}
     doc_attrs = document.attributes
@@ -182,7 +182,7 @@ class Parser
     end
 
     # parse title and consume name section of manpage document
-    parse_manpage_header reader, document, block_attrs if document.doctype == 'manpage'
+    parse_manpage_header reader, document, block_attrs, header_only if document.doctype == 'manpage'
 
     # NOTE block_attrs are the block-level attributes (not document attributes) that
     # precede the first line of content (document title, first section or first block)
@@ -192,7 +192,7 @@ class Parser
   # Public: Parses the manpage header of the AsciiDoc source read from the Reader
   #
   # returns Nothing
-  def self.parse_manpage_header(reader, document, block_attributes)
+  def self.parse_manpage_header(reader, document, block_attributes, header_only = false)
     if ManpageTitleVolnumRx =~ (doc_attrs = document.attributes)['doctitle']
       doc_attrs['manvolnum'] = manvolnum = $2
       doc_attrs['mantitle'] = (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle).downcase
@@ -209,6 +209,8 @@ class Parser
         doc_attrs['docname'] = manname
         doc_attrs['outfilesuffix'] = %(.#{manvolnum})
       end
+    elsif header_only
+      # done
     else
       reader.skip_blank_lines
       reader.save

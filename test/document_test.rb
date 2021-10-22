@@ -1318,6 +1318,47 @@ context 'Document' do
       assert_equal 0, doc.blocks.size
     end
 
+    test 'should parse header only when docytpe is manpage' do
+      input = <<~'EOS'
+      = cmd(1)
+      Author Name
+      :doctype: manpage
+
+      == Name
+
+      cmd - does stuff
+      EOS
+
+      doc = document_from_string input, parse_header_only: true
+      assert_equal 'cmd(1)', doc.doctitle
+      assert_equal 'Author Name', doc.author
+      assert_equal 'cmd', doc.attributes['mantitle']
+      assert_equal '1', doc.attributes['manvolnum']
+      assert_nil doc.attributes['manname']
+      assert_nil doc.attributes['manpurpose']
+      assert_equal 0, doc.blocks.size
+    end
+
+    test 'should not warn when parsing header only when docytpe is manpage and body is empty' do
+      input = <<~'EOS'
+      = cmd(1)
+      Author Name
+      :doctype: manpage
+      EOS
+
+      using_memory_logger do |logger|
+        doc = document_from_string input, parse_header_only: true
+        assert_empty logger.messages
+        assert_equal 'cmd(1)', doc.doctitle
+        assert_equal 'Author Name', doc.author
+        assert_equal 'cmd', doc.attributes['mantitle']
+        assert_equal '1', doc.attributes['manvolnum']
+        assert_nil doc.attributes['manname']
+        assert_nil doc.attributes['manpurpose']
+        assert_equal 0, doc.blocks.size
+      end
+    end
+
     test 'outputs footnotes in footer' do
       input = <<~'EOS'
       A footnote footnote:[An example footnote.];
