@@ -249,7 +249,7 @@ RVMを使用すると, システムから隔離された場所にgemがインス
 . プロジェクトのルートフォルダ(またはカレントディレクトリ)にGemfileを作成
 . `asciidoctor` gemをGemfileに以下のように追加:
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -352,13 +352,15 @@ APIは他のRubyソフトウェア, たとえばRails, Sinatra, GitHub, そし�
 
 Asciidoctorをアプリケーションの中で使うには, まずgemをrequireする必要があります:
 
-[source]
+----
 require 'asciidoctor'
+----
 
 そうすると, 以下のようにしてAsciiDocソースファイルをHTMLファイルに変換できます:
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: AsciidoctorをAPI経由で使っているとき, デフォルトのセーフモードは `:secure` （セキュアモード）です.
 セキュアモードでは, `include` ディレクティブを含むいくつかのコア機能が無効化されています.
@@ -366,7 +368,6 @@ WARNING: AsciidoctorをAPI経由で使っているとき, デフォルトのセ�
 
 AsciiDoc文字列を, 埋め込み用HTML(HTMLページヘの挿入用)に変換することもできます:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -374,7 +375,6 @@ Asciidoctor.convert content, safe: :safe
 
 もし完全なHTMLドキュメントが必要であれば, 以下のように `header_footer` オプションを有効にしてください:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -382,7 +382,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 パースされたドキュメントにアクセスしたい場合は, 変換を複数のステップに分割します:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

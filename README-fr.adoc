@@ -218,7 +218,7 @@ Lire {uri-install-docker}[Installer Asciidoctor en utilisant Docker].
 . Créez un fichier Gemfile à la racine de votre projet (ou du répertoire courant)
 . Ajoutez la gemme `asciidoctor` dans votre fichier Gemfile comme ci-dessous :
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -321,13 +321,15 @@ Référez-vous aux ressources suivantes pour en apprendre davantage sur la faço
 
 Pour utiliser Asciidoctor dans votre application, vous avez tout d'abord besoin de faire un « require » sur la gemme :
 
-[source]
+----
 require 'asciidoctor'
+----
 
 Vous pouvez ensuite convertir un fichier AsciiDoc en fichier HTML en utilisant :
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: Quand vous utilisez Asciidoctor via l'API, le mode de sûreté par défaut est `:secure`.
 Dans le mode « secure », plusieurs fonctionnalités centrales sont désactivées, comme la directive `include`.
@@ -335,7 +337,6 @@ Si vous souhaitez activer ces fonctionnalités, vous aurez besoin de définir ex
 
 Vous pouvez aussi convertir une chaîne de texte en fragment HTML (pour une insertion dans une page HTML) en utilisant :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -343,7 +344,6 @@ Asciidoctor.convert content, safe: :safe
 
 Si vous voulez le document HTML complet, activez l'option `header_footer` comme ci-dessous :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -351,7 +351,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 Si vous avez besoin d'accéder au document analysé, vous pouvez séparer la conversion en deux étapes distinctes :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

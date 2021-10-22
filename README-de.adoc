@@ -242,9 +242,8 @@ Siehe {uri-install-docker}[Installing Asciidoctor using Docker].
 
 . Erstellen Sie ein Gemfile im Stammordner Ihres Projekts (oder im aktuellen Verzeichnis).
 . Fügen Sie den `asciidoctor` Gem wie folgt zu Ihrem Gemfile hinzu:
-
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -348,14 +347,12 @@ Lesen Sie die folgenden Ressourcen, um mehr über die Verwendung des `asciidocto
 
 Um Asciidoctor in Ihrer Anwendung verwenden zu können, benötigen Sie zunächst das Gem:
 
-[source]
 ----
 require 'asciidoctor'
 ----
 
 Sie können dann eine AsciiDoc-Quelldatei in eine HTML-Datei konvertieren:
 
-[source]
 ----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
 ----
@@ -366,7 +363,6 @@ Wenn Sie diese Funktionen aktivieren möchten, müssen Sie den Sicherheitsmodus 
 
 Sie können einen AsciiDoc-String auch in ein integrierbares HTML (zum Einfügen in eine HTML-Seite) konvertieren, mit:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -374,7 +370,6 @@ Asciidoctor.convert content, safe: :safe
 
 Wenn Sie das komplette HTML-Dokument wünschen, aktivieren Sie die Option `head_footer` wie folgt:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -382,7 +377,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 Wenn Sie Zugriff auf das analysierte Dokument benötigen, können Sie die Konvertierung in einzelne Schritte aufteilen:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

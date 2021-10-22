@@ -178,7 +178,7 @@ TIP: 使用 Linux 包管理器安装的好处是如果你机器在之前没有�
 . 在项目的根目录（或者当前路径），创建一个 `Gemfile` 文件；
 . 在这个文件中添加 `asciidoctor` gem 如下：
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -309,13 +309,15 @@ Asciidoctor 还提供了一套 API。
 
 为了在你应用中使用 Asciidoctor，首先需要引入这个 gem：
 
-[source]
+----
 require 'asciidoctor'
+----
 
 然后，你可以通过下面的代码将 AsciiDoc 源文件转化成一个 HTML 文件：
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: 当你通过 API 使用 Asciidoctor 时，默认的安全模式是 `:secure`。
 在 secure 模式下，很多核心特性将不可用，包括 `include` 特性。
@@ -323,7 +325,6 @@ WARNING: 当你通过 API 使用 Asciidoctor 时，默认的安全模式是 `:se
 
 你也可以将 AsciiDoc 字符串转化为可内嵌的 HTML （为了插入到一个 HTML 页面），用法如下：
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -331,7 +332,6 @@ Asciidoctor.convert content, safe: :safe
 
 如果你想得到完整的 HTML 文档，只需要启用 `header_footer` 选项即可。如下：
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -339,7 +339,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 如果你想访问已经处理过的文档，可以将转化过程拆分成离散的几步：
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

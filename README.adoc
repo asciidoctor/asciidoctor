@@ -256,7 +256,7 @@ See {url-install-docker}[Installing Asciidoctor using Docker].
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -366,13 +366,15 @@ The API is intended for integration with other Ruby software, such as Rails, Git
 
 To use Asciidoctor in your application, you first need to require the gem:
 
-[source]
+----
 require 'asciidoctor'
+----
 
 You can then convert an AsciiDoc source file to an HTML file using:
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: When using Asciidoctor via the API, the default safe mode is `:secure`.
 In secure mode, several core features are disabled, including the `include` directive.
@@ -380,7 +382,6 @@ If you want to enable these features, you'll need to explicitly set the safe mod
 
 You can also convert an AsciiDoc string to embeddable HTML (for inserting in an HTML page) using:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -388,7 +389,6 @@ Asciidoctor.convert content, safe: :safe
 
 If you want the full HTML document, enable the `header_footer` option as follows:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -396,7 +396,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 If you need access to the parsed document, you can split the conversion into discrete steps:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
