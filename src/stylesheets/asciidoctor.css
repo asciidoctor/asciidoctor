@@ -41,7 +41,6 @@ h4,
 h5,
 h6,
 pre,
-form,
 p,
 blockquote,
 th,
@@ -94,8 +93,7 @@ strong strong {
 
 code,
 kbd,
-pre,
-samp {
+pre {
   font-family: "Droid Sans Mono", "DejaVu Sans Mono", monospace;
   font-size: 1em;
 }
@@ -206,64 +204,6 @@ audio:not([controls]) {
   height: 0;
 }
 
-fieldset {
-  border: 1px solid silver;
-  margin: 0 2px;
-  padding: 0.35em 0.625em 0.75em;
-}
-
-legend {
-  border: 0;
-  padding: 0;
-}
-
-button,
-input,
-select,
-textarea {
-  font-family: inherit;
-  font-size: 100%;
-  margin: 0;
-}
-
-button,
-input {
-  line-height: normal;
-}
-
-button,
-select {
-  text-transform: none;
-}
-
-button,
-html input[type=button],
-input[type=reset],
-input[type=submit] {
-  -webkit-appearance: button;
-  cursor: pointer;
-}
-
-button[disabled],
-html input[disabled] {
-  cursor: default;
-}
-
-input[type=checkbox],
-input[type=radio] {
-  padding: 0;
-}
-
-button::-moz-focus-inner,
-input::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
-textarea {
-  overflow: auto;
-}
-
 .left {
   float: left !important;
 }
@@ -290,10 +230,6 @@ textarea {
 
 .hide {
   display: none;
-}
-
-select {
-  width: 100%;
 }
 
 .subheader,
@@ -1657,7 +1593,9 @@ ul.checklist > li > p:first-child > .fa-check-square-o:first-child {
 }
 
 ul.checklist > li > p:first-child > input[type=checkbox]:first-child {
-  margin-right: 0.25em;
+  font: inherit;
+  margin: 0 0.25em 0 0;
+  padding: 0;
 }
 
 ul.inline {
