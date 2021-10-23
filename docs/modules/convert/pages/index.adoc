@@ -33,9 +33,9 @@ NOTE: The term `backend` is often used interchangeably with the name of a conver
 For example, you might hear "`the html5 backend`" when someone is talking about the HTML 5 converter.
 However, there's an important distinction between these terms.
 
-Alternate converter implementations can reclaim a backend identifier.
-Therefore, the backend doesn't universally reference a single converter.
-Instead, it tells you which converter is currently registered to handle that identifier.
+A xref:custom.adoc[custom converter] can either introduce or reclaim a backend identifier.
+Since it's possible for a converter to reclaim a backend identifier, we can't say that a backend universally equates to a given converter.
+Rather, the backend identifier informs the processor which converter to select to handle the requested backend based on what's currently registered.
 
 The user selects which converter to use to convert a document by specifying the `backend` document attribute, `-b` (`--backend`) command line option, or `backend` API option (e.g., `--backend=docbook5`).
 The `html5` and `docbook5` backends can be referred to using the aliases `html` and `docbook`, respectively.
