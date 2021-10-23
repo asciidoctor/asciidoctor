@@ -1953,17 +1953,6 @@ sup.footnoteref a:active {
   padding: 0.75em 0;
 }
 
-.gist .file-data > table {
-  border: 0;
-  background: #fff;
-  width: 100%;
-  margin-bottom: 0;
-}
-
-.gist .file-data > table td.line-data {
-  width: 99%;
-}
-
 div.unbreakable {
   page-break-inside: avoid;
 }
