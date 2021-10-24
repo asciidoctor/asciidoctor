@@ -62,9 +62,10 @@ Let's learn why that is and how to control it.
 
 == Embedded output
 
-When you pass a string to `Asciidoctor.convert` to convert it to a backend format, such as HTML, this method only returns the converted content for those blocks.
-It does not include the frame around that content (i.e., the header and footer) that is needed to make a standalone document.
-Instead, it makes an _embedded_ document.
+When you pass an AsciiDoc string to `Asciidoctor.convert` to convert it to a backend format, such as HTML, the `:standalone` option is `false` by default.
+That means this method only returns the converted content.
+This content does not include the frame around that content (i.e., the header and footer) that's included in a standalone document.
+In other words, it makes an _embedded_ document.
 This default was chosen to make Asciidoctor consistent with other lightweight markup processors like Markdown.
 
 Here's what's included in an embedded document:
@@ -74,19 +75,24 @@ Here's what's included in an embedded document:
 * The converted document body
 * The footnotes unless the `nofootnotes` attribute is set
 
+The embedded document is intended to be included in a template, such as one provided by a static site generator.
+That template is responsible for providing the styles and library integrations needed for the content to render properly.
+
 == Standalone output
 
 You can still generate a standalone document when converting a string.
-To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `standalone` option to `true`.
+To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `:standalone` option to `true`.
 
 [source,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
 ----
 
-Now you will see a full HTML file.
+Now you'll get a complete HTML file.
+The standalone output provides the framing around the content, which includes the styling and all the library integrations the content needs to properly render (e.g., the default stylesheet, MathJax, etc.).
+If you don't set the `:standalone` option to `true`, you only get the embedded document (i.e., body content).
 
-When the input or output is a file, the `standalone` option is enabled by default.
+When the input or output is a file, the `:standalone` option is enabled by default.
 Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDoc string, the `:to_file` option is mandatory. 
 
 [source,ruby]
@@ -94,10 +100,10 @@ Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDo
 Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
 ----
 
-If you want to generate embedded output when starting with a file, set the `standalone` option to `false`.
+If you want to generate embedded output when starting with a file, set the `:standalone` option to `false`.
 However, most of the time you'll want to generate a standalone document when converting a file (which is why it's default).
 
-When converting a string, the TOC is only included by default when using the `standalone` option as shown above (whether it's enabled implicitly or explicitly).
+When converting a string, the TOC is only included by default when using the `:standalone` option as shown above (whether it's enabled implicitly or explicitly).
 However, you can force it to be included without the header and footer by setting the `toc` attribute with a value of `macro` and using the `toc::[]` macro in the string itself.
 
 == Convert inline markup only
@@ -113,8 +119,8 @@ In this mode, Asciidoctor will only process the first block (e.g., paragraph) in
 
 == Convert to DocBook
 
-You can produce DocBook 5.0 by setting the `backend` option to `'docbook'`.
-Since embedded DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `standalone` option to `true`.
+You can produce DocBook 5.0 by setting the `:backend` option to `'docbook'`.
+Since embedded DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `:standalone` option to `true`.
 
 [source,ruby]
 ----
