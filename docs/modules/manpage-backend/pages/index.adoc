@@ -12,7 +12,7 @@ This page introduces **man**ual pages, examines the AsciiDoc structure of a man 
 
 == What is a manual page?
 
-A {url-man-page}[manual page^], typically abbreviated as [.term]_man page_, is a form of software documentation that typically accompanies software on Unix-like operating systems.
+A {url-man-page}[manual page^], abbreviated as [.term]_man page_, is a form of software documentation that typically accompanies software on Unix-like operating systems.
 Its formalized structure allows the `man` command to present the man page as a formatted document in a terminal pager.
 
 The benefit of composing a man page in AsciiDoc is that you can convert it to multiple formats, including HTML and PDF.
@@ -68,7 +68,7 @@ Asciidoctor provides a built-in converter to generate {url-man-7}[roff-formatted
 This converter is bound to the `manpage` backend (not to be confused with the `manpage` doctype).
 Notice the absense of the space in the backend value.
 
-The man page converter is typically used to generate man pages that accompany software on Unix-like operating systems.
+The man page converter is used to generate man pages that accompany software on Unix-like operating systems.
 In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated in this way from {url-asciidoctor-1-raw}[this AsciiDoc source].
 
 To use the man page converter, assign `manpage` to the `backend` option.
