@@ -240,6 +240,15 @@ context 'Invoker' do
     end
   end
 
+  test 'should suggest --trace option if not present when program raises error' do
+    redirect_streams do |_, err|
+      sample_filepath = fixture_path 'sample.adoc'
+      invoker = invoke_cli ['-r', 'no-such-module'], sample_filepath
+      assert_match(/'no-such-module' could not be loaded\n *Use --trace for backtrace/, err.string)
+      assert_equal 1, invoker.code
+    end
+  end
+
   test 'should treat extra arguments as files' do
     redirect_streams do |_, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.adoc), nil
