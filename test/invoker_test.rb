@@ -249,6 +249,18 @@ context 'Invoker' do
     end
   end
 
+  test 'should raise error when --trace option is specified and program raises error' do
+    sample_filepath = fixture_path 'sample.adoc'
+    invoker = assert_raises LoadError do
+      invoke_cli ['--trace', '-r', 'no-such-module'], sample_filepath
+    end
+  end
+
+  test 'should show backtrace when --trace option is specified and program raises error' do
+    result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
+    assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
+  end
+
   test 'should treat extra arguments as files' do
     redirect_streams do |_, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.adoc), nil
