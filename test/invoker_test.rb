@@ -251,7 +251,7 @@ context 'Invoker' do
 
   test 'should raise error when --trace option is specified and program raises error' do
     sample_filepath = fixture_path 'sample.adoc'
-    invoker = assert_raises LoadError do
+    assert_raises LoadError do
       invoke_cli ['--trace', '-r', 'no-such-module'], sample_filepath
     end
   end
