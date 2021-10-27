@@ -258,7 +258,11 @@ context 'Invoker' do
 
   test 'should show backtrace when --trace option is specified and program raises error' do
     result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
-    assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
+    if jruby?
+      assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
+    else
+      assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
+    end
   end
 
   test 'should treat extra arguments as files' do
