@@ -4,7 +4,7 @@
 *,::before,::after{box-sizing:border-box}
 html{font-size:100%;-webkit-text-size-adjust:100%}
 body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-size:inherit;line-height:1;position:relative;cursor:auto;-moz-tab-size:4;-o-tab-size:4;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
-dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0}
+dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,p,blockquote,th,td{margin:0;padding:0}
 a{background:none;color:#2156a5;text-decoration:underline;line-height:inherit}
 a:active,a:hover{cursor:pointer;outline:0}
 a:focus{outline:thin dotted}
@@ -13,7 +13,7 @@ abbr{font-size:.9em}
 abbr[title]{cursor:help;border-bottom:1px dotted #dddddf;text-decoration:none}
 b,strong{font-weight:bold;line-height:inherit}
 strong strong{font-weight:400}
-code,kbd,pre,samp{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-size:1em}
+code,kbd,pre{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-size:1em}
 code{font-weight:400;color:rgba(0,0,0,.9)}
 pre{color:rgba(0,0,0,.9);line-height:1.45;text-rendering:optimizeSpeed;white-space:pre-wrap}
 dfn{font-style:italic}
@@ -34,16 +34,6 @@ svg:not(:root){overflow:hidden}
 figure{margin:0}
 audio,video{display:inline-block}
 audio:not([controls]){display:none;height:0}
-fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
-legend{border:0;padding:0}
-button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
-button,input{line-height:normal}
-button,select{text-transform:none}
-button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}
-button[disabled],html input[disabled]{cursor:default}
-input[type=checkbox],input[type=radio]{padding:0}
-button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
-textarea{overflow:auto}
 .left{float:left!important}
 .right{float:right!important}
 .text-left{text-align:left!important}
@@ -51,7 +41,6 @@ textarea{overflow:auto}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-select{width:100%}
 .subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
 p aside{font-size:.875em;line-height:1.35;font-style:italic}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.2;word-spacing:-.05em}
@@ -270,7 +259,7 @@ ul.unstyled,ol.unstyled{margin-left:0}
 li>p:empty:only-child::before{content:"";display:inline-block}
 ul.checklist>li>p:first-child{margin-left:-1em}
 ul.checklist>li>p:first-child>.fa-square-o:first-child,ul.checklist>li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
-ul.checklist>li>p:first-child>input[type=checkbox]:first-child{margin-right:.25em}
+ul.checklist>li>p:first-child>input[type=checkbox]:first-child{font:inherit;margin:0 .25em 0 0;padding:0}
 ul.inline{display:flex;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
 ul.inline>li{margin-left:1.25em}
 .unstyled dl dt{font-weight:400;font-style:normal}
