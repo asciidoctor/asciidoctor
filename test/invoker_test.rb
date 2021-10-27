@@ -256,7 +256,7 @@ context 'Invoker' do
     end
   end
 
-  test 'should show backtrace when --trace option is specified and program raises error' do
+  test 'should show backtrace when --trace option is specified and program raises error' unless: jruby_9_1_windows? do
     result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
     if jruby?
       assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
