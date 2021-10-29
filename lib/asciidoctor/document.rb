@@ -972,8 +972,14 @@ class Document < AbstractBlock
 
   # Public: Write the output to the specified file
   #
-  # If the converter responds to :write, delegate the work of writing the file
-  # to that method. Otherwise, write the output the specified file.
+  # If the converter responds to :write, delegate the work of writing the output
+  # to that method. Otherwise, write the output to the specified file. In the
+  # latter case, this method ensures the output has a trailing newline if the
+  # target responds to write and the output is not empty.
+  #
+  # output - The output to write. Unless the converter responds to write, this
+  #          object is expected to be a String.
+  # target - The file to write, either a File object or a String path.
   #
   # Returns nothing
   def write output, target
