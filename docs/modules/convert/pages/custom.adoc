@@ -37,7 +37,7 @@ One such technique is to use temporary XML tags around boundaries of inline elem
 The https://github.com/asciidoctor/asciidoctor/blob/HEAD/lib/asciidoctor/converter/manpage.rb[built-in man page converter] provides a good example of these techniques.
 ****
 
-A converter is typically instantiated each time an AsciiDoc document is processed.
+Unless a converter instance is passed to the processor, the converter is instantiated each time an AsciiDoc document is processed.
 A converter in Asciidoctor is not designed to be reused from one conversion to the next and is therefore stateless.
 
 Implementing a custom converter consists of the following steps:
@@ -356,6 +356,9 @@ Here's an example of the output you will get:
 </body>
 </topic>
 ----
+
+NOTE: If the value of the `:to_file` option passed to Asciidoctor's convert API responds to the `write` method (e.g., an IO object), Asciidoctor will ensure the output has a trailing newline character.
+Otherwise, it's up to the converter to decide whether to append a trailing newline character to the output.
 
 If you don't register the converter with a backend, you can pass the converter class (or instance) using the `:converter` option of the xref:api:index.adoc[Asciidoctor API], as shown in the following code snippet:
 
