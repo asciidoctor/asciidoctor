@@ -839,7 +839,8 @@ Your browser does not support the audio tag.
   end
 
   def convert_thematic_break node
-    %(<hr#{@void_element_slash}>)
+    class_attribute = node.role ? %( class="#{node.role}") : ''
+    %(<hr#{class_attribute}#{@void_element_slash}>)
   end
 
   def convert_sidebar node

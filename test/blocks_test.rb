@@ -61,6 +61,16 @@ context 'Blocks' do
       assert_xpath '/hr/following-sibling::*', output, 1
     end
 
+    test 'horizontal rule with role' do
+      input = <<~'EOS'
+      [.fancy]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'hr', output, 1
+      assert_css 'hr.fancy', output, 1
+    end
+
     test 'page break' do
       output = convert_string_to_embedded %(page 1\n\n<<<\n\npage 2)
       assert_xpath '/*[@class="page-break"]', output, 1
