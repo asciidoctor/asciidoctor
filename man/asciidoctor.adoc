@@ -130,8 +130,8 @@ Matching templates found in subsequent directories override ones previously disc
 === Processing Information
 
 *--failure-level*=_LEVEL_::
-  The minimum logging level that triggers a non-zero exit code (failure).
-  If this option is not set (default: FATAL), the program exits with exit code zero even if warnings or errors have been logged.
+  Set the minimum logging level (default: FATAL) that yields a non-zero exit code (i.e., failure).
+  If this option is not set, the program exits with a zero exit code even if warnings or errors have been logged.
 
 *-q, --quiet*::
   Silence application log messages and script warnings.
