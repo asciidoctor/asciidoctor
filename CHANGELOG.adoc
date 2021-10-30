@@ -35,6 +35,8 @@ Improvements::
   * Allow hash to be specified for Vimeo video either in video ID or using `hash` attribute (#4176)
   * Remove unnecessary specificity in default stylesheet for styling p element inside list item
   * Remove obsolete gist embed styles from default stylesheet
+  * Allow `--failure-level` to be set to default value, `FATAL`
+  * Sort levels in help for `--failure-level` option in ascending order
 
 Documentation::
 
