@@ -2,6 +2,5 @@
 ** xref:convert-files.adoc[]
 ** xref:convert-strings.adoc[]
 ** xref:generate-html-toc.adoc[]
-** xref:load-templates.adoc[]
 ** xref:set-safe-mode.adoc[]
 ** xref:options.adoc[]
