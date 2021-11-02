@@ -8,6 +8,9 @@ on:
     paths-ignore: ['docs/**']
   schedule:
   - cron: '0 2 * * *'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   activate:
     if: |
