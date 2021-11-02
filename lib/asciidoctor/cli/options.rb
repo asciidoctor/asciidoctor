@@ -137,7 +137,7 @@ module Asciidoctor
           opts.on '--trace', 'include backtrace information when reporting errors (default: false)' do
             self[:trace] = true
           end
-          opts.on '-v', '--verbose', 'directs application messages logged at DEBUG or INFO level to STDERR (default: false)' do
+          opts.on '-v', '--verbose', 'show all application log messages, including DEBUG and INFO levels (default: false)' do
             self[:verbose] = 2
           end
           opts.on '-w', '--warnings', 'turn on script warnings (default: false)' do
