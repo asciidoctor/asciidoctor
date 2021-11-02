@@ -271,6 +271,18 @@ context 'Options' do
     assert_includes messages, 'invalid argument: --failure-level=foobar'
   end
 
+  test 'should set log level to DEBUG when --log-level option is specified' do
+    options = Asciidoctor::Cli::Options.parse! %w(--log-level debug test/fixtures/sample.adoc)
+    assert_equal Logger::Severity::DEBUG, options[:log_level]
+  end
+
+  test 'should allow log level to be set to WARN using any recognized abbreviation' do
+    %w(w warn WARN warning WARNING).each do |val|
+      options = Asciidoctor::Cli::Options.parse! %W(--log-level=#{val} test/fixtures/sample.adoc)
+      assert_equal ::Logger::Severity::WARN, options[:log_level]
+    end
+  end
+
   test 'should set verbose to 2 when -v flag is specified' do
     options = Asciidoctor::Cli::Options.parse! %w(-v test/fixtures/sample.adoc)
     assert_equal 2, options[:verbose]

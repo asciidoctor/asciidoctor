@@ -79,6 +79,11 @@ module Asciidoctor
           end
         end
 
+        if (logger_level = opts.delete :log_level) && !old_logger
+          old_logger_level ||= logger.level
+          logger.level = logger_level
+        end
+
         if infiles.size == 1
           if (infile0 = infiles[0]) == '-'
             outfile ||= infile0

@@ -129,6 +129,9 @@ Matching templates found in subsequent directories override ones previously disc
 
 === Processing Information
 
+*--log-level*=_LEVEL_::
+  Set the minimum severity level (default: WARN) of application log messages that get reported.
+
 *--failure-level*=_LEVEL_::
   Set the minimum logging level (default: FATAL) that yields a non-zero exit code (i.e., failure).
   If this option is not set, the program exits with a zero exit code even if warnings or errors have been logged.
