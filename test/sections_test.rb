@@ -3641,6 +3641,31 @@ context 'Sections' do
       assert_equal 'section', (doc.find_by id: 'appendix-section-title')[0].sectname
     end
 
+    test 'should allow part intro to be defined using special section' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      [partintro]
+      == Part Intro
+
+      Part intro content
+
+      == Chapter 1
+
+      Chapter content
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/book/part[@xml:id="_part_1"]', output, 1
+      assert_xpath '/book/part[@xml:id="_part_1"]/partintro', output, 1
+      assert_xpath '/book/part[@xml:id="_part_1"]/partintro[@xml:id="_part_intro"]', output, 1
+      assert_xpath '/book/part[@xml:id="_part_1"]/partintro[@xml:id="_part_intro"]/title[text()="Part Intro"]', output, 1
+      assert_xpath '/book/part[@xml:id="_part_1"]/partintro[@xml:id="_part_intro"]/following-sibling::chapter[@xml:id="_chapter_1"]', output, 1
+    end
+
     test 'should add partintro style to child paragraph of part' do
       input = <<~'EOS'
       = Book
