@@ -702,7 +702,7 @@ context 'Invoker' do
 
   test 'should set attribute with quoted value containing a space' do
     # emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
-    invoker = invoke_cli_to_buffer %w(--trace -a toc -a note-caption=Note\ to\ self: -o -)
+    invoker = invoke_cli_to_buffer ['--trace', '-a', 'toc', '-a', 'note-caption=Note to self:', '-o', '-']
     doc = invoker.document
     assert_equal 'Note to self:', doc.attr('note-caption')
     output = invoker.read_output
