@@ -3,7 +3,21 @@
 Asciidoctor provides security levels that control the read and write access of attributes, include directives, macros, and scripts while a document is processing.
 Each level includes the restrictions enabled in the prior security level.
 
-The safe mode can be set from the  xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
+.Security assumptions
+[#security-assumptions]
+****
+Asciidoctor's safe modes are primarily focused on what the processor is permitted to do.
+The safe modes do not provide a comprehensive security framework.
+In particular, there's no safe mode that restricts the kind of content the author can pass through to the output document.
+In other words, the safe mode setting does not provide a way to santiize the output.
+
+Asciidoctor performs sensible escaping to allow an author to safely input text, but does not limit the content that can be included in the output using passthrough blocks or custom substitutions.
+The reason for this policy is that we assume the document will be passed through a sanitizer if the HTML must be embedded directly into a web page, precisely what GitHub and GitLab do.
+This postprocessing (which could be done using a postprocessor extension) is better handled by a separate tool since.
+There are many permutations to consider and only a separate tool would know which restrictions to apply for a given situation.
+****
+
+The safe mode can be set from the xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
 You can also xref:reference-safe-mode.adoc[enable or disable content based on the current safe mode].
 
 [#unsafe]
