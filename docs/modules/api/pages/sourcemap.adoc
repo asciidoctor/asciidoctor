@@ -1,0 +1,154 @@
+= Map Source Location of Blocks
+:navtitle: Enable the Sourcemap
+
+Since Asciidoctor's primary focus is on conversion and speed, it does not attempt to track the source location of blocks when parsing by default.
+However, such information can be useful for extracting information from the source document, improving error messages, and for use in extensions.
+Therefore, Asciidoctor provides a flag to map the source location of blocks, known as the sourcemap.
+This page examples how to enable the sourcemap and how to make use of the information it provides.
+
+== What does the sourcemap provide?
+
+The sourcemap provides line and file information for all blocks in the parsed document.
+Specifically, it provides information about the start of each block.
+The start of the block does not include any block metadata (block anchor and block attributes) above the block.
+
+The sourcemap only works for blocks.
+It does not track the source location for inline elements, such as formatted text or an inline image, or for attribute entries.
+
+The sourcemap information is available on the `source_location` property of the block.
+When the sourcemap is enabled, the value of this property is a `Cursor` object.
+The `Cursor` object contains the following properties:
+
+[horizontal]
+file:: the absolute filename of the source file where the block starts (if input is a string, the value is `nil`)
+dir:: the absolute directory of the source file where the block starts (if input is a string, the value is the base dir)
+lineno:: the line number in the source file where the block starts (after any empty or block metadata lines)
+path:: the relative path (starting from docdir) of the source file where the block starts (if input is a string, the value is `<stdin>`)
+
+The `lineno` and `file` properties can be accessed as properties with the same name on the block itself.
+
+IMPORTANT: The sourcemap is not perfect.
+There are certain edge cases, such as when the block is split across multiple files or the block starts and ends on the last line of an include file, when the sourcemap may report the wrong file or line information.
+If you're writing a processor that relies on the sourcemap, it's a good idea to verify that the line at the cursor is the one you expect to find, then adjust accordingly.
+
+== Set :sourcemap option
+
+The sourcemap feature can be controlled from the API using the `:sourcemap` option.
+The value of this option is a boolean.
+If the value is `false` (default), the sourcemap is not enabled.
+If the value is `true`, the sourcemap is enabled.
+The `:sourcemap` option is accepted by all xref:index.adoc#entrypoints[entrypoint methods] (e.g., Asciidoctor#load_file).
+
+Here's an example of how to enable the sourcemap using the API:
+
+[,ruby]
+----
+doc = Asciidoctor.load_file 'doc.adoc', safe: :safe, sourcemap: true
+----
+
+Now that the sourcemap is enabled, you can access the source location of the block elements in the parsed document.
+
+== Use the sourcemap
+
+When the sourcemap is enabled, the parser will store source information on the `source_location` property on each block in the parsed document.
+Let's look at an example.
+
+Start by creating the following AsciiDoc file named [.path]_doc.adoc_.
+
+.doc.adoc
+[,asciidoc]
+----
+= Document Title
+
+== Section
+
+Paragraph.
+
+Another paragraph.
+----
+
+Now, load this file using Asciidoctor with the `:sourcemap` option enabled:
+
+[,ruby]
+----
+doc = Asciidoctor.load_file 'doc.adoc', safe: :safe, sourcemap: true
+----
+
+Let's find the first paragraph in the document and inspect its source location:
+
+[,ruby]
+----
+first_paragraph = (doc.find_by context: :paragraph)[0]
+puts first_paragraph.source_location
+----
+
+You'll see output similar to what's shown below:
+
+[.output]
+....
+doc.adoc: line 5
+....
+
+What you're seeing here is the string value of the cursor.
+There's more information to see if you replace `puts` with `pp`:
+
+[.output]
+....
+#<Asciidoctor::Reader::Cursor
+ @dir="/path/to/docdir",
+ @file="/path/to/docdir/doc.adoc",
+ @lineno=5,
+ @path="doc.adoc">
+....
+
+Since file and lineno are the most useful properties, they can be accessed directly from the block:
+
+[,ruby]
+----
+puts first_paragraph.file
+puts first_paragraph.lineno
+----
+
+If you move the source of the section to an include file, as shown here:
+
+.doc.adoc
+[,asciidoc]
+----
+= Document Title
+
+\include::partials/section.adoc[]
+----
+
+then the source location will follow the paragraph into that file:
+
+[.output]
+....
+#<Asciidoctor::Reader::Cursor
+ @dir="/path/to/docdir/partials",
+ @file="/path/to/docdir/partials/section.adoc",
+ @lineno=3,
+ @path="partials/section.adoc">
+....
+
+If the block has metadata lines, those lines are skipped when reporting the start location of the block.
+For example, let's assume the paragraph is defined as follows:
+
+[,asciidoc]
+----
+[#p1]
+Paragraph.
+----
+
+The lineno of the paragraph in the source location is now one greater than before:
+
+[.output]
+....
+#<Asciidoctor::Reader::Cursor
+ @dir="/path/to/docdir/partials",
+ @file="/path/to/docdir/partials/section.adoc",
+ @lineno=4,
+ @path="partials/section.adoc">
+....
+
+If you're writing a custom converter, the source location is not available for inline elements.
+However, you can access the source location of the parent element (e.g., `node.parent.source_location`), which should at leasat get you close to the location of the element.
