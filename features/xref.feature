@@ -552,6 +552,26 @@ Feature: Cross References
     |to find a table of features.
     """
 
+  Scenario: Create a basic cross reference to a formal paragraph
+  Given the AsciiDoc source
+    """
+    <<terms>> apply.
+
+    .Terms and conditions
+    [#terms]
+    These are the terms and conditions.
+    """
+  When it is converted to html
+  Then the result should match the HTML structure
+    """
+    .paragraph: p
+      a> href='#terms' Terms and conditions
+      |apply.
+    #terms.paragraph
+      .title Terms and conditions
+      p These are the terms and conditions.
+    """
+
   Scenario: Create a full cross reference to a formal image block
   Given the AsciiDoc source
     """
