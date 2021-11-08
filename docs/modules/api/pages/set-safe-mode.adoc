@@ -1,21 +1,33 @@
 = Set the Safe Mode Using the API
 :navtitle: Set Safe Mode
 
-The default xref:ROOT:safe-modes.adoc[safe mode] in the API is `SECURE`.
-You can change the safe mode using a string, symbol or integer value.
+When using Asciidoctor via the API, the default xref:ROOT:safe-modes.adoc[safe mode] is `SECURE`.
+You can change the safe mode using the `:safe` API option.
 
 == Set :safe option
 
-The value must be set in the document constructor using the `:safe` option.
+The safe mode can be controlled from the API using the `:safe` option.
+The `:safe` option is accepted by all xref:index.adoc#entrypoints[entrypoint methods] (e.g., `Asciidoctor#convert_file`).
 
- result = Asciidoctor.convert_file 'doc.adoc', safe: 'server'
+The `:safe` option accepts the safe mode as a string:
 
-or
+[,ruby]
+----
+Asciidoctor.convert_file 'doc.adoc', safe: 'server'
+----
 
- result = Asciidoctor.convert_file 'doc.adoc', safe: :server
+as a symbol (preferred):
 
-or
+[,ruby]
+----
+Asciidoctor.convert_file 'doc.adoc', safe: :server
+----
 
- result = Asciidoctor.convert_file 'doc.adoc', safe: 10
+as an integer:
+
+[,ruby]
+----
+Asciidoctor.convert_file 'doc.adoc', safe: 10
+----
 
 You can also set the xref:cli:set-safe-mode.adoc[safe mode from the CLI] and xref:ROOT:reference-safe-mode.adoc[enable or disable content based on the current safe mode].
