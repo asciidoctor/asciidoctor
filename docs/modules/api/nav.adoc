@@ -3,4 +3,5 @@
 ** xref:convert-strings.adoc[]
 ** xref:generate-html-toc.adoc[]
 ** xref:set-safe-mode.adoc[]
+** xref:sourcemap.adoc[]
 ** xref:options.adoc[]
