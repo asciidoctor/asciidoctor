@@ -1,7 +1,7 @@
 = Map Source Location of Blocks
 :navtitle: Enable the Sourcemap
 
-Since Asciidoctor's primary focus is on conversion and speed, it does not attempt to track the source location of blocks when parsing by default.
+Since Asciidoctor's primary focus is on converting documents efficiently, it does not attempt to track the source location of blocks when parsing by default.
 However, such information can be useful for extracting information from the source document, improving error messages, and for use in extensions.
 Therefore, Asciidoctor provides a flag to map the source location of blocks, known as the sourcemap.
 This page examples how to enable the sourcemap and how to make use of the information it provides.

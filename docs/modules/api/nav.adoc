@@ -4,4 +4,5 @@
 ** xref:generate-html-toc.adoc[]
 ** xref:set-safe-mode.adoc[]
 ** xref:sourcemap.adoc[]
+** xref:catalog-assets.adoc[]
 ** xref:options.adoc[]
