@@ -93,7 +93,7 @@ class Converter::Html5Converter < Converter::Base
 
   def convert_document node
     br = %(<br#{slash = @void_element_slash}>)
-    unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
+    unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
       asset_uri_scheme = %(#{asset_uri_scheme}:)
     end
     cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
@@ -628,7 +628,7 @@ Your browser does not support the audio tag.
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
-        ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
+        ((svg = node.option? 'inline') || (obj = node.option? 'interactive'))
       if svg
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif obj
@@ -1031,7 +1031,7 @@ Your browser does not support the audio tag.
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     case node.attr 'poster'
     when 'vimeo'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
@@ -1047,7 +1047,7 @@ Your browser does not support the audio tag.
 </div>
 </div>)
     when 'youtube'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       rel_param_val = (node.option? 'related') ? 1 : 0
@@ -1200,7 +1200,7 @@ Your browser does not support the video tag.
       attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
       attrs = attrs.empty? ? '' : attrs.join
       if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) &&
-          node.document.safe < SafeMode::SECURE && ((svg = (node.option? 'inline')) || (obj = (node.option? 'interactive')))
+          node.document.safe < SafeMode::SECURE && ((svg = node.option? 'inline') || (obj = node.option? 'interactive'))
         if svg
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif obj
