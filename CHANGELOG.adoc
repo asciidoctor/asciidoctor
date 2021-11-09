@@ -45,6 +45,7 @@ Bug Fixes::
   * Honor stripes=none on nested table (#4165)
   * Update default stylesheet to fix spacing around empty list item (#4184)
   * Honor `:header_only` option when parsing document with manpage doctype (#4192)
+  * Use numeric character reference for closing square bracket around alt text of icon
 
 Improvements::
 

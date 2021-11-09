@@ -917,12 +917,22 @@ context 'Substitutions' do
 
     test 'an icon macro should be interpreted as alt text if icons are disabled' do
       para = block_from_string 'icon:github[]'
-      assert_equal '<span class="icon">[github]</span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_equal '<span class="icon">[github&#93;</span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should not mangle icon with link if icons are disabled' do
+      para = block_from_string 'icon:github[link=https://github.com]'
+      assert_equal '<span class="icon"><a class="image" href="https://github.com">[github&#93;</a></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should not mangle icon inside link if icons are disabled' do
+      para = block_from_string 'https://github.com[icon:github[] GitHub]'
+      assert_equal '<a href="https://github.com"><span class="icon">[github&#93;</span> GitHub</a>', para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an icon macro should output alt text if icons are disabled and alt is given' do
       para = block_from_string 'icon:github[alt="GitHub"]'
-      assert_equal '<span class="icon">[GitHub]</span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_equal '<span class="icon">[GitHub&#93;</span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
     test 'an icon macro should be interpreted as a font-based icon when icons=font' do

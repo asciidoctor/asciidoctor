@@ -1191,7 +1191,7 @@ Your browser does not support the video tag.
       title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
       img = %(<i class="#{class_attr_val}"#{title_attr}></i>)
     elsif type == 'icon' && !(node.document.attr? 'icons')
-      img = %([#{node.alt}])
+      img = %([#{node.alt}&#93;)
     else
       target = node.target
       attrs = []
