@@ -1,0 +1,241 @@
+= Catalog Assets
+
+Since Asciidoctor's primary focus is on converting documents efficiently, it does not attempt to store information about all assets it comes across while processing the document.
+However, such information can be useful for analyzing the document or for use in extensions.
+Therefore, Asciidoctor provides a flag to catalog certain additional assets.
+This page explains how to enable this catalog and how to access it.
+
+== What assets are cataloged?
+
+The asset catalog provides a table of select assets grouped by type that are discovered while processing the document.
+This table is stored on the `catalog` property of the document model.
+
+When this feature is enabled, the processor catalogs the following assets:
+
+* links (but not xrefs) (key: `:links`)
+* block or inline images (key: `:images`)
+
+The processor always cataloged the following assets, regardless of this setting:
+
+* block or inline anchors (key: `:refs`)
+* footnotes (key: `:footnotes`)
+
+Inline elements are not cataloged until conversion.
+Therefore, they're only available after the document has been converted, not after it has been loaded.
+
+== Set :catalog_assets option
+
+Whether the processor catalogs assets (specifically links and images) is controlled from the API using the `:catalog_assets` option.
+The value of this option is a boolean.
+If the value is `false` (default), assets are not cataloged.
+If the value is `true`, assets are cataloged.
+The `:catalog_assets` option is accepted by all xref:index.adoc#entrypoints[entrypoint methods] (e.g., Asciidoctor#load_file).
+
+Here's an example of how to catalog assets when using the API:
+
+[,ruby]
+----
+doc = Asciidoctor.convert_file 'doc.adoc', safe: :safe, catalog_assets: true
+----
+
+Notice that we've used the `convert_file` method instead of the `load_file` method.
+This ensures that inline assets are included in the catalog as well.
+
+Now that you've configured the processor to catalog assets, you can access them from the document object.
+Let's explore it.
+
+== Use the asset catalog
+
+Assets which have been cataloged are available from the `catalog` property on the document model (i.e., the parsed document).
+The catalog is a Ruby hash.
+The keys are the asset families (e.g., `:links`, `:images`, etc).
+The value of each key is an array of assets.
+The asset object varies by family.
+
+Let's look at an example of how to access links, images, and refs from the asset catalog.
+
+=== :links
+
+Start by creating the following AsciiDoc file named [.path]_doc.adoc_.
+
+.doc.adoc
+[,asciidoc]
+----
+You can learn about Asciidoctor at https://docs.asciidoctor.org.
+The Asciidoctor source repo is hosted on https://github.com[GitHub].
+
+image::screenshot.png[]
+
+If you see image:green-check.png[], it means the job was successful.
+----
+
+Now, convert this file using Asciidoctor with the `:catalog_assets` option enabled:
+
+[,ruby]
+----
+doc = Asciidoctor.convert_file 'doc.adoc', safe: :safe, catalog_assets: true
+----
+
+Let's see what links the processor found:
+
+[,ruby]
+----
+links = doc.catalog[:links]
+puts "Found #{links.size} links:"
+puts links
+----
+
+You'll see the following output:
+
+[.output]
+....
+Found 2 links:
+https://docs.asciidoctor.org
+https://github.com
+....
+
+The value of the `:links` key is an array of unique URLs found in the document.
+The entry does not include the link text, only the URL itself.
+
+=== :images
+
+Let's add some images to the document.
+
+.doc.adoc
+[,asciidoc]
+----
+//...
+
+image::screenshot.png[]
+
+If you see image:green-check.png[], it means the job was successful.
+----
+
+Now, convert this file using Asciidoctor with the `:catalog_assets` option enabled:
+
+[,ruby]
+----
+doc = Asciidoctor.convert_file 'doc.adoc', safe: :safe, catalog_assets: true
+----
+
+Let's see what images the processor found:
+
+[,ruby]
+----
+images = doc.catalog[:images]
+puts "Found #{images.size} images:"
+puts images
+----
+
+You'll see the following output:
+
+[.output]
+....
+Found 2 images:
+screenshot.png
+green-check.png
+....
+
+The value of the `:images` key is an array of images (by occurrence) found in the document.
+While it looks like the value of each entry is a relative path string, there's actually more information there.
+
+Each entry in the `:images` collection is an ImageReference object.
+This object appears as a relative path string when printed (which explains the observed behavior).
+An ImageReference contains the following properties:
+
+target:: The image path relative to the value of imagesdir.
+imagesdir:: The value of the imagesdir attribute at the time the image was processed.
+
+Let's assume the images are located in the [.path]_images_ folder, and we have set the `imagesdir` attribute on the document accordingly.
+
+.doc.adoc
+[,asciidoc]
+----
+= Document Title
+:imagesdir: images
+
+//...
+
+image::screenshot.png[]
+
+If you see image:green-check.png[], it means the job was successful.
+----
+
+You can print the full location to the images as follows:
+
+[,ruby]
+----
+images = doc.catalog[:images]
+puts "Found #{images.size} images:"
+docdir = doc.attr 'docdir'
+puts images.map {|image| File.join docdir, image.imagesdir.to_s, image.target }
+----
+
+In the output, the image references will be shown as absolute paths.
+
+=== :refs
+
+In addition to images and links, you can also access all targetable references (i.e., elements that have an ID).
+First, let's add some referencable elements to our document.
+
+[,asciidoc]
+----
+= Document Title
+
+== Quickstart
+
+You can learn about Asciidoctor at https://docs.asciidoctor.org.
+The Asciidoctor source repo is hosted on https://github.com[GitHub].
+
+.Screenshot
+[#screenshot]
+image::screenshot.png[]
+
+== CI
+
+If you see image:green-check.png[], it means the job was successful.
+----
+
+Let's see what references the processor found:
+
+[,ruby]
+----
+refs = doc.catalog[:refs]
+puts "Found #{refs.size} references:"
+puts refs.keys
+----
+
+You'll see the following output:
+
+[.output]
+....
+Found 3 references:
+_quickstart
+screenshot
+_ci
+....
+
+The value of the `:refs` key is a map of unique references found in the document.
+The key names are the unique IDs.
+The values are the element nodes to which these IDs are bound.
+The API for the node depends on the type of element.
+The most common property is the reftext of the node.
+
+[,ruby]
+----
+refs = doc.catalog[:refs]
+puts "Found #{refs.size} references:"
+puts refs.map {|id, node| %(#{node.context}: #{id} => #{node.xreftext || "[#{id}]"}) }
+----
+
+Now you'll see the following output:
+
+[.output]
+....
+Found 3 references:
+section: _quickstart => Quickstart
+image: screenshot => Screenshot
+section: _ci => CI
+....
+
+An idea of something you can do with the refs table is validate deep xrefs across documents.
