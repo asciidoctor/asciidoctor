@@ -627,16 +627,18 @@ Your browser does not support the audio tag.
     target = node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE &&
-        ((svg = node.option? 'inline') || (obj = node.option? 'interactive'))
-      if svg
+    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      if node.option? 'inline'
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
-      elsif obj
+      elsif node.option? 'interactive'
         fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
         img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+      else
+        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       end
+    else
+      img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     end
-    img ||= %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
     id_attr = node.id ? %( id="#{node.id}") : ''
     classes = ['imageblock']
@@ -1199,16 +1201,18 @@ Your browser does not support the video tag.
       attrs << %( height="#{node.attr 'height'}") if node.attr? 'height'
       attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
       attrs = attrs.empty? ? '' : attrs.join
-      if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) &&
-          node.document.safe < SafeMode::SECURE && ((svg = node.option? 'inline') || (obj = node.option? 'interactive'))
-        if svg
+      if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+        if node.option? 'inline'
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
-        elsif obj
+        elsif node.option? 'interactive'
           fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
           img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
+        else
+          img = %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
+      else
+        img = %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
-      img ||= %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
     end
     img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
     if (role = node.role)
