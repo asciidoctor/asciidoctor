@@ -1183,23 +1183,28 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_image node
-    if (type = node.type || 'image') == 'icon' && (node.document.attr? 'icons', 'font')
-      class_attr_val = %(fa fa-#{node.target})
-      { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
-        class_attr_val = %(#{class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+    target = node.target
+    if (type = node.type || 'image') == 'icon'
+      if (icons = node.document.attr 'icons') == 'font'
+        i_class_attr_val = %(fa fa-#{target})
+        { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
+          i_class_attr_val = %(#{i_class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+        end
+        attrs = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
+        img = %(<i class="#{i_class_attr_val}"#{attrs}></i>)
+      elsif icons
+        attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+        attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
+        attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
+        img = %(<img src="#{node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+      else
+        img = %([#{node.alt}])
       end
-      title_attr = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
-      img = %(<i class="#{class_attr_val}"#{title_attr}></i>)
-    elsif type == 'icon' && !(node.document.attr? 'icons')
-      img = %([#{node.alt}])
     else
-      target = node.target
-      attrs = []
-      attrs << %( width="#{node.attr 'width'}") if node.attr? 'width'
-      attrs << %( height="#{node.attr 'height'}") if node.attr? 'height'
-      attrs << %( title="#{node.attr 'title'}") if node.attr? 'title'
-      attrs = attrs.empty? ? '' : attrs.join
-      if type != 'icon' && ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
+      attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
+      attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
+      if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
         if node.option? 'inline'
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
@@ -1209,20 +1214,15 @@ Your browser does not support the video tag.
           img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
       else
-        img = %(<img src="#{type == 'icon' ? (node.icon_uri target) : (node.image_uri target)}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
     end
     img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
+    class_attr_val = type
     if (role = node.role)
-      if node.attr? 'float'
-        class_attr_val = %(#{type} #{node.attr 'float'} #{role})
-      else
-        class_attr_val = %(#{type} #{role})
-      end
+      class_attr_val = (node.attr? 'float') ? %(#{class_attr_val} #{node.attr 'float'} #{role}) : %(#{class_attr_val} #{role})
     elsif node.attr? 'float'
-      class_attr_val = %(#{type} #{node.attr 'float'})
-    else
-      class_attr_val = type
+      class_attr_val = %(#{class_attr_val} #{node.attr 'float'})
     end
     %(<span class="#{class_attr_val}">#{img}</span>)
   end
