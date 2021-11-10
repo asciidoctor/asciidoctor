@@ -28,6 +28,7 @@ Enhancements::
   * Add support for dropping principal text of list item if empty in an ordered or unordered list when converting to man page (#4182)
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
   * Add support for role on thematic break in HTML converter (#4101)
+  * Add support for link=self on image macros (#3656)
 
 Compliance::
 

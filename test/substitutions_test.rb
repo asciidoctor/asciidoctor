@@ -775,6 +775,13 @@ context 'Substitutions' do
       refute_match(/<svg\s[^>]*style="[^>]*>/, result)
     end
 
+    test 'should ignore link attribute if value is self and image target is inline SVG' do
+      para = block_from_string 'image:circle.svg[Tiger,100,opts=inline,link=self]', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'imagesdir' => 'fixtures', 'docdir' => testdir }
+      result = para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, result)
+      refute_match(/<a href=/, result)
+    end
+
     test 'an image macro with an inline SVG image should be converted to an svg element even when data-uri is set' do
       para = block_from_string 'image:circle.svg[Tiger,100,opts=inline]', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'data-uri' => '', 'imagesdir' => 'fixtures', 'docdir' => testdir }
       assert_match(/<svg\s[^>]*width="100">/, para.sub_macros(para.source).gsub(/>\s+</, '><'))
@@ -812,6 +819,19 @@ context 'Substitutions' do
       para = block_from_string 'image:tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]'
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger"><img src="tiger.png" alt="Tiger"></a></span>',
         para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'a single-line image macro with text and link to self should be interpreted as a self-referencing image with alt text' do
+      para = block_from_string 'image:tiger.png[Tiger, link=self]', attributes: { 'imagesdir' => 'img' }
+      assert_equal '<span class="image"><a class="image" href="img/tiger.png"><img src="img/tiger.png" alt="Tiger"></a></span>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should link to data URI if value of link attribute is self and inline image is embedded' do
+      para = block_from_string 'image:circle.svg[Tiger,100,link=self]', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'data-uri' => '', 'imagesdir' => 'fixtures', 'docdir' => testdir }
+      output = para.sub_macros(para.source).gsub(/>\s+</, '><')
+      assert_xpath '//a[starts-with(@href,"data:image/svg+xml;base64,")]', output, 1
+      assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
     end
 
     test 'rel=noopener should be added to an image with a link that targets the _blank window' do
