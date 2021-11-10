@@ -1198,7 +1198,7 @@ Your browser does not support the video tag.
         attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
         img = %(<img src="#{node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       else
-        img = %([#{node.alt}])
+        img = %([#{node.alt}&#93;)
       end
     else
       attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
