@@ -944,6 +944,16 @@ context 'Substitutions' do
       assert_equal %{<span class="icon"><i class="fa fa-github fa-4x"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'an icon macro with flip should be interpreted as a flipped font-based icon when icons=font' do
+      para = block_from_string 'icon:shield[fw,flip=horizontal]', attributes: { 'icons' => 'font' }
+      assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-flip-horizontal"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an icon macro with rotate should be interpreted as a rotated font-based icon when icons=font' do
+      para = block_from_string 'icon:shield[fw,rotate=90]', attributes: { 'icons' => 'font' }
+      assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-rotate-90"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
       para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
       assert_equal %{<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>}, para.sub_macros(para.source).gsub(/>\s+</, '><')

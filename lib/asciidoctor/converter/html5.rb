@@ -1187,8 +1187,11 @@ Your browser does not support the video tag.
     if (type = node.type || 'image') == 'icon'
       if (icons = node.document.attr 'icons') == 'font'
         i_class_attr_val = %(fa fa-#{target})
-        { 'size' => 'fa-', 'rotate' => 'fa-rotate-', 'flip' => 'fa-flip-' }.each do |key, prefix|
-          i_class_attr_val = %(#{i_class_attr_val} #{prefix}#{node.attr key}) if node.attr? key
+        i_class_attr_val = %(#{i_class_attr_val} fa-#{node.attr 'size'}) if node.attr? 'size'
+        if node.attr? 'flip'
+          i_class_attr_val = %(#{i_class_attr_val} fa-flip-#{node.attr 'flip'})
+        elsif node.attr? 'rotate'
+          i_class_attr_val = %(#{i_class_attr_val} fa-rotate-#{node.attr 'rotate'})
         end
         attrs = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
         img = %(<i class="#{i_class_attr_val}"#{attrs}></i>)
