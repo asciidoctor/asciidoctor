@@ -1,21 +1,30 @@
 = Errors and Warnings
 
-All application messages (i.e., info, warning, error, or failure) emitted by Asciidoctor are written to the logger.
+All application messages (i.e., debug, info, warning, error, or fatal) emitted by Asciidoctor are written to the logger.
+By default, only warning, error, and fatal messages are logged.
 When using the CLI, the logger routes messages to the console via stderr (i.e., standard error).
 
 == Notification types
 
+DEBUG::
+Debug messages provide insight into what the software is doing and can be useful for tracking down problems or unexpected behavior.
+Currently, Asciidoctor does not log any messages at this level.
+However, extensions may do so.
+
 <<info,INFO>>::
 Info messages do not stop conversion, but they indicate possible problems, and the output may not be what you were expecting.
 
-<<warning,WARNING>>::
+<<warning,WARN>> (WARNING)::
 Warnings do not stop conversion, but they indicate likely problems, and the output probably won't be what you were expecting.
+In the CLI output, Asciidoctor labels these messages as `WARNING` rather than `WARN`.
 
 <<error,ERROR>>::
 Errors do not stop conversion, but the output document will almost certainly be wrong.
 
-<<fail,FAILED>>::
+<<fatal,FATAL>> (FAILED)::
 Failures are fatal; no output document will be produced.
+If the `--trace` CLI option is specified, the message may be accompanied by a stacktrace.
+In the CLI output, Asciidoctor labels these messages as `FAILED` rather than `FATAL`.
 
 The messages listed in the following sections may contain some of the following representative placeholders:
 
@@ -198,14 +207,14 @@ Check section levels.
 |Check for missing cell separator characters at the start of the line.
 |===
 
-[#fail]
-== Failure messages
+[#fatal]
+== Fatal messages
 
 [cols=2*]
 |===
 |Message |Troubleshooting
 
-|missing converter for backend '<x>'. Processing aborted. (RuntimeError)
+|missing converter for backend '<x>'. Processing aborted.
 |You used -b with an invalid or missing backend.
 
 //|Failed to load AsciiDoc document - undefined method `convert' for nil:NilClass
