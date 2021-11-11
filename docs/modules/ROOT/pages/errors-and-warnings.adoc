@@ -1,6 +1,6 @@
 = Errors and Warnings
 
-All application messages (i.e., info, warning, error, or failure) emitted by Asciidoctor a written to the logger.
+All application messages (i.e., info, warning, error, or failure) emitted by Asciidoctor are written to the logger.
 When using the CLI, the logger routes messages to the console via stderr (i.e., standard error).
 
 == Notification types
