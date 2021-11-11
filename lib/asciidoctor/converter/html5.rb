@@ -632,14 +632,16 @@ Your browser does not support the audio tag.
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif node.option? 'interactive'
         fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-        img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+        img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
       else
-        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       end
     else
-      img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     end
-    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
+    if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
+      img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+    end
     id_attr = node.id ? %( id="#{node.id}") : ''
     classes = ['imageblock']
     classes << (node.attr 'float') if node.attr? 'float'
@@ -1201,7 +1203,7 @@ Your browser does not support the video tag.
         attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
         attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
         attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
-        img = %(<img src="#{node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       else
         img = %([#{node.alt}&#93;)
       end
@@ -1214,15 +1216,17 @@ Your browser does not support the video tag.
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
           fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-          img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
+          img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{attrs}>#{fallback}</object>)
         else
-          img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+          img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
       else
-        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
     end
-    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
+    if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
+      img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+    end
     class_attr_val = type
     if (role = node.role)
       class_attr_val = (node.attr? 'float') ? %(#{class_attr_val} #{node.attr 'float'} #{role}) : %(#{class_attr_val} #{role})

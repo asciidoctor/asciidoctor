@@ -2408,6 +2408,19 @@ context 'Blocks' do
       refute_match(/<svg\s[^>]*style="[^>]*>/, output)
     end
 
+    test 'should ignore link attribute if value is self and image target is inline SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      [%inline]
+      image::circle.svg[Tiger,100,link=self]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output)
+      refute_match(/<a href=/, output)
+    end
+
     test 'should honor percentage width for SVG image with inline option' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2615,6 +2628,17 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'can convert block image with link to self' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::tiger.png[Tiger, link=self]
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="img/tiger.png"]/img[@src="img/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'adds rel=noopener attribute to block image with link that targets _blank window' do
@@ -2825,6 +2849,19 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
       assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
+    end
+
+    test 'should link to data URI if value of link attribute is self and image is embedded' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+      :data-uri:
+
+      image::circle.svg[Tiger,100,link=self]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
+      assert_xpath '//a[starts-with(@href,"data:image/svg+xml;base64,")]', output, 1
     end
 
     test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
