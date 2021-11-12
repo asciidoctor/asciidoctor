@@ -1775,7 +1775,7 @@ class Parser
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
 
-    metadata, implicit_author, implicit_authorinitials = implicit_authors = {}, nil, nil
+    metadata = {}
 
     if reader.has_more_lines? && !reader.next_line_empty?
       unless (author_metadata = process_authors reader.read_line).empty?

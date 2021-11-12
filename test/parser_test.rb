@@ -380,6 +380,30 @@ context 'Parser' do
     assert_equal 'JCVD', doc.attributes['authorinitials']
   end
 
+  test 'use implicit authors if value of authors attribute matches computed value' do
+    input = <<~'EOS'
+    Doc Writer; Junior Writer
+    :authors: Doc Writer, Junior Writer
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 'Doc Writer, Junior Writer', doc.attributes['authors']
+    assert_equal 'Doc Writer', doc.attributes['author_1']
+    assert_equal 'Junior Writer', doc.attributes['author_2']
+  end
+
+  test 'replace implicit authors if value of authors attribute does not match computed value' do
+    input = <<~'EOS'
+    Doc Writer; Junior Writer
+    :authors: Stuart Rackham; Dan Allen
+    EOS
+    doc = empty_document
+    parse_header_metadata input, doc
+    assert_equal 'Stuart Rackham, Dan Allen', doc.attributes['authors']
+    assert_equal 'Stuart Rackham', doc.attributes['author_1']
+    assert_equal 'Dan Allen', doc.attributes['author_2']
+  end
+
   test 'sets authorcount to 0 if document has no authors' do
     input = ''
     doc = empty_document
