@@ -1778,21 +1778,17 @@ class Parser
     metadata = {}
 
     if reader.has_more_lines? && !reader.next_line_empty?
-      unless (author_metadata = process_authors reader.read_line).empty?
-        if document
-          # apply header subs and assign to document
-          author_metadata.each do |key, val|
-            # NOTE the attributes substitution only applies for the email record
-            doc_attrs[key] = ::String === val ? (document.apply_header_subs val) : val unless doc_attrs.key? key
-          end
-
-          implicit_author = doc_attrs['author']
-          implicit_authorinitials = doc_attrs['authorinitials']
-          implicit_authors = doc_attrs['authors']
+      authorcount = (author_metadata = process_authors reader.read_line).delete 'authorcount'
+      if document && (doc_attrs['authorcount'] = authorcount) > 0
+        author_metadata.each do |key, val|
+          # apply header subs and assign to document; attributes substitution only relevant for email
+          doc_attrs[key] = document.apply_header_subs val unless doc_attrs.key? key
         end
-
-        metadata = author_metadata
+        implicit_author = doc_attrs['author']
+        implicit_authorinitials = doc_attrs['authorinitials']
+        implicit_authors = doc_attrs['authors']
       end
+      (metadata = author_metadata)['authorcount'] = authorcount
 
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries reader, document
