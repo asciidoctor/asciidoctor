@@ -71,6 +71,8 @@ Documentation::
   * Document how to extend an existing converter or create a new converter (#4136)
   * Document the syntax topic of the `--help` CLI option (#4175)
   * Document how to uninstall the Asciidoctor gem (#4154)
+  * Document how to enable and use the sourcemap (the `:sourcemap` option)
+  * Document how to catalog additional assets (the `:catalog_assets` option)
 
 // tag::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
