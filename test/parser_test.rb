@@ -395,13 +395,16 @@ context 'Parser' do
   test 'replace implicit authors if value of authors attribute does not match computed value' do
     input = <<~'EOS'
     Doc Writer; Junior Writer
-    :authors: Stuart Rackham; Dan Allen
+    :authors: Stuart Rackham; Dan Allen; Sarah White
     EOS
     doc = empty_document
-    parse_header_metadata input, doc
-    assert_equal 'Stuart Rackham, Dan Allen', doc.attributes['authors']
+    metadata = parse_header_metadata input, doc
+    assert_equal metadata['authorcount'], 3
+    assert_equal doc.attributes['authorcount'], 3
+    assert_equal 'Stuart Rackham, Dan Allen, Sarah White', doc.attributes['authors']
     assert_equal 'Stuart Rackham', doc.attributes['author_1']
     assert_equal 'Dan Allen', doc.attributes['author_2']
+    assert_equal 'Sarah White', doc.attributes['author_3']
   end
 
   test 'sets authorcount to 0 if document has no authors' do
@@ -410,6 +413,11 @@ context 'Parser' do
     metadata = parse_header_metadata input, doc
     assert_equal 0, doc.attributes['authorcount']
     assert_equal 0, metadata['authorcount']
+  end
+
+  test 'returns empty hash if document has no authors and invoked without document' do
+    metadata = parse_header_metadata ''
+    assert_empty metadata
   end
 
   test 'does not drop name joiner when using multiple authors' do
