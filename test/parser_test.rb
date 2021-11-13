@@ -399,8 +399,8 @@ context 'Parser' do
     EOS
     doc = empty_document
     metadata = parse_header_metadata input, doc
-    assert_equal metadata['authorcount'], 3
-    assert_equal doc.attributes['authorcount'], 3
+    assert_equal 3, metadata['authorcount']
+    assert_equal 3, doc.attributes['authorcount']
     assert_equal 'Stuart Rackham, Dan Allen, Sarah White', doc.attributes['authors']
     assert_equal 'Stuart Rackham', doc.attributes['author_1']
     assert_equal 'Dan Allen', doc.attributes['author_2']
