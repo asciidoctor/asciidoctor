@@ -1779,9 +1779,9 @@ class Parser
     metadata = {}
 
     if reader.has_more_lines? && !reader.next_line_empty?
-      authorcount = (author_metadata = process_authors reader.read_line).delete 'authorcount'
+      authorcount = (implicit_author_metadata = process_authors reader.read_line).delete 'authorcount'
       if document && (doc_attrs['authorcount'] = authorcount) > 0
-        author_metadata.each do |key, val|
+        implicit_author_metadata.each do |key, val|
           # apply header subs and assign to document; attributes substitution only relevant for email
           doc_attrs[key] = document.apply_header_subs val unless doc_attrs.key? key
         end
@@ -1789,7 +1789,7 @@ class Parser
         implicit_authorinitials = doc_attrs['authorinitials']
         implicit_authors = doc_attrs['authors']
       end
-      (metadata = author_metadata)['authorcount'] = authorcount
+      (metadata = implicit_author_metadata)['authorcount'] = authorcount
 
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries reader, document
@@ -1833,7 +1833,7 @@ class Parser
 
       reader.skip_blank_lines
     else
-      author_metadata = {}
+      implicit_author_metadata = {}
     end
 
     # process author attribute entries that override (or stand in for) the implicit author line
@@ -1850,7 +1850,7 @@ class Parser
         while doc_attrs.key? author_key
           # only use indexed author attribute if value is different
           # leaves corner case if line matches with underscores converted to spaces; use double space to force
-          if (author_override = doc_attrs[author_key]) == author_metadata[author_key]
+          if (author_override = doc_attrs[author_key]) == implicit_author_metadata[author_key]
             authors << nil
             sparse = true
           else
@@ -1864,9 +1864,9 @@ class Parser
           authors.each_with_index do |author, idx|
             next if author
             authors[idx] = [
-              author_metadata[%(firstname_#{name_idx = idx + 1})],
-              author_metadata[%(middlename_#{name_idx})],
-              author_metadata[%(lastname_#{name_idx})]
+              implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
+              implicit_author_metadata[%(middlename_#{name_idx})],
+              implicit_author_metadata[%(lastname_#{name_idx})]
             ].compact.map {|it| it.tr ' ', '_' }.join ' '
           end if sparse
           # process as names only
