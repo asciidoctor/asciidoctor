@@ -168,7 +168,7 @@ class Parser
       end
       block_attrs.clear
       (modified_attrs = document.instance_variable_get :@attributes_modified).delete 'doctitle'
-      parse_header_metadata reader, document
+      parse_header_metadata reader, document, nil
       if modified_attrs.include? 'doctitle'
         if (val = doc_attrs['doctitle']).nil_or_empty? || val == doctitle_attr_val
           doc_attrs['doctitle'] = doctitle_attr_val
@@ -1771,12 +1771,10 @@ class Parser
   #  parse_header_metadata(Reader.new data, nil, normalize: true)
   #  # => { 'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.' }
-  def self.parse_header_metadata(reader, document = nil)
+  def self.parse_header_metadata reader, document = nil, retrieve = true
     doc_attrs = document && document.attributes
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
-
-    metadata = {}
 
     if reader.has_more_lines? && !reader.next_line_empty?
       authorcount = (implicit_author_metadata = process_authors reader.read_line).delete 'authorcount'
@@ -1789,16 +1787,15 @@ class Parser
         implicit_authorinitials = doc_attrs['authorinitials']
         implicit_authors = doc_attrs['authors']
       end
-      (metadata = implicit_author_metadata)['authorcount'] = authorcount
+      implicit_author_metadata['authorcount'] = authorcount
 
       # NOTE this will discard any comment lines, but not skip blank lines
       process_attribute_entries reader, document
 
-      rev_metadata = {}
-
       if reader.has_more_lines? && !reader.next_line_empty?
         rev_line = reader.read_line
-        if (match = RevisionInfoLineRx.match(rev_line))
+        if (match = RevisionInfoLineRx.match rev_line)
+          rev_metadata = {}
           rev_metadata['revnumber'] = match[1].rstrip if match[1]
           unless (component = match[2].strip).empty?
             # version must begin with 'v' if date is absent
@@ -1809,23 +1806,16 @@ class Parser
             end
           end
           rev_metadata['revremark'] = match[3].rstrip if match[3]
+          if document && !rev_metadata.empty?
+            # apply header subs and assign to document
+            rev_metadata.each do |key, val|
+              doc_attrs[key] = document.apply_header_subs val unless doc_attrs.key? key
+            end
+          end
         else
           # throw it back
           reader.unshift_line rev_line
         end
-      end
-
-      unless rev_metadata.empty?
-        if document
-          # apply header subs and assign to document
-          rev_metadata.each do |key, val|
-            unless doc_attrs.key? key
-              doc_attrs[key] = document.apply_header_subs val
-            end
-          end
-        end
-
-        metadata.update rev_metadata
       end
 
       # NOTE this will discard any comment lines, but not skip blank lines
@@ -1872,12 +1862,16 @@ class Parser
           # process as names only
           author_metadata = process_authors authors, true, false
         else
-          author_metadata = {}
+          author_metadata = { 'authorcount' => 0 }
         end
       end
 
-      if author_metadata.empty?
-        metadata['authorcount'] ||= (doc_attrs['authorcount'] = 0)
+      if author_metadata['authorcount'] == 0
+        if authorcount
+          author_metadata = nil
+        else
+          doc_attrs['authorcount'] = 0
+        end
       else
         doc_attrs.update author_metadata
 
@@ -1888,7 +1882,7 @@ class Parser
       end
     end
 
-    metadata
+    implicit_author_metadata.merge rev_metadata.to_h, author_metadata.to_h if retrieve
   end
 
   # Internal: Parse the author line into a Hash of author metadata
