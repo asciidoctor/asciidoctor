@@ -47,6 +47,7 @@ Bug Fixes::
   * Update default stylesheet to fix spacing around empty list item (#4184)
   * Honor `:header_only` option when parsing document with manpage doctype (#4192)
   * Use numeric character reference for closing square bracket around alt text of icon
+  * Process author or authors document attribute in document header when implicit doctitle is absent (#4206)
 
 Improvements::
 
