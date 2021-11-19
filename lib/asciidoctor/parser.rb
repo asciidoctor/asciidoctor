@@ -125,6 +125,7 @@ class Parser
     # special case, block title is not allowed above document title,
     # carry attributes over to the document body
     if (implicit_doctitle = is_next_line_doctitle? reader, block_attrs, doc_attrs['leveloffset']) && block_attrs['title']
+      doc_attrs['authorcount'] = 0
       return document.finalize_header block_attrs, false
     end
 
@@ -179,6 +180,15 @@ class Parser
         modified_attrs << 'doctitle'
       end
       document.register :refs, [doc_id, document] if doc_id
+    elsif (author = doc_attrs['author'])
+      author_metadata = process_authors author, true, false
+      author_metadata.delete 'authorinitials' if doc_attrs['authorinitials']
+      doc_attrs.update author_metadata
+    elsif (author = doc_attrs['authors'])
+      author_metadata = process_authors author, true
+      doc_attrs.update author_metadata
+    else
+      doc_attrs['authorcount'] = 0
     end
 
     # parse title and consume name section of manpage document

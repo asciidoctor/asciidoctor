@@ -1074,6 +1074,121 @@ context 'Document' do
       assert_xpath '(/article/info/authorgroup/author)[2]/personname/firstname[text()="Junior"]', output, 1
     end
 
+    test 'should process author defined by attribute when implicit doctitle is absent' do
+      input = <<~'EOS'
+      :author: Doc Writer
+
+      {lastname}, {firstname} ({authorinitials})
+      EOS
+
+      doc = document_from_string input, standalone: false
+      assert_equal 'Doc Writer', (doc.attr 'author')
+      assert_nil (doc.attr 'author_1')
+      assert_equal 'Writer', (doc.attr 'lastname')
+      assert_equal 'Doc', (doc.attr 'firstname')
+      assert_equal 'DW', (doc.attr 'authorinitials')
+      assert_equal 1, (doc.attr 'authorcount')
+      output = doc.convert
+      assert_xpath '//p[text()="Writer, Doc (DW)"]', output, 1
+    end
+
+    test 'should process author and authorinitials defined by attribute when implicit doctitle is absent' do
+      input = <<~'EOS'
+      :authorinitials: DOC
+      :author: Doc Writer
+
+      {lastname}, {firstname} ({authorinitials})
+      EOS
+
+      doc = document_from_string input, standalone: false
+      assert_equal 'Doc Writer', (doc.attr 'author')
+      assert_equal 'DOC', (doc.attr 'authorinitials')
+      assert_equal 1, (doc.attr 'authorcount')
+      output = doc.convert
+      assert_xpath '//p[text()="Writer, Doc (DOC)"]', output, 1
+    end
+
+    test 'should process authors defined by attribute when implicit doctitle is absent' do
+      input = <<~'EOS'
+      :authors: Doc Writer; Other Author
+
+      {lastname}, {firstname} ({authorinitials})
+      EOS
+
+      doc = document_from_string input, standalone: false
+      assert_equal 'Doc Writer', (doc.attr 'author')
+      assert_equal 'Doc Writer, Other Author', (doc.attr 'authors')
+      assert_equal 'Doc Writer', (doc.attr 'author_1')
+      assert_equal 'Writer', (doc.attr 'lastname')
+      assert_equal 'Writer', (doc.attr 'lastname_1')
+      assert_equal 'Doc', (doc.attr 'firstname')
+      assert_equal 'Doc', (doc.attr 'firstname_1')
+      assert_equal 'DW', (doc.attr 'authorinitials')
+      assert_equal 'DW', (doc.attr 'authorinitials_1')
+      assert_equal 'Other Author', (doc.attr 'author_2')
+      assert_equal 'OA', (doc.attr 'authorinitials_2')
+      assert_equal 2, (doc.attr 'authorcount')
+      output = doc.convert
+      assert_xpath '//p[text()="Writer, Doc (DW)"]', output, 1
+    end
+
+    test 'should process authors and authorinitials defined by attribute when implicit doctitle is absent' do
+      input = <<~'EOS'
+      :authorinitials: DOC
+      :authors: Doc Writer; Other Author
+
+      {lastname}, {firstname} ({authorinitials})
+      EOS
+
+      doc = document_from_string input, standalone: false
+      assert_equal 'Doc Writer', (doc.attr 'author')
+      assert_equal 'Doc Writer', (doc.attr 'author_1')
+      # FIXME this should be supported, but isn't yet
+      #assert_equal 'DOC', (doc.attr 'authorinitials')
+      assert_equal 'DW', (doc.attr 'authorinitials')
+      assert_equal 'Other Author', (doc.attr 'author_2')
+      assert_equal 2, (doc.attr 'authorcount')
+      output = doc.convert
+      #assert_xpath '//p[text()="Writer, Doc (DOC)"]', output, 1
+      assert_xpath '//p[text()="Writer, Doc (DW)"]', output, 1
+    end
+
+    test 'should set authorcount to 0 if document has no header' do
+      doc = document_from_string 'content'
+      assert_equal 0, (doc.attr 'authorcount')
+    end
+
+    test 'should set authorcount to 0 if author not set by attribute and implicit doctitle is missing' do
+      input = <<~'EOS'
+      :idprefix:
+
+      == Section Title
+
+      content
+      EOS
+      doc = document_from_string input
+      assert_equal 0, (doc.attr 'authorcount')
+    end
+
+    test 'should set authorcount to 0 if author not set by attribute and document starts with level-0 section with style' do
+      input = <<~'EOS'
+      :doctype: book
+
+      [preface]
+      = Preface
+
+      content
+
+      = Part
+
+      == Chapter
+
+      content
+      EOS
+      doc = document_from_string input
+      assert_equal 0, (doc.attr 'authorcount')
+    end
+
     test 'with author defined by indexed attribute name' do
       input = <<~'EOS'
       = Document Title
