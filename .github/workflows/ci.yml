@@ -30,6 +30,7 @@ jobs:
         pygments-version: ['~> 2.0']
         rouge-version: [~]
         exclude:
+        # remove to mark as primary
         - os: ubuntu-latest
           ruby: '3.0'
         include:
