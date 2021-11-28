@@ -1,11 +1,19 @@
 = Install Using Ruby Packaging
 
+Using Ruby packaging entails using commands provided by Ruby (`gem` and `bundle`) to install RubyGems.
+The benefit of using Ruby packaging to install Asciidoctor is that it's universal.
+Provided you have configured Ruby correctly, Ruby packaging works the same way across Ruby runtimes and operating systems.
+This page explains how to use Ruby packaging to install Asciidoctor.
+
+== Configure Ruby packaging
+
+The best way to ensure Ruby is configured to use Ruby packaging is to install Ruby using a Ruby version manager.
+We recommend that you set up {url-rvm}[RVM^] and use it to install Ruby in your home directory (i.e., user space).
+Once that is done, you can safely use the `gem` or `bundle` commands to install or update the Asciidoctor gem, or any other gem for that matter.
+When using Ruby managed by RVM, gems are installed in a location isolated from the system (so you don't need root/administrator access).
+
 [#gem-install]
 == gem install
-
-Before installing Asciidoctor using `gem install`, you should set up {url-rvm}[RVM^] to install Ruby in your home directory (i.e., user space).
-Then, you can safely use the `gem` command to install or update the Asciidoctor gem, or any other gem for that matter.
-When using RVM, gems are installed in a location isolated from the system.
 
 Once you've installed Ruby using RVM, and you have activated it using `rvm use {ruby-version}`, open a terminal and type:
 
