@@ -39,6 +39,7 @@ Improvements::
   * Remove obsolete gist embed styles from default stylesheet
   * Allow `--failure-level` to be set to default value, `FATAL`
   * Sort levels in help for `--failure-level` option in ascending order
+  * Invert FR translations for caution & warning admonition labels (#4212) (*cyChop*)
 
 Documentation::
 
