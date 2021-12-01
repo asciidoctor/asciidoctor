@@ -1,7 +1,7 @@
 // French translation, courtesy of Nicolas Comet <nicolas.comet@gmail.com> with updates from Maheva Bagard Laursen <mblaursen@gbif.org>
 :appendix-caption: Annexe
 :appendix-refsig: {appendix-caption}
-:caution-caption: Avertissement
+:caution-caption: Attention
 :chapter-signifier: Chapitre
 :chapter-refsig: {chapter-signifier}
 :example-caption: Exemple
@@ -20,4 +20,4 @@ ifdef::preface-title[:preface-title: Préface]
 :toc-title: Table des matières
 :untitled-label: Sans titre
 :version-label: Version
-:warning-caption: Attention
+:warning-caption: Avertissement
