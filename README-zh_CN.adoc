@@ -9,7 +9,6 @@ Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://g
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
 :status:
-:outfilesuffix: .adoc
 :caution-caption: :fire:
 :important-caption: :exclamation:
 :note-caption: :paperclip:
