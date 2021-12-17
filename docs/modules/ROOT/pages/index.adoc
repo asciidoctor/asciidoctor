@@ -1,7 +1,7 @@
 = Asciidoctor Documentation
 :navtitle: Introduction
 
-This is the documentation for the Ruby-based AsciiDoc processor, Asciidoctor.
+This is the documentation for the Ruby-based AsciiDoc processor named Asciidoctor.
 Asciidoctor currently serves as the reference implementation for how to interpret the AsciiDoc language.
 If you're looking for the documentation for the AsciiDoc language, see the xref:asciidoc::index.adoc[AsciiDoc section] of this website.
 
