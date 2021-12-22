@@ -1112,7 +1112,7 @@ context 'Manpage' do
       assert_includes output, 'The options listed in Generic Program Information should always be used by themselves.'
     end
 
-    test 'should uppercase the reftext for level-2 section titles if the reftext matches the secton title' do
+    test 'should uppercase the reftext for level-2 section titles if the reftext matches the section title' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 

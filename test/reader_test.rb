@@ -1499,7 +1499,7 @@ class ReaderTest < Minitest::Test
         assert_includes output, %(<pre>#{expected}</pre>)
       end
 
-      test 'include directive skips all tagged regions except ones reenabled when value of tags attribute is negated wildcard followed by tag name' do
+      test 'include directive skips all tagged regions except ones re-enabled when value of tags attribute is negated wildcard followed by tag name' do
         ['!*;init', '**;!*;init'].each do |pattern|
           input = <<~EOS
           ----

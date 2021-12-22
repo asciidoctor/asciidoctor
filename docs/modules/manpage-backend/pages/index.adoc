@@ -22,7 +22,7 @@ That makes the source of the man page reusable.
 == manpage doctype
 
 The `manpage` doctype declares that the AsciiDoc structure serves as the source of a man page and conforms to the man page structure.
-Notice the absense of the space in the doctype value.
+Notice the absence of the space in the doctype value.
 
 By declaring the `manpage` doctype, the AsciiDoc processor expects the document to conform to the following structure.
 
@@ -66,7 +66,7 @@ In this example, the output filename is [.path]_eve.1_.
 
 Asciidoctor provides a built-in converter to generate {url-man-7}[roff-formatted^] man pages for AsciiDoc documents that declare and conform to the manpage doctype.
 This converter is bound to the `manpage` backend (not to be confused with the `manpage` doctype).
-Notice the absense of the space in the backend value.
+Notice the absence of the space in the backend value.
 
 The man page converter is used to generate man pages that accompany software on Unix-like operating systems.
 In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated in this way from {url-asciidoctor-1-raw}[this AsciiDoc source].

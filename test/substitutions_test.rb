@@ -1907,7 +1907,7 @@ context 'Substitutions' do
       assert_equal '&lt;{backend}&gt;', result
     end
 
-    test 'should not recognize pass macro with invalid subsitution list' do
+    test 'should not recognize pass macro with invalid substitution list' do
       [',', '42', 'a,'].each do |subs|
         para = block_from_string %(pass:#{subs}[foobar])
         result = para.extract_passthroughs para.source

@@ -465,7 +465,7 @@ class Parser
     end
 
     # The attributes returned here are orphaned attributes that fall at the end
-    # of a section that need to get transfered to the next section
+    # of a section that need to get transferred to the next section
     # see "trailing block attributes transfer to the following section" in
     # test/attributes_test.rb for an example
     [section == parent ? nil : section, attributes.merge]
@@ -1515,7 +1515,7 @@ class Parser
             break
           end
         else # only dlist in need of item text, so slurp it up!
-          # pop the blank line so it's not interpretted as a list continuation
+          # pop the blank line so it's not interpreted as a list continuation
           buffer.pop unless within_nested_list
           buffer << this_line
           has_text = true

@@ -665,7 +665,7 @@ module Extensions
 
   # Public: A specialization of the Extension proxy that additionally stores a
   # reference to the {Processor#process} method. By storing this reference, its
-  # possible to accomodate both concrete extension implementations and Procs.
+  # possible to accommodate both concrete extension implementations and Procs.
   class ProcessorExtension < Extension
     attr_reader :process_method
 
@@ -953,7 +953,7 @@ module Extensions
     end
 
     # Public: Registers an {DocinfoProcessor} with the extension registry to
-    # add additionnal docinfo to the document.
+    # add additional docinfo to the document.
     #
     # The DocinfoProcessor may be one of four types:
     #
