@@ -136,15 +136,18 @@ These attributes must be set in the document header.
 |Attribute |Description |Value (as parsed from example above)
 
 |`mantitle`
-|Alternative way to set the man page name.
+|Can be set by overriding the `doctitle` attribute.
+Must include both the man page name and volume number.
 |ASCIIDOCTOR(1)
 
 |`manvolnum`
-|Manual section number.
-|1
+|Can be set by overriding the `doctitle` attribute.
+Must include both the man page name and volume number.
+|ASCIIDOCTOR(1)
 
 |`manname`
 |Alternative way to set the command name.
+Only used if `manpurpose` is also set.
 |asciidoctor
 
 |`manpurpose`
