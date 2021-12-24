@@ -95,7 +95,7 @@ You can achieve the same result by including the directory in the value of the `
 
 If you set the value of `stylesdir` to an absolute directory, then Asciidoctor would still locate the stylesheet and embed it into the HTML.
 But this can create problems if you've configured the converter to link to the stylesheet instead.
-Let's look at thoses problem and ways to work through them.
+Let's look at those problem and ways to work through them.
 
 [#stylesdir-and-linkcss]
 == Styles directory and linkcss

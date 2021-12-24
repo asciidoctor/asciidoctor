@@ -413,7 +413,7 @@ end
 # class are primarily responsible for tracking the buffer of a cell as the parser
 # moves through the lines of the table using tail recursion. When a cell boundary
 # is located, the previous cell is closed, an instance of Table::Cell is
-# instantiated, the row is closed if the cell satisifies the column count and,
+# instantiated, the row is closed if the cell satisfies the column count and,
 # finally, a new buffer is allocated to track the next cell.
 class Table::ParserContext
   include Logging

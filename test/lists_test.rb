@@ -380,7 +380,7 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
     end
 
-    test 'paragraph-like blocks attached to an ancestory list item by a list continuation should produce blocks' do
+    test 'paragraph-like blocks attached to an ancestry list item by a list continuation should produce blocks' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
       * parent
@@ -2936,7 +2936,7 @@ context 'Description lists (:dlist)' do
       assert_xpath '//dl//dl//dl//dl', output, 1
     end
 
-    test 'single-line nested elements seperated by blank line at top level' do
+    test 'single-line nested elements separated by blank line at top level' do
       input = <<~'EOS'
       term1:: def1
 
@@ -2955,7 +2955,7 @@ context 'Description lists (:dlist)' do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test 'single-line nested elements seperated by blank line at nested level' do
+    test 'single-line nested elements separated by blank line at nested level' do
       input = <<~'EOS'
       term1:: def1
       label1::: detail1
@@ -3011,7 +3011,7 @@ context 'Description lists (:dlist)' do
       assert_xpath '(//dl)[1]/dt[2]/following-sibling::dd/p[text() = "def2"]', output, 1
     end
 
-    test 'multi-line nested elements seperated by blank line at nested level repeated' do
+    test 'multi-line nested elements separated by blank line at nested level repeated' do
       input = <<~'EOS'
       term1::
       def1
