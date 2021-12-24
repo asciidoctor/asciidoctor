@@ -42,7 +42,7 @@ If you require more advanced theming, you can inject additional resources using 
 [#migrate-stylesheet]
 === Default HTML stylesheet
 
-The Asciidoctor and AsciiDoc.py stylesheets look quite different, but they're mostly interchangable since the underlying HTML structure of the two processors is nearly identical.
+The Asciidoctor and AsciiDoc.py stylesheets look quite different, but they're mostly interchangeable since the underlying HTML structure of the two processors is nearly identical.
 
 If you prefer the AsciiDoc.py stylesheet, you can use it by copying it from the AsciiDoc.py [.path]_stylesheets_ directory and instructing Asciidoctor to apply it using:
 
@@ -316,7 +316,7 @@ ifdef::compat-mode[Compat mode is on!]
 ----
 
 When compat mode is enabled, Asciidoctor adapts some of its behavior and its interpretation of AsciiDoc to more closely align with AsciiDoc.py.
-The most noticable difference is that backticks now only indicate monospace text as oppossed to literal monospace.
+The most noticeable difference is that backticks now only indicate monospace text as opposed to literal monospace.
 Literal monospace is signified using a compound markup that combines an inline passthrough with monospace formatting.
 
 [cols=3*,width=75%]

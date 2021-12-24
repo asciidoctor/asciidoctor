@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Asciidoctor
 # Public: Methods to perform substitutions on lines of AsciiDoc text. This module
-# is intented to be mixed-in to Section and Block to provide operations for performing
+# is intended to be mixed-in to Section and Block to provide operations for performing
 # the necessary substitutions.
 module Substitutors
   SpecialCharsRx = /[<&>]/
@@ -940,7 +940,7 @@ module Substitutors
   # process_callouts - a Boolean flag indicating whether callout marks should be located and substituted
   #
   # Returns the highlighted source code, if a syntax highlighter is defined on the document, otherwise the source with
-  # verbatim substituions applied
+  # verbatim substitutions applied
   def highlight_source source, process_callouts
     # NOTE the call to highlight? is a defensive check since, normally, we wouldn't arrive here unless it returns true
     return sub_source source, process_callouts unless (syntax_hl = @document.syntax_highlighter) && syntax_hl.highlight?
@@ -1010,7 +1010,7 @@ module Substitutors
 
   # Public: Extract the passthrough text from the document for reinsertion after processing.
   #
-  # text - The String from which to extract passthrough fragements
+  # text - The String from which to extract passthrough fragments
   #
   # Returns the String text with passthrough regions substituted with placeholders
   def extract_passthroughs text
@@ -1217,7 +1217,7 @@ module Substitutors
       end
     end
     return unless candidates
-    # weed out invalid options and remove duplicates (order is preserved; first occurence wins)
+    # weed out invalid options and remove duplicates (order is preserved; first occurrence wins)
     resolved = candidates & SUB_OPTIONS[type]
     unless (candidates - resolved).empty?
       invalid = candidates - resolved

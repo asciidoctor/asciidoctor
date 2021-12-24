@@ -232,7 +232,7 @@ context 'Blocks' do
       assert_message @logger, :WARN, '<stdin>: line 4: unterminated comment block', Hash
     end
 
-    # WARNING if first line of content is a directive, it will get interpretted before we know it's a comment block
+    # WARNING if first line of content is a directive, it will get interpreted before we know it's a comment block
     # it happens because we always look a line ahead...not sure what we can do about it
     test 'preprocessor directives should not be processed within comment open block' do
       input = <<~'EOS'

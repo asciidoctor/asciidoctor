@@ -407,7 +407,7 @@ module Asciidoctor
   #   gist::123456[]
   #
   #--
-  # NOTE we've relaxed the match for target to accomodate the short format (e.g., name::[attrlist])
+  # NOTE we've relaxed the match for target to accommodate the short format (e.g., name::[attrlist])
   CustomBlockMacroRx = /^(#{CG_WORD}[#{CC_WORD}-]*)::(|\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
 
   # Matches an image, video or audio block macro.

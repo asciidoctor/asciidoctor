@@ -60,7 +60,7 @@ The DocBook converter will emit the following XML into the generated document:
 <inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msqrt><mml:mn>4</mml:mn></mml:msqrt></mml:math></inlineequation>
 ----
 
-It's now up to the DocBook toolchain to convert the MathML embeded in the DocBook into a displayable format.
+It's now up to the DocBook toolchain to convert the MathML embedded in the DocBook into a displayable format.
 Here's the result you should see:
 
 ====

@@ -60,7 +60,7 @@ Bug Fixes::
   * Don't crash if `:to_file` option is passed to `load` or `load_file` and value is not a string (#4055)
   * Use automatic link text if ID in shorthand xref is followed by dangling comma (e.g., `+<<idname,>>+`)
   * Update default stylesheet to indent blocks attached to list item in checklist (#2550)
-  * Update default stylesheet to reenable styling of implicit lead role on first paragraph of preamble inside AsciiDoc table cell
+  * Update default stylesheet to re-enable styling of implicit lead role on first paragraph of preamble inside AsciiDoc table cell
   * Update default stylesheet to fix conflict between text decoration and bottom border on abbr[title] element
   * Change invalid font family "sans" in default stylesheet to "sans-serif"
   * Fix missing automatic reftext for internal xrefs in manpage output (#4110)
@@ -171,7 +171,7 @@ Bug Fixes::
 
   * Set type and target property on unresolved footnote reference and unset id property (fixes regression) (#3825)
   * Fix crash when inlining an SVG if the explicit width or height value on the image node is not a string (#3829)
-  * Reset word wrap behavior to normal on tables, then reenable again for admonition content, horizontal dlist description, and AsciiDoc table cells (#3833)
+  * Reset word wrap behavior to normal on tables, then re-enable again for admonition content, horizontal dlist description, and AsciiDoc table cells (#3833)
 
 Improvements::
 
@@ -1173,7 +1173,7 @@ https://github.com/asciidoctor/asciidoctor/compare/v1.5.5\...v1.5.6[full diff]
 Enhancements::
 
   * Add preference to limit the maximum size of an attribute value (#1861)
-  * Honor SOURCE_DATE_EPOCH environment variable to accomodate reproducible builds (#1721) (*@JojoBoulix*)
+  * Honor SOURCE_DATE_EPOCH environment variable to accommodate reproducible builds (#1721) (*@JojoBoulix*)
   * Add reversed attribute to ordered list if reversed option is enabled (#1830)
   * Add support for additional docinfo locations (e.g., :header)
   * Configure default stylesheet to break monospace word if exceeds length of line using `word-wrap: break-word`; add `nobreak` and `nowrap` roles to prevent breaks (#1814)
@@ -1205,7 +1205,7 @@ Improvements::
 
 Compliance::
 
-  * Support 6-digit decimal char refs, 5-digit hexidecimal char refs (#1824)
+  * Support 6-digit decimal char refs, 5-digit hexadecimal char refs (#1824)
   * Compatibility fixes for Opal
   * Check for number using Integer instead of Fixnum class for compatibility with Ruby 2.4
 
@@ -1222,7 +1222,7 @@ Bug Fixes::
 
 Infrastructure::
 
-  * Build gem properly in the absense of a git workspace, make compatible with JRuby (#1779)
+  * Build gem properly in the absence of a git workspace, make compatible with JRuby (#1779)
   * Run tests in CI using latest versions of Ruby, including Ruby 2.3 (*@ferdinandrosario*)
 
 Distribution Packages::
@@ -1665,7 +1665,7 @@ Bug Fixes::
 Infrastructure::
 
   * add Ruby 2.1 to list of supported platforms
-  * reenable rbx in Travis build
+  * re-enable rbx in Travis build
   * switch tests to minitest (*@ktdreyer*)
   * update RPM for Fedora Rawhide (*@ktdreyer*)
   * refactor unit tests so they work in RubyMine (*@cmoulliard*)
@@ -1971,7 +1971,7 @@ Compliance::
   * support limited value comparison functionality of ifeval (#83)
   * added support for multiple attributes in ifdef and ifndef directives
   * don't attempt to embed image with uri reference when data-uri is set (#157)
-  * accomodate trailing dot in author name (#156)
+  * accommodate trailing dot in author name (#156)
   * don't hardcode language attribute in html backend (#185)
   * removed language from DocBook root node (#188)
   * fixed revinfo line swallowing attribute entry

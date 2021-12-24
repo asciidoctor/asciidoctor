@@ -198,7 +198,7 @@ class Document < AbstractBlock
   # Public: Get the document catalog Hash
   attr_reader :catalog
 
-  # Public: Alias catalog property as references for backwards compatiblity
+  # Public: Alias catalog property as references for backwards compatibility
   alias references catalog
 
   # Public: Get the Hash of document counters
@@ -328,7 +328,7 @@ class Document < AbstractBlock
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
       initialize_extensions = (defined? ::Asciidoctor::Extensions) || (options.key? :extensions) ? ::Asciidoctor::Extensions : nil
-      @extensions = nil # initialize furthur down if initialize_extensions is true
+      @extensions = nil # initialize further down if initialize_extensions is true
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 

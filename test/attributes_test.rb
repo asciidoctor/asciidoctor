@@ -667,7 +667,7 @@ context 'Attributes' do
       assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: foobarbaz'
     end
 
-    test "attribute value gets interpretted when converting" do
+    test 'attribute value gets interpreted when converting' do
       doc = document_from_string(":google: http://google.com[Google]\n\n{google}")
       assert_equal 'http://google.com[Google]', doc.attributes['google']
       output = doc.convert
@@ -1461,7 +1461,7 @@ context 'Attributes' do
       refute p2.role?('final')
     end
 
-    test 'has_role? can check for precense of role name' do
+    test 'has_role? can check for presence of role name' do
       input = <<~'EOS'
       [role="lead abstract"]
       A paragraph

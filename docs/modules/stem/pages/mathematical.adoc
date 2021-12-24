@@ -19,7 +19,7 @@ All the converter sees are image nodes that reference the generated images.
 Upon visiting each STEM node, the extension first extracts the expression source.
 If the expression is written in AsciiMath, the extension uses the AsciiMath library to convert that expression to LaTeX.
 The extension then passes the expression to Mathematical to render it as an image.
-The image is sized automatically to accomodate the rendered expression and, if necessary, resized to fit within the line.
+The image is sized automatically to accommodate the rendered expression and, if necessary, resized to fit within the line.
 Once the image is generated, the extension replaces the STEM node in the parsed document with an image node that references the generated image.
 
 When the extension finishes processing all the STEM nodes, it unsets the `stem` attribute on the document to indicate no further STEM processing should be performed on the document.
@@ -30,7 +30,7 @@ Since Asciidoctor Mathematical replaces all STEM nodes with image nodes, it serv
 All converters know how do deal with image nodes.
 The extension can be used with the built-in converters as well as add-on converters such as PDF and EPUB3.
 
-The main drawback of Asciidoctor Mathmatical when compared to MathJax is that you don't have a lot of control over the size and resolution of the images it generates.
+The main drawback of Asciidoctor Mathematical when compared to MathJax is that you don't have a lot of control over the size and resolution of the images it generates.
 It also lacks the interactivity with the expression that MathJax provides.
 So when your converting to HTML, MathJax is going to give you a better result.
 

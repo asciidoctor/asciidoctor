@@ -11,7 +11,7 @@ class AbstractBlock < AbstractNode
   # * :compound - this block contains other blocks
   # * :simple - this block holds a paragraph of prose that receives normal substitutions
   # * :verbatim - this block holds verbatim text (displayed "as is") that receives verbatim substitutions
-  # * :raw - this block holds unprocessed content passed directly to the output with no sustitutions applied
+  # * :raw - this block holds unprocessed content passed directly to the output with no substitutions applied
   # * :empty - this block has no content
   attr_accessor :content_model
 
@@ -271,7 +271,7 @@ class AbstractBlock < AbstractNode
     ORDERED_LIST_KEYWORDS[list_type || @style]
   end
 
-  # Public: Get the String title of this Block with title substitions applied
+  # Public: Get the String title of this Block with title substitutions applied
   #
   # The following substitutions are applied to block and section titles:
   #

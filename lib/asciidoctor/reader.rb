@@ -949,7 +949,7 @@ class PreprocessorReader < Reader
         if no_target
           # the text in brackets must match a conditional expression
           if text && EvalExpressionRx =~ text.strip
-            # NOTE assignments must happen before call to resolve_expr_val for compatiblity with Opal
+            # NOTE assignments must happen before call to resolve_expr_val for compatibility with Opal
             lhs = $1
             # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
             op = $2

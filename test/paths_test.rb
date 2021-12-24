@@ -120,7 +120,7 @@ context 'Path Resolver' do
       end
     end
 
-    #test 'raises security error if jail is not a canoncial path' do
+    #test 'raises security error if jail is not a canonical path' do
     #  begin
     #    @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
     #    flunk 'Expecting SecurityError to be raised'
