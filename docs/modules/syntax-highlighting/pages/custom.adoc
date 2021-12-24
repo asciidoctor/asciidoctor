@@ -52,6 +52,13 @@ Then, require this file when invoking Asciidoctor, setting `source-highlighter=p
 
  $ asciidoctor -r ./extended-pygments-syntax-highlighter.rb -a source-highlighter=pygments document.adoc
 
+If you wanted to modify the built-in adapter to honor the location of a custom stylesheet specified by the `pygments-stylesheet` attribute, you can do so by extending the adapter and overriding the `docinfo` method.
+
+[,ruby]
+----
+include::example$pygments-syntax-highlighter-with-custom-stylesheet.rb[]
+----
+
 If you want to decorate built-in behavior, you can invoke the `super` method anywhere inside the method to delegate to the behavior provided by the built-in adapter.
 
 Let's say you always want lines to be numbered, regardless of the setting in the document.
