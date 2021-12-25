@@ -352,7 +352,7 @@ context 'Extensions' do
         empty_document
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: foobar', e.message
+        assert_match %r/^Could not resolve class for name: foobar$/, e.message
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -1790,7 +1790,7 @@ context 'Extensions' do
       exception = assert_raises ArgumentError do
         convert_string_to_embedded input, extension_registry: create_cat_in_sink_block_macro
       end
-      assert_match(/target attribute is required/, exception.message)
+      assert_match %r/target attribute is required/, exception.message
     end
 
     test 'should assign alt attribute to image block if alt is not provided' do

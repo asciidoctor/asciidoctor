@@ -76,7 +76,7 @@ context 'Helpers' do
         Asciidoctor::Helpers.class_for_name 'InvalidModule::InvalidClass'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', e.message
+        assert_match %r/^Could not resolve class for name: InvalidModule::InvalidClass$/, e.message
       end
     end
 
@@ -85,7 +85,7 @@ context 'Helpers' do
         Asciidoctor::Helpers.class_for_name 'foobar'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: foobar', e.message
+        assert_match %r/^Could not resolve class for name: foobar$/, e.message
       end
     end
 
@@ -94,7 +94,7 @@ context 'Helpers' do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions::String'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
+        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, e.message
       end
     end
 
@@ -103,7 +103,7 @@ context 'Helpers' do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions', e.message
+        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions$/, e.message
       end
     end
 
@@ -124,7 +124,7 @@ context 'Helpers' do
         Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
         flunk 'Expecting RuntimeError to be raised'
       rescue NameError => e
-        assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', e.message
+        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, e.message
       end
     end
   end
