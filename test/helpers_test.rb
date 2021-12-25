@@ -76,28 +76,28 @@ context 'Helpers' do
       ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'InvalidModule::InvalidClass'
       end
-      assert_equal 'Could not resolve class for name: InvalidModule::InvalidClass', ex.message
+      assert_match %r/^Could not resolve class for name: InvalidModule::InvalidClass$/, ex.message
     end
 
     test 'should raise exception if constant name is invalid' do
       ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'foobar'
       end
-      assert_equal 'Could not resolve class for name: foobar', ex.message
+      assert_match %r/^Could not resolve class for name: foobar$/, ex.message
     end
 
     test 'should raise exception if class not found in scope' do
       ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions::String'
       end
-      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String/, ex.message
     end
 
     test 'should raise exception if name resolves to module' do
       ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions'
       end
-      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions', ex.message
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions/, ex.message
     end
 
     test 'should resolve class if class is given' do
@@ -116,7 +116,7 @@ context 'Helpers' do
       ex = assert_raises NameError do
         Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
       end
-      assert_equal 'Could not resolve class for name: Asciidoctor::Extensions::String', ex.message
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, ex.message
     end
   end
 end
