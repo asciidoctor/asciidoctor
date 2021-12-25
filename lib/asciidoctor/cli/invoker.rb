@@ -146,7 +146,7 @@ module Asciidoctor
           @code = (e.respond_to? :status) ? e.status : 1
           raise e if @options[:trace]
           err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
-          err.puts '  Use --trace for backtrace'
+          err.puts '  Use --trace to show the backtrace'
         end
         nil
       ensure

@@ -292,7 +292,7 @@ context 'Invoker' do
     redirect_streams do |_, err|
       sample_filepath = fixture_path 'sample.adoc'
       invoker = invoke_cli ['-r', 'no-such-module'], sample_filepath
-      assert_match(/'no-such-module' could not be loaded\n *Use --trace for backtrace/, err.string)
+      assert_match(/'no-such-module' could not be loaded\n *Use --trace to show the backtrace/, err.string)
       assert_equal 1, invoker.code
     end
   end
