@@ -51,6 +51,10 @@ class Minitest::Test
     Minitest::Test.windows?
   end
 
+  def self.ruby_3_1_up?
+    (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '3.1.0')
+  end
+
   def disk_root
     %(#{windows? ? (Asciidoctor::ROOT_DIR.partition '/')[0] : ''}/)
   end
