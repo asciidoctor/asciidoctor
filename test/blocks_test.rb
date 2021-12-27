@@ -2462,6 +2462,39 @@ context 'Blocks' do
       assert_css 'svg circle', output, 1
     end
 
+    test 'should cache remote SVG when allow-uri-read, cache-uri, and inline option are set', unless: ruby_3_1_up? do
+      begin
+        if OpenURI.respond_to? :cache_open_uri
+          OpenURI.singleton_class.send :remove_method, :open_uri
+          OpenURI.singleton_class.send :alias_method, :open_uri, :cache_open_uri
+        end
+        image_url = %(http://#{resolve_localhost}:9876/fixtures/circle.svg)
+        attributes = { 'allow-uri-read' => '', 'cache-uri' => '' }
+        input = %(image::#{image_url}[Circle,100,100,opts=inline])
+        output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
+        assert defined? OpenURI::Cache
+        assert_css 'svg circle', output, 1
+        Dir.mktmpdir do |cache_path|
+          original_cache_path = OpenURI::Cache.cache_path
+          begin
+            OpenURI::Cache.cache_path = cache_path
+            assert_nil OpenURI::Cache.get image_url
+            2.times do
+              output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
+              refute_nil OpenURI::Cache.get image_url
+              assert_css 'svg circle', output, 1
+            end
+          ensure
+            OpenURI::Cache.cache_path = original_cache_path
+          end
+        end
+      ensure
+        OpenURI.singleton_class.send :alias_method, :cache_open_uri, :open_uri
+        OpenURI.singleton_class.send :remove_method, :open_uri
+        OpenURI.singleton_class.send :alias_method, :open_uri, :original_open_uri
+      end
+    end
+
     test 'converts to alt text for SVG with inline option set if SVG cannot be read' do
       input = <<~'EOS'
       [%inline]
@@ -2872,6 +2905,40 @@ context 'Blocks' do
       end
 
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'should cache remote image when allow-uri-read, cache-uri, and data-uri are set', unless: ruby_3_1_up? do
+      begin
+        if OpenURI.respond_to? :cache_open_uri
+          OpenURI.singleton_class.send :remove_method, :open_uri
+          OpenURI.singleton_class.send :alias_method, :open_uri, :cache_open_uri
+        end
+        image_url = %(http://#{resolve_localhost}:9876/fixtures/dot.gif)
+        image_data_uri = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+        attributes = { 'allow-uri-read' => '', 'cache-uri' => '', 'data-uri' => '' }
+        input = %(image::#{image_url}[Dot])
+        output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
+        assert defined? OpenURI::Cache
+        assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
+        Dir.mktmpdir do |cache_path|
+          original_cache_path = OpenURI::Cache.cache_path
+          begin
+            OpenURI::Cache.cache_path = cache_path
+            assert_nil OpenURI::Cache.get image_url
+            2.times do
+              output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
+              refute_nil OpenURI::Cache.get image_url
+              assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
+            end
+          ensure
+            OpenURI::Cache.cache_path = original_cache_path
+          end
+        end
+      ensure
+        OpenURI.singleton_class.send :alias_method, :cache_open_uri, :open_uri
+        OpenURI.singleton_class.send :remove_method, :open_uri
+        OpenURI.singleton_class.send :alias_method, :open_uri, :original_open_uri
+      end
     end
 
     test 'uses remote image uri when data-uri attribute is set and image cannot be retrieved' do
