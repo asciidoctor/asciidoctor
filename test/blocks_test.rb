@@ -2486,7 +2486,7 @@ context 'Blocks' do
       assert_css 'svg circle', output, 1
     end
 
-    test 'should cache remote SVG when allow-uri-read, cache-uri, and inline option are set', unless: ruby_3_1_up? do
+    test 'should cache remote SVG when allow-uri-read, cache-uri, and inline option are set' do
       begin
         if OpenURI.respond_to? :cache_open_uri
           OpenURI.singleton_class.send :remove_method, :open_uri
@@ -2955,7 +2955,7 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    test 'should cache remote image when allow-uri-read, cache-uri, and data-uri are set', unless: ruby_3_1_up? do
+    test 'should cache remote image when allow-uri-read, cache-uri, and data-uri are set' do
       begin
         if OpenURI.respond_to? :cache_open_uri
           OpenURI.singleton_class.send :remove_method, :open_uri
