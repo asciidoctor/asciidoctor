@@ -48,6 +48,7 @@ Bug Fixes::
   * Honor `:header_only` option when parsing document with manpage doctype (#4192)
   * Use numeric character reference for closing square bracket around alt text of icon
   * Process author or authors document attribute in document header when implicit doctitle is absent (#4206)
+  * Patch open-uri-cached gem to work with Ruby 3.1 (#4227)
 
 Improvements::
 
@@ -67,7 +68,7 @@ Improvements::
   * Allow `--failure-level` to be set to default value, `FATAL`
   * Sort levels in help for `--failure-level` option in ascending order
   * Invert FR translations for caution & warning admonition labels (#4212) (*cyChop*)
-  * Add tests for open-uri/cached integration that is activated by the `cache-uri` attribute
+  * Add tests for open-uri-cached integration that is activated by the `cache-uri` attribute
 
 Documentation::
 
