@@ -1572,6 +1572,38 @@ context 'Extensions' do
       end
     end
 
+    test 'can use parse_content to append blocks to current parent' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :csv
+            on_context :literal
+            process do |parent, reader|
+              parse_content parent, [',==='] + reader.read_lines + [',===']
+              nil
+            end
+          end
+        end
+        input = <<~'EOS'
+        before
+
+        [csv]
+        ....
+        a,b,c
+        ....
+
+        after
+        EOS
+        doc = document_from_string input
+        assert_equal 3, doc.blocks.size
+        table = doc.blocks[1]
+        assert_equal :table, table.context
+        assert_css 'td', doc.convert, 3
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'parse_content should not share attributes between parsed blocks' do
       begin
         Asciidoctor::Extensions.register do
