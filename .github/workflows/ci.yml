@@ -92,7 +92,7 @@ jobs:
     - name: Install dependencies (scheduled build only)
       if: github.event_name == 'schedule'
       run: |
-        bundle config --local path .bundle/gems
+        bundle config --local path vendor/bundle
         bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
