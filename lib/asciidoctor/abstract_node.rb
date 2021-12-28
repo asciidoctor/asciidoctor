@@ -403,7 +403,6 @@ class AbstractNode
       # caching requires the open-uri-cached gem to be installed
       # processing will be automatically aborted if these libraries can't be opened
       Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-      patch_open_uri_cached
     elsif !RUBY_ENGINE_OPAL
       # autoload open-uri
       ::OpenURI
@@ -534,10 +533,7 @@ class AbstractNode
     if (Helpers.uriish? target) || ((start = opts[:start]) && (Helpers.uriish? start) &&
         (target = doc.path_resolver.web_path target, start))
       if doc.attr? 'allow-uri-read'
-        if doc.attr? 'cache-uri'
-          Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-          patch_open_uri_cached
-        end
+        Helpers.require_library 'open-uri/cached', 'open-uri-cached' if doc.attr? 'cache-uri'
         begin
           if opts[:normalize]
             contents = (Helpers.prepare_source_string ::OpenURI.open_uri(target, URI_READ_MODE) {|f| f.read }).join LF
@@ -556,14 +552,6 @@ class AbstractNode
     end
     logger.warn %(contents of #{opts[:label] || 'asset'} is empty: #{target}) if contents && opts[:warn_if_empty] && contents.empty?
     contents
-  end
-
-  def patch_open_uri_cached
-    return unless (::YAML.respond_to? :unsafe_load) && !(::OpenURI::Cache.const_defined? :YAML, false)
-    ::OpenURI::Cache.const_set :YAML, (::Module.new do
-      define_singleton_method :dump, &(::YAML.method :dump)
-      define_singleton_method :load, &(::YAML.method :unsafe_load)
-    end)
   end
 
   # Deprecated: Check whether the specified String is a URI by
