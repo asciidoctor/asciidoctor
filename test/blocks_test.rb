@@ -2492,24 +2492,32 @@ context 'Blocks' do
           OpenURI.singleton_class.send :remove_method, :open_uri
           OpenURI.singleton_class.send :alias_method, :open_uri, :cache_open_uri
         end
-        image_url = %(http://#{resolve_localhost}:9876/fixtures/circle.svg)
-        attributes = { 'allow-uri-read' => '', 'cache-uri' => '' }
-        input = %(image::#{image_url}[Circle,100,100,opts=inline])
-        output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
-        assert defined? OpenURI::Cache
-        assert_css 'svg circle', output, 1
-        Dir.mktmpdir do |cache_path|
-          original_cache_path = OpenURI::Cache.cache_path
-          begin
-            OpenURI::Cache.cache_path = cache_path
-            assert_nil OpenURI::Cache.get image_url
-            2.times do
-              output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
-              refute_nil OpenURI::Cache.get image_url
-              assert_css 'svg circle', output, 1
+        using_test_webserver do |base_url, thr|
+          image_url = %(#{base_url}/fixtures/circle.svg)
+          attributes = { 'allow-uri-read' => '', 'cache-uri' => '' }
+          input = %(image::#{image_url}[Circle,100,100,opts=inline])
+          output = convert_string_to_embedded input, safe: :safe, attributes: attributes
+          assert defined? OpenURI::Cache
+          assert_css 'svg circle', output, 1
+          # NOTE we can't assert here since this is using the system-wide cache
+          #assert_equal thr[:requests].size, 1
+          #assert_equal thr[:requests][0], image_url
+          thr[:requests].clear
+          Dir.mktmpdir do |cache_path|
+            original_cache_path = OpenURI::Cache.cache_path
+            begin
+              OpenURI::Cache.cache_path = cache_path
+              assert_nil OpenURI::Cache.get image_url
+              2.times do
+                output = convert_string_to_embedded input, safe: :safe, attributes: attributes
+                refute_nil OpenURI::Cache.get image_url
+                assert_css 'svg circle', output, 1
+              end
+              assert_equal thr[:requests].size, 1
+              assert_match %r/ \/fixtures\/circle\.svg /, thr[:requests][0], 1
+            ensure
+              OpenURI::Cache.cache_path = original_cache_path
             end
-          ensure
-            OpenURI::Cache.cache_path = original_cache_path
           end
         end
       ensure
@@ -2961,25 +2969,33 @@ context 'Blocks' do
           OpenURI.singleton_class.send :remove_method, :open_uri
           OpenURI.singleton_class.send :alias_method, :open_uri, :cache_open_uri
         end
-        image_url = %(http://#{resolve_localhost}:9876/fixtures/dot.gif)
-        image_data_uri = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-        attributes = { 'allow-uri-read' => '', 'cache-uri' => '', 'data-uri' => '' }
-        input = %(image::#{image_url}[Dot])
-        output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
-        assert defined? OpenURI::Cache
-        assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
-        Dir.mktmpdir do |cache_path|
-          original_cache_path = OpenURI::Cache.cache_path
-          begin
-            OpenURI::Cache.cache_path = cache_path
-            assert_nil OpenURI::Cache.get image_url
-            2.times do
-              output = using_test_webserver { convert_string_to_embedded input, safe: :safe, attributes: attributes }
-              refute_nil OpenURI::Cache.get image_url
-              assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
+        using_test_webserver do |base_url, thr|
+          image_url = %(#{base_url}/fixtures/dot.gif)
+          image_data_uri = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+          attributes = { 'allow-uri-read' => '', 'cache-uri' => '', 'data-uri' => '' }
+          input = %(image::#{image_url}[Dot])
+          output = convert_string_to_embedded input, safe: :safe, attributes: attributes
+          assert defined? OpenURI::Cache
+          assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
+          # NOTE we can't assert here since this is using the system-wide cache
+          #assert_equal thr[:requests].size, 1
+          #assert_equal thr[:requests][0], image_url
+          thr[:requests].clear
+          Dir.mktmpdir do |cache_path|
+            original_cache_path = OpenURI::Cache.cache_path
+            begin
+              OpenURI::Cache.cache_path = cache_path
+              assert_nil OpenURI::Cache.get image_url
+              2.times do
+                output = convert_string_to_embedded input, safe: :safe, attributes: attributes
+                refute_nil OpenURI::Cache.get image_url
+                assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
+              end
+              assert_equal thr[:requests].size, 1
+              assert_match %r/ \/fixtures\/dot\.gif /, thr[:requests][0], 1
+            ensure
+              OpenURI::Cache.cache_path = original_cache_path
             end
-          ensure
-            OpenURI::Cache.cache_path = original_cache_path
           end
         end
       ensure
