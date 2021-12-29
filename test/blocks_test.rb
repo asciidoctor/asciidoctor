@@ -2513,7 +2513,7 @@ context 'Blocks' do
                 refute_nil OpenURI::Cache.get image_url
                 assert_css 'svg circle', output, 1
               end
-              assert_equal thr[:requests].size, 1
+              assert_equal 1, thr[:requests].size
               assert_match %r/ \/fixtures\/circle\.svg /, thr[:requests][0], 1
             ensure
               OpenURI::Cache.cache_path = original_cache_path
@@ -2991,7 +2991,7 @@ context 'Blocks' do
                 refute_nil OpenURI::Cache.get image_url
                 assert_xpath %(//img[@src="#{image_data_uri}"][@alt="Dot"]), output, 1
               end
-              assert_equal thr[:requests].size, 1
+              assert_equal 1, thr[:requests].size
               assert_match %r/ \/fixtures\/dot\.gif /, thr[:requests][0], 1
             ensure
               OpenURI::Cache.cache_path = original_cache_path
