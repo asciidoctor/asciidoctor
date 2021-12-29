@@ -853,6 +853,11 @@ class PreprocessorReader < Reader
     elsif @skipping
       shift
       nil
+    elsif (line.start_with? ':') && AttributeEntryRx =~ line
+      attributes = {}
+      Parser.process_attribute_entry self, @document, attributes, $~
+      shift
+      nil
     else
       # NOTE optimization to inline super
       @look_ahead += 1
@@ -935,18 +940,7 @@ class PreprocessorReader < Reader
         end
       when 'ifeval'
         if no_target
-          # the text in brackets must match a conditional expression
-          if text && EvalExpressionRx =~ text.strip
-            # NOTE assignments must happen before call to resolve_expr_val for compatibility with Opal
-            lhs = $1
-            # regex enforces a restricted set of math-related operations (==, !=, <=, >=, <, >)
-            op = $2
-            rhs = $3
-            skip = ((resolve_expr_val lhs).send op, (resolve_expr_val rhs)) ? false : true rescue true
-          else
-            logger.error message_with_context %(malformed preprocessor directive - #{text ? 'invalid expression' : 'missing expression'}: ifeval::[#{text}]), source_location: cursor
-            return true
-          end
+            skip = !(conditional_ifeval text)
         else
           logger.error message_with_context %(malformed preprocessor directive - target not permitted: ifeval::#{target}[#{text}]), source_location: cursor
           return true
@@ -971,6 +965,17 @@ class PreprocessorReader < Reader
     end
 
     true
+  end
+
+  def conditional_ifeval text
+    # the text in brackets must match a conditional expression
+    if text && EvalExpressionRx =~ text.strip
+      parser = IfevalParser.new @document
+      return parser.solve text
+    else
+      logger.error message_with_context %(malformed preprocessor directive - #{text ? 'invalid expression' : 'missing expression'}: ifeval::[#{text}]), source_location: cursor
+      return true
+    end
   end
 
   # Internal: Preprocess the directive to include lines from another document.
@@ -1325,7 +1330,8 @@ class PreprocessorReader < Reader
     if ((val.start_with? '"') && (val.end_with? '"')) ||
         ((val.start_with? '\'') && (val.end_with? '\''))
       quoted = true
-      val = val.slice 1, (val.length - 1)
+      val = val.gsub(/"(.+)"/, '\1')
+      val = val.gsub(/'(.+)'/, '\1')
     else
       quoted = false
     end
@@ -1335,6 +1341,7 @@ class PreprocessorReader < Reader
     val = @document.sub_attributes val, attribute_missing: 'drop' if val.include? ATTR_REF_HEAD
 
     if quoted
+      val = val.gsub(/"(.+)"/, '\1')
       val
     elsif val.empty?
       nil
