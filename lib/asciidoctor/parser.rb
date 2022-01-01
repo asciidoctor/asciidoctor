@@ -660,7 +660,7 @@ class Parser
                 if (default_attrs = ext_config[:default_attrs])
                   attributes.update(default_attrs) {|_, old_v| old_v }
                 end
-                if (block = extension.process_method[parent, target, attributes])
+                if (block = extension.process_method[parent, target, attributes]) && block != parent
                   attributes.replace block.attributes
                   break
                 else
@@ -1050,12 +1050,12 @@ class Parser
     if (extension = options[:extension])
       # QUESTION do we want to delete the style?
       attributes.delete 'style'
-      return unless (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge])
+      return unless (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge]) && block != parent
       attributes.replace block.attributes
       # FIXME if the content model is set to compound, but we only have simple in this context, then
       # forcefully set the content_model to simple to prevent parsing blocks from children
       # TODO document this behavior!!
-      if block.content_model == :compound && !(lines = block.lines).empty?
+      if block.content_model == :compound && Block === block && !(lines = block.lines).empty?
         content_model = :compound
         block_reader = Reader.new lines
       end
