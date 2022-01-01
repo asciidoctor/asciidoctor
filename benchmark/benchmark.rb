@@ -48,10 +48,10 @@ def fetch_userguide
   require 'open-uri'
   userguide_uri = 'https://raw.githubusercontent.com/asciidoc/asciidoc/d43faae38c4a8bf366dcba545971da99f2b2d625/doc/asciidoc.txt'
   customers_uri = 'https://raw.githubusercontent.com/asciidoc/asciidoc/d43faae38c4a8bf366dcba545971da99f2b2d625/doc/customers.csv'
-  userguide_content = open(userguide_uri) {|fd2| fd2.read }
-  customers_content = open(customers_uri) {|fd2| fd2.read }
-  File.open('sample-data/userguide.adoc', 'w') {|fd1| fd1.write userguide_content }
-  File.open('sample-data/customers.csv', 'w') {|fd1| fd1.write customers_content }
+  userguide_content = OpenURI.open_uri(userguide_uri) {|fd2| fd2.read }
+  customers_content = OpenURI.open_uri(customers_uri) {|fd2| fd2.read }
+  File.write 'sample-data/userguide.adoc', userguide_content, mode: 'w:utf-8'
+  File.write 'sample-data/customers.csv', customers_content, mode: 'w:utf-8'
 end
 
 case bench
