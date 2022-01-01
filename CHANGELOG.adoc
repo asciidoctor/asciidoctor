@@ -19,6 +19,8 @@ This project utilizes semantic versioning.
 
 Bug Fixes::
 
+  * Don't crash if process method for custom block returns an abstract block with context `:compound` that isn't of type `Block` (e.g., a list)
+  * Ignore return value of process method for custom block or block macro if value matches parent argument
   * Remove unnamespaced selectors in Pygments stylesheet
   * Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
   * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) *@mogztter*

@@ -1576,6 +1576,61 @@ context 'Extensions' do
       end
     end
 
+    test 'should ignore return value of custom block if value is parent' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :unwrap
+            on_context :open
+            process do |parent, reader|
+              parse_content parent, reader.read_lines
+            end
+          end
+        end
+        input = <<~'EOS'
+        [unwrap]
+        --
+        a
+
+        b
+
+        c
+        --
+        EOS
+        doc = document_from_string input
+        assert_equal 3, doc.blocks.size
+        doc.blocks.each do |block|
+          assert_equal :paragraph, block.context
+        end
+        assert_equal 'a', doc.blocks[0].source
+        assert_css 'p', doc.convert, 3
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should ignore return value of custom block macro if value is parent' do
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :para do
+            process do |parent, target|
+              parse_content parent, target
+            end
+          end
+        end
+        input = <<~'EOS'
+        para::text[]
+        EOS
+        doc = document_from_string input
+        assert_equal 1, doc.blocks.size
+        assert_equal :paragraph, doc.blocks[0].context
+        assert_equal 'text', doc.blocks[0].source
+        assert_css 'p', doc.convert, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'parse_content should not share attributes between parsed blocks' do
       begin
         Asciidoctor::Extensions.register do
@@ -1609,6 +1664,107 @@ context 'Extensions' do
         assert_equal 2, wrap.blocks[0].attributes.size
         assert_equal 2, wrap.blocks[1].attributes.size
         assert_nil wrap.blocks[1].attributes['foo']
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should allow extension to replace custom block with a list' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :lst
+            on_context :paragraph
+            process do |parent, reader|
+              reader.read_lines.each_with_object create_list parent, :ulist do |line, list|
+                list << (create_list_item list, line)
+              end
+            end
+          end
+        end
+        input = <<~'EOS'
+        before
+
+        [lst]
+        a
+        b
+        c
+
+        after
+        EOS
+        doc = document_from_string input
+        assert_equal 3, doc.blocks.size
+        list = doc.blocks[1]
+        assert_equal :ulist, list.context
+        assert_equal 3, list.items.size
+        assert_equal 'a', list.items[0].text
+        assert_css 'li', doc.convert, 3
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should allow extension to replace custom block with a section' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :sect
+            on_context :open
+            process do |parent, _, attrs|
+              create_section parent, attrs['title'], {}
+            end
+          end
+        end
+        input = <<~'EOS'
+        .Section Title
+        [sect]
+        --
+        a
+
+        b
+        --
+        EOS
+        doc = document_from_string input
+        assert_equal 1, doc.blocks.size
+        sect = doc.blocks[0]
+        assert_equal :section, sect.context
+        assert_equal 'Section Title', sect.title
+        assert_equal 2, sect.blocks.size
+        assert_equal :paragraph, sect.blocks[0].context
+        assert_equal :paragraph, sect.blocks[1].context
+        assert_css 'p', doc.convert, 2
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'can use parse_content to append blocks to current parent' do
+      begin
+        Asciidoctor::Extensions.register do
+          block do
+            named :csv
+            on_context :literal
+            process do |parent, reader|
+              parse_content parent, [',==='] + reader.read_lines + [',===']
+              nil
+            end
+          end
+        end
+        input = <<~'EOS'
+        before
+
+        [csv]
+        ....
+        a,b,c
+        ....
+
+        after
+        EOS
+        doc = document_from_string input
+        assert_equal 3, doc.blocks.size
+        table = doc.blocks[1]
+        assert_equal :table, table.context
+        assert_css 'td', doc.convert, 3
       ensure
         Asciidoctor::Extensions.unregister_all
       end
