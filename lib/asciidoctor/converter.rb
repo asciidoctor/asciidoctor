@@ -43,7 +43,7 @@ module Asciidoctor
 #   puts Asciidoctor.convert_file 'sample.adoc', safe: :safe
 module Converter
   autoload :CompositeConverter, %(#{__dir__}/converter/composite)
-  autoload :TemplateConverter, %(#{__dir__}/converter/template)
+  autoload :TemplateConverter, %(#{__dir__}/converter/template) unless RUBY_ENGINE == 'opal'
 
   # Public: The String backend name that this converter is handling.
   attr_reader :backend
