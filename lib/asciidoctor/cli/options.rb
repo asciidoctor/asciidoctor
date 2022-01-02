@@ -258,7 +258,7 @@ module Asciidoctor
             raise $! if self[:trace]
             $stderr.puts 'asciidoctor: FAILED: \'tilt\' could not be loaded'
             $stderr.puts '  You must have the tilt gem installed (gem install tilt) to use custom backend templates'
-            $stderr.puts '  Use --trace to show the backtrace'
+            $stderr.puts '  Use --trace to show backtrace'
             return 1
           rescue ::SystemExit
             # not permitted here
@@ -278,7 +278,7 @@ module Asciidoctor
             rescue ::LoadError
               raise $! if self[:trace]
               $stderr.puts %(asciidoctor: FAILED: '#{path}' could not be loaded)
-              $stderr.puts '  Use --trace to show the backtrace'
+              $stderr.puts '  Use --trace to show backtrace'
               return 1
             rescue ::SystemExit
               # not permitted here

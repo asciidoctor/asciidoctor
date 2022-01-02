@@ -142,7 +142,7 @@ module Asciidoctor
             raise e
           else
             err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
-            err.puts '  Use --trace to show the backtrace'
+            err.puts '  Use --trace to show backtrace'
           end
         end
         nil
