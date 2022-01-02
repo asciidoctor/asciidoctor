@@ -96,6 +96,29 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_ulist node
+    attributes = common_html_attributes node.id, node.role
+    ret = []
+    ret << if node.title?
+      %(<ul#{attributes}>
+<strong class="title">#{node.title}</strong>)
+    else
+      %(<ul#{attributes}>)
+    end
+    node.items.each do |item|
+    sub_content = if item.blocks?
+      %(
+#{item.content}
+)
+    else
+      ""
+    end
+    ret << %(<li>#{item.text}#{sub_content}</li>)
+    end
+    ret << %{</ul>}
+    ret.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role
