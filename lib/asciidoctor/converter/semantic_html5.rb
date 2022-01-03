@@ -119,6 +119,38 @@ class Converter::SemanticHtml5Converter < Converter::Base
     ret.join LF
   end
 
+  def convert_olist node
+    attributes = common_html_attributes node.id, node.role
+    if node.list_marker_keyword
+      attributes << %( type="#{node.list_marker_keyword}")
+    end
+    if node.attr? 'start'
+      attributes << %( start="#{node.attr 'start'}")
+    end
+    if node.option? 'reversed'
+      attributes << %( reversed="true")
+    end
+    ret = []
+    ret << if node.title?
+      %(<ol#{attributes}>
+<strong class="title">#{node.title}</strong>)
+    else
+      %(<ol#{attributes}>)
+    end
+    node.items.each do |item|
+    sub_content = if item.blocks?
+      %(
+#{item.content}
+)
+    else
+      ""
+    end
+    ret << %(<li>#{item.text}#{sub_content}</li>)
+    end
+    ret << %{</ol>}
+    ret.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role
