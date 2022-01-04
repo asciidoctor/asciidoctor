@@ -511,6 +511,10 @@ module Extensions
   # registered to handle this name and, if found, invokes its {Processor#process}
   # method to build a corresponding node in the document tree.
   #
+  # If the process method returns an instance of Block, the content model of that
+  # Block is :compound, and the Block contains at least one line, the parser will
+  # parse those lines into blocks an assigned them to the returned block.
+  #
   # AsciiDoc example:
   #
   #   [shout]
@@ -593,6 +597,10 @@ module Extensions
 
   # Public: BlockMacroProcessors are used to handle block macros that have a
   # custom name.
+  #
+  # If the process method returns an instance of Block, the content model of that
+  # Block is :compound, and the Block contains at least one line, the parser will
+  # parse those lines into blocks an assigned them to the returned block.
   #
   # BlockMacroProcessor implementations must extend BlockMacroProcessor.
   class BlockMacroProcessor < MacroProcessor
