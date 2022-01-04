@@ -71,6 +71,7 @@ Improvements::
   * Sort levels in help for `--failure-level` option in ascending order
   * Invert FR translations for caution & warning admonition labels (#4212) (*cyChop*)
   * Add tests for open-uri-cached integration that is activated by the `cache-uri` attribute
+  * Don't warn if negated tag is not found in include file (#4230)
 
 Documentation::
 
