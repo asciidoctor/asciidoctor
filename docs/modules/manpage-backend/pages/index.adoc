@@ -33,7 +33,7 @@ The doctitle must not contain spaces.
 The volume number is a single digit optionally followed by a single character.
 
 Document Attributes::
-There are several built-in document attributes that impact how the source is parsed and converted when the manpage doctype is in use.
+There are several built-in document attributes that impact how the source is parsed and converted when the `manpage` doctype is in use.
 Refer to the <<document-attributes>> section.
 
 The NAME Section::
@@ -65,7 +65,7 @@ In this example, the output filename is [.path]_eve.1_.
 
 == manpage backend and converter
 
-Asciidoctor provides a built-in converter to generate {url-man-7}[roff-formatted^] man pages for AsciiDoc documents that declare and conform to the manpage doctype.
+Asciidoctor provides a built-in converter to generate {url-man-7}[roff-formatted^] man pages for AsciiDoc documents that declare and conform to the `manpage` doctype.
 This converter is bound to the `manpage` backend (not to be confused with the `manpage` doctype).
 Notice the absence of the space in the backend value.
 
@@ -98,6 +98,62 @@ You can just as well convert it to HTML, as shown here.
 
 The structure of the source document is still enforced, but the output document will look like the output of any other AsciiDoc document.
 
+== Repurpose a man page
+
+You may have a man page that you want to repurpose for documenting equivalent commands (but not aliases).
+You can do so by supplying an alternate man title, name, and/or purpose when converting the document.
+
+If you want to change `mantitle` and `manvolnum` attributes, you must override the `doctitle` attribute when invoking Asciidoctor.
+
+ $ asciidoctor -b manpage -a doctitle="othername(7)" progname.adoc
+
+This command sets the `mantitle` to "`othername`", the `manvolnum` to "`7`", and generates the file [.path]_progname.7_.
+However, the `mantitle` is only used in the hidden info section at the top of the man page.
+What you probably want to do is change the `manname` too, which is the name used in the header, the Name section, and the output filename.
+
+One way to change the `manname` is to set both the `manname` and `manpurpose` attributes when calling Asciidoctor.
+But first, you need to hide the default Name section in this case so you don't end up with two Name sections.
+
+[,asciidoc]
+----
+\ifndef::manname,manpurpose[]
+== Name
+
+progname - description of progname
+\endif::[]
+----
+
+Now, you can replace the information in the Name section when calling Asciidoctor:
+
+ $ asciidoctor -b manpage \
+   -a doctitle="othername(7)" \
+   -a manname=othername \
+   -a manpurpose="description of othername" \
+   progname.adoc
+
+This command generates the file [.path]_othername.7_.
+
+If you only want to override the `manname` attribute and not the `manpurpose` attribute, reconfigure the Name section as shown in the next example.
+
+[,asciidoc]
+----
+\ifndef::manname[:manname: progname]
+
+== Name
+
+{manname} - description of progname
+----
+
+Now, you can override the `manname` attribute without having to override the `manpurpose` attribute.
+
+ $ asciidoctor -b manpage \
+   -a doctitle="othername(7)" \
+   -a manname=othername \
+   progname.adoc
+
+It's important to remember that Asciidoctor derives the `manname` and `manpurpose` attributes from the Name section by default.
+That's why it's not enough just to override the attributes when calling Asciidoctor.
+
 == Convert the man page to PostScript / PDF
 
 Once you have created a man page, you can convert it to PostScript using the `man` command.
@@ -128,8 +184,8 @@ Another approach is to convert the AsciiDoc document to DocBook using the built-
 [#document-attributes]
 == Document attributes
 
-Several built-in document attributes only affect the manpage doctype and output.
-These attributes must be set in the document header.
+Several built-in document attributes only affect the `manpage` doctype and output.
+These attributes (or the attributes from which they are derived) must be set in the document header.
 
 .Built-in document attributes for man pages
 [%autowidth]
