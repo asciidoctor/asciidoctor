@@ -196,7 +196,7 @@ class Converter::TemplateConverter < Converter::Base
   def scan_dir template_dir, pattern, template_cache = nil
     result, helpers = {}, nil
     # Grab the files in the top level of the directory (do not recurse)
-    ::Dir.glob(pattern).select {|match| ::File.file? match }.each do |file|
+    ::Dir.glob(pattern).keep_if {|match| ::File.file? match }.each do |file|
       if (basename = ::File.basename file) == 'helpers.rb'
         helpers = file
         next
