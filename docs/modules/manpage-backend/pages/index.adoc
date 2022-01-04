@@ -37,8 +37,9 @@ There are several built-in document attributes that impact how the source is par
 Refer to the <<document-attributes>> section.
 
 The NAME Section::
-The first section is mandatory, must be titled "`Name`" (or "`NAME`") and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command purpose by a dash character (e.g., `progname - does stuff`).
+The first section is mandatory, must be titled "`Name`" (or "`NAME`"), and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command's purpose by a dash character (e.g., `progname - does stuff` or `name1, name2 - does stuff`).
 The dash must have at least one space character on either side.
+If multiple names are given, Asciidoctor will generate alias files for the secondary names that point to the primary name.
 
 The SYNOPSIS Section::
 The second section is recommended and, if present, must be titled "`Synopsis`" (or "`SYNOPSIS`").
