@@ -1658,6 +1658,34 @@ class ReaderTest < Minitest::Test
         end
       end
 
+      test 'should not warn if specified negated tag is not found in include file' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class-enclosed.rb[tag=!no-such-tag]
+        ----
+        EOS
+        expected = <<~EOS.chop
+        class Dog
+          def initialize breed
+            @breed = breed
+          end
+
+          def bark
+            if @breed == 'beagle'
+              'woof woof woof woof woof'
+            else
+              'woof woof'
+            end
+          end
+        end
+        EOS
+        using_memory_logger do |logger|
+          output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+          assert_includes output, %(<pre>#{expected}</pre>)
+          assert_empty logger.messages
+        end
+      end
+
       test 'should warn if specified tags are not found in include file' do
         input = <<~'EOS'
         ++++
@@ -1669,6 +1697,34 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           expected_tags = 'no-such-tag-b, no-such-tag-a'
           assert_message logger, :WARN, %(~<stdin>: line 2: tags '#{expected_tags}' not found in include file), Hash
+        end
+      end
+
+      test 'should not warn if specified negated tags are not found in include file' do
+        input = <<~'EOS'
+        ----
+        include::fixtures/tagged-class-enclosed.rb[tags=all;!no-such-tag;!unknown-tag]
+        ----
+        EOS
+        expected = <<~EOS.chop
+        class Dog
+          def initialize breed
+            @breed = breed
+          end
+
+          def bark
+            if @breed == 'beagle'
+              'woof woof woof woof woof'
+            else
+              'woof woof'
+            end
+          end
+        end
+        EOS
+        using_memory_logger do |logger|
+          output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
+          assert_includes output, %(<pre>#{expected}</pre>)
+          assert_empty logger.messages
         end
       end
 

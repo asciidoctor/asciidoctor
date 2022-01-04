@@ -1125,7 +1125,7 @@ class PreprocessorReader < Reader
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       elsif inc_tags
-        inc_lines, inc_offset, inc_lineno, tag_stack, tags_used, active_tag = [], nil, 0, [], ::Set.new, nil
+        inc_lines, inc_offset, inc_lineno, tag_stack, tags_selected, active_tag = [], nil, 0, [], ::Set.new, nil
         if inc_tags.key? '**'
           select = base_select = inc_tags.delete '**'
           if inc_tags.key? '*'
@@ -1164,9 +1164,9 @@ class PreprocessorReader < Reader
                     end
                   end
                 elsif inc_tags.key? this_tag
-                  tags_used << this_tag
+                  tags_selected << this_tag if (select = inc_tags[this_tag])
                   # QUESTION should we prevent tag from being selected when enclosing tag is excluded?
-                  tag_stack << [(active_tag = this_tag), (select = inc_tags[this_tag]), inc_lineno]
+                  tag_stack << [(active_tag = this_tag), select, inc_lineno]
                 elsif !wildcard.nil?
                   select = active_tag && !select ? false : wildcard
                   tag_stack << [(active_tag = this_tag), select, inc_lineno]
@@ -1187,7 +1187,7 @@ class PreprocessorReader < Reader
             logger.warn message_with_context %(detected unclosed tag '#{tag_name}' starting at line #{tag_lineno} of include #{target_type}: #{inc_path}), source_location: cursor, include_location: (create_include_cursor inc_path, expanded_target, tag_lineno)
           end
         end
-        unless (missing_tags = inc_tags.keys - tags_used.to_a).empty?
+        unless (missing_tags = inc_tags.keep_if {|_, v| v }.keys - tags_selected.to_a).empty?
           logger.warn message_with_context %(tag#{missing_tags.size > 1 ? 's' : ''} '#{missing_tags.join ', '}' not found in include #{target_type}: #{inc_path}), source_location: cursor
         end
         shift
