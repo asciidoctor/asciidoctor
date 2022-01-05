@@ -11,8 +11,8 @@ Asciidoctor is a fast, open source, text processor for parsing AsciiDoc into a d
 Asciidoctor is written in the Ruby programming language.
 
 //This Ruby library (or gem) is often referred to as the core Asciidoctor processor, or _Asciidoctor core_ for short.
-When we refer to Asciidoctor in this area of the documentation, we're specifically referring to the core Asciidoctor processor, abbreviated as Asciidoctor core.
-We add this qualifier because Asciidoctor is also the name of the family of projects that provide runtimes, extensions, and tools for processing AsciiDoc.
+When we say Asciidoctor in this area of the documentation, we're referring to the core Asciidoctor Ruby processor, abbreviated as _Asciidoctor core_ (and sometimes _Asciidoctor Ruby_).
+We add the qualifier "`core`" because Asciidoctor is also the name of the suite of projects that provide runtimes, extensions, and tools for processing AsciiDoc.
 
 To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygems}/asciidoctor[RubyGem named asciidoctor^].
 The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
