@@ -35,6 +35,21 @@ Compliance::
   * Don't promote level-0 special section at start of document to document title (#4151)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
 
+Improvements::
+
+  * Use width attribute to set table and column width instead of inline style (#4160)
+  * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
+  * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
+  * Use CSS class instead of inline style to apply page break behavior (#4051)
+  * Set width of line number table column of source block to 0.01% to restrict width and force table to span available width (#4137)
+  * Consolidate styles applied to primary containers (`#header`, `#content`, `#footnotes`, `#footer`) in default stylesheet (#4169)
+  * Constrain width of `<svg>` element to container in default stylesheet
+  * Target `<object>` element with image more accurately in default stylesheet
+  * Remove form styles from the default stylesheet (#4186)
+
+// tag::compact[]
+== 2.0.17 (2022-01-05) - @mojavelinux
+
 Bug Fixes::
 
   * Don't crash if process method for custom block returns an abstract block with context `:compound` that isn't of type `Block` (e.g., a list)
@@ -54,18 +69,9 @@ Bug Fixes::
 
 Improvements::
 
-  * Use width attribute to set table and column width instead of inline style (#4160)
-  * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments, rouge, and coderay) (#4128)
-  * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
-  * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
-  * Use CSS class instead of inline style to apply page break behavior (#4051)
-  * Set width of line number table column of source block to 0.01% to restrict width and force table to span available width (#4137)
-  * Consolidate styles applied to primary containers (`#header`, `#content`, `#footnotes`, `#footer`) in default stylesheet (#4169)
-  * Constrain width of `<svg>` element to container in default stylesheet
-  * Target `<object>` element with image more accurately in default stylesheet
+  * Prevent line numbers on source blocks in HTML output from being selected (applies to pygments and coderay) (#4128)
   * Allow hash to be specified for Vimeo video either in video ID or using `hash` attribute (#4176)
   * Remove unnecessary specificity in default stylesheet for styling p element inside list item
-  * Remove form styles from the default stylesheet (#4186)
   * Remove obsolete gist embed styles from default stylesheet
   * Allow `--failure-level` to be set to default value, `FATAL`
   * Sort levels in help for `--failure-level` option in ascending order
@@ -81,7 +87,7 @@ Documentation::
   * Document how to enable and use the sourcemap (the `:sourcemap` option)
   * Document how to catalog additional assets (the `:catalog_assets` option)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 
 Bug Fixes::
@@ -118,7 +124,6 @@ Build / Infrastructure::
   * Import source of default stylesheet into this repository; use PostCSS with cssnano to minify (#4062)
   * Use autoprefixer to manage browser prefixes in default stylesheet (#4118)
 
-// end::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 
 Bug Fixes::
