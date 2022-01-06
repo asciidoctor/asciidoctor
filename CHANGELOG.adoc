@@ -15,7 +15,8 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
-== Unreleased
+// tag::compact[]
+== 2.0.17 (2022-01-05) - @mojavelinux
 
 Bug Fixes::
 
@@ -54,7 +55,7 @@ Documentation::
   * Document how to enable and use the sourcemap (the `:sourcemap` option)
   * Document how to catalog additional assets (the `:catalog_assets` option)
 
-// tag::compact[]
+// end::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 
 Bug Fixes::
@@ -91,7 +92,6 @@ Build / Infrastructure::
   * Import source of default stylesheet into this repository; use PostCSS with cssnano to minify (#4062)
   * Use autoprefixer to manage browser prefixes in default stylesheet (#4118)
 
-// end::compact[]
 == 2.0.15 (2021-04-27) - @mojavelinux
 
 Bug Fixes::

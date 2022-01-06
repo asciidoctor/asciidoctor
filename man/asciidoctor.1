@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White
-.\" Generator: Asciidoctor 2.0.16
-.\"      Date: 2021-08-03
+.\" Generator: Asciidoctor 2.0.17
+.\"      Date: 2022-01-05
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 2.0.16
+.\"    Source: Asciidoctor 2.0.17
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2021-08-03" "Asciidoctor 2.0.16" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2022-01-05" "Asciidoctor 2.0.17" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -171,8 +171,8 @@ Matching templates found in subsequent directories override ones previously disc
 .sp
 \fB\-\-failure\-level\fP=\fILEVEL\fP
 .RS 4
-The minimum logging level that triggers a non\-zero exit code (failure).
-If this option is not set (default: FATAL), the program exits with exit code zero even if warnings or errors have been logged.
+Set the minimum logging level (default: FATAL) that yields a non\-zero exit code (i.e., failure).
+If this option is not set, the program exits with a zero exit code even if warnings or errors have been logged.
 .RE
 .sp
 \fB\-q, \-\-quiet\fP
@@ -206,6 +206,7 @@ Print timings report to stderr (time to read, parse, and convert).
 Print a help message.
 Show the command usage if \fITOPIC\fP is not specified or recognized.
 Dump the Asciidoctor man page (in troff/groff format) if \fITOPIC\fP is \fImanpage\fP.
+Print an AsciiDoc syntax crib sheet (in AsciiDoc) if \fITOPIC\fP is \fIsyntax\fP.
 .RE
 .sp
 \fB\-V, \-\-version\fP

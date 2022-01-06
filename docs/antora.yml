@@ -5,7 +5,7 @@ asciidoc:
   attributes:
     xrefstyle: short@
     listing-caption: Example@
-    release-version: '2.0.16'
+    release-version: '2.0.17'
     ruby-description: 'ruby 3.0.2p107 [x86_64-linux]'
     ruby-version: '3.0'
     url-api-gems: https://www.rubydoc.info/gems
