@@ -1,6 +1,6 @@
 = API Options
 
-[cols="~,~,30%,~"]
+[cols="~,~,15%,15%"]
 |===
 |Name |Description |Default value |Allowed values
 
