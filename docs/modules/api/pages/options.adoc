@@ -5,16 +5,19 @@
 |Name |Description |Default value |Allowed values
 
 |`:attributes`
-|Sets document attributes, which override equivalently-named attributes defined in the document unless soft set (`@`).
-When using the hash format, a `nil` value unsets the attribute and a `false` value soft unsets the attribute.
+|Sets document attributes, which override equivalently-named attributes defined in the document unless soft set.
+No substitutions are applied to the value of these attributes.
+In the hash format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
 |_not set_
-|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the following formats:
+a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the following formats:
 
-Hash: +
-`{'name'\=>'value'}` +
-Array: +
-`['name=value']` +
-String: +
+*Hash* +
+`{ 'name' \=> 'value' }`
+
+*Array* +
+`[ 'name=value' ]`
+
+*String* (space separated) +
 `'name=value'`
 
 |`:backend`
