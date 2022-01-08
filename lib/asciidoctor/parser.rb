@@ -1052,8 +1052,9 @@ class Parser
       attributes.delete 'style'
       return unless (block = extension.process_method[parent, block_reader || (Reader.new lines), attributes.merge]) && block != parent
       attributes.replace block.attributes
-      # FIXME if the content model is set to compound, but we only have simple in this context, then
-      # forcefully set the content_model to simple to prevent parsing blocks from children
+      # NOTE an extension can change the content model from :simple to :compound. It's up to the extension
+      # to decide which one to use. The extension can consult the cloaked-context attribute to determine
+      # if the input is a paragraph or delimited block.
       if block.content_model == :compound && Block === block && !(lines = block.lines).empty?
         content_model = :compound
         block_reader = Reader.new lines

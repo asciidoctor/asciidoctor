@@ -965,6 +965,28 @@ context 'Extensions' do
       end
     end
 
+    test 'should allow extension to promote paragraph to compound block' do
+      input = <<~'EOS'
+      [ex]
+      example
+      EOS
+      begin
+        Asciidoctor::Extensions.register do
+          block :ex do
+            on_context :paragraph
+            process do |parent, reader|
+              create_example_block parent, reader.read_lines, {}, content_model: :compound
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_css '.exampleblock .paragraph', output, 1
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke processor for custom block macro' do
       input = 'snippet::12345[mode=edit]'
 
