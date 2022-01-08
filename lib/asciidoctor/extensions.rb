@@ -513,7 +513,12 @@ module Extensions
   #
   # If the process method returns an instance of Block, the content model of that
   # Block is :compound, and the Block contains at least one line, the parser will
-  # parse those lines into blocks an assigned them to the returned block.
+  # parse those lines into blocks and append them to the returned block.
+  #
+  # If your custom block can be applied to a paragraph or delimited block, and you
+  # want to preserve the content model of the input, check whether the value of
+  # the cloaked-context attribute is :paragraph. If it is, set the content model of
+  # the returned block to :simple. Otherwise, set the content model to :compound.
   #
   # AsciiDoc example:
   #
