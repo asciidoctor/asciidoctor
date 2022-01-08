@@ -1054,7 +1054,6 @@ class Parser
       attributes.replace block.attributes
       # FIXME if the content model is set to compound, but we only have simple in this context, then
       # forcefully set the content_model to simple to prevent parsing blocks from children
-      # TODO document this behavior!!
       if block.content_model == :compound && Block === block && !(lines = block.lines).empty?
         content_model = :compound
         block_reader = Reader.new lines
