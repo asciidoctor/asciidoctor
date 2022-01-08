@@ -5,6 +5,8 @@ AllCops:
   TargetRubyVersion: 2.5
 Gemspec/DateAssignment:
   Enabled: true
+Gemspec/RequireMFA:
+  Enabled: true
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
 Layout/BeginEndAlignment:
@@ -147,6 +149,8 @@ Lint/UnusedMethodArgument:
   Enabled: false # reason: these are important for defining API methods
 Lint/UselessMethodDefinition:
   Enabled: true
+Lint/UselessRuby2Keywords:
+  Enabled: true
 Lint/UselessTimes:
   Enabled: true
 Metrics/AbcSize:
@@ -199,6 +203,8 @@ Minitest/UnreachableAssertion:
 Minitest/UnspecifiedException:
   Enabled: true
 Naming/AccessorMethodName:
+  Enabled: true
+Naming/BlockForwarding:
   Enabled: true
 Naming/ConstantName:
   Enabled: false # FIXME consider reenabling
@@ -280,6 +286,10 @@ Style/ExplicitBlockArgument:
   Enabled: false # reason: yield is fine
 Style/ExponentialNotation:
   Enabled: true
+Style/FileRead:
+  Enabled: true
+Style/FileWrite:
+  Enabled: true
 Style/FormatString:
   EnforcedStyle: sprintf
 Style/FormatStringToken:
@@ -322,6 +332,8 @@ Style/InfiniteLoop:
   Enabled: false # reason: loop is measurably slower than while true
 Style/KeywordParametersOrder:
   Enabled: true
+Style/MapToHash:
+  Enabled: true
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   EnforcedStyle: omit_parentheses
@@ -351,6 +363,8 @@ Style/NumericLiterals:
   Enabled: false # reason: makes large numbers unreadable and harder to copy
 Style/NumericPredicate:
   EnforcedStyle: comparison
+Style/OpenStructUse:
+  Enabled: true
 Style/OptionalBooleanParameter:
   Enabled: false # reason: invasive
 Style/ParallelAssignment:

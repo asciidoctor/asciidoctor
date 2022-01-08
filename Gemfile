@@ -33,8 +33,8 @@ end
 #end
 
 group :lint do
-  gem 'rubocop', '~> 1.22.0', require: false
-  gem 'rubocop-minitest', '~> 0.15.0', require: false
+  gem 'rubocop', '~> 1.24.0', require: false
+  gem 'rubocop-minitest', '~> 0.17.0', require: false
   gem 'rubocop-rake', '~> 0.6.0', require: false
 end unless (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.5.0')
 
