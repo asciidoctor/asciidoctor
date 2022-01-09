@@ -98,13 +98,8 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
   def convert_ulist node
     attributes = common_html_attributes node.id, node.role
-    ret = []
-    ret << if node.title?
-      %(<ul#{attributes}>
-<strong class="title">#{node.title}</strong>)
-    else
-      %(<ul#{attributes}>)
-    end
+    ret = [%(<ul#{attributes}>)]
+    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
     node.items.each do |item|
     sub_content = if item.blocks?
       %(
@@ -121,22 +116,18 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
   def convert_olist node
     attributes = common_html_attributes node.id, node.role
+    olist_attributes = []
     if node.list_marker_keyword
-      attributes << %( type="#{node.list_marker_keyword}")
+      olist_attributes << %( type="#{node.list_marker_keyword}")
     end
     if node.attr? 'start'
-      attributes << %( start="#{node.attr 'start'}")
+      olist_attributes << %( start="#{node.attr 'start'}")
     end
     if node.option? 'reversed'
-      attributes << %( reversed="true")
+      olist_attributes << %( reversed="true")
     end
-    ret = []
-    ret << if node.title?
-      %(<ol#{attributes}>
-<strong class="title">#{node.title}</strong>)
-    else
-      %(<ol#{attributes}>)
-    end
+    ret = [%(<ol#{attributes}#{olist_attributes.join('')}>)]
+    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
     node.items.each do |item|
     sub_content = if item.blocks?
       %(
@@ -148,6 +139,35 @@ class Converter::SemanticHtml5Converter < Converter::Base
     ret << %(<li>#{item.text}#{sub_content}</li>)
     end
     ret << %{</ol>}
+    ret.join LF
+  end
+
+  def convert_dlist node
+    roles = []
+    roles << node.style if node.style
+    roles << node.role if node.role
+    role = roles.join " "
+    attributes = common_html_attributes node.id, role.empty? ? nil : role
+    dlist_attributes = []
+    if node.list_marker_keyword
+      dlist_attributes << %( type="#{node.list_marker_keyword}")
+    end
+    ret = [%(<dl#{attributes}#{dlist_attributes.join('')}>)]
+    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
+    node.items.each do |terms, desc|
+      terms.each do |term|
+          ret << %(<dt>#{term.text}</dt>)
+      end
+      sub_content = if desc.blocks?
+        %(
+#{desc.content}
+)
+      else
+        ""
+      end
+      ret << %(<dd>#{desc.text}#{sub_content}</dd>)
+    end
+    ret << %{</dl>}
     ret.join LF
   end
 
