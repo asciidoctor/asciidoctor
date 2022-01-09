@@ -151,6 +151,39 @@ class Converter::SemanticHtml5Converter < Converter::Base
     ret.join LF
   end
 
+  def convert_dlist node
+    roles = []
+    roles << node.style if node.style
+    roles << node.role if node.role
+    role = roles.join " "
+    attributes = common_html_attributes node.id, role.empty? ? nil : role
+    if node.list_marker_keyword
+      attributes << %( type="#{node.list_marker_keyword}")
+    end
+    ret = []
+    ret << if node.title?
+      %(<dl#{attributes}>
+<strong class="title">#{node.title}</strong>)
+    else
+      %(<dl#{attributes}>)
+    end
+    node.items.each do |terms, desc|
+      terms.each do |term|
+          ret << %(<dt>#{term.text}</dt>)
+      end
+      sub_content = if desc.blocks?
+        %(
+#{desc.content}
+)
+      else
+        ""
+      end
+      ret << %(<dd>#{desc.text}#{sub_content}</dd>)
+    end
+    ret << %{</dl>}
+    ret.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role
