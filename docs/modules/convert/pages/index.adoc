@@ -44,4 +44,5 @@ In summary, a converter is a software component that handles the conversion from
 The backend represents the user's intent to transform the AsciiDoc document to a given format (e.g., `html5` for HTML 5).
 That backend also serves as an identifier that tells the processor which converter to use.
 More than one converter can bind to (i.e., stake claim to) the same backend in order to provide the user with alternatives for generating a given output format.
+For example, the backend `pdf` could be satisfied by Asciidoctor PDF, but it may also be mapped to a different implementation.
 The last converter that registers itself with a backend wins.
