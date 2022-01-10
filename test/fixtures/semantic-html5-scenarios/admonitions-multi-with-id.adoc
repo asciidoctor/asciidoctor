@@ -1,0 +1,34 @@
+[NOTE#the_note]
+====
+This is a note.
+
+The end.
+====
+
+[TIP#the_tip]
+====
+This is a tip.
+
+The end.
+====
+
+[IMPORTANT#the_important]
+====
+This is important.
+
+The end.
+====
+
+[CAUTION#the_caution]
+====
+This is a caution.
+
+The end.
+====
+
+[WARNING#the_warning]
+====
+This is a warning.
+
+The end.
+====

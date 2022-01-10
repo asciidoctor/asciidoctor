@@ -69,7 +69,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
   def convert_listing node
     caption = (caption = node.caption) ? %(<span class="label">#{caption}</span> ) : ''
-    title = node.title? ? %(<figcaption>#{caption}#{node.title}</figcaption>\n) : ''
+    title = node.title? ? %(<figcaption>#{caption}#{node.title}</figcaption>#{LF}) : ''
     attributes = common_html_attributes node.id, node.role, 'listing'
     nowrap = (node.option? 'nowrap') || !(node.document.attr? 'prewrap')
     if node.style == 'source'
@@ -94,6 +94,28 @@ class Converter::SemanticHtml5Converter < Converter::Base
 
   def convert_thematic_break node
     '<hr>'
+  end
+
+  def convert_admonition node
+    name = node.attr 'name'
+    text_label = node.attr 'textlabel'
+    attributes = common_html_attributes node.id, node.role, %(admonition #{name})
+    if node.document.attr? 'icons'
+      if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
+        label = %(<span class="icon"><i class="fa icon-#{name}" title="#{text_label}"></i></span>)
+      else
+        label = %(<span class="icon"><img src="#{node.icon_uri name}" alt="#{text_label}"/></span>)
+      end
+    else
+      label = text_label
+    end
+    ret = []
+    ret << %(<admonition#{attributes}>)
+    ret << %(<strong class="label">#{label}</strong>)
+    # TODO use whatever we decide on other blocks to display node.title
+    ret << node.content
+    ret << '</admonition>'
+    ret.join LF
   end
 
   def convert_image node

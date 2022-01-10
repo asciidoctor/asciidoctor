@@ -1,0 +1,14 @@
+NOTE: This is a note.
+It's just a paragraph.
+
+TIP: This is a tip.
+It's just a paragraph.
+
+IMPORTANT: This is an important.
+It's just a paragraph.
+
+CAUTION: This is a caution.
+It's just a paragraph.
+
+WARNING: This is a warning.
+It's just a paragraph.
