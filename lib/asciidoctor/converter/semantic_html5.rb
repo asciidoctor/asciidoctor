@@ -272,6 +272,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_break node
+    %(#{node.text}<br />)
+  end
+
   def convert_inline_kbd node
     if (keys = node.attr 'keys').size == 1
       %(<kbd>#{keys[0]}</kbd>)
