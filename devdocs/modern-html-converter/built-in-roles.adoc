@@ -38,14 +38,17 @@ Here's the list of all the built-in roles used in the (new) modern HTML converte
 |Double quotation mark
 
 |menuseq
-|Sequence of menu items (`menu` macro)
+|Sequence of UI menu items (`menu` macro)
 
 |menu
-|Menu which can contain a submenu or a menu item (`menu` macro)
+|UI menu which can contain a submenu or a menu item (`menu` macro)
 
 |submenu
-|Submenu which can contain submenus or a menu item (`menu` macro)
+|UI submenu which can contain submenus or a menu item (`menu` macro)
 
 |menuitem
-|Menu item (`menu` macro)
+|UI menu item (`menu` macro)
+
+|button
+|UI button (`button` macro)
 |====
