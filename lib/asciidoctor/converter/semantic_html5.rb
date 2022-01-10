@@ -184,6 +184,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_break node
+    %(#{node.text}<br>)
+  end
+
   def convert_inline_menu node
     caret = '&#160;<b class="caret">&#8250;</b> '
     submenu_joiner = %(</b>#{caret}<b class="submenu">)

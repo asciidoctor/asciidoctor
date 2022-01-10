@@ -1,0 +1,4 @@
+[%hardbreaks]
+This is a single line.
+This is the next line.
+This is a single line. It is the last line.
