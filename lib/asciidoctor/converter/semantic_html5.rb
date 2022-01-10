@@ -272,6 +272,18 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_kbd node
+    if (keys = node.attr 'keys').size == 1
+      %(<kbd>#{keys[0]}</kbd>)
+    else
+      %(<span class="keyseq"><kbd>#{keys.join '</kbd>+<kbd>'}</kbd></span>)
+    end
+  end
+
+  def convert_inline_button node
+    %(<samp class="button">#{node.text}</samp>)
+  end
+
   def convert_inline_menu node
     caret = '&#160;<b class="caret">&#8250;</b> '
     submenu_joiner = %(</b>#{caret}<b class="submenu">)
