@@ -1,0 +1,54 @@
+[NOTE]
+====
+This is a note.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[TIP]
+====
+This is a tip.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[IMPORTANT]
+====
+This is important.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[CAUTION]
+====
+This is a caution.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[WARNING]
+====
+This is a warning.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====

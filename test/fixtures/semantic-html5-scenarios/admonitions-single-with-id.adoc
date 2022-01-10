@@ -1,0 +1,19 @@
+[#the_note]
+NOTE: This is a note.
+It's just a paragraph.
+
+[#the_tip]
+TIP: This is a tip.
+It's just a paragraph.
+
+[#the_important]
+IMPORTANT: This is an important.
+It's just a paragraph.
+
+[#the_caution]
+CAUTION: This is a caution.
+It's just a paragraph.
+
+[#the_warning]
+WARNING: This is a warning.
+It's just a paragraph.

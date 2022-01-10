@@ -1,0 +1,19 @@
+[#the_note.role_1.role_2]
+NOTE: This is a note.
+It's just a paragraph.
+
+[#the_tip.role_1.role_2]
+TIP: This is a tip.
+It's just a paragraph.
+
+[#the_important.role_1.role_2]
+IMPORTANT: This is an important.
+It's just a paragraph.
+
+[#the_caution.role_1.role_2]
+CAUTION: This is a caution.
+It's just a paragraph.
+
+[#the_warning.role_1.role_2]
+WARNING: This is a warning.
+It's just a paragraph.

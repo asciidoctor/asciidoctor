@@ -96,6 +96,17 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_admonition node
+    attributes = common_html_attributes node.id, node.role, %(admonition #{node.attr 'name'})
+    ret = []
+    ret << %(<aside#{attributes}>)
+    ret << %(<em class="label">#{node.attr "textlabel"}</em>)
+    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
+    ret << node.content
+    ret << "</aside>"
+    ret.join "\n"
+  end
+
   def convert_ulist node
     attributes = common_html_attributes node.id, node.role
     ret = []

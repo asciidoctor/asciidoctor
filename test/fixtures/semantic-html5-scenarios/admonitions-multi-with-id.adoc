@@ -1,0 +1,54 @@
+[NOTE#the_note]
+====
+This is a note.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[TIP#the_tip]
+====
+This is a tip.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[IMPORTANT#the_important]
+====
+This is important.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[CAUTION#the_caution]
+====
+This is a caution.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[WARNING#the_warning]
+====
+This is a warning.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====

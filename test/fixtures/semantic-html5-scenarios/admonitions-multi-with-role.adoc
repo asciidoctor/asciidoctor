@@ -1,0 +1,54 @@
+[NOTE.role_1.role_2]
+====
+This is a note.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[TIP.role_1.role_2]
+====
+This is a tip.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[IMPORTANT.role_1.role_2]
+====
+This is important.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====
+
+[CAUTION.role_1.role_2]
+====
+This is a caution.
+
+. Item 1
+. Item 2
+. Item 3
+
+The end.
+====
+
+[WARNING.role_1.role_2]
+====
+This is a warning.
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+The end.
+====

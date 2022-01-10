@@ -1,0 +1,19 @@
+.Some Note
+NOTE: This is a note.
+It's just a paragraph.
+
+.Some Tip
+TIP: This is a tip.
+It's just a paragraph.
+
+.Some Important
+IMPORTANT: This is an important.
+It's just a paragraph.
+
+.Some Caution
+CAUTION: This is a caution.
+It's just a paragraph.
+
+.Some Warning
+WARNING: This is a warning.
+It's just a paragraph.
