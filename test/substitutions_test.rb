@@ -2025,11 +2025,11 @@ context 'Substitutions' do
         para = block_from_string input, backend: :docbook
         para.document.converter.instance_variable_set :@asciimath_status, :unavailable
         if asciimath_available
-          old_asciimath = ::AsciiMath
-          Object.send :remove_const, 'AsciiMath'
+          old_asciimath = AsciiMath
+          Object.send :remove_const, :AsciiMath
         end
         assert_equal '<inlineequation><mathphrase><![CDATA[a < b]]></mathphrase></inlineequation>', para.content
-        ::AsciiMath = old_asciimath if asciimath_available
+        Object.const_set :AsciiMath, old_asciimath if asciimath_available
       end
 
       test 'should honor explicit subslist on asciimath macro' do
