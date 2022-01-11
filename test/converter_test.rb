@@ -178,10 +178,10 @@ context 'Converter' do
         doc = Asciidoctor::Document.new [], template_dir: template_dir
         doc.converter
         caches = Asciidoctor::Converter::TemplateConverter.caches
-        if defined? ::Concurrent::Map
-          assert_kind_of ::Concurrent::Map, caches[:templates]
+        if defined? Concurrent::Map
+          assert_kind_of Concurrent::Map, caches[:templates]
         else
-          assert_kind_of ::Hash, caches[:templates]
+          assert_kind_of Hash, caches[:templates]
         end
         refute_empty caches[:templates]
         paragraph_template_before = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
@@ -216,7 +216,7 @@ context 'Converter' do
       refute_empty caches[:templates]
       paragraph_template = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
       refute_nil paragraph_template
-      assert_kind_of ::Tilt::HamlTemplate, paragraph_template
+      assert_kind_of Tilt::HamlTemplate, paragraph_template
     end
 
     test 'should be able to disable template cache' do
@@ -243,7 +243,7 @@ context 'Converter' do
         template = selected.templates[node_name]
         assert_kind_of Tilt::ERBTemplate, template
         refute_kind_of Tilt::ErubiTemplate, template
-        assert_kind_of ::ERB, template.instance_variable_get('@engine')
+        assert_kind_of ERB, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
       # NOTE verify behavior of trim mode
@@ -267,7 +267,7 @@ context 'Converter' do
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
         template = selected.templates[node_name]
         assert_kind_of Tilt::ErubiTemplate, template
-        assert_kind_of ::Erubi::Engine, template.instance_variable_get('@engine')
+        assert_kind_of Erubi::Engine, template.instance_variable_get('@engine')
         assert_equal %(block_#{node_name}.html.erb), File.basename(selected.templates[node_name].file)
       end
     end

@@ -251,8 +251,8 @@ context 'Invoker' do
     . run
     EOS
     begin
-      old_stderr, $stderr = $stderr, ::StringIO.new
-      old_stdout, $stdout = $stdout, ::StringIO.new
+      old_stderr, $stderr = $stderr, StringIO.new
+      old_stdout, $stdout = $stdout, StringIO.new
       invoker = invoke_cli(%w(-q), '-') { input }
       assert_equal 0, invoker.code
     ensure

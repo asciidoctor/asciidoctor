@@ -154,7 +154,7 @@ class TemperatureMacro < Asciidoctor::Extensions::InlineMacroProcessor
     when 'F'
       create_inline parent, :quoted, %(#{(c * 1.8 + 32).round precision} &#176;F), type: :unquoted
     else
-      raise ::ArgumentError, %(Unknown temperature units: #{units})
+      raise ArgumentError, %(Unknown temperature units: #{units})
     end
   end
 end
@@ -687,7 +687,7 @@ context 'Extensions' do
       assert_equal 'found include target \'include-file.adoc\' at line 4', lines.last
       assert_equal 'include-file.adoc: line 2', reader.line_info
       lines << reader.read_line while reader.has_more_lines?
-      source = lines * ::Asciidoctor::LF
+      source = lines * Asciidoctor::LF
       assert_match(/^found include target 'include-file.adoc' at line 4$/, source)
       assert_match(/^middle line$/, source)
       assert_match(/^last line of grandchild$/, source)

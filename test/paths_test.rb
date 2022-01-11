@@ -351,7 +351,7 @@ context 'Path Resolver' do
     test 'should resolve relative path relative to base dir in unsafe mode' do
       base_dir = fixture_path 'base'
       doc = empty_document base_dir: base_dir, safe: Asciidoctor::SafeMode::UNSAFE
-      expected = ::File.join base_dir, 'images', 'tiger.png'
+      expected = File.join base_dir, 'images', 'tiger.png'
       actual = doc.normalize_system_path 'tiger.png', 'images'
       assert_equal expected, actual
     end

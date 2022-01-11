@@ -239,27 +239,27 @@ context 'Options' do
 
   test 'should set failure level to FATAL by default' do
     options = Asciidoctor::Cli::Options.parse! %w(test/fixtures/sample.adoc)
-    assert_equal ::Logger::Severity::FATAL, options[:failure_level]
+    assert_equal Logger::Severity::FATAL, options[:failure_level]
   end
 
   test 'should allow failure level to be set to FATAL using any recognized abbreviation' do
     %w(f fatal FATAL).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal ::Logger::Severity::FATAL, options[:failure_level]
+      assert_equal Logger::Severity::FATAL, options[:failure_level]
     end
   end
 
   test 'should allow failure level to be set to ERROR using any recognized abbreviation' do
     %w(e err ERR error ERROR).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal ::Logger::Severity::ERROR, options[:failure_level]
+      assert_equal Logger::Severity::ERROR, options[:failure_level]
     end
   end
 
   test 'should allow failure level to be set to WARN using any recognized abbreviation' do
     %w(w warn WARN warning WARNING).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal ::Logger::Severity::WARN, options[:failure_level]
+      assert_equal Logger::Severity::WARN, options[:failure_level]
     end
   end
 
@@ -279,7 +279,7 @@ context 'Options' do
   test 'should allow log level to be set to WARN using any recognized abbreviation' do
     %w(w warn WARN warning WARNING).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--log-level=#{val} test/fixtures/sample.adoc)
-      assert_equal ::Logger::Severity::WARN, options[:log_level]
+      assert_equal Logger::Severity::WARN, options[:log_level]
     end
   end
 
