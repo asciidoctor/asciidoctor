@@ -287,6 +287,14 @@ context 'API' do
       assert_equal inline.method(:convert), inline.method(:render)
     end
 
+    test 'content method on Inline node is aliased to text method' do
+      input = 'paragraph'
+      doc = Asciidoctor.load input
+      inline = Asciidoctor::Inline.new doc.blocks[0], :quoted, 'yo', type: :strong
+      assert_equal inline.method(:content), inline.method(:text)
+      assert_equal 'yo', inline.content
+    end
+
     test 'should output timestamps by default' do
       doc = document_from_string 'text', backend: :html5, attributes: nil
       result = doc.convert
