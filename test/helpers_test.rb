@@ -119,4 +119,23 @@ context 'Helpers' do
       assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, ex.message
     end
   end
+
+  context 'Require Library' do
+    test 'should include backtrace in LoadError thrown by Helpers.require_library' do
+      ex = assert_raises LoadError do
+        Asciidoctor::Helpers.require_library 'does-not-exist'
+      end
+      expected_message = %(asciidoctor: FAILED: required gem 'does-not-exist' is not available. Processing aborted.)
+      expected_cause_message = %r/^(?:no such file to load|cannot load such file) -- does-not-exist$/
+      assert_equal expected_message, ex.message
+      assert_match expected_cause_message, ex.cause.message
+      if (ex.respond_to? :full_message) && !jruby?
+        assert_match %r/helpers\.rb.*in.*require_library/, ex.full_message
+        assert_match %r/(?:no such file to load|cannot load such file) -- does-not-exist/, ex.full_message
+      else
+        assert_match %r/helpers\.rb.*in.*require_library/, (ex.backtrace.join ?\n)
+        assert_match %r/helpers\.rb.*in.*require_library/, (ex.cause.backtrace.join ?\n)
+      end
+    end
+  end
 end
