@@ -1313,7 +1313,7 @@ class Parser
               catalog_inline_anchor $1, $2, list_item, reader
             end
           elsif item_text.start_with? '[ ] ', '[x] ', '[*] '
-            list_block.set_option 'checklist'
+            list_block.attributes['checklist-option'] = ''
             list_item.attributes['checkbox'] = ''
             list_item.attributes['checked'] = '' unless item_text.start_with? '[ '
             list_item.text = item_text.slice 4, item_text.length
