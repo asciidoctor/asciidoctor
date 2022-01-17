@@ -1824,6 +1824,58 @@ context 'API' do
       assert_equal Set['compact', 'reversed'], block.enabled_options
     end
 
+    test 'should set linenums option if linenums enabled on source block' do
+      input = <<~'EOS'
+      [,ruby,linenums]
+      ----
+      puts "Hello, World!"
+      ----
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert block.attr? 'linenums'
+      assert block.option? 'linenums'
+    end
+
+    test 'should set linenums option if linenums enabled on fenced code block' do
+      input = <<~'EOS'
+      ```ruby,linenums
+      puts "Hello, World!"
+      ```
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      assert block.attr? 'linenums'
+      assert block.option? 'linenums'
+    end
+
+    test 'should not set linenums attribute if linenums option is enabled on source block' do
+      input = <<~'EOS'
+      [%linenums,ruby]
+      ----
+      puts "Hello, World!"
+      ----
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      refute block.attr? 'linenums'
+      assert block.option? 'linenums'
+    end
+
+    test 'should not set linenums attribute if linenums option is enabled on fenced code block' do
+      input = <<~'EOS'
+      :source-linenums-option:
+
+      ```ruby
+      puts "Hello, World!"
+      ```
+      EOS
+
+      block = (document_from_string input).blocks[0]
+      refute block.attr? 'linenums'
+      assert block.option? 'linenums'
+    end
+
     test 'table column should not be a block or inline' do
       input = <<~'EOS'
       |===

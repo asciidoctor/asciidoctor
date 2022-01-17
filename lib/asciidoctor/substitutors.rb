@@ -950,7 +950,7 @@ module Substitutors
 
     doc_attrs = @document.attributes
     syntax_hl_name = syntax_hl.name
-    if (linenums_mode = (attr? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil) &&
+    if (linenums_mode = (option? 'linenums') ? (doc_attrs[%(#{syntax_hl_name}-linenums-mode)] || :table).to_sym : nil) &&
         (start_line_number = (attr 'start', 1).to_i) < 1
       start_line_number = 1
     end
