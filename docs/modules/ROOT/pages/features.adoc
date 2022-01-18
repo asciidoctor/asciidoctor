@@ -1,6 +1,7 @@
 = Features
+:description: This page highlights the features of Asciidoctor that make it a great choice for processing and publishing your AsciiDoc content.
 
-This page covers the features of Asciidoctor that make it a great choice for processing and publishing your AsciiDoc content.
+{description}
 
 == Readily available with no dependencies
 
