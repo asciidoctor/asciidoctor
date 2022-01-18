@@ -18,7 +18,7 @@ Here's an overview of the different ways to preview and edit your AsciiDoc docum
 
 == Web browser add-ons (preview only)
 
-All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension^], the {url-edge-addon}[Edge add-on^] the {url-firefox-addon}[Firefox add-on^] or the {url-opera-extension}[Opera extension^].
+To preview an AsciiDoc document in a web browser, install the {url-chrome-extension}[Chrome extension^], the {url-edge-addon}[Edge add-on^], the {url-firefox-addon}[Firefox add-on^], or the {url-opera-extension}[Opera extension^] (all produced from the same code base).
 Then you can see the AsciiDoc file rendered as HTML just by visiting it.
 
 == IDEs and text editors
