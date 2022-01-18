@@ -1,5 +1,6 @@
 = AsciiDoc Tooling
 :url-chrome-extension: https://chrome.google.com/webstore/detail/asciidoctorjs-live-previe/iaalpfgpbocpdfblpnhhgllgbdbchmia
+:url-edge-addon: https://microsoftedge.microsoft.com/addons/detail/asciidoctorjs-live-previ/pefkelkanablhjdekgdahplkccnbdggd
 :url-firefox-addon: https://addons.mozilla.org/en/firefox/addon/asciidoctorjs-live-preview
 :url-opera-extension: https://addons.opera.com/en/extensions/details/asciidoctorjs-live-preview/
 :url-asciidocfx: https://www.asciidocfx.com
@@ -17,8 +18,8 @@ Here's an overview of the different ways to preview and edit your AsciiDoc docum
 
 == Web browser add-ons (preview only)
 
-All you need to preview an AsciiDoc document in a web browser is to install the {url-chrome-extension}[Chrome extension^], the {url-firefox-addon}[Firefox add-on^] or the {url-opera-extension}[Opera extension^].
-Then you can see the AsciiDoc file rendered as HTML just by visiting it!
+To preview an AsciiDoc document in a web browser, install the {url-chrome-extension}[Chrome extension^], the {url-edge-addon}[Edge add-on^], the {url-firefox-addon}[Firefox add-on^], or the {url-opera-extension}[Opera extension^] (all produced from the same code base).
+Then you can see the AsciiDoc file rendered as HTML just by visiting it.
 
 == IDEs and text editors
 
