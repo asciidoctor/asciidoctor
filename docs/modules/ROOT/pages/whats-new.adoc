@@ -11,6 +11,43 @@ The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
 
+= Asciidoctor 2.0.17
+
+_**Release date:** 2022.01.05_
+
+== Bug Fixes
+
+* Don't crash if process method for custom block returns an abstract block with context :compound that isn't of type Block (e.g., a list)
+* Ignore return value of process method for custom block or block macro if value matches parent argument
+* Remove unnamespaced selectors in Pygments stylesheet
+* Normalize output from Pygments to use linenos class for inline line numbering and trim space after number; update default stylesheet accordingly
+* Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) (*@Mogztter*)
+* Hide built-in marker on HTML summary element in Safari when using default stylesheet (#4162)
+* Hide outline around HTML summary when activated in Safari (#4162)
+* Include primary video in value of playlist attribute when embeddding YouTube video (#4156)
+* Honor `stripes=none` on nested table (#4165)
+* Update default stylesheet to fix spacing around empty list item (#4184)
+* Honor `:header_only` option when parsing document with manpage doctype (#4192)
+* Use numeric character reference for closing square bracket around alt text of icon
+* Process author or authors document attribute in document header when implicit doctitle is absent (#4206)
+* Patch open-uri-cached gem to work with Ruby 3.1 (update: drop patch now that open-uri-cached has been fixed) (#4227)
+
+== Improvements
+
+* Prevent line numbers on source blocks in HTML output from being selected (applies to pygments and coderay) (#4128)
+* Allow hash to be specified for Vimeo video either in video ID or using hash attribute (#4176)
+* Remove unnecessary specificity in default stylesheet for styling p element inside list item
+* Remove obsolete gist embed styles from default stylesheet
+* Allow `--failure-level` to be set to default value, `FATAL`
+* Sort levels in help for `--failure-level` option in ascending order
+* Invert FR translations for caution & warning admonition labels (#4212) (*@cyChop*)
+* Add tests for open-uri-cached integration that's activated by the cache-uri attribute
+* Don't warn if negated tag is not found in include file (#4230)
+
+== Build / Infrastructure
+
+* Add Ruby 3.1 to CI matrix
+
 = Asciidoctor 2.0.16
 
 _**Release date:** 2021.08.03_
