@@ -2,6 +2,7 @@
 :url-writing-tests: https://github.com/asciidoctor/asciidoctor/blob/HEAD/CONTRIBUTING.adoc#writing-and-executing-tests
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-asciidoctor-1: {url-project}/man/asciidoctor
+:description: This page covers the differences between Asciidoctor and the legacy Python-based AsciiDoc processor, AsciiDoc.py, and provides guidance for migrating your content and processor settings from AsciiDoc.py to Asciidoctor.
 
 AsciiDoc.py is the original and legacy Python-based processor for the AsciiDoc language.
 It has been superseded by Asciidoctor.
