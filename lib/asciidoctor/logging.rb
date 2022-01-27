@@ -6,11 +6,12 @@ module Asciidoctor
 class Logger < ::Logger
   attr_reader :max_severity
 
-  def initialize *args
+  def initialize *args, **kwargs
+    args << $stderr if args.empty?
     super
     self.progname = 'asciidoctor'
-    self.formatter = BasicFormatter.new
-    self.level = WARN
+    self.formatter = kwargs[:formatter] || BasicFormatter.new
+    self.level = kwargs[:level] || WARN
   end
 
   def add severity, message = nil, progname = nil
@@ -41,7 +42,7 @@ class MemoryLogger < ::Logger
   attr_reader :messages
 
   def initialize
-    self.level = WARN
+    self.level = UNKNOWN
     @messages = []
   end
 
@@ -68,7 +69,7 @@ class NullLogger < ::Logger
   attr_reader :max_severity
 
   def initialize
-    self.level = WARN
+    self.level = UNKNOWN
   end
 
   def add severity, message = nil, progname = nil
