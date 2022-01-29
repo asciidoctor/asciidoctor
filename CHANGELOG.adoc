@@ -29,7 +29,10 @@ Enhancements::
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
   * Add support for role on thematic break in HTML converter (#4101)
   * Add support for link=self on image macros (#3656)
-  * alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
+  * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
+  * Update signature of Logger constructor so both positional arguments and keyword arguments are passed to super constructor (#4250)
+  * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
+  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
 
 Compliance::
 
