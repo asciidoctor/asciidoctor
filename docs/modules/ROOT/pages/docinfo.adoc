@@ -3,14 +3,16 @@
 :url-docinfo-example: https://github.com/clojure-cookbook/clojure-cookbook/blob/master/book-docinfo.xml
 // um anchor: docinfo-file
 
-You can add custom content to the head, header or footer of an output document using docinfo files.
-Docinfo files are useful for injecting auxiliary metadata, stylesheet, and script information into the output not added by the converter.
+Docinfo is a feature of AsciiDoc that allows you to insert custom content into the head, header, or footer of the output document.
+This custom content is read from files known as docinfo files by the converter.
+Docinfo files are intended as convenient way to supplement the output produced by a converter.
+Examples include injecting auxiliary metadata, stylesheets, and scripting logic not already provided by the converter.
 
 The docinfo feature does not apply to all backends.
 While it works when converting to output formats such as HTML and DocBook, it does not work when converting to PDF using Asciidoctor PDF.
 
 The docinfo feature must be explicitly enabled using the `docinfo` attribute (see <<enable>>).
-Which docinfo files get used depends on the value of the `docinfo` attribute as well as the backend.
+Which docinfo files are consumed depends on the value of the `docinfo` attribute as well as the backend.
 
 [#head]
 == Head docinfo files
