@@ -1,7 +1,6 @@
 = Docinfo Files
 :url-docbook-info-ref: https://tdg.docbook.org/tdg/5.0/info.html
 :url-docinfo-example: https://github.com/clojure-cookbook/clojure-cookbook/blob/master/book-docinfo.xml
-// um anchor: docinfo-file
 
 Docinfo is a feature of AsciiDoc that allows you to insert custom content into the head, header, or footer of the output document.
 This custom content is read from files known as docinfo files by the converter.

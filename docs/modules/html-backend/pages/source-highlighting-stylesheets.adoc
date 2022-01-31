@@ -1,6 +1,4 @@
 = Embed a CodeRay or Pygments Stylesheet
-// um anchor: hl-css
-// html-code-styles.adoc, included in convert-documents and the user-manual.
 
 Asciidoctor can embed the stylesheet for the CodeRay or Pygments syntax highlighters.
 
