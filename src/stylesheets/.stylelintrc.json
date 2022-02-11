@@ -2,6 +2,6 @@
   "extends": "stylelint-config-standard",
   "rules": {
     "comment-empty-line-before": null,
-    "no-descending-specificity": null,
+    "no-descending-specificity": null
   }
 }
