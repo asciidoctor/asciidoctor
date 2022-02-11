@@ -2,12 +2,12 @@
   "private": true,
   "description": "Compiles the default stylesheet for the built-in HTML converter.",
   "devDependencies": {
-    "autoprefixer": "~10.3",
+    "autoprefixer": "~10.4",
     "cssnano": "~5.0",
-    "postcss": "~8.3",
-    "postcss-cli": "~8.3",
-    "stylelint": "~13.13",
-    "stylelint-config-standard": "~22.0"
+    "postcss": "~8.4",
+    "postcss-cli": "~9.1",
+    "stylelint": "~14.5",
+    "stylelint-config-standard": "~25.0"
   },
   "scripts": {
     "build": "postcss asciidoctor.css -o ../../data/stylesheets/asciidoctor-default.css && postcss coderay-asciidoctor.css -o ../../data/stylesheets/coderay-asciidoctor.css",

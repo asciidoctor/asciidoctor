@@ -14,7 +14,7 @@ html {
 
 body {
   background: #fff;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 0.8);
   padding: 0;
   margin: 0;
   font-family: "Noto Serif", "DejaVu Serif", serif;
@@ -100,11 +100,11 @@ pre {
 
 code {
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.9);
+  color: rgb(0 0 0 / 0.9);
 }
 
 pre {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgb(0 0 0 / 0.9);
   line-height: 1.45;
   text-rendering: optimizeSpeed;
   white-space: pre-wrap;
@@ -381,7 +381,7 @@ blockquote {
 blockquote,
 blockquote p {
   line-height: 1.6;
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
 }
 
 @media screen and (min-width: 768px) {
@@ -424,7 +424,7 @@ table tfoot tr th,
 table tfoot tr td {
   padding: 0.5em 0.625em 0.625em;
   font-size: inherit;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 0.8);
   text-align: left;
 }
 
@@ -432,7 +432,7 @@ table tr th,
 table tr td {
   padding: 0.5625em 0.625em;
   font-size: inherit;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 0.8);
 }
 
 table tr.even,
@@ -523,18 +523,18 @@ pre.nowrap pre {
 }
 
 .keyseq {
-  color: rgba(51, 51, 51, 0.8);
+  color: rgb(51 51 51 / 0.8);
 }
 
 kbd {
   display: inline-block;
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 0.8);
   font-size: 0.65em;
   line-height: 1.45;
   background: #f7f7f7;
   border: 1px solid #ccc;
   border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.1em #fff inset;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.2), 0 0 0 0.1em #fff inset;
   margin: 0 0.15em;
   padding: 0.2em 0.5em;
   vertical-align: middle;
@@ -594,7 +594,7 @@ b.button::after {
 }
 
 p a > code:hover {
-  color: rgba(0, 0, 0, 0.9);
+  color: rgb(0 0 0 / 0.9);
 }
 
 body > div[id] {
@@ -624,7 +624,7 @@ body > div[id]::after,
 }
 
 #header > h1:first-child {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
   margin-top: 2.25rem;
   margin-bottom: 0;
 }
@@ -646,7 +646,7 @@ body.toc2 #header > h1:nth-last-child(2) {
   padding-top: 0.25em;
   padding-bottom: 0.25em;
   padding-left: 0.25em;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgb(0 0 0 / 0.6);
   display: flex;
   flex-flow: row wrap;
 }
@@ -656,7 +656,7 @@ body.toc2 #header > h1:nth-last-child(2) {
 }
 
 #header .details span.email a {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
 }
 
 #header .details br {
@@ -669,7 +669,7 @@ body.toc2 #header > h1:nth-last-child(2) {
 
 #header .details br + span.author::before {
   content: "\00a0\22c5\00a0";
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
 }
 
 #header .details br + span#revremark::before {
@@ -685,7 +685,7 @@ body.toc2 #header > h1:nth-last-child(2) {
 }
 
 #content > h1:first-child:not([class]) {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
   border-bottom: 1px solid #dddddf;
   padding-bottom: 8px;
   margin-top: 0;
@@ -840,12 +840,12 @@ body.toc2 #header > h1:nth-last-child(2) {
 
 #footer {
   max-width: none;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 0.8);
   padding: 1.25em;
 }
 
 #footer-text {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgb(255 255 255 / 0.8);
   line-height: 1.44;
 }
 
@@ -1035,7 +1035,7 @@ table.tableblock.fit-content > caption.title {
 #preamble > .sectionbody > [class=paragraph]:first-of-type p {
   font-size: 1.21875em;
   line-height: 1.6;
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
 }
 
 .admonitionblock > table {
@@ -1064,7 +1064,7 @@ table.tableblock.fit-content > caption.title {
   padding-left: 1.125em;
   padding-right: 1.25em;
   border-left: 1px solid #dddddf;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgb(0 0 0 / 0.6);
   word-wrap: anywhere;
 }
 
@@ -1153,7 +1153,7 @@ table.tableblock.fit-content > caption.title {
 
 .literalblock.output pre {
   color: #f7f7f8;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgb(0 0 0 / 0.9);
 }
 
 .listingblock > .content {
@@ -1274,7 +1274,7 @@ pre.rouge span.linenos {
 
 .quoteblock blockquote,
 .quoteblock p {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
   font-size: 1.15rem;
   line-height: 1.75;
   word-spacing: 0.1em;
@@ -1297,7 +1297,7 @@ pre.rouge span.linenos {
   line-height: 0.6em;
   margin-left: -0.6em;
   color: #7a2518;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
 }
 
 .quoteblock blockquote > .paragraph:last-child p {
@@ -1317,7 +1317,7 @@ pre.rouge span.linenos {
 .verseblock pre {
   font-family: "Open Sans", "DejaVu Sans", sans-serif;
   font-size: 1.15rem;
-  color: rgba(0, 0, 0, 0.85);
+  color: rgb(0 0 0 / 0.85);
   font-weight: 300;
   text-rendering: optimizeLegibility;
 }
@@ -1347,7 +1347,7 @@ pre.rouge span.linenos {
 .verseblock .attribution cite {
   display: block;
   letter-spacing: -0.025em;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgb(0 0 0 / 0.6);
 }
 
 .quoteblock.abstract blockquote::before,
@@ -1517,7 +1517,7 @@ tbody tr th,
 tbody tr th p,
 tfoot tr th,
 tfoot tr th p {
-  color: rgba(0, 0, 0, 0.8);
+  color: rgb(0 0 0 / 0.8);
   font-weight: bold;
 }
 
@@ -1962,7 +1962,7 @@ a span.icon > .fa {
 
 .admonitionblock td.icon [class^="fa icon-"] {
   font-size: 2.5em;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 1px 1px 2px rgb(0 0 0 / 0.5);
   cursor: default;
 }
 
@@ -1973,7 +1973,7 @@ a span.icon > .fa {
 
 .admonitionblock td.icon .icon-tip::before {
   content: "\f0eb";
-  text-shadow: 1px 1px 2px rgba(155, 155, 0, 0.8);
+  text-shadow: 1px 1px 2px rgb(155 155 0 / 0.8);
   color: #111;
 }
 
@@ -1995,7 +1995,7 @@ a span.icon > .fa {
 .conum[data-value] {
   display: inline-block;
   color: #fff !important;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgb(0 0 0 / 0.8);
   border-radius: 50%;
   text-align: center;
   font-size: 0.75em;
@@ -2248,7 +2248,7 @@ p.tableblock {
   }
 
   #footer-text {
-    color: rgba(0, 0, 0, 0.6);
+    color: rgb(0 0 0 / 0.6);
     font-size: 0.9em;
   }
 }
