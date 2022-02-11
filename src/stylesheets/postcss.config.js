@@ -1,3 +1,5 @@
+'use strict'
+
 module.exports = (ctx) => ({
   plugins: {
     autoprefixer: true,
@@ -15,7 +17,7 @@ module.exports = (ctx) => ({
         },
       ]
     },
-    './lib/postcss-minify-selectors.js': true,
-    './lib/postcss-rule-per-line.js': true,
+    [require.resolve('./lib/postcss-minify-selectors.js')]: true,
+    [require.resolve('./lib/postcss-rule-per-line.js')]: true,
   }
 })
