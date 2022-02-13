@@ -1,5 +1,6 @@
 = Asciidoctor Documentation
 :navtitle: Introduction
+:description: A brief introduction to Asciidoctor, its ecosystem, its relationship to AsciiDoc, and the language platforms on which it runs.
 
 This is the documentation for the Ruby-based AsciiDoc processor named Asciidoctor.
 Asciidoctor currently serves as the reference implementation for how to interpret the AsciiDoc language.
