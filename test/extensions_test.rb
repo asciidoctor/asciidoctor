@@ -393,6 +393,27 @@ context 'Extensions' do
       end
     end
 
+    test 'should reset registry if activate is called again' do
+      begin
+        Asciidoctor::Extensions.register :sample, SampleExtensionGroup
+        doc = Asciidoctor::Document.new
+        registry = Asciidoctor::Extensions::Registry.new
+        registry.activate doc
+        assert doc.attr? 'activate-method-called'
+        assert registry.preprocessors?
+        assert_equal 1, registry.preprocessors.size
+        assert_same doc, registry.document
+        doc = Asciidoctor::Document.new
+        registry.activate doc
+        assert doc.attr? 'activate-method-called'
+        assert registry.preprocessors?
+        assert_equal 1, registry.preprocessors.size
+        assert_same doc, registry.document
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke extension block' do
       begin
         doc = Asciidoctor::Document.new
