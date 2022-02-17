@@ -15,6 +15,12 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
+== Unreleased
+
+Bug Fixes::
+
+  * Reset registry if activate is called on it again (#4256)
+
 // tag::compact[]
 == 2.0.17 (2022-01-05) - @mojavelinux
 

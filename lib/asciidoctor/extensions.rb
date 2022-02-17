@@ -721,6 +721,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
+      reset
       @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
       @document = nil
     end
@@ -732,6 +733,7 @@ module Extensions
     #
     # Returns the instance of this [Registry].
     def activate document
+      reset if @document
       @document = document
       unless (ext_groups = Extensions.groups.values + @groups.values).empty?
         ext_groups.each do |group|
@@ -1427,6 +1429,11 @@ module Extensions
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
+    end
+
+    def reset
+      @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
+      @document = nil
     end
 
     def resolve_args args, expect
