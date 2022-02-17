@@ -1979,7 +1979,7 @@ context 'Extensions' do
 
     test 'should raise exception if document processor extension does not provide process method' do
       extension_registry = Asciidoctor::Extensions.create do
-        tree_processor do
+        tree_processor do # rubocop:disable Lint/EmptyBlock
         end
       end
       exception = assert_raises NoMethodError do
@@ -1991,6 +1991,9 @@ context 'Extensions' do
     test 'should raise exception if syntax processor extension does not provide process method' do
       extension_registry = Asciidoctor::Extensions.create do
         block_macro :foo do
+          process do
+            nil
+          end
         end
       end
       exception = assert_raises NoMethodError do
