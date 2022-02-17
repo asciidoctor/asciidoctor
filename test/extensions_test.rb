@@ -1977,6 +1977,45 @@ context 'Extensions' do
       end
     end
 
+    test 'should raise exception if document processor extension does not provide process method' do
+      extension_registry = Asciidoctor::Extensions.create do
+        tree_processor do
+        end
+      end
+      exception = assert_raises NoMethodError do
+        convert_string_to_embedded 'content', extension_registry: extension_registry
+      end
+      assert_match %r/No block specified to process tree processor extension at .*extensions_test\.rb:\d+/, exception.message
+    end
+
+    test 'should raise exception if syntax processor extension does not provide process method' do
+      extension_registry = Asciidoctor::Extensions.create do
+        block_macro :foo do
+        end
+      end
+      exception = assert_raises NoMethodError do
+        convert_string_to_embedded 'foo::bar[]', extension_registry: extension_registry
+      end
+      assert_match %r/No block specified to process block macro extension at .*extensions_test\.rb:\d+/, exception.message
+    end
+
+    test 'should raise exception if syntax processor extension does not provide a name' do
+      macro_name = (Class.new String do
+        def to_sym
+          nil
+        end
+      end).new 'foo'
+      extension_registry = Asciidoctor::Extensions.create do
+        block_macro do
+          named macro_name
+        end
+      end
+      exception = assert_raises ArgumentError do
+        convert_string_to_embedded 'foo::bar[]', extension_registry: extension_registry
+      end
+      assert_match %r/No name specified for block macro extension at .*extensions_test\.rb:\d+/, exception.message
+    end
+
     test 'should raise an exception if mandatory target attribute is not provided for image block' do
       input = 'cat_in_sink::[]'
       exception = assert_raises ArgumentError do
