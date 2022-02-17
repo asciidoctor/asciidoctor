@@ -1352,7 +1352,7 @@ module Extensions
           yield processor
         end
         unless processor.process_block_given?
-          raise ::ArgumentError, %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
         processor.freeze
         extension = ProcessorExtension.new kind, processor
@@ -1396,10 +1396,10 @@ module Extensions
           yield processor
         end
         unless (name = as_symbol processor.name)
-          raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location})
+          raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location.join ':'})
         end
         unless processor.process_block_given?
-          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
         processor.freeze
         kind_store[name] = ProcessorExtension.new kind, processor
