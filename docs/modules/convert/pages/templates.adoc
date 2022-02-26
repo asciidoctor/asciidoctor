@@ -601,7 +601,7 @@ To load templates from multiple directories when using the CLI, you can pass eac
 
  $ asciidoctor -T /path/to/common-templates -T /path/to/specialized-templates -E slim doc.adoc
 
-When using the API, you add all the template directories to the array value of the `:templates_dir` option:
+When using the API, you add all the template directories to the array value of the `:template_dirs` option:
 
 [,ruby]
 ----
