@@ -690,7 +690,7 @@ class PreprocessorReader < Reader
       # only process lines in AsciiDoc files
       if (@process_lines = file.end_with?(*ASCIIDOC_EXTENSIONS.keys))
         # NOTE registering the include with a nil value tracks it while not making it visible to interdocument xrefs
-        @includes[path.slice 0, (path.rindex '.')] = attributes['partial-option'] ? nil : true
+        @includes[path.slice 0, (path.rindex '.')] ||= attributes['partial-option'] ? nil : true
       end
     else
       @dir = '.'
@@ -698,7 +698,7 @@ class PreprocessorReader < Reader
       @process_lines = true
       if (@path = path)
         # NOTE registering the include with a nil value tracks it while not making it visible to interdocument xrefs
-        @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true
+        @includes[Helpers.rootname path] ||= attributes['partial-option'] ? nil : true
       else
         @path = '<stdin>'
       end

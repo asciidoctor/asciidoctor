@@ -937,6 +937,30 @@ context 'Links' do
     assert_xpath '//a[@href="other-chapters.html#ch2"][text()="the next chapter"]', output, 1
   end
 
+  test 'should produce an internal anchor for inter-document xref to file included fully and partially' do
+    input = <<~'EOS'
+    = Book Title
+    :doctype: book
+
+    [#ch1]
+    == Chapter 1
+
+    So it begins.
+
+    Read <<other-chapters.adoc#ch2,the next chapter>> to find out what happens next!
+
+    include::other-chapters.adoc[]
+
+    include::other-chapters.adoc[tag=ch2-noid]
+    EOS
+
+    doc = document_from_string input, safe: :safe, base_dir: fixturedir
+    assert doc.catalog[:includes].key?('other-chapters')
+    assert doc.catalog[:includes]['other-chapters']
+    output = doc.convert
+    assert_xpath '//a[@href="#ch2"][text()="the next chapter"]', output, 1
+  end
+
   test 'should warn and create link if debug mode is enabled, inter-document xref points to current doc, and reference not found' do
     input = <<~'EOS'
     [#foobar]
