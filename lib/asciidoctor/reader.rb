@@ -1035,7 +1035,7 @@ class PreprocessorReader < Reader
     # however, be friendly and at least make it a link to the source document
     elsif doc.safe >= SafeMode::SECURE
       # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{expanded_target}[])
+      replace_next_line %(link:#{expanded_target}[role=include])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1232,7 +1232,7 @@ class PreprocessorReader < Reader
   def resolve_include_path target, attrlist, attributes
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
-      return replace_next_line %(link:#{target}[#{attrlist}]) unless doc.attr? 'allow-uri-read'
+      return replace_next_line %(link:#{target}[role=include]) unless doc.attr? 'allow-uri-read'
       if doc.attr? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
         # processing will be automatically aborted if these libraries can't be opened
