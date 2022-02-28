@@ -666,11 +666,38 @@ class ReaderTest < Minitest::Test
     end
 
     context 'Include Directive' do
-      test 'include directive is disabled by default and becomes a link' do
+      test 'should replace include directive with link macro in default safe mode' do
         input = 'include::include-file.adoc[]'
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        assert_equal 'link:include-file.adoc[]', reader.read_line
+        assert_equal 'link:include-file.adoc[role=include]', reader.read_line
+      end
+
+      test 'should preserve attrlist when replacing include directive with link macro' do
+        input = 'include::include-file.adoc[leveloffset=+1]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:include-file.adoc[role=include,leveloffset=+1]', reader.read_line
+      end
+
+      test 'should replace include directive with link macro if safe mode allows it, but allow-uri-read is not set' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/dist/info.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should preserve attrlist when replacing remove include directive with link macro' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/dist/info.adoc[leveloffset=+1]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[role=include,leveloffset=+1]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
       end
 
       test 'include directive with remote target is converted to a link when allow-uri-read is not set' do
@@ -678,7 +705,7 @@ class ReaderTest < Minitest::Test
           input = 'include::http://example.org/team.adoc[]'
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
-          assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
           assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: http://example.org/team.adoc (allow-uri-read attribute not enabled)', Hash
         end
       end
@@ -688,7 +715,7 @@ class ReaderTest < Minitest::Test
           input = 'include::http://example.org/team.adoc[]'
           doc = Asciidoctor::Document.new input, safe: :secure
           reader = doc.reader
-          assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
           assert_empty logger.messages
         end
       end

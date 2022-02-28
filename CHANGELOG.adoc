@@ -56,7 +56,8 @@ Improvements::
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
-  * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*zkaip*)
+  * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*@zkaip*)
+  * Add include role to link/URL macro that replaces include directive when include is not enabled
 
 Bug Fixes::
 
@@ -98,7 +99,7 @@ Improvements::
   * Remove obsolete gist embed styles from default stylesheet
   * Allow `--failure-level` to be set to default value, `FATAL`
   * Sort levels in help for `--failure-level` option in ascending order
-  * Invert FR translations for caution & warning admonition labels (#4212) (*cyChop*)
+  * Invert FR translations for caution & warning admonition labels (#4212) (*@cyChop*)
   * Add tests for open-uri-cached integration that is activated by the `cache-uri` attribute
   * Don't warn if negated tag is not found in include file (#4230)
 
