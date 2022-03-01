@@ -628,6 +628,16 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:include-file.adoc[]', reader.read_line
       end
 
+      test 'include directive with remote target is converted to a link when allow-uri-read is not set' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
+          logger.messages.empty?
+        end
+      end
+
       test 'include directive is enabled when safe mode is less than SECURE' do
         input = 'include::fixtures/include-file.adoc[]'
         doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
