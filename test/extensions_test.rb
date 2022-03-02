@@ -1023,7 +1023,7 @@ context 'Extensions' do
       end
     end
 
-    test 'should not parse attributes when resolve attributes is false' do
+    test 'should not parse attributes on custom block macro when resolve attributes is false' do
       input = 'log::[hello, world!]'
 
       begin
@@ -1047,7 +1047,7 @@ context 'Extensions' do
       end
     end
 
-    test 'should not parse attributes when content model is :text' do
+    test 'should not parse attributes on custom block macro when content model is :text' do
       input = 'log::[hello, world!]'
 
       begin
