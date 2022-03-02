@@ -1270,6 +1270,48 @@ context 'Extensions' do
       end
     end
 
+    test 'should not parse attributes on custom inline macro when resolve attributes is false' do
+      input = 'Line is del:[good]great.'
+
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :del do
+            match_format :short
+            resolve_attributes false
+            process do |parent, _, attrs|
+              create_inline parent, :quoted, attrs['text'], type: :unquoted, attributes: { 'role' => 'line-through' }
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_includes output, '<span class="line-through">good</span>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not parse attributes on custom inline macro when content model is text' do
+      input = 'Line is del:[good]great.'
+
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :del do
+            match_format :short
+            content_model :text
+            process do |parent, _, attrs|
+              create_inline parent, :quoted, attrs['text'], type: :unquoted, attributes: { 'role' => 'line-through' }
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_includes output, '<span class="line-through">good</span>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should resolve regexp for inline macro lazily' do
       begin
         Asciidoctor::Extensions.register do
