@@ -1023,6 +1023,54 @@ context 'Extensions' do
       end
     end
 
+    test 'should not parse attributes when resolve attributes is false' do
+      input = 'log::[hello, world!]'
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :log do
+            resolve_attributes false
+            process do |parent, _, attrs|
+              parent.logger.info attrs['text']
+              nil
+            end
+          end
+        end
+
+        using_memory_logger :INFO do |logger|
+          output = convert_string_to_embedded input
+          assert_empty output
+          assert_message logger, :INFO, 'hello, world!'
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not parse attributes when content model is :text' do
+      input = 'log::[hello, world!]'
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :log do
+            content_model :text
+            process do |parent, _, attrs|
+              parent.logger.info attrs['text']
+              nil
+            end
+          end
+        end
+
+        using_memory_logger :INFO do |logger|
+          output = convert_string_to_embedded input
+          assert_empty output
+          assert_message logger, :INFO, 'hello, world!'
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should substitute attributes in target of custom block macro' do
       input = 'snippet::{gist-id}[mode=edit]'
 
