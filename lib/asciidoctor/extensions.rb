@@ -1531,7 +1531,7 @@ module Extensions
     #
     # Returns nothing
     def unregister *names
-      names.each {|group| @groups.delete group.to_sym }
+      names.each_with_object(groups) {|group, catalog| catalog.delete group.to_sym }
       nil
     end
   end
