@@ -345,6 +345,19 @@ context 'Extensions' do
       end
     end
 
+    test 'should not fail to unregister extension group if not registered' do
+      refute_nil Asciidoctor::Extensions.groups
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+      Asciidoctor::Extensions.unregister :sample
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
+    test 'should not fail to unregister extension group if extension groups are not initialized' do
+      Asciidoctor::Extensions.remove_instance_variable :@groups
+      Asciidoctor::Extensions.unregister :sample
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
     test 'should raise NameError if extension class cannot be resolved from string' do
       begin
         Asciidoctor::Extensions.register do
