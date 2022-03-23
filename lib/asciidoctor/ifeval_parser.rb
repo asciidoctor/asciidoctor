@@ -43,8 +43,8 @@ class IfevalParser
     if str =~ /^\s*\d+/ ||                         # for number
        str =~ /^\s*[+\-*\/()]/ ||            # for operator
        str =~ /^\s*(==|!=|>=|<=|>|<)/ ||     # for equivalent
-       str =~ /^\s*"\S*"/ ||                 # for string
-       str =~ /^\s*{\S+}/ ||                 # for attribute
+       str =~ /^\s*"\S*?"/ ||                 # for string
+       str =~ /^\s*{\S*?}/ ||                 # for attribute
        str =~ /^\s*(not|and|or|true|false)/  # for binary operator
       token = $~[0]
       @next_pos += token.length
