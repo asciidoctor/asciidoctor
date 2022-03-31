@@ -210,7 +210,7 @@ If other AsciiDoc files are added to the same folder, and `docinfo` is set to `s
 [#resolving]
 == Locating docinfo files
 
-By default, docinfo files are searched for in the same folder as the document file.
+By default, docinfo files are searched for in `base_dir` which for standalone conversion of files is the same folder as the document file.
 If you want to keep them anywhere else, set the `docinfodir` attribute to their location:
 
 [source,asciidoc]
@@ -218,7 +218,9 @@ If you want to keep them anywhere else, set the `docinfodir` attribute to their 
 :docinfodir: common/meta
 ----
 
-Note that if you use this attribute, only the specified folder will be searched; docinfo files in the document folder will no longer be found.
+The value of `docinfodir` is resolved relative to `base_dir`.
+
+Note that if you use this attribute, only the specified folder will be searched; docinfo files in the default location will no longer be found.
 
 [#attribute-substitution]
 == Attribute substitution in docinfo files
