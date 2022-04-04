@@ -39,7 +39,7 @@ end
 #   puts Asciidoctor.convert "I'm using *Asciidoctor* version {asciidoctor-version}.", safe: :safe
 #
 #   # Convert an AsciiDoc file using Tilt-supported templates
-#   Asciidoctor.convert_file 'document.adoc', safe: :safe, template_dir: '/path/to/templates'
+#   Asciidoctor.convert_file 'document.adoc', safe: :safe, template_dirs: ['/path/to/templates']
 #
 #   # Parse an AsciiDoc file into a document object
 #   doc = Asciidoctor.load_file 'document.adoc', safe: :safe

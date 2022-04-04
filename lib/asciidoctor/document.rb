@@ -922,7 +922,7 @@ class Document < AbstractBlock
   end
 
   # Public: Convert the AsciiDoc document using the templates
-  # loaded by the Converter. If a :template_dir is not specified,
+  # loaded by the Converter. If :template_dirs is not specified,
   # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
   def convert opts = {}
