@@ -45,7 +45,7 @@ If _FILE_ is _-_ then the AsciiDoc source is read from standard input.
 
 *-a, --attribute*=_ATTRIBUTE_::
   Define, override, or unset a document attribute.
-  Command-line attributes take precedence over attributes defined in the source file unless either the name or value ends in _@_.
+  This attribute takes precedence over the same attribute defined in the source file unless either the name or value ends in _@_.
   No substitutions are applied to the value.
 +
 _ATTRIBUTE_ is normally formatted as a key-value pair, in the form _NAME=VALUE_.
@@ -87,7 +87,8 @@ This option may be specified more than once.
 
 *-I, --load-path*=_DIRECTORY_::
   Add the specified directory to the load path, so that _-r_ can load extensions from outside the default Ruby load path.
-  This option may be specified more than once.
++
+This option may be specified more than once.
 
 *-n, --section-numbers*::
   Auto-number section titles.
@@ -108,7 +109,8 @@ This option may be specified more than once.
 
 *-r, --require*=_LIBRARY_::
   Require the specified library before executing the processor, using the standard Ruby require.
-  This option may be specified more than once.
++
+This option may be specified more than once.
 
 *-s, --no-header-footer*::
   Output an embeddable document, which excludes the header, the footer, and everything outside the body of the document.
@@ -126,7 +128,7 @@ If there is a subfolder that matches the engine name (if specified), that folder
 Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path.
 +
 This option may be specified more than once.
-Matching templates found in subsequent directories override ones previously discovered.
+Matching templates in later directories override templates discovered in previous directories.
 
 === Processing Information
 

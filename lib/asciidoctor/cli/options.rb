@@ -86,8 +86,9 @@ module Asciidoctor
             self[:eruby] = eruby
           end
           opts.on '-a', '--attribute name[=value]', 'a document attribute to set in the form of name, name!, or name=value pair',
-            'this attribute takes precedence over the same attribute defined in the source document',
-            'unless either the name or value ends in @ (i.e., name@=value or name=value@)' do |attr|
+            'that takes precedence over the same attribute defined in the source document',
+            'unless either the name or value ends in @ (i.e., name@=value or name=value@)',
+            'may be specified more than once' do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
             attr = attr.encode UTF_8 unless attr.encoding == UTF_8
             name, _, val = attr.partition '='

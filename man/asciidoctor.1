@@ -66,7 +66,7 @@ If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is inv
 \fB\-a, \-\-attribute\fP=\fIATTRIBUTE\fP
 .RS 4
 Define, override, or unset a document attribute.
-Command\-line attributes take precedence over attributes defined in the source file unless either the name or value ends in \fI@\fP.
+This attribute takes precedence over the same attribute defined in the source file unless either the name or value ends in \fI@\fP.
 No substitutions are applied to the value.
 .sp
 \fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
@@ -119,6 +119,7 @@ This option is useful for producing documents that can be inserted into an exter
 \fB\-I, \-\-load\-path\fP=\fIDIRECTORY\fP
 .RS 4
 Add the specified directory to the load path, so that \fI\-r\fP can load extensions from outside the default Ruby load path.
+.sp
 This option may be specified more than once.
 .RE
 .sp
@@ -148,6 +149,7 @@ If specified, the directory is resolved relative to the working directory.
 \fB\-r, \-\-require\fP=\fILIBRARY\fP
 .RS 4
 Require the specified library before executing the processor, using the standard Ruby require.
+.sp
 This option may be specified more than once.
 .RE
 .sp
@@ -172,7 +174,7 @@ If there is a subfolder that matches the engine name (if specified), that folder
 Similarly, if there is a subfolder in the resulting template directory that matches the name of the backend, that folder is appended to the template directory path.
 .sp
 This option may be specified more than once.
-Matching templates found in subsequent directories override ones previously discovered.
+Matching templates in later directories override templates discovered in previous directories.
 .RE
 .SS "Processing Information"
 .sp
