@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White
-.\" Generator: Asciidoctor 2.0.16
-.\"      Date: 2021-08-03
+.\" Generator: Asciidoctor 2.1.0.dev
+.\"      Date: 2022-04-16
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 2.0.16
+.\"    Source: Asciidoctor 2.1.0.dev
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2021-08-03" "Asciidoctor 2.0.16" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2022-04-16" "Asciidoctor 2.1.0.dev" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -67,10 +67,11 @@ If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is inv
 .RS 4
 Define, override, or unset a document attribute.
 Command\-line attributes take precedence over attributes defined in the source file unless either the name or value ends in \fI@\fP.
+No substitutions are applied to the value.
 .sp
 \fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
 Alternate forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unsets the \fINAME\fP attribute), and \fINAME=VALUE@\fP (or \fINAME@=VALUE\fP) (where \fIVALUE\fP does not override the \fINAME\fP attribute if it\(cqs already defined in the source document).
-Values containing spaces should be enclosed in quotes.
+A value containing spaces must be enclosed in quotes, in the form \fINAME="VALUE WITH SPACES"\fP.
 .sp
 This option may be specified more than once.
 .RE
@@ -156,6 +157,12 @@ Output an embeddable document, which excludes the header, the footer, and everyt
 This option is useful for producing documents that can be inserted into an external template.
 .RE
 .sp
+\fB\-\-sourcemap\fP
+.RS 4
+Enable the sourcemap option on the parser, which instructs the parser to add source location information to each parsed block.
+The sourcemap information is useful for extensions that need access to the file and line number of blocks in the source document.
+.RE
+.sp
 \fB\-T, \-\-template\-dir\fP=\fIDIR\fP
 .RS 4
 A directory containing custom converter templates that override one or more templates from the built\-in set.
@@ -169,10 +176,15 @@ Matching templates found in subsequent directories override ones previously disc
 .RE
 .SS "Processing Information"
 .sp
+\fB\-\-log\-level\fP=\fILEVEL\fP
+.RS 4
+Set the minimum severity level (default: WARN) of application log messages that get reported.
+.RE
+.sp
 \fB\-\-failure\-level\fP=\fILEVEL\fP
 .RS 4
-The minimum logging level that triggers a non\-zero exit code (failure).
-If this option is not set (default: FATAL), the program exits with exit code zero even if warnings or errors have been logged.
+Set the minimum logging level (default: FATAL) that yields a non\-zero exit code (i.e., failure).
+If this option is not set, the program exits with a zero exit code even if warnings or errors have been logged.
 .RE
 .sp
 \fB\-q, \-\-quiet\fP
@@ -187,7 +199,8 @@ Include backtrace information when reporting errors.
 .sp
 \fB\-v, \-\-verbose\fP
 .RS 4
-Sets log level to DEBUG so application messages logged at INFO or DEBUG level are printed to stderr.
+Sets log level to DEBUG so all application log messages are printed to stderr, including DEBUG and INFO levels.
+If the \f(CR\-\-log\-level\fP option is also specified, it takes precedence.
 .RE
 .sp
 \fB\-w, \-\-warnings\fP
@@ -206,6 +219,7 @@ Print timings report to stderr (time to read, parse, and convert).
 Print a help message.
 Show the command usage if \fITOPIC\fP is not specified or recognized.
 Dump the Asciidoctor man page (in troff/groff format) if \fITOPIC\fP is \fImanpage\fP.
+Print an AsciiDoc syntax crib sheet (in AsciiDoc) if \fITOPIC\fP is \fIsyntax\fP.
 .RE
 .sp
 \fB\-V, \-\-version\fP
