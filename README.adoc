@@ -60,7 +60,7 @@ In addition to running on Ruby, Asciidoctor can be executed on a JVM using {url-
 
 ifndef::env-site,env-yard[]
 This document is also available in the following languages: +
-{url-rel-file-base}README-zh_CN.adoc[汉语]
+{url-rel-file-base}README-zh_CN.adoc[简体中文]
 |
 {url-rel-file-base}README-de.adoc[Deutsch]
 |
