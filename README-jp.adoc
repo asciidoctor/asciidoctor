@@ -72,7 +72,7 @@ ifndef::env-site,env-yard[]
 このドキュメントには以下の言語版が存在します: +
 {uri-rel-file-base}README.adoc[English]
 |
-{uri-rel-file-base}README-zh_CN.adoc[汉语]
+{uri-rel-file-base}README-zh_CN.adoc[简体中文]
 |
 {uri-rel-file-base}README-de.adoc[Deutsch]
 |
