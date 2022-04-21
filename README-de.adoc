@@ -64,7 +64,7 @@ Das Asciidoctor-Projekt wird {uri-repo}[auf GitHub] gehostet.
 
 ifndef::env-site[]
 Dieses Dokument ist auch in folgenden Sprachen erhältlich: +
-{uri-rel-file-base}README-zh_CN.adoc[汉语]
+{uri-rel-file-base}README-zh_CN.adoc[简体中文]
 |
 {uri-rel-file-base}README.adoc[English]
 |
