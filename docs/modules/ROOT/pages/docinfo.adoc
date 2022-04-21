@@ -210,15 +210,17 @@ If other AsciiDoc files are added to the same folder, and `docinfo` is set to `s
 [#resolving]
 == Locating docinfo files
 
-By default, docinfo files are searched for in the same folder as the document file.
-If you want to keep them anywhere else, set the `docinfodir` attribute to their location:
+By default, docinfo files are searched for in the same directory as the document file (which can be overridden by setting the `:base_dir` API option / `--base-dir` CLI option).
+If you want to load them from another location, set the `docinfodir` attribute to the directory where the files are located.
+If the value of the `docinfodir` attribute is a relative path, that value is appended to the document directory.
+If the value is an absolute path, that value is used as is.
 
 [source,asciidoc]
 ----
 :docinfodir: common/meta
 ----
 
-Note that if you use this attribute, only the specified folder will be searched; docinfo files in the document folder will no longer be found.
+Note that if you use this attribute, only the specified folder will be searched; docinfo files in the document directory will no longer be found.
 
 [#attribute-substitution]
 == Attribute substitution in docinfo files
