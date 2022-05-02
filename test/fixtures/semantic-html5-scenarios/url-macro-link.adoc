@@ -1,1 +1,1 @@
-Visit https://docs.asciidoctor.org[Asciidoctor Docs] to learn more about asciidoctor.
+Visit https://docs.asciidoctor.org[Asciidoctor Docs] to learn more about Asciidoctor.
