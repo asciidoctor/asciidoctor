@@ -67,6 +67,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_thematic_break node
+    "<hr />"
+  end
+
   def convert_inline_anchor node
     case node.type
     when :link
