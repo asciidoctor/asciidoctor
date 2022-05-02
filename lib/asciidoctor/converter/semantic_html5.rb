@@ -75,16 +75,16 @@ class Converter::SemanticHtml5Converter < Converter::Base
     roles = []
     roles << node.role if node.role
     roles << %(text-#{node.attr 'align'}) if node.attr? 'align'
-    roles << %(#{node.attr 'float'}) if node.attr? 'float'
-    role = roles.join " "
+    roles << (node.attr 'float').to_s if node.attr? 'float'
+    role = roles.join ' '
     attributes = common_html_attributes node.id, role.empty? ? nil : role
     size = []
-    size << %( width="#{node.attr "width"}") if node.attr? "width"
-    size << %( height="#{node.attr "height"}") if node.attr? "height"
+    size << %( width="#{node.attr 'width'}") if node.attr? 'width'
+    size << %( height="#{node.attr 'height'}") if node.attr? 'height'
     size = size.join
-    target = node.attr "target"
-    link_start = %(<a href="#{node.attr "link"}">) if node.attr? "link"
-    link_end = %(</a>) if node.attr? "link"
+    target = node.attr 'target'
+    link_start = %(<a href="#{node.attr 'link'}">) if node.attr? 'link'
+    link_end = %(</a>) if node.attr? 'link'
 
     if node.title?
       %(<figure#{attributes}>
@@ -100,15 +100,15 @@ class Converter::SemanticHtml5Converter < Converter::Base
     roles = []
     roles << node.role if node.role
     roles << %(text-#{node.attr 'align'}) if node.attr? 'align'
-    roles << %(#{node.attr 'float'}) if node.attr? 'float'
-    role = roles.join " "
+    roles << (node.attr 'float').to_s if node.attr? 'float'
+    role = roles.join ' '
     attributes = common_html_attributes node.id, role.empty? ? nil : role
     size = []
-    size << %( width="#{node.attr "width"}") if node.attr? "width"
-    size << %( height="#{node.attr "height"}") if node.attr? "height"
+    size << %( width="#{node.attr 'width'}") if node.attr? 'width'
+    size << %( height="#{node.attr 'height'}") if node.attr? 'height'
     size = size.join
     target = node.target
-    title = %( title="#{node.attr "title"}") if node.attr? "title"
+    title = %( title="#{node.attr 'title'}") if node.attr? 'title'
     %(<img src="#{target}" alt="#{encode_attribute_value node.alt}"#{title}#{attributes}#{size} />)
   end
 
