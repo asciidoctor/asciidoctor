@@ -71,6 +71,26 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_image node
+    attributes = common_html_attributes node.id, node.role
+    size = []
+    size << %( width="#{node.attr "width"}") if node.attr? "width"
+    size << %( height="#{node.attr "height"}") if node.attr? "height"
+    size = size.join
+    target = node.attr "target"
+    link_start = %(<a href="#{node.attr "link"}">) if node.attr? "link"
+    link_end = %(</a>) if node.attr? "link"
+
+    if node.title?
+      %(<figure#{attributes}>
+#{link_start}<img src="#{target}" alt="#{encode_attribute_value node.alt}"#{size} />#{link_end}
+<figcaption>#{node.captioned_title}</figcaption>
+</figure>)
+    else
+      %(#{link_start}<img src="#{target}" alt="#{encode_attribute_value node.alt}"#{attributes}#{size} />#{link_end})
+    end
+  end
+
   def convert_inline_anchor node
     case node.type
     when :link
@@ -218,6 +238,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
     attrs << %( rel="#{link_types.join ' '}") unless link_types.empty?
     attrs
+  end
+
+  def encode_attribute_value val
+    (val.include? '"') ? (val.gsub '"', '&quot;') : val
   end
 end
 end

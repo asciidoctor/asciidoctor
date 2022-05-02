@@ -1,0 +1,4 @@
+This is a block image.
+
+[#the_image.role_1.role_2]
+image::../dot.gif[A dot image]

@@ -1,0 +1,3 @@
+This is a block image with no stated alt. AsciiDoctor replaces the alt with unpathified filename.
+
+image::../dot.gif[]

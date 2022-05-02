@@ -1,0 +1,6 @@
+This is a block image link with a caption.
+
+[#the_image.role_1.role_2]
+.Image of a dot.
+[link=https://docs.asciidoctor.org]
+image::../dot.gif[A dot image, 100, 100]
