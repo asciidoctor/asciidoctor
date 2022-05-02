@@ -72,7 +72,12 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_image node
-    attributes = common_html_attributes node.id, node.role
+    roles = []
+    roles << node.role if node.role
+    roles << %(text-#{node.attr 'align'}) if node.attr? 'align'
+    roles << %(#{node.attr 'float'}) if node.attr? 'float'
+    role = roles.join " "
+    attributes = common_html_attributes node.id, role.empty? ? nil : role
     size = []
     size << %( width="#{node.attr "width"}") if node.attr? "width"
     size << %( height="#{node.attr "height"}") if node.attr? "height"
@@ -89,6 +94,22 @@ class Converter::SemanticHtml5Converter < Converter::Base
     else
       %(#{link_start}<img src="#{target}" alt="#{encode_attribute_value node.alt}"#{attributes}#{size} />#{link_end})
     end
+  end
+
+  def convert_inline_image node
+    roles = []
+    roles << node.role if node.role
+    roles << %(text-#{node.attr 'align'}) if node.attr? 'align'
+    roles << %(#{node.attr 'float'}) if node.attr? 'float'
+    role = roles.join " "
+    attributes = common_html_attributes node.id, role.empty? ? nil : role
+    size = []
+    size << %( width="#{node.attr "width"}") if node.attr? "width"
+    size << %( height="#{node.attr "height"}") if node.attr? "height"
+    size = size.join
+    target = node.target
+    title = %( title="#{node.attr "title"}") if node.attr? "title"
+    %(<img src="#{target}" alt="#{encode_attribute_value node.alt}"#{title}#{attributes}#{size} />)
   end
 
   def convert_inline_anchor node

@@ -1,0 +1,1 @@
+This is an inline image. image:../dot.gif[inline dot, role="role_1 role_2"] Did you see it?
