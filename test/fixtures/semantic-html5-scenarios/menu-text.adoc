@@ -1,0 +1,9 @@
+:experimental:
+
+Open the menu:file[] menu.
+
+To save, select menu:file[save].
+
+To order grape soda: menu:Drinks[Soda > Grape].
+
+To order a hamburger: menu:Entrees[Sandwiches > Burgers > Hamburger], or a cheeseburger: menu:Entrees[Sandwiches > Burgers > Cheeseburger].
