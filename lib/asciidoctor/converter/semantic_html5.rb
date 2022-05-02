@@ -108,10 +108,10 @@ class Converter::SemanticHtml5Converter < Converter::Base
     when :subscript
       %(<sub#{attributes}>#{node.text}</sub>)
     when :single
-      attributes = common_html_attributes node.id, node.role, 'single_quote'
+      attributes = common_html_attributes node.id, node.role, 'singlequote'
       %(<span#{attributes}>&#8216;#{node.text}&#8217;</span>)
     when :double
-      attributes = common_html_attributes node.id, node.role, 'double_quote'
+      attributes = common_html_attributes node.id, node.role, 'doublequote'
       %(<span#{attributes}>&#8220;#{node.text}&#8221;</span>)
     else
       %(<span#{attributes}>#{node.text}</span>)
