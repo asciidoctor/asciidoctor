@@ -22,6 +22,10 @@ Install using `dnf` (Fedora-based systems)::
 +
  $ sudo dnf install rubygem-rouge
 
+Install using `pacman` (ArchLinux-based systems)::
++
+ $ sudo pacman -S ruby-rouge
+
 == Assign rouge to source-highlighter
 
 Once you've installed the RubyGem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
