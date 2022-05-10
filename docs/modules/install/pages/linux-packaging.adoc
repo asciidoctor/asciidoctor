@@ -52,7 +52,7 @@ include::partial$success.adoc[]
 [#pacman]
 == pacman (Arch Linux)
 
-To install the gem on Arch-based distributions, open a terminal and type:
+To install the gem on Arch Linux-based distributions, open a terminal and type:
 
  $ sudo pacman -S asciidoctor
 
