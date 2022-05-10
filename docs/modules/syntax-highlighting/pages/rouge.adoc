@@ -22,7 +22,7 @@ Install using `dnf` (Fedora-based systems)::
 +
  $ sudo dnf install rubygem-rouge
 
-Install using `pacman` (ArchLinux-based systems)::
+Install using `pacman` (Arch Linux-based systems)::
 +
  $ sudo pacman -S ruby-rouge
 
