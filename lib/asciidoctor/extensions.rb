@@ -201,6 +201,20 @@ module Extensions
       block
     end
 
+    # Public: Creates an inline node and binds it to the specified parent.
+    #
+    # parent  - The parent Block of this new inline node.
+    # context - The context of the inline node to create (e.g., :quoted, :anchor, etc).
+    # text    - The text of the inline node.
+    # opts    - An optional Hash of options (default: {}):
+    #           :type - The subtype of the inline node context. For a :quoted node, this can be
+    #                   :strong, :emphasis, :monospaced, etc. For an :anchor node, this can be
+    #                   :xref, :link, :ref, etc.
+    #           :attributes - The attributes to set on the inline node. If the "subs" attribute is
+    #                         specified, the convert will apply the specified substitutions to the
+    #                         text of the inline node.
+    #
+    # Returns an [Inline] node with all properties properly initialized.
     def create_inline parent, context, text, opts = {}
       Inline.new parent, context, text, context == :quoted ? ({ type: :unquoted }.merge opts) : opts
     end
