@@ -10,7 +10,6 @@
 :url-intellij-plugin-quickstart: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/quick-start.html
 :url-intellij-plugin-features: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/features.html
 :url-scite: https://www.scintilla.org/SciTE.html
-:url-scite-asciidoc-lexer: https://sourceforge.net/p/scintilla/scite/ci/default/tree/src/asciidoc.properties
 
 Since AsciiDoc syntax is just plain text, you can write an AsciiDoc document using any text editor.
 You don't need complex word processing programs like Microsoft Word or Google Docs.
@@ -95,12 +94,11 @@ It works with the free community editions as well as with the paid editions of I
 
 === SciTE
 
-Install {url-scite}[SciTE^] 5.1.6 or later. To enable the Asciidoc lexer:
+Install {url-scite}[SciTE^] 5.2.3 or later. To enable the Asciidoc lexer:
 
-. Copy {url-scite-asciidoc-lexer}[`asciidoc.properties`^] (already bundled with SciTE 5.2.3 and later) to the directory where all other language properties files are installed.
 . Edit the user properties file and remove `asciidoc` from the list in `imports.exclude`.
 . Restart SciTE.
-. SciTE will automatically apply Asciidoc syntax highlighting to files ending in `.adoc` and `.asciidoc`. To manually apply to files with other extensions, click :Language[Asciidoc].
+. SciTE will automatically apply Asciidoc syntax highlighting to files ending in `.adoc` and `.asciidoc`. To manually apply to files with other extensions, click menu:Language[Asciidoc].
 
 === Visual Studio Code
 
