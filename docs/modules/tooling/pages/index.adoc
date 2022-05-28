@@ -94,11 +94,12 @@ It works with the free community editions as well as with the paid editions of I
 
 === SciTE
 
-Install {url-scite}[SciTE^] 5.2.3 or later. To enable the Asciidoc lexer:
+Install {url-scite}[SciTE^] 5.2.3 or later.
+To enable the AsciiDoc lexer, follow these steps:
 
 . Edit the user properties file and remove `asciidoc` from the list in `imports.exclude`.
 . Restart SciTE.
-. SciTE will automatically apply Asciidoc syntax highlighting to files ending in `.adoc` and `.asciidoc`. To manually apply to files with other extensions, click menu:Language[Asciidoc].
+. SciTE will automatically apply AsciiDoc syntax highlighting to files ending in `.adoc` and `.asciidoc`.
 
 === Visual Studio Code
 
