@@ -9,6 +9,7 @@
 :url-eclipse-plugin-github: https://github.com/de-jcup/eclipse-asciidoctor-editor
 :url-intellij-plugin-quickstart: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/quick-start.html
 :url-intellij-plugin-features: https://intellij-asciidoc-plugin.ahus1.de/docs/users-guide/features.html
+:url-scite: https://www.scintilla.org/SciTE.html
 
 Since AsciiDoc syntax is just plain text, you can write an AsciiDoc document using any text editor.
 You don't need complex word processing programs like Microsoft Word or Google Docs.
@@ -48,7 +49,7 @@ Then you can see the AsciiDoc file rendered as HTML just by visiting it.
 
 == IDEs and text editors
 
-The following IDEs and text editors support the AsciiDoc syntax and provide document preview rendering with Asciidoctor.
+The following IDEs and text editors support the AsciiDoc syntax and most provide document preview rendering with Asciidoctor.
 
 === AsciiDocFX
 
@@ -90,6 +91,17 @@ It includes support for Antora and Spring REST Docs and creates PDFs using Ascii
 It works with the free community editions as well as with the paid editions of IntelliJ IDEA, CLion, PhpStorm, RubyMine, Android Studio etc.
 
 {url-intellij-plugin-quickstart}[Install the AsciiDoc plugin^] or {url-intellij-plugin-features}[learn more about its features^].
+
+=== SciTE
+
+Install {url-scite}[SciTE^] 5.2.3 or later.
+To enable the AsciiDoc lexer, follow these steps:
+
+. Edit the user properties file and remove `asciidoc` from the list in `imports.exclude`.
+. Restart SciTE.
+. SciTE will automatically apply AsciiDoc syntax highlighting to files ending in `.adoc` and `.asciidoc`.
+
+SciTE does not provide document preview rendering like other editors listed on this page.
 
 === Visual Studio Code
 
