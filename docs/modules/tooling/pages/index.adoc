@@ -49,7 +49,7 @@ Then you can see the AsciiDoc file rendered as HTML just by visiting it.
 
 == IDEs and text editors
 
-The following IDEs and text editors support the AsciiDoc syntax (all) and provide document preview rendering (except SciTE) with Asciidoctor.
+The following IDEs and text editors support the AsciiDoc syntax and most provide document preview rendering with Asciidoctor.
 
 === AsciiDocFX
 
@@ -100,6 +100,8 @@ To enable the AsciiDoc lexer, follow these steps:
 . Edit the user properties file and remove `asciidoc` from the list in `imports.exclude`.
 . Restart SciTE.
 . SciTE will automatically apply AsciiDoc syntax highlighting to files ending in `.adoc` and `.asciidoc`.
+
+SciTE does not provide document preview rendering like other editors listed on this page.
 
 === Visual Studio Code
 
