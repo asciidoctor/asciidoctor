@@ -1905,6 +1905,19 @@ context 'Tables' do
       assert_css 'table > tbody > tr > td:nth-child(2) table > tbody > tr > td', output, 1
     end
 
+    test 'AsciiDoc table cell should inherit to_dir option from parent document' do
+      doc = document_from_string <<~'EOS', parse: true, to_dir: testdir
+      |===
+      a|
+      AsciiDoc table cell
+      |===
+      EOS
+
+      nested_doc = (doc.blocks[0].find_by context: :document, traverse_documents: true)[0]
+      assert nested_doc.nested?
+      assert_equal doc.options[:to_dir], nested_doc.options[:to_dir]
+    end
+
     test 'AsciiDoc table cell should not inherit toc setting from parent document' do
       input = <<~'EOS'
       = Document Title
