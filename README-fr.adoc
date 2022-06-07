@@ -63,11 +63,13 @@ Le projet Asciidoctor est {uri-repo}[hébergé sur GitHub].
 
 ifndef::env-site[]
 Ce document est traduit dans les langues suivantes : +
-{uri-rel-file-base}README.adoc[Anglais]
+{uri-rel-file-base}README.adoc[English]
 |
-{uri-rel-file-base}README-zh_CN.adoc[Chinois]
+{uri-rel-file-base}README-zh_CN.adoc[简体中文]
 |
-{uri-rel-file-base}README-jp.adoc[Japonais]
+{uri-rel-file-base}README-jp.adoc[日本語]
+|
+{uri-rel-file-base}README-de.adoc[Deutsch]
 endif::[]
 
 .Documentation clé
