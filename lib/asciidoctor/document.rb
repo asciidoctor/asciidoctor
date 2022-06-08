@@ -257,6 +257,7 @@ class Document < AbstractBlock
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
+      options[:to_dir] = parent_doc.options[:to_dir] if parent_doc.options[:to_dir]
       @catalog = parent_doc.catalog.merge footnotes: []
       # QUESTION should we support setting attribute in parent document from nested document?
       @attribute_overrides = attr_overrides = (parent_doc.instance_variable_get :@attribute_overrides).merge parent_doc.attributes

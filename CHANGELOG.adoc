@@ -17,6 +17,10 @@ This project utilizes semantic versioning.
 
 == Unreleased
 
+Improvements::
+
+  * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
+
 Bug Fixes::
 
   * Don't raise error if `Asciidoctor::Extensions.unregister` is called before groups are initialized (#4270)
