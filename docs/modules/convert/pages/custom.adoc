@@ -295,6 +295,7 @@ If we change the definition of our converter class to extend {apidoc-converter-b
 One noticeable difference is that we now either have to provide a handler for every xref:contexts-ref.adoc[convertible context], or implement a `method_missing` method as a catch all.
 Here's how that looks:
 
+.dita-converter.rb
 [,ruby]
 ----
 class DitaConverter < Asciidoctor::Converter::Base
@@ -341,8 +342,9 @@ To do so, pass the converter to the `-r` CLI option and set the backend to `dita
 
  $ asciidoctor -r ./dita-converter.rb -b dita doc.adoc
 
-Here's an example of the output you will get:
+Here's an example of the output you will get, which is automatically written to the [.path]_doc.dita_ file.
 
+.doc.dita
 [,xml]
 ----
 <!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN" "topic.dtd">
@@ -371,3 +373,52 @@ Asciidoctor.convert_file 'doc.adoc', safe: :safe, backend: 'dita', converter: Di
 ----
 
 To write a fully-functional converter, you'll need to provide a convert method for all convertible contexts (or provide a fallback for contexts the converter does not handle).
+
+== Convert to text only
+
+You may want to extract the text from an AsciiDoc document without any markup.
+Since there's no single definition of what "plain text" is, this is a perfect opportunity to use a custom converter
+
+Begin by defining a `TextConverter` that is registered with the `text` backend, as follows:
+
+.text-converter.rb
+[,rb]
+----
+class TextConverter
+  include Asciidoctor::Converter
+  register_for 'text'
+  def initialize *args
+    super
+    outfilesuffix '.txt'
+  end
+  def convert node, transform = node.node_name, opts = nil
+    case transform
+    when 'document', 'section'
+      [node.title, node.content].join %(\n\n)
+    when 'paragraph'
+      (node.content.tr ?\n, ' ') << ?\n
+    else
+      (transform.start_with? 'inline_') ? node.text : node.content
+    end
+  end
+end
+----
+
+You can now use this converter to convert the sample AsciiDoc document to text.
+To do so, pass the converter to the `-r` CLI option and set the backend to `text` using the `b` CLI option.
+
+ $ asciidoctor -r ./text-converter.rb -b text doc.adoc
+
+Here's an example of the output you will get, which is automatically written to the [.path]_doc.txt_ file.
+
+.doc.txt
+[,xml]
+----
+Document Title
+
+Section Title
+
+This is the main content.
+----
+
+If you need to retain some text notations, you can add them back while the document is converted, where necessary.
