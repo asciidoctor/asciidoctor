@@ -1267,7 +1267,7 @@ class PreprocessorReader < Reader
 
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
-    return unless (delim = data[0]) == '---'
+    return unless (delim = data[0]) == '---' || delim == '+++'
     original_data = data.drop 0
     data.shift
     front_matter = []

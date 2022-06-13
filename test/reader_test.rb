@@ -556,6 +556,31 @@ class ReaderTest < Minitest::Test
         assert_equal front_matter, doc.attributes['front-matter']
         assert_equal 7, reader.lineno
       end
+
+      test 'should skip TOML front matter if specified by skip-front-matter attribute' do
+        front_matter = <<~'EOS'.chop
+        layout = 'post'
+        title = 'Document Title'
+        author = 'username'
+        tags = ['first', 'second']
+        EOS
+
+        input = <<~EOS
+        +++
+        #{front_matter}
+        +++
+        = Document Title
+        Author Name
+
+        preamble
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'skip-front-matter' => '' }
+        reader = doc.reader
+        assert_equal '= Document Title', reader.peek_line
+        assert_equal front_matter, doc.attributes['front-matter']
+        assert_equal 7, reader.lineno
+      end
     end
 
     context 'Include Stack' do
