@@ -84,74 +84,74 @@ endif::[]
 
 == 赞助商
 
-我们想感谢我们的{url-project}/supporters[赞助商]致力于通过支持此项目来改善技术文档的生态。谢谢赞助商！没有你们的慷慨支持，Asciidoctor 是不可能的。
+我们想感谢我们的{url-project}/supporters[赞助商]致力于通过支持此项目来改善技术文档的生态。谢谢赞助商！没有你们的慷慨支持，Asciidoctor 不可能持续下去。
 
 你可以通过 https://opencollective.com/asciidoctor[OpenCollective] 成为发起人来支持此项目。
 
 == AsciiDoc 处理器和内置转换器
 
-AsciiDoc is the language. +
-Asciidoctor is the processor.
+AsciiDoc 是语言。
+Asciidoctor 是处理器。
 
-Asciidoctor reads the AsciiDoc source, as shown in the panel on the left in the image below, and converts it to publishable formats, such as HTML 5, as shown rendered in the panel on the right.
+Asciidoctor 读取AsciiDoc源文档，如下图左侧面板所示，并将其转换为可发布格式，如 HTML 5，如右侧面板所示。
 
 image::{image-url-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
-Asciidoctor provides built-in {url-docs}/asciidoctor/latest/converters/[converters] for three output formats by default: {url-docs}/asciidoctor/latest/html-backend/[HTML 5], {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5], and {url-docs}/asciidoctor/latest/manpage-backend/[man page] (short for manual page).
-Additional converters, such as PDF and EPUB 3, are provided by separate gems.
-Asciidoctor also provides an out-of-the-box HTML experience complete with a {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[default stylesheet] and built-in integrations like Font Awesome (for icons), highlight.js, Rouge, and Pygments (for source highlighting), and MathJax (for STEM processing).
+Asciidoctor 提供内置的 {url-docs}/asciidoctor/latest/converters/[转换器]，默认三种格式: {url-docs}/asciidoctor/latest/html-backend/[HTML 5]， {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5] 和 {url-docs}/asciidoctor/latest/manpage-backend/[手册页]。
+额外的转换器，如 PDF 和 EPUB 3 是由单独的 gem 提供的。
+Asciidoctor还提供开箱即用的HTML体验，并提供 {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[默认样式] 和内置集成，如 Font Awesome (为图标设计的)、highlight.js、Rouge、和 Pygments （代码高亮），and MathJax（STEM 处理）。
 
-== Asciidoctor Ecosystem
+== Asciidoctor 生态系统
 
-Although Asciidoctor is written in Ruby, it does not mean you need Ruby to use it.
-Asciidoctor can be executed on a JVM using {url-docs}/asciidoctorj/latest/[AsciidoctorJ] or in any JavaScript environment (including the browser) using {url-docs}/asciidoctor.js/latest/[Asciidoctor.js].
+虽然 Asciidoctor 是 Ruby 编写的，但并不是说你一定要使用 Ruby。
+使用 {url-asciidoctorj}[AsciidoctorJ] 直接调用 Asciidoctor 的 API 运行在 Java 或者其他 Java 虚拟机中。
+使用 {url-asciidoctorjs}[Asciidoctor.js] 运行在 JavaScript 当中。
 
-Installing an Asciidoctor processor is just the beginning of your publishing experience.
-Asciidoctor gives you access to a ecosystem of extensions and tools, ranging from add-on converters, to extended syntax, to build plugins, to integrated writing and preview environments:
+安装 Asciidoctor 处理器只是文档体验的开始。
+Asciidoctor 使你可以访问扩展和工具的生态系统，从附加的转换器到扩展语法、构建插件，再到集成的写入和预览环境：
 
-* {url-docs}/diagram-extension/latest/[Asciidoctor Diagram]
-* {url-docs}/maven-tools/latest/[Maven plugin and site module]
-* {url-gradle-plugin}[Gradle plugin]
+* {url-docs}/diagram-extension/latest/[Asciidoctor 图表]
+* {url-docs}/maven-tools/latest/[Maven 插件 and site 模块]
+* {url-gradle-plugin}[Gradle 插件]
 * {url-docs}/asciidoclet/latest/[Asciidoclet]
-* {url-docs}/reveal.js-converter/latest/[reveal.js converter]
-* {url-docs}/epub3-converter/latest/[EPUB 3 converter]
-* https://intellij-asciidoc-plugin.ahus1.de/docs[IntelliJ plugin]
-* {url-docs}/asciidoctor/latest/tooling/#web-browser-add-ons-preview-only[web browser extensions]
-* {url-org}[and more]
+* {url-docs}/reveal.js-converter/latest/[reveal.js 转换器]
+* {url-docs}/epub3-converter/latest/[EPUB 3 转换器]
+* https://intellij-asciidoc-plugin.ahus1.de/docs[IntelliJ 插件]
+* {url-docs}/asciidoctor/latest/tooling/#web-browser-add-ons-preview-only[web 浏览器扩展]
+* {url-org}[更多...]
 
-Asciidoctor is the successor to AsciiDoc.py.
-If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-py/[Migrate from AsciiDoc.py] to learn how to upgrade to Asciidoctor.
+Asciidoctor 是 AsciiDoc.py 的继承者。
+如果你正在使用 AsciiDoc.py，参见 {url-docs}/asciidoctor/latest/migrate/asciidoc-py/[从 AsciiDoc.py 迁移] 去学习如何升级到 Asciidoctor。
 
-== Requirements
+== 环境要求
 
-Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
+Asciidoctor 可以在 Linux、macOS 和 Windows 上运行，需要 {url-ruby}[Ruby] 的以下实现之一：
 
-* CRuby (aka MRI) 2.3 - 3.0
+* CRuby（也被称为 MRI）2.3 - 3.0
 * JRuby 9.1 - 9.2
-* TruffleRuby (GraalVM)
+* TruffleRuby（GraalVM）
 
-[CAUTION]
+[注意]
 ====
-If you're using a non-English Windows environment, you may bump into an `Encoding::UndefinedConversionError` when invoking Asciidoctor.
-To solve this issue, we recommend changing the active code page in your console to UTF-8:
+如果你正在使用一个非英语的 Windows 环境，当调用 Asciidoctor 时，你可能会遇到 `Encoding::UndefinedConversionError`。
+为了解决这个问题，我们建议将控制台中的编码更改为 UTF-8：
 
  chcp 65001
 
-Once you make this change, all your Unicode headaches will be behind you.
-If you're using an IDE like Eclipse, make sure you set the encoding to UTF-8 there as well.
-Asciidoctor works best when you use UTF-8 everywhere.
+一旦你做出了这个改变，你所有的关于 Unicode 的麻烦都将挥之而去。
+如果您使用的是 Eclipse 这样的IDE，请确保将编码设置为 UTF-8。当您在任何地方都使用 UTF-8 时，Asciidoctor 的工作效果最好。
 ====
 
-== Installation
+== 安装
 
-Asciidoctor is packaged and distributed to RubyGems.org as a RubyGem (aka gem) named {url-rubygem}[asciidoctor^].
-The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
-Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew and MacPorts).
+Asciidoctor 在 RubyGems.org 上以 RubyGem（也被称为 gem）的形式打包和分发，被命名为 {url-rubygem}[asciidoctor^]。
+asciidoctor gem 可以使用 Ruby 打包工具安装在所有主要操作系统上（gem 或 bundle）。
+Asciidoctor 还作为 Docker 镜像分发，作为许多 Linux 发行版的软件包分发，以及作为 macOS 的软件包分发（通过 Homebrew 和 MacPorts）。
 
-=== Linux package managers
+=== Linux 包管理器
 
-The version of Asciidoctor installed by the package manager may not match the latest release of Asciidoctor.
-Consult the package repository for your distribution to find out which version is packaged per distribution release.
+包管理器安装的 Asciidoctor 版本可能与 Asciidoctor 的最新版本不匹配。
+请查阅发行版的软件包存储库，以了解每个发行版打包的版本。
 
 * https://pkgs.alpinelinux.org/packages?name=asciidoctor[Alpine Linux (asciidoctor)]
 * https://www.archlinux.org/packages/?name=asciidoctor[Arch Linux (asciidoctor)]
@@ -160,31 +160,31 @@ Consult the package repository for your distribution to find out which version i
 * https://software.opensuse.org/package/rubygem-asciidoctor[OpenSUSE (rubygem-asciidoctor)]
 * https://packages.ubuntu.com/search?keywords=asciidoctor[Ubuntu (asciidoctor)]
 
-If you want to use a version of Asciidoctor that's newer than what is installed by the package manager, see the <<gem-install,gem installation instructions>>.
+如果您想使用更高版本的 Asciidoctor，参见 <<gem-install,gem 安装说明>>。
 
 ==== apk (Alpine Linux)
 
-To install the gem on Alpine Linux, open a terminal and type:
+在 Alpine Linux 上安装 gem，打开终端并键入：
 
  $ sudo apk add asciidoctor
 
 ==== pacman (Arch Linux)
 
-To install the gem on Arch-based distributions, open a terminal and type:
+在基于 Arch 的发行版上安装, 打开终端并键入：
 
  $ sudo pacman -S asciidoctor
 
 ==== APT
 
-On Debian and Debian-based distributions such as Ubuntu, use APT to install Asciidoctor.
-To install the package, open a terminal and type:
+在 Ubuntu 等基于 Debian 和 Debian 的发行版上，使用 APT 安装 Asciidoctor。
+要安装，打开终端并键入：
 
  $ sudo apt-get install -y asciidoctor
 
 ==== DNF
 
-On RPM-based Linux distributions, such as Fedora, CentOS, and RHEL, use the DNF package manager to install Asciidoctor.
-To install the package, open a terminal and type:
+在基于 RPM 的 Linux 发行版（如 Fedora、CentOS 和 RHEL）上，使用 DNF 包管理器安装 Asciidoctor。
+要安装，打开终端并键入：
 
  $ sudo dnf install -y asciidoctor
 
@@ -192,11 +192,11 @@ To install the package, open a terminal and type:
 
 ==== Homebrew
 
-You can use https://brew.sh[Homebrew], the macOS package manager, to install Asciidoctor.
-If you don't have Homebrew on your computer, complete the https://brew.sh[installation instructions] first.
+你可以使用 https://brew.sh[Homebrew]，macOS 包管理器，去安装 Asciidoctor。
+如果你的电脑上没有 Homebrew，先 https://brew.sh[安装] 它。
 
-Once Homebrew is installed, you're ready to install the `asciidoctor` gem.
-Open a terminal and type:
+Homebrew 安装好以后，你就可以安装 `asciidoctor` gem 了。
+打开终端并键入：
 
  $ brew install asciidoctor
 
@@ -204,25 +204,25 @@ Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independ
 
 ==== MacPorts
 
-You can also use https://www.macports.org[MacPorts], another package manager for macOS, to install Asciidoctor.
-If you don't have MacPorts on your computer, complete the https://www.macports.org/install.php[installation instructions] first.
+你也可以使用 https://www.macports.org[MacPorts]，macOS 的包管理器，用于安装 Asciidoctor。
+如果您的计算机上没有 MacPorts，先 https://www.macports.org/install.php[安装] 。
 
-Once MacPorts is installed, you're ready to install the `asciidoctor` gem via the https://ports.macports.org/port/asciidoctor/[Asciidoctor port].
-Open a terminal and type:
+安装 MacPorts 后，你就可以通过 https://ports.macports.org/port/asciidoctor/[Asciidoctor port] 安装 `asciidoctor` gem 了。
+打开终端并键入：
 
  $ sudo port install asciidoctor
 
 === Windows
 
-To use Asciidoctor with Windows, you have two options.
+要在 Windows 上使用 Asciidoctor，你有两个选择：
 
 ==== Chocolatey
 
-When you already use https://chocolatey.org[chocolatey] on your machine, you can use:
+当你已经使用 https://chocolatey.org[chocolatey] ，你可以使用：
 
  choco install ruby
 
-Then follow <<gem-install,gem installation instructions>>.
+然后参照 <<gem-install,gem 安装说明>>.
 
 ==== Rubyinstaller
 
