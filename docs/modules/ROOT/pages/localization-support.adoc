@@ -48,14 +48,21 @@ One way is to set the following attributes in the document header or by passing 
 |Appendix
 |
 
+|`appendix-refsig`
+|Appendix
+|Used when referencing an appendix.
+
 |`caution-caption`
 |Caution
 |
 
-|`chapter-label`
+|`chapter-signifier`
 |Chapter
-|Applies only when `doctype` is `book`.
-PDF converter only.
+|Only applies when `doctype` is `book`.
+
+|`chapter-refsig`
+|Chapter
+|Used when referencing a chapter.
 
 |`example-caption`
 |Example
@@ -76,19 +83,31 @@ PDF converter only.
 |`listing-caption`
 |_not set_
 |By default, listing blocks do not have captions.
-Specify `listing-caption` to turn on listing block captions.
+Specify `listing-caption` to turn on captions for listing blocks.
 
 |`manname-title`
 |NAME
-|Applies only when `doctype` is `manpage`.
+|Only applies when `doctype` is `manpage`.
 
 |`note-caption`
 |Note
 |
 
+|`part-signifier`
+|Part
+|
+
+|`part-refsig`
+|Part
+|Used when referencing a part.
+
 |`preface-title`
 |_not set_
-|Applies only when `doctype` is `book`.
+|Only applies when `doctype` is `book`.
+
+|`section-refsig`
+|Section
+|Used when referencing a section.
 
 |`table-caption`
 |Table
