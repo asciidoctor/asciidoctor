@@ -262,7 +262,7 @@ gem 'asciidoctor'
 ----
 
 . 保存 Gemfile
-. 打开命令行安装 the gem，如下：
+. 打开命令行安装 gem：
 
  $ bundle
 
