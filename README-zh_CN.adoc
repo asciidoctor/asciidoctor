@@ -99,16 +99,16 @@ image::{image-url-screenshot}[Preview of AsciiDoc source and corresponding rende
 
 Asciidoctor 提供内置的 {url-docs}/asciidoctor/latest/converters/[转换器]，默认三种格式: {url-docs}/asciidoctor/latest/html-backend/[HTML 5]， {url-docs}/asciidoctor/latest/docbook-backend/[DocBook 5] 和 {url-docs}/asciidoctor/latest/manpage-backend/[手册]。
 额外的转换器，如 PDF 和 EPUB 3 是由单独的 gem 提供的。
-Asciidoctor还提供开箱即用的HTML体验，并提供 {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[默认样式] 和内置集成，如 Font Awesome (为图标设计的)、highlight.js、Rouge、和 Pygments （代码高亮），and MathJax（STEM 处理）。
+Asciidoctor还提供开箱即用的 HTML 体验，并提供 {url-docs}/asciidoctor/latest/html-backend/default-stylesheet/[默认样式] 和内置集成，如 Font Awesome (为图标设计的)、highlight.js、Rouge、和 Pygments （代码高亮）、和 MathJax（STEM 处理）。
 
 == Asciidoctor 生态系统
 
 虽然 Asciidoctor 是 Ruby 编写的，但并不是说你一定要使用 Ruby。
-使用 {url-asciidoctorj}[AsciidoctorJ] 直接调用 Asciidoctor 的 API 运行在 Java 或者其他 Java 虚拟机中。
-使用 {url-asciidoctorjs}[Asciidoctor.js] 运行在 JavaScript 当中。
+你可以使用 {url-asciidoctorj}[AsciidoctorJ] 直接调用 Asciidoctor 的 API 运行在 Java 或者其他 Java 虚拟机中。
+你可以使用 {url-asciidoctorjs}[Asciidoctor.js] 运行在 JavaScript 当中。
 
-安装 Asciidoctor 处理器只是文档体验的开始。
-Asciidoctor 使你可以访问扩展和工具的生态系统，从附加的转换器到扩展语法、构建插件，再到集成的写入和预览环境：
+安装 Asciidoctor 处理器只是文档处理体验的开始。
+Asciidoctor 使你可以使用扩展和工具的生态系统，从附加的转换器到扩展语法、构建插件，再到集成的写入和预览环境，都有相应的支持：
 
 * {url-docs}/diagram-extension/latest/[Asciidoctor 图表]
 * {url-docs}/maven-tools/latest/[Maven 插件 and site 模块]
@@ -139,14 +139,14 @@ Asciidoctor 可以在 Linux、macOS 和 Windows 上运行，需要 {url-ruby}[Ru
  chcp 65001
 
 一旦你做出了这个改变，你所有的关于 Unicode 的麻烦都将挥之而去。
-如果您使用的是 Eclipse 这样的IDE，请确保将编码设置为 UTF-8。当您在任何地方都使用 UTF-8 时，Asciidoctor 的工作效果最好。
+如果您使用的是 Eclipse 这样的 IDE，请确保将编码设置为 UTF-8。当您在任何地方都使用 UTF-8 时，Asciidoctor 的工作效果最好。
 ====
 
 == 安装
 
 Asciidoctor 在 RubyGems.org 上以 RubyGem（也被称为 gem）的形式打包和分发，被命名为 {url-rubygem}[asciidoctor^]。
 asciidoctor gem 可以使用 Ruby 打包工具安装在所有主要操作系统上（gem 或 bundle）。
-Asciidoctor 还作为 Docker 镜像分发，作为许多 Linux 发行版的软件包分发，以及作为 macOS 的软件包分发（通过 Homebrew 和 MacPorts）。
+Asciidoctor 还作为 Docker 镜像发行，作为许多 Linux 发行版的软件包发行，以及作为 macOS 的软件包发行（通过 Homebrew 和 MacPorts）。
 
 === Linux 包管理器
 
@@ -399,7 +399,7 @@ html = document.convert
 你需要注意的是，如果你不喜欢 Asciidoctor 的输出， _你可以改变！_
 Asciidoctor 支持自定义转换器，可以处理从解析文档到生成输出的转换。
 定制输出片段的一种简单方法是使用模板转换器。
-模板转换器允许您提供一个 {url-tilt}[Tilt]——以支持模板文件来处理转换文档中的任何节点。
+模板转换器允许您提供一个 {url-tilt}[Tilt]——以支持使用模板文件来处理转换文档中的任何节点。
 
 不管你怎么做，你都可以 100% 控制输出。
 有关如何使用 API 或定制输出的更多信息，请参见:
@@ -428,7 +428,7 @@ Asciidoctor 支持自定义转换器，可以处理从解析文档到生成输�
 * 修复 {url-issues}[issue]
 * 审查补丁
 
-{url-contribute}[贡献指南] 提供了关于如何创建，排版和提交 issue、特性请求、代码和文档到 Asciidoctor 的信息。
+{url-contribute}[贡献指南] 提供了关于如何创建、排版和提交 issue、特性请求、代码和文档到 Asciidoctor 的信息。
 
 == 获取帮助
 
