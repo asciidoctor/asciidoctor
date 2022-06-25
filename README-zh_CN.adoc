@@ -84,7 +84,7 @@ endif::[]
 
 == 赞助商
 
-我们想感谢我们的{url-project}/supporters[赞助商]致力于通过支持此项目来改善技术文档的生态。谢谢赞助商！没有你们的慷慨支持，Asciidoctor 不可能持续下去。
+我们想感谢我们的 {url-project}/supporters[赞助商] 致力于通过支持此项目来改善技术文档的生态。谢谢赞助商！没有你们的慷慨支持，Asciidoctor 不可能持续下去。
 
 你可以通过 https://opencollective.com/asciidoctor[OpenCollective] 成为发起人来支持此项目。
 
@@ -93,7 +93,7 @@ endif::[]
 AsciiDoc 是语言。
 Asciidoctor 是处理器。
 
-Asciidoctor 读取AsciiDoc源文档，如下图左侧面板所示，并将其转换为可发布格式，如 HTML 5，如右侧面板所示。
+Asciidoctor 读取 AsciiDoc 源文档，如下图左侧面板所示，并将其转换为可发布格式，如 HTML 5，如右侧面板所示。
 
 image::{image-url-screenshot}[Preview of AsciiDoc source and corresponding rendered HTML]
 
@@ -200,7 +200,7 @@ Homebrew 安装好以后，你就可以安装 `asciidoctor` gem 了。
 
  $ brew install asciidoctor
 
-Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independent of system gems.
+Homebrew 安装 `asciidoctor` gem 到一个独有的“前缀”中，它独立于系统的 gem。
 
 ==== MacPorts
 
@@ -222,36 +222,36 @@ Homebrew installs the `asciidoctor` gem into an exclusive prefix that's independ
 
  choco install ruby
 
-然后参照 <<gem-install,gem 安装说明>>.
+然后参照 <<gem-install,gem 安装说明>>。
 
 ==== Rubyinstaller
 
-Or you use the https://rubyinstaller.org/downloads/[Rubyinstaller], download the package for your Windows Version and after the installation go ahead with <<gem-install,gem installation instructions>>.
+或者你可以使用 https://rubyinstaller.org/downloads/[Rubyinstaller]，下载它，然后参照 <<gem-install,gem 安装说明>>。
 
 [#gem-install]
 === gem install
 
-Before installing Asciidoctor using `gem install`, you should set up https://rvm.io[RVM] (or similar) to install Ruby in your home directory (i.e., user space).
-Then, you can safely use the `gem` command to install or update the Asciidoctor gem, or any other gem for that matter.
-When using RVM, gems are installed in a location isolated from the system.
-(You should never use the gem command to install system-wide gems).
+在你使用 `gem install` 安装 AsciiDoctor 之前，你应该安装 https://rvm.io[RVM]（或者类似的软件）以在 home 目录下安装 Ruby.
+然后，你可以安全地使用 `gem` 命令去安装或更新 Asciidoctor gem，或者其它的 `gem` 命令。
+当使用 RVM,gem 安装在与系统隔离的位置。
+（您不应该使用 gem 命令安装系统范围的 gem）
 
-Once you've installed Ruby using RVM, and you have activated it using `rvm use 3.0`, open a terminal and type:
+使用 RVM 安装 Ruby 并使用 `rvm use 3.0` 激活 Ruby 后，打开终端并键入：
 
  $ gem install asciidoctor
 
-If you want to install a pre-release version (e.g., a release candidate), use:
+如果要安装预发布版本（例如，候选发布版本），请使用：
 
  $ gem install asciidoctor --pre
 
 === Docker
 
-See {url-install-docker}[Installing Asciidoctor using Docker].
+参见 {url-install-docker}[使用 Docker 安装 Asciidoctor]。
 
 === Bundler
 
-. Create a Gemfile in the root folder of your project (or the current directory)
-. Add the `asciidoctor` gem to your Gemfile as follows:
+. 在项目的根目录（或当前目录）中创建一个 Gemfile
+. 将 `asciidoctor` gem 像下面这样加入到 Gemfile 中：
 +
 [subs=attributes+]
 ----
@@ -261,63 +261,63 @@ gem 'asciidoctor'
 # gem 'asciidoctor', '{release-version}'
 ----
 
-. Save the Gemfile
-. Open a terminal and install the gem using:
+. 保存 Gemfile
+. 打开命令行安装 the gem，如下：
 
  $ bundle
 
-To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
-Using `bundle update` (without specifying a gem) is *not* recommended as it will also update other gems, which may not be the desired result.
+要更新 gem，在 Gemfile 指定新版本，再次运行 `bundle`。
+使用 `bundle update`（没有指定 gem）是不推荐的，因为它也更新了其他的 gem，可能这并不是预期的结果。
 
-== Upgrade
+== 更新
 
-If you installed Asciidoctor using a package manager, your operating system is probably configured to automatically update packages, in which case you don't need to update the gem manually.
+如果你使用包管理器来安装 Asciidoctor，你的操作系统可能配置为自动更新，在这种情况下，您不需要手动更新 gem。
 
 === apk (Alpine Linux)
 
-To upgrade the gem, use:
+更新 gem，使用：
 
  $ sudo apk add -u asciidoctor
 
 === APT
 
-To upgrade the gem, use:
+更新 gem，使用：
 
  $ sudo apt-get upgrade -y asciidoctor
 
 === DNF
 
-To upgrade the gem, use:
+更新 gem，使用：
 
  $ sudo dnf update -y asciidoctor
 
 === Homebrew (macOS)
 
-To upgrade the gem, use:
+更新 gem，使用：
 
  $ brew update
  $ brew upgrade asciidoctor
 
 === MacPorts (macOS)
 
-To upgrade the gem, use:
+更新 gem，使用：
 
  $ sudo port selfupdate
  $ sudo port upgrade asciidoctor
 
 === gem install
 
-If you previously installed Asciidoctor using the `gem` command, you'll need to manually upgrade Asciidoctor when a new version is released.
-You can upgrade the gem by typing:
+如果您以前使用 `gem` 命令安装 Asciidoctor，那么当新版本发布时，您需要手动升级 Asciidoctor。
+你可以执行下面的命令来进行更新：
 
  $ gem install asciidoctor
 
-When you install a new version of the gem using `gem install`, you end up with multiple versions installed.
-Use the following command to remove the old versions:
+当你使用 `gem install` 安装 gem 的新版本时，你最终会安装多个版本。
+使用下面的命令来移除旧版本：
 
  $ gem cleanup asciidoctor
 
-== Usage
+== 使用
 
 If the Asciidoctor gem installed successfully, the `asciidoctor` command line interface (CLI) will be available on your PATH.
 To verify it's available, run the following in your terminal:
@@ -494,5 +494,5 @@ ifeval::[{safe-mode-level} < 20]
 include::CHANGELOG.adoc[tag=compact,leveloffset=+1]
 endif::[]
 
-Refer to the {url-changelog}[CHANGELOG] for a complete list of changes in older releases.
+参见 {url-changelog}[CHANGELOG] 查看对旧版本中更改的完整列表。
 endif::[]
