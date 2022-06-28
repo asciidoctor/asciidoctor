@@ -27,6 +27,7 @@ module Asciidoctor
         self[:destination_dir] = options[:destination_dir]
         self[:log_level] = options[:log_level]
         self[:failure_level] = ::Logger::Severity::FATAL
+        self[:sourcemap] = options[:sourcemap]
         self[:trace] = false
         self[:timings] = false
       end
