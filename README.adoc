@@ -41,7 +41,7 @@ endif::[]
 :url-license: {url-rel-file-base}LICENSE
 :url-tests: {url-rel-tree-base}test
 :url-discuss: https://discuss.asciidoctor.org
-:url-chat: https://asciidoctor.zulipchat.com
+:url-chat: https://chat.asciidoctor.org
 :url-rubygem: https://rubygems.org/gems/asciidoctor
 :url-what-is-asciidoc: {url-docs}/asciidoctor/latest/#relationship-to-asciidoc
 :url-install-docker: https://github.com/asciidoctor/docker-asciidoctor
@@ -440,12 +440,13 @@ The {url-contribute}[Contributing] guide provides information on how to create, 
 == Getting Help
 
 Asciidoctor is developed to help you easily write and publish your content.
-But we can't do it without your feedback!
-We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
+But we can't do it without your input.
+If you need assistance or want to provide feedback, please follow the links to the resources listed on the https://docs.asciidoctor.org/about/support/[Get Help] page in the docs.
+Here's a quick summary:
 
-Chat (Zulip):: {url-chat}
-Discussion list (Nabble):: {url-discuss}
-Twitter:: Follow https://twitter.com/asciidoctor[@asciidoctor] or search for the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
+Project chat (Zulip):: {url-chat}
+Discussion list (archived):: {url-discuss}
+Social media (Twitter):: Follow https://twitter.com/asciidoctor[@asciidoctor] or search the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.
