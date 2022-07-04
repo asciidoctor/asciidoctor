@@ -591,6 +591,12 @@ context 'Substitutions' do
       assert_equal '<strong class="rolename">blah</strong>', para.content
     end
 
+    test 'should allow role to be defined using attribute reference' do
+      input = '[{rolename}]#phrase#'
+      result = convert_string_to_embedded input, doctype: 'inline', attributes: { 'rolename' => 'red' }
+      assert_equal '<span class="red">phrase</span>', result
+    end
+
     test 'should ignore attributes after comma' do
       para = block_from_string '[red, foobar]#alert#'
       assert_equal '<span class="red">alert</span>', para.sub_quotes(para.source)
