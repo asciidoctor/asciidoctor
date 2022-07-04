@@ -573,8 +573,8 @@ module Asciidoctor
   #
   # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
   InlinePassRx = {
-    false => ['+', '`', /(^|[^#{CC_WORD};:])(?:\[([^\]]+)\])?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
-    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:\[([^\]]+)\])?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m],
+    false => ['+', '`', /(^|[^#{CC_WORD};:])(?:#{QuoteAttributeListRxt})?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
+    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:#{QuoteAttributeListRxt})?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m],
   }
 
   # Matches an inline plus passthrough spanning multiple lines, but only when it occurs directly
@@ -595,7 +595,7 @@ module Asciidoctor
   #   pass:quotes[text]
   #
   # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc.py
-  InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
+  InlinePassMacroRx = /(?:(?:(\\?)#{QuoteAttributeListRxt})?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
   # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
   #
