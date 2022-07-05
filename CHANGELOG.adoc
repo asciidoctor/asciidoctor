@@ -27,6 +27,7 @@ Bug Fixes::
   * If path is included both partially and fully, store it with true value (included fully) in includes table of document catalog
   * Reset registry if activate is called on it again (#4256)
   * Format source location in exception message when extension code is malformed
+  * Fix lineno on reader when `skip-front-matter` attribute is set but end of front matter is not found
 
 // tag::compact[]
 == 2.0.17 (2022-01-05) - @mojavelinux

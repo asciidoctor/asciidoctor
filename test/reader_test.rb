@@ -511,6 +511,25 @@ class ReaderTest < Minitest::Test
         reader = doc.reader
         refute doc.attributes.key?('front-matter')
         assert_equal '---', reader.peek_line
+        assert_equal 1, reader.lineno
+      end
+
+      test 'should not skip front matter if ending delimiter is not found' do
+        input = <<~'EOS'
+        ---
+        title: Document Title
+        tags: [ first, second ]
+        = Document Title
+        Author Name
+
+        preamble
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'skip-front-matter' => '' }
+        reader = doc.reader
+        assert_equal '---', reader.peek_line
+        refute doc.attributes.key? 'front-matter'
+        assert_equal 1, reader.lineno
       end
 
       test 'should skip front matter if specified by skip-front-matter attribute' do
@@ -535,6 +554,7 @@ class ReaderTest < Minitest::Test
         reader = doc.reader
         assert_equal '= Document Title', reader.peek_line
         assert_equal front_matter, doc.attributes['front-matter']
+        assert_equal 7, reader.lineno
       end
     end
 
