@@ -1,0 +1,5 @@
+This is a first paragraph.
+
+---
+
+This is a paragraph after a break.
