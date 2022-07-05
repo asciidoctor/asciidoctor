@@ -1,0 +1,4 @@
+:experimental:
+
+Press kbd:[Shift] to enter capital numbers.
+Press kbd:[Ctrl+C] and kbd:[Ctrl+V] to copy and paste.

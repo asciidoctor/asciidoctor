@@ -80,6 +80,14 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_kbd node
+    if (keys = node.attr 'keys').size == 1
+      %(<kbd>#{keys[0]}</kbd>)
+    else
+      %(<span class="keyseq"><kbd>#{keys.join '</kbd>+<kbd>'}</kbd></span>)
+    end
+  end
+
   def generate_section_numbering node
     level = node.level
     doc_attrs = node.document.attributes
