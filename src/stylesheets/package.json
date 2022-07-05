@@ -15,6 +15,7 @@
     "lint": "stylelint *.css"
   },
   "browserslist": [
-    "defaults"
+    "defaults",
+    "IE 11"
   ]
 }
