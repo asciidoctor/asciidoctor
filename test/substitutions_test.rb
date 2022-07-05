@@ -203,6 +203,11 @@ context 'Substitutions' do
       assert_equal '<span class="statement">a few words</span>', para.sub_quotes(para.source)
     end
 
+    test 'does not recognize attribute list with left square bracket on formatted text' do
+      para = block_from_string 'key: [ *before [.redacted]#redacted# after* ]'
+      assert_equal 'key: [ <strong>before <span class="redacted">redacted</span> after</strong> ]', para.sub_quotes(para.source)
+    end
+
     test 'single-line constrained strong string' do
       para = block_from_string '*a few strong words*'
       assert_equal '<strong>a few strong words</strong>', para.sub_quotes(para.source)
