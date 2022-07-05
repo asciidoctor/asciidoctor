@@ -1267,27 +1267,22 @@ class PreprocessorReader < Reader
 
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
-    front_matter = nil
-    if data[0] == '---'
-      original_data = data.drop 0
-      data.shift
-      front_matter = []
+    return unless (delim = data[0]) == '---'
+    original_data = data.drop 0
+    data.shift
+    front_matter = []
+    @lineno += 1 if increment_linenos
+    until (eof = data.empty?) || data[0] == delim
+      front_matter << data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data[0] != '---'
-        front_matter << data.shift
-        @lineno += 1 if increment_linenos
-      end
-
-      if data.empty?
-        data.unshift(*original_data)
-        @lineno = 0 if increment_linenos
-        front_matter = nil
-      else
-        data.shift
-        @lineno += 1 if increment_linenos
-      end
     end
-
+    if eof
+      data.unshift(*original_data)
+      @lineno -= original_data.size if increment_linenos
+      return
+    end
+    data.shift
+    @lineno += 1 if increment_linenos
     front_matter
   end
 
