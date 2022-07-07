@@ -377,7 +377,7 @@ To write a fully-functional converter, you'll need to provide a convert method f
 == Convert to text only
 
 You may want to extract the text from an AsciiDoc document without any markup.
-Since there's no single definition of what "plain text" is, this is a perfect opportunity to use a custom converter
+Since there's no single definition of what "plain text" is, this is a perfect opportunity to use a custom converter.
 
 Begin by defining a `TextConverter` that is registered with the `text` backend, as follows:
 
