@@ -344,7 +344,7 @@ Instead, Asciidoctor provides an xref:extensions:register.adoc[extension API] th
 
 === Localization
 
-AsciiDoc.py had built-in [.path]_.conf_ files that translated built-in labels.
+AsciiDoc.py has built-in [.path]_.conf_ files that translated built-in labels.
 In Asciidoctor, you must define the translations for these labels explicitly.
 See xref:ROOT:localization-support.adoc[] for details.
 
@@ -377,6 +377,63 @@ a|
 
 AsciiDoc.py custom extensions are Python commands, so they don't work with Asciidoctor.
 Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions:index.adoc[extensions in Ruby, Java, or JavaScript].
+
+== Extract text
+
+AsciiDoc.py provides a frontend to the DocBook toolchain named a2x.py.
+This script can produce various output formats from an AsciiDoc document.
+One of those formats is text (aka "`plain text`").
+In order to extract the text, the DocBook toolchain first converts the AsciiDoc to HTML, then extracts the text from that document using lynx.
+
+There are numerous approaches to extracting text from AsciiDoc in Asciidoctor.
+One way is to write an Asciidoctor converter mapped to the `text` backend that xref:convert:custom.adoc#convert-to-text-only[converts AsciiDoc to text only].
+Another approach is to convert the AsciiDoc to HTML, then extract text from the HTML output document using a text-based browser, just like the DocBook toolchain does.
+
+Before continuing, it's worth noting that there's no universal definition of "`plain text`".
+It all depends on what information you are trying to extract.
+That's why you won't find a text backend provided by Asciidoctor core.
+Let's consider what tools are available.
+
+As an alternative to lynx, the text-based browser w3m does a nice job of extracting text from an HTML document.
+For example:
+
+ $ w3m -dump -cols 120 doc.html > doc.txt
+
+You can set the number of columns so lines aren't hard wrapped at a fixed line width.
+The upper bounds for this value is MAX_INT (2147483647).
+You can retrieve that value dynamically using Perl.
+
+ $ w3m -dump -cols $(perl -MPOSIX -e 'print INT_MAX') doc.html > doc.txt
+
+It doesn't seem possible to configure w3m to preserve markup that indicates headings.
+However, the text-based browser `elinks` offers this behavior by default through indentation.
+
+ $ elinks -dump 1 -no-references -no-numbering -dump-width 50000 doc.html > doc.txt
+
+Yet another option is the https://www.npmjs.com/package/html-to-text[html-to-text^] module for Node.js, which parses HTML and returns beautiful text.
+
+If you want to extract the text during AsciiDoc conversion, you can do so using an Asciidoctor postprocessor extension.
+
+[,ruby]
+----
+require 'open3'
+
+Asciidoctor::Extensions.register do
+  postprocessor do
+    process do |doc, output|
+      outfile = (doc.attr 'outfile').sub %r/\.\S+$/, '.txt'
+      Open3.popen2 'elinks -dump 1 -no-references -no-numbering' do |is, os|
+        is.print output
+        is.close
+        File.write outfile, os.read
+      end
+      output
+    end
+  end
+end
+----
+
+This extension will write a file with a .txt extension adjacent to the document written by the converter.
 
 == Doctest
 
