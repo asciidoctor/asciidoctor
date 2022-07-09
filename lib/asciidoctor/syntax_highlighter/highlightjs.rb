@@ -26,7 +26,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
 #{(doc.attr? 'highlightjs-languages') ? ((doc.attr 'highlightjs-languages').split ',').map {|lang| %(<script src="#{base_url}/languages/#{lang.lstrip}.min.js"></script>\n) }.join : ''}<script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>)
     end
