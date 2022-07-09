@@ -4,18 +4,18 @@ require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 
 context 'Invoker' do
   test 'should allow Options to be passed as first argument of constructor' do
-    opts = Asciidoctor::Cli::Options.new attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true
+    opts = Asciidoctor::Cli::Options.new attributes: { 'toc' => '' }, doctype: 'book', eruby: 'erubis'
     invoker = Asciidoctor::Cli::Invoker.new opts
     assert_same invoker.options, opts
   end
 
   test 'should allow options Hash to be passed as first argument of constructor' do
-    opts = { attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true }
+    opts = { attributes: { 'toc' => '' }, doctype: 'book', eruby: 'erubis' }
     invoker = Asciidoctor::Cli::Invoker.new opts
     resolved_opts = invoker.options
     assert_equal opts[:attributes], resolved_opts[:attributes]
     assert_equal 'book', resolved_opts[:attributes]['doctype']
-    assert resolved_opts[:sourcemap]
+    assert_equal 'erubis', resolved_opts[:eruby]
   end
 
   test 'should parse options from array passed as first argument of constructor' do
