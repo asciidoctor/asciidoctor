@@ -19,7 +19,7 @@ module Asciidoctor
         when Options
           @options = first_option
         when ::Hash
-          @options = Options.new options
+          @options = Options.new first_option
         else
           if ::Integer === (result = Options.parse! options)
             @code = result
