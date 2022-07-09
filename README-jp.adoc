@@ -42,7 +42,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-chat: https://asciidoctor.zulipchat.com
+:uri-chat: https://chat.asciidoctor.org
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
