@@ -313,7 +313,7 @@ You can also enable compat mode implicitly by beginning the document with an set
 Compat Mode
 ===========
 
-ifdef::compat-mode[Compat mode is on!]
+\ifdef::compat-mode[Compat mode is on!]
 ----
 
 When compat mode is enabled, Asciidoctor adapts some of its behavior and its interpretation of AsciiDoc to more closely align with AsciiDoc.py.
