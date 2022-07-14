@@ -287,11 +287,11 @@ This feature isn't implemented in Asciidoctor, but you can send remarks to the o
 
 [source,asciidoc]
 ----
- ifdef::showcomments+basebackend-docbook[]
- ++++
- <remark>Your comment here</remark>
- ++++
- endif::[]
+\ifdef::showcomments+basebackend-docbook[]
+++++
+<remark>Your comment here</remark>
+++++
+\endif::[]
 ----
 
 == Compatibility mode
