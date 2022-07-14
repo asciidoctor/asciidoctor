@@ -316,6 +316,17 @@ Compat Mode
 \ifdef::compat-mode[Compat mode is on!]
 ----
 
+If you prefer the setext-style document title, but don't want compat mode to be enabled, you must unset the `compat-mode` attribute explicitly.
+
+[,asciidoc]
+----
+Not Compat Mode
+===============
+:!compat-mode:
+
+\ifndef::compat-mode[Compat mode is not on.]
+----
+
 When compat mode is enabled, Asciidoctor adapts some of its behavior and its interpretation of AsciiDoc to more closely align with AsciiDoc.py.
 The most noticeable difference is that backticks now only indicate monospace text as opposed to literal monospace.
 Literal monospace is signified using a compound markup that combines an inline passthrough with monospace formatting.
