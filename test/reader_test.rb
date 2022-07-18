@@ -679,7 +679,17 @@ class ReaderTest < Minitest::Test
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
           assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
-          assert_empty logger
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: http://example.org/team.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'include directive with remote target is converted to a link when safe mode is secure' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :secure
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
+          assert_empty logger.messages
         end
       end
 
