@@ -679,7 +679,7 @@ class ReaderTest < Minitest::Test
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
           assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1201,7 +1201,7 @@ class ReaderTest < Minitest::Test
           input = %(include::#{tmp_include_path}[tag=include-me])
           using_memory_logger do |logger|
             output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
-            assert_empty logger.messages
+            assert_empty logger
             assert_includes output, 'line included'
             refute_includes output, 'line not included'
           end
@@ -1715,7 +1715,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1757,7 +1757,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
