@@ -679,7 +679,7 @@ class ReaderTest < Minitest::Test
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
           assert_equal 'link:http://example.org/team.adoc[]', reader.read_line
-          logger.messages.empty?
+          assert_empty logger.messages
         end
       end
 
