@@ -63,18 +63,31 @@ This attribute accepts a symbol, an array of symbols, or a comma-separated strin
 Let's say that we want normal substitutions to be applied to the text.
 Here's how that can be done:
 
-[source,ruby]
+[,ruby]
 ----
-create_inline_pass parent, '*https://asciidoctor.org[Asciidoctor]*', attributes: { 'subs' => :normal }
+create_inline_pass parent, '*https://example.org[Learn more]*',
+  attributes: { 'subs' => :normal }
 ----
 
-This node will be converted into a link with bold link text.
+This inline passthrough node will produce a link that has link text with strong emphasis (i.e., bold).
 
 You can also specify the substitutions as a string, which is parsed just like the value of the subs attribute on a block.
 
-[source,ruby]
+[,ruby]
 ----
-create_inline_pass parent, '*https://asciidoctor.org[Asciidoctor]*', attributes: { 'subs' => 'quotes,macros' }
+create_inline_pass parent, '*https://example.org[Learn more]*',
+  attributes: { 'subs' => 'quotes,macros' }
 ----
 
 You can specify whichever substitutions you want applied, and in what order.
+
+Instead of creating an inline passthrough node, you can also create a span of formatted text with additional substitutions applied.
+
+[,ruby]
+----
+create_inline parent, :quoted, 'https://asciidoctor.org is _awesome_!',
+  attributes: { 'subs' => :quotes }
+----
+
+The `:quoted` primary type represents a span of formatted text.
+In this case, we don't need to apply the `macros` substitution since links have not yet been converted.
