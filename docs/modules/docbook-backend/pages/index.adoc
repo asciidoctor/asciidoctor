@@ -82,3 +82,110 @@ Asciidoctor.convert_file 'my-document.adoc', backend: 'docbook'
 ----
 
 If you need to output DocBook 4.5, you may find the community-supported {url-docbook45}[DocBook 4.5 Converter^] useful.
+
+== Convert DocBook to PDF
+
+Although the Asciidoctor project provides xref:pdf-converter::index.adoc[Asciidoctor PDF] for performing direct AsciiDoc to PDF conversion, you may opt instead to convert to PDF via DocBook.
+The DocBook to PDF conversion is handled by the DocBook toolchain.
+
+The DocBook toolchain can prove to be a challenge to set up.
+This section provides several suggestions for how to use the DocBook toolchain, though this list is by no means exhaustive.
+If you already have a working DocBook toolchain, then these instructions are not for you.
+
+=== xmlto
+
+If you're using a Linux distribution, the *xmlto* package might be an option for you.
+https://pagure.io/xmlto[xmlto] is a simple shell script for converting XML files to various formats using the DocBook toolchain.
+Among those formats supported is DocBook as an input format and PDF as an output format.
+
+To install xmlto, look for the package by the same name and use your package manager to install it (e.g., `dnf install xmlto fop` or `apt-get install xmlto fop`).
+Once you have installed the package, you can use it to generate PDF from DocBook with Apache FOP as follows:
+
+ $ xmlto --skip-validation --with-fop pdf doc.xml
+
+If you're using an RPM-based Linux distribution, you may be able to use the dblatex backend to generate the PDF instead:
+
+ $ xmlto --skip-validation pdf doc.xml
+
+The AsciiDoc processor adds several XML processing instructions to support features not provided by DocBook, such as a thematic break and a page break.
+When using the Apache FOP backend, you need to provide an XSL stylesheet fragment that modifies the default XSL stylesheet to support these processing instructions.
+You can also use this stylesheet as an opportunity to customize the PDF that Apache FOP produces.
+
+Here's an example of an XSL stylesheet fragment to get you started:
+
+.custom.xsl
+[,xml]
+----
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:fo="http://www.w3.org/1999/XSL/Format">
+  <xsl:param name="hyphenate">false</xsl:param>
+  <xsl:param name="runinhead.default.title.end.punct"/>
+  <xsl:param name="generate.toc">
+    <xsl:choose>
+      <xsl:when test="/processing-instruction('asciidoc-toc')">
+article toc,title
+book toc,title,figure,table,example,equation
+      </xsl:when>
+      <xsl:otherwise>
+article nop
+book nop
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:param>
+  <xsl:param name="section.autolabel">
+    <xsl:choose>
+      <xsl:when test="/processing-instruction('asciidoc-numbered')">1</xsl:when>
+      <xsl:otherwise>0</xsl:otherwise>
+    </xsl:choose>
+  </xsl:param>
+  <xsl:template match="processing-instruction('asciidoc-br')">
+    <fo:block/>
+  </xsl:template>
+  <xsl:template match="processing-instruction('asciidoc-hr')">
+    <fo:block space-after="1em">
+      <fo:leader leader-pattern="rule" rule-thickness="0.5pt" rule-style="solid" leader-length.minimum="100%"/>
+    </fo:block>
+  </xsl:template>
+  <xsl:template match="processing-instruction('asciidoc-pagebreak')">
+     <fo:block break-after='page'/>
+  </xsl:template>
+</xsl:stylesheet>
+----
+
+Pass this stylesheet to xmlto as follows:
+
+ $ xmlto --skip-validation --with-fop -m custom.xsl pdf doc.xml
+
+To get more ideas of how to customize the stylesheet, refer to XSL stylesheet from the https://github.com/asciidoctor/asciidoctor-fopub/blob/main/src/dist/docbook-xsl/fo-pdf.xsl[fopub] project.
+
+=== fopub
+
+A similar alternative to xmlto is https://github.com/asciidoctor/asciidoctor-fopub[fopub].
+fopub uses Java and the Gradle build tool to wrap the DocBook toolchain.
+The only prerequisite to perform the DocBook to PDF conversion using fopub is a Java Development Kit (JDK), which provides the Java runtime.
+
+WARNING: Please note that the fopub project is archived.
+However, it still may prove useful.
+
+To get fopub, you must clone the repository.
+Once you have done so, you can run the `fopub` script in that repository to convert a DocBook file to PDF.
+
+ $ ./fopub README.xml
+
+The benefit of fopub is that it's preconfigured to convert DocBook with AsciiDoc processing instructions.
+The stylesheet it provides also smooths out some of the rough edges of the visual styling provided by the DocBook toolchain.
+However, the project is no longer actively maintained, so keep that in mind when deciding whether to use it.
+As an alternative, you may give https://github.com/aanno/db-toolchain[db-toolchain], which positions itself as a successor to fopub (albeit more complex).
+
+=== Maven plugins
+
+If you are using Maven to build your docs, then you might consider using either the docbkx or jdocbook plugins to generate PDF from DocBook.
+You can find example projects in the Asciidoctor Maven example repository:
+
+* https://github.com/asciidoctor/asciidoctor-maven-examples/tree/main/docbook-pipeline-docbkx-example[docbkx]
+* https://github.com/asciidoctor/asciidoctor-maven-examples/tree/main/docbook-pipeline-jdocbook-example[jdocbook]
+
+The typical way to use these plugins is in a pipeline following the xref:maven-tools::index.adoc[Asciidoctor Maven plugin].
+The Asciidoctor Maven plugin uses Asciidoctor to generate the DocBook file(s).
