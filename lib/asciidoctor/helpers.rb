@@ -300,5 +300,21 @@ module Helpers
   rescue
     raise ::NameError, %(Could not resolve class for name: #{qualified_name})
   end
+
+  # Internal: Require the OpenURI library.
+  #
+  # Attempts to load `open-uri-cached` if the cache argument is true otherwise autoload `open-uri`.
+  #
+  # cache - A Boolean flag indicating whether to activate content cache URI
+  def require_open_uri cache = false
+    if cache
+      # caching requires the open-uri-cached gem to be installed
+      # processing will be automatically aborted if these libraries can't be opened
+      require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
+    elsif !RUBY_ENGINE_OPAL
+      # autoload open-uri
+      ::OpenURI
+    end
+  end
 end
 end

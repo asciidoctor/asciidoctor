@@ -400,15 +400,7 @@ class AbstractNode
   # Returns A data URI string built from Base64 encoded data read from the URI
   # and the mime type specified in the Content Type header.
   def generate_data_uri_from_uri image_uri, cache_uri = false
-    if cache_uri
-      # caching requires the open-uri-cached gem to be installed
-      # processing will be automatically aborted if these libraries can't be opened
-      Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-    elsif !RUBY_ENGINE_OPAL
-      # autoload open-uri
-      ::OpenURI
-    end
-
+    Helpers.require_open_uri cache_uri
     begin
       mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
       # NOTE base64 is autoloaded by reference to ::Base64

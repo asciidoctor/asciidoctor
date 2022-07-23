@@ -1221,14 +1221,7 @@ class PreprocessorReader < Reader
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       return replace_next_line %(link:#{target}[#{attrlist}]) unless doc.attr? 'allow-uri-read'
-      if doc.attr? 'cache-uri'
-        # caching requires the open-uri-cached gem to be installed
-        # processing will be automatically aborted if these libraries can't be opened
-        Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
-      elsif !RUBY_ENGINE_OPAL
-        # autoload open-uri
-        ::OpenURI
-      end
+      Helpers.require_open_uri doc.attr?('cache-uri')
       [(::URI.parse target), :uri, target]
     else
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
