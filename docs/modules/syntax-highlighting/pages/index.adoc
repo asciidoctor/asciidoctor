@@ -86,3 +86,46 @@ It's then up to the DocBook toolchain to apply syntax highlighting to the conten
 You can explore these integrations in depth on the xref:highlightjs.adoc[], xref:rouge.adoc[], xref:pygments.adoc[], and xref:coderay.adoc[] pages.
 
 You can also create your own integration by making a xref:custom.adoc[].
+
+== Custom subs on source blocks
+
+You should not mix syntax highlighting with AsciiDoc text formatting (i.e., the `quotes` and `macros` substitutions).
+In many converters, these two operations are mutually exclusive.
+
+.Improper use of custom substitutions on a source block
+[,asciidoc]
+....
+[,java,subs=+quotes]
+----
+interface OrderRepository extends CrudRepository<Order,Long> {
+
+  *List<Order>* findByCategory(String category);
+
+  Order findById(long id);
+}
+----
+....
+
+The additional markup introduced by AsciiDoc text formatting may confuse the syntax highlighter and lead to unexpected results.
+While it may work in some syntax highlighters in the HTML backend (which perhaps know how to work around the formatting tags), it will most certainly fail when converting to other formats such as PDF.
+
+If you're going to customize the substitutions on a source block using the `subs` attribute, you should limit those substitutions to attribute replacements (`attributes`).
+
+.Valid use of custom substitutions on a source block
+[,asciidoc]
+....
+[,java,subs=attributes+]
+----
+interface {model}Repository extends CrudRepository<{model},Long> {
+
+  {model} findById(long id);
+}
+----
+....
+
+If you still need to emphasize certain tokens in the block of code, you should do so by creating a custom lexer or formatter for the syntax highlighting library that understands these additional semantics and perhaps even hints.
+In other words, work through the syntax highlighter so it's added during the highlighting process, giving the syntax highlighter full knowledge as to what's going on.
+Another option is to use a xref:custom.adoc[custom syntax highlighter adapter].
+
+Before trying to get the syntax highlighter to recognize new tokens, make sure it doesn't already recognize them.
+If it does, it may just be a matter of customizing the syntax highlighter theme to apply different formatting to those tokens.
