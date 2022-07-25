@@ -1220,7 +1220,10 @@ class PreprocessorReader < Reader
   def resolve_include_path target, attrlist, attributes
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
-      return replace_next_line %(link:#{target}[#{attrlist}]) unless doc.attr? 'allow-uri-read'
+      unless doc.attr? 'allow-uri-read'
+        logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
+        return replace_next_line %(link:#{target}[#{attrlist}])
+      end
       if doc.attr? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
         # processing will be automatically aborted if these libraries can't be opened
