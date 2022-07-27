@@ -32,7 +32,7 @@ end
 #  gem 'listen', :github => 'guard/listen'
 #end
 
-group :ci do
+group :coverage do
   gem 'json', '~> 2.2.0' if RUBY_ENGINE == 'truffleruby'
   gem 'simplecov', '~> 0.16.0'
 end

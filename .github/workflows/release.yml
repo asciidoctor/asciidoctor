@@ -1,24 +1,35 @@
 name: Release
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: Enter version to release (e.g., 2.1.0).
+        required: false
+      release-beer:
+        default: TBD
+        description: Enter beer to mark the occasion.
+        required: false
 jobs:
   activate:
-    if: github.repository_owner == 'asciidoctor'
     runs-on: ubuntu-latest
+    if: github.repository_owner == 'asciidoctor' && github.event_name == 'workflow_dispatch'
     steps:
-    - name: Proceed
-      run: echo ok go
-  build:
+    - run: echo ok go
+  perform:
     needs: activate
     runs-on: ubuntu-latest
+    environment: releases
+    env:
+      SOURCE_DATE_EPOCH: '1521504000'
+      PYGMENTS_VERSION: '~> 2.0'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        ruby-version: '3.1'
+        bundler-cache: false
     - name: Configure Bundler
       run: |
         bundle config --local path .bundle/gems
@@ -27,7 +38,11 @@ jobs:
       run: bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec rake test:all
-    - name: Publish gem
-      uses: dawidd6/action-publish-gem@v1
-      with:
-        api_key: ${{ secrets.RUBYGEMS_API_KEY }}
+    - name: Setup release environment
+      run: |
+        echo ${{ secrets[format('GH_TOKEN_{0}', github.actor)] }} | gh auth login --with-token
+        echo RELEASE_VERSION=${{ github.event.inputs.release-version }} >> $GITHUB_ENV
+        echo RELEASE_BEER=${{ toJSON(github.event.inputs.release-beer) }} >> $GITHUB_ENV
+        echo RELEASE_RUBYGEMS_API_KEY=${{ secrets[format('RUBYGEMS_API_KEY_{0}', github.actor)] }} >> $GITHUB_ENV
+    - name: Build, tag, and publish gem
+      run: ./release.sh
