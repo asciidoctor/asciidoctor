@@ -70,10 +70,13 @@ This default was chosen to make Asciidoctor consistent with other lightweight ma
 
 Here's what's included in an embedded document:
 
-* The document title, but only if the `showtitle` attribute is set (no attribution and revision information)
-* The table of contents if the `toc` attribute is enabled (and not macro or preamble)
+* The document title if the `showtitle` attribute is set
+* The table of contents if the `toc` attribute is set and the value is not `preamble`
 * The converted document body
 * The footnotes unless the `nofootnotes` attribute is set
+
+The author and revision information is never shown in an embedded document.
+If you need to display that information, you can use attribute references such as `\{author}` and `\{revnumber}`.
 
 The embedded document is intended to be included in a template, such as one provided by a static site generator.
 That template is responsible for providing the styles and library integrations needed for the content to render properly.
