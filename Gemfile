@@ -38,7 +38,7 @@ group :lint do
   gem 'rubocop-rake', '~> 0.6.0', require: false
 end unless (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.5.0')
 
-group :ci do
+group :coverage do
   gem 'json', '~> 2.2.0' if RUBY_ENGINE == 'truffleruby'
   gem 'simplecov', '~> 0.16.0'
 end
