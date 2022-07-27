@@ -23,15 +23,6 @@ group :docs do
   gem 'yard-tomdoc'
 end
 
-# enable this group to use Guard for continuous testing
-# after removing comments, run `bundle install` then `guard`
-#group :guardtest do
-#  gem 'guard'
-#  gem 'guard-test'
-#  gem 'libnotify'
-#  gem 'listen', :github => 'guard/listen'
-#end
-
 group :lint do
   gem 'rubocop', '~> 1.24.0', require: false
   gem 'rubocop-minitest', '~> 0.17.0', require: false
