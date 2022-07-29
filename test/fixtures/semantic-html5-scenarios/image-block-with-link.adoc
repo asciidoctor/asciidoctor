@@ -1,0 +1,4 @@
+This is a block image with link.
+
+[link=https://docs.asciidoctor.org]
+image::../dot.gif[A dot image, 100, 100]

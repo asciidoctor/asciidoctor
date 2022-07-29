@@ -1,0 +1,3 @@
+This is a block image.
+
+image::../dot.gif[A dot image, align="center"]
