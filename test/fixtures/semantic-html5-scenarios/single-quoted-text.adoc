@@ -1,0 +1,1 @@
+She said, '`Here is singley quoted text`'.

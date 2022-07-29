@@ -133,6 +133,32 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_quoted node
+    attributes = common_html_attributes node.id, node.role
+    case node.type
+    when :strong
+      %(<strong#{attributes}>#{node.text}</strong>)
+    when :emphasis
+      %(<em#{attributes}>#{node.text}</em>)
+    when :monospaced
+      %(<code#{attributes}>#{node.text}</code>)
+    when :mark
+      %(<mark#{attributes}>#{node.text}</mark>)
+    when :superscript
+      %(<sup#{attributes}>#{node.text}</sup>)
+    when :subscript
+      %(<sub#{attributes}>#{node.text}</sub>)
+    when :single
+      attributes = common_html_attributes node.id, node.role, 'singlequote'
+      %(<span#{attributes}>&#8216;#{node.text}&#8217;</span>)
+    when :double
+      attributes = common_html_attributes node.id, node.role, 'doublequote'
+      %(<span#{attributes}>&#8220;#{node.text}&#8221;</span>)
+    else
+      %(<span#{attributes}>#{node.text}</span>)
+    end
+  end
+
   def generate_section_numbering node
     level = node.level
     doc_attrs = node.document.attributes

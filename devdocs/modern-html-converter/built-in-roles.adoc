@@ -30,4 +30,10 @@ Here's the list of all the built-in roles used in the (new) modern HTML converte
 
 |revision
 |Revision table
+
+|simplequote
+|Single quotation mark
+
+|doublequote
+|Double quotation mark
 |====
