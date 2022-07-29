@@ -1,0 +1,1 @@
+This is an inline image. image:../dot.gif[inline dot, float="left"] Did you see it?

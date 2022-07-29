@@ -1,0 +1,5 @@
+This is a block image with a caption.
+
+[#the_image]
+.Image of a dot.
+image::../dot.gif[A dot image]

@@ -1,0 +1,4 @@
+This is a block image with a caption.
+
+.Image of a dot.
+image::../dot.gif[A dot image, float="right"]
