@@ -1,0 +1,1 @@
+*Bold words* and bold **c**h**a**r**a**c**t**e**r**s.
