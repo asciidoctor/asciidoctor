@@ -181,11 +181,10 @@ As an alternative, you may give https://github.com/aanno/db-toolchain[db-toolcha
 
 === Maven plugins
 
-If you are using Maven to build your docs, then you might consider using either the docbkx or jdocbook plugins to generate PDF from DocBook.
-You can find example projects in the Asciidoctor Maven example repository:
+If you are using Maven to build your docs, then you might consider using either the docbkx plugin to generate PDF from DocBook.
+You can find an example projects in the Asciidoctor Maven example repository:
 
 * https://github.com/asciidoctor/asciidoctor-maven-examples/tree/main/docbook-pipeline-docbkx-example[docbkx]
-* https://github.com/asciidoctor/asciidoctor-maven-examples/tree/main/docbook-pipeline-jdocbook-example[jdocbook]
 
-The typical way to use these plugins is in a pipeline following the xref:maven-tools::index.adoc[Asciidoctor Maven plugin].
+The typical way to use these plugins is in a processing pipeline starting with the xref:maven-tools::index.adoc[Asciidoctor Maven plugin].
 The Asciidoctor Maven plugin uses Asciidoctor to generate the DocBook file(s).
