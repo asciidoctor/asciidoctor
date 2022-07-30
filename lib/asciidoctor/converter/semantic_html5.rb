@@ -184,6 +184,21 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_inline_menu node
+    caret = '&#160;<b class="caret">&#8250;</b> '
+    submenu_joiner = %(</b>#{caret}<b class="submenu">)
+    menu = node.attr 'menu'
+    if (submenus = node.attr 'submenus').empty?
+      if (menuitem = node.attr 'menuitem')
+        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="menuitem">#{menuitem}</b></span>)
+      else
+        %(<span class="menuseq"><b class="menu">#{menu}</b></span>)
+      end
+    else
+      %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus.join submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></span>)
+    end
+  end
+
   def generate_section_numbering node
     level = node.level
     doc_attrs = node.document.attributes
