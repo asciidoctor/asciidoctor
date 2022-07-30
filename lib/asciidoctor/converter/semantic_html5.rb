@@ -101,16 +101,11 @@ class Converter::SemanticHtml5Converter < Converter::Base
     ret = [%(<ul#{attributes}>)]
     ret << %(<strong class="title">#{node.title}</strong>) if node.title?
     node.items.each do |item|
-    sub_content = if item.blocks?
-      %(
+      ret << %(<li>#{item.text}#{item.blocks? ? %(
 #{item.content}
-)
-    else
-      ""
+) : ''}</li>)
     end
-    ret << %(<li>#{item.text}#{sub_content}</li>)
-    end
-    ret << %{</ul>}
+    ret << %(</ul>)
     ret.join LF
   end
 
@@ -126,19 +121,14 @@ class Converter::SemanticHtml5Converter < Converter::Base
     if node.option? 'reversed'
       olist_attributes << %( reversed="true")
     end
-    ret = [%(<ol#{attributes}#{olist_attributes.join('')}>)]
+    ret = [%(<ol#{attributes}#{olist_attributes.join}>)]
     ret << %(<strong class="title">#{node.title}</strong>) if node.title?
     node.items.each do |item|
-    sub_content = if item.blocks?
-      %(
+      ret << %(<li>#{item.text}#{item.blocks? ? %(
 #{item.content}
-)
-    else
-      ""
+) : ''}</li>)
     end
-    ret << %(<li>#{item.text}#{sub_content}</li>)
-    end
-    ret << %{</ol>}
+    ret << %(</ol>)
     ret.join LF
   end
 
@@ -146,28 +136,23 @@ class Converter::SemanticHtml5Converter < Converter::Base
     roles = []
     roles << node.style if node.style
     roles << node.role if node.role
-    role = roles.join " "
+    role = roles.join ' '
     attributes = common_html_attributes node.id, role.empty? ? nil : role
     dlist_attributes = []
     if node.list_marker_keyword
       dlist_attributes << %( type="#{node.list_marker_keyword}")
     end
-    ret = [%(<dl#{attributes}#{dlist_attributes.join('')}>)]
+    ret = [%(<dl#{attributes}#{dlist_attributes.join}>)]
     ret << %(<strong class="title">#{node.title}</strong>) if node.title?
     node.items.each do |terms, desc|
       terms.each do |term|
-          ret << %(<dt>#{term.text}</dt>)
+        ret << %(<dt>#{term.text}</dt>)
       end
-      sub_content = if desc.blocks?
-        %(
+      ret << %(<dd>#{desc.text}#{ desc.blocks? ? %(
 #{desc.content}
-)
-      else
-        ""
-      end
-      ret << %(<dd>#{desc.text}#{sub_content}</dd>)
+) : ''}</dd>)
     end
-    ret << %{</dl>}
+    ret << %(</dl>)
     ret.join LF
   end
 
