@@ -34,6 +34,9 @@ Here's the list of all the built-in roles used in the (new) modern HTML converte
 |simplequote
 |Single quotation mark
 
+|doublequote
+|Double quotation mark
+
 |menuseq
 |Sequence of menu items (`menu` macro)
 
