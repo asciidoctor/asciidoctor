@@ -67,6 +67,31 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_listing node
+    caption = (caption = node.caption) ? %(<span class="label">#{caption}</span> ) : ''
+    title = node.title? ? %(<figcaption>#{caption}#{node.title}</figcaption>\n) : ''
+    attributes = common_html_attributes node.id, node.role, 'listing'
+    nowrap = (node.option? 'nowrap') || !(node.document.attr? 'prewrap')
+    if node.style == 'source'
+      lang = node.attr 'language'
+      if (syntax_hl = node.document.syntax_highlighter)
+        opts = syntax_hl.highlight? ? {
+          css_mode: ((doc_attrs = node.document.attributes)[%(#{syntax_hl.name}-css)] || :class).to_sym,
+          style: doc_attrs[%(#{syntax_hl.name}-style)],
+        } : {}
+        opts[:nowrap] = nowrap
+        content = syntax_hl.format node, lang, opts
+      else
+        content = %(<code#{lang ? %( data-lang="#{lang}") : ''}>#{node.content || ''}</code>)
+      end
+    else
+      content = node.content || ''
+    end
+    %(<figure#{attributes}>
+#{title}<pre#{nowrap ? ' class="nowrap"' : ''}>#{content}</pre>
+</figure>)
+  end
+
   def convert_thematic_break node
     '<hr>'
   end
