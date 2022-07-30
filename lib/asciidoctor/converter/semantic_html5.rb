@@ -296,7 +296,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_inline_button node
-    %(<samp class="button">#{node.text}</samp>)
+    %(<span class="button">#{node.text}</span>)
   end
 
   def convert_inline_menu node
