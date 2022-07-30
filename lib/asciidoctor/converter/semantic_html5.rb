@@ -165,12 +165,12 @@ class Converter::SemanticHtml5Converter < Converter::Base
     menu = node.attr 'menu'
     if (submenus = node.attr 'submenus').empty?
       if (menuitem = node.attr 'menuitem')
-        %(<samp class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="menuitem">#{menuitem}</b></samp>)
+        %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="menuitem">#{menuitem}</b></span>)
       else
-        %(<samp class="menuseq"><b class="menu">#{menu}</b></samp>)
+        %(<span class="menuseq"><b class="menu">#{menu}</b></span>)
       end
     else
-      %(<samp class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus.join submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></samp>)
+      %(<span class="menuseq"><b class="menu">#{menu}</b>#{caret}<b class="submenu">#{submenus.join submenu_joiner}</b>#{caret}<b class="menuitem">#{node.attr 'menuitem'}</b></span>)
     end
   end
 
