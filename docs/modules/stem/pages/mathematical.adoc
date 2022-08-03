@@ -49,7 +49,7 @@ Asciidoctor Mathematical depends on Mathematical, which is a native gem.
 In other words, Mathematical must be recompiled during installation, which requires access to build tools and native development libraries on the host system.
 //Furthermore, this compilation currently only works on Linux and on macOS with Xcode.
 Furthermore, this compilation currently only works on Linux.
-You cannot install this gem on macOS or Windows.
+You cannot install this gem on Windows.
 Please refer to the {url-asciidoctor-mathematical}/#installation[installation section] in the Asciidoctor Mathematical documentation to learn which system tools and development libraries you need in order to install it.
 
 If you run into problems installing this gem, or need to use it on Windows, consider using the {url-asciidoctor-docker}[Asciidoctor Docker container].
