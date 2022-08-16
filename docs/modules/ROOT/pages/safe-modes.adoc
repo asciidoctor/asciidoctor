@@ -9,7 +9,7 @@ Each level includes the restrictions enabled in the prior security level.
 Asciidoctor's safe modes are primarily focused on what the processor is permitted to do.
 The safe modes do not provide a comprehensive security framework.
 In particular, there's no safe mode that restricts the kind of content the author can pass through to the output document.
-In other words, the safe mode setting does not provide a way to santiize the output.
+In other words, the safe mode setting does not provide a way to sanitize the output.
 
 Asciidoctor performs sensible escaping to allow an author to safely input text, but does not limit the content that can be included in the output using passthrough blocks or custom substitutions.
 The reason for this policy is that we assume the document will be passed through a sanitizer if the HTML must be embedded directly into a web page, precisely what GitHub and GitLab do.
