@@ -176,7 +176,7 @@ In the output, the image references will be shown as absolute paths.
 === :refs
 
 In addition to images and links, you can also access all targetable references (i.e., elements that have an ID).
-First, let's add some referencable elements to our document.
+First, let's add some referenceable elements to our document.
 
 [,asciidoc]
 ----

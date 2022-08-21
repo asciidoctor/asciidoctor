@@ -17,7 +17,7 @@ Consult the package repository for your distribution to find out which version i
 * {url-arch}[Arch Linux (asciidoctor)^]
 * {url-debian}[Debian (asciidoctor)^]
 * {url-fedora}[Fedora (asciidoctor)^]
-* {url-suse}[OpenSUSE (rubygem-asciidoctor)^]
+* {url-suse}[openSUSE (rubygem-asciidoctor)^]
 * {url-ubuntu}[Ubuntu (asciidoctor)^]
 
 If you want to use a version of Asciidoctor that is newer than what is available via your package manager, see xref:ruby-packaging.adoc[].
