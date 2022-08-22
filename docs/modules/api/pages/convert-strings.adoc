@@ -1,12 +1,12 @@
 = Load and Convert Strings Using the API
 :navtitle: Load and Convert Strings
 
-This page explains how to load and convert AsciiDoc-formatted strings using the API.
+This page explains how to load and convert AsciiDoc strings using the API.
 A string is the bare AsciiDoc content (often the contents of a file).
 
 == Load an AsciiDoc string
 
-To parse an AsciiDoc-formatted string into a document object model, use:
+To parse an AsciiDoc string into a document object model, use:
 
 [source,ruby]
 ----
@@ -32,7 +32,7 @@ However, if you're only interested in converting the AsciiDoc source when using 
 
 == Convert an AsciiDoc string
 
-To convert the AsciiDoc-formatted string directly to HTML, use:
+To convert the AsciiDoc string directly to HTML, use:
 
 [source,ruby]
 ----

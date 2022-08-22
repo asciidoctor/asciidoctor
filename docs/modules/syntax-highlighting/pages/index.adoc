@@ -46,7 +46,7 @@ There are benefits and drawbacks of each type.
 The benefit of a client-side syntax highlighter is that does not require installing any additional libraries.
 It also makes conversion faster and makes it produce smaller output since the syntax highlighting is deferred until page load.
 The main drawback is that callouts in the source block can be mangled by the syntax highlighter or confuse it.
-The benefits of a build-time syntax highlighter is that you have more control over syntax highlighting and can enable additional features such as line numbers and line highlighting.
+The benefits of a build-time syntax highlighter are that you have more control over syntax highlighting and can enable additional features such as line numbers and line highlighting.
 The main drawback is that it requires installing an extra library, it slows down conversion, and causes the output to be larger.
 
 You should try each syntax highlighter and find the one that works best for you.

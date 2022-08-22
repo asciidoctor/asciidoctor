@@ -60,7 +60,7 @@ Additionally, it:
 * disables icons
 * disables include directives (`+include::[]+`)
 * data can not be retrieved from URIs
-* prevents access to stylesheets and JavaScripts
+* prevents access to stylesheets and JavaScript files
 * sets the backend to `html5`
 * disables `docinfo` files
 * disables `data-uri`

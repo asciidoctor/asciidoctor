@@ -100,7 +100,7 @@ Let's look at those problem and ways to work through them.
 [#stylesdir-and-linkcss]
 == Styles directory and linkcss
 
-Using `stylesdir` gets tricky when your linking to the stylesheet instead of embedding it.
+Using `stylesdir` gets tricky when you're linking to the stylesheet instead of embedding it.
 That's because we're now dealing with two different paths.
 One is the path where the stylesheet is located on disk (either absolute or relative to the document).
 The other is the path the browser uses to access the stylesheet.
@@ -196,5 +196,5 @@ For [.path]_c.adoc_, set `stylesdir` to:
 :stylesdir: ../my-styles
 ----
 
-If you're serving your documents from a webserver, you can solve this problem by providing an absolute path to the stylesheet.
+If you're serving your documents from a web server, you can solve this problem by providing an absolute path to the stylesheet.
 You can also try to use the `copycss` per document to control where Asciidoctor looks for the stylesheet independent of where Asciidoctor copies it and the converter configured the HTML to reference it.

@@ -62,7 +62,7 @@ There are similar attributes to control how additional resources are resolved.
 As the steward of the AsciiDoc language, Asciidoctor reworked some of the AsciiDoc syntax originally introduced by AsciiDoc.py in an effort to make it more consistent, easier to learn, and, in some cases, more concise.
 This section outlines those improvements to the modern AsciiDoc syntax and how it differs from the legacy AsciiDoc recognized by AsciiDoc.py.
 
-*If a feature or attribute isn't mentioned in the following tables, than it works in Asciidoctor just like it worked in AsciiDoc.py.*
+*If a feature or attribute isn't mentioned in the following tables, then it works in Asciidoctor just like it worked in AsciiDoc.py.*
 
 === Inline formatting
 
@@ -306,7 +306,7 @@ If you can't migrate right now, you can activate compat mode by setting the `com
 
  $ asciidoctor -a compat-mode document.adoc
 
-You can also enable compat mode implicitly by beginning the document with an setext-style (i.e., two-line) document title:
+You can also enable compat mode implicitly by beginning the document with a setext-style (i.e., two-line) document title:
 
 [,asciidoc]
 ----

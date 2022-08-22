@@ -341,7 +341,7 @@ Refer to the documentation for the template engine for details.
 
 If you find yourself putting a lot of logic in the template, you may want to extract that logic into custom helper functions.
 When using Haml or Slim, you can define these helper functions in the file [.path]_helper.rb_ located in the same folder as the templates.
-These helper functions can simplify reoccuring elements that appear across multiple templates.
+These helper functions can simplify reoccurring elements that appear across multiple templates.
 
 The helper file must define the Ruby module `Haml::Helpers` or `Slim::Helpers`, depending on which template engine your templates target.
 Every method defined in that module becomes a top-level function in the template.
