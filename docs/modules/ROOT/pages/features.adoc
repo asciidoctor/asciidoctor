@@ -93,7 +93,7 @@ Asciidoctor offers two interfaces for processing AsciiDoc content: a commandline
 The *CLI* is designed as a simple tool for non-programmers who want to convert AsciiDoc without having to write a program or for converting content in an automated environment such as CI.
 Many of the processing options are accessible from the CLI using option flags.
 When you're first starting out with Asciidoctor, you'll mostly likely interact with it via the CLI.
-Although the CLI itself does not require any programming, it can still load extension code that auguments processing.
+Although the CLI itself does not require any programming, it can still load extension code that augments processing.
 
 NOTE: If you're migrating from AsciiDoc.py, the `asciidoctor` CLI is a drop-in replacement for the `asciidoc` CLI.
 

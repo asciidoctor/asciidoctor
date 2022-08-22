@@ -149,7 +149,7 @@ Of course, you're probably hoping this has already been done for you.
 Indeed, it has!
 
 You can find an {url-lang-attributes}[AsciiDoc file^] in the Asciidoctor repository that provides translations of these attributes for most major languages.
-Thus far, the built-in labels have been translated into the following languages: Arabic, Belarusian, Bulgarian, Catalan, Czech, Danish, Dutch, German, Spanish, Persian (Farsi), Finnish, French, Hungarian, Bahasa Indonesian, Italian, Japanese, Korean, Norweign Bokmål, Norwegian Nynorsk, Polish, Portuguese, Brazilian Portuguese, Romanian, Russian, Serbian Cyrillic, Serbian Latin, Swedish, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese.
+Thus far, the built-in labels have been translated into the following languages: Arabic, Belarusian, Bulgarian, Catalan, Czech, Danish, Dutch, German, Spanish, Persian (Farsi), Finnish, French, Hungarian, Bahasa Indonesian, Italian, Japanese, Korean, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese, Brazilian Portuguese, Romanian, Russian, Serbian Cyrillic, Serbian Latin, Swedish, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese.
 The translations are defined using AsciiDoc attribute entries inside conditional preprocessor blocks, just as suggested above.
 
 To use this file to translate the built-in labels according the value of the `lang` attribute (just like the DocBook toolchain does), follow these steps:

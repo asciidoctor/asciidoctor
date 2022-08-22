@@ -151,4 +151,4 @@ The lineno of the paragraph in the source location is now one greater than befor
 ....
 
 If you're writing a custom converter, the source location is not available for inline elements.
-However, you can access the source location of the parent element (e.g., `node.parent.source_location`), which should at leasat get you close to the location of the element.
+However, you can access the source location of the parent element (e.g., `node.parent.source_location`), which should at least get you close to the location of the element.

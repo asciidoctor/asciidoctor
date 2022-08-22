@@ -1,7 +1,7 @@
 = Load and Convert Files Using the API
 :navtitle: Load and Convert Files
 
-This page explains how to load and convert AsciiDoc-formatted files using the API.
+This page explains how to load and convert AsciiDoc files using the API.
 
 == Load an AsciiDoc file
 

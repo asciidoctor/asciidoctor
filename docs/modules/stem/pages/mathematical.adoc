@@ -32,7 +32,7 @@ The extension can be used with the built-in converters as well as add-on convert
 
 The main drawback of Asciidoctor Mathematical when compared to MathJax is that you don't have a lot of control over the size and resolution of the images it generates.
 It also lacks the interactivity with the expression that MathJax provides.
-So when your converting to HTML, MathJax is going to give you a better result.
+So when you're converting to HTML, MathJax is going to give you a better result.
 
 Another drawback when compared to MathJax is that it requires installing an extra library, and that library can be difficult to install.
 Nonetheless, if you need it and you're up for the challenge, that's where we're headed next.
