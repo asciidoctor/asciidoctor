@@ -1,0 +1,9 @@
+:hardbreaks-option:
+
+This is a single line.
+This is the next line.
+This is the last line.
+
+This is another paragraph. It has sentences in it.
+This line is on its own.
+But this one is not. The end.
