@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'erubi', '~> 1.10.0'
   s.add_development_dependency 'haml', '~> 5.2.0'
   s.add_development_dependency 'minitest', '~> 5.14.0'
-  s.add_development_dependency 'nokogiri', '~> 1.10.0'
+  s.add_development_dependency 'nokogiri', '~> 1.13.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
   s.add_development_dependency 'slim', '~> 4.1.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'
