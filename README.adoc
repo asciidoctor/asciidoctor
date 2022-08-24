@@ -128,8 +128,8 @@ If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-
 
 Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
 
-* CRuby (aka MRI) 2.3 - 3.0
-* JRuby 9.1 - 9.2
+* CRuby (aka MRI) 2.5 - 3.1
+* JRuby 9.1 - 9.3
 * TruffleRuby (GraalVM)
 
 [CAUTION]

@@ -15,7 +15,7 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |Supported Runtime |Supported Versions
 
 |Ruby
-|&#8805; 2.3
+|&#8805; 2.5
 
 |JRuby
 |&#8805; 9.1
