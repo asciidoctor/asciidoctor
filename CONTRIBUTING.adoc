@@ -53,9 +53,10 @@ Please respect the work of those who have volunteered their time and effort to d
 == Submitting a Pull Request
 
 . {uri-fork-help}[Fork the repository].
-. Run `bundle --path=.bundle/gems` to install development dependencies.
+. Run `bundle config --local path .bundle/gems` to configure Bundler to install development dependencies inside the project.
  ** If the `bundle` command is not available, run `gem install bundler` to install it.
  ** If the libxml2 and libxslt development libraries are available on your system (Ubuntu: `sudo apt install libxml2-dev libxslt-dev`, Fedora: `sudo dnf install libxml2-devel libxslt-devel`), you can speed up installation of the `nokogiri` gem by linking directly against these libraries by running `bundle config --local build__nokogiri --use-system-libraries` first.
+. Run `bundle` to install development dependencies.
 . {uri-branch-help}[Create a topic branch] (preferably using the pattern `issue-XYZ`, where `XYZ` is the issue number).
 . Add tests for your unimplemented feature or bug fix. (See <<writing-and-executing-tests>>)
 . Run `bundle exec rake` to run the tests.
