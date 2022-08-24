@@ -33,9 +33,6 @@ jobs:
         # remove 3.1 on ubuntu-latest to mark as primary
         - os: ubuntu-latest
           ruby: '3.1'
-        # remove 3.1 on windows as it's not yet available
-        - os: windows-latest
-          ruby: '3.1'
         include:
         - os: ubuntu-latest
           ruby: truffleruby-21.1.0

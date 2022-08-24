@@ -16,6 +16,9 @@ group :development do
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
   # rouge is needed for testing source highlighting; Asciidoctor supports rouge >= 2
   gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '~> 3.0')
+  if Gem.win_platform? && (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '2.6.0')
+    gem 'nokogiri', '~> 1.13.0'
+  end
 end
 
 group :docs do
