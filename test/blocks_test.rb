@@ -3086,6 +3086,82 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
       assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
+
+    test 'can convert block image with attribute loading=eager' do
+      input = 'image::image.png[loading=eager]'
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'eager', img.attr('loading')
+    end
+
+    test 'can convert block image with attribute loading=lazy' do
+      input = 'image::image.png[loading=lazy]'
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'lazy', img.attr('loading')
+    end
+
+    test 'defaults to global image-loading attribute if not specified on block image' do
+      input = <<~EOS
+      :image-loading: lazy
+
+      image::image.png[]
+      EOS
+
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'lazy', img.attr('loading')
+    end
+
+    test 'specifying loading attribute on block image overrides global value' do
+      input = <<~EOS
+      :image-loading: lazy
+
+      image::image.png[loading=eager]
+      EOS
+
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'eager', img.attr('loading')
+    end
+
+    test 'can convert inline image with attribute loading=eager' do
+      input = 'image:image.png[loading=eager]'
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'eager', img.attr('loading')
+    end
+
+    test 'can convert inline image with attribute loading=lazy' do
+      input = 'image:image.png[loading=lazy]'
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'lazy', img.attr('loading')
+    end
+
+    test 'defaults to global image-loading attribute if not specified on inline image' do
+      input = <<~EOS
+      :image-loading: lazy
+
+      image:image.png[]
+      EOS
+
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'lazy', img.attr('loading')
+    end
+
+    test 'specifying loading attribute on inline image overrides global value' do
+      input = <<~EOS
+      :image-loading: lazy
+
+      image:image.png[loading=eager]
+      EOS
+
+      output = convert_string input
+      img = xmlnodes_at_xpath '//img', output, 1
+      assert_equal 'eager', img.attr('loading')
+    end
   end
 
   context 'Media' do
