@@ -66,12 +66,10 @@ class AttributeList
     return @attributes if @attributes
 
     @attributes = {}
-    index = 0
 
-    while parse_attribute index, positional_attrs
+    while parse_attribute positional_attrs
       break if @scanner.eos?
       skip_delimiter
-      index += 1
     end
 
     @attributes
@@ -93,7 +91,7 @@ class AttributeList
 
   private
 
-  def parse_attribute index, positional_attrs
+  def parse_attribute positional_attrs
     continue = true
     skip_blank
     case @scanner.peek 1
@@ -170,11 +168,11 @@ class AttributeList
         end
       end
     else
+      index = @attributes.select {|key| key.is_a? Numeric }.size
       name = @block.apply_subs name if single_quoted && @block
       if (positional_attr_name = positional_attrs[index]) && name
         @attributes[positional_attr_name] = name
       end
-      # QUESTION should we assign the positional key even when it's claimed by a positional attribute?
       @attributes[index + 1] = name
     end
 

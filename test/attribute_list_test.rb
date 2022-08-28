@@ -218,7 +218,7 @@ context 'AttributeList' do
   test 'collect mixed named and unnamed attributes' do
     attributes = {}
     line = %(first, second="value two", third=three, Sherlock Holmes)
-    expected = { 1 => 'first', 'second' => 'value two', 'third' => 'three', 4 => 'Sherlock Holmes' }
+    expected = { 1 => 'first', 'second' => 'value two', 'third' => 'three', 2 => 'Sherlock Holmes' }
     (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
@@ -226,7 +226,7 @@ context 'AttributeList' do
   test 'collect mixed empty named and blank unnamed attributes' do
     attributes = {}
     line = 'first,,third=,,fifth=five'
-    expected = { 1 => 'first', 2 => nil, 'third' => '', 4 => nil, 'fifth' => 'five' }
+    expected = { 1 => 'first', 2 => nil, 'third' => '', 3 => nil, 'fifth' => 'five' }
     (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
