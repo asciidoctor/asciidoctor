@@ -2,6 +2,8 @@
 
 source 'https://rubygems.org'
 
+require_relative 'gem-version-patch'
+
 # Look in asciidoctor.gemspec for runtime and development dependencies
 gemspec
 
