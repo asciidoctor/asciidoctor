@@ -91,7 +91,11 @@ module Asciidoctor
             'unless either the name or value ends in @ (i.e., name@=value or name=value@)',
             'may be specified more than once' do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
-            attr = attr.encode UTF_8 unless attr.encoding == UTF_8
+            begin
+              attr = attr.encode UTF_8
+            rescue ::EncodingError
+              attr = attr.force_encoding UTF_8
+            end unless attr.encoding == UTF_8
             name, _, val = attr.partition '='
             self[:attributes][name] = val
           end
