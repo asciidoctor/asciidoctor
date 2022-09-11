@@ -56,6 +56,7 @@ Improvements::
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
+  * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*zkaip*)
 
 Bug Fixes::
 
