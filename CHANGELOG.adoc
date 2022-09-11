@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 Improvements::
 
   * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
+  * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*zkaip*)
 
 Bug Fixes::
 

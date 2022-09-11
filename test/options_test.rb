@@ -145,6 +145,14 @@ context 'Options' do
     assert_nil options[:attributes]
   end
 
+  test 'should gracefully force encoding to UTF-8 if encoding on string is mislabeled' do
+    args = ['-a', ((%w(platform-name 云平台).join '=').force_encoding Encoding::ASCII_8BIT), '-']
+    options = Asciidoctor::Cli::Options.parse! args
+
+    assert_equal '云平台', options[:attributes]['platform-name']
+    assert_equal Encoding::UTF_8, options[:attributes]['platform-name'].encoding
+  end
+
   test 'should allow safe mode to be specified' do
     options = Asciidoctor::Cli::Options.parse!(%w(-S safe test/fixtures/sample.adoc))
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]

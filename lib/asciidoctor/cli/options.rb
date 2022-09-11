@@ -85,7 +85,11 @@ module Asciidoctor
               'this attribute takes precedence over the same attribute defined in the source document',
               'unless either the name or value ends in @ (i.e., name@=value or name=value@)') do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
-            attr = attr.encode UTF_8 unless attr.encoding == UTF_8
+            begin
+              attr = attr.encode UTF_8
+            rescue ::EncodingError
+              attr = attr.force_encoding UTF_8
+            end unless attr.encoding == UTF_8
             name, _, val = attr.partition '='
             self[:attributes][name] = val
           end
