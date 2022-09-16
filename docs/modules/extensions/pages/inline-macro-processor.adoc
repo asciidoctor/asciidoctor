@@ -25,16 +25,19 @@ class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
   name_positional_attributes 'volnum'
 
   def process parent, target, attrs
+    doc = parent.document
     text = manname = target
-    suffix = ''
-    target = %(#{manname}.html)
-    suffix = if (volnum = attrs['volnum'])
-      "(#{volnum})"
+    suffix = (volnum = attrs['volnum']) ? %((#{volnum})) : ''
+    if doc.basebackend? 'html'
+      target = %(#{manname}#{doc.outfilesuffix})
+      doc.register :links, target
+      node = create_anchor parent, text, type: :link, target: target
+    elsif doc.backend == 'manpage' 
+      node = create_inline parent, :quoted, manname, type: :strong
     else
-      nil
+      node = create_inline parent, :quoted, manname
     end
-    parent.document.register :links, target
-    %(#{(create_anchor parent, text, type: :link, target: target).convert}#{suffix})
+    create_inline parent, :quoted, %(#{node.convert}#{suffix})
   end
 end
 ----
