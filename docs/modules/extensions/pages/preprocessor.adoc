@@ -27,9 +27,6 @@ content
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
 class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
   def process document, reader
     lines = reader.lines # get raw lines
