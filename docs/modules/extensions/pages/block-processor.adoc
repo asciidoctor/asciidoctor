@@ -16,9 +16,6 @@ The time is now. Get a move on.
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
 class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
   PeriodRx = /\.(?= |$)/
 

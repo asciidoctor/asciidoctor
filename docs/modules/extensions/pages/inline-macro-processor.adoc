@@ -15,9 +15,6 @@ See man:gittutorial[7] to get started.
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
 class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
   use_dsl
 

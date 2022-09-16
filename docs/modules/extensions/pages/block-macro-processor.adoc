@@ -16,9 +16,6 @@ gist::123456[]
 
 [source,ruby]
 ----
-require 'asciidoctor'
-require 'asciidoctor/extensions'
-
 class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
   use_dsl
 
