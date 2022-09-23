@@ -748,6 +748,21 @@ class ReaderTest < Minitest::Test
         end
       end
 
+      test 'include directive should not attempt to resolve target as remote if allow-uri-read is set and URL is not on first line' do
+        using_memory_logger do |logger|
+          input = <<~'EOS'
+          :target: not-a-file.adoc + \
+          http://example.org/team.adoc
+
+          include::{target}[]
+          EOS
+          doc = Asciidoctor.load input, safe: :safe, base_dir: fixturedir
+          lines = doc.blocks[0].lines
+          assert_equal [%(Unresolved directive in <stdin> - include::not-a-file.adoc +\nhttp://example.org/team.adoc[])], lines
+          assert_message logger, :ERROR, %(<stdin>: line 4: include file not found: #{fixture_path 'not-a-file.adoc'} +\nhttp://example.org/team.adoc), Hash
+        end
+      end
+
       test 'include directive should resolve file relative to current include' do
         input = 'include::fixtures/parent-include.adoc[]'
         pseudo_docfile = File.join DIRNAME, 'main.adoc'

@@ -51,6 +51,10 @@ context 'Helpers' do
       assert Asciidoctor::UriSniffRx !~ 'c:/sample.adoc'
       assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
     end
+
+    test 'UriSniffRx should not detect URI that does not start on first line' do
+      assert Asciidoctor::UriSniffRx !~ %(text\nhttps://example.org)
+    end
   end
 
   context 'Type Resolution' do
