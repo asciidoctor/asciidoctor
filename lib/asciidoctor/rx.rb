@@ -717,7 +717,11 @@ module Asciidoctor
   #
   #   not c:/sample.adoc or c:\sample.adoc
   #
-  UriSniffRx = %r(\A#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+  if RUBY_ENGINE == 'opal'
+    UriSniffRx = %r(^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+  else
+    UriSniffRx = %r(\A#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+  end
 
   # Detects XML tags
   XmlSanitizeRx = /<[^>]+>/
