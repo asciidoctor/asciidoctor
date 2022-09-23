@@ -717,7 +717,7 @@ module Asciidoctor
   #
   #   not c:/sample.adoc or c:\sample.adoc
   #
-  UriSniffRx = %r(^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+  UriSniffRx = %r(\A#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
 
   # Detects XML tags
   XmlSanitizeRx = /<[^>]+>/
