@@ -62,7 +62,7 @@ See its documentation for {url-asciidocfx-docs}[download and installation instru
 ====
 The Atom editor's official site has announced that Atom is being sunset at the end of 2022.
 
-See link:https://github.blog/2022-06-08-sunsetting-atom/[Sunsetting Atom]
+See https://github.blog/2022-06-08-sunsetting-atom/[Sunsetting Atom]
 ====
 
 Install https://atom.io/[Atom^].
