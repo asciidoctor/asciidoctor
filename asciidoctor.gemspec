@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
-    'mailing_list_uri' => 'https://discuss.asciidoctor.org',
+    'mailing_list_uri' => 'https://chat.asciidoctor.org',
     'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
   }
 
