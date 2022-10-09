@@ -85,11 +85,10 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        #bundler: ${{ matrix.os == 'windows-latest' && matrix.ruby == '3.0' && '2.3' || 'default' }}
-        bundler-cache: ${{ github.event_name != 'schedule' }}
-        #cache-version: 1
+        bundler: ${{ matrix.os == 'windows-latest' && matrix.ruby == '3.0' && '2.3' || 'default' }}
+        bundler-cache: ${{ matrix.os != 'windows-latest' && github.event_name != 'schedule' }}
     - name: Install dependencies (scheduled build only)
-      if: github.event_name == 'schedule'
+      if: matrix.os == 'windows-latest' || github.event_name == 'schedule'
       run: |
         bundle config --local path vendor/bundle
         bundle --jobs 3 --retry 3
