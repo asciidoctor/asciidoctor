@@ -130,7 +130,7 @@ class Converter::Html5Converter < Converter::Base
         result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
       end
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
       else
         result << %(<style>
 #{Stylesheets.instance.primary_stylesheet_data}
@@ -138,7 +138,7 @@ class Converter::Html5Converter < Converter::Base
       end
     elsif node.attr? 'stylesheet'
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir', '')}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir')}"#{slash}>)
       else
         result << %(<style>
 #{node.read_contents (node.attr 'stylesheet'), start: (node.attr 'stylesdir'), warn_on_failure: true, label: 'stylesheet'}
@@ -151,7 +151,7 @@ class Converter::Html5Converter < Converter::Base
         result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
       end
     end
 

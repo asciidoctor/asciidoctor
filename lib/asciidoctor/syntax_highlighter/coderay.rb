@@ -38,7 +38,7 @@ class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
 
   def docinfo location, doc, opts
     if opts[:linkcss]
-      %(<link rel="stylesheet" href="#{doc.normalize_web_path stylesheet_basename, (doc.attr 'stylesdir', ''), false}"#{opts[:self_closing_tag_slash]}>)
+      %(<link rel="stylesheet" href="#{doc.normalize_web_path stylesheet_basename, (doc.attr 'stylesdir'), false}"#{opts[:self_closing_tag_slash]}>)
     else
       %(<style>
 #{read_stylesheet}
