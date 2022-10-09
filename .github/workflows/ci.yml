@@ -86,9 +86,9 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler: ${{ matrix.os == 'windows-latest' && startsWith(matrix.ruby, '3.') && '2.3.22' || 'default' }}
-        bundler-cache: ${{ matrix.os != 'windows-latest' && github.event_name != 'schedule' }}
+        bundler-cache: ${{ github.event_name != 'schedule' }}
     - name: Install dependencies (scheduled build only)
-      if: matrix.os == 'windows-latest' || github.event_name == 'schedule'
+      if: github.event_name == 'schedule'
       run: |
         bundle config --local path vendor/bundle
         bundle --jobs 3 --retry 3
