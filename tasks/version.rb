@@ -3,6 +3,7 @@
 require 'time'
 
 release_version = ENV['RELEASE_VERSION']
+release_gem_version = ENV['RELEASE_GEM_VERSION']
 prerelease = (release_version.count '[a-z]') > 0 ? %(-#{(release_version.split '.', 3)[-1]}) : nil
 release_date = Time.now.strftime '%Y-%m-%d'
 release_user = ENV['RELEASE_USER']
@@ -13,7 +14,7 @@ changelog_file = 'CHANGELOG.adoc'
 antora_file = 'docs/antora.yml'
 
 version_contents = (File.readlines version_file, mode: 'r:UTF-8').map do |l|
-  (l.include? 'VERSION') ? (l.sub %r/'[^']+'/, %('#{release_version}')) : l
+  (l.include? 'VERSION') ? (l.sub %r/'[^']+'/, %('#{release_gem_version}')) : l
 end
 
 readme_contents = File.readlines readme_file, mode: 'r:UTF-8'
@@ -29,12 +30,13 @@ end
 if (last_release_idx = changelog_contents.index {|l| (l.start_with? '== ') && (%r/^== \d/.match? l) })
   previous_release_version = (changelog_contents[last_release_idx].match %r/\d\S+/)[0]
 else
+  changelog_contents << ?\n
   last_release_idx = changelog_contents.length
 end
 changelog_contents.insert last_release_idx, <<~END
 === Details
 
-{url-repo}/releases/tag/v#{release_version}[git tag]#{previous_release_version ? %( | {url-repo}/compare/v#{previous_release_version}\\...v#{release_version}[source diff]) : ''}
+{url-repo}/releases/tag/v#{release_version}[git tag]#{previous_release_version ? %( | {url-repo}/compare/v#{previous_release_version}\\...v#{release_version}[full diff]) : ''}
 // end::compact[]
 
 END
