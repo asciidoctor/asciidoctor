@@ -101,7 +101,7 @@ jobs:
       if: matrix.primary
       run: |
         cd src/stylesheets
-        npm i --silent --no-audit --no-audit --no-fund --no-package-lock --no-progress
+        npm i --silent --no-audit --no-fund --no-package-lock --no-progress
         npm run lint
         npm run build
         cd -
