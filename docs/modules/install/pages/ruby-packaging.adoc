@@ -5,6 +5,11 @@ The benefit of using Ruby packaging to install Asciidoctor is that it's universa
 Provided you have configured Ruby correctly, Ruby packaging works the same way across Ruby runtimes and operating systems.
 This page explains how to use Ruby packaging to install Asciidoctor.
 
+WARNING: Unless you're running in a container (Docker, podman, OCI), _never_ install gems using `gem install` as the root user.
+Doing so will almost certainly interfere with, and possibly corrupt, the Ruby installation on your system.
+We strongly advise you to use <<Bundler>> to manage your gems within a project (or at very least, within user space).
+The `gem install` instructions are provided for when you're running in a container.
+
 == Configure Ruby packaging
 
 The best way to ensure Ruby is configured to use Ruby packaging is to install Ruby using a Ruby version manager.
