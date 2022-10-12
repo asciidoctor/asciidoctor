@@ -57,6 +57,9 @@ gem 'asciidoctor'
 To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
 Using `bundle update` (without specifying a gem) is *not* recommended as it will also update other gems, which may not be the desired result.
 
+IMPORTANT: Once you install using Bundler, you must run any executables provided by the gems (e.g., `asciidoctor`) from the directory where [.path]_Gemfile_ is located and also prefix the executable name with `bundle exec` (e.g., `bundle exec asciidoctor`).
+The `bundle exec` prefix tells Ruby to use the gems defined in the [.path]_Gemfile_.
+
 [#gem-update]
 == Upgrade using gem update
 
