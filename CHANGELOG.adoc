@@ -61,7 +61,7 @@ Improvements::
 Bug Fixes::
 
   * Change internal `uriish?` helper to only detect a URI pattern at start of a string; avoids misleading messages (#4357)
-  * Prevent highlight.js warning when no language is set on source block; don't call `highlightBlock` if `data-lang` attribute is absent
+  * Prevent highlight.js warning when no language is set on source block; don't call `highlightBlock` if `data-lang` attribute is absent (#4263)
   * Don't raise error if `Asciidoctor::Extensions.unregister` is called before groups are initialized (#4270)
   * If path is included both partially and fully, store it with true value (included fully) in includes table of document catalog
   * Reset registry if activate is called on it again (#4256)
