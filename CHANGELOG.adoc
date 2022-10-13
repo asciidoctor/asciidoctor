@@ -32,6 +32,7 @@ Bug Fixes::
   * Format source location in exception message when extension code is malformed
   * Fix lineno on reader when `skip-front-matter` attribute is set but end of front matter is not found
   * Fix `Asciidoctor::Cli::Invoker` constructor when first argument is a hash
+  * Update default stylesheet to honor marker on unordered list when marker is defined on ancestor unordered list (#4361)
 
 // tag::compact[]
 == 2.0.17 (2022-01-05) - @mojavelinux
