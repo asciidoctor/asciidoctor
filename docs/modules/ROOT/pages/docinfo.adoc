@@ -231,7 +231,7 @@ The value of this attribute defaults to `attributes`.
 
 For example, if you created the following docinfo file:
 
-.Docinfo file containing a revnumber attribute reference
+.Docinfo file (docinfo.xml) containing a revnumber attribute reference
 [source,xml]
 ----
 <edition>{revnumber}</edition>
@@ -240,7 +240,7 @@ For example, if you created the following docinfo file:
 And this source document:
 
 .Source document including a revision number
-[source,asciidoc]
+[,asciidoc]
 ----
 = Document Title
 Author Name
@@ -252,7 +252,8 @@ v1.0, 2020-12-30
 
 Then the converted DocBook output would be:
 
-[source,xml]
+.Converted DocBook containing the docinfo
+[,xml]
 ----
 <?xml version="1.0" encoding="UTF-8"?>
 <book xmlns="http://docbook.org/ns/docbook"
@@ -278,3 +279,29 @@ Then the converted DocBook output would be:
 </book>
 ----
 <.> The revnumber attribute reference was replaced by the source document's revision number in the converted output.
+
+Another example is if you want to define the the licence link tag in the HTML head.
+
+.Docinfo file (docinfo.html) containing a license meta tag
+[,html]
+----
+<link rel="license" href="{license-url}" title="{license-title}">
+----
+
+Now define these attributes in your AsciiDoc source:
+
+.Source document that defines license attributes
+[,asciidoc]
+----
+= Document Title
+:license-url: https://mit-license.org
+:license-title: MIT
+----
+
+Then the `<head>` tag in the converted HTML would include:
+
+.Rendered license link tag in HTML output
+[,html]
+----
+<link rel="license" href="https://mit-license.org" title="MIT">
+----
