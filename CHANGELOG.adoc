@@ -21,7 +21,7 @@ Improvements::
 
   * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
   * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*@zkaip*)
-  * Add include role to link/URL macro that replaces include directive when include is not enabled
+  * Add include role to link macro that replaces include directive when include is not enabled
 
 Bug Fixes::
 
