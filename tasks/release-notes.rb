@@ -10,6 +10,7 @@ spec = Gem::Specification.load Dir['*.gemspec'].first
 gem_name = spec.name
 gem_version = spec.version
 gem_dist_url = %(https://rubygems.org/gems/#{gem_name})
+release_notes_file = 'pkg/release-notes.md'
 release_user = ENV['RELEASE_USER'] || 'mojavelinux'
 release_beer = ENV['RELEASE_BEER'] || 'TBD'
 release_tag = %(v#{gem_version})
@@ -37,7 +38,7 @@ changelog = (File.readlines 'CHANGELOG.adoc', chomp: true, mode: 'r:UTF-8').redu
   accum
 end
 
-notes = <<~EOS.chomp
+release_notes = <<~EOS.chomp
 Write summary...
 
 ## Distribution
@@ -63,4 +64,4 @@ Logs: [resolved issues](#{issues_url}?q=is%3Aissue+label%3A#{release_tag}+is%3Ac
 A very special thanks to all the **awesome** [supporters of the Asciidoctor OpenCollective campaign](https://opencollective.com/asciidoctor), who provide critical funding for the ongoing development of this project.
 EOS
 
-File.write 'release-notes.md', notes, mode: 'w:UTF-8'
+File.write release_notes_file, release_notes, mode: 'w:UTF-8'
