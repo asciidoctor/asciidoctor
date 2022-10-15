@@ -33,11 +33,12 @@ chmod 600 $HOME/.gem/credentials
 (
   set -e
   ruby tasks/version.rb
-  git commit -a -m "release $RELEASE_VERSION"
+  git commit -a -m "release $RELEASE_VERSION [no ci]"
   git tag -m "version $RELEASE_VERSION" v$RELEASE_VERSION
   mkdir -p pkg
   gem build $GEMSPEC -o pkg/$RELEASE_GEM_NAME-$RELEASE_GEM_VERSION.gem
   git push origin $(git describe --tags --exact-match)
+  git push origin $RELEASE_BRANCH
   gem push pkg/$RELEASE_GEM_NAME-$RELEASE_GEM_VERSION.gem
   ruby tasks/release-notes.rb
   gh release create v$RELEASE_VERSION -t v$RELEASE_VERSION -F release-notes.md -d
