@@ -15,7 +15,8 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
-== Unreleased
+// tag::compact[]
+== 2.0.18 (2022-10-15) - @mojavelinux
 
 Improvements::
 
@@ -35,7 +36,11 @@ Bug Fixes::
   * Fix `Asciidoctor::Cli::Invoker` constructor when first argument is a hash
   * Update default stylesheet to honor marker on unordered list when marker is defined on ancestor unordered list (#4361)
 
-// tag::compact[]
+=== Details
+
+{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
+// end::compact[]
+
 == 2.0.17 (2022-01-05) - @mojavelinux
 
 Bug Fixes::
@@ -75,7 +80,6 @@ Documentation::
   * Document how to enable and use the sourcemap (the `:sourcemap` option)
   * Document how to catalog additional assets (the `:catalog_assets` option)
 
-// end::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 
 Bug Fixes::

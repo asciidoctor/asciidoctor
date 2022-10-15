@@ -1,5 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
+v2.0.18, 2022-10-15
 // settings:
 :idprefix:
 :idseparator: -
