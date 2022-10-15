@@ -641,20 +641,19 @@ class ReaderTest < Minitest::Test
     end
 
     context 'Include Directive' do
-      test 'replace include directive with link in default safe mode' do
+      test 'should replace include directive with link macro in default safe mode' do
         input = 'include::include-file.adoc[]'
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         assert_equal 'link:include-file.adoc[role=include]', reader.read_line
       end
 
-      test 'replace include directive with URL macro if safe mode allows it, but allow-uri-read is not set' do
+      test 'should replace include directive with link macro if safe mode allows it, but allow-uri-read is not set' do
         using_memory_logger do |logger|
           input = 'include::https://example.org/dist/info.adoc[]'
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
-          #assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled', Hash
           assert_empty logger
         end
       end
