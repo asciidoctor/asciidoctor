@@ -16,6 +16,10 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
+== Unreleased
+
+_No changes since previous release._
+
 == 2.0.18 (2022-10-15) - @mojavelinux
 
 Improvements::
