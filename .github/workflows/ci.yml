@@ -14,7 +14,8 @@ jobs:
   activate:
     if: |
       (github.event_name == 'schedule' && github.repository_owner == 'asciidoctor') ||
-      (github.event_name != 'schedule' && !endsWith(github.event.head_commit.message, '[skip ci]'))
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'docs/'))
     runs-on: ubuntu-latest
     steps:
     - name: Proceed
