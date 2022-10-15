@@ -41,7 +41,7 @@ chmod 600 $HOME/.gem/credentials
   git push origin $RELEASE_BRANCH
   gem push pkg/$RELEASE_GEM_NAME-$RELEASE_GEM_VERSION.gem
   ruby tasks/release-notes.rb
-  gh release create v$RELEASE_VERSION -t v$RELEASE_VERSION -F release-notes.md -d
+  gh release create v$RELEASE_VERSION -t v$RELEASE_VERSION -F pkg/release-notes.md -d
   ruby tasks/postversion.rb
   git commit -a -m 'prepare branch for development [no ci]'
   git push origin $RELEASE_BRANCH
