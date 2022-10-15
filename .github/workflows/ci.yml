@@ -2,10 +2,9 @@ name: CI
 on:
   push:
     branches: ['**']
-    tags-ignore: ['**']
-    paths-ignore: ['docs/**']
+    paths-ignore: ['*.adoc', 'docs/**']
   pull_request:
-    paths-ignore: ['docs/**']
+    paths-ignore: ['*.adoc', 'docs/**']
   schedule:
   - cron: '0 2 * * *'
 concurrency:
