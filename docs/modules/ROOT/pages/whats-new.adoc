@@ -1,7 +1,7 @@
 //= What's New (Asciidoctor {page-component-version})
 = What's New in {page-component-version}
 :doctype: book
-:description: This page presents the changes made in each of the patch releases in the Asciidoctor {page-component-version} release line.
+:description: The new features, improvements, and bug fixes made in each patch release of the Asciidoctor {page-component-version} release line.
 :page-toclevels: 0
 :url-releases-asciidoctor: {url-org}/asciidoctor/releases
 :url-milestone: {url-org}/asciidoctor/milestone/33?closed=1
@@ -10,6 +10,27 @@
 The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
+
+= Asciidoctor 2.0.18
+
+_**Release date:** 2022.10.15_
+
+== Bug Fixes
+
+* Change internal `uriish?` helper to only detect a URI pattern at start of a string; avoids misleading messages (#4357)
+* Prevent highlight.js warning when no language is set on source block; don't call `highlightBlock` if `data-lang` attribute is absent (#4263)
+* Don't raise error if `Asciidoctor::Extensions.unregister` is called before groups are initialized (#4270)
+* If path is included both partially and fully, store it with true value (included fully) in includes table of document catalog
+* Reset registry if activate is called on it again (#4256)
+* Format source location in exception message when extension code is malformed
+* Fix lineno on reader when `skip-front-matter` attribute is set but end of front matter is not found
+* Fix `Asciidoctor::Cli::Invoker` constructor when first argument is a hash
+* Update default stylesheet to honor marker on unordered list when marker is defined on ancestor unordered list (#4361)
+
+== Improvements
+
+* Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
+* Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*@zkaip*)
 
 = Asciidoctor 2.0.17
 
@@ -20,7 +41,7 @@ _**Release date:** 2022.01.05_
 * Don't crash if process method for custom block returns an abstract block with context :compound that isn't of type Block (e.g., a list)
 * Ignore return value of process method for custom block or block macro if value matches parent argument
 * Remove unnamespaced selectors in Pygments stylesheet
-* Normalize output from Pygments to use linenos class for inline line numbering and trim space after number; update default stylesheet accordingly
+* Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
 * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) (*@Mogztter*)
 * Hide built-in marker on HTML summary element in Safari when using default stylesheet (#4162)
 * Hide outline around HTML summary when activated in Safari (#4162)
@@ -29,7 +50,7 @@ _**Release date:** 2022.01.05_
 * Update default stylesheet to fix spacing around empty list item (#4184)
 * Honor `:header_only` option when parsing document with manpage doctype (#4192)
 * Use numeric character reference for closing square bracket around alt text of icon
-* Process author or authors document attribute in document header when implicit doctitle is absent (#4206)
+* Process `author` or `authors` document attribute in document header when implicit doctitle is absent (#4206)
 * Patch open-uri-cached gem to work with Ruby 3.1 (update: drop patch now that open-uri-cached has been fixed) (#4227)
 
 == Improvements
@@ -41,7 +62,7 @@ _**Release date:** 2022.01.05_
 * Allow `--failure-level` to be set to default value, `FATAL`
 * Sort levels in help for `--failure-level` option in ascending order
 * Invert FR translations for caution & warning admonition labels (#4212) (*@cyChop*)
-* Add tests for open-uri-cached integration that's activated by the cache-uri attribute
+* Add tests for open-uri-cached integration that's activated by the `cache-uri` attribute
 * Don't warn if negated tag is not found in include file (#4230)
 
 == Build / Infrastructure
@@ -56,7 +77,7 @@ _**Release date:** 2021.08.03_
 
 * Include all lines outside of specified tagged region when tag filter on include directive is a single negated tag (#4048)
 * Only interpret negated wildcard in tag filter on include directive as implicit globstar if it precedes other tags (#4086)
-* Change ifeval directive to resolve to false if comparison operation cannot be performed (#4046)
+* Change `ifeval` directive to resolve to false if comparison operation cannot be performed (#4046)
 * Don't crash if `:to_file` option is passed to `load` or `load_file` and value is not a string (#4055)
 * Use automatic link text if ID in shorthand xref is followed by dangling comma (e.g., `+<<idname,>>+`)
 * Update default stylesheet to indent blocks attached to list item in checklist (#2550)
@@ -116,7 +137,7 @@ _**Release date:** 2021.04.19_
 
 * Don't allow AsciiDoc table cell to set document attribute that was unset from the API (exceptions include: compat-mode, toc, showtitle, and notitle) (#4017)
 * Ensure default document attributes unset in parent document remain unset in AsciiDoc table cell (#2586)
-* Allow showtitle/notitle to be toggled in AsciiDoc table cell if set in parent document (#4018)
+* Allow `showtitle` and `notitle` to be toggled in AsciiDoc table cell if set in parent document (#4018)
 * Ensure mtime of input file honors TZ environment variable on JRuby for Windows (affects value of `docdatetime` attribute) (#3550)
 * Honor caption attribute on blocks that support captioned title even if corresponding `*-caption` document attribute (e.g., `example-caption`) is unset (#4023)
 * Suppress missing attribute warning when applying substitutions to implicit document title for assignment to intrinsic `doctitle` attribute (#4024)
