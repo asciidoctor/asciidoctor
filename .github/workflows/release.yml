@@ -26,6 +26,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets[format('GH_TOKEN_{0}', github.actor)] }}
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
