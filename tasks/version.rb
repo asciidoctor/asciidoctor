@@ -55,6 +55,8 @@ antora_contents = (File.readlines antora_file, mode: 'r:UTF-8').map do |l|
     %(prerelease: #{prerelease ? 'true' : 'false'}\n)
   elsif l.start_with? 'version: '
     %(version: '#{release_version}'\n)
+  elsif l.start_with? '    release-version: '
+    %(    release-version: '#{release_version}'\n)
   else
     l
   end
