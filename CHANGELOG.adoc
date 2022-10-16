@@ -15,6 +15,7 @@ For an even more detailed look at what has changed, refer to the {uri-repo}/comm
 
 This project utilizes semantic versioning.
 
+// tag::compact[]
 == Unreleased
 
 Enhancements::
@@ -54,10 +55,15 @@ Improvements::
   * Target `<object>` element with image more accurately in default stylesheet
   * Remove form styles from the default stylesheet (#4186)
   * Set linenums option on source block when line numbering is enabled (#3313)
-  * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
+
+== 2.0.18 (2022-10-15) - @mojavelinux
+
+Improvements::
+
+  * Propagate `:to_dir` option to document of AsciiDoc table cell (#4297)
   * Force encoding of attribute data passed via CLI to UTF-8 if transcoding fails (#4351) (*@zkaip*)
-  * Add include role to link/URL macro that replaces include directive when include is not enabled
+  * Add include role to link macro that replaces include directive when include is not enabled
 
 Bug Fixes::
 
@@ -71,7 +77,11 @@ Bug Fixes::
   * Fix `Asciidoctor::Cli::Invoker` constructor when first argument is a hash
   * Update default stylesheet to honor marker on unordered list when marker is defined on ancestor unordered list (#4361)
 
-// tag::compact[]
+=== Details
+
+{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
+
+// end::compact[]
 == 2.0.17 (2022-01-05) - @mojavelinux
 
 Bug Fixes::
@@ -111,7 +121,6 @@ Documentation::
   * Document how to enable and use the sourcemap (the `:sourcemap` option)
   * Document how to catalog additional assets (the `:catalog_assets` option)
 
-// end::compact[]
 == 2.0.16 (2021-08-03) - @mojavelinux
 
 Bug Fixes::
