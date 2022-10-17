@@ -129,16 +129,20 @@ class Reader
   # Returns the next line of the source data as a String if there are lines remaining.
   # Returns nothing if there is no more data.
   def peek_line direct = false
-    if direct || @look_ahead > 0
-      @unescape_next_line ? ((line = @lines[-1]).slice 1, line.length) : @lines[-1]
-    elsif @lines.empty?
-      @look_ahead = 0
-      nil
-    else
-      # FIXME the problem with this approach is that we aren't
-      # retaining the modified line (hence the @unescape_next_line tweak)
-      # perhaps we need a stack of proxied lines
-      (process_line @lines[-1]) || peek_line
+    while true
+      next_line = @lines[-1]
+      return @unescape_next_line ? (next_line.slice 1, next_line.length) : next_line if direct || @look_ahead > 0
+      if next_line
+        # FIXME the problem with this approach is that we aren't
+        # retaining the modified line (hence the @unescape_next_line tweak)
+        # perhaps we need a stack of proxied lines
+        if (line = process_line next_line)
+          return line
+        end
+      else
+        @look_ahead = 0
+        return
+      end
     end
   end
 

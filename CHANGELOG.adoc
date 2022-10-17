@@ -57,6 +57,10 @@ Improvements::
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
 
+Bug Fixes::
+
+  * Redo loop rather than using recursion to locate next line to process; prevents stack limit error (#4368)
+
 == 2.0.18 (2022-10-15) - @mojavelinux
 
 Improvements::
