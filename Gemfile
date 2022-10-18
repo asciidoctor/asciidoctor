@@ -16,7 +16,7 @@ group :development do
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
   # rouge is needed for testing source highlighting; Asciidoctor supports rouge >= 2
   gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '~> 3.0')
-  if RUBY_ENGINE == 'truffleruby' || (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.5.0')
+  if RUBY_ENGINE == 'truffleruby'
     gem 'nokogiri', '~> 1.10.0'
   elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.6.0')
     gem 'nokogiri', '~> 1.12.0'
@@ -32,9 +32,9 @@ group :lint do
   gem 'rubocop', '~> 1.24.0', require: false
   gem 'rubocop-minitest', '~> 0.17.0', require: false
   gem 'rubocop-rake', '~> 0.6.0', require: false
-end unless (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.5.0')
+end
 
 group :coverage do
   gem 'json', '~> 2.2.0' if RUBY_ENGINE == 'truffleruby'
   gem 'simplecov', '~> 0.16.0'
-end unless (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.5.0')
+end
