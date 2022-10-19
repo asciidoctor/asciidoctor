@@ -1,2 +1,12 @@
-# undef_method wasn't public until 2.5
-Dir.singleton_class.send :undef_method, :home
+# frozen_string_literal: false
+
+class Dir
+  class << self
+    prepend (Module.new do
+      def home
+        raise 'mimic failure' if caller[0].include? '/asciidoctor.rb:'
+        super
+      end
+    end)
+  end
+end
