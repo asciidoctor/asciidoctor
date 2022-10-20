@@ -7,9 +7,11 @@ on:
     paths-ignore: ['*.adoc', 'docs/**']
   schedule:
   - cron: '0 2 * * *'
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+permissions: read-all
 jobs:
   activate:
     if: |
