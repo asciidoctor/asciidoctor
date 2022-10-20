@@ -1193,7 +1193,7 @@ context 'Blocks' do
     test 'should strip leading and trailing blank lines when converting verbatim block' do
       # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
       input = <<~EOS
-      [subs="attributes"]
+      [subs=attributes+]
       ....
 
 
