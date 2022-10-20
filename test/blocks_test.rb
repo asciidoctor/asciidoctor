@@ -1468,6 +1468,18 @@ context 'Blocks' do
       assert_equal output.rstrip, output2.rstrip
     end
 
+    test 'should not mangle array that contains formatted text with role in listing block with quotes sub enabled' do
+      input = <<~'EOS'
+      [,ruby,subs=+quotes]
+      ----
+      nums = [1, 2, 3, [.added]#4#]
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_includes output, 'nums = [1, 2, 3, <span class="added">4</span>]'
+    end
+
     test 'first character of block title may be a period if not followed by space' do
       input = <<~'EOS'
       ..gitignore

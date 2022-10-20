@@ -208,6 +208,11 @@ context 'Substitutions' do
       assert_equal 'key: [ <strong>before <span class="redacted">redacted</span> after</strong> ]', para.sub_quotes(para.source)
     end
 
+    test 'should ignore enclosing square brackets when processing formatted text with attribute list' do
+      doc = document_from_string 'nums = [1, 2, 3, [.blue]#4#]', doctype: :inline
+      assert_equal 'nums = [1, 2, 3, <span class="blue">4</span>]', doc.convert
+    end
+
     test 'single-line constrained strong string' do
       para = block_from_string '*a few strong words*'
       assert_equal '<strong>a few strong words</strong>', para.sub_quotes(para.source)
