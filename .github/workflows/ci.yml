@@ -7,6 +7,7 @@ on:
     paths-ignore: ['*.adoc', 'docs/**']
   schedule:
   - cron: '0 2 * * *'
+permissions: read-all
 jobs:
   activate:
     if: |
