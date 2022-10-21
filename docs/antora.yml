@@ -24,7 +24,6 @@ nav:
 - modules/cli/nav.adoc
 - modules/api/nav.adoc
 - modules/ROOT/nav-safe-modes.adoc
-- modules/ROOT/nav-docinfo.adoc
 - modules/tooling/nav.adoc
 - modules/syntax-highlighting/nav.adoc
 - modules/stem/nav.adoc
