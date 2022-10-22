@@ -146,6 +146,10 @@ class ReaderTest < Minitest::Test
         assert reader.next_line_empty?
       end
 
+      test 'peek_line should return nil if next entry is nil' do
+        assert_nil (Asciidoctor::Reader.new [nil]).peek_line
+      end
+
       test 'peek_line should return next line if there are lines remaining' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         assert_equal SAMPLE_DATA.first, reader.peek_line
@@ -2818,6 +2822,39 @@ class ReaderTest < Minitest::Test
           assert_empty result
           assert_empty logger
         end
+      end
+
+      test 'should not fail to process preprocessor directive that evaluates to false and has a large number of lines' do
+        lines = (%w(data) * 5000) * ?\n
+        input = <<~EOS
+        before
+
+        ifdef::attribute-not-set[]
+        #{lines}
+        endif::attribute-not-set[]
+
+        after
+        EOS
+
+        doc = Asciidoctor.load input
+        assert_equal 2, doc.blocks.size
+        assert_equal 'before', doc.blocks[0].source
+        assert_equal 'after', doc.blocks[1].source
+      end
+
+      test 'should not fail to process lines if reader contains a nil entry' do
+        input = ['before', '', '', '', 'after']
+        doc = Asciidoctor.load input, extensions: proc {
+          preprocessor do
+            process do |_, reader|
+              reader.source_lines[2] = nil
+              nil
+            end
+          end
+        }
+        assert_equal 2, doc.blocks.size
+        assert_equal 'before', doc.blocks[0].source
+        assert_equal 'after', doc.blocks[1].source
       end
     end
   end
