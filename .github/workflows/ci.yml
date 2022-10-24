@@ -64,7 +64,7 @@ jobs:
       SOURCE_DATE_EPOCH: '1521504000'
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install prerequisites for Nokogiri (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install libxslt1-dev
@@ -123,7 +123,7 @@ jobs:
       BUNDLE_WITHOUT: docs:lint:coverage
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
