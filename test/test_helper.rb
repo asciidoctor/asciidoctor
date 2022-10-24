@@ -332,8 +332,6 @@ class Minitest::Test
     [Gem.ruby, *ruby_args, (File.join bindir, 'asciidoctor')]
   end
 
-  # NOTE run_command fails on JRuby 9.1 for Windows with the following error:
-  # Java::JavaLang::ClassCastException at org.jruby.util.ShellLauncher.getModifiedEnv(ShellLauncher.java:271)
   def run_command cmd, *args, &block
     if Array === cmd
       args.unshift(*cmd)
@@ -344,17 +342,7 @@ class Minitest::Test
     (env ||= {})['RUBYOPT'] = nil unless kw_args[:use_bundler]
     opts = { err: [:child, :out] }
     if env
-      # NOTE while JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child
-      if jruby?
-        begin
-          old_env, env = ENV.merge, (ENV.merge env)
-          env.each {|key, val| env.delete key if val.nil? } if env.value? nil
-          ENV.replace env
-          popen [cmd, *args, opts], &block
-        ensure
-          ENV.replace old_env
-        end
-      elsif env.value? nil
+      if env.value? nil
         env = env.each_with_object ENV.to_h do |(key, val), accum|
           val.nil? ? (accum.delete key) : (accum[key] = val)
         end
@@ -368,11 +356,18 @@ class Minitest::Test
   end
 
   def popen args, &block
-    # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
     if jruby? && windows?
       result = nil
+      # While JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child process
+      if Hash === args[-1] && args[-1][:unsetenv_others] && Hash === (env = args[0])
+        old_env = ENV.merge
+        ENV.replace env
+      end
+      # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
       IO.popen args do |io|
         result = yield io
+      ensure
+        ENV.replace old_env if old_env
       end
       result
     else

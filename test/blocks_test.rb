@@ -1456,9 +1456,7 @@ context 'Blocks' do
       EOS
 
       output2 = convert_string_to_embedded input2
-      # FIXME JRuby is adding extra trailing newlines in the second document,
-      # for now, rstrip is necessary
-      assert_equal output.rstrip, output2.rstrip
+      assert_equal output, output2
     end
 
     test 'should not mangle array that contains formatted text with role in listing block with quotes sub enabled' do
