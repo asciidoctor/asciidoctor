@@ -266,9 +266,8 @@ context 'Tables' do
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
-    test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+    test 'wip should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
+      input = <<~'EOS'
       [cols=2*]
       |===
       l|
@@ -285,8 +284,7 @@ context 'Tables' do
     end
 
     test 'should ignore v table cell style' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [cols=2*]
       |===
       v|
@@ -821,8 +819,7 @@ context 'Tables' do
     end
 
     test 'should interpret leading indent if first cell is AsciiDoc and there is no implicit header row' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [cols="1a,1"]
       |===
       |
@@ -1629,8 +1626,7 @@ context 'Tables' do
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       |===
       a|
        $ command

@@ -1090,8 +1090,7 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
         end
 
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         <code class="language-ruby" data-lang="ruby">def initialize breed
           @breed = breed
         end</code>
@@ -1292,8 +1291,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1311,8 +1309,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1338,8 +1335,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1357,8 +1353,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1409,8 +1404,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1437,8 +1431,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1484,8 +1477,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1518,8 +1510,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1567,8 +1558,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1594,8 +1584,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1619,8 +1608,7 @@ class ReaderTest < Minitest::Test
           EOS
 
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-          # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-          expected = <<~EOS.chop
+          expected = <<~'EOS'.chop
           class Dog
             def initialize breed
               @breed = breed
@@ -1639,8 +1627,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1728,8 +1715,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         def bark
           if @breed == 'beagle'
             'woof woof woof woof woof'

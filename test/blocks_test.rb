@@ -1191,8 +1191,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [subs=attributes+]
       ....
 
@@ -1227,8 +1226,7 @@ context 'Blocks' do
     end
 
     test 'should remove block indent if indent attribute is 0' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="0"]
       ----
           def names
@@ -1239,8 +1237,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
         @names.split
@@ -1256,8 +1253,7 @@ context 'Blocks' do
     end
 
     test 'should not remove block indent if indent attribute is -1' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="-1"]
       ----
           def names
@@ -1278,8 +1274,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="1"]
       ----
           def names
@@ -1300,8 +1295,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent document attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       :source-indent: 1
 
       [source,ruby]
@@ -1337,8 +1331,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
           @names.split
@@ -1828,8 +1821,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting raw block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       ++++
       line above
       ++++
