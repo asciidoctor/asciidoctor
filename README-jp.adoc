@@ -14,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.16
+:release-version: 2.0.18
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -134,8 +134,8 @@ Chrome, Atom, Bracketsやその他のウェブベースのツールで, AsciiDoc
 
 AsciidoctorはLinux, macOS, およびWindowsで動作し, 下記の {uri-ruby}[Ruby]実装の一つを必要とします.
 
-* CRuby (aka MRI) 2.3 - 2.6
-* JRuby 9.1 - 9.2
+* CRuby (aka MRI) 2.5 - 3.1
+* JRuby 9.1 - 9.3
 * TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
@@ -317,7 +317,7 @@ AsciidoctorのバージョンとRuby環境についての情報がターミナ�
 [.output,subs=attributes+]
 ....
 Asciidoctor {release-version} [https://asciidoctor.org]
-Runtime Environment (ruby 2.6.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 3.0.1p64 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 AsciidoctorはAPIも提供します.
