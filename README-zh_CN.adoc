@@ -127,8 +127,8 @@ Asciidoctor 是 AsciiDoc.py 的继承者。
 
 Asciidoctor 可以在 Linux、macOS 和 Windows 上运行，需要 {url-ruby}[Ruby] 的以下实现之一：
 
-* CRuby（也被称为 MRI）2.3 - 3.0
-* JRuby 9.1 - 9.2
+* CRuby（也被称为 MRI）2.5 - 3.1
+* JRuby 9.1 - 9.3
 * TruffleRuby（GraalVM）
 
 [注意]
