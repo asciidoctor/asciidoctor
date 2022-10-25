@@ -13,8 +13,8 @@ In other words, the safe mode setting does not provide a way to sanitize the out
 
 Asciidoctor performs sensible escaping to allow an author to safely input text, but does not limit the content that can be included in the output using passthrough blocks or custom substitutions.
 The reason for this policy is that we assume the document will be passed through a sanitizer if the HTML must be embedded directly into a web page, precisely what GitHub and GitLab do.
-This postprocessing (which could be done using a postprocessor extension) is better handled by a separate tool since.
-There are many permutations to consider and only a separate tool would know which restrictions to apply for a given situation.
+This postprocessing (which could be done using a postprocessor extension) is better handled by a separate tool since
+there are many permutations to consider and only a separate tool would know which restrictions to apply for a given situation.
 ****
 
 The safe mode can be set from the xref:cli:set-safe-mode.adoc[CLI] and the xref:api:set-safe-mode.adoc[API].
