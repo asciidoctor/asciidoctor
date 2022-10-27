@@ -200,7 +200,7 @@ context 'Sections' do
       assert_equal 'Section One <a id="one"></a>', sec.title
     end
 
-    test 'should apply substititons to title with attribute references when registering section with auto-generated ID' do
+    test 'should apply substitutions to title with attribute references when registering section with auto-generated ID' do
       input = <<~'EOS'
       = Document Title
       :foo: bar
@@ -222,7 +222,7 @@ context 'Sections' do
       assert_xpath '//h2[@id="_section_baz"][text()="Section baz"]', output, 1
     end
 
-    test 'should apply substititons to title with attribute references when registering section with explicit ID' do
+    test 'should apply substitutions to title with attribute references when registering section with explicit ID' do
       input = <<~'EOS'
       = Document Title
       :foo: bar
@@ -245,7 +245,7 @@ context 'Sections' do
       assert_xpath '//h2[@id="explicit"][text()="Section baz"]', output, 1
     end
 
-    test 'should not apply substititons to title with attribute references when parsing section with empty ID' do
+    test 'should not apply substitutions to title with attribute references when parsing section with empty ID' do
       input = <<~'EOS'
       = Document Title
       :attribute-missing: warn
