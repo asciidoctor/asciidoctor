@@ -109,7 +109,7 @@ jobs:
         cd -
         if [ -n "$(git diff --name-only -- data/stylesheets)" ]; then
           echo 'Detected the following uncommitted changes to the default stylesheet:'
-          git diff
+          git --no-pager diff
           exit 1
         fi
     - name: Run tests
