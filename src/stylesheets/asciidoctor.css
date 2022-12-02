@@ -830,14 +830,6 @@ body.toc2 #header > h1:nth-last-child(2) {
   border-radius: 4px;
 }
 
-#content #toc > :first-child {
-  margin-top: 0;
-}
-
-#content #toc > :last-child {
-  margin-bottom: 0;
-}
-
 #footer {
   max-width: none;
   background: rgb(0 0 0 / 0.8);
@@ -1095,11 +1087,13 @@ table.tableblock.fit-content > caption.title {
   text-align: center;
 }
 
+#content #toc > :first-child,
 .exampleblock > .content > :first-child,
 .sidebarblock > .content > :first-child {
   margin-top: 0;
 }
 
+#content #toc > :last-child,
 .exampleblock > .content > :last-child,
 .exampleblock > .content > :last-child > :last-child,
 .exampleblock > .content .olist > ol > li:last-child > :last-child,
