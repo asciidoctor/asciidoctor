@@ -170,7 +170,6 @@ table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
 .admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6);word-wrap:anywhere}
 .admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
 .exampleblock>.content{border:1px solid #e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#fffef7;border-radius:4px;box-shadow:0 1px 4px #e0e0dc}
-.exampleblock>.content>:first-child{margin-top:0}
 .sidebarblock{border:1px solid #dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;border-radius:4px}
 .sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
 .exampleblock>.content>:first-child,.sidebarblock>.content>:first-child{margin-top:0}
