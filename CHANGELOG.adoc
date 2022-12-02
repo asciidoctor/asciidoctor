@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Use correct selector to collapse margin on first and last child of sidebar
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
