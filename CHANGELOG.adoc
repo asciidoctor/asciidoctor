@@ -60,6 +60,7 @@ Improvements::
 Bug Fixes::
 
   * Redo loop rather than using recursion to locate next line to process; prevents stack limit error (#4368)
+  * Use correct selector to collapse margin on first and last child of sidebar 
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 

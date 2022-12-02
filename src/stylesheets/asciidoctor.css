@@ -1085,10 +1085,6 @@ table.tableblock.fit-content > caption.title {
   margin-top: 0;
 }
 
-.exampleblock > .content > :last-child {
-  margin-bottom: 0;
-}
-
 .sidebarblock {
   border: 1px solid #dbdbd6;
   margin-bottom: 1.25em;
@@ -1097,24 +1093,23 @@ table.tableblock.fit-content > caption.title {
   border-radius: 4px;
 }
 
-.sidebarblock > :first-child {
-  margin-top: 0;
-}
-
-.sidebarblock > :last-child {
-  margin-bottom: 0;
-}
-
 .sidebarblock > .content > .title {
   color: #7a2518;
   margin-top: 0;
   text-align: center;
 }
 
+.exampleblock > .content > :first-child,
+.sidebarblock > .content > :first-child {
+  margin-top: 0;
+}
+
+.exampleblock > .content > :last-child,
 .exampleblock > .content > :last-child > :last-child,
 .exampleblock > .content .olist > ol > li:last-child > :last-child,
 .exampleblock > .content .ulist > ul > li:last-child > :last-child,
 .exampleblock > .content .qlist > ol > li:last-child > :last-child,
+.sidebarblock > .content > :last-child,
 .sidebarblock > .content > :last-child > :last-child,
 .sidebarblock > .content .olist > ol > li:last-child > :last-child,
 .sidebarblock > .content .ulist > ul > li:last-child > :last-child,
