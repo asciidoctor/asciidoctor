@@ -62,6 +62,7 @@ Improvements::
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
   * Return empty string instead of nil if raw or verbatim block has no lines
+  * Avoid numeric character reference when looking for fragment in target of xref (#4393)
   * Don't split value of `-r` CLI option; treat as single path (#4425)
 
 Bug Fixes::

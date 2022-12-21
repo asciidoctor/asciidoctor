@@ -756,7 +756,7 @@ module Substitutors
 
         if doc.compat_mode
           fragment = refid
-        elsif (hash_idx = refid.index '#')
+        elsif (hash_idx = refid.index '#') && refid[hash_idx - 1] != '&'
           if hash_idx > 0
             if (fragment_len = refid.length - 1 - hash_idx) > 0
               path, fragment = (refid.slice 0, hash_idx), (refid.slice hash_idx + 1, fragment_len)
