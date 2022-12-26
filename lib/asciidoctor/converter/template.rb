@@ -30,7 +30,7 @@ class Converter::TemplateConverter < Converter::Base
     erb: { trim: 0 },
     # TODO line 466 of haml/compiler.rb sorts the attributes; file an issue to make this configurable
     # NOTE AsciiDoc syntax expects HTML/XML output to use double quotes around attribute values
-    haml: { format: :xhtml, attr_wrapper: '"', escape_attrs: false, ugly: true },
+    haml: { format: :xhtml, escape_attrs: false, ugly: true },
     slim: { disable_escape: true, sort_attrs: false, pretty: false },
   }
 
@@ -225,9 +225,10 @@ class Converter::TemplateConverter < Converter::Base
           end
         when :haml
           unless @active_engines[extsym]
-            Helpers.require_library 'haml' unless defined? ::Haml::Engine
+            Helpers.require_library 'asciidoctor/haml' unless defined? ::Asciidoctor::Haml::Template
             # NOTE Haml 5 dropped support for pretty printing
             @engine_options[extsym].delete :ugly if defined? ::Haml::TempleEngine
+            @engine_options[extsym][::Asciidoctor::Haml::QUOTE_ATTR] = '"'
             @active_engines[extsym] = true
           end
         when :erb

@@ -703,7 +703,7 @@ context 'Invoker' do
     assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
     selected = doc.converter.find_converter 'paragraph'
     assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-    assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+    assert_kind_of Asciidoctor::Haml::Template, selected.templates['paragraph']
   end
 
   test 'should load custom templates from multiple template directories' do

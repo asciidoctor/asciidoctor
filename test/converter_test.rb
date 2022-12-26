@@ -10,7 +10,7 @@ context 'Converter' do
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter 'paragraph'
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+      assert_kind_of Asciidoctor::Haml::Template, selected.templates['paragraph']
       assert_equal :html5, selected.templates['paragraph'].options[:format]
     end
 
@@ -19,7 +19,7 @@ context 'Converter' do
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter 'paragraph'
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+      assert_kind_of Asciidoctor::Haml::Template, selected.templates['paragraph']
       assert_equal :xhtml, selected.templates['paragraph'].options[:format]
     end
 
@@ -96,7 +96,7 @@ context 'Converter' do
       %w(paragraph sidebar).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
+        assert_kind_of Asciidoctor::Haml::Template, selected.templates[node_name]
         assert_equal %(block_#{node_name}.html.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -127,7 +127,7 @@ context 'Converter' do
       %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
+        assert_kind_of Asciidoctor::Haml::Template, selected.templates[node_name]
         assert_equal %(block_#{node_name}.xml.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -216,7 +216,7 @@ context 'Converter' do
       refute_empty caches[:templates]
       paragraph_template = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
       refute_nil paragraph_template
-      assert_kind_of Tilt::HamlTemplate, paragraph_template
+      assert_kind_of Asciidoctor::Haml::Template, paragraph_template
     end
 
     test 'should be able to disable template cache' do
