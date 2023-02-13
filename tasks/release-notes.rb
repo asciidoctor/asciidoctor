@@ -45,7 +45,7 @@ Write summary...
 
 - [RubyGem (#{gem_name})](#{gem_dist_url})
 
-Asciidoctor is also packaged for [Fedora](https://apps.fedoraproject.org/packages/rubygem-asciidoctor), [Debian](https://packages.debian.org/sid/asciidoctor), [Ubuntu](https://packages.ubuntu.com/search?keywords=asciidoctor), [Alpine Linux](https://pkgs.alpinelinux.org/packages?name=asciidoctor), [OpenSUSE](https://software.opensuse.org/package/rubygem-asciidoctor), and [Homebrew](http://brewformulas.org/Asciidoctor). You can use the system's package manager to install the package named **asciidoctor**.
+Asciidoctor is also packaged for [Fedora](https://apps.fedoraproject.org/packages/rubygem-asciidoctor), [Debian](https://packages.debian.org/sid/asciidoctor), [Ubuntu](https://packages.ubuntu.com/search?keywords=asciidoctor), [Alpine Linux](https://pkgs.alpinelinux.org/packages?name=asciidoctor), [OpenSUSE](https://software.opensuse.org/package/rubygem-asciidoctor), and [Homebrew](https://formulae.brew.sh/formula/asciidoctor). You can use the system's package manager to install the package named **asciidoctor**.
 
 ## Changelog
 
