@@ -178,7 +178,6 @@ Asciidoctor is more careful when deriving automatic IDs for sections from the se
 
 To ensure your IDs have maximum portability, it's best to define them explicitly if the section title contains special characters or formatting.
 
-
 === Tables
 
 [cols="~,~,~,~"]
@@ -279,6 +278,15 @@ In other words, tabs are not expanded in verbatim content blocks unless this att
 For all other text, Asciidoctor tabs are fixed at 4 spaces by the CSS.
 See xref:asciidoc:directives:include-with-indent.adoc[normalize block indentation].
 |===
+
+=== docinfo attributes
+
+`docinfo` attribute values were introduced into AsciiDoc by Asciidoctor 1.5.5 to replace the less descriptive `docinfo1` and `docinfo2` attributes.
+Here are the equivalents of the old attributes using the new values:
+
+* `:docinfo:` = `:docinfo: private`
+* `:docinfo1:` = `:docinfo: shared`
+* `:docinfo2:` = `:docinfo: shared,private`
 
 === showcomments
 
