@@ -33,7 +33,7 @@ jobs:
           ruby: '3.1'
         include:
         - os: ubuntu-latest
-          ruby: truffleruby-21.1.0
+          ruby: truffleruby-22.2.0
         - os: ubuntu-latest
           ruby: jruby-9.1.17.0
           pygments-version: ~
