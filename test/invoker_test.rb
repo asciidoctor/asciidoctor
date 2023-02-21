@@ -734,7 +734,7 @@ context 'Invoker' do
     assert_include '<p>IBM866:IBM866</p>', result
   end
 
-  test 'should not fail to load if call to Dir.home fails' do
+  test 'should not fail to load if call to Dir.home fails', unless: RUBY_ENGINE == 'truffleruby' do
     cmd = asciidoctor_cmd ['-r', (fixture_path 'undef-dir-home.rb')]
     result = run_command(cmd, '-e', '-o', '-', (fixture_path 'basic.adoc')) {|out| out.read }
     assert_include 'Body content', result
