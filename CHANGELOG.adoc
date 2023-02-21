@@ -42,6 +42,7 @@ Compliance::
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
+  * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
   * Drop support for Ruby < 2.5 and JRuby < 9.2
   * Update latest Ruby to 3.2 in CI workflows
 
