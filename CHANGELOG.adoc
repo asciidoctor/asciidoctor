@@ -22,7 +22,6 @@ Compliance::
 
   * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
   * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
-  * Update latest Ruby to 3.2 in CI workflows
 
 Bug Fixes::
 
