@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Compliance::
+
+  * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
+
 Bug Fixes::
 
   * Use correct selector to collapse margin on first and last child of sidebar
