@@ -1552,6 +1552,13 @@ context 'Document' do
       assert_equal 'foobar', (doc.resolve_id 'Foo Bar')
     end
 
+    test 'should return nil if there is already an entry for ID in the :refs table' do
+      doc = empty_document
+      ref = ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', type: :ref, target: 'tigers'), '[tigers]']
+      assert_equal ref[1], (doc.register :refs, ref)
+      assert_nil doc.register :refs, ref
+    end
+
     test 'should record imagesdir when image is registered with catalog' do
       doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
       doc.register :images, 'diagram.svg'
