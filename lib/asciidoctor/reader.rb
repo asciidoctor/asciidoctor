@@ -1189,15 +1189,16 @@ class PreprocessorReader < Reader
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       else
+        inc_content = nil
         begin
           # NOTE read content before shift so cursor is only advanced if IO operation succeeds
           inc_content = reader.call(inc_path, read_mode) {|f| f.read }
           shift
-          push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
           logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
+        push_include inc_content, inc_path, relpath, 1, parsed_attrs
       end
       true
     end
