@@ -21,6 +21,7 @@ This project utilizes semantic versioning.
 Compliance::
 
   * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
+  * Update latest Ruby to 3.2 in CI workflows
 
 Bug Fixes::
 
