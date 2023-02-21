@@ -20,6 +20,8 @@ group :development do
     gem 'nokogiri', '~> 1.10.0'
   elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.6.0')
     gem 'nokogiri', '~> 1.12.0'
+  elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.7.0')
+    gem 'nokogiri', '~> 1.13.0'
   end
 end
 
