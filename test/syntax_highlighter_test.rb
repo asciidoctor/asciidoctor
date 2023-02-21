@@ -1061,8 +1061,8 @@ context 'Syntax Highlighter' do
       EOS
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_css 'pre.rouge', output, 1
-      assert_includes output, 'pre.rouge .no {'
-      assert_match %r/pre\.rouge \{\s*background-color: #f8f8f8;/m, output
+      expected_css = (Asciidoctor::SyntaxHighlighter.for 'rouge').read_stylesheet 'github'
+      assert_includes output, expected_css
     end
 
     test 'should restore isolated callout mark on last line of source' do
