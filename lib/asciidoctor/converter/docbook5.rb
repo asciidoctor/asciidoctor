@@ -404,6 +404,9 @@ class Converter::DocBook5Converter < Converter::Base
       result << %(<t#{tsec}>)
       rows.each do |row|
         result << '<row>'
+        if (tsec == :head) && (node.option? 'headerbg')
+          result << '<?dbfo bgcolor="#EBEBEB" ?>'
+        end
         row.each do |cell|
           colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : ''
           rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
