@@ -20,8 +20,13 @@ The processor always cataloged the following assets, regardless of this setting:
 * block or inline anchors (key: `:refs`)
 * footnotes (key: `:footnotes`)
 
-Inline elements are not cataloged until conversion.
+Generally speaking, inline elements are not cataloged until conversion.
 Therefore, they're only available after the document has been converted, not after it has been loaded.
+However, inline anchors are an exception.
+
+Inline anchors in paragraphs and list items are cataloged when the document is parsed.
+However, the scan for inline anchors happens before inline passthroughs are processed.
+Therefore, to escape an inline anchor, you must use a backslash instead of an inline passthrough.
 
 == Set :catalog_assets option
 
