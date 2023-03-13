@@ -385,6 +385,7 @@ class Converter::DocBook5Converter < Converter::Base
     elsif node.option? 'breakable'
       result << '<?dbfo keep-together="auto"?>'
     end
+    stripes = node.attr 'stripes', nil, 'table-stripes'
     result << %(<title>#{node.title}</title>) if tag_name == 'table'
     if (width = (node.attr? 'width') ? (node.attr 'width') : nil)
       TABLE_PI_NAMES.each do |pi_name|
@@ -402,8 +403,17 @@ class Converter::DocBook5Converter < Converter::Base
       next if rows.empty?
       has_body = true if tsec == :body
       result << %(<t#{tsec}>)
-      rows.each do |row|
+      rows.each_with_index do |row, index|
         result << '<row>'
+        if (stripes === 'odd')
+          if (tsec == :body) && (index % 2 != 0)
+            result << '<?dbfo bgcolor="#EFEFEF" ?>'
+          end
+        elsif (stripes === 'even')
+          if (tsec == :body) && (index % 2 == 0)
+            result << '<?dbfo bgcolor="#EFEFEF" ?>'
+          end
+        end
         row.each do |cell|
           colspan_attribute = cell.colspan ? %( namest="col_#{colnum = cell.column.attr 'colnumber'}" nameend="col_#{colnum + cell.colspan - 1}") : ''
           rowspan_attribute = cell.rowspan ? %( morerows="#{cell.rowspan - 1}") : ''
