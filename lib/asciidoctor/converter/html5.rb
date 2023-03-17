@@ -93,10 +93,7 @@ class Converter::Html5Converter < Converter::Base
 
   def convert_document node
     br = %(<br#{slash = @void_element_slash}>)
-    unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
-      asset_uri_scheme = %(#{asset_uri_scheme}:)
-    end
-    cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
+    cdn_base_url = %(#{asset_uri_scheme_from_node node}//cdnjs.cloudflare.com/ajax/libs)
     linkcss = node.attr? 'linkcss'
     max_width_attr = (node.attr? 'max-width') ? %( style="max-width: #{node.attr 'max-width'};") : ''
     result = ['<!DOCTYPE html>']
@@ -127,7 +124,7 @@ class Converter::Html5Converter < Converter::Base
 
     if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
-        result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{asset_uri_scheme_from_node node}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
       end
       if linkcss
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
@@ -1035,9 +1032,6 @@ Your browser does not support the audio tag.
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     case node.attr 'poster'
     when 'vimeo'
-      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
-        asset_uri_scheme = %(#{asset_uri_scheme}:)
-      end
       start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
       delimiter = ['?']
       target, hash = (node.attr 'target').split '/', 2
@@ -1047,13 +1041,10 @@ Your browser does not support the audio tag.
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{target}#{hash_param}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme_from_node node}//player.vimeo.com/video/#{target}#{hash_param}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     when 'youtube'
-      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
-        asset_uri_scheme = %(#{asset_uri_scheme}:)
-      end
       rel_param_val = (node.option? 'related') ? 1 : 0
       # NOTE start and end must be seconds (t parameter allows XmYs where X is minutes and Y is seconds)
       start_param = (node.attr? 'start') ? %(&amp;start=#{node.attr 'start'}) : ''
@@ -1092,7 +1083,7 @@ Your browser does not support the audio tag.
 
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme_from_node node}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
     else
@@ -1319,6 +1310,12 @@ Your browser does not support the video tag.
       attrs << %( rel="#{rel}")
     end
     attrs
+  end
+
+  def asset_uri_scheme_from_node node
+    node.attr('asset-uri-scheme', 'https').then do |scheme|
+      scheme.empty? ? '' : %(#{scheme}:)
+    end
   end
 
   def encode_attribute_value val
