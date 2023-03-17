@@ -93,7 +93,6 @@ class Converter::Html5Converter < Converter::Base
 
   def convert_document node
     br = %(<br#{slash = @void_element_slash}>)
-    cdn_base_url = %(#{asset_uri_scheme_from_node node}//cdnjs.cloudflare.com/ajax/libs)
     linkcss = node.attr? 'linkcss'
     max_width_attr = (node.attr? 'max-width') ? %( style="max-width: #{node.attr 'max-width'};") : ''
     result = ['<!DOCTYPE html>']
@@ -145,7 +144,7 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'icons', 'font'
       if node.attr? 'iconfont-remote'
-        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url node}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
@@ -250,12 +249,12 @@ class Converter::Html5Converter < Converter::Base
 
     if syntax_hl
       if syntax_hl.docinfo? :head
-        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
+        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url(node), linkcss: linkcss, self_closing_tag_slash: slash
       else
         result.delete_at syntax_hl_docinfo_head_idx
       end
       if syntax_hl.docinfo? :footer
-        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url(node), linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
@@ -287,7 +286,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   })
 })
 </script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base_url node}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -1316,6 +1315,10 @@ Your browser does not support the video tag.
     node.attr('asset-uri-scheme', 'https').then do |scheme|
       scheme.empty? ? '' : %(#{scheme}:)
     end
+  end
+
+  def cdn_base_url node
+    %(#{asset_uri_scheme_from_node node}//cdnjs.cloudflare.com/ajax/libs)
   end
 
   def encode_attribute_value val
