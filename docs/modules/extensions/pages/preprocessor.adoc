@@ -1,10 +1,22 @@
-= Preprocessor Extension Example
+= Preprocessor Extensions
 :navtitle: Preprocessor
+
+Preprocessors are run after the source text is split into lines and normalized, but before parsing begins.
+
+Prior to invoking the preprocessor, Asciidoctor splits the source text into lines and normalizes them. The normalize process strips trailing whitespace and the end of line character sequence from each line.
+
+Asciidoctor passes the document and the document's Reader to the `Asciidoctor::Extensions::Processor#process` method of the Preprocessor instance. The Preprocessor can modify the Reader as necessary and either return the same Reader (or falsy, which is equivalent) or a reference to a substitute Reader.
+
+Note that in this process, line numbers are not retained. If the preprocessor adds or removes lines, the parser and other extensions could produce misleading line number information.
+
+Preprocessor implementations must extend the https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/Preprocessor[`Preprocessor`] class.
+
+== Preprocessor Extension Example
 
 Purpose::
 Skim off front matter from the top of the document that gets used by site generators like Jekyll and Awestruct.
 
-== sample-with-front-matter.adoc
+=== sample-with-front-matter.adoc
 
 [source,asciidoc]
 ----
@@ -23,7 +35,7 @@ content
 ....
 ----
 
-== FrontMatterPreprocessor
+=== FrontMatterPreprocessor
 
 [source,ruby]
 ----
@@ -53,7 +65,7 @@ class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
 end
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
 ----

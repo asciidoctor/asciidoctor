@@ -1,10 +1,20 @@
-= Tree Processor Extension Example
+= Tree Processor Extensions
 :navtitle: Tree Processor
+
+TreeProcessors are run on the Document after the source has been parsed into an abstract syntax tree (AST), as represented by the Document object and its child Node objects (e.g., Section, Block, List, ListItem).
+
+Asciidoctor invokes the `Processor#process` method on an instance of each registered TreeProcessor.
+
+The AST nodes contain unconverted text (for example `[.role]#hello#`), and conversion is typically done when the text is read from the node (for the previous example, returning `<span class="role">hello</span>`). Unconverted text can be written back to the node during transformation (for example `[.role]#goodbye#`).
+
+TreeProcessor implementations must extend https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/TreeProcessor[`TreeProcessor`].
+
+== Tree Processor Extension Example
 
 Purpose::
 Detect literal blocks that contain shell commands, strip the prompt character and style the command using CSS in such a way that the prompt character cannot be selected (as seen on help.github.com).
 
-== sample-with-shell-session.adoc
+=== sample-with-shell-session.adoc
 
 [source,asciidoc]
 ----
@@ -14,7 +24,7 @@ Detect literal blocks that contain shell commands, strip the prompt character an
  $ gem install asciidoctor
 ----
 
-== ShellSessionTreeProcessor
+=== ShellSessionTreeProcessor
 
 [source,ruby]
 ----
@@ -47,7 +57,7 @@ class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
 end
 ----
 
-== Usage
+=== Usage
 
 [source,ruby]
 ----
