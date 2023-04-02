@@ -24,6 +24,7 @@ class AbstractBlock < AbstractNode
   attr_accessor :numeral
 
   # Public: Gets/Sets the location in the AsciiDoc source where this block begins.
+  # Tracking source location is not enabled by default, and is controlled by the sourcemap option.
   attr_accessor :source_location
 
   # Public: Get/Set the String style (block type qualifier) for this block.
