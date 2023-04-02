@@ -35,7 +35,7 @@ src.toFile().eachFileRecurse { f ->
         serializer.writeToFile(
                 result, tmpHtml.absolutePath, "utf-8"
         )
-        "pandoc -f html -t asciidoc $tmpHtml -o ${target}.adoc".execute().waitFor()
+        "pandoc -f html-native_divs -t asciidoctor $tmpHtml --wrap=none -o ${target}.adoc".execute().waitFor()
         tmpHtml.delete()
     }/* else {
         "cp html/$relative $target".execute()
