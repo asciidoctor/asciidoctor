@@ -1,7 +1,7 @@
-= Preprocessor Extensions
+= Preprocessor Extension
 :navtitle: Preprocessor
 
-The https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/Preprocessor[Preprocessor] extension runs prior to the AsciiDoc source being parsed.
+The {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/Extensions/Preprocessor[Preprocessor^] extension runs prior to the AsciiDoc source being parsed.
 Specifically, it runs after the Document instance has been created and its PreprocessorReader has been initialized to start reading the lines of the source document.
 
 [WARNING]
