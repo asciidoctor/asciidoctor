@@ -1,13 +1,14 @@
 = Tree Processor Extensions
 :navtitle: Tree Processor
 
-TreeProcessors are run on the Document after the source has been parsed into an abstract syntax tree (AST), as represented by the Document object and its child Node objects (e.g., Section, Block, List, ListItem).
+A https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/TreeProcessor[TreeProcessor] extension is run on the Document instance after the blocks in the source have been parsed into a document structure, as represented by the Document object and its child AbstractNode objects (e.g., Section, Block, List, ListItem).
 
-Asciidoctor invokes the `Processor#process` method on an instance of each registered TreeProcessor.
+Asciidoctor invokes the `Processor#process` method on an instance of each registered TreeProcessor extension.
 
-The AST nodes contain unconverted text (for example `[.role]#hello#`), and conversion is typically done when the text is read from the node (for the previous example, returning `<span class="role">hello</span>`). Unconverted text can be written back to the node during transformation (for example `[.role]#goodbye#`).
-
-TreeProcessor implementations must extend https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/TreeProcessor[`TreeProcessor`].
+IMPORTANT: A TreeProcessor extension is run before any inline markup is interpreted.
+At the time the process method on the TreeProcessor extension is invoked, the block nodes in the document have unprocessed, unconverted text.
+Conversion of inline markup is done when the document is being converted.
+Thus, it's possible for the TreeProcessor extension to replace the source text on the nodes, but it must consider the fact that the text is still going to be parsed (according to the content model of the block).
 
 == Tree Processor Extension Example
 
