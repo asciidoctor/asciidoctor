@@ -46,6 +46,26 @@ Here's an example of how to enable the sourcemap using the API:
 doc = Asciidoctor.load_file 'doc.adoc', safe: :safe, sourcemap: true
 ----
 
+Extensions can enable the sourcemap as such:
+
+[,ruby]
+----
+class Asciidoctor::Document
+  attr_writer :sourcemap unless method_defined? :sourcemap=
+end
+
+# A preprocessor that enables the sourcemap feature if not
+# already enabled via the API.
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      doc.sourcemap = true
+      nil
+    end
+  end
+end
+----
+
 Now that the sourcemap is enabled, you can access the source location of the block elements in the parsed document.
 
 == Use the sourcemap
