@@ -4,7 +4,6 @@
 :url-pandoc: https://pandoc.org
 :url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
 :url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
-// from migrating-from-msword.adoc
 
 == Pandoc
 
@@ -18,20 +17,20 @@ To perform the conversion from MS Word docx to AsciiDoc, you need to perform the
 
 .pandoc < 2.11.2
  
- $ pandoc --from=docx --to=asciidoc --wrap=none --atx-headers \
-     --extract-media=extracted-media input.docx > output.adoc
+ $ pandoc -f docx -t asciidoctor --wrap=none --atx-headers \
+   --extract-media=extracted-media -o output.adoc
  
 .pandoc (2.11.2 or newer)
  
- $ pandoc input.docx -f docx -t asciidoc --wrap=none --markdown-headings=atx \                                                                             
-    --extract-media=extracted-media  -o output2.adoc
+ $ pandoc input.docx -f docx -t asciidoctor --wrap=none --markdown-headings=atx \
+   --extract-media=extracted-media -o output.adoc
 
 .pandoc (2.11.2 or newer) and docker
 
 If you use docker you can also use the latest version of pandoc with docker without installing it:
 
- $ docker run --rm --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
- -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media  -o output2.adoc
+ $ docker run --rm --volume "$PWD:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
+   -t asciidoctor --wrap=none --markdown-headings=atx --extract-media=extracted-media -o output.adoc
 
 Then, edit the output file to tidy it up.
 
