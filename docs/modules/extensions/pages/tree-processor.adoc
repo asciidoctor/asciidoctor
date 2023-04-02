@@ -1,7 +1,7 @@
-= Tree Processor Extensions
+= Tree Processor Extension
 :navtitle: Tree Processor
 
-A https://www.rubydoc.info/gems/asciidoctor/Asciidoctor/Extensions/TreeProcessor[TreeProcessor] extension is run on the Document instance after the blocks in the source have been parsed into a document structure, as represented by the Document object and its child AbstractNode objects (e.g., Section, Block, List, ListItem).
+A {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/Extensions/TreeProcessor[TreeProcessor^] extension is run on the Document instance after the blocks in the source have been parsed into a document structure, as represented by the Document object and its child AbstractNode objects (e.g., Section, Block, List, ListItem).
 
 Asciidoctor invokes the `Processor#process` method on an instance of each registered TreeProcessor extension.
 
