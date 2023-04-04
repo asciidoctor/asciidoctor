@@ -1,0 +1,15 @@
+name: Deploy Docs
+on:
+  push:
+    branches: [ v2.0.x ]
+    paths: [ 'docs/**' ]
+permissions: read-all
+jobs:
+  build:
+    if: github.repository_owner == 'asciidoctor'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN_SCOPE_REPO }}
+      run: gh workflow run trigger.yml -R asciidoctor/docs.asciidoctor.org -r main
