@@ -10,7 +10,7 @@ group :development do
   gem 'asciimath', (ENV.fetch 'ASCIIMATH_VERSION', '~> 2.0')
   # coderay is needed for testing source highlighting
   gem 'coderay', '~> 1.1.0'
-  gem 'haml', '~> 4.0' if RUBY_ENGINE == 'truffleruby'
+  gem 'haml', ENV['HAML_VERSION'] if ENV.key? 'HAML_VERSION'
   gem 'open-uri-cached', '~> 1.0.0'
   # pygments.rb is needed for testing source highlighting; Asciidoctor supports pygments.rb >= 1.2.0
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'

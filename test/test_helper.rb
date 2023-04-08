@@ -258,6 +258,10 @@ class Minitest::Test
     [number].pack 'U1'
   end
 
+  def haml_template_class
+    (defined? Haml::Template) ? Haml::Template : Tilt::HamlTemplate
+  end
+
   def invoke_cli_with_filenames argv = [], filenames = [], &block
     filepaths = []
 
