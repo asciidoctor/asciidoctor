@@ -1105,14 +1105,19 @@ context 'Blocks' do
       assert_message @logger, :WARN, '<stdin>: line 3: unterminated listing block', Hash
     end
 
-    test 'should not crash if listing block has no lines' do
-      input = <<~'EOS'
-      ----
-      ----
-      EOS
-      output = convert_string_to_embedded input
-      assert_css 'pre', output, 1
-      assert_css 'pre:empty', output, 1
+    test 'should not crash when converting verbatim block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        output = convert_string_to_embedded input
+        assert_css 'pre', output, 1
+        assert_css 'pre:empty', output, 1
+      end
+    end
+
+    test 'should return content as empty string for verbatim or raw block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should preserve newlines in literal block' do
@@ -1848,7 +1853,7 @@ context 'Blocks' do
   end
 
   context 'Math blocks' do
-    test 'should not crash when converting to HTML if stem block is empty' do
+    test 'should not crash when converting stem block that has no lines' do
       input = <<~'EOS'
       [stem]
       ++++
@@ -1857,6 +1862,13 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input
       assert_css '.stemblock', output, 1
+    end
+
+    test 'should return content as empty string for stem or pass block that has no lines' do
+      [%(++++\n++++), %([stem]\n++++\n++++)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should add LaTeX math delimiters around latexmath block content' do

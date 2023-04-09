@@ -678,7 +678,7 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
     %(<div#{id_attribute} class="listingblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
-#{syntax_hl ? (syntax_hl.format node, lang, opts) : pre_open + (node.content || '') + pre_close}
+#{syntax_hl ? (syntax_hl.format node, lang, opts) : pre_open + node.content + pre_close}
 </div>
 </div>)
   end
