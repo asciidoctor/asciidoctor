@@ -205,13 +205,13 @@ context 'Options' do
     end
   end
 
-  test '-r flag with multiple values requires specified libraries' do
+  test '-r flag with multiple values separated by commas is treated as a single path' do
     options = Asciidoctor::Cli::Options.new
     redirect_streams do |_, stderr|
-      exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.adoc)
-      assert_match %(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string
+      exitval = options.parse! %w(-r /no-such-folder/a,b,c/ext.rb test/fixtures/sample.adoc)
+      assert_include %(asciidoctor: FAILED: '/no-such-folder/a,b,c/ext.rb' could not be loaded), stderr.string
       assert_equal 1, exitval
-      assert_equal %w(foobar foobaz), options[:requires]
+      assert_equal %w(/no-such-folder/a,b,c/ext.rb), options[:requires]
     end
   end
 
