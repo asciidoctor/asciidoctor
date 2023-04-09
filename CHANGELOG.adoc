@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Improvements::
+
+  * Return empty string instead of nil if raw or verbatim block has no lines
+
 Compliance::
 
   * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
