@@ -25,6 +25,7 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         ruby: ['jruby-9.2.19.0', '2.3', '2.7', '3.0', '3.1']
         asciimath-version: [~]
+        haml-version: [~]
         pygments-version: ['~> 2.0']
         rouge-version: [~]
         exclude:
@@ -45,9 +46,9 @@ jobs:
         - os: ubuntu-latest
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
-        #- os: ubuntu-latest
-        #  ruby: '2.3'
-        #  pygments-version: '~> 1.2.0'
+        - os: ubuntu-latest
+          ruby: '2.3'
+          haml-version: '~> 5.2.0'
         - os: ubuntu-latest
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
