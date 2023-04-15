@@ -127,7 +127,7 @@ module Asciidoctor
           end
           opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
             'may be specified more than once' do |path|
-            (self[:requires] ||= []).concat path.split ','
+            (self[:requires] ||= []) << path
           end
           opts.on '--log-level LEVEL', %w(debug DEBUG info INFO warning WARNING error ERROR fatal FATAL), 'set minimum level of log messages that get logged: [DEBUG, INFO, WARN, ERROR, FATAL] (default: WARN)' do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
