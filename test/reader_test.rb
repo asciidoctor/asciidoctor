@@ -713,6 +713,14 @@ class ReaderTest < Minitest::Test
         end
       end
 
+      test 'include directive should not match if target is empty or starts or ends with space' do
+        ['include::[]', 'include:: []', 'include:: not-include[]', 'include::not-include []'].each do |input|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          assert_equal input, reader.read_line
+        end
+      end
+
       test 'include directive should not attempt to resolve target as remote if allow-uri-read is set and URL is not on first line' do
         using_memory_logger do |logger|
           input = <<~'EOS'
