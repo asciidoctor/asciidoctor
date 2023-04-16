@@ -45,6 +45,7 @@ Compliance::
   * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
   * Drop support for Ruby < 2.5 and JRuby < 9.2
   * Update latest Ruby to 3.2 in CI workflows
+  * Update latest JRuby in CI workflow to 9.4.2.0
   * Add support for Haml 6 to template converter (#4429)
 
 Improvements::

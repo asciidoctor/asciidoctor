@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [jruby-9.3.8.0, '2.5', '2.7', '3.0', '3.2']
+        ruby: [jruby-9.4.2.0, '2.5', '2.7', '3.0', '3.2']
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.0']
@@ -86,6 +86,12 @@ jobs:
       run: |
         echo 'BUNDLE_WITHOUT=docs' >> $GITHUB_ENV
         echo 'COVERAGE=true' >> $GITHUB_ENV
+    - name: Upgrade Java (JRuby for Windows)
+      if: matrix.os == 'windows-latest'
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: '17'
     - name: Install Ruby (uses cached dependencies for non-scheduled build)
       uses: ruby/setup-ruby@v1
       with:
