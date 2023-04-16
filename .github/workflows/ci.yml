@@ -69,12 +69,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Install prerequisites for Nokogiri (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install libxslt1-dev
-    - name: Configure Nokogiri installation (Linux, macOS)
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
-      run: echo 'BUNDLE_BUILD__NOKOGIRI=--use-system-libraries' >> $GITHUB_ENV
     - name: Set AsciiMath version
       if: matrix.asciimath-version
       run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
