@@ -90,7 +90,7 @@ module Asciidoctor
   #   include::chapter1.ad[]
   #   include::example.txt[lines=1;2;5..10]
   #
-  IncludeDirectiveRx = /^(\\)?include::([^\[][^\[]*)\[(#{CC_ANY}+)?\]$/
+  IncludeDirectiveRx = /^(\\)?include::([^\s\[](?:[^\[]*[^\s\[])?)\[(#{CC_ANY}+)?\]$/
 
   # Matches a trailing tag directive in an include file.
   #

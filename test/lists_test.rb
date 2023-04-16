@@ -2109,6 +2109,22 @@ context 'Description lists (:dlist)' do
       assert_css 'dl > dt:empty', output, 1
     end
 
+    test 'should parse a dlist if term is include and principal text is []' do
+      input = 'include:: []'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "[]"]', output, 1
+    end
+
+    test 'should parse a dlist if term is include and principal text matches macro form' do
+      input = 'include:: pass:[${placeholder}]'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "${placeholder}"]', output, 1
+    end
+
     test 'single-line adjacent elements' do
       input = <<~'EOS'
       term1:: def1

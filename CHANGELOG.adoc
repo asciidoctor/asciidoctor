@@ -67,6 +67,7 @@ Bug Fixes::
 
   * Redo loop rather than using recursion to locate next line to process; prevents stack limit error (#4368)
   * Use correct selector to collapse margin on first and last child of sidebar
+  * Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
