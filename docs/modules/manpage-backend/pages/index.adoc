@@ -46,6 +46,7 @@ The second section is recommended and, if present, must be titled "`Synopsis`" (
 
 Subsequent sections are optional, but typical sections include "`Description`", "`Options`", "`Bugs`", "`See Also`", "`Copyright`", and "`Author`".
 You can write the section titles in all uppercase, but it's better to let the man page converter handle that for you.
+See <<generate>> for details.
 
 TIP: Since the structure required by the `manpage` doctype is standard AsciiDoc, you can opt to declare the `manpage` doctype at runtime.
 When the `doctype` attribute is not set, Asciidoctor will parse the document as an article and not give it any special treatment.
@@ -75,6 +76,7 @@ In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated in th
 To use the man page converter, assign `manpage` to the `backend` option.
 The man page converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document (e.g., `progname(1)`).
 
+[#generate]
 == Generate a man page
 
 Before running Asciidoctor, make sure your source document conforms to the <<doctype,manpage doctype structure>> and the `doctype` attribute is set and has the value `manpage`.
@@ -84,8 +86,9 @@ To generate a man page, run:
  $ asciidoctor -b manpage progname.adoc
 
 When converting to the man page format, Asciidoctor uppercases the titles of all level-0 and level-1 sections.
-This saves you from having to type section titles in all uppercase in the source document.
-It also makes the document portable to other output formats since this style is only used for the man page output to align with conventions.
+This transformation is applied to conform to the widely adopted convention used by most man pages found on *nix systems.
+By applying this transform in the converter, it saves you from having to type section titles in all uppercase in the source document.
+It also makes the document portable to other output formats since this style is only needed for the man page output.
 If the titles are uppercased in the source, that casing ends up getting used in all output formats.
 
 CAUTION: Prior to Ruby 2.4, Ruby could only uppercase Latin letters.

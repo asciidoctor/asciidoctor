@@ -441,6 +441,18 @@ context 'Manpage' do
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, '.SH "\(lqMAIN\(rq \fI<OPTIONS>\fP"'
     end
+
+    test 'should not uppercase monospace span in section titles' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      does stuff
+
+      == `show` option
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, '.SH "\f(CRshow\fP OPTION"'
+    end
   end
 
   context 'Backslash' do
