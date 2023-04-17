@@ -765,6 +765,17 @@ context 'Manpage' do
       assert output.end_with? %(\n.sp\n[signs point to yes])
     end
 
+    test 'should manify alt text of block image' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      image::rainbow.jpg["That's a double rainbow, otherwise known as rainbow{pp}!"]
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? %/\n.sp\n[That\\(cqs a double rainbow, otherwise known as rainbow++!]/
+    end
+
     test 'should replace inline image with alt text enclosed in square brackets' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}

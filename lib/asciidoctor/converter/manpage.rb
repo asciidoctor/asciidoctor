@@ -236,7 +236,7 @@ r lw(\n(.lu*75u/100u).'
     result << (node.title? ? %(.sp
 .B #{manify node.captioned_title}
 .br) : '.sp')
-    result << %([#{node.alt}])
+    result << %([#{manify node.alt}])
     result.join LF
   end
 
