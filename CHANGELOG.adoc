@@ -63,6 +63,7 @@ Improvements::
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
   * Return empty string instead of nil if raw or verbatim block has no lines
   * Don't split value of `-r` CLI option; treat as single path (#4425)
+  * Don't uppercase monospace span in section title in manpage output (#4402)
 
 Bug Fixes::
 
