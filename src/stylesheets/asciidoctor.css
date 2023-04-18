@@ -2043,6 +2043,7 @@ p,
 blockquote,
 dt,
 td.content,
+td.hdlist1,
 span.alt,
 summary {
   font-size: 1.0625rem;
