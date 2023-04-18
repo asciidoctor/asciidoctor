@@ -62,12 +62,12 @@ Improvements::
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
   * Return empty string instead of nil if raw or verbatim block has no lines
-  * Avoid numeric character reference when looking for fragment in target of xref (#4393)
   * Don't split value of `-r` CLI option; treat as single path (#4425)
 
 Bug Fixes::
 
   * Redo loop rather than using recursion to locate next line to process; prevents stack limit error (#4368)
+  * Avoid numeric character reference when looking for fragment in target of xref (#4393)
   * Use correct selector to collapse margin on first and last child of sidebar
   * Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
   * Manify alt text of block image in manpage output (#4401)
