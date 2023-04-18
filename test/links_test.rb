@@ -1209,6 +1209,25 @@ context 'Links' do
     assert_xpath '//a[@href="#s1"][text()="Section Title"]', output, 1
   end
 
+  test 'should not match numeric character references while searching for fragment in xref target' do
+    input = <<~'EOS'
+    see <<Cub => Tiger>>
+
+    == Cub => Tiger
+    EOS
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#_cub_tiger"]', output, 1
+    assert_xpath %(//a[@href="#_cub_tiger"][text()="Cub #{decode_char 8658} Tiger"]), output, 1
+  end
+
+  test 'should not match numeric character references in path of interdocument xref' do
+    input = <<~'EOS'
+    see xref:{cpp}[{cpp}].
+    EOS
+    output = convert_string_to_embedded input
+    assert_includes output, '<a href="#C&#43;&#43;">C&#43;&#43;</a>'
+  end
+
   test 'anchor creates reference' do
     doc = document_from_string '[[tigers]]Tigers roam here.'
     ref = doc.catalog[:refs]['tigers']

@@ -30,6 +30,7 @@ Compliance::
 
 Bug Fixes::
 
+  * Avoid matching numeric character references when searching for # in xref target (#4393)
   * Use correct selector to collapse margin on first and last child of sidebar
   * Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
   * Manify alt text of block image in manpage output (#4401)
