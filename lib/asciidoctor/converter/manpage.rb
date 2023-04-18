@@ -28,7 +28,7 @@ class Converter::ManPageConverter < Converter::Base
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
   WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
   XMLMarkupRx = /&#?[a-z\d]+;|</
-  PCDATAFilterRx = /(&#?[a-z\d]+;|<[^>]+>)|([^&<]+)/
+  PCDATAFilterRx = %r((&#?[a-z\d]+;|<#{ESC}\\f\(CR.*?</#{ESC}\\fP>|<[^>]+>)|([^&<]+))
 
   def initialize backend, opts = {}
     @backend = backend
