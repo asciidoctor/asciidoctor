@@ -30,7 +30,7 @@ jobs:
         ruby: [jruby-9.4.2.0, '2.5', '2.7', '3.0', '3.2']
         asciimath-version: [~]
         haml-version: [~]
-        pygments-version: ['~> 2.0']
+        pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
         # remove 3.2 on ubuntu-latest to mark as primary
