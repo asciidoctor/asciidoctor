@@ -4155,6 +4155,89 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
     end
+
+    test 'block attribute lines above nested horizontal list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'block attribute lines above nested list with style does not break list' do
+      input = <<~'EOS'
+      TODO List::
+      * get groceries
+      Grocery List::
+      [square]
+      * bread
+      * milk
+      * lettuce
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[2]//ul[@class="square"]', output, 1
+    end
+
+    test 'multiple block attribute lines above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'multiple block attribute lines separated by empty line above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+
+      [horizontal]
+
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
   end
 
   context 'Item with text inline' do
