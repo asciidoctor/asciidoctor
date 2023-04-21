@@ -67,7 +67,7 @@ class Converter::DocBook5Converter < Converter::Base
     else
       tag_name = node.sectname
     end
-    title_el = node.special && (node.option? 'untitled') ? '' : %(<title>#{node.title}</title>\n)
+    title_el = node.special && ((node.option? 'notitle') || (node.option? 'untitled')) ? '' : %(<title>#{node.title}</title>\n)
     %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 #{title_el}#{node.content}
 </#{tag_name}>)
