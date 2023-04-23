@@ -74,6 +74,7 @@ Bug Fixes::
   * Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
   * Manify alt text of block image in manpage output (#4401)
   * Adjust font size of term in horizontal dlist to match font size of term in regular dlist
+  * Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
