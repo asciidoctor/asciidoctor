@@ -1447,7 +1447,7 @@ class Parser
         buffer.concat reader.read_lines_until terminator: match.terminator, read_last_line: true, context: nil
         continuation = :inactive
       # BlockAttributeLineRx only breaks dlist if ensuing line is not a list item
-      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
+      elsif dlist && continuation != :active && (this_line.start_with? '[') && (BlockAttributeLineRx.match? this_line)
         block_attribute_lines = [this_line]
         while (next_line = reader.peek_line)
           if is_delimited_block? next_line
@@ -1482,7 +1482,8 @@ class Parser
           end
           continuation = :inactive
         # let block metadata play out until we find the block
-        elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
+        elsif ((ch0 = this_line.chr) == '.' && (BlockTitleRx.match? this_line)) ||
+            (ch0 == '[' && (BlockAttributeLineRx.match? this_line)) || (ch0 == ':' && (AttributeEntryRx.match? this_line))
           buffer << this_line
         else
           if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
