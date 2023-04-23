@@ -2726,17 +2726,19 @@ context 'Sections' do
       assert_xpath '//glossary/glossentry', output, 2
     end
 
-    test 'should drop title on special section in DocBook output if untitled option is set' do
-      input = <<~'EOS'
-      [dedication%untitled]
-      == Dedication
+    test 'should drop title on special section in DocBook output if notitle or untitled option is set' do
+      %w(notitle untitled).each do |option|
+        input = <<~EOS
+        [dedication%#{option}]
+        == Dedication
 
-      content
-      EOS
+        content
+        EOS
 
-      output = convert_string_to_embedded input, backend: :docbook
-      assert_xpath '/dedication', output, 1
-      assert_xpath '/dedication/title', output, 0
+        output = convert_string_to_embedded input, backend: :docbook
+        assert_xpath '/dedication', output, 1
+        assert_xpath '/dedication/title', output, 0
+      end
     end
   end
 
