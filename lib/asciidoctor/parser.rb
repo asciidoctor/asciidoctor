@@ -1439,21 +1439,33 @@ class Parser
 
       # a delimited block immediately breaks the list unless preceded
       # by a list continuation (they are harsh like that ;0)
-      if (match = is_delimited_block?(this_line, true))
-        if continuation == :active
-          buffer << this_line
-          # grab all the lines in the block, leaving the delimiters in place
-          # we're being more strict here about the terminator, but I think that's a good thing
-          buffer.concat reader.read_lines_until(terminator: match.terminator, read_last_line: true, context: nil)
-          continuation = :inactive
-        else
+      if (match = is_delimited_block? this_line, true)
+        break unless continuation == :active
+        buffer << this_line
+        # grab all the lines in the block, leaving the delimiters in place
+        # we're being more strict here about the terminator, but I think that's a good thing
+        buffer.concat reader.read_lines_until terminator: match.terminator, read_last_line: true, context: nil
+        continuation = :inactive
+      # BlockAttributeLineRx only breaks dlist if ensuing line is not a list item
+      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
+        block_attribute_lines = [this_line]
+        while (next_line = reader.peek_line)
+          if is_delimited_block? next_line
+            interrupt = true
+          elsif next_line.empty? || ((next_line.start_with? '[') && (BlockAttributeLineRx.match? next_line))
+            block_attribute_lines << reader.read_line
+            next
+          elsif (AnyListRx.match? next_line) && !(is_sibling_list_item? next_line, list_type, sibling_trait)
+            buffer.concat block_attribute_lines
+          else # rubocop:disable Lint/DuplicateBranch
+            interrupt = true
+          end
           break
         end
-      # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
-      # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
-      # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
-      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
-        break
+        if interrupt
+          reader.unshift_lines block_attribute_lines
+          break
+        end
       elsif continuation == :active && !this_line.empty?
         # literal paragraphs have special considerations (and this is one of
         # two entry points into one)
