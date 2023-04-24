@@ -1,0 +1,198 @@
+= Find Blocks
+
+Once the document has been loaded (or partially loaded), you can traverse the document to find block nodes.
+There are two ways to look for block nodes.
+One way is to start walking down the tree starting from the Document object.
+All blocks can be reached from the Document object.
+However, a much quicker way to find blocks is to use the `find_by` method, which does the walking for you.
+We'll start there, then look at how to use the custom traversal approach.
+
+== find_by
+
+Every block node (a parsed block), including the Document object, provides the {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/AbstractBlock#find_by-instance_method[find_by] method.
+The purpose of this method is to help you quickly find descendant blocks.
+Since some blocks have different models, this method can help you navigate the document without having to worry about those nuances.
+
+IMPORTANT: The `find_by` method only finds block nodes.
+It does not find inline nodes.
+
+If you want to look for any block in the parsed document, call the `find_by` method on the Document object.
+Otherwise, you can look for blocks in a specific area of the document by calling it on the relevant ancestor of those blocks.
+
+The return value of this method is a flat array of blocks in document order which were matched.
+The relationship between those blocks is only preserved by way of their own model.
+If no blocks are matched, the method returns an empty array.
+
+=== All blocks
+
+If not called with any arguments, the `find_by` method will return all blocks starting from the block on which it was called.
+If called on the Document object, it will return all blocks in the document (except for blocks in AsciiDoc table cells), including the document itself.
+Here's an example:
+
+[,ruby]
+----
+require 'asciidoctor'
+
+doc = Asciidoctor.load_file 'input.adoc', safe: :safe
+puts doc.find_by
+----
+
+Here's an example of how to find all the blocks in the first section:
+
+[,ruby]
+----
+doc.sections.first.find_by
+----
+
+Notice that the `find_by` method always returns the block that you start with as the first result (assuming it also matches the provided selector, covered later).
+If you want to exclude that block, slice it off from the results:
+
+[,ruby]
+----
+puts doc.find_by.slice 1..-1
+----
+
+If youre just looking for the first result, you can pluck it from the result array:
+
+[,ruby]
+----
+puts doc.find_by.first
+----
+
+By default, and for backwards compatibility, the `find_by` method does not traverse into AsciiDoc table cells.
+If you want it to look in these cells for blocks, set the `:traverse_documents` key on the selector Hash to true.
+
+[,ruby]
+----
+all_blocks = doc.find_by traverse_documents: true
+----
+
+The next section will look at how to filter the blocks that are returned.
+
+=== Filter blocks
+
+When using the `find_by` method, you're probably looking for specific blocks.
+The method accepts an optional selector (a Hash) and an optional block filter (a Ruby proc).
+The method will walk the entire tree (including in AsciiDoc table cells if `:traverse_documents` is `true`) to find blocks.
+By default, it will descend into a block which does not match, though this behavior can be controlled using the block filter.
+
+The simplest way to match blocks is to use the selector.
+The selector is a Hash that accepts four predefined symbol keys:
+
+:context:: A single block xref:convert:contexts-ref.adoc[context] (i.e., block name), such as `:paragraph`.
+:style:: A single block style, such as `source`.
+:id:: An ID.
+:role:: A single role.
+
+If an `:id` is specified, the method will never return more than one block since an ID is, by natural, globally unique.
+Here's an example of how to find a block by ID using the `:id` selector:
+
+[,ruby]
+----
+match = (doc.find_by id: 'prerequisites').first
+----
+
+Now let's assume we want to match all listing blocks that are source blocks.
+We can do so by combining the `:context` and `:style` selectors:
+
+[,ruby]
+----
+some_source_blocks = doc.find_by context: :listing, style: 'source'
+----
+
+Since literal blocks can also be source blocks, if we want all source blocks, we'd need to leave off the `:context` selector:
+
+[,ruby]
+----
+all_source_blocks = doc.find_by style: 'source'
+----
+
+If we want all blocks marked with a specific role, we can find them using the `:role` selector:
+
+[,ruby]
+----
+blocks_with_role = doc.find_by role: 'try-it'
+----
+
+The selector Hash is intentionally simple to make it easy to find blocks.
+If the blocks you're looking for cannot be described using that selector, then you'll want to use a block filter instead.
+
+A block filter is a Ruby proc that runs on each block visited.
+It accepts the candidate block as the sole argument (i.e., the candidate block is yielded to the proc).
+If the proc returns true, then the candidate is considered matched.
+
+Here's an example of using the block filter to find all top-level sections:
+
+[,ruby]
+----
+top_level_sections = doc.find_by {|block| block.context == :section && block.level == 1 }
+----
+
+We can make this slightly more efficient by combining it with a selector:
+
+[,ruby]
+----
+top_level_sections = doc.find_by(context: :section) {|section| section.level == 1 }
+----
+
+If a Ruby block is given, it's applied as a supplemental filter to the selector.
+In other words, the candidate block must match the selector and the filter.
+
+=== Control the traversal
+
+The benefit of the block filter is that it also allows you to control the traversal.
+The filter method can return any of the following keywords:
+
+true::
+:accept::
+The block is accepted and the traversal continues.
+
+false::
+:skip::
+The block is skipped but its children are traversed.
+
+:reject::
+The block is rejected and its children are not traversed.
+
+:prune::
+The block is accepted, but its descendants are not traversed.
+
+Here's an efficient way to match all sidebars that are not contained within another block.
+
+[,ruby]
+----
+top_level_sidebars = doc.find_by do |block|
+  if block == block.document
+    :skip
+  elsif block.context == :sidebar
+    :prune
+  else
+    :reject
+  end
+end
+----
+
+The filter has to return `:skip` instead of `:reject` for the document object or else no blocks will be traversed.
+
+If you combine the selector and the block filter, you will have less control over which nodes are traversed.
+Therefore, if you're going to be using the block filter to control the traversal, it's best to do all logic in that filter.
+
+== Custom traversal
+
+Another way to find blocks is to traverse the tree explicitly.
+Starting at the document object, you can access its children by calling the `blocks` method.
+
+[,ruby]
+----
+doc.blocks.each do |block|
+  puts block
+end
+----
+
+CAUTION: Not all blocks have the same model.
+For example, each item in a description list is an array of two nodes.
+And tables have a very different model from other blocks.
+These differences are important to be aware of when traversing the document model.
+
+If the block or blocks you're looking for are close at hand or in a known location, it may be more efficient to use a custom traversal.
+However, if you aren't sure where the block is located in the document tree, you'd be much better off using the `find_by` method to locate it.
