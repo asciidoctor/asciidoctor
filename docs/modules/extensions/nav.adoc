@@ -1,5 +1,6 @@
 * xref:index.adoc[]
 ** xref:register.adoc[]
+** xref:logging.adoc[]
 ** xref:preprocessor.adoc[]
 ** xref:tree-processor.adoc[]
 ** xref:postprocessor.adoc[]
