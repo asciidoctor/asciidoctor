@@ -22,6 +22,7 @@ Improvements::
 
   * Return empty string instead of nil if raw or verbatim block has no lines
   * Don't uppercase monospace span in section title in manpage output (#4402)
+  * Simplify processing of implicit link (i.e., autolink) by separating implicit and explicit match
 
 Compliance::
 

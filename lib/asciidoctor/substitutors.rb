@@ -526,7 +526,7 @@ module Substitutors
     if found_colon && (text.include? '://')
       # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
       text = text.gsub InlineLinkRx do
-        if (target = $2).start_with? RS
+        if (target = $2 + ($3 || $5)).start_with? RS
           # honor the escape
           next ($&.slice 0, (rs_idx = $1.length)) + ($&.slice rs_idx + 1, $&.length)
         end
@@ -543,15 +543,7 @@ module Substitutors
           when 'link:', ?", ?'
             next $&
           end
-          case $3
-          when ')', '?', '!'
-            target = target.chop
-            if (suffix = $3) == ')' && (target.end_with? '.', '?', '!')
-              suffix = target[-1] + suffix
-              target = target.chop
-            end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
+          case $6
           when ';'
             if (prefix.start_with? '&lt;') && (target.end_with? '&gt;')
               # move surrounding <> out of URL
