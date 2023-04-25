@@ -517,9 +517,9 @@ module Asciidoctor
   #   <https://github.com>
   #   link:https://github.com[]
   #   "https://github.com[]"
+  #   (https://github.com) <= parenthesis not included in autolink
   #
-  # FIXME revisit! the main issue is we need different rules for implicit vs explicit
-  InlineLinkRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://[^\s\[\]<]*([^\s.,\[\]<]))(?:\[(|#{CC_ALL}*?[^\\])\])?)m
+  InlineLinkRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))m
 
   # Match a link or e-mail inline macro.
   #
