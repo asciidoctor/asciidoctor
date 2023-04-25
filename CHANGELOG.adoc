@@ -39,6 +39,7 @@ Bug Fixes::
   * Manify alt text of block image in manpage output (#4401)
   * Adjust font size of term in horizontal dlist to match font size of term in regular dlist
   * Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
+  * Don't swallow square brackets when processing escaped URL macro
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 

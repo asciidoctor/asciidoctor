@@ -222,6 +222,12 @@ context 'Links' do
     assert_xpath '//a', convert_string('\http://asciidoc.org is the project page for AsciiDoc.'), 0
   end
 
+  test 'escaped inline qualified url as macro should not create link' do
+    output = convert_string '\http://asciidoc.org[asciidoc.org] is the project page for AsciiDoc.'
+    assert_xpath '//a', output, 0
+    assert_xpath '//p[starts-with(text(), "http://asciidoc.org[asciidoc.org]")]', output, 1
+  end
+
   test 'url in link macro with at (@) sign should not create mailto link' do
     assert_xpath '//a[@href="http://xircles.codehaus.org/lists/dev@geb.codehaus.org"][text()="subscribe"]', convert_string('http://xircles.codehaus.org/lists/dev@geb.codehaus.org[subscribe]')
   end

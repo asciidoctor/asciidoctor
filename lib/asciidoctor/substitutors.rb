@@ -528,7 +528,7 @@ module Substitutors
       text = text.gsub InlineLinkRx do
         if (target = $2).start_with? RS
           # honor the escape
-          next %(#{$1}#{target.slice 1, target.length}#{$4})
+          next ($&.slice 0, (rs_idx = $1.length)) + ($&.slice rs_idx + 1, $&.length)
         end
 
         prefix, suffix = $1, ''
