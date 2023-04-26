@@ -396,6 +396,16 @@ context 'Links' do
     assert_includes output, (input.sub '{empty}', '')
   end
 
+  test 'reftext of macro inline ref can resolve to empty' do
+    input = 'anchor:id-only[{empty}]text\n\nsee <<id-only>>'
+    doc = document_from_string input
+    assert doc.catalog[:refs].key? 'id-only'
+    output = doc.convert standalone: false
+    assert_xpath '//a[@id="id-only"]', output, 1
+    assert_xpath '//a[@href="#id-only"]', output, 1
+    assert_xpath '//a[@href="#id-only"][text()="[id-only]"]', output, 1
+  end
+
   test 'inline ref with reftext' do
     %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
