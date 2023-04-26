@@ -388,6 +388,14 @@ context 'Links' do
     assert_xpath '//a[@id = "1-install"]', output, 0
   end
 
+  test 'reftext of shorthand inline ref cannot resolve to empty' do
+    input = '[[no-such-id,{empty}]]text'
+    doc = document_from_string input
+    assert_empty doc.catalog[:refs]
+    output = doc.convert standalone: false
+    assert_includes output, (input.sub '{empty}', '')
+  end
+
   test 'inline ref with reftext' do
     %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
