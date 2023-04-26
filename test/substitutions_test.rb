@@ -59,7 +59,7 @@ context 'Substitutions' do
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
 
       para = block_from_string '"`a few quoted words`"', backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="double">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line double-quoted string' do
@@ -116,7 +116,7 @@ context 'Substitutions' do
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
 
       para = block_from_string %q('`a few quoted words`'), backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="single">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line single-quoted string' do
