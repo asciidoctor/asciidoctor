@@ -1168,8 +1168,8 @@ class Parser
           if reftext.include? ']'
             reftext = reftext.gsub '\]', ']'
             reftext = document.sub_attributes reftext if reftext.include? ATTR_REF_HEAD
-          elsif (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
-            next
+          elsif reftext.include? ATTR_REF_HEAD
+            next if (reftext = document.sub_attributes reftext).empty?
           end
         end
       end
