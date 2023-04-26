@@ -33,6 +33,7 @@ Compliance::
 
 Bug Fixes::
 
+  * Catalog inline ref defined using anchor macro even when resolved reftext is empty
   * Use while loop rather than recursion to locate next line to process; prevents stack limit error (#4368)
   * Avoid matching numeric character references when searching for # in xref target (#4393)
   * Use correct selector to collapse margin on first and last child of sidebar
