@@ -39,7 +39,7 @@ Nonetheless, if you need it and you're up for the challenge, that's where we're 
 
 == Install
 
-Asciidoctor Mathematical is distributed as a RubyGem named https://rubygems.org/gems/asciidoctor-mathematical[asciidoctor-mathematical^].
+Asciidoctor Mathematical is distributed as a gem named https://rubygems.org/gems/asciidoctor-mathematical[asciidoctor-mathematical^].
 You can install it using the Ruby packaging tools (gem or bundle).
 
  $ gem install asciidoctor-mathematical

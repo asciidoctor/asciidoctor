@@ -55,7 +55,7 @@ You should try each syntax highlighter and find the one that works best for you.
 
 [%autowidth]
 |===
-|Type |Syntax Highlighter |Required RubyGem |Compatible Converters
+|Type |Syntax Highlighter |Required Gem |Compatible Converters
 
 h|Client-side
 

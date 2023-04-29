@@ -1,9 +1,11 @@
 = Install Using Ruby Packaging
 
-Using Ruby packaging entails using commands provided by Ruby (`gem` and `bundle`) to install RubyGems.
+Using Ruby packaging entails making use of commands provided by Ruby (`gem` and `bundle`) to install gems.
+A gem is a packaged Ruby application or library, often retrieved from {url-rubygems}[RubyGems.org^].
+
 The benefit of using Ruby packaging to install Asciidoctor is that it's universal.
-Provided you have configured Ruby correctly, Ruby packaging works the same way across Ruby runtimes and operating systems.
-This page explains how to use Ruby packaging to install Asciidoctor.
+Provided you have configured Ruby correctly, Ruby packaging works the same way across all Ruby runtimes and operating systems.
+This page explains how to use Ruby packaging to install Asciidoctor from the *asciidoctor* gem.
 
 WARNING: Unless you're running in a container (Docker, podman, OCI), _never_ install gems using `gem install` as the root user.
 Doing so will almost certainly interfere with, and possibly corrupt, the Ruby installation on your system.

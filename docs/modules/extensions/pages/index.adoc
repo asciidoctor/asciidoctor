@@ -6,7 +6,7 @@ Asciidoctor provides an {url-api-gems}/asciidoctor/{release-version}/Asciidoctor
 As a result, extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
 
 Asciidoctor also allows extensions to be written using the full power of a programming language (whether it be Ruby, Java, Groovy or JavaScript).
-You don't have to shave yaks to get the functionality you want, and you can distribute the extension using de facto standard packaging mechanisms like RubyGems or JARs.
+You don't have to shave yaks to get the functionality you want, and you can distribute the extension using de facto standard packaging mechanisms like gems or JARs.
 
 == Available extension points
 

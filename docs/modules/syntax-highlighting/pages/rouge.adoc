@@ -7,7 +7,7 @@
 
 == Install Rouge
 
-To use Rouge with Asciidoctor, you need the {url-rouge-gem}[rouge RubyGem^].
+To use Rouge with Asciidoctor, you need the {url-rouge-gem}[rouge gem^].
 You can use one of the following methods to install Rouge.
 
 Install using `gem` (all systems)::
@@ -28,7 +28,7 @@ Install using `pacman` (Arch Linux-based systems)::
 
 == Assign rouge to source-highlighter
 
-Once you've installed the RubyGem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
+Once you've installed the gem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
 
 [source,asciidoc]
 ----
