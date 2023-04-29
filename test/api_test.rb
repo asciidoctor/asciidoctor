@@ -1401,6 +1401,43 @@ context 'API' do
       end
     end
 
+    test 'should copy custom stylesheet to destination dir if copycss is a path string' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => 'custom.css' }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a Pathname object' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_src_path = Pathname.new fixture_path 'custom.css'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => custom_stylesheet_src_path }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
     test 'should convert source file and write result to adjacent file by default' do
       sample_input_path = fixture_path 'sample.adoc'
       sample_output_path = fixture_path 'sample.html'
