@@ -151,8 +151,8 @@ We can turn to the `copycss` attribute to clear this situation up.
 NOTE: This situation is unique to when `linkcss` is set.
 It's not a problem when the converter embeds the stylesheet since there is no secondary reference involved.
 
-The `copycss` attribute can accepts a value.
-Asciidoctor uses that value as an override for where to look for the stylesheet to read.
+The `copycss` attribute can accept a non-empty value.
+Asciidoctor uses this value as an override for where to look for the stylesheet to read.
 The converter, on the other hand, does not use this value.
 That means we can use `stylesdir` and `stylesheet` to assemble the path relative to the output directory where Asciidoctor should write and link to the stylesheet independent of the location where it reads the file.
 
