@@ -140,16 +140,16 @@ Let's look at how to do that.
 
 In addition to the `logger` method, Asciidoctor's `Logging` module also adds a helper named `message_with_context` that generates a message object that bundles source information with the string message.
 
-For block and block macro extensions, you probably want to reference the location where the block is found, which you can retrieve using the `parent.reader.cursor_at_mark` method call.
+For block and block macro extensions, you probably want to reference the location where the block is found, which you can retrieve using the `parent.document.reader.cursor_at_mark` method call.
 For a tree processor extension, you can retrieve the source location from the `source_location` method on the block.
-For most other extensions, you likely want to reference the current cursor, which is accessible from `parent.reader.cursor` or (`doc.reader` for extensions that only provide access to the document object).
+For most other extensions, you likely want to reference the current cursor, which is accessible from `parent.document.reader.cursor` or (`doc.reader` for extensions that only provide access to the document object).
 
 Here's an example that replaces the message with an object that includes the source location:
 
 [,ruby]
 ----
 logger.warn(%(#{logger.progname} (custom-block-extension))) {
-  message_with_context 'Something is out of sorts.', source_location: parent.reader.cursor_at_mark
+  message_with_context 'Something is out of sorts.', source_location: parent.document.reader.cursor_at_mark
 }
 ----
 
