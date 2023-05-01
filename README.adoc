@@ -135,13 +135,15 @@ Asciidoctor works on Linux, macOS and Windows and requires one of the following 
 [CAUTION]
 ====
 If you're using a non-English Windows environment, you may bump into an `Encoding::UndefinedConversionError` when invoking Asciidoctor.
-To solve this issue, we recommend changing the active code page in your console to UTF-8:
+To solve this issue, we recommend overriding the default external and internal character encodings to `utf-8`.
+You can do so by setting the `RUBYOPT` environment variable as follows:
 
- chcp 65001
+ RUBYOPT="-E utf-8:utf-8"
 
-Once you make this change, all your Unicode headaches will be behind you.
+Once you make this change, all your Unicode headaches should be behind you.
+
 If you're using an IDE like Eclipse, make sure you set the encoding to UTF-8 there as well.
-Asciidoctor works best when you use UTF-8 everywhere.
+Asciidoctor works best when you use UTF-8 as the default encoding.
 ====
 
 == Installation
