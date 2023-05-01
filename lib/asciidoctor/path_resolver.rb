@@ -109,6 +109,7 @@ class PathResolver
   SLASH = '/'
   BACKSLASH = '\\'
   DOUBLE_SLASH = '//'
+  URI_CLASSLOADER = 'uri:classloader:'
   WindowsRootRx = %r(^(?:[a-zA-Z]:)?[\\/])
 
   attr_accessor :file_separator
@@ -148,8 +149,9 @@ class PathResolver
   # Public: Check if the specified path is an absolute root path (or, in the
   # browser environment, an absolute URI as well)
   #
-  # This operation considers both posix paths and Windows paths. If the JavaScript IO
-  # module is xmlhttprequest, this operation also considers absolute URIs.
+  # This operation considers both POSIX and Windows paths. If the JavaScript IO module
+  # is xmlhttprequest, this operation also considers absolute URIs. If running on JRuby,
+  # this operation also considers classloader URIs (starts with uri:classloader:).
   #
   # Unix absolute paths and UNC paths start with slash. Windows roots can
   # start with a drive letter. When the IO module is xmlhttprequest (Opal
@@ -163,6 +165,10 @@ class PathResolver
   if RUBY_ENGINE == 'opal' && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
     def root? path
       (absolute_path? path) || (path.start_with? 'file://', 'http://', 'https://')
+    end
+  elsif ::RUBY_ENGINE == 'jruby'
+    def root? path
+      (absolute_path? path) || (path.start_with? URI_CLASSLOADER)
     end
   else
     alias root? absolute_path?
@@ -299,6 +305,9 @@ class PathResolver
       # ex. /sample/path
       elsif posix_path.start_with? SLASH
         root = SLASH
+      # ex. uri:classloader:sample/path (or uri:classloader:/sample/path)
+      elsif posix_path.start_with? URI_CLASSLOADER
+        root = posix_path.slice 0, URI_CLASSLOADER.length
       # ex. C:/sample/path (or file:///sample/path in browser environment)
       else
         root = posix_path.slice 0, (posix_path.index SLASH) + 1

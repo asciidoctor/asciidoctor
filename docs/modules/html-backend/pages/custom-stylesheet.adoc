@@ -159,11 +159,16 @@ That means we can use `stylesdir` and `stylesheet` to assemble the path relative
 Let's revisit the broken scenario from the previous section and use `copycss` to reconcile the problem:
 
  $ asciidoctor -a stylesdir=css -a stylesheet=default.css \
- -a copycss=`pwd`/my-styles/my-stylesheet.css -a linkcss -D public my-document.adoc
+ -a copycss=$PWD/my-styles/my-stylesheet.css -a linkcss -D public my-document.adoc
 
 Asciidoctor copies the stylesheet from the absolute path specified by the `copycss` attribute to the path [.path]_public/css/default.css_ and links to it using the path [.path]_css/default.css_.
-Notice that we even changed the name of the folder and stylesheet file in the output.
+Notice that we changed the name of the folder and stylesheet file in the output.
 That demonstrates that we have decoupled the path where the stylesheet is read from the location where the stylesheet is published and referenced.
+
+TIP: When running on JRuby, you can point `copycss` to a classloader URI to load a stylesheet from a JAR file (e.g., `uri:classloader:/css/styles.css`).
+However, the HTML cannot link to that location.
+Therefore, you must use the `stylesheet` attribute (and optionally the `stylesdir`) to specify a filename or relative path where Asciidoctor will write the stylesheet.
+The HTML will then be able to link to that destination.
 
 == Styles directory and nested documents when linking
 

@@ -120,8 +120,14 @@ module Helpers
   # str - the String to check
   #
   # returns true if the String is a URI, false if it is not
-  def uriish? str
-    (str.include? ':') && (UriSniffRx.match? str)
+  if ::RUBY_ENGINE == 'jruby'
+    def uriish? str
+      (str.include? ':') && !(str.start_with? 'uri:classloader:') && (UriSniffRx.match? str)
+    end
+  else
+    def uriish? str
+      (str.include? ':') && (UriSniffRx.match? str)
+    end
   end
 
   # Internal: Encode a URI component String for safe inclusion in a URI.

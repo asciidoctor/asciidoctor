@@ -2857,6 +2857,21 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'embeds base64-encoded data uri for image in classloader when data-uri attribute is set', if: jruby? do
+      require fixture_path 'assets.jar'
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: uri:classloader:/images-in-jar
+
+      image::dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => testdir }
+      assert_equal 'uri:classloader:/images-in-jar', doc.attributes['imagesdir']
+      output = doc.convert
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
     test 'embeds SVG image with image/svg+xml mimetype when file extension is .svg' do
       input = <<~'EOS'
       :imagesdir: fixtures

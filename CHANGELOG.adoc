@@ -42,6 +42,7 @@ Bug Fixes::
   * Adjust font size of term in horizontal dlist to match font size of term in regular dlist
   * Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
   * Don't swallow square brackets when processing escaped URL macro
+  * Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
