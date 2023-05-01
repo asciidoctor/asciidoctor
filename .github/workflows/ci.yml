@@ -23,15 +23,15 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [jruby-9.4.2.0, '2.3', '2.7', '3.0', '3.1']
+        ruby: [jruby-9.4.2.0, '2.3', '2.7', '3.0', '3.2']
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.1 on ubuntu-latest to mark as primary
+        # remove 3.2 on ubuntu-latest to mark as primary
         - os: ubuntu-latest
-          ruby: '3.1'
+          ruby: '3.2'
         include:
         - os: ubuntu-latest
           ruby: truffleruby-22.2.0
@@ -42,7 +42,7 @@ jobs:
           ruby: jruby-9.1.17.0
           pygments-version: ~
         - os: macos-latest
-          ruby: '3.1'
+          ruby: '3.2'
         - os: ubuntu-latest
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
@@ -53,7 +53,7 @@ jobs:
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
-          ruby: '3.1'
+          ruby: '3.2'
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
@@ -129,7 +129,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1'
+        ruby-version: '3.2'
         bundler-cache: true
     - name: Build dependents
       env:
