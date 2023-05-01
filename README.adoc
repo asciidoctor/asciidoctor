@@ -143,7 +143,7 @@ You can do so by setting the `RUBYOPT` environment variable as follows:
 Once you make this change, all your Unicode headaches should be behind you.
 
 If you're using an IDE like Eclipse, make sure you set the encoding to UTF-8 there as well.
-Asciidoctor works best when you use UTF-8 as the default encoding.
+Asciidoctor is optimized to work with UTF-8 as the default encoding.
 ====
 
 == Installation
