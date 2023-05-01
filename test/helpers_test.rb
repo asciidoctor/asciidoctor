@@ -52,6 +52,16 @@ context 'Helpers' do
       assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
     end
 
+    test 'uriish? should not detect a classloader path as a URI on JRuby' do
+      input = 'uri:classloader:/sample.png'
+      assert Asciidoctor::UriSniffRx =~ input
+      if jruby?
+        refute Asciidoctor::Helpers.uriish? input
+      else
+        assert Asciidoctor::Helpers.uriish? input
+      end
+    end
+
     test 'UriSniffRx should not detect URI that does not start on first line' do
       assert Asciidoctor::UriSniffRx !~ %(text\nhttps://example.org)
     end

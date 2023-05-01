@@ -284,6 +284,18 @@ context 'Path Resolver' do
       assert_equal '//server/docs/output.html', @resolver.system_path('//server/docs/output.html')
     end
 
+    test 'resolves classloader path if start is classloader path and target is relative', if: jruby? do
+      assert_equal 'uri:classloader:images/sample.png', @resolver.system_path('sample.png', 'uri:classloader:images')
+    end
+
+    test 'resolves classloader path if start is root-relative classloader path and target is relative', if: jruby? do
+      assert_equal 'uri:classloader:/images/sample.png', @resolver.system_path('sample.png', 'uri:classloader:/images')
+    end
+
+    test 'preserves classloader path if start is absolute path and target is classloader path', if: jruby? do
+      assert_equal 'uri:classloader:/images/sample.png', @resolver.system_path('uri:classloader:/images/sample.png', '/home/doctor/docs')
+    end
+
     test 'resolves relative target relative to current directory if start is empty' do
       pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')

@@ -740,6 +740,15 @@ class ReaderTest < Minitest::Test
         assert_match(/<h1>人<\/h1>/, output)
       end
 
+      test 'should include content from a file on the classloader', if: jruby? do
+        require fixture_path 'assets.jar'
+        input = 'include::uri:classloader:/includes-in-jar/include-file.adoc[]'
+        doc = document_from_string input, safe: :unsafe, standalone: false, base_dir: DIRNAME
+        output = doc.convert
+        assert_match(/included from a file/, output)
+        assert doc.catalog[:includes]['uri:classloader:/includes-in-jar/include-file']
+      end
+
       test 'should not track include in catalog for non-AsciiDoc include files' do
         input = <<~'EOS'
         ----
