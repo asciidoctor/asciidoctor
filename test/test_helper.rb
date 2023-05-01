@@ -360,7 +360,7 @@ class Minitest::Test
       #if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
       if jruby?
         begin
-          old_env, env = ENV.merge, (ENV.merge env)
+          env = (old_env = ENV.to_h).merge env
           env.each {|key, val| env.delete key if val.nil? } if env.value? nil
           ENV.replace env
           popen [cmd, *args, opts], &block
