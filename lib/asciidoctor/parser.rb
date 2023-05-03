@@ -206,7 +206,7 @@ class Parser
   def self.parse_manpage_header reader, document, block_attributes, header_only = false
     if ManpageTitleVolnumRx =~ (doc_attrs = document.attributes)['doctitle']
       doc_attrs['manvolnum'] = manvolnum = $2
-      doc_attrs['mantitle'] = (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle).downcase
+      doc_attrs['mantitle'] = (document.sub_replacements (((mantitle = $1).include? ATTR_REF_HEAD) ? (document.sub_attributes mantitle) : mantitle)).downcase
     else
       logger.error message_with_context 'non-conforming manpage title', source_location: (reader.cursor_at_line 1)
       # provide sensible fallbacks
