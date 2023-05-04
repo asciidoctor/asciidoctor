@@ -1811,6 +1811,26 @@ context 'Document' do
       assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
     end
 
+    test 'should apply replacements substitution to value of mantitle attribute used in DocBook output' do
+      input = <<~'EOS'
+      = foo\--bar(1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
+
+      == NAME
+
+      foo--bar - puts the foo in your bar
+      EOS
+
+      doc = Asciidoctor.load input, backend: :docbook, standalone: true
+      assert_equal 'foo\\--bar', (doc.attr 'mantitle')
+      result = doc.convert
+      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text()="foo--bar(1)"]', result, 1
+      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="foo--bar"]', result, 1
+    end
+
     test 'should be able to set doctype to book when converting to DocBook' do
       input = <<~'EOS'
       = Title
