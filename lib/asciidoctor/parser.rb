@@ -399,18 +399,22 @@ class Parser
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
-              # if this block wasn't marked as [partintro], emulate behavior as if it had
+              # if this not a [partintro] open block, enclose it in a [partintro] open block
               if new_block.style != 'partintro'
-                # emulate [partintro] paragraph
-                if new_block.context == :paragraph
-                  new_block.context = :open
+                # if this is already a normal open block, simply add the partintro style
+                if new_block.style == 'open' && new_block.context == :open
                   new_block.style = 'partintro'
-                # emulate [partintro] open block
                 else
                   new_block.parent = (intro = Block.new section, :open, content_model: :compound)
                   intro.style = 'partintro'
                   section.blocks << intro
                 end
+              # if this is a [partintro] paragraph, convert it to a [partintro] open block w/ single paragraph
+              elsif new_block.content_model == :simple
+                new_block.content_model = :compound
+                new_block << (Block.new new_block, :paragraph, source: new_block.lines, subs: new_block.subs)
+                new_block.lines.clear
+                new_block.subs.clear
               end
             elsif section.blocks.size == 1
               first_block = section.blocks[0]
@@ -420,12 +424,11 @@ class Parser
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
                 new_block.parent = (intro = Block.new section, :open, content_model: :compound)
-                intro.style = 'partintro'
-                section.blocks.shift
-                if first_block.style == 'partintro'
+                if first_block.style == (intro.style = 'partintro')
                   first_block.context = :paragraph
                   first_block.style = nil
                 end
+                section.blocks.shift
                 intro << first_block
                 section.blocks << intro
               end
