@@ -706,7 +706,7 @@ class Converter::DocBook5Converter < Converter::Base
 
     if doc.doctype == 'manpage'
       result << '<refmeta>'
-      result << %(<refentrytitle>#{doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
+      result << %(<refentrytitle>#{doc.apply_reftext_subs doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
       result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
       result << %(<refmiscinfo class="source">#{doc.attr 'mansource', '&#160;'}</refmiscinfo>)
       result << %(<refmiscinfo class="manual">#{doc.attr 'manmanual', '&#160;'}</refmiscinfo>)

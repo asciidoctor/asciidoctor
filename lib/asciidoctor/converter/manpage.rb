@@ -40,7 +40,7 @@ class Converter::ManPageConverter < Converter::Base
     unless node.attr? 'mantitle'
       raise 'asciidoctor: ERROR: doctype must be set to manpage when using manpage backend'
     end
-    mantitle = node.attr 'mantitle'
+    mantitle = (node.attr 'mantitle').gsub InvalidSectionIdCharsRx, ''
     manvolnum = node.attr 'manvolnum', '1'
     manname = node.attr 'manname', mantitle
     manmanual = node.attr 'manmanual'

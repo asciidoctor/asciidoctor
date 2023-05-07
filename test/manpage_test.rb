@@ -47,6 +47,24 @@ context 'Manpage' do
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
+    test 'should replace invalid characters in mantitle in info comment' do
+      input = <<~'EOS'
+      = foo\--<bar> (1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
+
+      == NAME
+
+      foo-bar - puts the foo in your bar
+      EOS
+
+      doc = Asciidoctor.load input, backend: :manpage, standalone: true
+      output = doc.convert
+      assert_includes output, %(Title: foo--bar\n)
+    end
+
     test 'should substitute attributes in manname and manpurpose in NAME section' do
       input = <<~'EOS'
       = {cmdname} (1)
@@ -130,7 +148,7 @@ context 'Manpage' do
         assert_equal '.1', doc.attr('outfilesuffix')
         output = doc.convert
         refute_empty logger.messages
-        assert_includes output, 'Title: cmd'
+        assert_includes output, %(Title: cmd\n)
         assert output.end_with?('garbage in')
       end
     end
