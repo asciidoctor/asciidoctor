@@ -46,6 +46,7 @@ Bug Fixes::
   * Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
   * Don't swallow square brackets when processing escaped URL macro
   * Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
+  * Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
