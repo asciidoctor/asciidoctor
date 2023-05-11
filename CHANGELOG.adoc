@@ -47,6 +47,7 @@ Bug Fixes::
   * Don't swallow square brackets when processing escaped URL macro
   * Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
   * Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
+  * Enclose `<reftext>` tag in `<article>` tag in DocBook output for man page (#4452)
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
