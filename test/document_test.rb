@@ -1776,22 +1776,23 @@ context 'Document' do
       section body
       EOS
       result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
-      assert_xpath '/xmlns:refentry', result, 1
-      doc = xmlnodes_at_xpath '/xmlns:refentry', result, 1
+      assert_xpath '/xmlns:article', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry', result, 1
+      doc = xmlnodes_at_xpath '/xmlns:article', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
-      assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text()="asciidoctor(1)"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text()="1"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="Asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="Asciidoctor Manual"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text()="asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text()="Process text"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text()="some text"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
-      assert_css 'refentry:root > refsection[xml|id="_first_section"]', result, 1
+      assert_equal '5.0', (doc.attr 'version')
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text()="asciidoctor(1)"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text()="1"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="Asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="Asciidoctor Manual"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text()="Process text"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text()="some text"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsection', result, 1
+      assert_css 'article:root > refentry > refsection[xml|id="_first_section"]', result, 1
     end
 
     test 'should output non-breaking space for source and manual in docbook manpage output if absent from source' do
@@ -1807,8 +1808,8 @@ context 'Document' do
       some text
       EOS
       result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
     end
 
     test 'should apply replacements substitution to value of mantitle attribute used in DocBook output' do
@@ -1827,8 +1828,8 @@ context 'Document' do
       doc = Asciidoctor.load input, backend: :docbook, standalone: true
       assert_equal 'foo\\--bar', (doc.attr 'mantitle')
       result = doc.convert
-      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text()="foo--bar(1)"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="foo--bar"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text()="foo--bar(1)"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="foo--bar"]', result, 1
     end
 
     test 'should be able to set doctype to book when converting to DocBook' do
@@ -1881,9 +1882,9 @@ context 'Document' do
       EOS
 
       result = convert_string input, backend: 'docbook5'
-      assert_xpath '/refentry/refnamediv/refname', result, 2
-      assert_xpath '(/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
-      assert_xpath '(/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
+      assert_xpath '/article/refentry/refnamediv/refname', result, 2
+      assert_xpath '(/article/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
+      assert_xpath '(/article/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
     end
 
     test 'adds a front and back cover image to DocBook 5 when doctype is book' do
