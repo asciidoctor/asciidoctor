@@ -758,8 +758,8 @@ class PreprocessorReader < Reader
 
   def include_processors?
     if @include_processor_extensions.nil?
-      if @document.extensions? && @document.extensions.include_processors?
-        (@include_processor_extensions = @document.extensions.include_processors) ? true : false
+      if @document.extensions? && (@include_processor_extensions = @document.extensions.include_processors)
+        true
       else
         @include_processor_extensions = false
       end

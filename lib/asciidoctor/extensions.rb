@@ -1120,11 +1120,7 @@ module Extensions
     # Returns the [Extension] proxy object for the BlockProcessor that matches
     # the block name and context or false if no match is found.
     def registered_for_block? name, context
-      if (ext = @block_extensions[name.to_sym])
-        (ext.config[:contexts].include? context) ? ext : false
-      else
-        false
-      end
+      (ext = @block_extensions[name.to_sym]) ? (ext.config[:contexts].include? context) && ext : false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockProcessor registered
@@ -1219,7 +1215,7 @@ module Extensions
     #--
     # TODO only allow blank target if format is :short
     def registered_for_block_macro? name
-      (ext = @block_macro_extensions[name.to_sym]) ? ext : false
+      @block_macro_extensions[name.to_sym] || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockMacroProcessor registered
@@ -1312,7 +1308,7 @@ module Extensions
     # Returns the [Extension] proxy object for the InlineMacroProcessor that matches
     # the macro name or false if no match is found.
     def registered_for_inline_macro? name
-      (ext = @inline_macro_extensions[name.to_sym]) ? ext : false
+      @inline_macro_extensions[name.to_sym] || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the InlineMacroProcessor registered
