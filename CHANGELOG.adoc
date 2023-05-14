@@ -68,6 +68,7 @@ Improvements::
   * Simplify processing of implicit link (i.e., autolink) by separating implicit and explicit match
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Generate partintro block consistently (#4450)
+  * Use safe navigation to avoid crashing when querying for extensions
 
 Bug Fixes::
 

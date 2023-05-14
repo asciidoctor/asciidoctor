@@ -573,6 +573,20 @@ context 'Extensions' do
   end
 
   context 'Integration' do
+    test 'does not crash when querying for extensions if none are registered' do
+      registry = Asciidoctor::Extensions.create
+
+      doc = document_from_string %(= Document Title\n\ncontent), extension_registry: registry
+      refute_nil doc.extensions
+      assert_equal false, (doc.extensions.registered_for_block? :unknown, :paragraph) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_block_extension :unknown
+      assert_equal false, (doc.extensions.registered_for_block_macro? :unknown) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_block_macro_extension :unknown
+      assert_equal false, (doc.extensions.registered_for_inline_macro? :unknown) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_inline_macro_extension :unknown
+      assert_empty doc.extensions.inline_macros
+    end
+
     test 'can provide extension registry as an option' do
       registry = Asciidoctor::Extensions.create do
         tree_processor SampleTreeProcessor
