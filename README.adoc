@@ -14,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.18
+:release-version: 2.0.19
 // URLs:
 :url-org: https://github.com/asciidoctor
 :url-repo: {url-org}/asciidoctor
