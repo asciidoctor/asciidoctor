@@ -1280,6 +1280,26 @@ context 'Substitutions' do
       assert_include '<a href="#_footnoteref_1">1</a>. See <a href="#gof">[gof]</a> to find a collection of design patterns.', result
     end
 
+    test 'footnotes in headings are expected to be numbered out of sequence' do
+      input = <<~'EOS'
+      == Section 1
+
+      para.footnote:[first footnote]
+
+      == Section 2footnote:[second footnote]
+
+      para.footnote:[third footnote]
+      EOS
+
+      result = convert_string_to_embedded input
+      footnote_refs = xmlnodes_at_css 'a.footnote', result
+      footnote_defs = xmlnodes_at_css 'div.footnote', result
+      assert_equal 3, footnote_refs.length
+      assert_equal %w(1 1 2), footnote_refs.map(&:text)
+      assert_equal 3, footnote_defs.length
+      assert_equal ['1. second footnote', '1. first footnote', '2. third footnote'], footnote_defs.map(&:text).map(&:strip)
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
