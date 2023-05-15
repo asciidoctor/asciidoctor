@@ -69,6 +69,7 @@ Improvements::
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Generate partintro block consistently (#4450)
   * Use safe navigation to avoid crashing when querying for extensions
+  * Add Kiswahili translation for built-in labels (PR #4454) *@bkmgit*
 
 Bug Fixes::
 
