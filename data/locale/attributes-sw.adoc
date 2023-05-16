@@ -19,5 +19,5 @@ ifdef::preface-title[:preface-title: Dibaji]
 :tip-caption: Shauri
 :toc-title: Fahirisi
 :untitled-label: Bila kichwa
-:version-label: Tafsiri
+:version-label: Toleo
 :warning-caption: Onyo
