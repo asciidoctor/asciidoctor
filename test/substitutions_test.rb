@@ -2168,8 +2168,8 @@ context 'Substitutions' do
 
       test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
         input = 'use `\+{author}+` to show an attribute reference'
-        para = block_from_string input
-        assert_equal 'use <code>+{author}+</code> to show an attribute reference', para.content
+        para = block_from_string input, attributes: { 'author' => 'Dan' }
+        assert_equal 'use <code>+Dan+</code> to show an attribute reference', para.content
       end
 
       test 'should not recognize stem macro with no content' do
