@@ -49,6 +49,7 @@ Bug Fixes::
   * Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
   * Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
   * Enclose `<reftext>` tag in `<article>` tag in DocBook output for man page (#4452)
+  * Correctly handle compat role on monospace and constrained passthrough when box attrlist or formatted text is escaped
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
