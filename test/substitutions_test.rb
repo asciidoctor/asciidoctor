@@ -345,6 +345,18 @@ context 'Substitutions' do
     end
 
     # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained monospace string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}`leave it alone`)
+      assert_equal '[x-]`leave it alone`', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped forced compat role on single-line constrained monospace string' do
+      para = block_from_string %(#{BACKSLASH}[x-]`just *mono*`)
+      assert_equal '[x-]<code>just <strong>mono</strong></code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'multi-line constrained monospaced string' do
       para = block_from_string %(`a few\n<{monospaced}> words`), attributes: { 'monospaced' => 'monospaced', 'compat-mode' => '' }
       assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_subs(para.source)
@@ -466,6 +478,12 @@ context 'Substitutions' do
 
       para = block_from_string %(call #{BACKSLASH}[method]#{BACKSLASH}`save()` to persist the changes)
       assert_equal %(call #{BACKSLASH}[method]`save()` to persist the changes), para.sub_quotes(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained passthrough string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}+leave it alone+)
+      assert_equal '[x-]+leave it alone+', para.apply_subs(para.source)
     end
 
     test 'single-line unconstrained monospaced chars' do

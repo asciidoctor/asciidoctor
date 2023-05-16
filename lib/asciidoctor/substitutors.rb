@@ -1061,28 +1061,31 @@ module Substitutors
       preceding = $1
       attrlist = $2
       escape_mark = RS if (quoted_text = $3).start_with? RS
-      format_mark = $4
+      backtick_mark = $4 == '`'
       content = $5
 
       if compat_mode
         old_behavior = true
-      elsif (old_behavior = attrlist && (attrlist.end_with? 'x-'))
-        attrlist = attrlist.slice 0, attrlist.length - 2
+      elsif attrlist && (attrlist.end_with? 'x-')
+        old_behavior = old_behavior_forced = true
       end
 
       if attrlist
-        if format_mark == '`' && !old_behavior
+        if backtick_mark && !old_behavior
           next extract_inner_passthrough content, %(#{preceding}[#{attrlist}]#{escape_mark})
         elsif escape_mark
           # honor the escape of the formatting mark
-          next %(#{preceding}[#{attrlist}]#{quoted_text.slice 1, quoted_text.length})
+          next %(#{preceding}[#{attrlist}]#{old_behavior_forced && backtick_mark ? quoted_text : (quoted_text.slice 1, quoted_text.length)})
         elsif preceding == RS
           # honor the escape of the attributes
+          next %(#{preceding}[#{attrlist}]#{quoted_text}) if old_behavior_forced && backtick_mark
           preceding = %([#{attrlist}])
+        elsif old_behavior_forced
+          attributes = attrlist == 'x-' ? {} : (parse_quoted_text_attributes attrlist.slice 0, attrlist.length - 3)
         else
           attributes = parse_quoted_text_attributes attrlist
         end
-      elsif format_mark == '`' && !old_behavior
+      elsif backtick_mark && !old_behavior
         next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
       elsif escape_mark
         # honor the escape of the formatting mark
@@ -1093,7 +1096,7 @@ module Substitutors
         passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
-          subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
+          subs = backtick_mark ? BASIC_SUBS : NORMAL_SUBS
           passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
           passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
