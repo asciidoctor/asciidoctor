@@ -345,6 +345,12 @@ context 'Substitutions' do
     end
 
     # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'should ignore role that ends with transitional role on constrained monospace span' do
+      para = block_from_string %([foox-]`leave it alone`)
+      assert_equal '<code class="foox-">leave it alone</code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'escaped single-line constrained monospace string with forced compat role' do
       para = block_from_string %([x-]#{BACKSLASH}`leave it alone`)
       assert_equal '[x-]`leave it alone`', para.apply_subs(para.source)
