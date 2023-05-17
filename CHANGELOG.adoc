@@ -16,7 +16,7 @@ For an even more detailed look at what has changed, refer to the {url-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
-== Unreleased
+== 2.0.19 (2023-05-17) - @mojavelinux
 
 Improvements::
 
@@ -55,6 +55,11 @@ Build / Infrastructure::
   * Update latest CRuby in CI workflow to 3.2
   * Update latest JRuby in CI workflow to 9.4.2.0
 
+=== Details
+
+{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[source diff]
+// end::compact[]
+
 == 2.0.18 (2022-10-15) - @mojavelinux
 
 Improvements::
@@ -78,7 +83,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
-// end::compact[]
 
 == 2.0.17 (2022-01-05) - @mojavelinux
 
