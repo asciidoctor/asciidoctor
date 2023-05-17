@@ -2117,6 +2117,42 @@ context 'Substitutions' do
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
+      test 'should support constrained passthrough in middle of monospace span' do
+        input = 'a `foo +bar+ baz` kind of thing'
+        para = block_from_string input
+        assert_equal 'a <code>foo bar baz</code> kind of thing', para.content
+      end
+
+      test 'should support constrained passthrough in monospace span preceded by escaped boxed attrlist with transitional role' do
+        input = %(#{BACKSLASH}[x-]`foo +bar+ baz`)
+        para = block_from_string input
+        assert_equal '[x-]<code>foo bar baz</code>', para.content
+      end
+
+      test 'should treat monospace phrase with escaped boxed attrlist with transitional role as monospace' do
+        input = %(#{BACKSLASH}[x-]`*foo* +bar+ baz`)
+        para = block_from_string input
+        assert_equal '[x-]<code><strong>foo</strong> bar baz</code>', para.content
+      end
+
+      test 'should ignore escaped attrlist with transitional role on monospace phrase if not proceeded by [' do
+        input = %(#{BACKSLASH}x-]`*foo* +bar+ baz`)
+        para = block_from_string input
+        assert_equal %(#{BACKSLASH}x-]<code><strong>foo</strong> bar baz</code>), para.content
+      end
+
+      test 'should not process passthrough inside transitional literal monospace span' do
+        input = 'a [x-]`foo +bar+ baz` kind of thing'
+        para = block_from_string input
+        assert_equal 'a <code>foo +bar+ baz</code> kind of thing', para.content
+      end
+
+      test 'should support constrained passthrough in monospace phrase with attrlist' do
+        input = '[.role]`foo +bar+ baz`'
+        para = block_from_string input
+        assert_equal '<code class="role">foo bar baz</code>', para.content
+      end
+
       test 'should support attrlist on a literal monospace phrase' do
         input = '[.baz]`+foo--bar+`'
         para = block_from_string input
