@@ -25,11 +25,11 @@ Check that you have a `python2` (Linux), `python` (macOS), or `py -2` (Windows) 
 Check that you have a `python3` (Linux/macOS) or `py -3` (Windows) executable on your PATH.
 
 .Installing Python and the pygments.rb gem via the CLI (cross platform)
-[source,console]
-....
+[,console]
+----
 $ "`\which apt-get || \which dnf || \which yum || \which brew`" install python # <.>
 $ gem install pygments.rb # <.>
-....
+----
 <.> Install Python using your package manager
 <.> Install the pygments.rb gem
 
@@ -37,7 +37,7 @@ $ gem install pygments.rb # <.>
 
 Once you've installed these libraries, assign `pygments` to the `source-highlighter` attribute in your document's header.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :source-highlighter: pygments
 ----

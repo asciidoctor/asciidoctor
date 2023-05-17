@@ -32,7 +32,7 @@ Skim off front matter from the top of the document that gets used by site genera
 === sample-with-front-matter.adoc
 
 [source,asciidoc]
-----
+....
 tags: [announcement, website]
 ---
 = Document Title
@@ -41,12 +41,12 @@ content
 
 [subs=+attributes]
 .Captured front matter
-....
+----
 ---
 {front-matter}
 ---
-....
 ----
+....
 
 === FrontMatterPreprocessor
 
