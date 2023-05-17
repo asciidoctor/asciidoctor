@@ -1,6 +1,6 @@
 name: asciidoctor
 title: Asciidoctor
-version: '2.0.19'
+version: '2.0'
 asciidoc:
   attributes:
     xrefstyle: short@
