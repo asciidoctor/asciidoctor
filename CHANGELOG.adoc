@@ -73,6 +73,7 @@ Improvements::
 
 Bug Fixes::
 
+  * Process constrained inline passthrough inside monospace span (#4458)
   * Catalog inline ref defined using anchor macro even when resolved reftext is empty
   * Use while loop rather than recursion to locate next line to process; prevents stack limit error (#4368)
   * Avoid numeric character reference when looking for fragment in target of xref (#4393, #3642)

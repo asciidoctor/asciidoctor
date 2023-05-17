@@ -1065,10 +1065,11 @@ module Substitutors
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub pass_inline_rx do
       preceding = $1
-      attrlist = $2
-      escape_mark = RS if (quoted_text = $3).start_with? RS
-      backtick_mark = $4 == '`'
-      content = $5
+      attrlist = $4 || $3
+      escaped = true if $5
+      quoted_text = $6
+      format_mark = $7
+      content = $8
 
       if compat_mode
         old_behavior = true
@@ -1077,32 +1078,30 @@ module Substitutors
       end
 
       if attrlist
-        if backtick_mark && !old_behavior
-          next extract_inner_passthrough content, %(#{preceding}[#{attrlist}]#{escape_mark})
-        elsif escape_mark
+        if escaped
           # honor the escape of the formatting mark
-          next %(#{preceding}[#{attrlist}]#{old_behavior_forced && backtick_mark ? quoted_text : (quoted_text.slice 1, quoted_text.length)})
+          next %(#{preceding}[#{attrlist}]#{quoted_text.slice 1, quoted_text.length})
         elsif preceding == RS
           # honor the escape of the attributes
-          next %(#{preceding}[#{attrlist}]#{quoted_text}) if old_behavior_forced && backtick_mark
+          next %(#{preceding}[#{attrlist}]#{quoted_text}) if old_behavior_forced && format_mark == '`'
           preceding = %([#{attrlist}])
         elsif old_behavior_forced
           attributes = attrlist == 'x-' ? {} : (parse_quoted_text_attributes attrlist.slice 0, attrlist.length - 3)
         else
           attributes = parse_quoted_text_attributes attrlist
         end
-      elsif backtick_mark && !old_behavior
-        next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
-      elsif escape_mark
+      elsif escaped
         # honor the escape of the formatting mark
         next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
+      elsif compat_mode && preceding == RS
+        next quoted_text
       end
 
       if compat_mode
         passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
-          subs = backtick_mark ? BASIC_SUBS : NORMAL_SUBS
+          subs = format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS
           passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
           passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
@@ -1398,20 +1397,6 @@ module Substitutors
         line
       end
     end.join LF)
-  end
-
-  # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
-  def extract_inner_passthrough text, pre
-    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
-      if $1
-        %(#{pre}`+#{$2}+`)
-      else
-        @passthroughs[passthru_key = @passthroughs.size] = { text: $2, subs: BASIC_SUBS }
-        %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
-      end
-    else
-      %(#{pre}`#{text}`)
-    end
   end
 
   # Internal: Convert a quoted text region
