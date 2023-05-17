@@ -22,7 +22,7 @@ jobs:
     environment: releases
     env:
       SOURCE_DATE_EPOCH: '1521504000'
-      PYGMENTS_VERSION: '~> 2.0'
+      PYGMENTS_VERSION: '~> 2.3.0'
     steps:
     - name: Checkout
       uses: actions/checkout@v3
