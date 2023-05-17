@@ -93,7 +93,7 @@ You should not mix syntax highlighting with AsciiDoc text formatting (i.e., the 
 In many converters, these two operations are mutually exclusive.
 
 .Improper use of custom substitutions on a source block
-[,asciidoc]
+[source,asciidoc]
 ....
 [,java,subs=+quotes]
 ----
@@ -112,7 +112,7 @@ While it may work in some syntax highlighters in the HTML backend (which perhaps
 If you're going to customize the substitutions on a source block using the `subs` attribute, you should limit those substitutions to attribute replacements (`attributes`).
 
 .Valid use of custom substitutions on a source block
-[,asciidoc]
+[source,asciidoc]
 ....
 [,java,subs=attributes+]
 ----
