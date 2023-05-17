@@ -569,22 +569,16 @@ module Asciidoctor
   # Examples
   #
   #   +text+
-  #   `text` (compat)
+  #   [x-]+text+
+  #   [x-]`text`
+  #   `text` (compat only)
+  #   [role]`text` (compat only)
   #
   # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
   InlinePassRx = {
-    false => ['+', '`', /(^|[^#{CC_WORD};:])(?:#{QuoteAttributeListRxt})?(\\?(\+|`)(\S|\S#{CC_ALL}*?\S)\4)(?!#{CG_WORD})/m],
-    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:#{QuoteAttributeListRxt})?(\\?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\4)(?![`#{CC_WORD}])/m],
+    false => ['+', '-]', /((?:^|[^#{CC_WORD};:\\])(?=(\[)|\+)|\\(?=\[)|(?=\\\+))(?:\2(x-|[^\[\]]+ x-)\]|(?:#{QuoteAttributeListRxt})?(?=(\\)?\+))(\5?(\+|`)(\S|\S#{CC_ALL}*?\S)\7)(?!#{CG_WORD})/m],
+    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:(\Z)()|#{QuoteAttributeListRxt}(?=(\\))?)?(\5?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\7)(?![`#{CC_WORD}])/m],
   }
-
-  # Matches an inline plus passthrough spanning multiple lines, but only when it occurs directly
-  # inside constrained monospaced formatting in non-compat mode.
-  #
-  # Examples
-  #
-  #   +text+
-  #
-  SinglePlusInlinePassRx = /^(\\)?\+(\S|\S#{CC_ALL}*?\S)\+$/m
 
   # Matches several variants of the passthrough inline macro, which may span multiple lines.
   #
