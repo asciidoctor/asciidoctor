@@ -31,8 +31,6 @@ Compliance::
   * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
   * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
   * Support `notitle` option on section as alternative to `untitled` to hide title (#4437)
-  * Update latest CRuby in CI workflow to 3.2
-  * Update latest JRuby in CI workflow to 9.4.2.0
   * Add support for Haml 6 to template converter (#4429)
 
 Bug Fixes::
@@ -51,6 +49,11 @@ Bug Fixes::
   * Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
   * Enclose `<reftext>` tag in `<article>` tag in DocBook output for man page (#4452)
   * Correctly handle compat role on monospace and constrained passthrough when box attrlist or formatted text is escaped
+
+Build / Infrastructure::
+
+  * Update latest CRuby in CI workflow to 3.2
+  * Update latest JRuby in CI workflow to 9.4.2.0
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
