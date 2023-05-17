@@ -1019,11 +1019,17 @@ module Substitutors
             next %(#{$1}[#{attrlist}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
           elsif $1 == RS
             preceding = %([#{attrlist}])
-          else
-            if boundary == '++' && (attrlist.end_with? 'x-')
+          elsif boundary == '++'
+            if attrlist == 'x-'
               old_behavior = true
-              attrlist = attrlist.slice 0, attrlist.length - 2
+              attributes = {}
+            elsif attrlist.end_with? ' x-'
+              old_behavior = true
+              attributes = parse_quoted_text_attributes attrlist.slice 0, attrlist.length - 3
+            else
+              attributes = parse_quoted_text_attributes attrlist
             end
+          else
             attributes = parse_quoted_text_attributes attrlist
           end
         elsif (escape_count = $3.length) > 0
@@ -1065,7 +1071,7 @@ module Substitutors
 
       if compat_mode
         old_behavior = true
-      elsif attrlist && (attrlist.end_with? 'x-')
+      elsif attrlist && (attrlist == 'x-' || (attrlist.end_with? ' x-'))
         old_behavior = old_behavior_forced = true
       end
 
