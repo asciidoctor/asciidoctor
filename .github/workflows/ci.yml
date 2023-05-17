@@ -55,6 +55,9 @@ jobs:
           haml-version: '~> 5.2.0'
         - os: ubuntu-latest
           ruby: '2.3'
+          pygments-version: '~> 1.2.0'
+        - os: ubuntu-latest
+          ruby: '2.3'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
           ruby: '3.2'
@@ -80,6 +83,9 @@ jobs:
     - name: Set Pygments version
       if: matrix.pygments-version
       run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
+    - name: Install prerequisites for Pygments ~> 1.2.0 (Linux)
+      if: matrix.os == 'ubuntu-latest' && matrix.pygments-version == '~> 1.2.0'
+      run: sudo apt-get install python2
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
