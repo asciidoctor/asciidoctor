@@ -66,6 +66,8 @@ jobs:
     env:
       BUNDLE_WITHOUT: coverage:docs
       SOURCE_DATE_EPOCH: '1521504000'
+      # work around `Permission denied - NUL' error when installing/using the bundler gem on JRuby for Windows
+      JRUBY_OPTS: '-J-Djdk.io.File.enableADS=true'
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -93,7 +95,7 @@ jobs:
         echo 'BUNDLE_WITHOUT=docs' >> $GITHUB_ENV
         echo 'COVERAGE=true' >> $GITHUB_ENV
     - name: Upgrade Java (JRuby for Windows)
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest' && matrix.ruby == 'jruby-9.4.2.0'
       uses: actions/setup-java@v3
       with:
         distribution: temurin
