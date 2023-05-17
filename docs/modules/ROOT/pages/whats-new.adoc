@@ -11,6 +11,47 @@ The releases are ordered from newest to oldest.
 
 _**Cumulative issues resolved:** {url-milestone}[2.0.x^]_
 
+= Asciidoctor 2.0.19
+
+_**Release date:** 2023.05.15_
+
+== Improvements
+
+* Return empty string instead of nil if raw or verbatim block has no lines
+* Don't uppercase monospace span in section title in manpage output (#4402)
+* Simplify processing of implicit link (i.e., autolink) by separating implicit and explicit match
+* Generate partintro block consistently (#4450)
+* Add Kiswahili translation for built-in labels (PR #4454) *@bkmgit*
+
+== Compliance
+
+* Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
+* Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
+* Support `notitle` option on section as alternative to `untitled` to hide title (#4437)
+* Add support for Haml 6 to template converter (#4429)
+
+== Bug Fixes
+
+* Process constrained inline passthrough inside monospace span (#4458)
+* Catalog inline ref defined using anchor macro even when resolved reftext is empty
+* Use while loop rather than recursion to locate next line to process; prevents stack limit error (#4368)
+* Avoid matching numeric character references when searching for # in xref target (#4393)
+* Use correct selector to collapse margin on first and last child of sidebar
+* Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
+* Manify alt text of block image in manpage output (#4401)
+* Adjust font size of term in horizontal dlist to match font size of term in regular dlist
+* Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
+* Don't swallow square brackets when processing escaped URL macro
+* Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
+* Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
+* Enclose `<reftext>` tag in `<article>` tag in DocBook output for man page (#4452)
+* Correctly handle compat role on monospace and constrained passthrough when box attrlist or formatted text is escaped
+
+== Build / Infrastructure
+
+* Update latest CRuby in CI workflow to 3.2
+* Update latest JRuby in CI workflow to 9.4.2.0
+
 = Asciidoctor 2.0.18
 
 _**Release date:** 2022.10.15_
