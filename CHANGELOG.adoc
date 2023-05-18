@@ -64,7 +64,7 @@ Build / Infrastructure::
 
 === Details
 
-{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[source diff]
+{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[full diff]
 // end::compact[]
 
 == 2.0.18 (2022-10-15) - @mojavelinux
@@ -89,7 +89,7 @@ Bug Fixes::
 
 === Details
 
-{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
+{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[full diff]
 
 == 2.0.17 (2022-01-05) - @mojavelinux
 
