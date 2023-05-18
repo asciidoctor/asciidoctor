@@ -21,7 +21,7 @@ _**Release date:** 2023.05.15_
 * Don't uppercase monospace span in section title in manpage output (#4402)
 * Simplify processing of implicit link (i.e., autolink) by separating implicit and explicit match
 * Generate partintro block consistently (#4450)
-* Add Kiswahili translation for built-in labels (PR #4454) *@bkmgit*
+* Add Kiswahili translation for built-in labels (PR #4454) (*@bkmgit*)
 
 == Compliance
 
