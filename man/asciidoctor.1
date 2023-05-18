@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: asciidoctor
 .\"    Author: Dan Allen, Sarah White
-.\" Generator: Asciidoctor 2.0.17
-.\"      Date: 2022-01-05
+.\" Generator: Asciidoctor 2.0.19
+.\"      Date: 2018-03-20
 .\"    Manual: Asciidoctor Manual
-.\"    Source: Asciidoctor 2.0.17
+.\"    Source: Asciidoctor 2.0.20
 .\"  Language: English
 .\"
-.TH "ASCIIDOCTOR" "1" "2022-01-05" "Asciidoctor 2.0.17" "Asciidoctor Manual"
+.TH "ASCIIDOCTOR" "1" "2018-03-20" "Asciidoctor 2.0.20" "Asciidoctor Manual"
 .ie \n(.g .ds Aq \(aq
 .el       .ds Aq '
 .ss \n[.ss] 0
@@ -67,10 +67,11 @@ If not set, the safe mode level defaults to \fIunsafe\fP when Asciidoctor is inv
 .RS 4
 Define, override, or unset a document attribute.
 Command\-line attributes take precedence over attributes defined in the source file unless either the name or value ends in \fI@\fP.
+No substitutions are applied to the value.
 .sp
 \fIATTRIBUTE\fP is normally formatted as a key\-value pair, in the form \fINAME=VALUE\fP.
 Alternate forms are \fINAME\fP (where the \fIVALUE\fP defaults to an empty string), \fINAME!\fP (unsets the \fINAME\fP attribute), and \fINAME=VALUE@\fP (or \fINAME@=VALUE\fP) (where \fIVALUE\fP does not override the \fINAME\fP attribute if it\(cqs already defined in the source document).
-Values containing spaces should be enclosed in quotes.
+A value containing spaces must be enclosed in quotes, in the form \fINAME="VALUE WITH SPACES"\fP.
 .sp
 This option may be specified more than once.
 .RE
