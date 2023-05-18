@@ -18,7 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+   * Update `release-version` attribute in READMEs and man page during release
+   * Rebuild man page during release
 
 == 2.0.19 (2023-05-17) - @mojavelinux
 
