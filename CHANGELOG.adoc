@@ -62,6 +62,17 @@ Improvements::
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Use safe navigation to avoid crashing when querying for extensions
 
+== 2.0.20 (2023-05-18) - @mojavelinux
+
+Bug Fixes::
+
+   * Update `release-version` attribute in READMEs and man page during release
+   * Rebuild man page during release
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.20[git tag] | {url-repo}/compare/v2.0.19\...v2.0.20[full diff]
+
 == 2.0.19 (2023-05-17) - @mojavelinux
 
 Improvements::
@@ -103,7 +114,7 @@ Build / Infrastructure::
 
 === Details
 
-{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[source diff]
+{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[full diff]
 // end::compact[]
 
 == 2.0.18 (2022-10-15) - @mojavelinux
@@ -128,7 +139,7 @@ Bug Fixes::
 
 === Details
 
-{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
+{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[full diff]
 
 == 2.0.17 (2022-01-05) - @mojavelinux
 
