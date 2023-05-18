@@ -21,10 +21,12 @@ readme_files = readme_files.map do |readme_file|
   readme_contents = (File.readlines readme_file, mode: 'r:UTF-8').map do |l|
     (l.start_with? ':release-version: ') ? %(:release-version: #{release_version}\n) : l
   end
-  if readme_contents[2].start_with? 'v'
-    readme_contents[2] = %(v#{release_version}, #{release_date}\n)
-  elsif readme_file == 'README.adoc'
-    readme_contents.insert 2, %(v#{release_version}, #{release_date}\n)
+  if readme_file.include? 'README'
+    if readme_contents[2].start_with? 'v'
+      readme_contents[2] = %(v#{release_version}, #{release_date}\n)
+    else
+      readme_contents.insert 2, %(v#{release_version}, #{release_date}\n)
+    end
   end
   [readme_file, readme_contents]
 end
