@@ -128,8 +128,9 @@ jobs:
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Install gem and doc
       run: |
-        bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
-        bundle exec gem install --local --document rdoc,ri asciidoctor.gem
+        rm -rf pkg
+        bundle exec rake build
+        bundle exec gem install --local --document rdoc,ri pkg/*.gem
         bundle exec gem uninstall -ax asciidoctor
   build-dependents:
     name: build:dependents
