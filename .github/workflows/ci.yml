@@ -127,10 +127,11 @@ jobs:
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Install gem and doc
+      if: "!startsWith(matrix.ruby, 'truffleruby-')"
       run: |
         ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
         bundle exec rake build
-        bundle exec gem install --local --document rdoc,ri pkg/*.gem
+        bundle exec gem --backtrace install --local --document rdoc,ri pkg/*.gem
         bundle exec gem uninstall -ax asciidoctor
   build-dependents:
     name: build:dependents
