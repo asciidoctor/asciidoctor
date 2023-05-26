@@ -1,5 +1,6 @@
 = Supported Platforms and System Requirements
 :navtitle: Supported Platforms
+:ge: &#8805;
 
 Asciidoctor operates on Linux, macOS, and Windows and requires one of the supported Ruby implementations listed in the next section.
 
@@ -31,19 +32,16 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |Supported OS |Supported Versions
 
 |Ubuntu
-|18.04 LTS +
-20.04 LTS
+|{ge} 18.04 LTS
 
 |Fedora
-|&#8805; 33
+|{ge} 36
 
 |macOS
-|Mojave +
-Catalina +
-Big Sur
+|{ge} macOS 11 (Big Sur)
 
 |Microsoft
-|Windows 10 +
+|{ge} Windows 10 +
 Windows Server 2019
 |===
 
