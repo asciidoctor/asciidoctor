@@ -712,38 +712,38 @@ allbox tab(:);'
     else
       str = str.tr_s WHITESPACE, ' '
     end
-    str = str
-      .gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' } # literal backslash (not a troff escape sequence)
-      .gsub(EllipsisCharRefRx, '...') # horizontal ellipsis
-      .gsub(LeadingPeriodRx, '\\\&.') # leading . is used in troff for macro call or other formatting; replace with \&.
-      .gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) } # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-      .gsub('-', '\-')
-      .gsub('&lt;', '<')
-      .gsub('&gt;', '>')
-      .gsub('&#43;', '+')       # plus sign; alternately could use \c(pl
-      .gsub('&#160;', '\~')     # non-breaking space
-      .gsub('&#169;', '\(co')   # copyright sign
-      .gsub('&#174;', '\(rg')   # registered sign
-      .gsub('&#8482;', '\(tm')  # trademark sign
-      .gsub('&#176;', '\(de')   # degree sign
-      .gsub('&#8201;', ' ')     # thin space
-      .gsub('&#8211;', '\(en')  # en dash
-      .gsub(EmDashCharRefRx, '\(em') # em dash
-      .gsub('&#8216;', '\(oq')  # left single quotation mark
-      .gsub('&#8217;', '\(cq')  # right single quotation mark
-      .gsub('&#8220;', '\(lq')  # left double quotation mark
-      .gsub('&#8221;', '\(rq')  # right double quotation mark
-      .gsub('&#8592;', '\(<-')  # leftwards arrow
-      .gsub('&#8594;', '\(->')  # rightwards arrow
-      .gsub('&#8656;', '\(lA')  # leftwards double arrow
-      .gsub('&#8658;', '\(rA')  # rightwards double arrow
-      .gsub('&#8203;', '\:')    # zero width space
-      .gsub('&amp;', '&')       # literal ampersand (NOTE must take place after any other replacement that includes &)
-      .gsub('\'', '\*(Aq')      # apostrophe / neutral single quote
-      .gsub(MockMacroRx, '\1')  # mock boundary
-      .gsub(ESC_BS, '\\')       # unescape troff backslash (NOTE update if more escapes are added)
-      .gsub(ESC_FS, '.')        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
-      .rstrip                   # strip trailing space
+    str = str.
+      gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' }. # literal backslash (not a troff escape sequence)
+      gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
+      gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
+      gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) }. # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
+      gsub('-', '\-').
+      gsub('&lt;', '<').
+      gsub('&gt;', '>').
+      gsub('&#43;', '+').      # plus sign; alternately could use \c(pl
+      gsub('&#160;', '\~').    # non-breaking space
+      gsub('&#169;', '\(co').  # copyright sign
+      gsub('&#174;', '\(rg').  # registered sign
+      gsub('&#8482;', '\(tm'). # trademark sign
+      gsub('&#176;', '\(de').  # degree sign
+      gsub('&#8201;', ' ').    # thin space
+      gsub('&#8211;', '\(en'). # en dash
+      gsub(EmDashCharRefRx, '\(em'). # em dash
+      gsub('&#8216;', '\(oq'). # left single quotation mark
+      gsub('&#8217;', '\(cq'). # right single quotation mark
+      gsub('&#8220;', '\(lq'). # left double quotation mark
+      gsub('&#8221;', '\(rq'). # right double quotation mark
+      gsub('&#8592;', '\(<-'). # leftwards arrow
+      gsub('&#8594;', '\(->'). # rightwards arrow
+      gsub('&#8656;', '\(lA'). # leftwards double arrow
+      gsub('&#8658;', '\(rA'). # rightwards double arrow
+      gsub('&#8203;', '\:').   # zero width space
+      gsub('&amp;', '&').      # literal ampersand (NOTE must take place after any other replacement that includes &)
+      gsub('\'', '\*(Aq').     # apostrophe / neutral single quote
+      gsub(MockMacroRx, '\1'). # mock boundary
+      gsub(ESC_BS, '\\').      # unescape troff backslash (NOTE update if more escapes are added)
+      gsub(ESC_FS, '.').       # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
+      rstrip                   # strip trailing space
     opts[:append_newline] ? %(#{str}#{LF}) : str
   end
 
