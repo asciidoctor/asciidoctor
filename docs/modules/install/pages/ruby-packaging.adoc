@@ -43,7 +43,7 @@ Note that it's possible that the prerelease version is older than the latest sta
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
 +
-[source,ruby,subs=attributes+]
+[,ruby,subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'

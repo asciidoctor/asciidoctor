@@ -83,7 +83,7 @@ Otherwise, the browser will not be able to find the stylesheet.
 
 To solve this problem, set the safe mode to server or lower (e.g., server, safe, or unsafe) and Asciidoctor will embed the default stylesheet, like when using the `asciidoctor` command.
 
-[source,ruby]
+[,ruby]
 ----
 require 'asciidoctor'
 
@@ -133,7 +133,7 @@ Let's say you want to change the color of headings (and other heading-like title
 Start by creating a file named [.path]_docinfo.html_ (head is the default location) and populate it with a `<style>` element with the necessary styles.
 
 .docinfo.html
-[source,html]
+[,html]
 ----
 <style>
 h1, h2, h3, h4, h5, h6, #toctitle,
@@ -183,7 +183,7 @@ Then, add another `@import` declaration to import the web fonts the default styl
 Finally, add your overrides below those `@import` directives.
 Here's how that looks altogether.
 
-[source,css,subs=attributes+]
+[,css,subs=attributes+]
 ----
 @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";
 @import "{url-default-stylesheet}";

@@ -6,7 +6,7 @@ Insert copyright text in the footer.
 
 == CopyrightFooterPostprocessor
 
-[source,ruby]
+[,ruby]
 ----
 class CopyrightFooterPostprocessor < Asciidoctor::Extensions::Postprocessor
   def process document, output
@@ -25,7 +25,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   postprocessor CopyrightFooterPostprocessor

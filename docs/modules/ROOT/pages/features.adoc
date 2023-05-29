@@ -73,7 +73,7 @@ If you're writing technical documentation that presents snippets of source code 
 Syntax highlighting is the practice of colorizing (or otherwise emphasizing) keywords and syntax elements in a structured programming or configuration language.
 Here's an example to give you an idea:
 
-[source,ruby]
+[,ruby]
 ----
 phrase = "I love AsciiDoc"
 puts phrase

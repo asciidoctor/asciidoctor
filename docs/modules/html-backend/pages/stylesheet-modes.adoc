@@ -35,7 +35,7 @@ The `linkcss` document attribute must be set by the end of the header to be effe
 One way to do that is to set the attribute in the document header:
 
 .linkcss attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :linkcss:
@@ -49,7 +49,7 @@ You can also set `linkcss` using the API or CLI (shown here):
 In either case, if you inspect the `<head>` element in the output file [.path]_my-document.html_, you'll see that the HTML links to the stylesheet.
 
 .my-document.html
-[source,html]
+[,html]
 ----
 <link rel="stylesheet" href="./asciidoctor.css">
 ----
@@ -100,7 +100,7 @@ The `copycss` document attribute must be unset by the end of the header to be ef
 One way to do that is to unset the attribute in the document header:
 
 .copycss attribute unset in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :linkcss:

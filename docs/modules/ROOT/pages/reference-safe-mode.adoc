@@ -14,7 +14,7 @@ The xref:safe-modes.adoc[safe mode] can be referenced by one of the following do
 
 The attributes in the next example define replacement text for features that are disabled in high security environments:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 \ifdef::safe-mode-secure[]
 Link to chapters instead of including them.

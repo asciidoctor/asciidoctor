@@ -36,7 +36,7 @@ a|
  $ asciidoctor document.adoc
 
 a|
-[source,ruby]
+[,ruby]
 ----
 require 'asciidoctor'
 Asciidoctor.convert_file \

@@ -6,7 +6,7 @@ Register a custom block style named `shout` that uppercases all the words and co
 
 == sample-with-shout-block.adoc
 
-[source,asciidoc]
+[,asciidoc]
 ----
 [shout]
 The time is now. Get a move on.
@@ -14,7 +14,7 @@ The time is now. Get a move on.
 
 == ShoutBlock
 
-[source,ruby]
+[,ruby]
 ----
 class ShoutBlock < Asciidoctor::Extensions::BlockProcessor
   PeriodRx = /\.(?= |$)/
@@ -35,7 +35,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   block ShoutBlock
