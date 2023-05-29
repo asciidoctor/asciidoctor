@@ -50,7 +50,7 @@ content
 
 === FrontMatterPreprocessor
 
-[source,ruby]
+[,ruby]
 ----
 class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
   def process document, reader
@@ -80,7 +80,7 @@ end
 
 === Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor

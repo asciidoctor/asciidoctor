@@ -293,7 +293,7 @@ Here are the equivalents of the old attributes using the new values:
 In AsciiDoc.py, single line comments could be turned into DocBook `<remark>` elements using `showcomments`.
 This feature isn't implemented in Asciidoctor, but you can send remarks to the output, using an extension, or ifdef directives and passthrough blocks like the example shown below.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 \ifdef::showcomments+basebackend-docbook[]
 ++++
@@ -491,7 +491,7 @@ This content needs to be move to the specific subject docs pages if applicable
 Asciidoctor has shorthand for id, role, style and options.
 The following longhand syntax in AsciiDoc.py:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 [[id]]
 [style,role="role",options="option1,option2"]
@@ -499,7 +499,7 @@ The following longhand syntax in AsciiDoc.py:
 
 can be written using the shorthand supported by Asciidoctor:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 [style#id.role%option1%option2]
 ----

@@ -64,7 +64,7 @@ Once Asciidoctor Mathematical is installed, you can activate the extension when 
 
 If you're invoking Asciidoctor via the API, you must require the gem before invoking Asciidoctor:
 
-[source,ruby]
+[,ruby]
 ----
 require 'asciidoctor-mathematical'
 

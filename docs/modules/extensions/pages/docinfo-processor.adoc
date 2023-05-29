@@ -6,7 +6,7 @@ Appends the Google Analytics tracking code to the bottom of an HTML document.
 
 == GoogleAnalyticsDocinfoProcessor
 
-[source,ruby]
+[,ruby]
 ----
 class GoogleAnalyticsDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
   use_dsl
@@ -27,7 +27,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   docinfo_processor GoogleAnalyticsDocinfoProcessor

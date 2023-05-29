@@ -7,7 +7,7 @@ Front matter typically starts on the first line of a file and is bounded by bloc
 
 Here's an example of a document that contains front matter:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 ---  <.>
 layout: default <.>

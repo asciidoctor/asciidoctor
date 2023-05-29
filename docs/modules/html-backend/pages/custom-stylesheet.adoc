@@ -18,7 +18,7 @@ To keep it simple, we'll just define a basic stylesheet that changes all text to
 Create the file [.path]_my-stylesheet.css_ the directory with your AsciiDoc source files and populate it with the following contents:
 
 .my-stylesheet.css
-[source,css]
+[,css]
 ----
 body {
   color: #ff0000;
@@ -31,7 +31,7 @@ The `stylesheet` document attribute must be set by the end of the header to be e
 One way to do that is to set the attribute in the document header:
 
 .stylesheet attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
@@ -75,7 +75,7 @@ The `stylesdir` document attribute must be set by the end of the header to be ef
 One way to do that is to set the attribute in the document header:
 
 .stylesdir attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
@@ -113,7 +113,7 @@ If you invoke Asciidoctor as follows:
 
 Then when you inspect the HTML, you will see:
 
-[source,html]
+[,html]
 ----
 <link rel="stylesheet" href="my-styles/asciidoctor.css">
 ----
@@ -130,7 +130,7 @@ We'll specify the location of `stylesdir` as an absolute path and generate the o
 Asciidoctor generates the HTML file into the [.path]_public_ folder, but it does not copy the stylesheet.
 Furthermore, it uses an absolute path in the link to the stylesheet:
 
-[source,html]
+[,html]
 ----
 <link rel="stylesheet" href="/path/to/documents/my-styles/asciidoctor.css">
 ----
@@ -189,14 +189,14 @@ Let's say you have three AsciiDoc documents saved in the following directory str
 
 For [.path]_a.adoc_ and [.path]_b.adoc_, set `stylesdir` to:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :stylesdir: my-styles
 ----
 
 For [.path]_c.adoc_, set `stylesdir` to:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :stylesdir: ../my-styles
 ----

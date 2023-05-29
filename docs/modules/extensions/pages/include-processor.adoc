@@ -13,7 +13,7 @@ TIP: Asciidoctor supports including content from a URI out of the box if you set
 :source-highlighter: coderay
 
 .Gemfile
-[source,ruby]
+[,ruby]
 ----
 \include::https://cdn.jsdelivr.net/gh/asciidoctor/asciidoctor/Gemfile[]
 ----
@@ -21,7 +21,7 @@ TIP: Asciidoctor supports including content from a URI out of the box if you set
 
 == UriIncludeProcessor
 
-[source,ruby]
+[,ruby]
 ----
 class UriIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
   def handles? target
@@ -38,7 +38,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   include_processor UriIncludeProcessor

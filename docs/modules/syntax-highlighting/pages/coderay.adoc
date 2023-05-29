@@ -4,20 +4,19 @@
 
 {url-coderay}[CodeRay^] is an encoding-aware, syntax highlighter that supports the languages listed below.
 
-[%autowidth,cols="3*",grid=none,frame=none]
+[%autowidth,cols="4*",grid=none,frame=none]
 |===
 | C
 | C++
 | Clojure
-
 | CSS
+
 | Delphi
 | diff
-
 | ERB
 | Go
-| Groovy
 
+| Groovy
 | HAML
 | HTML
 | Java
@@ -25,15 +24,14 @@
 | JavaScript
 | JSON
 | Lua
-
 | PHP
+
 | Python
 | Ruby
-
 | Sass
 | SQL
-| Taskpaper
 
+| Taskpaper
 | XML
 | YAML
 |
@@ -60,7 +58,7 @@ Install using dnf (Fedora-based systems)::
 
 Once you've installed the gem, assign the `coderay` value to the `source-highlighter` attribute in the document header to activate it.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :source-highlighter: coderay
 ----
@@ -86,7 +84,7 @@ Default: `table`.
 :source-highlighter: coderay
 :coderay-linenums-mode: inline
 
-[source%linenums,ruby]
+[%linenums,ruby]
 ----
 ORDERED_LIST_KEYWORDS = {
   'loweralpha' => 'a',

@@ -11,9 +11,20 @@ puts "Hello, World!"
 ----
 ....
 
+If a language is specified on a listing block, the source style is implied.
+Therefore, it can be excluded in this case.
+
+[source,asciidoc]
+....
+[,ruby]
+----
+puts "Hello, World!"
+----
+....
+
 Here's how we expect it to appear:
 
-[source,ruby]
+[,ruby]
 ----
 puts "Hello, World!"
 ----

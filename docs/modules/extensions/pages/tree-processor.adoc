@@ -17,7 +17,7 @@ Detect literal blocks that contain shell commands, strip the prompt character an
 
 === sample-with-shell-session.adoc
 
-[source,asciidoc]
+[,asciidoc]
 ----
  $ echo "Hello, World!"
  > Hello, World!
@@ -27,7 +27,7 @@ Detect literal blocks that contain shell commands, strip the prompt character an
 
 === ShellSessionTreeProcessor
 
-[source,ruby]
+[,ruby]
 ----
 class ShellSessionTreeProcessor < Asciidoctor::Extensions::TreeProcessor
   LF = ?\n
@@ -60,7 +60,7 @@ end
 
 === Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   tree_processor ShellSessionTreeProcessor

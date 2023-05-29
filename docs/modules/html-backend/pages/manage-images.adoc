@@ -8,7 +8,7 @@ If you have image references in your document, you'll have to save the image fil
 As an alternative, you can embed the images directly into the document by setting the `data-uri` document attribute.
 
 .data-uri attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :imagesdir: my-images

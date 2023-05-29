@@ -2,7 +2,7 @@
 
 When using Asciidoctor to generate a standalone HTML document (i.e., the `standalone` option is `true`), you can instruct the processor to include a link to a favicon by setting the favicon attribute in the document header.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 = Document Title
 :favicon:
@@ -10,7 +10,7 @@ When using Asciidoctor to generate a standalone HTML document (i.e., the `standa
 
 By default, the processor will add a link reference of type "icon" that refers to a file named _favicon.ico_ (relative to the HTML document):
 
-[source,html]
+[,html]
 ----
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 ----
@@ -19,7 +19,7 @@ This reference gets added inside the HTML `<head>` element (which explains why t
 
 To modify the name or location of the icon file, simply assign a value to the favicon attribute:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 = Document Title
 :favicon: ./images/favicon/favicon.png
@@ -27,7 +27,7 @@ To modify the name or location of the icon file, simply assign a value to the fa
 
 This will now produce the following HTML element:
 
-[source,html]
+[,html]
 ----
 <link rel="icon" type="image/png" href="./images/favicon/favicon.png">
 ----
@@ -37,7 +37,7 @@ Notice the mimetype is automatically set based on the file extension of the imag
 The value of the `iconsdir` attribute is not prepend to the favicon path as it is with icons in the content.
 If you want this directory to be included in the favicon path, you must reference it explicitly:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :favicon: {iconsdir}/favicon.png
 ----
