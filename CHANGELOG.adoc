@@ -62,6 +62,10 @@ Improvements::
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Use safe navigation to avoid crashing when querying for extensions
 
+Bug Fixes::
+
+  * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
+
 == 2.0.20 (2023-05-18) - @mojavelinux
 
 Bug Fixes::

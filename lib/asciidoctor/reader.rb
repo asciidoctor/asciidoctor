@@ -1026,6 +1026,7 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif doc.safe >= SafeMode::SECURE
+      expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
       # FIXME we don't want to use a link macro if we are in a verbatim context
       replace_next_line %(link:#{expanded_target}[role=include#{attrlist ? ',' + attrlist : ''}])
     elsif @maxdepth
@@ -1227,6 +1228,7 @@ class PreprocessorReader < Reader
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       unless doc.attr? 'allow-uri-read'
         logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
+        target = %(pass:c[#{target}]) if target.include? ' '
         return replace_next_line %(link:#{target}[role=include#{attrlist ? ',' + attrlist : ''}])
       end
       if doc.attr? 'cache-uri'

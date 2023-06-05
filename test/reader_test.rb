@@ -677,6 +677,13 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:include-file.adoc[role=include]', reader.read_line
       end
 
+      test 'should escape spaces in target when generating link from include directive' do
+        input = 'include::foo bar baz.adoc[]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:pass:c[foo bar baz.adoc][role=include]', reader.read_line
+      end
+
       test 'should preserve attrlist when replacing include directive with link macro' do
         input = 'include::include-file.adoc[leveloffset=+1]'
         doc = Asciidoctor::Document.new input
@@ -691,6 +698,16 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
           assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should escape spaces in target when generating link from remote include directive' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/no such file.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/no such file.adoc (allow-uri-read attribute not enabled)', Hash
         end
       end
 
