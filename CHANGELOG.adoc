@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 

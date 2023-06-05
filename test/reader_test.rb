@@ -652,6 +652,13 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:include-file.adoc[role=include]', reader.read_line
       end
 
+      test 'should escape spaces in target when generating link from include directive' do
+        input = 'include::foo bar baz.adoc[]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:pass:c[foo bar baz.adoc][role=include]', reader.read_line
+      end
+
       test 'should replace include directive with link macro if safe mode allows it, but allow-uri-read is not set' do
         using_memory_logger do |logger|
           input = 'include::https://example.org/dist/info.adoc[]'
@@ -660,6 +667,13 @@ class ReaderTest < Minitest::Test
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
           assert_empty logger
         end
+      end
+
+      test 'should escape spaces in target when generating link from remote include directive' do
+        input = 'include::https://example.org/no such file.adoc[]'
+        doc = Asciidoctor::Document.new input, safe: :safe
+        reader = doc.reader
+        assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
       end
 
       test 'include directive is enabled when safe mode is less than SECURE' do
