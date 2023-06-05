@@ -16,7 +16,7 @@ In this section, we'll create a sample document, then process and convert it wit
 . To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plaintext file.
 +
 .my-document.adoc
-[source#ex-my-doc,asciidoc]
+[#ex-my-doc,asciidoc]
 ----
 include::example$my-document.adoc[tags=title;body]
 ----

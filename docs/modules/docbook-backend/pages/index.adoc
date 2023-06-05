@@ -17,7 +17,7 @@ To use the DocBook converter, assign `docbook` or `docbook5` to the `backend` op
 . To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plain text file.
 +
 .my-document.adoc
-[source#ex-my-doc,asciidoc]
+[#ex-my-doc,asciidoc]
 ----
 include::html-backend:example$my-document.adoc[tags=title;body]
 ----
