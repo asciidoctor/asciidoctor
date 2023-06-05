@@ -374,7 +374,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     result = [%(<ul class="sectlevel#{sections[0].level}">)]
     sections.each do |section|
       slevel = section.level
-      stitle = build_title(section, opts)
+      stitle = build_title section, opts
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
       if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
         result << %(<li><a href="##{section.id}">#{stitle}</a>)
@@ -391,7 +391,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   def convert_section node
     doc_attrs = node.document.attributes
     level = node.level
-    title = build_title(node)
+    title = build_title node
     if node.id
       id_attr = %( id="#{id = node.id}")
       if doc_attrs['sectlinks']
