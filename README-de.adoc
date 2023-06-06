@@ -126,7 +126,7 @@ Es wird für die AsciiDoc Vorschau-Erweiterungen für Chrome, Atom, Brackets und
 
 == Anforderungen
 
-Asciidoctor arbeitet unter Linux, MacOS und Windows und benötigt eine der folgenden Implementierungen von {uri-ruby}[Ruby]:
+Asciidoctor arbeitet unter Linux, MacOS, Android und Windows und benötigt eine der folgenden Implementierungen von {uri-ruby}[Ruby]:
 
 * CRuby (aka MRI) 2.5 - 3.1
 * JRuby 9.1 - 9.3
@@ -201,6 +201,19 @@ Sobald Homebrew installiert ist, können Sie das Asciidoctor gem installieren.
  $ brew install asciidoctor
 
 Homebrew installiert das `asciidoctor` Gem in ein exklusives Präfix, das unabhängig von den System-Gems ist.
+
+=== Android
+
+https://github.com/gsantner/markor[Markor] ist ein Markdown Text Editor für Android.
+Seit Version 2.11 unterstützt Markor das AsciiDoc Format mit
+
+* SyntaxHighlighting und 
+* Html-Vorschau (mit der Möglickeit zum export als pdf Datei)
+
+Markor verwendet Javascript für die AutoDoc Verarbeitung.
+
+Download via https://f-droid.org/packages/net.gsantner.markor/[f-droid]
+
 
 === (c) Windows
 
