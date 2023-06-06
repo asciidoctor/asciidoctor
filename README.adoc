@@ -126,7 +126,7 @@ If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-
 
 == Requirements
 
-Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
+Asciidoctor works on Linux, macOS, Android and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
 
 * CRuby (aka MRI) 2.7 - 3.2
 * JRuby 9.2 - 9.4
@@ -215,6 +215,18 @@ Once MacPorts is installed, you're ready to install the `asciidoctor` gem via th
 Open a terminal and type:
 
  $ sudo port install asciidoctor
+
+=== Android
+
+https://github.com/gsantner/markor[Markor] is a Lightweight Markdown Text editor for android.
+Since Version 2.11 Markor supports AsciiDoc with 
+
+* SyntaxHighlighting and 
+* HtmlPreview (with option to export as pdf file)
+
+Markor uses the javascript for AutoDoc processing.
+
+Is is available on https://f-droid.org/packages/net.gsantner.markor/[f-droid]
 
 === Windows
 
