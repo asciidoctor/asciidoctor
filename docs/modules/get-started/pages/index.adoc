@@ -3,8 +3,8 @@
 
 Assumptions:
 
-- [x] You've installed Asciidoctor.
-- [x] You've confirmed that the Asciidoctor command line interface (CLI) is available on your PATH.
+* [x] You've installed Asciidoctor.
+* [x] You've confirmed that the Asciidoctor command line interface (CLI) is available on your PATH.
 
 On this page, you'll learn how to run Asciidoctor on an AsciiDoc document and convert it to HTML.
 
