@@ -30,4 +30,4 @@ If the target of one or more images in the document is a URI, you must also set 
 
  $ asciidoctor -a data-uri -a allow-uri-read my-document.adoc
 
-The same is true when converting the document to PDF using Asciidoctor PDF, even if the `allow-uri-read` attribute is not set (since the behavior is implied).
+The same is true when converting the document to PDF using Asciidoctor PDF, regardless of whether the `data-uri` attribute is set since this behavior is implicit.
