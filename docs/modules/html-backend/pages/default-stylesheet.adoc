@@ -223,8 +223,12 @@ To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet
 == Are there different themes?
 
 The default stylesheet does not provide different themes.
-However, you can find stylesheets with different themes in the https://github.com/darshandsoni/asciidoctor-skins[Asciidoctor Skins^] project.
-These stylesheets take the approach of loading the default stylesheet (from a CDN), then overlaying additional styles to create a variety of themes.
+You may be interested in trying the themes provided by the https://github.com/darshandsoni/asciidoctor-skins[Asciidoctor Skins^] project.
+These stylesheets take the approach of loading the default stylesheet (from a CDN), then overlaying additional styles to produce a variety of themes.
 You also have the option of downloading the {url-default-stylesheet-source}[source of the default stylesheet^] and customizing it to suit your needs.
+
+CAUTION: The Asciidoctor Skins project is hosted outside of the Asciidoctor organization.
+As such, it's not guaranteed to be compatible with the latest Asciidoctor releaes.
+If there are problems with the stylesheets it provides, please report it to that project.
 
 To learn how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
