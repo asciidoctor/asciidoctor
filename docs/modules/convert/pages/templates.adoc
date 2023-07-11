@@ -4,7 +4,7 @@
 :apidoc-abstract-node: {apidoc-root}/AbstractNode
 :apidoc-block: {apidoc-root}/Block
 :url-pry: http://pry.github.io
-:url-slim: http://slim-lang.com
+:url-slim: https://slim-template.github.io
 :url-tilt: https://github.com/rtomayko/tilt
 :!listing-caption:
 
