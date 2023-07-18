@@ -513,7 +513,7 @@ module Asciidoctor
   #
   #   https://github.com
   #   https://github.com[GitHub]
-  #   <https://github.com>
+  #   <https://github.com> <= angle brackets not included in autolink
   #   link:https://github.com[]
   #   "https://github.com[]"
   #   (https://github.com) <= parenthesis not included in autolink
