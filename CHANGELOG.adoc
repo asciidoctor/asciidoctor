@@ -61,6 +61,7 @@ Improvements::
   * Don't split value of `-r` CLI option; treat as single path (#4425)
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Use safe navigation to avoid crashing when querying for extensions
+  * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
 
 Bug Fixes::
 

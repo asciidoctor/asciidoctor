@@ -423,9 +423,9 @@ allbox tab(:);'
           row_header[row_index][cell_index] ||= []
           # Add an empty cell if this is a rowspan cell
           if row_header[row_index][cell_index] == ['^t']
-            row_text[row_index] << %(T{#{LF}.sp#{LF}T}:)
+            row_text[row_index] << %(T{#{LF}T}:)
           end
-          row_text[row_index] << %(T{#{LF}.sp#{LF})
+          row_text[row_index] << %(T{#{LF})
           cell_halign = (cell.attr 'halign', 'left').chr
           if tsec == :body
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
