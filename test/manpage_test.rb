@@ -718,19 +718,15 @@ context 'Manpage' do
       allbox tab(:);
       lt.
       T{
-      .sp
       Header
       T}
       T{
-      .sp
       Body 1
       T}
       T{
-      .sp
       Body 2
       T}
       T{
-      .sp
       Footer
       T}
       .TE
@@ -778,23 +774,17 @@ context 'Manpage' do
       allbox tab(:);
       lt lt lt.
       T{
-      .sp
       Name
       T}:T{
-      .sp
       Description
       T}:T{
-      .sp
       Default
       T}
       T{
-      .sp
       dim
       T}:T{
-      .sp
       dimension of the object
       T}:T{
-      .sp
       3
       T}
       .TE
@@ -819,10 +809,8 @@ context 'Manpage' do
       allbox tab(:);
       lt lt.
       T{
-      .sp
       a
       T}:T{
-      .sp
       .nf
       b
       c    _d_

@@ -65,6 +65,7 @@ Improvements::
 Bug Fixes::
 
   * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
+  * Tables in man pages no longer have a blank line at the top of each table cell
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 
