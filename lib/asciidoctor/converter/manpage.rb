@@ -432,7 +432,7 @@ allbox tab(:);'
             when :literal
               cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
             else
-              cell_content = manify cell.content.join, whitespace: :normalize
+              cell_content = cell.content.map {|p| manify p, whitespace: :normalize }.join %(#{LF}.sp#{LF})
             end
             row_text[row_index] << %(#{cell_content}#{LF})
           else # tsec == :head || tsec == :foot
