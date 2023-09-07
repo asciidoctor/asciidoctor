@@ -349,6 +349,51 @@ context 'Manpage' do
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
+    test 'should preserve break between paragraphs in normal table cell' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      [cols=3*]
+      |===
+      |single paragraph
+      |first paragraph
+
+      second paragraph
+      |foo
+
+      more foo
+
+      even more foo
+      |===
+      EOS
+
+      expected_coda = <<~'EOS'.chop
+      .TS
+      allbox tab(:);
+      lt lt lt.
+      T{
+      .sp
+      single paragraph
+      T}:T{
+      .sp
+      first paragraph
+      .sp
+      second paragraph
+      T}:T{
+      .sp
+      foo
+      .sp
+      more foo
+      .sp
+      even more foo
+      T}
+      .TE
+      .sp
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
     test 'should normalize whitespace in a list item' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
