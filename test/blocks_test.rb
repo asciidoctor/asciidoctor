@@ -3260,6 +3260,26 @@ context 'Blocks' do
       assert_css 'iframe[height="360"]', output, 1
     end
 
+    test 'video macro should output custom HTML with iframe for wistia service' do
+      input = 'video::e4a27b971d[wistia, 640, 360, start=60, options="autoplay,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/e4a27b971d?time=60&autoPlay=true&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should output custom HTML with iframe for wistia service with loop behavior set' do
+      input = 'video::e4a27b971d[wistia, 640, 360, start=60, loopBehavior="reset" options="autoplay,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/e4a27b971d?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
     test 'should detect and convert audio macro' do
       input = 'audio::podcast.mp3[]'
       output = convert_string_to_embedded input

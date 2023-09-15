@@ -1095,6 +1095,21 @@ Your browser does not support the audio tag.
 <iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
+    when 'wistia'
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
+        asset_uri_scheme = %(#{asset_uri_scheme}:)
+      end
+      delimiter = ['?']
+      start_anchor = (node.attr? 'start') ? %(#{delimiter.pop || '&amp;'}time=#{node.attr 'start'}) : ''
+      loop_param = (node.attr? 'loopBehavior') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=#{node.attr 'loopBehavior'}) : ''
+      target = (node.attr 'target')
+      autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoPlay=true) : ''
+      muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=true) : ''
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<div class="content">
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{loop_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
+</div>
+</div>)
     else
       poster_attribute = (val = node.attr 'poster').nil_or_empty? ? '' : %( poster="#{node.media_uri val}")
       preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
