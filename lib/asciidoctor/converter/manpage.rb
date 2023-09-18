@@ -409,19 +409,11 @@ allbox tab(:);'
       rows.each do |row|
         row_header[row_index] ||= []
         row_text[row_index] ||= []
-        # result << LF
-        # l left-adjusted
-        # r right-adjusted
-        # c centered-adjusted
-        # n numerical align
-        # a alphabetic align
-        # s spanned
-        # ^ vertically spanned
         remaining_cells = row.size
         row.each_with_index do |cell, cell_index|
           remaining_cells -= 1
           row_header[row_index][cell_index] ||= []
-          # Add an empty cell if this is a rowspan cell
+          # add an empty cell as a placeholder if this is a rowspan cell
           if row_header[row_index][cell_index] == ['^t']
             row_text[row_index] << %(T{#{LF}T}:)
           end
