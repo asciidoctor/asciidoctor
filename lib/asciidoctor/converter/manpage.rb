@@ -398,8 +398,7 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.captioned_title}
 )
     end
-    result << '.TS
-allbox tab(:);'
+    result << %(.TS#{LF}allbox tab(:);)
     row_header = []
     row_text = []
     row_index = 0
