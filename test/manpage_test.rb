@@ -372,15 +372,12 @@ context 'Manpage' do
       allbox tab(:);
       lt lt lt.
       T{
-      .sp
       single paragraph
       T}:T{
-      .sp
       first paragraph
       .sp
       second paragraph
       T}:T{
-      .sp
       foo
       .sp
       more foo
