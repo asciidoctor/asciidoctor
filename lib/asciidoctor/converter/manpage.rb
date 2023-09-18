@@ -476,18 +476,9 @@ allbox tab(:);'
       end unless rows.empty?
     end
 
-    #row_header.each do |row|
-    #  result << LF
-    #  row.each_with_index do |cell, i|
-    #    result << (cell.join ' ')
-    #    result << ' ' if row.size > i + 1
-    #  end
-    #end
-    # FIXME temporary fix to get basic table to display
+    # NOTE set number of columns and cell defaults
+    result << %(#{LF}#{row_header[0].map { 'lt' }.join ' '}.)
     result << LF
-    result << ('lt ' * row_header[0].size).chop
-
-    result << %(.#{LF})
     row_text.each do |row|
       result << row.join
     end
