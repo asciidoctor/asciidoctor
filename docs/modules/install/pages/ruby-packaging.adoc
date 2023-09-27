@@ -40,12 +40,14 @@ Note that it's possible that the prerelease version is older than the latest sta
 
 == Bundler
 
-. Create a Gemfile in the root folder of your project (or the current directory)
-. Add the `asciidoctor` gem to your Gemfile as follows:
+. Create a Gemfile in the root folder of your project (or the current directory):
+
+ $ bundle init
+
+. Add the `asciidoctor` gem to the bottom of your Gemfile as follows:
 +
 [,ruby,subs=attributes+]
 ----
-source 'https://rubygems.org'
 gem 'asciidoctor'
 # or specify the version explicitly
 # gem 'asciidoctor', '{release-version}'
