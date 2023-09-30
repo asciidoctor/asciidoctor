@@ -40,6 +40,7 @@ class MemoryLogger < ::Logger
   attr_reader :messages
 
   def initialize
+    super nil
     self.level = WARN
     @messages = []
   end
@@ -67,6 +68,7 @@ class NullLogger < ::Logger
   attr_reader :max_severity
 
   def initialize
+    super nil
     self.level = WARN
   end
 
