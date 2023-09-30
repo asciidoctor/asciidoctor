@@ -42,8 +42,7 @@ class MemoryLogger < ::Logger
   attr_reader :messages
 
   def initialize
-    super nil
-    self.level = UNKNOWN
+    super nil, level: UNKNOWN
     @messages = []
   end
 
@@ -70,8 +69,7 @@ class NullLogger < ::Logger
   attr_reader :max_severity
 
   def initialize
-    super nil
-    self.level = UNKNOWN
+    super nil, level: UNKNOWN
   end
 
   def add severity, message = nil, progname = nil
