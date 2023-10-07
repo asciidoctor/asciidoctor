@@ -295,7 +295,7 @@ sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
 #footnotes .footnote:last-of-type{margin-bottom:0}
 #content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
 div.page-break{display:none}
-div.unbreakable{page-break-inside:avoid}
+div.unbreakable{-moz-column-break-inside:avoid;break-inside:avoid}
 .big{font-size:larger}
 .small{font-size:smaller}
 .underline{text-decoration:underline}
@@ -362,10 +362,10 @@ a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
 a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
 abbr[title]{border-bottom:1px dotted}
 abbr[title]::after{content:" (" attr(title) ")"}
-pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+pre,blockquote,tr,img,object,svg{-moz-column-break-inside:avoid;break-inside:avoid}
 thead{display:table-header-group}
 p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
-h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+h2,h3,#toctitle,.sidebarblock>.content>.title{-moz-column-break-after:avoid;break-after:avoid}
 body>div[id]{max-width:none}
 #toc,.sidebarblock,.exampleblock>.content{background:none!important}
 #toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
@@ -376,9 +376,9 @@ body.book #header .details span:first-child{margin-left:0!important}
 body.book #header .details br{display:block}
 body.book #header .details br+span::before{content:none!important}
 body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
-body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{-moz-column-break-before:page;break-before:page}
 .listingblock code[data-lang]::before{display:block}
-div.page-break{display:block;page-break-after:always}
+div.page-break{display:block;-moz-column-break-after:page;break-after:page}
 #footer{padding:0 .9375em}
 .hide-on-print{display:none!important}
 .print-only{display:block!important}
