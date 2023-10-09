@@ -92,7 +92,7 @@ module Asciidoctor
     @names_by_value = (constants false).map {|sym| [(const_get sym), sym.to_s.downcase] }.sort {|(a), (b)| a <=> b }.to_h
 
     def self.value_for_name name
-      const_get name.upcase, false
+      const_get name.upcase, false rescue nil
     end
 
     def self.name_for_value value
