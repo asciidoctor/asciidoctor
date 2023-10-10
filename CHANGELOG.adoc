@@ -35,6 +35,7 @@ Enhancements::
   * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
   * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
+  * Add `-c, --config-file` option to CLI to specify a config file containing API options (#566)
 
 Compliance::
 

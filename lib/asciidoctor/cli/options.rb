@@ -9,6 +9,7 @@ module Asciidoctor
     class Options < ::Hash
       def initialize options = {}
         self[:attributes] = options[:attributes] || {}
+        self[:config_file] = options[:config_file]
         self[:input_files] = options[:input_files]
         self[:output_file] = options[:output_file]
         self[:safe] = options[:safe] || SafeMode::UNSAFE
@@ -98,6 +99,9 @@ module Asciidoctor
             end unless attr.encoding == UTF_8
             name, _, val = attr.partition '='
             self[:attributes][name] = val
+          end
+          opts.on '-c', '--config-file FILE', 'a YAML file that contains API options defined as key-value pairs' do |config_file|
+            self[:config_file] = config_file
           end
           opts.on '-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
             'may be specified multiple times' do |template_dir|
