@@ -34,7 +34,7 @@ This will now produce the following HTML element:
 
 Notice the mimetype is automatically set based on the file extension of the image.
 
-The value of the `iconsdir` attribute is not prepend to the favicon path as it is with icons in the content.
+The value of the `iconsdir` attribute is not prepended to the favicon path as it is with icons in the content.
 If you want this directory to be included in the favicon path, you must reference it explicitly:
 
 [,asciidoc]
