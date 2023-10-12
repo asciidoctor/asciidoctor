@@ -2078,4 +2078,14 @@ context 'API' do
       refute doc.blocks[1].sections?
     end
   end
+
+  context 'SafeMode' do
+    test 'should return nil if safe mode value not recognized' do
+      assert_nil Asciidoctor::SafeMode.name_for_value 99
+    end
+
+    test 'should return nil if safe mode name not recognized' do
+      assert_nil Asciidoctor::SafeMode.value_for_name 'unknown'
+    end
+  end
 end

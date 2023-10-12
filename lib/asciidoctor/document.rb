@@ -323,7 +323,7 @@ class Document < AbstractBlock
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
-        @safe = (SafeMode.value_for_name safe_mode) rescue SafeMode::SECURE
+        @safe = (SafeMode.value_for_name safe_mode) || SafeMode::SECURE
       end
       input_mtime = options.delete :input_mtime
       @compat_mode = attr_overrides.key? 'compat-mode'

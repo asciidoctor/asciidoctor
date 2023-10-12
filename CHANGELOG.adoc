@@ -62,6 +62,7 @@ Improvements::
   * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
   * Use safe navigation to avoid crashing when querying for extensions
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
+  * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
 
 Bug Fixes::
 
