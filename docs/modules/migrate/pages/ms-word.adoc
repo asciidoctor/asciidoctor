@@ -3,7 +3,7 @@
 :description: This page presents various tools and strategies for migrating from MS Word to AsciiDoc.
 :url-pandoc: https://pandoc.org
 :url-google-asciidoc: https://workspace.google.com/marketplace/app/asciidoc_processor/1023004302050
-:url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
+:url-google-asciidoc-source:  https://github.com/ggrossetie/asciidoc-googledocs-addon/
 
 == Pandoc
 
@@ -186,7 +186,7 @@ It will get confused by abbreviations, but there is no way around that.
 == Google Docs
 
 Google Docs can already upload and edit MS Word docx files.
-Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/Mogztter[Guillaume Grossetie^], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/ggrossetie[Guillaume Grossetie^], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
 The source for the add-on can be found in {url-google-asciidoc-source}[its repository^].
 
