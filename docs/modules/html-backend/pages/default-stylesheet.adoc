@@ -228,7 +228,7 @@ These stylesheets take the approach of loading the default stylesheet (from a CD
 You also have the option of downloading the {url-default-stylesheet-source}[source of the default stylesheet^] and customizing it to suit your needs.
 
 CAUTION: The Asciidoctor Skins project is hosted outside of the Asciidoctor organization.
-As such, it's not guaranteed to be compatible with the latest Asciidoctor releaes.
+As such, it's not guaranteed to be compatible with the latest Asciidoctor releases.
 If there are problems with the stylesheets it provides, please report it to that project.
 
 To learn how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
