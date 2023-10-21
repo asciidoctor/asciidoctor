@@ -46,6 +46,27 @@ module Asciidoctor
         # NOTE in Ruby 2.7, RubyGems sets SOURCE_DATE_EPOCH if it's not set
         ::ENV.delete 'SOURCE_DATE_EPOCH' if (::ENV.key? 'IGNORE_SOURCE_DATE_EPOCH') && (::Gem.respond_to? :source_date_epoch)
 
+        if (config_file = @options[:config_file])
+          require 'yaml'
+          if ::Hash === (config_data = ::YAML.load_file config_file)
+            if ::Hash === (nested_config_data = config_data['asciidoc'] || config_data[:asciidoc])
+              config_data = nested_config_data
+            end
+            config_data.each do |opt_name, opt_val|
+              case (opt_name = opt_name.to_sym)
+              when :attributes
+                if ::Hash === opt_val
+                  opt_val.each_with_object(@options[:attributes] ||= {}) {|(n, v), accum| accum[n] = v }
+                end
+              when :input_file, :output_file, :source_dir, :destination_dir
+                # ignore
+              else
+                @options[opt_name] = opt_val
+              end
+            end
+          end
+        end
+
         @options.map do |key, val|
           case key
           when :input_files

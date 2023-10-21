@@ -210,6 +210,20 @@ context 'Invoker' do
     assert_equal 'asciidoctor: INFO: possible invalid reference: install', output.chomp
   end
 
+  test 'should allow API options to be passed from config file' do
+    input_path = fixture_path 'sample.adoc'
+    config_path = fixture_path 'config.yml'
+    output = run_command(asciidoctor_cmd, '-c', config_path, '-o', '-', input_path) {|out| out.read }
+    assert_includes output, '<div id="toc" class="toc">'
+  end
+
+  test 'should merge attributes from config file with attributes passed as CLI options' do
+    input_path = fixture_path 'sample.adoc'
+    config_path = fixture_path 'config.yml'
+    output = run_command(asciidoctor_cmd, '-c', config_path, '-a', 'toc-class=interactive-toc', '-o', '-', input_path) {|out| out.read }
+    assert_includes output, '<div id="toc" class="interactive-toc">'
+  end
+
   test 'should not log when --log-level and -q are both specified' do
     input = <<~'EOS'
     skip to <<install>>
