@@ -334,6 +334,19 @@ context 'Converter' do
       assert_xpath '//*[@id="toc"]/ul[1]/li', output, 3
       assert_xpath '//*[@id="toc"]/ul[1]/li[1][text()="Section One"]', output, 1
     end
+
+    test 'resolves templates from classloader when using JRuby', if: jruby? do
+      require fixture_path 'templates.jar'
+      input = <<~'EOS'
+      * foo
+      * bar
+      * baz
+      EOS
+
+      doc = Asciidoctor.load input, template_dir: 'uri:classloader:templates', template_cache: false
+      output = doc.convert
+      assert_includes output, '<span class="principal">foo</span>'
+    end
   end
 
   context 'Custom converters' do
