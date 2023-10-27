@@ -212,19 +212,23 @@ audio:not([controls]) {
   float: right !important;
 }
 
-.text-left, div.text-left > * {
+.text-left,
+div.text-left > * {
   text-align: left !important;
 }
 
-.text-right, div.text-right > * {
+.text-right,
+div.text-right > * {
   text-align: right !important;
 }
 
-.text-center, div.text-center > * {
+.text-center,
+div.text-center > * {
   text-align: center !important;
 }
 
-.text-justify, div.text-justify > * {
+.text-justify,
+div.text-justify > * {
   text-align: justify !important;
 }
 
