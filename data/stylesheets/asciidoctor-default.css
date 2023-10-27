@@ -36,10 +36,10 @@ audio,video{display:inline-block}
 audio:not([controls]){display:none;height:0}
 .left{float:left!important}
 .right{float:right!important}
-.text-left{text-align:left!important}
-.text-right{text-align:right!important}
-.text-center{text-align:center!important}
-.text-justify{text-align:justify!important}
+.text-left,div.text-left>*{text-align:left!important}
+.text-right,div.text-right>*{text-align:right!important}
+.text-center,div.text-center>*{text-align:center!important}
+.text-justify,div.text-justify>*{text-align:justify!important}
 .hide{display:none}
 .subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
 p aside{font-size:.875em;line-height:1.35;font-style:italic}
