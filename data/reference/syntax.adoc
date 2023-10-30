@@ -287,6 +287,8 @@ video::aHjpOzsQ9YI[youtube]
 
 video::300817511[vimeo]
 
+video::e4a27b971d[wistia]
+
 == Breaks
 
 // thematic break (aka horizontal rule)
