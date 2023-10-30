@@ -1101,13 +1101,13 @@ Your browser does not support the audio tag.
       end
       delimiter = ['?']
       start_anchor = (node.attr? 'start') ? %(#{delimiter.pop || '&amp;'}time=#{node.attr 'start'}) : ''
-      loop_param = (node.attr? 'loopBehavior') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=#{node.attr 'loopBehavior'}) : ''
+      end_video_behavior_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=loop) : ((node.option? 'reset') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=reset) : '')
       target = (node.attr 'target')
       autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoPlay=true) : ''
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=true) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{loop_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{end_video_behavior_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
 </div>
 </div>)
     else
