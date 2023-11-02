@@ -9,7 +9,7 @@ This page explains how to use Ruby packaging to install Asciidoctor from the *as
 
 WARNING: Unless you're running in a container (Docker, podman, OCI), _never_ install gems using `gem install` as the root user.
 Doing so will almost certainly interfere with, and possibly corrupt, the Ruby installation on your system.
-We strongly advise you to use <<Bundler>> to manage your gems within a project (or at very least, within user space).
+We strongly advise you to use <<Bundler>> to manage your gems within a project (or an RVM gemset to scope the install to your user/home directory).
 The `gem install` instructions are provided for when you're running in a container or when your using RVM (ideally with a gemset).
 
 == Configure Ruby packaging
@@ -40,6 +40,9 @@ Note that it's possible that the prerelease version is older than the latest sta
 
 == Bundler
 
+Bundler creates a virtual environment that scopes the installation of gems to the current project.
+Here's how you can use it to install and run Asciidoctor.
+
 . Create a Gemfile in the root folder of your project (or the current directory):
 
  $ bundle init
@@ -63,6 +66,8 @@ Using `bundle update` (without specifying a gem) is *not* recommended as it will
 
 IMPORTANT: Once you install using Bundler, you must run any executables provided by the gems (e.g., `asciidoctor`) from the directory where [.path]_Gemfile_ is located and also prefix the executable name with `bundle exec` (e.g., `bundle exec asciidoctor`).
 The `bundle exec` prefix tells Ruby to use the gems defined in the [.path]_Gemfile_.
+
+If you want to understand more about Bundler and `bundle exec` and when to use them, see the article https://www.ombulabs.com/blog/ruby/learning/understanding-bundler.html[Understanding Bundler^].
 
 [#gem-update]
 == Upgrade using gem update
