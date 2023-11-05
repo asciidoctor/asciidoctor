@@ -1539,13 +1539,18 @@ class Parser
           buffer << this_line
           has_text = true
         end
+      elsif this_line == LIST_CONTINUATION
+        has_text = true
+        buffer << this_line
       else
-        has_text = true unless this_line.empty?
-        if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
-          within_nested_list = true
-          if nested_list_type == :dlist && $3.nil_or_empty?
-            # get greedy again
-            has_text = false
+        unless this_line.empty?
+          has_text = true
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
+            within_nested_list = true
+            if nested_list_type == :dlist && $3.nil_or_empty?
+              # get greedy again
+              has_text = false
+            end
           end
         end
         buffer << this_line
