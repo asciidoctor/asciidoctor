@@ -3077,6 +3077,21 @@ context 'Description lists (:dlist)' do
       assert_xpath '//dl//dl/dt[normalize-space(text()) = "label1"]', output, 1
       assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
     end
+
+    test 'nested dlist attached by list continuation should not consume detached paragraph' do
+      input = <<~'EOS'
+      term:: text
+      +
+      nested term::: text
+
+      paragraph
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_css '.dlist .paragraph', output, 0
+      assert_css '.dlist + .paragraph', output, 1
+    end
   end
 
   context 'Special lists' do
