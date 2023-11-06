@@ -1489,7 +1489,7 @@ class Parser
             (ch0 == '[' && (BlockAttributeLineRx.match? this_line)) || (ch0 == ':' && (AttributeEntryRx.match? this_line))
           buffer << this_line
         else
-          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
               # get greedy again

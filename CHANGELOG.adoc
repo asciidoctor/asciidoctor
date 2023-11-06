@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 
 Bug Fixes::
 
+  * Nested dlist attached using list continuation should not consume detached paragraph (#3535)
   * Preserve paragraph breaks in normal table cell in manpage output (#4481)
   * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
 
