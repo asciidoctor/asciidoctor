@@ -182,6 +182,14 @@ class AbstractBlock < AbstractNode
 
   alias query find_by
 
+  # Like find_by, but only returns the first result or nil if no matching block-level node is found
+  def get_by selector = {}, &block
+    find_by_internal (selector.merge single_result: true), (result = []), &block
+    result[0]
+  rescue ::StopIteration
+    result[0]
+  end
+
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
   def next_adjacent_block
@@ -451,28 +459,29 @@ class AbstractBlock < AbstractNode
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
+      single_result = id_selector ? true : selector[:single_result]
       if block_given?
         if (verdict = yield self)
           case verdict
           when :prune
             result << self
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if single_result
             return result
           when :reject
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if single_result
             return result
           when :stop
             raise ::StopIteration
           else
             result << self
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if single_result
           end
         elsif id_selector
           raise ::StopIteration
         end
       else
         result << self
-        raise ::StopIteration if id_selector
+        raise ::StopIteration if single_result
       end
     end
     case @context
