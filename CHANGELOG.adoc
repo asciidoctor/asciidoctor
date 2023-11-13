@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Compliance::
+
+  * Support logger in Ruby 3.3 by properly initialize super class (#4493) (*@mtasaka*)
+
 Bug Fixes::
 
   * Nested dlist attached using list continuation should not consume detached paragraph (#3535)
