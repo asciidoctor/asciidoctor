@@ -11,8 +11,11 @@ This page describes how to do that.
 
 == Mix in the Logger
 
-To access the instance of Asciidoctor's Logger, you need to include the `Asciidoctor::Logging` module into your extension.
+To access the instance of Asciidoctor's Logger, you must include the `Asciidoctor::Logging` module into your extension.
 In doing so, it will provide access to the static `logger` method, which will retrieve the instance from the `LoggerManager`.
+
+TIP: The logger can also be accessed using the `logger` method on the document object.
+If you're writing an extension that has access to the document object, this may be a simpler approach.
 
 If you're writing a class-based extension, you can include the `Logging` module using the `include` keyword.
 
@@ -43,12 +46,31 @@ Asciidoctor::Extensions.register do
 end
 ----
 
+[TIP]
+====
+As mentioned above, you can access the logger from the `logger` method on the document object that's passed to the extension's process method.
+For example:
+
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  block :custom do
+    process do |doc, reader, attrs|
+      puts doc.logger
+
+      # ...
+    end
+  end
+end
+----
+====
+
 In order to log a message, pass the message string to one of the severity methods (e.g., `error`, `warn`, `info`, etc) on the logger instance returned by the `logger` method.
 Here's an example of how to log a warning message in the process method.
 
 [,ruby]
 ----
-def process doc, reader, attr
+def process doc, reader, attrs
   logger.warn 'We are logging!'
 
   # ...
@@ -148,9 +170,9 @@ Here's an example that replaces the message with an object that includes the sou
 
 [,ruby]
 ----
-logger.warn(%(#{logger.progname} (custom-block-extension))) {
+logger.warn %(#{logger.progname} (custom-block-extension)) do
   message_with_context 'Something is out of sorts.', source_location: parent.document.reader.cursor_at_mark
-}
+end
 ----
 
 Here's an example of what Asciidoctor will print:
@@ -169,9 +191,9 @@ Asciidoctor::Extensions.register do
   tree_processor do |doc|
     singleton_class.include Asciidoctor::Logging
     doc.find_by context: :paragraph do |paragraph|
-      logger.warn(%(#{logger.progname} (custom-tree-processor))) {
+      logger.warn %(#{logger.progname} (custom-tree-processor)) do
         message_with_context 'Found paragraph.', source_location: paragraph.source_location
-      }
+      end
     end
     nil
   end
