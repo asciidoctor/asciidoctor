@@ -74,17 +74,23 @@ Notice the absence of the space in the backend value.
 The man page converter is used to generate man pages that accompany software on Unix-like operating systems.
 In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated in this way from {url-asciidoctor-1-raw}[this AsciiDoc source].
 
-To use the man page converter, assign `manpage` to the `backend` option.
-The man page converter sets the output file name to `progname.1`, where `progname` is the name of the command and `1` is the volume number, as defined by the doctitle of the source document (e.g., `progname(1)`).
-
 [#generate]
 == Generate a man page
 
-Before running Asciidoctor, make sure your source document conforms to the <<doctype,manpage doctype structure>> and the `doctype` attribute is set and has the value `manpage`.
+First, ensure your source document conforms to the <<doctype,manpage doctype structure>> and the `doctype` attribute is set to the value `manpage`.
+Then, to activate the man page converter, you must assign `manpage` to the `backend` option.
+Doing so will instruct the processor to use the man page converter to convert the document.
+
+For the purpose of this example, we'll assue that the doctitle in [.path]_progname.adoc_ is `progname(1)`, where `progname` is the name of the command and `1` is the volume number.
+Based on this information, the man page converter will set the output file name to [.path]_progname.1_.
 
 To generate a man page, run:
 
  $ asciidoctor -b manpage progname.adoc
+
+You can then view the resulting man page using the `man` command:
+
+ $ man ./progname.1
 
 When converting to the man page format, Asciidoctor uppercases the titles of all level-0 and level-1 sections.
 This transformation is applied to conform to the widely adopted convention used by most man pages found on *nix systems.
@@ -157,6 +163,21 @@ Now, you can override the `manname` attribute without having to override the `ma
 
 It's important to remember that Asciidoctor derives the `manname` and `manpurpose` attributes from the Name section by default.
 That's why it's not enough just to override the attributes when calling Asciidoctor.
+
+However, if you want to make a well-formed man page from a document that doesn't have a Name section, you can effectively insert one by setting the `manname` and `manpurpose` attributes from the CLI:
+
+ $ asciidoctor -b manpage \
+   -a doctitle="README(1)" \
+   -a doctype=manpage \
+   -a manname=README \
+   -a manpurpose="Information about this project" \
+   README.adoc
+
+You can now view the README as a man page using the `man` command:
+
+ man ./README.1
+
+Just remember that a well-formed man page requires both a name and a purpose.
 
 == Convert the man page to PostScript / PDF
 
