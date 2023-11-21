@@ -112,7 +112,7 @@ Attach a block or paragraph to a list item using a list continuation (which you 
 
 .Some Authors
 [circle]
-- Edgar Allen Poe
+- Edgar Allan Poe
 - Sheri S. Tepper
 - Bill Bryson
 
