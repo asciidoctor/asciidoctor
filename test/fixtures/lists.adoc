@@ -8,7 +8,7 @@ NOTE: This is test, only a test.
 == Lists
 
 .Unordered, basic
-* Edgar Allen Poe
+* Edgar Allan Poe
 * Sheri S. Tepper
 * Bill Bryson
 
