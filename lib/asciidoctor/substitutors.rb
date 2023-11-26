@@ -445,7 +445,14 @@ module Substitutors
           # indexterm:[Tigers,Big cats]
           if (attrlist = normalize_text $2, true, true).include? '='
             if (primary = (attrs = (AttributeList.new attrlist, self).parse)[1])
-              attrs['terms'] = [primary]
+              terms = [primary]
+              if (secondary = attrs[2])
+                terms << secondary
+                if (tertiary = attrs[3])
+                  terms << tertiary
+                end
+              end
+              attrs['terms'] = terms
               if (see_also = attrs['see-also'])
                 attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
               end
