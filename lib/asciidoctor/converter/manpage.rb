@@ -476,12 +476,14 @@ allbox tab(:);'
       end unless rows.empty?
     end
 
-    # NOTE set number of columns and cell defaults
-    result << %(#{LF}#{row_header[0].map { 'lt' }.join ' '}.)
-    result << LF
-    row_text.each do |row|
-      result << row.join
+    if node.has_header_option && (header_row_text = row_text[0])
+      result << %(#{LF}#{row_header[0].join ' '}.)
+      result << %(#{LF}#{header_row_text.join})
+      result << '.T&'
+      row_text = row_text.slice 1, row_text.length
     end
+    result << %(#{LF}#{row_header[0].map { 'lt' }.join ' '}.#{LF})
+    row_text.each {|row| result << row.join }
     result << %(.TE#{LF}.sp)
     result.join
   end

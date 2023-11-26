@@ -705,11 +705,13 @@ context 'Manpage' do
       EOS
       expected_coda = <<~'EOS'.chop
       allbox tab(:);
-      lt.
+      ltB.
       T{
       .sp
       Header
       T}
+      .T&
+      lt.
       T{
       .sp
       Body 1
@@ -765,7 +767,7 @@ context 'Manpage' do
       .B Table 1. Table of options
       .TS
       allbox tab(:);
-      lt lt lt.
+      ltB ltB ltB.
       T{
       .sp
       Name
@@ -776,6 +778,8 @@ context 'Manpage' do
       .sp
       Default
       T}
+      .T&
+      lt lt lt.
       T{
       .sp
       dim
