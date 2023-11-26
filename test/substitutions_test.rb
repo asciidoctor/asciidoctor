@@ -1632,6 +1632,17 @@ context 'Substitutions' do
       assert_includes output, indexterm_html5
     end
 
+    test 'should honor secondary and tertiary index terms when primary index term is quoted and contains equals sign' do
+      sentence = 'Assigning variables.'
+      expected = %(#{sentence}<indexterm><primary>name=value</primary><secondary>variable</secondary><tertiary>assignment</tertiary></indexterm>)
+      macros = ['indexterm:["name=value",variable,assignment]', '(((name=value,variable,assignment)))']
+      macros.each do |macro|
+        para = block_from_string %(#{sentence}#{macro}), backend: 'docbook'
+        output = (para.sub_macros para.source).tr ?\n, ''
+        assert_equal expected, output
+      end
+    end
+
     context 'Button macro' do
       test 'btn macro' do
         para = block_from_string 'btn:[Save]', attributes: { 'experimental' => '' }
