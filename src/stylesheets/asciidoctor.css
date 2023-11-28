@@ -1790,7 +1790,7 @@ div.page-break {
 }
 
 div.unbreakable {
-  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .big {
@@ -2111,7 +2111,7 @@ p.tableblock {
   img,
   object,
   svg {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   thead {
@@ -2131,7 +2131,7 @@ p.tableblock {
   h3,
   #toctitle,
   .sidebarblock > .content > .title {
-    page-break-after: avoid;
+    break-after: avoid;
   }
 
   body > div[id] {
@@ -2187,7 +2187,7 @@ p.tableblock {
   body.book #preamble,
   body.book h1.sect0,
   body.book .sect1 > h2 {
-    page-break-before: always;
+    break-before: page;
   }
 
   .listingblock code[data-lang]::before {
@@ -2196,7 +2196,7 @@ p.tableblock {
 
   div.page-break {
     display: block;
-    page-break-after: always;
+    break-after: page;
   }
 
   #footer {
