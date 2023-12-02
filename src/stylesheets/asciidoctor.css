@@ -792,8 +792,7 @@ p a > code:hover {
   border-top: 1px solid #dddddf;
 }
 
-#header > h1:only-child,
-body.toc2 #header > h1:nth-last-child(2) {
+#header > h1:only-child {
   border-bottom: 1px solid #dddddf;
   padding-bottom: 8px;
 }
@@ -899,6 +898,11 @@ body.toc2 #header > h1:nth-last-child(2) {
   body.toc2 {
     padding-left: 15em;
     padding-right: 0;
+  }
+
+  body.toc2 #header > h1:nth-last-child(2) {
+    border-bottom: 1px solid #dddddf;
+    padding-bottom: 8px;
   }
 
   #toc.toc2 {
