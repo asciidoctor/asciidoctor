@@ -17,3 +17,10 @@ You can read more about this initiative in the {url-docbookrx}#readme[README^].
 The best thing about this tool is all the active users who are putting it through its paces.
 The more advanced the DocBook XML this tool tackles, and the more feedback we receive, the better the tool will become.
 Use it today to escape from XML hell!
+
+== Doxygen - Just What the DocBookRx Ordered
+
+It is also important to mention that Doxygen supports DocBook, and therefore a pathway from Doxygen to AsciiDoc is possible.
+Simply set, `GENERATE_DOCBOOK` to `YES` in the Doxygen configuration file and run the doxygen command to generate the DocBook XML output.
+Once the DocBook XMl files are generated, run DocBookRx on the files to generate AsciiDoc files.
+Some post processing might be necessary.
