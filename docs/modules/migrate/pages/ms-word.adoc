@@ -30,7 +30,7 @@ To perform the conversion from MS Word docx to AsciiDoc, you need to perform the
 If you use docker you can also use the latest version of pandoc with docker without installing it:
 
  $ docker run --rm --volume "$PWD:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
-   -t asciidoctor --wrap=none --markdown-headings=atx --extract-media=extracted-media -o output.adoc
+   -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media -o output.adoc
 
 Then, edit the output file to tidy it up.
 
