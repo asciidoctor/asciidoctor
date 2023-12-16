@@ -1,0 +1,39 @@
+[NOTE]
+.Here is a note
+====
+This is a note.
+
+The end.
+====
+
+[TIP]
+.Here is a tip
+====
+This is a tip.
+
+The end.
+====
+
+[IMPORTANT]
+.This is important
+====
+This is important.
+
+The end.
+====
+
+[CAUTION]
+.Here is a caution
+====
+This is a caution.
+
+The end.
+====
+
+[WARNING]
+.This is a warning
+====
+This is a warning.
+
+The end.
+====
