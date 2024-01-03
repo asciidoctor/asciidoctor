@@ -22,6 +22,10 @@ Compliance::
 
   * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
 
+Improvements::
+
+  * Modify default stylesheet to add text decoration to active footnote number link in footnotes list (#4530) (@Larhzu)
+
 Bug Fixes::
 
   * Nested dlist attached using list continuation should not consume detached paragraph (#3535)

@@ -1907,7 +1907,8 @@ sup.footnoteref a {
 }
 
 sup.footnote a:active,
-sup.footnoteref a:active {
+sup.footnoteref a:active,
+#footnotes .footnote a:first-of-type:active {
   text-decoration: underline;
 }
 
