@@ -59,7 +59,7 @@ context 'Substitutions' do
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
 
       para = block_from_string '"`a few quoted words`"', backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="double">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line double-quoted string' do
@@ -116,7 +116,7 @@ context 'Substitutions' do
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
 
       para = block_from_string %q('`a few quoted words`'), backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="single">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line single-quoted string' do
@@ -345,6 +345,24 @@ context 'Substitutions' do
     end
 
     # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'should ignore role that ends with transitional role on constrained monospace span' do
+      para = block_from_string %([foox-]`leave it alone`)
+      assert_equal '<code class="foox-">leave it alone</code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained monospace string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}`leave it alone`)
+      assert_equal '[x-]`leave it alone`', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped forced compat role on single-line constrained monospace string' do
+      para = block_from_string %(#{BACKSLASH}[x-]`just *mono*`)
+      assert_equal '[x-]<code>just <strong>mono</strong></code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'multi-line constrained monospaced string' do
       para = block_from_string %(`a few\n<{monospaced}> words`), attributes: { 'monospaced' => 'monospaced', 'compat-mode' => '' }
       assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_subs(para.source)
@@ -466,6 +484,12 @@ context 'Substitutions' do
 
       para = block_from_string %(call #{BACKSLASH}[method]#{BACKSLASH}`save()` to persist the changes)
       assert_equal %(call #{BACKSLASH}[method]`save()` to persist the changes), para.sub_quotes(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained passthrough string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}+leave it alone+)
+      assert_equal '[x-]+leave it alone+', para.apply_subs(para.source)
     end
 
     test 'single-line unconstrained monospaced chars' do
@@ -1280,6 +1304,26 @@ context 'Substitutions' do
       assert_include '<a href="#_footnoteref_1">1</a>. See <a href="#gof">[gof]</a> to find a collection of design patterns.', result
     end
 
+    test 'footnotes in headings are expected to be numbered out of sequence' do
+      input = <<~'EOS'
+      == Section 1
+
+      para.footnote:[first footnote]
+
+      == Section 2footnote:[second footnote]
+
+      para.footnote:[third footnote]
+      EOS
+
+      result = convert_string_to_embedded input
+      footnote_refs = xmlnodes_at_css 'a.footnote', result
+      footnote_defs = xmlnodes_at_css 'div.footnote', result
+      assert_equal 3, footnote_refs.length
+      assert_equal %w(1 1 2), footnote_refs.map(&:text)
+      assert_equal 3, footnote_defs.length
+      assert_equal ['1. second footnote', '1. first footnote', '2. third footnote'], footnote_defs.map(&:text).map(&:strip)
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
@@ -1586,6 +1630,17 @@ context 'Substitutions' do
       EOS
       assert_includes output, indexterm_flash
       assert_includes output, indexterm_html5
+    end
+
+    test 'should honor secondary and tertiary index terms when primary index term is quoted and contains equals sign' do
+      sentence = 'Assigning variables.'
+      expected = %(#{sentence}<indexterm><primary>name=value</primary><secondary>variable</secondary><tertiary>assignment</tertiary></indexterm>)
+      macros = ['indexterm:["name=value",variable,assignment]', '(((name=value,variable,assignment)))']
+      macros.each do |macro|
+        para = block_from_string %(#{sentence}#{macro}), backend: 'docbook'
+        output = (para.sub_macros para.source).tr ?\n, ''
+        assert_equal expected, output
+      end
     end
 
     context 'Button macro' do
@@ -2110,6 +2165,42 @@ context 'Substitutions' do
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
+      test 'should support constrained passthrough in middle of monospace span' do
+        input = 'a `foo +bar+ baz` kind of thing'
+        para = block_from_string input
+        assert_equal 'a <code>foo bar baz</code> kind of thing', para.content
+      end
+
+      test 'should support constrained passthrough in monospace span preceded by escaped boxed attrlist with transitional role' do
+        input = %(#{BACKSLASH}[x-]`foo +bar+ baz`)
+        para = block_from_string input
+        assert_equal '[x-]<code>foo bar baz</code>', para.content
+      end
+
+      test 'should treat monospace phrase with escaped boxed attrlist with transitional role as monospace' do
+        input = %(#{BACKSLASH}[x-]`*foo* +bar+ baz`)
+        para = block_from_string input
+        assert_equal '[x-]<code><strong>foo</strong> bar baz</code>', para.content
+      end
+
+      test 'should ignore escaped attrlist with transitional role on monospace phrase if not proceeded by [' do
+        input = %(#{BACKSLASH}x-]`*foo* +bar+ baz`)
+        para = block_from_string input
+        assert_equal %(#{BACKSLASH}x-]<code><strong>foo</strong> bar baz</code>), para.content
+      end
+
+      test 'should not process passthrough inside transitional literal monospace span' do
+        input = 'a [x-]`foo +bar+ baz` kind of thing'
+        para = block_from_string input
+        assert_equal 'a <code>foo +bar+ baz</code> kind of thing', para.content
+      end
+
+      test 'should support constrained passthrough in monospace phrase with attrlist' do
+        input = '[.role]`foo +bar+ baz`'
+        para = block_from_string input
+        assert_equal '<code class="role">foo bar baz</code>', para.content
+      end
+
       test 'should support attrlist on a literal monospace phrase' do
         input = '[.baz]`+foo--bar+`'
         para = block_from_string input
@@ -2130,8 +2221,8 @@ context 'Substitutions' do
 
       test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
         input = 'use `\+{author}+` to show an attribute reference'
-        para = block_from_string input
-        assert_equal 'use <code>+{author}+</code> to show an attribute reference', para.content
+        para = block_from_string input, attributes: { 'author' => 'Dan' }
+        assert_equal 'use <code>+Dan+</code> to show an attribute reference', para.content
       end
 
       test 'should not recognize stem macro with no content' do

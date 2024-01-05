@@ -1348,6 +1348,22 @@ context 'API' do
       assert_include 'color: green', styles
     end
 
+    test 'should embed custom stylesheet read from classloader URI', if: jruby? do
+      require fixture_path 'assets.jar'
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = Asciidoctor.convert input, safe: :unsafe, standalone: true, attributes: { 'stylesdir' => 'uri:classloader:/styles-in-jar', 'stylesheet' => 'custom.css' }
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.content
+      refute_nil styles
+      refute_empty styles.strip
+      assert_include 'color: green', styles
+    end
+
     test 'should embed custom stylesheet in remote stylesdir if SafeMode is less than SECURE and allow-uri-read is set' do
       input = <<~'EOS'
       = Document Title
@@ -1395,6 +1411,63 @@ context 'API' do
         assert_path_exists custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         assert_xpath '/html/head/link[@rel="stylesheet"][@href="./custom.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a path string' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => 'custom.css' }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a Pathname object' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_src_path = Pathname.new fixture_path 'custom.css'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => custom_stylesheet_src_path }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a classloader URI', if: jruby? do
+      require fixture_path 'assets.jar'
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_src_path = 'uri:classloader:/styles-in-jar/custom.css'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :unsafe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => custom_stylesheet_src_path }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
         assert_xpath 'style', output, 0
       ensure
         FileUtils.rm_r output_dir, force: true, secure: true
@@ -2003,6 +2076,16 @@ context 'API' do
       doc = document_from_string input
       refute doc.blocks[0].sections?
       refute doc.blocks[1].sections?
+    end
+  end
+
+  context 'SafeMode' do
+    test 'should return nil if safe mode value not recognized' do
+      assert_nil Asciidoctor::SafeMode.name_for_value 99
+    end
+
+    test 'should return nil if safe mode name not recognized' do
+      assert_nil Asciidoctor::SafeMode.value_for_name 'unknown'
     end
   end
 end

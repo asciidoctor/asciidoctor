@@ -18,7 +18,7 @@ To keep it simple, we'll just define a basic stylesheet that changes all text to
 Create the file [.path]_my-stylesheet.css_ the directory with your AsciiDoc source files and populate it with the following contents:
 
 .my-stylesheet.css
-[source,css]
+[,css]
 ----
 body {
   color: #ff0000;
@@ -31,7 +31,7 @@ The `stylesheet` document attribute must be set by the end of the header to be e
 One way to do that is to set the attribute in the document header:
 
 .stylesheet attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
@@ -75,7 +75,7 @@ The `stylesdir` document attribute must be set by the end of the header to be ef
 One way to do that is to set the attribute in the document header:
 
 .stylesdir attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :stylesheet: my-stylesheet.css
@@ -113,7 +113,7 @@ If you invoke Asciidoctor as follows:
 
 Then when you inspect the HTML, you will see:
 
-[source,html]
+[,html]
 ----
 <link rel="stylesheet" href="my-styles/asciidoctor.css">
 ----
@@ -130,7 +130,7 @@ We'll specify the location of `stylesdir` as an absolute path and generate the o
 Asciidoctor generates the HTML file into the [.path]_public_ folder, but it does not copy the stylesheet.
 Furthermore, it uses an absolute path in the link to the stylesheet:
 
-[source,html]
+[,html]
 ----
 <link rel="stylesheet" href="/path/to/documents/my-styles/asciidoctor.css">
 ----
@@ -151,19 +151,24 @@ We can turn to the `copycss` attribute to clear this situation up.
 NOTE: This situation is unique to when `linkcss` is set.
 It's not a problem when the converter embeds the stylesheet since there is no secondary reference involved.
 
-The `copycss` attribute can accepts a value.
-Asciidoctor uses that value as an override for where to look for the stylesheet to read.
+The `copycss` attribute can accept a non-empty value.
+Asciidoctor uses this value as an override for where to look for the stylesheet to read.
 The converter, on the other hand, does not use this value.
 That means we can use `stylesdir` and `stylesheet` to assemble the path relative to the output directory where Asciidoctor should write and link to the stylesheet independent of the location where it reads the file.
 
 Let's revisit the broken scenario from the previous section and use `copycss` to reconcile the problem:
 
  $ asciidoctor -a stylesdir=css -a stylesheet=default.css \
- -a copycss=`pwd`/my-styles/my-stylesheet.css -a linkcss -D public my-document.adoc
+ -a copycss=$PWD/my-styles/my-stylesheet.css -a linkcss -D public my-document.adoc
 
 Asciidoctor copies the stylesheet from the absolute path specified by the `copycss` attribute to the path [.path]_public/css/default.css_ and links to it using the path [.path]_css/default.css_.
-Notice that we even changed the name of the folder and stylesheet file in the output.
+Notice that we changed the name of the folder and stylesheet file in the output.
 That demonstrates that we have decoupled the path where the stylesheet is read from the location where the stylesheet is published and referenced.
+
+TIP: When running on JRuby, you can point `copycss` to a classloader URI to load a stylesheet from a JAR file (e.g., `uri:classloader:/css/styles.css`).
+However, the HTML cannot link to that location.
+Therefore, you must use the `stylesheet` attribute (and optionally the `stylesdir`) to specify a filename or relative path where Asciidoctor will write the stylesheet.
+The HTML will then be able to link to that destination.
 
 == Styles directory and nested documents when linking
 
@@ -184,14 +189,14 @@ Let's say you have three AsciiDoc documents saved in the following directory str
 
 For [.path]_a.adoc_ and [.path]_b.adoc_, set `stylesdir` to:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :stylesdir: my-styles
 ----
 
 For [.path]_c.adoc_, set `stylesdir` to:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :stylesdir: ../my-styles
 ----

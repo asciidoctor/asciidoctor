@@ -677,6 +677,13 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:include-file.adoc[role=include]', reader.read_line
       end
 
+      test 'should escape spaces in target when generating link from include directive' do
+        input = 'include::foo bar baz.adoc[]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:pass:c[foo bar baz.adoc][role=include]', reader.read_line
+      end
+
       test 'should preserve attrlist when replacing include directive with link macro' do
         input = 'include::include-file.adoc[leveloffset=+1]'
         doc = Asciidoctor::Document.new input
@@ -691,6 +698,16 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
           assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should escape spaces in target when generating link from remote include directive' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/no such file.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/no such file.adoc (allow-uri-read attribute not enabled)', Hash
         end
       end
 
@@ -740,6 +757,15 @@ class ReaderTest < Minitest::Test
         assert_match(/<h1>人<\/h1>/, output)
       end
 
+      test 'should include content from a file on the classloader', if: jruby? do
+        require fixture_path 'assets.jar'
+        input = 'include::uri:classloader:/includes-in-jar/include-file.adoc[]'
+        doc = document_from_string input, safe: :unsafe, standalone: false, base_dir: DIRNAME
+        output = doc.convert
+        assert_match(/included from a file/, output)
+        assert doc.catalog[:includes]['uri:classloader:/includes-in-jar/include-file']
+      end
+
       test 'should not track include in catalog for non-AsciiDoc include files' do
         input = <<~'EOS'
         ----
@@ -776,6 +802,14 @@ class ReaderTest < Minitest::Test
           assert_match(/included content/, output)
         ensure
           FileUtils.rm include_file_with_sp
+        end
+      end
+
+      test 'include directive should not match if target is empty or starts or ends with space' do
+        ['include::[]', 'include:: []', 'include:: not-include[]', 'include::not-include []'].each do |input|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          assert_equal input, reader.read_line
         end
       end
 

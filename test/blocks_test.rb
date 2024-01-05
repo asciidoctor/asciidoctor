@@ -1105,14 +1105,19 @@ context 'Blocks' do
       assert_message @logger, :WARN, '<stdin>: line 3: unterminated listing block', Hash
     end
 
-    test 'should not crash if listing block has no lines' do
-      input = <<~'EOS'
-      ----
-      ----
-      EOS
-      output = convert_string_to_embedded input
-      assert_css 'pre', output, 1
-      assert_css 'pre:empty', output, 1
+    test 'should not crash when converting verbatim block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        output = convert_string_to_embedded input
+        assert_css 'pre', output, 1
+        assert_css 'pre:empty', output, 1
+      end
+    end
+
+    test 'should return content as empty string for verbatim or raw block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should preserve newlines in literal block' do
@@ -1848,7 +1853,7 @@ context 'Blocks' do
   end
 
   context 'Math blocks' do
-    test 'should not crash when converting to HTML if stem block is empty' do
+    test 'should not crash when converting stem block that has no lines' do
       input = <<~'EOS'
       [stem]
       ++++
@@ -1857,6 +1862,13 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input
       assert_css '.stemblock', output, 1
+    end
+
+    test 'should return content as empty string for stem or pass block that has no lines' do
+      [%(++++\n++++), %([stem]\n++++\n++++)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should add LaTeX math delimiters around latexmath block content' do
@@ -2882,6 +2894,21 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'embeds base64-encoded data uri for image in classloader when data-uri attribute is set', if: jruby? do
+      require fixture_path 'assets.jar'
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: uri:classloader:/images-in-jar
+
+      image::dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => testdir }
+      assert_equal 'uri:classloader:/images-in-jar', doc.attributes['imagesdir']
+      output = doc.convert
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
     test 'embeds SVG image with image/svg+xml mimetype when file extension is .svg' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -3229,6 +3256,26 @@ context 'Blocks' do
       assert_css 'video', output, 0
       assert_css 'iframe', output, 1
       assert_css 'iframe[src="https://www.youtube.com/embed/SCZF6I-Rc4I?rel=0&start=60&autoplay=1&playlist=SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should output custom HTML with iframe for wistia service' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,loop,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=loop&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should output custom HTML with iframe for wistia service with loop behavior set' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,reset,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
       assert_css 'iframe[width="640"]', output, 1
       assert_css 'iframe[height="360"]', output, 1
     end

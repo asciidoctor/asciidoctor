@@ -1,12 +1,12 @@
 = Extensions
-:url-exten-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
+:url-ext-lab: https://github.com/asciidoctor/asciidoctor-extensions-lab
 
 Extensions are central to the success of AsciiDoc because they open up the language to new use cases.
-Asciidoctor provides an extension API that offers a superset of extension points.
+Asciidoctor provides an {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/Extensions[extension API^] that offers a superset of extension points.
 As a result, extensions in Asciidoctor are easy to write, powerful, and simple to distribute.
 
 Asciidoctor also allows extensions to be written using the full power of a programming language (whether it be Ruby, Java, Groovy or JavaScript).
-You don't have to shave yaks to get the functionality you want, and you can distribute the extension using de facto standard packaging mechanisms like RubyGems or JARs.
+You don't have to shave yaks to get the functionality you want, and you can distribute the extension using de facto standard packaging mechanisms like gems or JARs.
 
 == Available extension points
 
@@ -48,4 +48,4 @@ Include processor::
 Processes the `include::<filename>[]` directive.
 See xref:include-processor.adoc[].
 
-There are additional extension examples in the {url-exten-lab}[Asciidoctor extensions lab^].
+There are additional extension examples in the {url-ext-lab}[Asciidoctor extensions lab^].

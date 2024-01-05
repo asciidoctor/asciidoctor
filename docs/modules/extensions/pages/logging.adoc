@@ -1,0 +1,205 @@
+= Log from an Extension
+
+If a problem occurs while an extension is running, you probably want to communicate that information to the user.
+The extension should only throw an error (i.e., raise an exception) if the problem is so severe that no additional processing should be done.
+Otherwise, we recommend that extensions report the problem as a log message at an appropriate severity level.
+You can use Asciidoctor's logger to log messages.
+
+When Asciidoctor processes a document, it creates a https://ruby-doc.org/3.2.2/stdlibs/logger/Logger.html[Logger^] instance scoped to that document.
+You can access that logger in your extension to log messages.
+This page describes how to do that.
+
+== Mix in the Logger
+
+To access the instance of Asciidoctor's Logger, you must include the `Asciidoctor::Logging` module into your extension.
+In doing so, it will provide access to the static `logger` method, which will retrieve the instance from the `LoggerManager`.
+
+TIP: The logger can also be accessed using the `logger` method on the document object.
+If you're writing an extension that has access to the document object, this may be a simpler approach.
+
+If you're writing a class-based extension, you can include the `Logging` module using the `include` keyword.
+
+[,ruby]
+----
+class CustomBlock < Asciidoctor::Extensions::BlockProcessor
+  include Asciidoctor::Logging
+
+  # ...
+end
+
+Asciidoctor::Extensions.register do
+  block CustomBlock, :custom
+end
+----
+
+If you're writing an extension purely using the DSL, the processor class is created dynamically.
+Therefore, you need to mix in the `Logging` module by referencing the `include` method on that class instead.
+
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  block :custom do
+    singleton_class.include Asciidoctor::Logging
+
+    # ...
+  end
+end
+----
+
+[TIP]
+====
+As mentioned above, you can access the logger from the `logger` method on the document object that's passed to the extension's process method.
+For example:
+
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  block :custom do
+    process do |doc, reader, attrs|
+      puts doc.logger
+
+      # ...
+    end
+  end
+end
+----
+====
+
+In order to log a message, pass the message string to one of the severity methods (e.g., `error`, `warn`, `info`, etc) on the logger instance returned by the `logger` method.
+Here's an example of how to log a warning message in the process method.
+
+[,ruby]
+----
+def process doc, reader, attrs
+  logger.warn 'We are logging!'
+
+  # ...
+end
+----
+
+Here's what Asciidoctor will print to the log:
+
+[.output]
+....
+asciidoctor: WARN: We are logging!
+....
+
+Refer to the documentation for https://ruby-doc.org/3.2.2/stdlibs/logger/Logger.html[Logger^] to learn about the available methods.
+
+Here's a complete example to show where these additions are used in context:
+
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  block :custom do
+    singleton_class.include Asciidoctor::Logging
+
+    on_context :paragraph
+    process do |parent, reader, attrs|
+      logger.warn 'We are logging!'
+      create_paragraph parent, reader.lines, attrs
+    end
+  end
+end
+----
+
+Keep in mind that the message will only be displayed if its severity level is enabled by the user.
+By default, error and warn(ing) messages will be displayed.
+
+You should refrain from using the `fatal` method unless the extension is in the process of throwing an error.
+
+== Add context to the message
+
+If you pass a string to the log method, Asciidoctor will only print the severity level and the message.
+That means the user won't know what AsciiDoc source the message refers to nor that the message is coming from an extension.
+Therefore, you'll probably want to provide more detail.
+Let's begin by including the extension name in the message.
+
+=== Add the extension name
+
+First, when logging a message, you should prefix that message with the name of the extension.
+
+[,ruby]
+----
+logger.warn '(custom-block-extension) Something is out of sorts.'
+----
+
+That will print the message as follows:
+
+[.output]
+....
+asciidoctor: WARN: (custom-block-extension) Something is out of sorts.
+....
+
+Alternately, you can move your extension name so that it immediately follows the program name (i.e., `asciidoctor`).
+
+[,ruby]
+----
+logger.log ::Logger::WARN, 'hi', %(#{logger.progname} (custom-block-extension))
+----
+
+That will print the message as follows:
+
+[.output]
+....
+asciidoctor (custom-block-extension): WARN: Something is out of sorts.
+....
+
+Another way to get the same output is to use the form that accepts the message as a block.
+
+[,ruby]
+----
+logger.warn(%(#{logger.progname} (custom-block-extension))) { 'Something is out of sorts.' }
+----
+
+The block form is useful in other ways.
+If the computation of the message is expensive, the block form defers evaluation of the message until (and thus if) it is logged.
+
+Now the reader knows that the message is coming from an extension, but not the location of the AsciiDoc source the extension is processing.
+Let's look at how to do that.
+
+=== Add the source location
+
+In addition to the `logger` method, Asciidoctor's `Logging` module also adds a helper named `message_with_context` that generates a message object that bundles source information with the string message.
+
+For block and block macro extensions, you probably want to reference the location where the block is found, which you can retrieve using the `parent.document.reader.cursor_at_mark` method call.
+For a tree processor extension, you can retrieve the source location from the `source_location` method on the block.
+For most other extensions, you likely want to reference the current cursor, which is accessible from `parent.document.reader.cursor` or (`doc.reader` for extensions that only provide access to the document object).
+
+Here's an example that replaces the message with an object that includes the source location:
+
+[,ruby]
+----
+logger.warn %(#{logger.progname} (custom-block-extension)) do
+  message_with_context 'Something is out of sorts.', source_location: parent.document.reader.cursor_at_mark
+end
+----
+
+Here's an example of what Asciidoctor will print:
+
+[.output]
+....
+asciidoctor (custom-block-extension): WARNING: test.adoc: line 4: Something is out of sorts.
+....
+
+In a tree processor extension, you can get the source location from any block if the sourcemap is enabled.
+If it's not enabled, the code will degrade gracefully by logging the message without the source location.
+
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  tree_processor do |doc|
+    singleton_class.include Asciidoctor::Logging
+    doc.find_by context: :paragraph do |paragraph|
+      logger.warn %(#{logger.progname} (custom-tree-processor)) do
+        message_with_context 'Found paragraph.', source_location: paragraph.source_location
+      end
+    end
+    nil
+  end
+end
+----
+
+Source location tracking in Asciidoctor is not perfect, so you may need to retrieve the cursor and adjust it slightly to align it with the line you want to reference in the message.
+
+Refer to {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/Reader#cursor-instance_method[Reader#cursor^] for a list of cursor methods.

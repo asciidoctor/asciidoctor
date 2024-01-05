@@ -46,6 +46,21 @@ doc = Asciidoctor.convert_file 'doc.adoc', safe: :safe, catalog_assets: true
 Notice that we've used the `convert_file` method instead of the `load_file` method.
 This ensures that inline assets are included in the catalog as well.
 
+If you need to enable the `:catalog_assets` option when using the CLI, you'll need to require the following extension:
+
+.enable-catalog-assets-preprocessor.rb
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      doc.instance_variable_set :@options, ((doc.instance_variable_get :@options).merge catalog_assets: true)
+      nil
+    end
+  end
+end
+----
+
 Now that you've configured the processor to catalog assets, you can access them from the document object.
 Let's explore it.
 

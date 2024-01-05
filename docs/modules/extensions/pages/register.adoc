@@ -4,7 +4,7 @@
 
 These extensions are registered per document using a callback that feels like a DSL:
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do |document|
   preprocessor FrontMatterPreprocessor

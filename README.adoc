@@ -14,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.18
+:release-version: 2.0.20
 // URLs:
 :url-org: https://github.com/asciidoctor
 :url-repo: {url-org}/asciidoctor
@@ -128,20 +128,22 @@ If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-
 
 Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
 
-* CRuby (aka MRI) 2.5 - 3.1
-* JRuby 9.1 - 9.3
+* CRuby (aka MRI) 2.7 - 3.2
+* JRuby 9.2 - 9.4
 * TruffleRuby (GraalVM)
 
 [CAUTION]
 ====
 If you're using a non-English Windows environment, you may bump into an `Encoding::UndefinedConversionError` when invoking Asciidoctor.
-To solve this issue, we recommend changing the active code page in your console to UTF-8:
+To solve this issue, we recommend overriding the default external and internal character encodings to `utf-8`.
+You can do so by setting the `RUBYOPT` environment variable as follows:
 
- chcp 65001
+ RUBYOPT="-E utf-8:utf-8"
 
-Once you make this change, all your Unicode headaches will be behind you.
+Once you make this change, all your Unicode headaches should be behind you.
+
 If you're using an IDE like Eclipse, make sure you set the encoding to UTF-8 there as well.
-Asciidoctor works best when you use UTF-8 everywhere.
+Asciidoctor is optimized to work with UTF-8 as the default encoding.
 ====
 
 == Installation

@@ -2,9 +2,8 @@
 :navtitle: Migrate from MS Word
 :description: This page presents various tools and strategies for migrating from MS Word to AsciiDoc.
 :url-pandoc: https://pandoc.org
-:url-google-asciidoc: https://chrome.google.com/webstore/detail/asciidoc-processor/eghlmnhjljbjodpeehjjcgfcjegcfbhk/
-:url-google-asciidoc-source:  https://github.com/Mogztter/asciidoc-googledocs-addon/
-// from migrating-from-msword.adoc
+:url-google-asciidoc: https://workspace.google.com/marketplace/app/asciidoc_processor/1023004302050
+:url-google-asciidoc-source:  https://github.com/ggrossetie/asciidoc-googledocs-addon/
 
 == Pandoc
 
@@ -18,20 +17,20 @@ To perform the conversion from MS Word docx to AsciiDoc, you need to perform the
 
 .pandoc < 2.11.2
  
- $ pandoc --from=docx --to=asciidoc --wrap=none --atx-headers \
-     --extract-media=extracted-media input.docx > output.adoc
+ $ pandoc -f docx -t asciidoctor --wrap=none --atx-headers \
+   --extract-media=extracted-media -o output.adoc
  
 .pandoc (2.11.2 or newer)
  
- $ pandoc input.docx -f docx -t asciidoc --wrap=none --markdown-headings=atx \                                                                             
-    --extract-media=extracted-media  -o output2.adoc
+ $ pandoc input.docx -f docx -t asciidoc --wrap=none --markdown-headings=atx \
+   --extract-media=extracted-media -o output.adoc
 
 .pandoc (2.11.2 or newer) and docker
 
 If you use docker you can also use the latest version of pandoc with docker without installing it:
 
- $ docker run --rm --volume "`pwd`:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
- -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media  -o output2.adoc
+ $ docker run --rm --volume "$PWD:/data" --user `id -u`:`id -g` pandoc/core input.docx -f docx \
+   -t asciidoc --wrap=none --markdown-headings=atx --extract-media=extracted-media -o output.adoc
 
 Then, edit the output file to tidy it up.
 
@@ -187,7 +186,7 @@ It will get confused by abbreviations, but there is no way around that.
 == Google Docs
 
 Google Docs can already upload and edit MS Word docx files.
-Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/Mogztter[Guillaume Grossetie^], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
+Using the {url-google-asciidoc}[AsciiDoc Processor add-on^] by https://github.com/ggrossetie[Guillaume Grossetie^], you can copy and paste part or all of the document from Google Docs as AsciiDoc text.
 The features that it can handle seem to be substantially fewer than pandoc but expect further development.
 The source for the add-on can be found in {url-google-asciidoc-source}[its repository^].
 

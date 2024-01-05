@@ -399,18 +399,22 @@ class Parser
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
-              # if this block wasn't marked as [partintro], emulate behavior as if it had
+              # if this not a [partintro] open block, enclose it in a [partintro] open block
               if new_block.style != 'partintro'
-                # emulate [partintro] paragraph
-                if new_block.context == :paragraph
-                  new_block.context = :open
+                # if this is already a normal open block, simply add the partintro style
+                if new_block.style == 'open' && new_block.context == :open
                   new_block.style = 'partintro'
-                # emulate [partintro] open block
                 else
                   new_block.parent = (intro = Block.new section, :open, content_model: :compound)
                   intro.style = 'partintro'
                   section.blocks << intro
                 end
+              # if this is a [partintro] paragraph, convert it to a [partintro] open block w/ single paragraph
+              elsif new_block.content_model == :simple
+                new_block.content_model = :compound
+                new_block << (Block.new new_block, :paragraph, source: new_block.lines, subs: new_block.subs)
+                new_block.lines.clear
+                new_block.subs.clear
               end
             elsif section.blocks.size == 1
               first_block = section.blocks[0]
@@ -420,12 +424,11 @@ class Parser
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
                 new_block.parent = (intro = Block.new section, :open, content_model: :compound)
-                intro.style = 'partintro'
-                section.blocks.shift
-                if first_block.style == 'partintro'
+                if first_block.style == (intro.style = 'partintro')
                   first_block.context = :paragraph
                   first_block.style = nil
                 end
+                section.blocks.shift
                 intro << first_block
                 section.blocks << intro
               end
@@ -1165,8 +1168,8 @@ class Parser
           if reftext.include? ']'
             reftext = reftext.gsub '\]', ']'
             reftext = document.sub_attributes reftext if reftext.include? ATTR_REF_HEAD
-          elsif (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
-            next
+          elsif reftext.include? ATTR_REF_HEAD
+            reftext = nil if (reftext = document.sub_attributes reftext).empty?
           end
         end
       end
@@ -1443,11 +1446,26 @@ class Parser
         # we're being more strict here about the terminator, but I think that's a good thing
         buffer.concat reader.read_lines_until terminator: match.terminator, read_last_line: true, context: nil
         continuation = :inactive
-      # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
-      # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
-      # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
-      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
-        break
+      # BlockAttributeLineRx only breaks dlist if ensuing line is not a list item
+      elsif dlist && continuation != :active && (this_line.start_with? '[') && (BlockAttributeLineRx.match? this_line)
+        block_attribute_lines = [this_line]
+        while (next_line = reader.peek_line)
+          if is_delimited_block? next_line
+            interrupt = true
+          elsif next_line.empty? || ((next_line.start_with? '[') && (BlockAttributeLineRx.match? next_line))
+            block_attribute_lines << reader.read_line
+            next
+          elsif (AnyListRx.match? next_line) && !(is_sibling_list_item? next_line, list_type, sibling_trait)
+            buffer.concat block_attribute_lines
+          else # rubocop:disable Lint/DuplicateBranch
+            interrupt = true
+          end
+          break
+        end
+        if interrupt
+          reader.unshift_lines block_attribute_lines
+          break
+        end
       elsif continuation == :active && !this_line.empty?
         # literal paragraphs have special considerations (and this is one of
         # two entry points into one)
@@ -1464,10 +1482,11 @@ class Parser
           end
           continuation = :inactive
         # let block metadata play out until we find the block
-        elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
+        elsif ((ch0 = this_line.chr) == '.' && (BlockTitleRx.match? this_line)) ||
+            (ch0 == '[' && (BlockAttributeLineRx.match? this_line)) || (ch0 == ':' && (AttributeEntryRx.match? this_line))
           buffer << this_line
         else
-          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
               # get greedy again
@@ -1520,13 +1539,18 @@ class Parser
           buffer << this_line
           has_text = true
         end
+      elsif this_line == LIST_CONTINUATION
+        has_text = true
+        buffer << this_line
       else
-        has_text = true unless this_line.empty?
-        if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
-          within_nested_list = true
-          if nested_list_type == :dlist && $3.nil_or_empty?
-            # get greedy again
-            has_text = false
+        unless this_line.empty?
+          has_text = true
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
+            within_nested_list = true
+            if nested_list_type == :dlist && $3.nil_or_empty?
+              # get greedy again
+              has_text = false
+            end
           end
         end
         buffer << this_line

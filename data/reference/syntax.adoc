@@ -112,7 +112,7 @@ Attach a block or paragraph to a list item using a list continuation (which you 
 
 .Some Authors
 [circle]
-- Edgar Allen Poe
+- Edgar Allan Poe
 - Sheri S. Tepper
 - Bill Bryson
 
@@ -286,6 +286,8 @@ video::movie.mp4[width=640,start=60,end=140,options=autoplay]
 video::aHjpOzsQ9YI[youtube]
 
 video::300817511[vimeo]
+
+video::e4a27b971d[wistia]
 
 == Breaks
 

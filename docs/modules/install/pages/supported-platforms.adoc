@@ -1,5 +1,6 @@
 = Supported Platforms and System Requirements
 :navtitle: Supported Platforms
+:ge: &#8805;
 
 Asciidoctor operates on Linux, macOS, and Windows and requires one of the supported Ruby implementations listed in the next section.
 
@@ -15,13 +16,13 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |Supported Runtime |Supported Versions
 
 |Ruby
-|&#8805; 2.5
+|{ge} 2.7
 
 |JRuby
-|&#8805; 9.1
+|{ge} 9.2
 
 |TruffleRuby
-|&#8805; 20.2
+|{ge} 22.2
 |===
 
 == Operating systems
@@ -31,20 +32,33 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |Supported OS |Supported Versions
 
 |Ubuntu
-|18.04 LTS +
-20.04 LTS
+|{ge} 18.04 LTS
 
 |Fedora
-|&#8805; 33
+|{ge} 36
 
 |macOS
-|Mojave +
-Catalina +
-Big Sur
+|{ge} macOS 11 (Big Sur)
 
 |Microsoft
-|Windows 10 +
+|{ge} Windows 10 +
 Windows Server 2019
 |===
 
 While the community tests Asciidoctor on a variety of Linux distributions, it's only officially tested on Ubuntu and Fedora.
+
+== System encoding
+
+Asciidoctor assumes you're using UTF-8 encoding.
+To minimize encoding problems, make sure the default encoding of your system is set to UTF-8.
+
+If you're using a non-English Windows environment, you may bump into an `Encoding::UndefinedConversionError` when invoking Asciidoctor.
+To solve this issue, we recommend overriding the default external and internal character encodings to `utf-8`.
+You can do so by setting the `RUBYOPT` environment variable as follows:
+
+ RUBYOPT="-E utf-8:utf-8"
+
+Once you make this change, all your Unicode headaches should be behind you.
+
+If you're using an IDE like Eclipse, make sure you set the encoding to UTF-8 there as well.
+Asciidoctor is optimized to work with UTF-8 as the default encoding.

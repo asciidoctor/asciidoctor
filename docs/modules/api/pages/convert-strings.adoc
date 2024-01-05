@@ -8,7 +8,7 @@ A string is the bare AsciiDoc content (often the contents of a file).
 
 To parse an AsciiDoc string into a document object model, use:
 
-[source,ruby]
+[,ruby]
 ----
 doc = Asciidoctor.load '*This* is Asciidoctor.'
 ----
@@ -34,14 +34,14 @@ However, if you're only interested in converting the AsciiDoc source when using 
 
 To convert the AsciiDoc string directly to HTML, use:
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.'
 ----
 
 Here's the output you will see:
 
-[source,html]
+[,html]
 ----
 <div class="paragraph">
 <p><strong>This</strong> is Asciidoctor.</p>
@@ -86,7 +86,7 @@ That template is responsible for providing the styles and library integrations n
 You can still generate a standalone document when converting a string.
 To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `:standalone` option to `true`.
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
 ----
@@ -98,7 +98,7 @@ If you don't set the `:standalone` option to `true`, you only get the embedded d
 When the input or output is a file, the `:standalone` option is enabled by default.
 Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDoc string, the `:to_file` option is mandatory. 
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
 ----
@@ -113,7 +113,7 @@ However, you can force it to be included without the header and footer by settin
 
 If you only want the inline markup to be returned, set the `:doctype` option to `'inline'`:
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', doctype: 'inline'
 ----
@@ -125,7 +125,7 @@ In this mode, Asciidoctor will only process the first block (e.g., paragraph) in
 You can produce DocBook 5.0 by setting the `:backend` option to `'docbook'`.
 Since embedded DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `:standalone` option to `true`.
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true, backend: 'docbook'
 ----

@@ -8,15 +8,15 @@ If you're looking for the documentation for the AsciiDoc language, see the xref:
 
 == What is Asciidoctor?
 
-Asciidoctor is a fast, open source, text processor for parsing AsciiDoc into a document model and converting it to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, man(ual) pages, PDF, and [.nowrap]#EPUB 3#.
+Asciidoctor is a fast, open source, text processor for parsing AsciiDoc into a document model, then converting it to output formats such as [.nowrap]#HTML 5#, [.nowrap]#DocBook 5#, man(ual) pages, PDF, and [.nowrap]#EPUB 3#.
 Asciidoctor is written in the Ruby programming language.
 
-//This Ruby library (or gem) is often referred to as the core Asciidoctor processor, or _Asciidoctor core_ for short.
-When we say Asciidoctor in this area of the documentation, we're referring to the core Asciidoctor Ruby processor, abbreviated as _Asciidoctor core_ (and sometimes _Asciidoctor Ruby_).
-We add the qualifier "`core`" because Asciidoctor is also the name of the suite of projects that provide runtimes, extensions, and tools for processing AsciiDoc.
+When we use the name "`Asciidoctor`" in this area of the documentation, we're referring to the core Asciidoctor Ruby processor, abbreviated as _Asciidoctor core_ or _Asciidoctor Ruby_.
+We add the qualifier "`core`" because Asciidoctor is also the name of the suite of projects that provides runtimes, extensions, and tools for processing AsciiDoc.
 
-To simplify installation, Asciidoctor is packaged and distributed to RubyGems.org as a {url-rubygems}/asciidoctor[RubyGem named asciidoctor^].
-The asciidoctor gem can be installed on all major operating systems using Ruby packaging tools (gem or bundle).
+To simplify installation, Asciidoctor is packaged as a gem named {url-rubygems}/asciidoctor[asciidoctor^] and published to the gem hosting service located at RubyGems.org.
+A https://guides.rubygems.org/what-is-a-gem/[gem^] is a packaged Ruby application or library (in this case, both).
+The *asciidoctor* gem can be installed directly from RubyGems.org on all major operating systems using Ruby packaging tools (gem or bundle).
 Asciidoctor is also distributed as a Docker image, as a package for numerous Linux distributions, and as a package for macOS (via Homebrew and MacPorts).
 
 Asciidoctor is open source software available under the terms of the MIT license and {url-org}[hosted on GitHub^].
@@ -36,7 +36,7 @@ a|
  $ asciidoctor document.adoc
 
 a|
-[source,ruby]
+[,ruby]
 ----
 require 'asciidoctor'
 Asciidoctor.convert_file \

@@ -27,9 +27,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [jruby-9.3.8.0, '2.5', '2.7', '3.0', '3.2']
+        ruby: [jruby-9.4.2.0, '2.7', '3.0', '3.2']
         asciimath-version: [~]
-        pygments-version: ['~> 2.0']
+        haml-version: [~]
+        pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
         # remove 3.2 on ubuntu-latest to mark as primary
@@ -47,13 +48,16 @@ jobs:
         - os: macos-latest
           ruby: '3.2'
         - os: ubuntu-latest
-          ruby: '2.5'
+          ruby: '2.7'
           asciimath-version: '~> 1.0.0'
         - os: ubuntu-latest
-          ruby: '2.5'
+          ruby: '2.7'
+          haml-version: '~> 5.2.0'
+        - os: ubuntu-latest
+          ruby: '2.7'
           pygments-version: '~> 1.2.0'
         - os: ubuntu-latest
-          ruby: '2.5'
+          ruby: '2.7'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-latest
           ruby: '3.2'
@@ -65,12 +69,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Install prerequisites for Nokogiri (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: sudo apt-get install libxslt1-dev
-    - name: Configure Nokogiri installation (Linux, macOS)
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
-      run: echo 'BUNDLE_BUILD__NOKOGIRI=--use-system-libraries' >> $GITHUB_ENV
     - name: Set AsciiMath version
       if: matrix.asciimath-version
       run: echo 'ASCIIMATH_VERSION=${{ matrix.asciimath-version }}' >> $GITHUB_ENV
@@ -88,6 +86,12 @@ jobs:
       run: |
         echo 'BUNDLE_WITHOUT=docs' >> $GITHUB_ENV
         echo 'COVERAGE=true' >> $GITHUB_ENV
+    - name: Upgrade Java (JRuby for Windows)
+      if: matrix.os == 'windows-latest'
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: '17'
     - name: Install Ruby (uses cached dependencies for non-scheduled build)
       uses: ruby/setup-ruby@v1
       with:
@@ -117,6 +121,14 @@ jobs:
         fi
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
+    - name: Install gem and doc
+      if: |
+        !startsWith(matrix.ruby, 'truffleruby-') && (matrix.os != 'windows-latest' || !startsWith(matrix.ruby, 'jruby-9.2.'))
+      run: |
+        ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
+        bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
+        bundle exec gem install --local --document rdoc,ri asciidoctor.gem
+        bundle exec gem uninstall -ax asciidoctor
   build-dependents:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'

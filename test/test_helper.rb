@@ -258,6 +258,10 @@ class Minitest::Test
     [number].pack 'U1'
   end
 
+  def haml_template_class
+    (defined? Haml::Template) ? Haml::Template : Tilt::HamlTemplate
+  end
+
   def invoke_cli_with_filenames argv = [], filenames = [], &block
     filepaths = []
 
@@ -360,7 +364,7 @@ class Minitest::Test
       result = nil
       # While JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child process
       if Hash === args[-1] && args[-1][:unsetenv_others] && Hash === (env = args[0])
-        old_env = ENV.merge
+        old_env = ENV.to_h
         ENV.replace env
       end
       # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value

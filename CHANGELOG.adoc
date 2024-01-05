@@ -23,8 +23,8 @@ Enhancements::
   * Allow the CLI to control the logging level using the `--log-level` option (#3868)
   * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
   * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
-  * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) *@rpavlik*
-  * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) *@hackingotter*
+  * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) (*@rpavlik*)
+  * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) (*@hackingotter*)
   * Allow section ID to be unset by assigning an empty value to the `id` block attribute (#4139)
   * Add support for dropping principal text of list item if empty in an ordered or unordered list when converting to man page (#4182)
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
@@ -34,17 +34,19 @@ Enhancements::
   * Update signature of Logger constructor so both positional arguments and keyword arguments are passed to super constructor (#4250)
   * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
   * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
-  * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) *@abhinav*
+  * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
+  * Add support for Wistia using the video macro
 
 Compliance::
 
+  * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
   * Don't promote level-0 special section at start of document to document title (#4151)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
-  * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
-  * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
-  * Drop support for Ruby < 2.5 and JRuby < 9.2
+  * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
+  * Drop support for Ruby < 2.7 and JRuby < 9.2
   * Update latest Ruby to 3.2 in CI workflows
+  * Update latest JRuby in CI workflow to 9.4.2.0
 
 Improvements::
 
@@ -59,11 +61,77 @@ Improvements::
   * Remove form styles from the default stylesheet (#4186)
   * Set linenums option on source block when line numbering is enabled (#3313)
   * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
+  * Don't split value of `-r` CLI option; treat as single path (#4425)
+  * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
+  * Use safe navigation to avoid crashing when querying for extensions
+  * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
+  * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
+  * Modify default stylesheet to honor text-* roles on quote blocks
+  * Modify default stylesheet to add text decoration to active footnote number link in footnotes list (#4530) (@Larhzu)
 
 Bug Fixes::
 
-  * Redo loop rather than using recursion to locate next line to process; prevents stack limit error (#4368)
+  * Nested dlist attached using list continuation should not consume detached paragraph (#3535)
+  * Preserve paragraph breaks in normal table cell in manpage output (#4481)
+  * Style cells in head row as bold in manpage output (#4490)
+  * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
+  * Honor secondary and tertiary terms on `indexterm` macro when primary term is quoted and contains an equals sign (#3652)
+  * Remove extra border below doctitle when sidebar toc is collapsed into main content area (#4523)
+
+== 2.0.20 (2023-05-18) - @mojavelinux
+
+Bug Fixes::
+
+   * Update `release-version` attribute in READMEs and man page during release
+   * Rebuild man page during release
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.20[git tag] | {url-repo}/compare/v2.0.19\...v2.0.20[full diff]
+
+== 2.0.19 (2023-05-17) - @mojavelinux
+
+Improvements::
+
+  * Return empty string instead of nil if raw or verbatim block has no lines
+  * Don't uppercase monospace span in section title in manpage output (#4402)
+  * Simplify processing of implicit link (i.e., autolink) by separating implicit and explicit match
+  * Generate partintro block consistently (#4450)
+  * Add Kiswahili translation for built-in labels (PR #4454) (*@bkmgit*)
+
+Compliance::
+
+  * Fix call order so use of an include file with invalid encoding continues to raise error when using Ruby >= 3.2.0
+  * Fix test assertion for fallback Rouge stylesheet to be compatible with Rouge 4.1 (#4406) (*@tmzullinger*)
+  * Support `notitle` option on section as alternative to `untitled` to hide title (#4437)
+  * Add support for Haml 6 to template converter (#4429)
+
+Bug Fixes::
+
+  * Process constrained inline passthrough inside monospace span (#4458)
+  * Catalog inline ref defined using anchor macro even when resolved reftext is empty
+  * Use while loop rather than recursion to locate next line to process; prevents stack limit error (#4368)
+  * Avoid matching numeric character references when searching for # in xref target (#4393)
   * Use correct selector to collapse margin on first and last child of sidebar
+  * Don't allow target of include directive to start with a space (to distinguish it from a dlist item) or to end with a space
+  * Manify alt text of block image in manpage output (#4401)
+  * Adjust font size of term in horizontal dlist to match font size of term in regular dlist
+  * Implicitly attach nested list that starts with block attribute lines to dlist entry (#4268)
+  * Don't swallow square brackets when processing escaped URL macro
+  * Treat `uri:classloader:` as an absolute path prefix when running on JRuby (#3929)
+  * Apply reftext substitutions to value of `mantitle` attribute in DocBook output (#4448)
+  * Enclose `<reftext>` tag in `<article>` tag in DocBook output for man page (#4452)
+  * Correctly handle compat role on monospace and constrained passthrough when box attrlist or formatted text is escaped
+
+Build / Infrastructure::
+
+  * Update latest CRuby in CI workflow to 3.2
+  * Update latest JRuby in CI workflow to 9.4.2.0
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[full diff]
+// end::compact[]
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
@@ -87,9 +155,8 @@ Bug Fixes::
 
 === Details
 
-{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[source diff]
+{url-repo}/releases/tag/v2.0.18[git tag] | {url-repo}/compare/v2.0.17\...v2.0.18[full diff]
 
-// end::compact[]
 == 2.0.17 (2022-01-05) - @mojavelinux
 
 Bug Fixes::
@@ -98,7 +165,7 @@ Bug Fixes::
   * Ignore return value of process method for custom block or block macro if value matches parent argument
   * Remove unnamespaced selectors in Pygments stylesheet
   * Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
-  * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) *@mogztter*
+  * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) (*@mogztter*)
   * Hide built-in marker on HTML summary element in Safari when using default stylesheet (#4162)
   * Hide outline around HTML summary when activated in Safari (#4162)
   * Include primary video in value of `playlist` attribute when embeddding YouTube video (#4156)

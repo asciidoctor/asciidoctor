@@ -25,11 +25,11 @@ Check that you have a `python2` (Linux), `python` (macOS), or `py -2` (Windows) 
 Check that you have a `python3` (Linux/macOS) or `py -3` (Windows) executable on your PATH.
 
 .Installing Python and the pygments.rb gem via the CLI (cross platform)
-[source,console]
-....
+[,console]
+----
 $ "`\which apt-get || \which dnf || \which yum || \which brew`" install python # <.>
 $ gem install pygments.rb # <.>
-....
+----
 <.> Install Python using your package manager
 <.> Install the pygments.rb gem
 
@@ -37,7 +37,7 @@ $ gem install pygments.rb # <.>
 
 Once you've installed these libraries, assign `pygments` to the `source-highlighter` attribute in your document's header.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :source-highlighter: pygments
 ----
@@ -70,7 +70,7 @@ Default: `table`.
 :pygments-style: manni
 :pygments-linenums-mode: inline
 
-[source%linenums,ruby]
+[%linenums,ruby]
 ----
 ORDERED_LIST_KEYWORDS = {
   'loweralpha' => 'a',
@@ -133,7 +133,7 @@ Let's call it [.path]_pygments_init.rb_.
 Populate the script with the following content:
 
 .pygments_init.rb
-[source,ruby]
+[,ruby]
 ----
 require 'pygments'
 
@@ -154,7 +154,7 @@ When using the `asciidoctor` command, pass the script using the `-r` flag:
 
 When using the Asciidoctor API, require the script using `require` or `require_relative`:
 
-[source,ruby]
+[,ruby]
 ----
 require 'asciidoctor'
 require_relative './pygments_init.rb'

@@ -212,19 +212,23 @@ audio:not([controls]) {
   float: right !important;
 }
 
-.text-left {
+.text-left,
+div.text-left > * {
   text-align: left !important;
 }
 
-.text-right {
+.text-right,
+div.text-right > * {
   text-align: right !important;
 }
 
-.text-center {
+.text-center,
+div.text-center > * {
   text-align: center !important;
 }
 
-.text-justify {
+.text-justify,
+div.text-justify > * {
   text-align: justify !important;
 }
 
@@ -634,8 +638,7 @@ body > div[id]::after,
   border-top: 1px solid #dddddf;
 }
 
-#header > h1:only-child,
-body.toc2 #header > h1:nth-last-child(2) {
+#header > h1:only-child {
   border-bottom: 1px solid #dddddf;
   padding-bottom: 8px;
 }
@@ -741,6 +744,11 @@ body.toc2 #header > h1:nth-last-child(2) {
   body.toc2 {
     padding-left: 15em;
     padding-right: 0;
+  }
+
+  body.toc2 #header > h1:nth-last-child(2) {
+    border-bottom: 1px solid #dddddf;
+    padding-bottom: 8px;
   }
 
   #toc.toc2 {
@@ -1740,7 +1748,8 @@ sup.footnoteref a {
 }
 
 sup.footnote a:active,
-sup.footnoteref a:active {
+sup.footnoteref a:active,
+#footnotes .footnote a:first-of-type:active {
   text-decoration: underline;
 }
 
@@ -1786,7 +1795,7 @@ div.page-break {
 }
 
 div.unbreakable {
-  page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .big {
@@ -2043,6 +2052,7 @@ p,
 blockquote,
 dt,
 td.content,
+td.hdlist1,
 span.alt,
 summary {
   font-size: 1.0625rem;
@@ -2106,7 +2116,7 @@ p.tableblock {
   img,
   object,
   svg {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   thead {
@@ -2126,7 +2136,7 @@ p.tableblock {
   h3,
   #toctitle,
   .sidebarblock > .content > .title {
-    page-break-after: avoid;
+    break-after: avoid;
   }
 
   body > div[id] {
@@ -2182,7 +2192,7 @@ p.tableblock {
   body.book #preamble,
   body.book h1.sect0,
   body.book .sect1 > h2 {
-    page-break-before: always;
+    break-before: page;
   }
 
   .listingblock code[data-lang]::before {
@@ -2191,7 +2201,7 @@ p.tableblock {
 
   div.page-break {
     display: block;
-    page-break-after: always;
+    break-after: page;
   }
 
   #footer {

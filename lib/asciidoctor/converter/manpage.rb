@@ -29,7 +29,7 @@ class Converter::ManPageConverter < Converter::Base
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
   WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
   XMLMarkupRx = /&#?[a-z\d]+;|</
-  PCDATAFilterRx = /(&#?[a-z\d]+;|<[^>]+>)|([^&<]+)/
+  PCDATAFilterRx = %r((&#?[a-z\d]+;|<#{ESC}\\f\(CR.*?</#{ESC}\\fP>|<[^>]+>)|([^&<]+))
 
   def initialize backend, opts = {}
     @backend = backend
@@ -40,7 +40,7 @@ class Converter::ManPageConverter < Converter::Base
     unless node.attr? 'mantitle'
       raise 'asciidoctor: ERROR: doctype must be set to manpage when using manpage backend'
     end
-    mantitle = node.attr 'mantitle'
+    mantitle = (node.attr 'mantitle').gsub InvalidSectionIdCharsRx, ''
     manvolnum = node.attr 'manvolnum', '1'
     manname = node.attr 'manname', mantitle
     manmanual = node.attr 'manmanual'
@@ -241,7 +241,7 @@ r lw(\n(.lu*75u/100u).'
     result << (node.title? ? %(.sp
 .B #{manify node.captioned_title}
 .br) : '.sp')
-    result << %([#{node.alt}])
+    result << %([#{manify node.alt}])
     result.join LF
   end
 
@@ -383,12 +383,10 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  # FIXME The reason this method is so complicated is because we are not
-  # receiving empty(marked) cells when there are colspans or rowspans. This
-  # method has to create a map of all cells and in the case of rowspans
-  # create empty cells as placeholders of the span.
-  # To fix this, asciidoctor needs to provide an API to tell the user if a
-  # given cell is being used as a colspan or rowspan.
+  # NOTE This handler inserts empty cells to account for colspans and rowspans.
+  # In order to support colspans and rowspans propertly, that information must
+  # be computed up front and consulted when rendering the cell as this information
+  # is not available on the cell itself.
   def convert_table node
     result = []
     if node.title?
@@ -400,8 +398,7 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.captioned_title}
 )
     end
-    result << '.TS
-allbox tab(:);'
+    result << %(.TS#{LF}allbox tab(:);)
     row_header = []
     row_text = []
     row_index = 0
@@ -409,23 +406,15 @@ allbox tab(:);'
       rows.each do |row|
         row_header[row_index] ||= []
         row_text[row_index] ||= []
-        # result << LF
-        # l left-adjusted
-        # r right-adjusted
-        # c centered-adjusted
-        # n numerical align
-        # a alphabetic align
-        # s spanned
-        # ^ vertically spanned
         remaining_cells = row.size
         row.each_with_index do |cell, cell_index|
           remaining_cells -= 1
           row_header[row_index][cell_index] ||= []
-          # Add an empty cell if this is a rowspan cell
+          # add an empty cell as a placeholder if this is a rowspan cell
           if row_header[row_index][cell_index] == ['^t']
-            row_text[row_index] << %(T{#{LF}.sp#{LF}T}:)
+            row_text[row_index] << %(T{#{LF}T}:)
           end
-          row_text[row_index] << %(T{#{LF}.sp#{LF})
+          row_text[row_index] << %(T{#{LF})
           cell_halign = (cell.attr 'halign', 'left').chr
           if tsec == :body
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
@@ -440,7 +429,7 @@ allbox tab(:);'
             when :literal
               cell_content = %(.nf#{LF}#{manify cell.text, whitespace: :preserve}#{LF}.fi)
             else
-              cell_content = manify cell.content.join, whitespace: :normalize
+              cell_content = cell.content.map {|p| manify p, whitespace: :normalize }.join %(#{LF}.sp#{LF})
             end
             row_text[row_index] << %(#{cell_content}#{LF})
           else # tsec == :head || tsec == :foot
@@ -484,21 +473,14 @@ allbox tab(:);'
       end unless rows.empty?
     end
 
-    #row_header.each do |row|
-    #  result << LF
-    #  row.each_with_index do |cell, i|
-    #    result << (cell.join ' ')
-    #    result << ' ' if row.size > i + 1
-    #  end
-    #end
-    # FIXME temporary fix to get basic table to display
-    result << LF
-    result << ('lt ' * row_header[0].size).chop
-
-    result << %(.#{LF})
-    row_text.each do |row|
-      result << row.join
+    if node.has_header_option && (header_row_text = row_text[0])
+      result << %(#{LF}#{row_header[0].join ' '}.)
+      result << %(#{LF}#{header_row_text.join})
+      result << '.T&'
+      row_text = row_text.slice 1, row_text.length
     end
+    result << %(#{LF}#{row_header[0].map { 'lt' }.join ' '}.#{LF})
+    row_text.each {|row| result << row.join }
     result << %(.TE#{LF}.sp)
     result.join
   end
@@ -726,9 +708,7 @@ allbox tab(:);'
       .gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' } # literal backslash (not a troff escape sequence)
       .gsub(EllipsisCharRefRx, '...') # horizontal ellipsis
       .gsub(LeadingPeriodRx, '\\\&.') # leading . is used in troff for macro call or other formatting; replace with \&.
-      .gsub EscapedMacroRx do # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-        (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest})
-      end
+      .gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) } # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
       .gsub('-', '\-')
       .gsub('&lt;', '<')
       .gsub('&gt;', '>')

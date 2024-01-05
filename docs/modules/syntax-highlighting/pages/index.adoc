@@ -11,9 +11,20 @@ puts "Hello, World!"
 ----
 ....
 
+If a language is specified on a listing block, the source style is implied.
+Therefore, it can be excluded in this case.
+
+[source,asciidoc]
+....
+[,ruby]
+----
+puts "Hello, World!"
+----
+....
+
 Here's how we expect it to appear:
 
-[source,ruby]
+[,ruby]
 ----
 puts "Hello, World!"
 ----
@@ -55,7 +66,7 @@ You should try each syntax highlighter and find the one that works best for you.
 
 [%autowidth]
 |===
-|Type |Syntax Highlighter |Required RubyGem |Compatible Converters
+|Type |Syntax Highlighter |Required Gem |Compatible Converters
 
 h|Client-side
 
@@ -93,7 +104,7 @@ You should not mix syntax highlighting with AsciiDoc text formatting (i.e., the 
 In many converters, these two operations are mutually exclusive.
 
 .Improper use of custom substitutions on a source block
-[,asciidoc]
+[source,asciidoc]
 ....
 [,java,subs=+quotes]
 ----
@@ -112,7 +123,7 @@ While it may work in some syntax highlighters in the HTML backend (which perhaps
 If you're going to customize the substitutions on a source block using the `subs` attribute, you should limit those substitutions to attribute replacements (`attributes`).
 
 .Valid use of custom substitutions on a source block
-[,asciidoc]
+[source,asciidoc]
 ....
 [,java,subs=attributes+]
 ----

@@ -16,7 +16,7 @@ In this section, we'll create a sample document, then process and convert it wit
 . To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plaintext file.
 +
 .my-document.adoc
-[source#ex-my-doc,asciidoc]
+[#ex-my-doc,asciidoc]
 ----
 include::example$my-document.adoc[tags=title;body]
 ----
@@ -57,6 +57,10 @@ image::my-document.png[]
 The document's text, titles, and link are styled by the default Asciidoctor stylesheet, which is embedded in the HTML output.
 As a result, you could save [.path]_my-document.html_ to any computer and it will look the same.
 --
+
+. If you want to preview the HTML in the terminal, you can use this command instead:
+
+ $ asciidoctor my-document.adoc -o - | w3m - -T text/html
 
 [#xhtml]
 == Generate XHTML

@@ -7,7 +7,7 @@
 
 == Install Rouge
 
-To use Rouge with Asciidoctor, you need the {url-rouge-gem}[rouge RubyGem^].
+To use Rouge with Asciidoctor, you need the {url-rouge-gem}[rouge gem^].
 You can use one of the following methods to install Rouge.
 
 Install using `gem` (all systems)::
@@ -28,9 +28,9 @@ Install using `pacman` (Arch Linux-based systems)::
 
 == Assign rouge to source-highlighter
 
-Once you've installed the RubyGem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
+Once you've installed the gem, assign the `rouge` value to the `source-highlighter` attribute in the document header to activate it.
 
-[source,asciidoc]
+[,asciidoc]
 ----
 :source-highlighter: rouge
 ----
@@ -63,7 +63,7 @@ However, you can define them per document as shown in the following example.
 :source-highlighter: rouge
 :rouge-style: monokai
 
-[source,ruby]
+[,ruby]
 ----
 puts "Hello, Rouge!"
 ----
@@ -76,7 +76,7 @@ You can enable line numbering using the linenums option on the block.
 ....
 :source-highlighter: rouge
 
-[source%linenums,ruby]
+[%linenums,ruby]
 ----
 ORDERED_LIST_KEYWORDS = {
   'loweralpha' => 'a',

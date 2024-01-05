@@ -4,7 +4,7 @@
 :apidoc-abstract-node: {apidoc-root}/AbstractNode
 :apidoc-block: {apidoc-root}/Block
 :url-pry: http://pry.github.io
-:url-slim: http://slim-lang.com
+:url-slim: https://slim-template.github.io
 :url-tilt: https://github.com/rtomayko/tilt
 :!listing-caption:
 
@@ -574,11 +574,16 @@ Either way, the *tilt* and *slim* gems must be available on the load path when r
 Instructing Asciidoctor to apply your templates is the easiest part.
 You only need to tell Asciidoctor where the templates are located and which template engine you're using.
 (Technically, you don't need to specify the template engine.
-But, by doing so, it makes the scan more efficient and deterministic.)
+However, by doing so, it makes the scan more efficient and deterministic.)
 
 If you're using the CLI, you specify the template directory using the `-T` option (longhand: `--template-dir`) and the template engine using the `-E` option (longhand: `--template-engine`).
 
  $ asciidoctor -T /path/to/templates -E slim doc.adoc
+
+When using JRuby, you can refer to a directory on the classpath by prefixing the path with `uri:classloader:`.
+For example:
+
+ $ asciidoctor -r /path/to/templates.jar -T uri:classloader:/path/to/templates -E slim doc.adoc
 
 If you're using the API, you specify the template directory (or directories) using the `:template_dirs` option and the template engine using the `:template_engine` option.
 

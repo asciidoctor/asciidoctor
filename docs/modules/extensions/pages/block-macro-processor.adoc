@@ -6,7 +6,7 @@ Create a block macro named `gist` for embedding a gist.
 
 == sample-with-gist-macro.adoc
 
-[source,asciidoc]
+[,asciidoc]
 ----
 .My Gist
 gist::123456[]
@@ -14,7 +14,7 @@ gist::123456[]
 
 == GistBlockMacro
 
-[source,ruby]
+[,ruby]
 ----
 class GistBlockMacro < Asciidoctor::Extensions::BlockMacroProcessor
   use_dsl
@@ -38,7 +38,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   block_macro GistBlockMacro if document.basebackend? 'html'

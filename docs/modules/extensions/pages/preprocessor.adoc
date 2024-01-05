@@ -1,13 +1,38 @@
-= Preprocessor Extension Example
+= Preprocessor Extension
 :navtitle: Preprocessor
 
-Purpose::
-Skim off front matter from the top of the document that gets used by site generators like Jekyll and Awestruct.
+The {url-api-gems}/asciidoctor/{release-version}/Asciidoctor/Extensions/Preprocessor[Preprocessor^] extension runs prior to the AsciiDoc source being parsed.
+Specifically, it runs after the Document instance has been created and its PreprocessorReader has been initialized to start reading the lines of the source document.
 
-== sample-with-front-matter.adoc
+[WARNING]
+====
+If the preprocessor extension reads lines from the reader, it will cause side effects.
+One of these side effects is that document attributes in the header may not be interpreted correctly.
+Another is that it may interfere with line number tracking.
+If the extension adds or removes lines, the parser could produce misleading line number information.
+Thus, interacting with the reader in a prepreprocessor extension should be avoided, if possible.
+
+A preprocessor extension can still be used to modify options on the Document object, in which case there's no side effect.
+It may also be possible to avoid side effects by reading lines which are not interpreted as AsciiDoc, as is shown in the example on this page.
+====
+
+Prior to invoking the preprocessor extension, Asciidoctor splits the source text of the primary document into lines and xref:asciidoc::normalization.adoc[normalizes them].
+It then creates an instance of PreprocessorReader from these lines.
+
+Asciidoctor then passes the Document and PreprocessorReader instances to the `Asciidoctor::Extensions::Processor#process` method of the extension.
+If the extension reads lines from reader, those lines will first be preprocessed by Asciidoctor's internal preprocessor.
+The extension can modify the Reader and either return the same Reader (or falsy, which is equivalent) or a new Reader instance to replace it.
+However, as stated above, be careful when reading lines from the original PreprocessorReader instance as it can have side effets.
+
+== Preprocessor Extension Example
+
+Purpose::
+Skim off front matter from the top of the document that gets used by site generators like Jekyll.
+
+=== sample-with-front-matter.adoc
 
 [source,asciidoc]
-----
+....
 tags: [announcement, website]
 ---
 = Document Title
@@ -16,16 +41,16 @@ content
 
 [subs=+attributes]
 .Captured front matter
-....
+----
 ---
 {front-matter}
 ---
-....
 ----
+....
 
-== FrontMatterPreprocessor
+=== FrontMatterPreprocessor
 
-[source,ruby]
+[,ruby]
 ----
 class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
   def process document, reader
@@ -53,9 +78,9 @@ class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
 end
 ----
 
-== Usage
+=== Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor

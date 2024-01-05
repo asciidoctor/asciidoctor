@@ -6,14 +6,14 @@ Create an inline macro named `man` that links to another man page.
 
 == sample-with-man-link.adoc
 
-[source,asciidoc]
+[,asciidoc]
 ----
 See man:gittutorial[7] to get started.
 ----
 
 == ManpageInlineMacro
 
-[source,ruby]
+[,ruby]
 ----
 class ManInlineMacro < Asciidoctor::Extensions::InlineMacroProcessor
   use_dsl
@@ -41,7 +41,7 @@ end
 
 == Usage
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor::Extensions.register do
   inline_macro ManInlineMacro

@@ -47,6 +47,24 @@ context 'Manpage' do
       assert_includes output.lines, %(command, alt_command \\- does stuff\n)
     end
 
+    test 'should replace invalid characters in mantitle in info comment' do
+      input = <<~'EOS'
+      = foo\--<bar> (1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
+
+      == NAME
+
+      foo-bar - puts the foo in your bar
+      EOS
+
+      doc = Asciidoctor.load input, backend: :manpage, standalone: true
+      output = doc.convert
+      assert_includes output, %(Title: foo--bar\n)
+    end
+
     test 'should substitute attributes in manname and manpurpose in NAME section' do
       input = <<~'EOS'
       = {cmdname} (1)
@@ -130,7 +148,7 @@ context 'Manpage' do
         assert_equal '.1', doc.attr('outfilesuffix')
         output = doc.convert
         refute_empty logger.messages
-        assert_includes output, 'Title: cmd'
+        assert_includes output, %(Title: cmd\n)
         assert output.end_with?('garbage in')
       end
     end
@@ -331,6 +349,48 @@ context 'Manpage' do
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
+    test 'should preserve break between paragraphs in normal table cell' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      [cols=3*]
+      |===
+      |single paragraph
+      |first paragraph
+
+      second paragraph
+      |foo
+
+      more foo
+
+      even more foo
+      |===
+      EOS
+
+      expected_coda = <<~'EOS'.chop
+      .TS
+      allbox tab(:);
+      lt lt lt.
+      T{
+      single paragraph
+      T}:T{
+      first paragraph
+      .sp
+      second paragraph
+      T}:T{
+      foo
+      .sp
+      more foo
+      .sp
+      even more foo
+      T}
+      .TE
+      .sp
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
     test 'should normalize whitespace in a list item' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
@@ -440,6 +500,18 @@ context 'Manpage' do
       EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, '.SH "\(lqMAIN\(rq \fI<OPTIONS>\fP"'
+    end
+
+    test 'should not uppercase monospace span in section titles' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      does stuff
+
+      == `show` option
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, '.SH "\f(CRshow\fP OPTION"'
     end
   end
 
@@ -686,21 +758,19 @@ context 'Manpage' do
       EOS
       expected_coda = <<~'EOS'.chop
       allbox tab(:);
-      lt.
+      ltB.
       T{
-      .sp
       Header
       T}
+      .T&
+      lt.
       T{
-      .sp
       Body 1
       T}
       T{
-      .sp
       Body 2
       T}
       T{
-      .sp
       Footer
       T}
       .TE
@@ -746,25 +816,21 @@ context 'Manpage' do
       .B Table 1. Table of options
       .TS
       allbox tab(:);
-      lt lt lt.
+      ltB ltB ltB.
       T{
-      .sp
       Name
       T}:T{
-      .sp
       Description
       T}:T{
-      .sp
       Default
       T}
+      .T&
+      lt lt lt.
       T{
-      .sp
       dim
       T}:T{
-      .sp
       dimension of the object
       T}:T{
-      .sp
       3
       T}
       .TE
@@ -789,10 +855,8 @@ context 'Manpage' do
       allbox tab(:);
       lt lt.
       T{
-      .sp
       a
       T}:T{
-      .sp
       .nf
       b
       c    _d_
@@ -819,6 +883,17 @@ context 'Manpage' do
 
       output = Asciidoctor.convert input, backend: :manpage
       assert output.end_with? %(\n.sp\n[signs point to yes])
+    end
+
+    test 'should manify alt text of block image' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      image::rainbow.jpg["That's a double rainbow, otherwise known as rainbow{pp}!"]
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? %/\n.sp\n[That\\(cqs a double rainbow, otherwise known as rainbow++!]/
     end
 
     test 'should replace inline image with alt text enclosed in square brackets' do

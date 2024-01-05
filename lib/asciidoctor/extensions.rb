@@ -1041,7 +1041,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def docinfo_processors location = nil
-      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : @docinfo_processor_extensions
+      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : (@docinfo_processor_extensions || [])
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
@@ -1117,11 +1117,7 @@ module Extensions
     # Returns the [Extension] proxy object for the BlockProcessor that matches
     # the block name and context or false if no match is found.
     def registered_for_block? name, context
-      if (ext = @block_extensions[name.to_sym])
-        (ext.config[:contexts].include? context) ? ext : false
-      else
-        false
-      end
+      (ext = @block_extensions&.[] name.to_sym) ? (ext.config[:contexts].include? context) && ext : false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockProcessor registered
@@ -1132,7 +1128,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockProcessor or nil if a match is not found.
     def find_block_extension name
-      @block_extensions[name.to_sym]
+      @block_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {BlockMacroProcessor} with the extension registry to
@@ -1210,7 +1206,7 @@ module Extensions
     #--
     # TODO only allow blank target if format is :short
     def registered_for_block_macro? name
-      (ext = @block_macro_extensions[name.to_sym]) ? ext : false
+      (@block_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockMacroProcessor registered
@@ -1221,7 +1217,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockMacroProcessor or nil if a match is not found.
     def find_block_macro_extension name
-      @block_macro_extensions[name.to_sym]
+      @block_macro_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {InlineMacroProcessor} with the extension registry to
@@ -1297,7 +1293,7 @@ module Extensions
     # Returns the [Extension] proxy object for the InlineMacroProcessor that matches
     # the macro name or false if no match is found.
     def registered_for_inline_macro? name
-      (ext = @inline_macro_extensions[name.to_sym]) ? ext : false
+      (@inline_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the InlineMacroProcessor registered
@@ -1308,7 +1304,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding InlineMacroProcessor or nil if a match is not found.
     def find_inline_macro_extension name
-      @inline_macro_extensions[name.to_sym]
+      @inline_macro_extensions&.[] name.to_sym
     end
 
     # Public: Retrieves the {Extension} proxy objects for all
@@ -1316,7 +1312,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def inline_macros
-      @inline_macro_extensions.values
+      (@inline_macro_extensions || {}).values
     end
 
     # Public: Inserts the document processor {Extension} instance as the first

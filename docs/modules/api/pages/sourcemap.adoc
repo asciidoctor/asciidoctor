@@ -31,7 +31,7 @@ IMPORTANT: The sourcemap is not perfect.
 There are certain edge cases, such as when the block is split across multiple files or the block starts and ends on the last line of an include file, when the sourcemap may report the wrong file or line information.
 If you're writing a processor that relies on the sourcemap, it's a good idea to verify that the line at the cursor is the one you expect to find, then adjust accordingly.
 
-== Set :sourcemap option
+== Enable using :sourcemap option
 
 The sourcemap feature can be controlled from the API using the `:sourcemap` option.
 The value of this option is a boolean.
@@ -46,7 +46,29 @@ Here's an example of how to enable the sourcemap using the API:
 doc = Asciidoctor.load_file 'doc.adoc', safe: :safe, sourcemap: true
 ----
 
-Now that the sourcemap is enabled, you can access the source location of the block elements in the parsed document.
+== Enable from extension
+
+You can enable the sourcemap using an Asciidoctor preprocessor extension.
+This technique is useful if your extension needs access to the source location of blocks, but you don't want to require users to pass an additional option to Asciidoctor.
+
+[,ruby]
+----
+Asciidoctor::Document.prepend (Module.new do
+  attr_writer :sourcemap
+end) unless Asciidoctor::Document.method_defined? :sourcemap=
+
+# A preprocessor that enables the sourcemap feature if not already enabled via the API.
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      doc.sourcemap = true
+      nil
+    end
+  end
+end
+----
+
+Now that the sourcemap is enabled, your extension can access the source location of the block elements in the parsed document.
 
 == Use the sourcemap
 

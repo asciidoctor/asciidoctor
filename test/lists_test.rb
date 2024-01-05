@@ -2109,6 +2109,22 @@ context 'Description lists (:dlist)' do
       assert_css 'dl > dt:empty', output, 1
     end
 
+    test 'should parse a dlist if term is include and principal text is []' do
+      input = 'include:: []'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "[]"]', output, 1
+    end
+
+    test 'should parse a dlist if term is include and principal text matches macro form' do
+      input = 'include:: pass:[${placeholder}]'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "${placeholder}"]', output, 1
+    end
+
     test 'single-line adjacent elements' do
       input = <<~'EOS'
       term1:: def1
@@ -3060,6 +3076,21 @@ context 'Description lists (:dlist)' do
       assert_xpath '(//dl)[1]/dt[1]/following-sibling::dd/p[contains(text(), "continued")]', output, 1
       assert_xpath '//dl//dl/dt[normalize-space(text()) = "label1"]', output, 1
       assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
+    end
+
+    test 'nested dlist attached by list continuation should not consume detached paragraph' do
+      input = <<~'EOS'
+      term:: text
+      +
+      nested term::: text
+
+      paragraph
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_css '.dlist .paragraph', output, 0
+      assert_css '.dlist + .paragraph', output, 1
     end
   end
 
@@ -4138,6 +4169,89 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
+    end
+
+    test 'block attribute lines above nested horizontal list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'block attribute lines above nested list with style does not break list' do
+      input = <<~'EOS'
+      TODO List::
+      * get groceries
+      Grocery List::
+      [square]
+      * bread
+      * milk
+      * lettuce
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[2]//ul[@class="square"]', output, 1
+    end
+
+    test 'multiple block attribute lines above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'multiple block attribute lines separated by empty line above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+
+      [horizontal]
+
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
     end
   end
 

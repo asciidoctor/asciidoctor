@@ -1,4 +1,4 @@
-= Local Font Awesome
+= Use Local Font Awesome
 
 When font-based icons are enabled, the HTML converter configures the HTML document to retrieve the Font Awesome assets (CSS and fonts) from a CDN.
 This default behavior provides a convenience for users who want the visual enhancement of font-based icons without having to do any extra steps.

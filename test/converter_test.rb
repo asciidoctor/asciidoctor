@@ -10,7 +10,7 @@ context 'Converter' do
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter 'paragraph'
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+      assert_kind_of haml_template_class, selected.templates['paragraph']
       assert_equal :html5, selected.templates['paragraph'].options[:format]
     end
 
@@ -19,7 +19,7 @@ context 'Converter' do
       assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
       selected = doc.converter.find_converter 'paragraph'
       assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-      assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+      assert_kind_of haml_template_class, selected.templates['paragraph']
       assert_equal :xhtml, selected.templates['paragraph'].options[:format]
     end
 
@@ -96,7 +96,7 @@ context 'Converter' do
       %w(paragraph sidebar).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
+        assert_kind_of haml_template_class, selected.templates[node_name]
         assert_equal %(block_#{node_name}.html.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -127,7 +127,7 @@ context 'Converter' do
       %w(paragraph).each do |node_name|
         selected = doc.converter.find_converter node_name
         assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-        assert_kind_of Tilt::HamlTemplate, selected.templates[node_name]
+        assert_kind_of haml_template_class, selected.templates[node_name]
         assert_equal %(block_#{node_name}.xml.haml), File.basename(selected.templates[node_name].file)
       end
     end
@@ -216,7 +216,7 @@ context 'Converter' do
       refute_empty caches[:templates]
       paragraph_template = caches[:templates].values.find {|t| File.basename(t.file) == 'block_paragraph.html.haml' }
       refute_nil paragraph_template
-      assert_kind_of Tilt::HamlTemplate, paragraph_template
+      assert_kind_of haml_template_class, paragraph_template
     end
 
     test 'should be able to disable template cache' do
@@ -333,6 +333,19 @@ context 'Converter' do
       assert_xpath '//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="toc"]/ul[1]/li', output, 3
       assert_xpath '//*[@id="toc"]/ul[1]/li[1][text()="Section One"]', output, 1
+    end
+
+    test 'resolves templates from classloader when using JRuby', if: jruby? do
+      require fixture_path 'templates.jar'
+      input = <<~'EOS'
+      * foo
+      * bar
+      * baz
+      EOS
+
+      doc = Asciidoctor.load input, template_dir: 'uri:classloader:templates', template_cache: false
+      output = doc.convert
+      assert_includes output, '<span class="principal">foo</span>'
     end
   end
 

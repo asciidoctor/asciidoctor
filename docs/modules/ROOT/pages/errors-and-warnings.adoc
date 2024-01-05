@@ -40,6 +40,31 @@ Represents a URI (i.e., URL) being referenced.
 <x> or <y>::
 Placeholders for other contextual information in the message.
 
+[#debug]
+== Debug messages
+
+[cols=2*]
+|===
+|Message |Troubleshooting
+
+|unknown style for <y> block: <x>
+|The processor could not find an extension registered for the <y> block with the custom style <x>.
+It's not required to register an extension for a custom block, so this message is merely informational.
+If the extension is not registered, the processor will fall back to the default semantics of the block.
+The block will be rendered as though the custom style is not present.
+
+|unknown name for block macro: <x>
+|The processor could not find an extension registered for the block macro named <x>.
+It's not required to register an extension for a custom block macro, so this message is merely informational.
+If the extension is not registered, the processor will leave the block macro unprocessed (treat it as paragraph text).
+
+|unknown style for paragraph: <x>
+|The processor could not find an extension registered for the paragraph with the custom style <x>.
+It's not required to register an extension for a custom paragraph, so this message is merely informational.
+If the extension is not registered, the processor will fall back to the default semantics of the paragraph.
+The paragraph will be rendered as though the custom style is not present.
+|===
+
 [#info]
 == Info messages
 

@@ -2792,17 +2792,19 @@ context 'Sections' do
       assert_xpath '//glossary/glossentry', output, 2
     end
 
-    test 'should drop title on special section in DocBook output if untitled option is set' do
-      input = <<~'EOS'
-      [dedication%untitled]
-      == Dedication
+    test 'should drop title on special section in DocBook output if notitle or untitled option is set' do
+      %w(notitle untitled).each do |option|
+        input = <<~EOS
+        [dedication%#{option}]
+        == Dedication
 
-      content
-      EOS
+        content
+        EOS
 
-      output = convert_string_to_embedded input, backend: :docbook
-      assert_xpath '/dedication', output, 1
-      assert_xpath '/dedication/title', output, 0
+        output = convert_string_to_embedded input, backend: :docbook
+        assert_xpath '/dedication', output, 1
+        assert_xpath '/dedication/title', output, 0
+      end
     end
   end
 
@@ -3631,6 +3633,8 @@ context 'Sections' do
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+      assert_css '#_chapter_one + .openblock.partintro p', output, 1
+      assert_css '#_chapter_two + .openblock.partintro p', output, 1
     end
 
     test 'should print error if level 0 section comes after nested section and doctype is not book' do
@@ -3739,7 +3743,7 @@ context 'Sections' do
 
       = Part 1
 
-      part intro
+      part intro--a summary
 
       == Chapter 1
       EOS
@@ -3747,7 +3751,53 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
+      assert_empty partintro.lines
+      assert_empty partintro.subs
       assert_equal 'partintro', partintro.style
+      assert_equal :paragraph, partintro.blocks[0].context
+      assert_equal ['part intro--a summary'], partintro.blocks[0].lines
+      assert_include 'part intro&#8212;&#8203;a summary', partintro.convert
+    end
+
+    test 'should preserve title on partintro defined as partintro paragraph' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      .Intro
+      [partintro]
+      Read this first.
+
+      == Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'Intro', partintro.title
+    end
+
+    test 'should not promote title on partintro defined as normal paragraph' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      .Intro
+      Read this first.
+
+      == Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_nil partintro.title
+      assert_equal 'Intro', partintro.blocks[0].title
     end
 
     test 'should add partintro style to child open block of part' do
@@ -3767,7 +3817,9 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
       assert_equal 'partintro', partintro.style
+      assert_equal :paragraph, partintro.blocks[0].context
     end
 
     test 'should wrap child paragraphs of part in partintro open block' do
@@ -3787,6 +3839,7 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
       assert_equal 'partintro', partintro.style
       assert_equal 2, partintro.blocks.size
       assert_equal :paragraph, partintro.blocks[0].context

@@ -116,7 +116,7 @@ class Block < AbstractBlock
       # maybe apply_subs can know how to strip whitespace?
       result = apply_subs @lines, @subs
       if result.size < 2
-        result[0]
+        result[0] || ''
       else
         result.shift while (first = result[0]) && first.rstrip.empty?
         result.pop while (last = result[-1]) && last.rstrip.empty?
