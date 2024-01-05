@@ -380,9 +380,8 @@ class Converter::DocBook5Converter < Converter::Base
     frame = 'topbot' if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
     grid = node.attr 'grid', nil, 'table-grid'
     stripes = node.attr 'stripes', nil, 'table-stripes'
-    stripe_style = ("striped-even" if stripes==='even') || ("striped-odd" if stripes==='odd') || nil
-    header_style = ('headerbg' if node.option? 'headerbg') || nil
-    tab_style = [stripe_style, header_style].compact.join(',');
+    stripe_style = ("stripes-even" if stripes==='even') || ("stripes-odd" if stripes==='odd') || ("stripes-all" if stripes==='all') || nil
+    tab_style = [stripe_style].compact.join(',');
     result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{(%w(none cols).include? grid) ? 0 : 1}" colsep="#{(%w(none rows).include? grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''} #{tab_style.empty? ? '' : 'tabstyle="' + "#{tab_style}" +'"'}>)
     if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
