@@ -382,7 +382,7 @@ class Converter::DocBook5Converter < Converter::Base
     stripes = node.attr 'stripes', nil, 'table-stripes'
     stripe_style = ("stripes-even" if stripes==='even') || ("stripes-odd" if stripes==='odd') || ("stripes-all" if stripes==='all') || nil
     tab_style = [stripe_style].compact.join(',');
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{(%w(none cols).include? grid) ? 0 : 1}" colsep="#{(%w(none rows).include? grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''} #{tab_style.empty? ? '' : 'tabstyle="' + "#{tab_style}" +'"'}>)
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{(%w(none cols).include? grid) ? 0 : 1}" colsep="#{(%w(none rows).include? grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''} #{tab_style.empty? ? '' : 'tabstyle="' + "#{tab_style}" + '"'}>)
     if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
     elsif node.option? 'breakable'
