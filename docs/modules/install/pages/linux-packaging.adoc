@@ -2,7 +2,7 @@
 :url-alpine: https://pkgs.alpinelinux.org/packages?name=asciidoctor
 :url-arch: https://www.archlinux.org/packages/?name=asciidoctor
 :url-debian: https://packages.debian.org/sid/asciidoctor
-:url-fedora: https://apps.fedoraproject.org/packages/rubygem-asciidoctor
+:url-fedora: https://packages.fedoraproject.org/pkgs/rubygem-asciidoctor/rubygem-asciidoctor/
 :url-suse: https://software.opensuse.org/package/rubygem-asciidoctor
 :url-ubuntu: https://packages.ubuntu.com/search?keywords=asciidoctor
 
