@@ -66,6 +66,13 @@ Instead of providing a Ruby block containing extensions to register, this option
 |_not set_
 |`Extensions::Registry` instance
 
+|`:logger`
+|Shorthand to assign a new value to the global `LoggerManager.logger`.
+This is persistent change, so you either have to reset the value afterwards or pass the option each time you call the API.
+If value is falsy, it assigns a null logger, effectively turning off logging.
+|_not set_
+|`Logger` instance
+
 |`:parse_header_only`
 |If `true`, the parser stops after reading the header.
 |`false`
