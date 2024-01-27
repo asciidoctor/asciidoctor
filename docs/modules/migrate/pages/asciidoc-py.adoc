@@ -350,6 +350,10 @@ Literal monospace is signified using a compound markup that combines an inline p
 | Literal monospace
 | pass:[`+1...10+`]
 | `+1...10+`
+
+| Italic
+| pass:['text']
+| _text_
 |===
 
 To learn more about the adaptations that are activated by compat mode, refer to <<inline-formatting,inline formatting>>.
