@@ -7,6 +7,8 @@ Asciidoctor's default output format is HTML.
 
 `html`:: The HTML 5 converter (`html` or `html5`) generates HTML 5 styled with CSS3.
 
+WARNING: The <<Default stylesheet>> uses Google Fonts which is https://cookie-script.com/blog/google-fonts-and-gdpr[not GDPR compliant]. To avoid this issue you can <<Apply a Custom Stylesheet>>.
+
 == Generate HTML using the html5 converter
 
 In this section, we'll create a sample document, then process and convert it with Asciidoctor's built-in HTML converter.
