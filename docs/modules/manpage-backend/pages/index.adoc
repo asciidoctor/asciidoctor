@@ -7,14 +7,13 @@
 :url-git-man: https://github.com/git/git/tree/master/Documentation
 
 The AsciiDoc language defines a doctype named `manpage` for composing manual pages (man pages) in AsciiDoc.
-Asciidoctor provides a converter for converting this AsciiDoc structure into a roff-formatted man page.
+Asciidoctor provides a converter for converting this AsciiDoc structure into a groff-formatted man page.
+This page introduces **man**ual pages, examines the AsciiDoc structure of a man page, and shows how to convert an AsciiDoc document to groff-formatted man page and other formats using Asciidoctor.
 
-This page introduces **man**ual pages, examines the AsciiDoc structure of a man page, and shows how to convert an AsciiDoc document to roff-formatted man page and other formats using Asciidoctor.
-
-== What is a manual page?
+== What's a manual page?
 
 A {url-man-page}[manual page^], abbreviated as [.term]_man page_, is a form of software documentation that typically accompanies software on Unix-like operating systems.
-Its formalized structure allows the `man` command to present the man page as a formatted document in a terminal pager.
+Its formalized structure allows the `man` command to present the man page as a formatted document in a terminal pager, such as `less`.
 
 The benefit of composing a man page in AsciiDoc is that you can convert it to multiple formats, including HTML and PDF.
 That makes the source of the man page reusable.
@@ -23,7 +22,7 @@ That makes the source of the man page reusable.
 == manpage doctype
 
 The `manpage` doctype declares that the AsciiDoc structure serves as the source of a man page and conforms to the man page structure.
-Notice the absence of the space in the doctype value.
+Note the absence of the space in the doctype value.
 
 By declaring the `manpage` doctype, the AsciiDoc processor expects the document to conform to the following structure.
 
@@ -53,7 +52,7 @@ TIP: Since the structure required by the `manpage` doctype is standard AsciiDoc,
 When the `doctype` attribute is not set, Asciidoctor will parse the document as an article and not give it any special treatment.
 
 Here's an example man page composed in AsciiDoc for the `eve` command.
-Notice that it declares the `manpage` doctype and conforms to the described structure.
+Observe that it declares the `manpage` doctype and conforms to the described structure.
 
 .progname.adoc
 [,asciidoc]
@@ -65,14 +64,19 @@ Although the source document is named [.path]_progname.adoc_, you can name the f
 The output filename is determined by the `manname` and `manvolnum` attributes implicitly defined by the doctitle.
 In this example, the output filename is [.path]_eve.1_.
 
-== manpage backend and converter
+== Backend and converter
 
-Asciidoctor provides a built-in converter to generate {url-man-7}[roff-formatted^] man pages for AsciiDoc documents that declare and conform to the `manpage` doctype.
-This converter is bound to the `manpage` backend (not to be confused with the `manpage` doctype).
-Notice the absence of the space in the backend value.
+Asciidoctor provides a built-in converter to generate {url-man-7}[groff-formatted^] man pages for AsciiDoc documents that declare the `manpage` doctype and conform to it.
+Asciidoctor's own man page (i.e., `man asciidoctor`) is generated using this converter from {url-asciidoctor-1-raw}[this AsciiDoc source].
 
-The man page converter is used to generate man pages that accompany software on Unix-like operating systems.
-In fact, Asciidoctor's own man page (i.e., `man asciidoctor`) is generated in this way from {url-asciidoctor-1-raw}[this AsciiDoc source].
+The man page converter is bound to the `manpage` backend (not to be confused with the `manpage` doctype).
+Note the absence of the space in the backend value.
+
+[horizontal]
+Backend name:: `manpage`
+Converter class:: `Asciidoctor::Converter::ManpageConverter`
+Output format:: groff
+Output file extension:: .\{manvolnum} (e.g., .1)
 
 [#generate]
 == Generate a man page

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Asciidoctor
-# A built-in {Converter} implementation that generates the man page (troff) format.
+# A built-in {Converter} implementation that generates the man page (groff) format.
 #
 # The output of this converter adheres to the man definition as defined by
 # groff and uses the manpage output of the DocBook toolchain as a foundation.
