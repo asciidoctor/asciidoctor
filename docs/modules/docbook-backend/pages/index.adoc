@@ -3,16 +3,23 @@
 :url-docbook45: https://github.com/asciidoctor/asciidoctor-docbook45
 :url-yelp: https://wiki.gnome.org/action/show/Apps/Yelp
 
-== DocBook 5.0 converter
+Asciidoctor can produce the DocBook 5 XML output format from an AsciiDoc document.
+Although DocBook XML is not a publishable format, it can be used to tie into an existing publishing toolchain that processes DocBook.
+This page explains how to use Asciidoctor to convert AsciiDoc to DocBook.
 
-Asciidoctor can produce DocBook 5.0 XML output.
-There's a corresponding DocBook element for each AsciiDoc element.
+== Backend and converter
 
-`docbook`::
-The DocBook 5.0 converter generates DocBook 5.0 XML.
-To use the DocBook converter, assign `docbook` or `docbook5` to the `backend` option.
+Asciidoctor's built-in DocBook converter is registered for the `docbook` and `docbook5` backends.
+The DocBook converter generates XML that adheres to the DocBook XML schema.
+There's a corresponding DocBook tag for each AsciiDoc element.
 
-== Generate DocBook with the docbook converter
+[horizontal]
+Backend names:: `docbook`, `docbook5`
+Converter class:: `Asciidoctor::Converter::DocBook5Converter`
+Output format:: XML
+Output file extension:: .xml
+
+== Generate DocBook
 
 . To follow along with the steps below, use your own AsciiDoc file or copy the contents of <<ex-my-doc>> into a new plain text file.
 +
