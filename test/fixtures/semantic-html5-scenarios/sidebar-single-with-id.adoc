@@ -1,0 +1,6 @@
+This is a paragraph.
+
+[sidebar#the_sidebar]
+This is a sidebar.
+
+This is a paragraph.

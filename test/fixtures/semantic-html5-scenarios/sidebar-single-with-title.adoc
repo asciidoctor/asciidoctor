@@ -1,0 +1,7 @@
+This is a paragraph.
+
+[sidebar]
+.Sidebar Title
+This is a sidebar.
+
+This is a paragraph.

@@ -1,0 +1,11 @@
+This is a paragraph.
+
+.Sidebar Title
+[.role1.role2]
+****
+This is a sidebar.
+
+This is another paragraph in the sidebar.
+****
+
+This is a paragraph.
