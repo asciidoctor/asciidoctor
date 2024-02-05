@@ -207,6 +207,18 @@ class Converter::SemanticHtml5Converter < Converter::Base
     end
   end
 
+  def convert_sidebar node
+    attributes = common_html_attributes node.id, node.role
+
+    ret = [ %(<aside#{attributes}>) ]
+    if node.title?
+      ret << %(<p role="heading"><strong class="title">#{node.title}</strong></p>)
+    end
+    ret << node.content
+    ret << %(</aside>)
+    ret.join LF
+  end
+
   def generate_section_numbering node
     level = node.level
     doc_attrs = node.document.attributes

@@ -1,0 +1,9 @@
+This is a paragraph.
+
+****
+This is a sidebar.
+
+This is another paragraph in the sidebar.
+****
+
+This is a paragraph.
