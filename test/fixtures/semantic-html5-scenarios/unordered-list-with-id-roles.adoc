@@ -1,0 +1,3 @@
+[#my_list.role1.role2]
+* alice
+* bob

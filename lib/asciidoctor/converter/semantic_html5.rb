@@ -96,6 +96,66 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_ulist node
+    attributes = common_html_attributes node.id, node.role
+    ret = [%(<ul#{attributes}>)]
+    ret << %(<header><strong class="title">#{node.title}</strong><header>) if node.title?
+    node.items.each do |item|
+      ret << %(<li><span class="principal">#{item.text}</span>#{item.blocks? ? %(
+#{item.content}
+) : ''}</li>)
+    end
+    ret << %(</ul>)
+    ret.join LF
+  end
+
+  def convert_olist node
+    attributes = common_html_attributes node.id, node.role
+    olist_attributes = []
+    if node.list_marker_keyword
+      olist_attributes << %( type="#{node.list_marker_keyword}")
+    end
+    if node.attr? 'start'
+      olist_attributes << %( start="#{node.attr 'start'}")
+    end
+    if node.option? 'reversed'
+      olist_attributes << %( reversed="true")
+    end
+    ret = [%(<ol#{attributes}#{olist_attributes.join}>)]
+    ret << %(<header><strong class="title">#{node.title}</strong></header>) if node.title?
+    node.items.each do |item|
+      ret << %(<li><span class="principal">#{item.text}</span>#{item.blocks? ? %(
+#{item.content}
+) : ''}</li>)
+    end
+    ret << %(</ol>)
+    ret.join LF
+  end
+
+  def convert_dlist node
+    roles = []
+    roles << node.style if node.style
+    roles << node.role if node.role
+    role = roles.join ' '
+    attributes = common_html_attributes node.id, role.empty? ? nil : role
+    dlist_attributes = []
+    if node.list_marker_keyword
+      dlist_attributes << %( type="#{node.list_marker_keyword}")
+    end
+    ret = [%(<dl#{attributes}#{dlist_attributes.join}>)]
+    ret << %(<header><strong class="title">#{node.title}</strong></header>) if node.title?
+    node.items.each do |terms, desc|
+      terms.each do |term|
+        ret << %(<dt>#{term.text}</dt>)
+      end
+      ret << %(<dd><span class="principal">#{desc.text}</span>#{ desc.blocks? ? %(
+#{desc.content}
+) : ''}</dd>)
+    end
+    ret << %(</dl>)
+    ret.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role
