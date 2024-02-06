@@ -99,9 +99,9 @@ class Converter::SemanticHtml5Converter < Converter::Base
   def convert_ulist node
     attributes = common_html_attributes node.id, node.role
     ret = [%(<ul#{attributes}>)]
-    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
+    ret << %(<header><strong class="title">#{node.title}</strong><header>) if node.title?
     node.items.each do |item|
-      ret << %(<li>#{item.text}#{item.blocks? ? %(
+      ret << %(<li><span class="principal">#{item.text}</span>#{item.blocks? ? %(
 #{item.content}
 ) : ''}</li>)
     end
@@ -122,9 +122,9 @@ class Converter::SemanticHtml5Converter < Converter::Base
       olist_attributes << %( reversed="true")
     end
     ret = [%(<ol#{attributes}#{olist_attributes.join}>)]
-    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
+    ret << %(<header><strong class="title">#{node.title}</strong></header>) if node.title?
     node.items.each do |item|
-      ret << %(<li>#{item.text}#{item.blocks? ? %(
+      ret << %(<li><span class="principal">#{item.text}</span>#{item.blocks? ? %(
 #{item.content}
 ) : ''}</li>)
     end
@@ -143,12 +143,12 @@ class Converter::SemanticHtml5Converter < Converter::Base
       dlist_attributes << %( type="#{node.list_marker_keyword}")
     end
     ret = [%(<dl#{attributes}#{dlist_attributes.join}>)]
-    ret << %(<strong class="title">#{node.title}</strong>) if node.title?
+    ret << %(<header><strong class="title">#{node.title}</strong></header>) if node.title?
     node.items.each do |terms, desc|
       terms.each do |term|
         ret << %(<dt>#{term.text}</dt>)
       end
-      ret << %(<dd>#{desc.text}#{ desc.blocks? ? %(
+      ret << %(<dd><span class="principal">#{desc.text}</span>#{ desc.blocks? ? %(
 #{desc.content}
 ) : ''}</dd>)
     end
