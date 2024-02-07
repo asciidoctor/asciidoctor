@@ -366,7 +366,7 @@ Otherwise, it's up to the converter to decide whether to append a trailing newli
 
 If you don't register the converter with a backend, you can pass the converter class (or instance) using the `:converter` option of the xref:api:index.adoc[Asciidoctor API], as shown in the following code snippet:
 
-[,rb]
+[,ruby]
 ----
 require 'asciidoctor'
 require_relative 'dita-converter.rb'
@@ -384,7 +384,7 @@ Since there's no single definition of what "plain text" is, this is a perfect op
 Begin by defining a `TextConverter` that is registered with the `text` backend, as follows:
 
 .text-converter.rb
-[,rb]
+[,ruby]
 ----
 class TextConverter
   include Asciidoctor::Converter
