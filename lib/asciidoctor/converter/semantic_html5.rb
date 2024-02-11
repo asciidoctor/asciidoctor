@@ -117,6 +117,31 @@ class Converter::SemanticHtml5Converter < Converter::Base
     ret.join LF
   end
 
+  def convert_verse node
+    attributes = common_html_attributes node.id, node.role
+    title = node.title ? %(<header><strong class="title">#{node.title}</strong></header>) : nil
+    attribution = (node.attr? 'attribution') ? (node.attr 'attribution') : nil
+    citation = (node.attr? 'citetitle') ? (node.attr 'citetitle') : nil
+    ret = []
+    ret << "<blockquote class=\"verse\">"
+    if title
+      ret << title
+    end
+    ret << %(<pre class="verse">#{node.content}</pre>)
+    if attribution or citation
+      ret << "<footer>"
+      if attribution
+        ret << %(<span class="verse-attribution">#{attribution}</span>)
+      end
+      if citation
+        ret << %(<cite class="verse-citation">#{citation}</cite>)
+      end
+      ret << "<footer>"
+    end
+    ret << "</blockquote>"
+    ret.join LF
+  end
+
   def convert_thematic_break node
     '<hr>'
   end

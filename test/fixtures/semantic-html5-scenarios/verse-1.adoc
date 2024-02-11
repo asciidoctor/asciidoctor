@@ -1,0 +1,5 @@
+The verse example 1 from https://docs.asciidoctor.org/asciidoc/latest/blocks/verses/[here].
+
+[verse,Carl Sandburg, two lines from the poem Fog]
+The fog comes
+on little cat feet.
