@@ -1,0 +1,5 @@
+The blockquote example 2 from https://docs.asciidoctor.org/asciidoc/latest/blocks/blockquotes/[here].
+
+.After landing the cloaked Klingon bird of prey in Golden Gate park:
+[quote,Captain James T. Kirk,Star Trek IV: The Voyage Home]
+Everybody remember where we parked.
