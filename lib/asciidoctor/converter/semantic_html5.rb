@@ -102,11 +102,7 @@ class Converter::SemanticHtml5Converter < Converter::Base
     if title
       ret << title
     end
-    if node.content.start_with? "<"
-      ret << node.content
-    else
-      ret << %(<p>#{node.content}</p>)
-    end
+    ret << (node.content_model == :simple ? %(<p>#{node.content}</p>) : node.content)
     if attribution or citation
       ret << "<footer>"
       if attribution
