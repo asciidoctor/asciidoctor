@@ -1,0 +1,14 @@
+This tests the blockquotes for occasions where a quote might begin with a leading `<`.
+
+[quote, redbow-kimee, AsciiDoctor Test Suite]
+<A single line quote may start with a `<`.
+
+[quote, redbow-kimee, AsciiDoctor Test Suite]
+<A single line quote> may start with a `<`, and have a `>` within it.
+
+[quote, redbow-kimee, AsciiDoctor Test Suite]
+____
+<A multi paragraph quote may start with `<` and contain a `>`.
+
+This is the second paragraph
+____

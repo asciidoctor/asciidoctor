@@ -1,0 +1,5 @@
+The blockquote example 6 from https://docs.asciidoctor.org/asciidoc/latest/blocks/blockquotes/[here].
+
+> I hold it that a little rebellion now and then is a good thing,
+> and as necessary in the political world as storms in the physical.
+> -- Thomas Jefferson, Papers of Thomas Jefferson: Volume 11
