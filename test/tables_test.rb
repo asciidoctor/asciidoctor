@@ -266,7 +266,7 @@ context 'Tables' do
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
-    test 'wip should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
+    test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
       input = <<~'EOS'
       [cols=2*]
       |===
