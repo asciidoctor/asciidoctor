@@ -168,7 +168,7 @@ context 'Preamble' do
     assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
   end
 
-  test 'should move abstract in preface to info tag when converting to DocBook' do
+  test 'should move abstract in implicit preface to info tag when converting to DocBook' do
     input = <<~'EOS'
     = Document Title
 
@@ -202,7 +202,7 @@ context 'Preamble' do
     assert_xpath '/article/info/abstract', output, 1
   end
 
-  test 'should move abstract in preface to info tag when converting to DocBook' do
+  test 'should move abstract in preface section to info tag when converting to DocBook' do
     input = <<~'EOS'
     = Document Title
     :doctype: book
