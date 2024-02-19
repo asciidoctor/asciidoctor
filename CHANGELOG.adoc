@@ -79,6 +79,8 @@ Bug Fixes::
   * Move abstract inside info tag in DocBook output (#3602)
   * Honor secondary and tertiary terms on `indexterm` macro when primary term is quoted and contains an equals sign (#3652)
   * Remove extra border below doctitle when sidebar toc is collapsed into main content area (#4523)
+  * Treat bare URL enclosed in angle brackets as unconstrained syntax; only match until closing angled bracket (#4468)
+  * Allow URL enclosed in angled brackets syntax to be escaped using backslash (#4468)
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 
