@@ -553,9 +553,9 @@ module Substitutors
           end
           case $6
           when ';'
-            if (prefix.start_with? '&lt;') && (target.end_with? '&gt;')
+            if prefix == '&lt;' && (target.end_with? '&gt;')
               # move surrounding <> out of URL
-              prefix = prefix.slice 4, prefix.length
+              prefix = ''
               target = target.slice 0, target.length - 4
             elsif (target = target.chop).end_with? ')'
               # move trailing ); out of URL
