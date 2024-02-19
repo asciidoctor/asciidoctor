@@ -3631,8 +3631,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
-      assert_css 'abstract > simpara', output, 2
+      assert_css 'info > abstract', output, 1
+      assert_css 'info > abstract > simpara', output, 2
     end
 
     test 'should make abstract on open block with title converted to DocBook' do
@@ -3647,9 +3647,9 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
-      assert_css 'abstract > title', output, 1
-      assert_css 'abstract > title + simpara', output, 1
+      assert_css 'info > abstract', output, 1
+      assert_css 'info > abstract > title', output, 1
+      assert_css 'info > abstract > title + simpara', output, 1
     end
 
     test 'should allow abstract in document with title if doctype is book converted to DocBook' do
@@ -3662,7 +3662,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
+      assert_css 'info > abstract', output, 1
+      assert_css 'preface', output, 0
     end
 
     test 'should not allow abstract as direct child of document if doctype is book converted to DocBook' do
