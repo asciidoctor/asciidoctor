@@ -1168,13 +1168,13 @@ context 'API' do
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     end
 
-    test 'lines in output should be separated by line feed' do
+    test 'lines in output should be separated by line feed (universal newline)' do
       sample_input_path = fixture_path('sample.adoc')
 
       output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       refute_empty output
-      lines = output.split("\n")
-      assert_equal lines.size, output.split(/\r\n|\r|\n/).size
+      refute_includes output, ?\r
+      lines = output.split ?\n
       assert_equal lines.map(&:length), lines.map(&:rstrip).map(&:length)
     end
 
@@ -1536,6 +1536,23 @@ context 'API' do
         flunk e.message
       ensure
         FileUtils.rm(sample_output_path, force: true)
+      end
+    end
+
+    test 'should write file in bin mode and thus not convert line feeds to system-dependent newline' do
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.html'
+      begin
+        Asciidoctor.convert_file sample_input_path
+        assert_path_exists sample_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        refute_empty output
+        assert_includes output, ?\n
+        refute_includes output, ?\r
+        assert_includes output, %(<\/body>\n<\/html>)
+        refute output.end_with? ?\n
+      ensure
+        FileUtils.rm sample_output_path
       end
     end
 
