@@ -70,7 +70,7 @@ jobs:
       JRUBY_OPTS: '-J-Djdk.io.File.enableADS=true'
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install prerequisites for Nokogiri (Linux)
       if: matrix.os == 'ubuntu-latest'
       run: sudo apt-get install libxslt1-dev
@@ -96,7 +96,7 @@ jobs:
         echo 'COVERAGE=true' >> $GITHUB_ENV
     - name: Upgrade Java (JRuby for Windows)
       if: matrix.os == 'windows-latest' && startsWith(matrix.ruby, 'jruby-')
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: '17'
@@ -142,7 +142,7 @@ jobs:
       BUNDLE_WITHOUT: docs:coverage
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:

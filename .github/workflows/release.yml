@@ -25,7 +25,7 @@ jobs:
       PYGMENTS_VERSION: '~> 2.3.0'
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets[format('GH_TOKEN_{0}', github.actor)] }}
     - name: Install Ruby
