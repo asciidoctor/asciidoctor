@@ -2759,9 +2759,9 @@ context 'Sections' do
       Abstract content
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook'
-      assert_xpath '/abstract[@xml:id="abstract_title"]', output, 1
-      assert_xpath '/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/article/info/abstract[@xml:id="abstract_title"]', output, 1
+      assert_xpath '/article/info/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
 
     test 'should allow a special section to be nested at arbitrary depth in DocBook output' do
@@ -3844,6 +3844,50 @@ context 'Sections' do
       assert_equal 2, partintro.blocks.size
       assert_equal :paragraph, partintro.blocks[0].context
       assert_equal :paragraph, partintro.blocks[1].context
+    end
+
+    test 'should wrap abstract in implicit part intro in info tag when converting to DocBook' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      [abstract]
+      Abstract of part.
+
+      more part intro
+
+      == Chapter 1
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '//abstract', output, 1
+      assert_xpath '//partintro/info/abstract', output, 1
+    end
+
+    test 'should wrap abstract in part intro section in info tag when converting to DocBook' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      [partintro]
+      == Part Intro
+
+      [abstract]
+      Abstract of part.
+
+      more part intro
+
+      == Chapter 1
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '//abstract', output, 1
+      assert_xpath '//partintro/info/abstract', output, 1
+      assert_xpath '//partintro/simpara', output, 1
     end
 
     test 'should warn if part has no sections' do
