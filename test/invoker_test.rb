@@ -426,6 +426,12 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       assert_path_exists asciidoctor_stylesheet
       assert_path_exists coderay_stylesheet
+      [sample_outpath, asciidoctor_stylesheet, coderay_stylesheet].each do |path|
+        contents = File.read path, mode: Asciidoctor::FILE_READ_MODE
+        assert_includes contents, ?\n
+        refute_includes contents, ?\r
+        refute contents.end_with? ?\n
+      end
     ensure
       FileUtils.rm_f sample_outpath
       FileUtils.rm_f asciidoctor_stylesheet
