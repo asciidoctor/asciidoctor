@@ -45,7 +45,8 @@ class Converter::DocBook5Converter < Converter::Base
     end
     root_tag_idx = result.size
     id = node.id
-    result << (document_info_tag node) unless node.noheader
+    abstract = find_root_abstract node
+    result << (document_info_tag node, abstract) unless node.noheader
     if manpage
       result << '<refentry>'
       result << '<refmeta>'
@@ -62,7 +63,9 @@ class Converter::DocBook5Converter < Converter::Base
     unless (docinfo_content = node.docinfo :header).empty?
       result << docinfo_content
     end
-    result << node.content if node.blocks?
+    abstract = extract_abstract node, abstract if abstract
+    result << (node.blocks.map {|block| block.convert }.compact.join LF) if node.blocks?
+    restore_abstract abstract if abstract
     unless (docinfo_content = node.docinfo :footer).empty?
       result << docinfo_content
     end
@@ -74,7 +77,15 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  alias convert_embedded content_only
+  def convert_embedded node
+    # NOTE in DocBook 5, the root abstract must be in the info tag and is thus not part of the body
+    if @backend == 'docbook5' && (abstract = find_root_abstract node)
+      abstract = extract_abstract node, abstract
+    end
+    result = node.blocks.map {|block| block.convert }.compact.join LF
+    restore_abstract abstract if abstract
+    result
+  end
 
   def convert_section node
     if node.document.doctype == 'manpage'
@@ -310,13 +321,17 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_open node
     case node.style
     when 'abstract'
-      if node.parent == node.document && node.document.doctype == 'book'
+      if (parent = node.parent) == node.document && node.document.doctype == 'book'
         logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
         ''
       else
-        %(<abstract>
+        result = %(<abstract>
 #{title_tag node}#{enclose_content node}
 </abstract>)
+        if @backend == 'docbook5' && !(node.option? 'root') && (parent.context == :open ? parent.style == 'partintro' : parent.context == :section && parent.sectname == 'partintro') && node == parent.blocks[0]
+          result = %(<info>\n#{result}\n</info>)
+        end
+        result
       end
     when 'partintro'
       if node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
@@ -663,7 +678,7 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def document_info_tag doc
+  def document_info_tag doc, abstract
     result = ['<info>']
     unless doc.notitle
       if (title = doc.doctitle partition: true, use_fallback: true).subtitle?
@@ -717,9 +732,35 @@ class Converter::DocBook5Converter < Converter::Base
         result << docinfo_content
       end
     end
+    if abstract
+      abstract.set_option 'root'
+      result << (convert abstract, abstract.node_name)
+      abstract.remove_attr 'root-option'
+    end
     result << '</info>'
 
     result.join LF
+  end
+
+  def find_root_abstract doc
+    return unless doc.blocks?
+    if (first_block = doc.blocks[0]).context == :preamble
+      return unless (first_block = first_block.blocks[0])
+    elsif first_block.context == :section
+      return first_block if first_block.sectname == 'abstract'
+      return unless first_block.sectname == 'preface' && (first_block = first_block.blocks[0])
+    end
+    return first_block if first_block.style == 'abstract' && first_block.context == :open
+  end
+
+  def extract_abstract document, abstract
+    parent = abstract.parent
+    parent = parent.parent while parent != document && parent.blocks.length == 1
+    parent.blocks.delete_at 0
+  end
+
+  def restore_abstract abstract
+    abstract.parent.blocks.insert 0, abstract
   end
 
   def get_root_document node

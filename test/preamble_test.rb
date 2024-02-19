@@ -167,4 +167,58 @@ context 'Preamble' do
     output = convert_string input
     assert_xpath '//*[@id="preamble"]/*[@id="toc"]', output, 1
   end
+
+  test 'should move abstract in preface to info tag when converting to DocBook' do
+    input = <<~'EOS'
+    = Document Title
+
+    [abstract]
+    This is the abstract.
+
+    == Fin
+    EOS
+
+    %w(article book).each do |doctype|
+      output = convert_string input, backend: 'docbook', doctype: doctype
+      assert_xpath '//abstract', output, 1
+      assert_xpath %(/#{doctype}/info/abstract), output, 1
+    end
+  end
+
+  test 'should move abstract as first section to info tag when converting to DocBook' do
+    input = <<~'EOS'
+    = Document Title
+
+    [abstract]
+    == Abstract
+
+    This is the abstract.
+
+    == Fin
+    EOS
+
+    output = convert_string input, backend: 'docbook'
+    assert_xpath '//abstract', output, 1
+    assert_xpath '/article/info/abstract', output, 1
+  end
+
+  test 'should move abstract in preface to info tag when converting to DocBook' do
+    input = <<~'EOS'
+    = Document Title
+    :doctype: book
+
+    [preface]
+    == Preface
+
+    [abstract]
+    This is the abstract.
+
+    == Fin
+    EOS
+
+    output = convert_string input, backend: 'docbook'
+    assert_xpath '//abstract', output, 1
+    assert_xpath '/book/info/abstract', output, 1
+    assert_xpath '//preface', output, 0
+  end
 end

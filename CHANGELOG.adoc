@@ -76,6 +76,7 @@ Bug Fixes::
   * Preserve paragraph breaks in normal table cell in manpage output (#4481)
   * Style cells in head row as bold in manpage output (#4490)
   * Escape spaces in include target (using inline passthrough) when generating link from include directive (#4461)
+  * Move abstract inside info tag in DocBook output (#3602)
   * Honor secondary and tertiary terms on `indexterm` macro when primary term is quoted and contains an equals sign (#3652)
   * Remove extra border below doctitle when sidebar toc is collapsed into main content area (#4523)
 
