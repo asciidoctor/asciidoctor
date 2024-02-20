@@ -23,6 +23,7 @@ Compliance::
   * Turn off system-dependent newline conversion when writing files; don't convert line feeds to system-dependent newline (#4550)
   * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
   * Add support for `scaledwidth` and `scale` attributes on inline image macro in DocBook output (#4552)
+  * Update latest Ruby to 3.3 in CI workflows
 
 Improvements::
 
