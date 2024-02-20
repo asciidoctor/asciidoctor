@@ -849,6 +849,18 @@ context 'Substitutions' do
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'a single-line image macro with scaledwidth attribute should be supported in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,scaledwidth=25%]', backend: 'docbook'
+      assert_equal '<inlinemediaobject><imageobject><imagedata fileref="tiger.png" width="25%"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'a single-line image macro with scaled attribute should be supported in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,scale=200]', backend: 'docbook'
+      assert_equal '<inlinemediaobject><imageobject><imagedata fileref="tiger.png" scale="200"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'should pass through role on image macro to DocBook output' do
       para = block_from_string 'image:tiger.png[Tiger,200,role=animal]', backend: 'docbook'
       result = para.sub_macros para.source

@@ -42,6 +42,7 @@ Compliance::
   * Turn off system-dependent newline conversion when writing files; don't convert line feeds to system-dependent newline (#4550)
   * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
   * Don't promote level-0 special section at start of document to document title (#4151)
+  * Add support for `scaledwidth` and `scale` attributes on inline image macro in DocBook output (#4552)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
