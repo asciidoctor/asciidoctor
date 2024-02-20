@@ -47,7 +47,7 @@ Compliance::
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
   * Drop support for Ruby < 2.7 and JRuby < 9.2
-  * Update latest Ruby to 3.2 in CI workflows
+  * Update latest Ruby to 3.3 in CI workflows
   * Update latest JRuby in CI workflow to 9.4.2.0
 
 Improvements::
