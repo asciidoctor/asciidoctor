@@ -16,7 +16,7 @@ For an even more detailed look at what has changed, refer to the {url-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
-== Unreleased
+== 2.0.21 (2024-02-20) - @mojavelinux
 
 Compliance::
 
@@ -43,6 +43,11 @@ Bug Fixes::
   * Treat bare URL enclosed in angle brackets as unconstrained syntax; only match until closing angled bracket (#4468)
   * Allow URL enclosed in angled brackets syntax to be escaped using backslash (#4468)
 
+=== Details
+
+{url-repo}/releases/tag/v2.0.21[git tag] | {url-repo}/compare/v2.0.20\...v2.0.21[full diff]
+// end::compact[]
+
 == 2.0.20 (2023-05-18) - @mojavelinux
 
 Bug Fixes::
@@ -53,7 +58,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.20[git tag] | {url-repo}/compare/v2.0.19\...v2.0.20[full diff]
-// end::compact[]
 
 == 2.0.19 (2023-05-17) - @mojavelinux
 
