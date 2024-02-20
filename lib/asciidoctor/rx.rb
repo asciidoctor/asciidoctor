@@ -518,7 +518,7 @@ module Asciidoctor
   #   "https://github.com[]"
   #   (https://github.com) <= parenthesis not included in autolink
   #
-  InlineLinkRx = %r((^|link:|#{CG_BLANK}|&lt;|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))m
+  InlineLinkRx = %r((^|link:|#{CG_BLANK}|\\?&lt;()|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|\2([^\s]*?)&gt;|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))m
 
   # Match a link or e-mail inline macro.
   #

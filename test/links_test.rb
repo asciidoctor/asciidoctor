@@ -78,7 +78,31 @@ context 'Links' do
   end
 
   test 'qualified url surrounded by angled brackets' do
-    assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', convert_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
+  end
+
+  test 'qualified url surrounded by double angled brackets should preserve outer angled brackets' do
+    assert_includes convert_string_to_embedded('<<https://asciidoc.org>>'), '&lt;<a href="https://asciidoc.org" class="bare">https://asciidoc.org</a>&gt;'
+  end
+
+  test 'qualified url macro inside angled brackets' do
+    assert_includes convert_string_to_embedded('<https://asciidoc.org[]>'), '&lt;<a href="https://asciidoc.org" class="bare">https://asciidoc.org</a>&gt;'
+  end
+
+  test 'qualified url surrounded by angled brackets in unconstrained context' do
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('URLは<http://asciidoc.org>。fin'), 1
+  end
+
+  test 'multiple qualified urls surrounded by angled brackets in unconstrained context' do
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('URLは<http://asciidoc.org>。URLは<http://asciidoc.org>。'), 2
+  end
+
+  test 'qualified url surrounded by escaped angled brackets should escape form' do
+    assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('\\<http://asciidoc.org>'), 1
+  end
+
+  test 'escaped qualified url surrounded by angled brackets should escape autolink' do
+    assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('<\\http://asciidoc.org>'), 1
   end
 
   test 'qualified url surrounded by round brackets' do
@@ -209,14 +233,14 @@ context 'Links' do
     assert_include '"<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>"', output
   end
 
-  test 'should convert qualified url as macro with trailing period' do
-    result = convert_string_to_embedded 'Information about the https://symbols.example.org/.[.] character.'
-    assert_xpath '//a[@href="https://symbols.example.org/."][text()="."]', result, 1
-  end
-
   test 'should convert qualified url as macro enclosed in single quotes' do
     output = convert_string_to_embedded('\'https://asciidoctor.org[]\'')
     assert_include '\'<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>\'', output
+  end
+
+  test 'should convert qualified url as macro with trailing period' do
+    result = convert_string_to_embedded 'Information about the https://symbols.example.org/.[.] character.'
+    assert_xpath '//a[@href="https://symbols.example.org/."][text()="."]', result, 1
   end
 
   test 'qualified url using invalid link macro should not create link' do
