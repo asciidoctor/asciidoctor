@@ -3685,7 +3685,7 @@ context 'Blocks' do
 
       output = convert_string input
       assert_css '.abstract', output, 0
-      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
     end
 
     test 'should make abstract on open block without title converted to DocBook' do
@@ -3746,7 +3746,7 @@ context 'Blocks' do
 
       output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 0
-      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
     end
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place

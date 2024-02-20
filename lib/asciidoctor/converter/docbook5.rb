@@ -306,7 +306,7 @@ class Converter::DocBook5Converter < Converter::Base
     case node.style
     when 'abstract'
       if (parent = node.parent) == node.document && node.document.doctype == 'book'
-        logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        logger.warn 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
         ''
       else
         result = %(<abstract>

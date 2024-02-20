@@ -751,7 +751,7 @@ Your browser does not support the audio tag.
   def convert_open node
     if (style = node.style) == 'abstract'
       if node.parent == node.document && node.document.doctype == 'book'
-        logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        logger.warn 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
         ''
       else
         id_attr = node.id ? %( id="#{node.id}") : ''
