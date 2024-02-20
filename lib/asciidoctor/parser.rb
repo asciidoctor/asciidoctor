@@ -43,6 +43,12 @@ class Parser
 
   AuthorKeys = ['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
 
+  ListContinuationMarker = ::Module.new
+
+  ListContinuationPlaceholder = ::String.new.extend ListContinuationMarker
+
+  ListContinuationString = (::String.new LIST_CONTINUATION).extend ListContinuationMarker
+
   # Internal: A Hash mapping horizontal alignment abbreviations to alignments
   # that can be applied to a table cell (or to all cells in a column)
   TableCellHorzAlignments = {
@@ -1420,17 +1426,18 @@ class Parser
       # the termination of the list
       break if is_sibling_list_item?(this_line, list_type, sibling_trait)
 
+      this_line = ListContinuationString if this_line == LIST_CONTINUATION
       prev_line = buffer.empty? ? nil : buffer[-1]
 
-      if prev_line == LIST_CONTINUATION
+      if ListContinuationMarker === prev_line
         if continuation == :inactive
           continuation = :active
           has_text = true
-          buffer[-1] = '' unless within_nested_list
+          buffer[-1] = ListContinuationPlaceholder unless within_nested_list
         end
 
         # dealing with adjacent list continuations (which is really a syntax error)
-        if this_line == LIST_CONTINUATION
+        if ListContinuationMarker === this_line
           if continuation != :frozen
             continuation = :frozen
             buffer << this_line
@@ -1510,7 +1517,7 @@ class Parser
 
         if this_line == LIST_CONTINUATION
           detached_continuation = buffer.size
-          buffer << this_line
+          buffer << ListContinuationString
         elsif has_text # has_text only relevant for dlist, which is more greedy until it has text for an item; has_text is always true for all other lists
           # in this block, we have to see whether we stay in the list
           # TODO any way to combine this with the check after skipping blank lines?
@@ -1543,6 +1550,9 @@ class Parser
           buffer << this_line
           has_text = true
         end
+      elsif ListContinuationMarker === this_line
+        has_text = true
+        buffer << this_line
       else
         has_text = true unless this_line.empty?
         if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
@@ -1559,16 +1569,17 @@ class Parser
 
     reader.unshift_line this_line if this_line
 
-    buffer[detached_continuation] = '' if detached_continuation
+    buffer[detached_continuation] = ListContinuationPlaceholder if detached_continuation
 
     until buffer.empty?
+      # drop optional trailing continuation
+      if ListContinuationMarker === (last_line = buffer[-1])
+        buffer.pop
+        break
       # strip trailing blank lines to prevent empty blocks
-      if (last_line = buffer[-1]).empty?
+      elsif last_line.empty?
         buffer.pop
       else
-        # drop optional trailing continuation
-        # (a blank line would have served the same purpose in the document)
-        buffer.pop if last_line == LIST_CONTINUATION
         break
       end
     end

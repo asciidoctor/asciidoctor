@@ -3123,6 +3123,24 @@ context "Description lists (:dlist)" do
       assert_css '.dlist .paragraph', output, 0
       assert_css '.dlist + .paragraph', output, 1
     end
+
+    test 'nested dlist with attached block offset by empty line' do
+      input = <<~'EOS'
+      category::
+
+      term 1:::
+      +
+      --
+      def 1
+      --
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_xpath '(//dl)[1]/dt[1][normalize-space(text()) = "category"]', output, 1
+      assert_xpath '(//dl)[1]//dl/dt[1][normalize-space(text()) = "term 1"]', output, 1
+      assert_xpath '(//dl)[1]//dl/dt[1]/following-sibling::dd//p[starts-with(text(), "def 1")]', output, 1
+    end
   end
 
   context 'Special lists' do
