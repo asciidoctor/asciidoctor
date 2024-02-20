@@ -195,27 +195,11 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_image node
-    # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
-    # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
-    if node.attr? 'scaledwidth'
-      width_attribute = %( width="#{node.attr 'scaledwidth'}")
-      depth_attribute = ''
-      scale_attribute = ''
-    elsif node.attr? 'scale'
-      # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
-      #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
-      #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : ''
-      scale_attribute = %( scale="#{node.attr 'scale'}")
-    else
-      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
-      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
-      scale_attribute = ''
-    end
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
 
     mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri node.attr 'target'}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
+<imagedata fileref="#{node.image_uri node.attr 'target'}"#{image_size_attributes node.attributes}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
@@ -553,11 +537,9 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_inline_image node
-    width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
-    depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
     %(<inlinemediaobject#{common_attributes nil, node.role}>
 <imageobject>
-<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
+<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </inlinemediaobject>)
@@ -662,6 +644,23 @@ class Converter::DocBook5Converter < Converter::Base
       %(#{attrs} xreflabel="#{reftext}")
     else
       attrs
+    end
+  end
+
+  def image_size_attributes attributes
+    # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
+    # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
+    if attributes.key? 'scaledwidth'
+      %( width="#{attributes['scaledwidth']}")
+    elsif attributes.key? 'scale'
+      # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
+      #width_attribute = (attributes.key? 'width') ? %( width="#{attributes['width']}") : ''
+      #depth_attribute = (attributes.key? 'height') ? %( depth="#{attributes['height']}") : ''
+      %( scale="#{attributes['scale']}")
+    else
+      width_attribute = (attributes.key? 'width') ? %( contentwidth="#{attributes['width']}") : ''
+      depth_attribute = (attributes.key? 'height') ? %( contentdepth="#{attributes['height']}") : ''
+      %(#{width_attribute}#{depth_attribute})
     end
   end
 
@@ -785,26 +784,18 @@ class Converter::DocBook5Converter < Converter::Base
 
   def cover_tag doc, face, use_placeholder = false
     if (cover_image = doc.attr %(#{face}-cover-image))
-      width_attr = ''
-      depth_attr = ''
       if (cover_image.include? ':') && ImageMacroRx =~ cover_image
-        attrlist = $2
-        cover_image = doc.image_uri $1
-        if attrlist
-          attrs = (AttributeList.new attrlist).parse %w(alt width height)
-          if attrs.key? 'scaledwidth'
-            # NOTE scalefit="1" is the default in this case
-            width_attr = %( width="#{attrs['scaledwidth']}")
-          else
-            width_attr = %( contentwidth="#{attrs['width']}") if attrs.key? 'width'
-            depth_attr = %( contentdepth="#{attrs['height']}") if attrs.key? 'height'
-          end
-        end
+        target, attrlist = $1, $2
+        cover_image = doc.image_uri target
+        # NOTE scalefit="1" is the default for a cover image
+        size_attrs = image_size_attributes (AttributeList.new attrlist).parse %w(alt width height) if attrlist
+      else
+        size_attrs = ''
       end
       %(<cover role="#{face}">
 <mediaobject>
 <imageobject>
-<imagedata fileref="#{cover_image}"#{width_attr}#{depth_attr}/>
+<imagedata fileref="#{cover_image}"#{size_attrs}/>
 </imageobject>
 </mediaobject>
 </cover>)
