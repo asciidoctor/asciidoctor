@@ -27,6 +27,7 @@ Compliance::
 
 Improvements::
 
+  * Change title to doctitle in warning message about use of abstract to make subject more clear
   * Modify default stylesheet to add text decoration to active footnote number link in footnotes list (#4530) (@Larhzu)
 
 Bug Fixes::
