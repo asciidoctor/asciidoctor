@@ -568,7 +568,7 @@ module Substitutors
                 # move trailing ; out of URL
                 suffix = ';'
               end
-              # NOTE handle case when modified target is a URI scheme (e.g., http://)
+              # NOTE handle case when modified target is a bare URI scheme (e.g., http://)
               next $& if target == $3
             when ':'
               if (target = target.chop).end_with? ')'
@@ -579,7 +579,7 @@ module Substitutors
                 # move trailing : out of URL
                 suffix = ':'
               end
-              # NOTE handle case when modified target is a URI scheme (e.g., http://)
+              # NOTE handle case when modified target is a bare URI scheme (e.g., http://)
               next $& if target == $3
             end
           end
@@ -605,12 +605,12 @@ module Substitutors
             end
 
             if new_link_text && new_link_text.empty?
-              # NOTE it's not possible for the URI scheme to be bare in this case
+              # NOTE the modified target will not be a bare URI scheme (e.g., http://) in this case
               link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
               bare = true
             end
           else
-            # NOTE it's not possible for the URI scheme to be bare in this case
+            # NOTE the modified target will not be a bare URI scheme (e.g., http://) in this case
             link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
             bare = true
           end
