@@ -532,97 +532,101 @@ module Substitutors
     end
 
     if found_colon && (text.include? '://')
-      # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
+      # inline urls, target[text] (optionally prefixed with link: or enclosed in <>)
       text = text.gsub InlineLinkRx do
-        if (target = $2 + ($3 || $5)).start_with? RS
-          # honor the escape
-          next ($&.slice 0, (rs_idx = $1.length)) + ($&.slice rs_idx + 1, $&.length)
-        end
-
-        prefix, suffix = $1, ''
-        # NOTE if $4 is set, we're looking at a formal macro (e.g., https://example.org[])
-        if $4
-          prefix = '' if prefix == 'link:'
-          link_text = nil if (link_text = $4).empty?
+        if $2 && !$5
+          # honor the escapes
+          next $&.slice 1, $&.length if $1.start_with? RS
+          next %(#{$1}#{$&.slice $1.length + 1, $&.length}) if $3.start_with? RS
+          target = $3 + $6
+          next $& if target == $3
+          doc.register :links, target
+          link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+          (Inline.new self, :anchor, link_text, type: :link, target: target, attributes: { 'role' => 'bare' }).convert
         else
-          # invalid macro syntax (link: prefix w/o trailing square brackets or enclosed in double quotes)
-          # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
-          case prefix
-          when 'link:', ?", ?'
-            next $&
-          end
-          case $6
-          when ';'
-            if prefix == '&lt;' && (target.end_with? '&gt;')
-              # move surrounding <> out of URL
-              prefix = ''
-              target = target.slice 0, target.length - 4
-            elsif (target = target.chop).end_with? ')'
-              # move trailing ); out of URL
-              target = target.chop
-              suffix = ');'
-            else
-              # move trailing ; out of URL
-              suffix = ';'
+          # honor the escape
+          next %(#{$1}#{$&.slice $1.length + 1, $&.length}) if $3.start_with? RS
+          prefix, target, suffix = $1, $3 + ($4 || $7), ''
+          # NOTE if $5 is set (the attrlist), we're looking at a formal macro (e.g., https://example.org[])
+          if $5
+            prefix = '' if prefix == 'link:'
+            link_text = nil if (link_text = $5).empty?
+          else
+            case prefix
+            # invalid macro syntax (link: prefix w/o trailing square brackets or URL enclosed in quotes)
+            # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
+            when 'link:', ?", ?'
+              next $&
             end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
-          when ':'
-            if (target = target.chop).end_with? ')'
-              # move trailing ): out of URL
-              target = target.chop
-              suffix = '):'
-            else
-              # move trailing : out of URL
-              suffix = ':'
-            end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
-          end
-        end
-
-        attrs, link_opts = nil, { type: :link }
-
-        if link_text
-          new_link_text = link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
-          if !doc.compat_mode && (link_text.include? '=')
-            # NOTE if an equals sign (=) is present, extract attributes from link text
-            link_text, attrs = extract_attributes_from_text link_text, ''
-            new_link_text = link_text
-            link_opts[:id] = attrs['id']
-          end
-
-          if link_text.end_with? '^'
-            new_link_text = link_text = link_text.chop
-            if attrs
-              attrs['window'] ||= '_blank'
-            else
-              attrs = { 'window' => '_blank' }
+            case $8
+            when ';'
+              if (target = target.chop).end_with? ')'
+                # move trailing ); out of URL
+                target = target.chop
+                suffix = ');'
+              else
+                # move trailing ; out of URL
+                suffix = ';'
+              end
+              # NOTE handle case when modified target is a URI scheme (e.g., http://)
+              next $& if target == $3
+            when ':'
+              if (target = target.chop).end_with? ')'
+                # move trailing ): out of URL
+                target = target.chop
+                suffix = '):'
+              else
+                # move trailing : out of URL
+                suffix = ':'
+              end
+              # NOTE handle case when modified target is a URI scheme (e.g., http://)
+              next $& if target == $3
             end
           end
 
-          if new_link_text && new_link_text.empty?
+          link_opts = { type: :link }
+
+          if link_text
+            new_link_text = link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
+            if !doc.compat_mode && (link_text.include? '=')
+              # NOTE if an equals sign (=) is present, extract attributes from link text
+              link_text, attrs = extract_attributes_from_text link_text, ''
+              new_link_text = link_text
+              link_opts[:id] = attrs['id']
+            end
+
+            if link_text.end_with? '^'
+              new_link_text = link_text = link_text.chop
+              if attrs
+                attrs['window'] ||= '_blank'
+              else
+                attrs = { 'window' => '_blank' }
+              end
+            end
+
+            if new_link_text && new_link_text.empty?
+              # NOTE it's not possible for the URI scheme to be bare in this case
+              link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+              bare = true
+            end
+          else
             # NOTE it's not possible for the URI scheme to be bare in this case
             link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
             bare = true
           end
-        else
-          # NOTE it's not possible for the URI scheme to be bare in this case
-          link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
-          bare = true
-        end
 
-        if bare
-          if attrs
-            attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
-          else
-            attrs = { 'role' => 'bare' }
+          if bare
+            if attrs
+              attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
+            else
+              attrs = { 'role' => 'bare' }
+            end
           end
-        end
 
-        doc.register :links, (link_opts[:target] = target)
-        link_opts[:attributes] = attrs if attrs
-        %(#{prefix}#{(Inline.new self, :anchor, link_text, link_opts).convert}#{suffix})
+          doc.register :links, (link_opts[:target] = target)
+          link_opts[:attributes] = attrs if attrs
+          %(#{prefix}#{(Inline.new self, :anchor, link_text, link_opts).convert}#{suffix})
+        end
       end
     end
 
