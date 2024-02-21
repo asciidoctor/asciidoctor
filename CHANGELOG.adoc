@@ -39,15 +39,11 @@ Enhancements::
 
 Compliance::
 
-  * Turn off system-dependent newline conversion when writing files; don't convert line feeds to system-dependent newline (#4550)
-  * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
   * Don't promote level-0 special section at start of document to document title (#4151)
-  * Add support for `scaledwidth` and `scale` attributes on inline image macro in DocBook output (#4552)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
   * Drop support for Ruby < 2.7 and JRuby < 9.2
-  * Update latest Ruby to 3.3 in CI workflows
   * Update latest JRuby in CI workflow to 9.4.2.0
 
 Improvements::
@@ -68,8 +64,20 @@ Improvements::
   * Use safe navigation to avoid crashing when querying for extensions
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
-  * Change title to doctitle in warning message about use of abstract to make subject more clear
   * Modify default stylesheet to honor text-* roles on quote blocks
+
+== 2.0.21 (2024-02-20) - @mojavelinux
+
+Compliance::
+
+  * Turn off system-dependent newline conversion when writing files; don't convert line feeds to system-dependent newline (#4550)
+  * Support logger in Ruby 3.3 by instantiating super class (#4493) (*@mtasaka*)
+  * Add support for `scaledwidth` and `scale` attributes on inline image macro in DocBook output (#4552)
+  * Update latest Ruby to 3.3 in CI workflows
+
+Improvements::
+
+  * Change title to doctitle in warning message about use of abstract to make subject more clear
   * Modify default stylesheet to add text decoration to active footnote number link in footnotes list (#4530) (@Larhzu)
 
 Bug Fixes::
@@ -84,6 +92,11 @@ Bug Fixes::
   * Remove extra border below doctitle when sidebar toc is collapsed into main content area (#4523)
   * Treat bare URL enclosed in angle brackets as unconstrained syntax; only match until closing angled bracket (#4468)
   * Allow URL enclosed in angled brackets syntax to be escaped using backslash (#4468)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.21[git tag] | {url-repo}/compare/v2.0.20\...v2.0.21[full diff]
+// end::compact[]
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 
@@ -138,7 +151,6 @@ Build / Infrastructure::
 === Details
 
 {url-repo}/releases/tag/v2.0.19[git tag] | {url-repo}/compare/v2.0.18\...v2.0.19[full diff]
-// end::compact[]
 
 == 2.0.18 (2022-10-15) - @mojavelinux
 
