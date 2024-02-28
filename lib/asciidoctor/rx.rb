@@ -104,6 +104,7 @@ module Asciidoctor
   #   }
   #   // end::try-catch[]
   # NOTE m flag is required for Asciidoctor.js
+  # NOTE the regex checks for \r to account of include files that use Windows newlines
   TagDirectiveRx = /\b(?:tag|(e)nd)::(\S+?)\[\](?=$|[ \r])/m
 
   ## Attribute entries and references
