@@ -23,6 +23,7 @@ group :development do
   elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.7.0')
     gem 'nokogiri', '~> 1.13.0'
   end
+  gem 'minitest', '~> 5.14.0' if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.6.0')
 end
 
 group :docs do
