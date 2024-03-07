@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Compliance::
+
+  * Remove use of base64 library to prevent warning in Ruby >= 3.3 (#4561)
 
 == 2.0.21 (2024-02-20) - @mojavelinux
 

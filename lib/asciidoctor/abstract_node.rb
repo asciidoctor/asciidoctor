@@ -354,8 +354,8 @@ class AbstractNode
   #
   # First, and foremost, the target image path is cleaned if the document safe mode level
   # is set to at least SafeMode::SAFE (a condition which is true by default) to prevent access
-  # to ancestor paths in the filesystem. The image data is then read and converted to
-  # Base64. Finally, a data URI is built which can be used in an image tag.
+  # to ancestor paths in the filesystem. The image data is then read and converted to base64.
+  # Finally, a data URI is built which can be used in an image tag.
   #
   # target_image - A String path to the target image
   # asset_dir_key - The String attribute key used to lookup the directory where
@@ -376,8 +376,8 @@ class AbstractNode
     end
 
     if ::File.readable? image_path
-      # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.strict_encode64 ::File.binread image_path})
+      # NOTE pack 'm0' is equivalent to Base64.strict_encode64
+      %(data:#{mimetype};base64,#{[(::File.binread image_path)].pack 'm0'})
     else
       logger.warn %(image to embed not found or not readable: #{image_path})
       %(data:#{mimetype};base64,)
@@ -410,8 +410,8 @@ class AbstractNode
 
     begin
       mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
-      # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.strict_encode64 bindata})
+      # NOTE pack 'm0' is equivalent to Base64.strict_encode64
+      %(data:#{mimetype};base64,#{[bindata].pack 'm0'})
     rescue
       logger.warn %(could not retrieve image data from URI: #{image_uri})
       image_uri
