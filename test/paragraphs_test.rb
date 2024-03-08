@@ -326,6 +326,11 @@ context 'Paragraphs' do
       [source]
       use the source, luke!
       EOS
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :paragraph, (block.attr 'cloaked-context')
+      assert_nil (block.attr 'language')
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[text()="use the source, luke!"]), output, 1
     end
@@ -335,6 +340,11 @@ context 'Paragraphs' do
       [source, perl]
       die 'zomg perl is tough';
       EOS
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :paragraph, (block.attr 'cloaked-context')
+      assert_equal 'perl', (block.attr 'language')
       output = convert_string_to_embedded input
       assert_xpath %(/*[@class="listingblock"]//pre[@class="highlight"]/code[@class="language-perl"][@data-lang="perl"][text()="die 'zomg perl is tough';"]), output, 1
     end

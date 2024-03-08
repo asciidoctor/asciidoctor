@@ -3557,6 +3557,11 @@ context 'Blocks' do
       ```
       EOS
 
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :fenced_code, (block.attr 'cloaked-context')
+      assert_nil (block.attr 'language')
       output = convert_string_to_embedded input
       assert_css '.listingblock', output, 1
       assert_css '.listingblock pre code', output, 1
@@ -3589,6 +3594,11 @@ context 'Blocks' do
       ```
       EOS
 
+      block = (document_from_string input).blocks[0]
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :fenced_code, (block.attr 'cloaked-context')
+      assert_equal 'ruby', (block.attr 'language')
       output = convert_string_to_embedded input
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
@@ -3610,6 +3620,46 @@ context 'Blocks' do
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
       assert_css '.listingblock pre code.language-javascript[data-lang=javascript]', output, 1
+    end
+
+    test 'should allow source style to be specified on literal block' do
+      input = <<~'EOS'
+      [source]
+      ....
+      console.log('Hello, World!')
+      ....
+      EOS
+
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :literal, (block.attr 'cloaked-context')
+      assert_nil (block.attr 'language')
+      output = convert_string_to_embedded input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code[data-lang]', output, 0
+    end
+
+    test 'should allow source style and language to be specified on literal block' do
+      input = <<~'EOS'
+      [source,js]
+      ....
+      console.log('Hello, World!')
+      ....
+      EOS
+
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :literal, (block.attr 'cloaked-context')
+      assert_equal 'js', (block.attr 'language')
+      output = convert_string_to_embedded input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code[data-lang]', output, 1
     end
   end
 
