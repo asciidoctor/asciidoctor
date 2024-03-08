@@ -561,6 +561,7 @@ class Parser
       # process lines verbatim
       if style && Compliance.strict_verbatim_paragraphs && (VERBATIM_STYLES.include? style)
         block_context = style.to_sym
+        cloaked_context = :paragraph
         reader.unshift_line this_line
         # advance to block parsing =>
         break
@@ -819,15 +820,16 @@ class Parser
       case block_context
       when :listing, :source
         if block_context == :source || (language = attributes[1] ? nil : attributes[2] || doc_attrs['source-language'])
-          if language
+          if language # :listing
             attributes['style'] = 'source'
             attributes['language'] = language
             AttributeList.rekey attributes, [nil, nil, 'linenums']
-          else
+          else # :source
             AttributeList.rekey attributes, [nil, 'language', 'linenums']
             if doc_attrs.key? 'source-language'
               attributes['language'] = doc_attrs['source-language']
             end unless attributes.key? 'language'
+            attributes['cloaked-context'] = cloaked_context unless cloaked_context == :listing
           end
           if attributes['linenums-option'] || doc_attrs['source-linenums-option']
             attributes['linenums'] = ''
@@ -856,6 +858,7 @@ class Parser
         else
           attributes['language'] = language
         end
+        attributes['cloaked-context'] = cloaked_context
         if attributes['linenums-option'] || doc_attrs['source-linenums-option']
           attributes['linenums'] = ''
         end unless attributes.key? 'linenums'
