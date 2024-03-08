@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 module Asciidoctor
-  VERSION = '2.0.21'
+  VERSION = '2.0.22'
 end

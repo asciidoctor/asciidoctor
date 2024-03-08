@@ -16,7 +16,7 @@ For an even more detailed look at what has changed, refer to the {url-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
-== Unreleased
+== 2.0.22 (2024-03-08) - @mojavelinux
 
 Improvements::
 
@@ -25,6 +25,11 @@ Improvements::
 Compliance::
 
   * Remove use of base64 library to prevent warning in Ruby >= 3.3 (#4561)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.22[git tag] | {url-repo}/compare/v2.0.21\...v2.0.22[full diff]
+// end::compact[]
 
 == 2.0.21 (2024-02-20) - @mojavelinux
 
@@ -56,7 +61,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.21[git tag] | {url-repo}/compare/v2.0.20\...v2.0.21[full diff]
-// end::compact[]
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 
