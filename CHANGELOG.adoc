@@ -45,7 +45,6 @@ Compliance::
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
   * Drop support for Ruby < 2.7 and JRuby < 9.2
   * Update latest JRuby in CI workflow to 9.4.2.0
-  * Remove use of base64 library to prevent warning in Ruby >= 3.3 (#4561)
 
 Improvements::
 
@@ -66,7 +65,21 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+
+== 2.0.22 (2024-03-08) - @mojavelinux
+
+Improvements::
+
   * Set `cloaked-context` attribute on source block when context is not `:listing` (#4556)
+
+Compliance::
+
+  * Remove use of base64 library to prevent warning in Ruby >= 3.3 (#4561)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.22[git tag] | {url-repo}/compare/v2.0.21\...v2.0.22[full diff]
+// end::compact[]
 
 == 2.0.21 (2024-02-20) - @mojavelinux
 
@@ -98,7 +111,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.21[git tag] | {url-repo}/compare/v2.0.20\...v2.0.21[full diff]
-// end::compact[]
 
 == 2.0.20 (2023-05-18) - @mojavelinux
 
