@@ -818,7 +818,7 @@ class Parser
     unless block
       case block_context
       when :listing, :source
-        if block_context == :source || (!attributes[1] && (language = attributes[2] || doc_attrs['source-language']))
+        if block_context == :source || (language = attributes[1] ? nil : language = attributes[2] || doc_attrs['source-language'])
           if language
             attributes['style'] = 'source'
             attributes['language'] = language
