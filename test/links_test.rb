@@ -105,6 +105,11 @@ context 'Links' do
     assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('<\\http://asciidoc.org>'), 1
   end
 
+  test 'autolink containing text enclosed in angle brackets' do
+    output = convert_string_to_embedded 'https://github.com/<org>/'
+    assert_include '<a href="https://github.com/&lt;org&gt;/" class="bare">https://github.com/&lt;org&gt;/</a>', output
+  end
+
   test 'qualified url surrounded by round brackets' do
     assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', convert_string('(http://asciidoc.org) is the project page for AsciiDoc.'), 1
   end
