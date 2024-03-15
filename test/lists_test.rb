@@ -1346,14 +1346,14 @@ context 'Bulleted lists (:ulist)' do
 
     test 'trailing block title line attached by continuation should not create block' do
       input = <<~'EOS'
-    Lists
-    =====
+      Lists
+      =====
 
-    * Item one, paragraph one
-    +
-    .Disappears into the ether
+      * Item one, paragraph one
+      +
+      .Disappears into the ether
 
-    * Item two
+      * Item two
       EOS
       output = convert_string input
       assert_xpath '//ul', output, 1
