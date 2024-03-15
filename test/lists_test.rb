@@ -373,7 +373,7 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
     end
 
-    test 'paragraph-like blocks attached to an ancestry list item by a list continuation should produce blocks' do
+    test 'paragraph-like blocks attached to an ancestor list item by a list continuation should produce blocks' do
       input = <<~'EOS'
       * parent
        ** child
