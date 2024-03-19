@@ -4157,7 +4157,23 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]//p[text()="detached"]', output, 1
     end
 
-    test 'attribute line breaks list even when term has no inline description' do
+    test 'block attribute line above delimited block that breaks a dlist is not duplicated' do
+      input = <<~'EOS'
+      == Lists
+
+      term:: desc
+      [.rolename]
+      ----
+      detached
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//*[@class="dlist"]/dl', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="listingblock rolename"]', output, 1
+    end
+
+    test 'block attribute line above paragraph breaks list even when term has no inline description' do
       input = <<~'EOS'
       == Lists
 
@@ -4173,7 +4189,21 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]/pre[text()="detached"]', output, 1
     end
 
-    test 'id line breaks list even when term has no inline description' do
+    test 'block attribute line above paragraph that breaks a dlist is not duplicated' do
+      input = <<~'EOS'
+      == Lists
+
+      term:: desc
+      [.rolename]
+      detached
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//*[@class="dlist"]/dl', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph rolename"]', output, 1
+    end
+
+    test 'block anchor line breaks list even when term has no inline description' do
       input = <<~'EOS'
       == Lists
 
