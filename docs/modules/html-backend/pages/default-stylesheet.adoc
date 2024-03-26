@@ -219,16 +219,3 @@ Asciidoctor::Stylesheets.instance.write_primary_stylesheet '.'
 You can also download the {url-default-stylesheet-source}[source of the default stylesheet^] if you want to use it as a starting point for developing a custom stylesheet.
 
 To learn more about how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
-
-== Are there different themes?
-
-The default stylesheet does not provide different themes.
-You may be interested in trying the themes provided by the https://github.com/darshandsoni/asciidoctor-skins[Asciidoctor Skins^] project.
-These stylesheets take the approach of loading the default stylesheet (from a CDN), then overlaying additional styles to produce a variety of themes.
-You also have the option of downloading the {url-default-stylesheet-source}[source of the default stylesheet^] and customizing it to suit your needs.
-
-CAUTION: The Asciidoctor Skins project is hosted outside of the Asciidoctor organization.
-As such, it's not guaranteed to be compatible with the latest Asciidoctor release.
-If there are problems with the stylesheets it provides, please report it to that project.
-
-To learn how to apply a custom stylesheet, see xref:custom-stylesheet.adoc[].
