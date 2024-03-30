@@ -628,14 +628,20 @@ You'll then observe the result of this customization by using the template when 
 You first need to install the required libraries (i.e., gems) for the template engine.
 Since you'll be using Slim, you need to install the *slim* gem.
 You also need to install the *tilt* gem, which provides Tilt, the generic interface for Ruby template engines that Asciidoctor uses to load and invoke templates.
+Although not required, Asciidoctor will prompt you to also install the *concurrent-ruby* gem to properly implement the template cache.
 
 The preferred way of installing a gem is to add it to the [.path]_Gemfile_ in your project.
 
 .Gemfile
 [,ruby]
 ----
+source 'https://rubygems.org'
+
+gem 'asciidoctor'
+# ...any other gems you are using
 gem 'tilt'
 gem 'slim'
+gem 'concurrent-ruby'
 ----
 
 Run Bundler to install the gems into your project.
@@ -644,7 +650,7 @@ Run Bundler to install the gems into your project.
 
 If you're not using Bundler, and you have configured Ruby to install gems in your user/home directory, then you can use the `gem` command instead:
 
- $ gem install tilt slim
+ $ gem install tilt slim concurrent-ruby
 
 Now that you've installed Tilt and the Slim template engine, you can get started writing templates.
 
@@ -654,6 +660,8 @@ Next, create a new folder named [.path]_templates_ to store your templates.
 We also recommend creating a nested folder named [.path]_html5_ to organize the templates by backend.
 
  $ mkdir -p templates/html5
+
+You can further organize templates into folders by engine, though that's not required.
 
 === Compose a template
 
@@ -684,7 +692,22 @@ Since the context for unordered lists is `:ulist` (see xref:contexts-ref.adoc[])
 === Apply the templates
 
 The final step is to use the templates when you invoke Asciidoctor.
-You can do so by passing the directory containing the templates using the `-T` option and the name of the template engine using the `-E` option.
+Create an AsciiDoc file named [.path]_doc.adoc_ that contains an unordered list.
+
+.doc.adoc
+[,asciidoc]
+----
+* cats
+* dogs
+* birds
+----
+
+You can now instruct Asciidoctor to convert this list using your template by passing the directory containing the templates using the `-T` option and the name of the template engine using the `-E` option.
+If you used Bundler to install gems, run Asciidoctor as follows:
+
+ $ bundle exec asciidoctor -T templates -E slim doc.adoc
+
+Otherwise, you can drop the `bundle exec` prefix:
 
  $ asciidoctor -T templates -E slim doc.adoc
 
@@ -694,7 +717,7 @@ Now that you've created your first converter template, you're well on your way t
 
 Here's a quick review for how to start using templates written in Slim to customize the output of the built-in HTML 5 converter.
 
-. Install the `tilt` and `slim` gems using `bundle` or `gem install`.
+. Install the `tilt`, `slim`, and `concurrent-ruby` gems using `bundle` or `gem install`.
 . Create a folder named [.path]_templates/html5_ to store the templates.
 . Create a template named [.path]_paragraph.html.slim_ in that folder.
 . Populate the template with your own template logic.
@@ -708,8 +731,12 @@ p id=id role=role =content
 
 . Load the templates using the -T flag from the CLI:
 
- $ asciidoctor -T path/to/templates -E slim doc.adoc
+ $ bundle exec asciidoctor -T path/to/templates -E slim doc.adoc
 +
-When invoking Asciidoctor via the API, you load the templates by passing the path to the `:templates` option.
+or
+
+ $ asciidoctor -T path/to/templates -E slim doc.adoc
+
+TIP: When invoking Asciidoctor via the API, you load the templates by passing the path to the `:templates` option.
 
 We hope you'll agree that using templates makes it easy to customize the output that Asciidoctor produces.
