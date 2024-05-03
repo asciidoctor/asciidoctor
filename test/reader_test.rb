@@ -2232,6 +2232,19 @@ class ReaderTest < Minitest::Test
         assert_equal 4, reader.lineno
       end
 
+      test 'peek_line returns nil if contents of skipped conditional is empty line' do
+        input = <<~'EOS'
+        ifdef::foobar[]
+
+        endif::foobar[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 1, reader.lineno
+        assert_nil reader.peek_line
+      end
+
       test 'ifdef with defined attribute includes content' do
         input = <<~'EOS'
         ifdef::holygrail[]
@@ -2539,6 +2552,19 @@ class ReaderTest < Minitest::Test
 
         result = (Asciidoctor::Document.new input, attributes: { 'swallow' => '' }).reader.read
         assert_equal 'Our quest is complete!', result
+      end
+
+      test 'ifdef around empty line does not introduce extra line' do
+        input = <<~'EOS'
+        before
+        ifdef::no-such-attribute[]
+
+        endif::[]
+        after
+        EOS
+
+        result = (Asciidoctor::Document.new input).reader.read
+        assert_equal %(before\nafter), result
       end
 
       test 'should log warning if endif is unmatched' do

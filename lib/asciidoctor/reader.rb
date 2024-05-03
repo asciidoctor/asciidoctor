@@ -807,6 +807,10 @@ class PreprocessorReader < Reader
     return line unless @process_lines
 
     if line.empty?
+      if @skipping
+        shift
+        return nil
+      end
       @look_ahead += 1
       return line
     end
