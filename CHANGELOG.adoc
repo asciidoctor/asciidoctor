@@ -66,6 +66,10 @@ Improvements::
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
 
+Bug Fixes::
+
+  * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
+
 == 2.0.22 (2024-03-08) - @mojavelinux
 
 Improvements::
