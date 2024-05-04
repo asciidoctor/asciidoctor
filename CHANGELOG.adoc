@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 
