@@ -69,6 +69,7 @@ Improvements::
 Bug Fixes::
 
   * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
+  * Don't duplicate block attribute line above detached block that breaks a dlist; fixes duplicate role on detached block (#4565)
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 

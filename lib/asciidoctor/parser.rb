@@ -1473,6 +1473,7 @@ class Parser
           break
         end
         if interrupt
+          this_line = nil
           reader.unshift_lines block_attribute_lines
           break
         end
