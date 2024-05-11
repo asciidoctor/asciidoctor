@@ -18,9 +18,9 @@ In fact, you shouldn't use these programs because they add cruft to your documen
 
 Here's an overview of the different ways to preview and edit your AsciiDoc documents.
 
-== Hosted Git repositories
+== Hosted git repositories
 
-Many popular Git repository hosts, including https://github.com/[GitHub], https://about.gitlab.com/[GitLab], and https://codeberg.org/[Codeberg], support editing and previewing AsciiDoc files.
+Many popular git repository hosts, including https://github.com/[GitHub], https://about.gitlab.com/[GitLab], and https://codeberg.org/[Codeberg], support editing and previewing AsciiDoc files.
 In order to activate this support, the file must have a supported AsciiDoc extension, such as `.adoc`.
 
 When you view an AsciiDoc file on these sites, you will see an HTML preview of the AsciiDoc content.
