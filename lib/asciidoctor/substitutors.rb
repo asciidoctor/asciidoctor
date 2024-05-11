@@ -538,9 +538,8 @@ module Substitutors
           # honor the escapes
           next $&.slice 1, $&.length if $1.start_with? RS
           next %(#{$1}#{$&.slice $1.length + 1, $&.length}) if $3.start_with? RS
-          target = $3 + $6
-          next $& if target == $3
-          doc.register :links, target
+          next $& unless $6
+          doc.register :links, (target = $3 + $6)
           link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
           (Inline.new self, :anchor, link_text, type: :link, target: target, attributes: { 'role' => 'bare' }).convert
         else
