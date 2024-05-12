@@ -522,9 +522,9 @@ module Asciidoctor
   #
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, a back reference succeeds if not set; invert the logic to give it a match to refute
-    InlineLinkRx = %r((^|link:|#{CG_BLANK}|\\?&lt;(?=\\?(?:https?|file|ftp|irc)(:))|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|(?!\2)([^\s]*?)&gt;|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))
+    InlineLinkRx = %r((^|link:|#{CG_BLANK}|\\?&lt;(?=\\?(?:https?|file|ftp|irc)(:))|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|(?!\2)([^\s]+?)&gt;|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))
   else
-    InlineLinkRx = %r((^|link:|#{CG_BLANK}|\\?&lt;()|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|\2([^\s]*?)&gt;|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))m
+    InlineLinkRx = %r((^|link:|#{CG_BLANK}|\\?&lt;()|[>\(\)\[\];"'])(\\?(?:https?|file|ftp|irc)://)(?:([^\s\[\]]+)\[(|#{CC_ALL}*?[^\\])\]|\2([^\s]+?)&gt;|([^\s\[\]<]*([^\s,.?!\[\]<\)]))))m
   end
 
   # Match a link or e-mail inline macro.
