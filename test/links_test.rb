@@ -105,6 +105,11 @@ context 'Links' do
     assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('<\\http://asciidoc.org>'), 1
   end
 
+  test 'xref shorthand with target that starts with URL protocol and has space after comma should not crash parser' do
+    output = convert_string_to_embedded '<<https://example.com, Example>>'
+    assert_include '<a href="#https://example.com">Example</a>', output
+  end
+
   test 'autolink containing text enclosed in angle brackets' do
     output = convert_string_to_embedded 'https://github.com/<org>/'
     assert_include '<a href="https://github.com/&lt;org&gt;/" class="bare">https://github.com/&lt;org&gt;/</a>', output
