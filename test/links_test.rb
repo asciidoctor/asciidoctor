@@ -193,16 +193,31 @@ context 'Links' do
   end
 
   test 'URI scheme with trailing characters should not be converted to a link' do
-    input_sources = %w(
-      (https://)
+    comma = ','
+    input_sources = %W(
       http://;
       file://:
+      irc://#{comma}
+    )
+    expected_outputs = %W(
+      http://;
+      file://:
+      irc://#{comma}
+    )
+    input_sources.each_with_index do |input_source, i|
+      expected_output = expected_outputs[i]
+      actual = block_from_string input_source
+      assert_equal expected_output, actual.content
+    end
+  end
+
+  test 'bare URI scheme enclosed in brackets should not be converted to link' do
+    input_sources = %w(
+      (https://)
       <ftp://>
     )
     expected_outputs = %w(
       (https://)
-      http://;
-      file://:
       &lt;ftp://&gt;
     )
     input_sources.each_with_index do |input_source, i|
