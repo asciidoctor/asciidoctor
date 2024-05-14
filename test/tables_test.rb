@@ -1213,13 +1213,13 @@ context 'Tables' do
       end
     end
 
-    test 'paragraph and literal repeated content' do
+    test 'should apply cell style for column to repeated content' do
       input = <<~'EOS'
       [cols=",^l"]
       |===
       |Paragraphs |Literal
 
-      3*|The discussion about what is good,
+      2*|The discussion about what is good,
       what is beautiful, what is noble,
       what is pure, and what is true
       could always go on.
