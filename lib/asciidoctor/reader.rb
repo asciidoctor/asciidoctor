@@ -809,7 +809,7 @@ class PreprocessorReader < Reader
     if line.empty?
       if @skipping
         shift
-        return nil
+        return
       end
       @look_ahead += 1
       return line
