@@ -103,6 +103,8 @@ Lint/MissingSuper:
   Enabled: false # FIXME consider enabling
 Lint/MixedRegexpCaptureTypes:
   Enabled: true
+Lint/NonLocalExitFromIterator:
+  Enabled: false
 Lint/NoReturnInBeginEndBlocks:
   Enabled: true
 Lint/NumberedParameterAssignment:
