@@ -23,6 +23,8 @@ Bug Fixes::
   * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
   * Don't duplicate block attribute line above detached block that breaks a dlist; fixes duplicate role on detached block (#4565)
   * Don't crash when parsing xref shorthand if target starts with URL protocol and text is offset by space (#4570)
+  * Only drop current row if colspan of last cell exceeds specified number of columns (#4587)
+  * Drop last row if colspan of last cell in table exceeds specified number of columns (#4587)
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 
