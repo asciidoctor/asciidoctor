@@ -1194,7 +1194,7 @@ context 'Tables' do
       assert_xpath '((//row)[1]/entry)[3][@namest="col_4"][@nameend="col_5"]', output, 1
     end
 
-    test 'ignores cell with colspan that exceeds colspec' do
+    test 'should drop row but preserve remaining rows after cell with colspan exceeds number of columns' do
       input = <<~'EOS'
       [cols=2*]
       |===
@@ -1208,8 +1208,57 @@ context 'Tables' do
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
         assert_css 'table', output, 1
+        assert_css 'table tr', output, 1
+        assert_xpath '/table/tbody/tr/td[1]/p[text()="B"]', output, 1
+        assert_message logger, :ERROR, '<stdin>: line 3: dropping cell because it exceeds specified number of columns', Hash
+      end
+    end
+
+    test 'should drop last row if last cell in table has colspan that exceeds specified number of columns' do
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      |a 2+|b
+      |===
+      EOS
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'table', output, 1
         assert_css 'table *', output, 0
-        assert_message logger, :ERROR, '<stdin>: line 5: dropping cell because it exceeds specified number of columns', Hash
+        assert_message logger, :ERROR, '<stdin>: line 3: dropping cell because it exceeds specified number of columns', Hash
+      end
+    end
+
+    test 'should drop last row if last cell in table has colspan that exceeds implicit number of columns' do
+      input = <<~'EOS'
+      |===
+      |a |b
+      |c 2+|d
+      |===
+      EOS
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'table', output, 1
+        assert_css 'table tr', output, 1
+        assert_xpath '/table/tbody/tr/td[1]/p[text()="a"]', output, 1
+        assert_message logger, :ERROR, '<stdin>: line 3: dropping cell because it exceeds specified number of columns', Hash
+      end
+    end
+
+    test 'should take colspan into account when taking cells for row' do
+      input = <<~'EOS'
+      [cols=7]
+      |===
+      2+|a 2+|b 2+|c 2+|d
+      |e |f |g |h |i |j |k
+      |===
+      EOS
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'table', output, 1
+        assert_css 'table tr', output, 1
+        assert_css 'table tr td', output, 7
+        assert_message logger, :ERROR, '<stdin>: line 3: dropping cell because it exceeds specified number of columns', Hash
       end
     end
 
