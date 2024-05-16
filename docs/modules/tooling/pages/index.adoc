@@ -39,7 +39,9 @@ On GitLab, you can find support for include directives, admonition icons, diagra
 GitHub, on the other hand, provides a table of contents browser, whereas on GitLab you must add a TOC explicitly using the `toc` attribute.
 
 On GitHub, if you want to see the source of an AsciiDoc file instead of the preview, click the btn:[Code] button or append `?plain=1` to the end of the URL.
-Alternatively, if you enter edit mode by clicking the btn:[Edit file] button, you can modify the source of the AsciiDoc file and see a preview of the modified source before you commit your changes.
+
+If you enter edit mode by clicking the btn:[Edit file] button on either GitHub or GitLab, you can modify the source of the AsciiDoc file and see a preview of the modified source before you commit your changes.
+GitLab even allows you to edit multiple files in a single commit using its Web IDE.
 
 == Web browser add-ons (preview only)
 
