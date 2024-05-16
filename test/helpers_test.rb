@@ -6,7 +6,7 @@ context 'Helpers' do
   context 'URI Encoding' do
     test 'should URI encode non-word characters generally' do
       given = ' !*/%&?\\='
-      expect = '+%21%2A%2F%25%26%3F%5C%3D'
+      expect = '%20%21%2A%2F%25%26%3F%5C%3D'
       assert_equal expect, (Asciidoctor::Helpers.encode_uri_component given)
     end
 

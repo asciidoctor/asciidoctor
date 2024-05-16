@@ -677,17 +677,17 @@ context 'Substitutions' do
 
     test 'a mailto macro with text and subject should be interpreted as a mailto link' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request">Doc Writer</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request">Doc Writer</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro with text, subject and body should be interpreted as a mailto link' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">Doc Writer</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">Doc Writer</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro with subject and body only should use e-mail as text' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[,Pull request,Please accept my pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">doc.writer@asciidoc.org</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">doc.writer@asciidoc.org</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro supports id and role attributes' do
