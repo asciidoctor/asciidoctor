@@ -2417,6 +2417,7 @@ class Parser
       end
     end
 
+    parser_ctx.close_table
     table.assign_column_widths unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
     table.has_header_option = true if implicit_header
     table.partition_header_footer attributes
