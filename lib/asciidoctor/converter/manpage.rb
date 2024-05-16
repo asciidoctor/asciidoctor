@@ -698,7 +698,7 @@ r lw(\n(.lu*75u/100u).'
   def manify str, opts = {}
     case opts.fetch :whitespace, :collapse
     when :preserve
-      str = str.gsub TAB, ET
+      str = (str.gsub TAB, ET).gsub(/(^)?  +/) { $1 ? $& : %(#{ESC_BS}&#{$&}) }
     when :normalize
       str = str.gsub WrappedIndentRx, LF
     else

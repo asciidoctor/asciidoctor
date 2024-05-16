@@ -349,6 +349,37 @@ context 'Manpage' do
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
     end
 
+    test 'should escape repeated spaces in literal content' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      ....
+        ,---.          ,-----.
+        |Bob|          |Alice|
+        `-+-'          `--+--'
+          |    hello      |
+          |-------------->|
+        ,-+-.          ,--+--.
+        |Bob|          |Alice|
+        `---'          `-----'
+      ....
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, <<~'EOS'
+      .fam C
+        ,\-\-\-.\&          ,\-\-\-\-\-.
+        |Bob|\&          |Alice|
+        `\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
+          |\&    hello\&      |
+          |\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
+        ,\-+\-.\&          ,\-\-+\-\-.
+        |Bob|\&          |Alice|
+        `\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
+      .fam
+      EOS
+    end
+
     test 'should preserve break between paragraphs in normal table cell' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
@@ -859,7 +890,7 @@ context 'Manpage' do
       T}:T{
       .nf
       b
-      c    _d_
+      c\&    _d_
       \&.
       .fi
       T}
