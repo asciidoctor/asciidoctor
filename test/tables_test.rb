@@ -1708,6 +1708,36 @@ context 'Tables' do
       assert_match(/included content/, output)
     end
 
+    test 'error about unresolved preprocessor directive on first line of an AsciiDoc table cell should have correct cursor' do
+      begin
+        tmp_include = Tempfile.new %w(include- .adoc)
+        tmp_include_dir, tmp_include_path = File.split tmp_include.path
+        tmp_include.write <<~'EOS'
+        |===
+        |A |B
+
+        |text
+        a|include::does-not-exist.adoc[]
+        |===
+        EOS
+        tmp_include.close
+        input = <<~EOS
+        first
+
+        include::#{tmp_include_path}[]
+
+        last
+        EOS
+        using_memory_logger do |logger|
+          output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
+          assert_includes output, %(Unresolved directive in #{tmp_include_path})
+          assert_message logger, :ERROR, %(#{tmp_include_path}: line 5: include file not found: #{File.join tmp_include_dir, 'does-not-exist.adoc'}), Hash
+        end
+      ensure
+        tmp_include.close!
+      end
+    end
+
     test 'cross reference link in an AsciiDoc table cell should resolve to reference in main document' do
       input = <<~'EOS'
       == Some
