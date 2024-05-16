@@ -684,6 +684,12 @@ class Table::ParserContext
     nil
   end
 
+  def close_table
+    return if @column_visits == 0
+    logger.error message_with_context 'dropping cells from incomplete row detected end of table', source_location: @reader.cursor_before_mark
+    nil
+  end
+
   private
 
   # Internal: Close the row by adding it to the Table and resetting the row

@@ -1262,6 +1262,23 @@ context 'Tables' do
       end
     end
 
+    test 'should drop incomplete row at end of table and log an error' do
+      input = <<~'EOS'
+      [cols=2*]
+      |===
+      |a |b
+      |c |d
+      |e
+      |===
+      EOS
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'table', output, 1
+        assert_css 'table tr', output, 2
+        assert_message logger, :ERROR, '<stdin>: line 5: dropping cells from incomplete row detected end of table', Hash
+      end
+    end
+
     test 'should apply cell style for column to repeated content' do
       input = <<~'EOS'
       [cols=",^l"]
