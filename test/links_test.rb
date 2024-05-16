@@ -110,6 +110,11 @@ context 'Links' do
     assert_include '<a href="#https://example.com">Example</a>', output
   end
 
+  test 'xref shorthand with link macro as target should be ignored' do
+    output = convert_string_to_embedded '<<link:https://example.com[], Example>>'
+    assert_include '&lt;&lt;<a href="https://example.com" class="bare">https://example.com</a>, Example&gt;&gt;', output
+  end
+
   test 'autolink containing text enclosed in angle brackets' do
     output = convert_string_to_embedded 'https://github.com/<org>/'
     assert_include '<a href="https://github.com/&lt;org&gt;/" class="bare">https://github.com/&lt;org&gt;/</a>', output
