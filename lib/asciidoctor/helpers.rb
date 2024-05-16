@@ -146,10 +146,13 @@ module Helpers
         })
       )
     end
-  else
-    CGI = ::CGI
+  elsif (CGI = ::CGI).respond_to? :escapeURIComponent
     def encode_uri_component str
-      CGI.escape str
+      CGI.escapeURIComponent str
+    end
+  else
+    def encode_uri_component str
+      (CGI.escape str).gsub '+', '%20'
     end
   end
 
