@@ -22,6 +22,10 @@ Compliance::
 
   * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of using + (#4576)
 
+Improvements::
+
+  * Log error when an incomplete row is detected at the end of a table (#4573)
+
 Bug Fixes::
 
   * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
