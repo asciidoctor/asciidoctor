@@ -353,28 +353,28 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       ....
-        ,---.          ,-----.
-        |Bob|          |Alice|
-        `-+-'          `--+--'
-          |    hello      |
-          |-------------->|
-        ,-+-.          ,--+--.
-        |Bob|          |Alice|
-        `---'          `-----'
+      \x20 ,---.          ,-----.
+      \x20 |Bob|          |Alice|
+      \x20 `-+-'          `--+--'
+      \x20   |    hello      |
+      \x20   |-------------->|
+      \x20 ,-+-.          ,--+--.
+      \x20 |Bob|          |Alice|
+      \x20 `---'          `-----'
       ....
       EOS
 
       output = Asciidoctor.convert input, backend: :manpage
-      assert_includes output, <<~'EOS'
+      assert_includes output, <<~'EOS'.lines.map {|it| it.chr == '.' ? it : '  ' + it }.join
       .fam C
-        ,\-\-\-.\&          ,\-\-\-\-\-.
-        |Bob|\&          |Alice|
-        `\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
-          |\&    hello\&      |
-          |\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
-        ,\-+\-.\&          ,\-\-+\-\-.
-        |Bob|\&          |Alice|
-        `\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
+      ,\-\-\-.\&          ,\-\-\-\-\-.
+      |Bob|\&          |Alice|
+      `\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
+        |\&    hello\&      |
+        |\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
+      ,\-+\-.\&          ,\-\-+\-\-.
+      |Bob|\&          |Alice|
+      `\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
       .fam
       EOS
     end
