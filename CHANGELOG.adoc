@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Compliance::
+
+  * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of using + (#4576)
+
 Bug Fixes::
 
   * Don't leave behind empty line inside skipped preprocessor conditional (#4580)
