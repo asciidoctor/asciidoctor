@@ -20,7 +20,7 @@ This project utilizes semantic versioning.
 
 Compliance::
 
-  * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of using + (#4576)
+  * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of + (#4576)
 
 Improvements::
 
