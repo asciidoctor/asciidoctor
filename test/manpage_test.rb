@@ -365,18 +365,19 @@ context 'Manpage' do
       EOS
 
       output = Asciidoctor.convert input, backend: :manpage
-      assert_includes output, <<~'EOS'.lines.map {|it| it.chr == '.' ? it : '  ' + it }.join
-      .fam C
-      ,\-\-\-.\&          ,\-\-\-\-\-.
-      |Bob|\&          |Alice|
-      `\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
-        |\&    hello\&      |
-        |\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
-      ,\-+\-.\&          ,\-\-+\-\-.
-      |Bob|\&          |Alice|
-      `\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
-      .fam
+      expects = <<~'EOS'.lines.map {|it| (' ' * it.chr.to_i) + (it.slice 1, it.length) }.join
+      0.fam C
+      2,\-\-\-.\&          ,\-\-\-\-\-.
+      2|Bob|\&          |Alice|
+      2`\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
+      4|\&    hello\&      |
+      4|\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
+      2,\-+\-.\&          ,\-\-+\-\-.
+      2|Bob|\&          |Alice|
+      2`\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
+      0.fam
       EOS
+      assert_includes output, expects
     end
 
     test 'should preserve break between paragraphs in normal table cell' do
