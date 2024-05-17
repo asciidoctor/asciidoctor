@@ -16,7 +16,7 @@ For an even more detailed look at what has changed, refer to the {url-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
-== Unreleased
+== 2.0.23 (2024-05-17) - @mojavelinux
 
 Compliance::
 
@@ -35,6 +35,11 @@ Bug Fixes::
   * Drop last row if colspan of last cell in table exceeds specified number of columns (#4587)
   * Preserve repeating spaces in verbatim content in manpage output (#3583)
 
+=== Details
+
+{url-repo}/releases/tag/v2.0.23[git tag] | {url-repo}/compare/v2.0.22\...v2.0.23[full diff]
+// end::compact[]
+
 == 2.0.22 (2024-03-08) - @mojavelinux
 
 Improvements::
@@ -48,7 +53,6 @@ Compliance::
 === Details
 
 {url-repo}/releases/tag/v2.0.22[git tag] | {url-repo}/compare/v2.0.21\...v2.0.22[full diff]
-// end::compact[]
 
 == 2.0.21 (2024-02-20) - @mojavelinux
 
