@@ -43,7 +43,6 @@ Compliance::
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
-  * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of using + (#4576)
   * Drop support for Ruby < 2.7 and JRuby < 9.2
   * Update latest JRuby in CI workflow to 9.4.2.0
 
@@ -66,6 +65,15 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+
+== 2.0.23 (2024-05-17) - @mojavelinux
+
+Compliance::
+
+  * Encode spaces in mailto links as %20, in accordance with RFC 3986, instead of + (#4576)
+
+Improvements::
+
   * Log error when an incomplete row is detected at the end of a table (#4573)
 
 Bug Fixes::
@@ -76,6 +84,11 @@ Bug Fixes::
   * Only drop current row if colspan of last cell exceeds specified number of columns (#4587)
   * Drop last row if colspan of last cell in table exceeds specified number of columns (#4587)
   * Preserve repeating spaces in verbatim content in manpage output (#3583)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.23[git tag] | {url-repo}/compare/v2.0.22\...v2.0.23[full diff]
+// end::compact[]
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 
@@ -90,7 +103,6 @@ Compliance::
 === Details
 
 {url-repo}/releases/tag/v2.0.22[git tag] | {url-repo}/compare/v2.0.21\...v2.0.22[full diff]
-// end::compact[]
 
 == 2.0.21 (2024-02-20) - @mojavelinux
 
