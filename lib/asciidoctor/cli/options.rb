@@ -100,7 +100,7 @@ module Asciidoctor
             self[:attributes][name] = val
           end
           opts.on '-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
-            'may be specified multiple times' do |template_dir|
+            'may be specified more than once' do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
             elsif ::Array === self[:template_dirs]
