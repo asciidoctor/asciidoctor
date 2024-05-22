@@ -6,13 +6,13 @@ These extensions are registered per document using a callback that feels like a 
 
 [,ruby]
 ----
-Asciidoctor::Extensions.register do |document|
+Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor
   tree_processor ShellSessionTreeProcessor
   postprocessor CopyrightFooterPostprocessor
-  docinfo_processor TrackingCodeDocinfoProcessor if document.basebackend? 'html'
+  docinfo_processor TrackingCodeDocinfoProcessor if @document.basebackend? 'html'
   block ShoutBlock
-  block_macro GistBlockMacro if document.basebackend? 'html'
+  block_macro GistBlockMacro if @document.basebackend? 'html'
   inline_macro ManInlineMacro
   include_processor UriIncludeProcessor
 end
