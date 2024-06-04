@@ -14,15 +14,20 @@ The `gem install` instructions are provided for when you're running in a contain
 
 == Configure Ruby packaging
 
-The best way to ensure Ruby is configured to use Ruby packaging is to install Ruby using a Ruby version manager.
+If you're using Linux, the best way to ensure Ruby is configured to use Ruby packaging is to install Ruby using a Ruby version manager.
 We recommend that you set up {url-rvm}[RVM^] and use it to install Ruby in your home directory (i.e., user space).
 Once that is done, you can safely use the `gem` or `bundle` commands to install or update the Asciidoctor gem, or any other gem for that matter.
 When using Ruby managed by RVM, gems are installed in a location isolated from the system (so you don't need root/administrator access).
 
+If you're using Windows, you can install Ruby using Chocolatey or the RubyInstaller.
+You will not be able to use RVM if you are using Windows.
+
+If you're using macOS, you can install Asciidoctor directly using Homebrew, though using RVM is also an option.
+
 [#gem-install]
 == gem install
 
-Once you've installed Ruby using RVM, and you have activated it using `rvm use {ruby-version}`, open a terminal and type:
+Once you've installed Ruby (and have activated it using `rvm use {ruby-version}` if you're using RVM), open a terminal and type:
 
  $ gem install asciidoctor
 
