@@ -8,8 +8,8 @@ When you already use https://chocolatey.org[Chocolatey^] on your machine, you ca
 
  C:\> choco install ruby
 
-Then follow the xref:ruby-packaging.adoc[gem installation instructions].
+Then follow the xref:ruby-packaging.adoc#gem-install[gem installation instructions].
 
 == RubyInstaller
 
-Or you use the https://rubyinstaller.org/downloads/[RubyInstaller^], download the package for your Windows Version and after the installation, then follow the xref:ruby-packaging.adoc[gem installation instructions].
+Or you use the https://rubyinstaller.org/downloads/[RubyInstaller^], download the package for your Windows Version and after the installation, then follow the xref:ruby-packaging.adoc#gem-install[gem installation instructions].
