@@ -1190,14 +1190,15 @@ Your browser does not support the video tag.
 
   def convert_inline_footnote node
     if (index = node.attr 'index')
+      view_footnote_tip = node.document.attr 'view-footnote-tip', 'View footnote.'
       if node.type == :xref
-        %(<sup class="footnoteref">[<a class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
+        %(<sup class="footnoteref">[<a class="footnote" href="#_footnotedef_#{index}" title="#{view_footnote_tip}">#{index}</a>]</sup>)
       else
         id_attr = node.id ? %( id="_footnote_#{node.id}") : ''
-        %(<sup class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnotedef_#{index}" title="View footnote.">#{index}</a>]</sup>)
+        %(<sup class="footnote"#{id_attr}>[<a id="_footnoteref_#{index}" class="footnote" href="#_footnotedef_#{index}" title="#{view_footnote_tip}">#{index}</a>]</sup>)
       end
     elsif node.type == :xref
-      %(<sup class="footnoteref red" title="Unresolved footnote reference.">[#{node.text}]</sup>)
+      %(<sup class="footnoteref red" title="#{node.document.attr 'unresolved-footnoteref-tip', 'Unresolved footnote reference.'}">[#{node.text}]</sup>)
     end
   end
 
