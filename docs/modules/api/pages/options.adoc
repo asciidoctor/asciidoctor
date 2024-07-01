@@ -7,7 +7,8 @@
 |`:attributes`
 |Sets document attributes, which override equivalently-named attributes defined in the document unless soft set.
 No substitutions are applied to the value of these attributes.
-In the hash format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
+In the Hash format, the name *must* be a String, not a Symbol (e.g., `name: 'value'` is *invalid*).
+In this format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
 |_not set_
 a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the following formats:
 
