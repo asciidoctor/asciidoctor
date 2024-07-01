@@ -805,7 +805,6 @@ class PreprocessorReader < Reader
 
   def process_line line
     return line unless @process_lines
-
     if line.empty?
       if @skipping
         shift
@@ -859,6 +858,15 @@ class PreprocessorReader < Reader
         line
       end
     elsif @skipping
+      # If we are skipping, and we can see that we will reach the end
+      # without an endif, then warn you've forgotten to close the
+      # conditional
+      if @lines.length == 1
+        next_line = @lines[-1]
+        if not next_line.include? 'endif'
+          logger.warn message_with_context %(Unclosed conditional at end of parsing), source_location: cursor
+        end
+      end
       shift
       nil
     else

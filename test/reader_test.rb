@@ -2902,6 +2902,27 @@ class ReaderTest < Minitest::Test
         assert_equal 'before', doc.blocks[0].source
         assert_equal 'after', doc.blocks[1].source
       end
+
+      test 'should warn if unclosed if' do
+        input = <<~EOS
+
+        ifdef::flag[]
+        closed ifdef
+        endif::[]
+
+        ifdef::flag[]
+        unclosed ifdef
+
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input, attribues: {'flag' => 'true'}
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_message logger, :WARN, '<stdin>: line 7: Unclosed conditional at end of parsing', Hash
+        end
+      end
     end
   end
 end
