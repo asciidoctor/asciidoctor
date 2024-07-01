@@ -24,6 +24,10 @@ Asciidoctor.convert_file 'document.adoc', doctype: :book, safe: :unsafe,
   attributes: { 'toc' => 'left', 'sectnums' => '', 'source-highlighter' => 'highlight.js' }
 ----
 
+IMPORTANT: When passing attributes using the Hash format, the attribute name *must* be specified as a String, not a Symbol.
+In other words, `toc: 'left'` is not recognized as an attribute entry (since `toc:` creates a Symbol key).
+It must be specified as `'toc' \=> 'left'`, as shown in the previous example.
+
 This API call can be abbreviated by declaring the document attributes using shorthand form:
 
 [,ruby]
