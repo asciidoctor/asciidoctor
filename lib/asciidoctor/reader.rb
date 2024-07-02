@@ -644,6 +644,13 @@ class PreprocessorReader < Reader
     if (line = super)
       line
     elsif @include_stack.empty?
+      unless @conditional_stack.empty?
+        at_cursor = cursor_at_prev_line
+        while (pair = @conditional_stack.pop)
+          details = pair[:target].empty? ? '' : %( '#{pair[:target]}')
+          logger.error message_with_context %(unterminated preprocessor conditional directive#{details}), source_location: at_cursor
+        end
+      end
       nil
     else
       pop_include
@@ -905,6 +912,7 @@ class PreprocessorReader < Reader
       end
       return true
     elsif @skipping
+      return true if keyword == 'ifeval' ? !(no_target && text && (EvalExpressionRx.match? text.strip)) : no_target
       skip = false
     else
       # QUESTION any way to wrap ifdef & ifndef logic up together?
