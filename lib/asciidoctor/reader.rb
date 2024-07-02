@@ -644,6 +644,13 @@ class PreprocessorReader < Reader
     if (line = super)
       line
     elsif @include_stack.empty?
+      unless @conditional_stack.empty?
+        at_cursor = cursor_at_prev_line
+        @conditional_stack.each do |pair|
+          logger.error message_with_context %(end of document reached with unterminated preprocessor conditional directive: #{pair[:name]}::#{pair[:target] || ''}[#{pair[:expr] || ''}]), source_location: at_cursor
+        end
+        @conditional_stack.clear
+      end
       nil
     else
       pop_include
