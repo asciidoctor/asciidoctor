@@ -2590,7 +2590,10 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
           assert_equal 'Our quest is complete!', result
-          assert_message logger, :ERROR, '~<stdin>: line 3: mismatched preprocessor directive: endif::on-journey[]', Hash
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 3: mismatched preprocessor directive: endif::on-journey[]', Hash],
+            [:ERROR, '~<stdin>: line 3: unterminated preprocessor conditional directive \'on-quest\'', Hash],
+          ]
         end
       end
 
@@ -2599,12 +2602,16 @@ class ReaderTest < Minitest::Test
         ifdef::on-quest[]
         Our quest is complete!
         endif::on-quest[complete!]
+        fin
         EOS
 
         using_memory_logger do |logger|
           result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
-          assert_equal 'Our quest is complete!', result
-          assert_message logger, :ERROR, '~<stdin>: line 3: malformed preprocessor directive - text not permitted: endif::on-quest[complete!]', Hash
+          assert_equal %(Our quest is complete!\nfin), result
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 3: malformed preprocessor directive - text not permitted: endif::on-quest[complete!]', Hash],
+            [:ERROR, '~<stdin>: line 4: unterminated preprocessor conditional directive \'on-quest\'', Hash],
+          ]
         end
       end
 
@@ -2867,6 +2874,51 @@ class ReaderTest < Minitest::Test
           result = (Asciidoctor::Document.new input).reader.read
           assert_empty result
           assert_empty logger
+        end
+      end
+
+      test 'should warn if preprocessor conditional directive is unterminated' do
+        input = <<~'EOS'
+        before
+        ifdef::not-set[]
+        skip
+        these
+        lines
+        fin
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'before', (lines * Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 6: unterminated preprocessor conditional directive \'not-set\'', Hash
+        end
+      end
+
+      test 'should warn if multiple preprocessor conditional directives are unterminated' do
+        input = <<~'EOS'
+        before
+        ifdef::not-set[]
+        skip
+        these
+        lines
+        ifeval::[1 == 2]
+        {asciidoctor-version}
+        fin
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'before', (lines * Asciidoctor::LF)
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 8: unterminated preprocessor conditional directive', Hash],
+            [:ERROR, '~<stdin>: line 8: unterminated preprocessor conditional directive \'not-set\'', Hash],
+          ]
         end
       end
 

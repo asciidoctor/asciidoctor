@@ -65,6 +65,7 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+  * Log error if unterminated preprocessor conditional directive is detected (#3545)
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
