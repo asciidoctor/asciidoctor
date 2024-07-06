@@ -918,6 +918,11 @@ class PreprocessorReader < Reader
       end
       return true
     elsif @skipping
+      if keyword === 'ifeval'
+        return true unless no_target && text && (EvalExpressionRx.match? text.strip)
+      elsif no_target
+        return true
+      end
       skip = false
     else
       # QUESTION any way to wrap ifdef & ifndef logic up together?

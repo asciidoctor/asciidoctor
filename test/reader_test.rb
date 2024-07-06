@@ -2879,18 +2879,36 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should not warn if preprocessor directive is invalid if already skipping' do
+      test 'should not warn about invalid ifdef preprocessor directive if already skipping' do
         input = <<~'EOS'
         ifdef::attribute-not-set[]
         foo
         ifdef::[]
         bar
         endif::[]
+        baz
         EOS
 
         using_memory_logger do |logger|
           result = (Asciidoctor::Document.new input).reader.read
-          assert_empty result
+          assert_equal 'baz', result
+          assert_empty logger
+        end
+      end
+
+      test 'should not warn about invalid ifeval preprocessor directive if already skipping' do
+        input = <<~'EOS'
+        ifdef::attribute-not-set[]
+        foo
+        ifeval::[]
+        bar
+        endif::[]
+        baz
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input).reader.read
+          assert_equal 'baz', result
           assert_empty logger
         end
       end

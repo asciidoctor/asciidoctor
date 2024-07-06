@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
