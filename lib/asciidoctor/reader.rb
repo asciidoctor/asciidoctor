@@ -901,7 +901,7 @@ class PreprocessorReader < Reader
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{@conditional_stack[-1][:target]}[]), source_location: cursor
+        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{@conditional_stack[-1][:target] || ''}[]), source_location: cursor
       end
       return true
     elsif @skipping
@@ -968,11 +968,11 @@ class PreprocessorReader < Reader
     end
 
     # conditional inclusion block
-    if name == 'ifeval' || !text
+    if name == 'ifeval'
       @skipping = true if skip
-      @conditional_stack << { target: target, skip: skip, skipping: @skipping }
+      @conditional_stack << { name: name, expr: text, skip: skip, skipping: @skipping }
     # single line conditional inclusion
-    else
+    elsif text
       unless @skipping || skip
         replace_next_line text.rstrip
         # HACK push dummy line to stand in for the opening conditional directive that's subsequently dropped
@@ -981,6 +981,10 @@ class PreprocessorReader < Reader
         # QUESTION should we just call preprocess_include_directive here?
         @look_ahead -= 1 if text.start_with? 'include::'
       end
+    # conditional inclusion block
+    else
+      @skipping = true if skip
+      @conditional_stack << { name: name, target: target, skip: skip, skipping: @skipping }
     end
 
     true
