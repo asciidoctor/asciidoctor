@@ -877,7 +877,7 @@ class PreprocessorReader < Reader
   # preprocessing recursively until the next line of available content is
   # found.
   #
-  # keyword   - The conditional inclusion directive (ifdef, ifndef, ifeval, endif)
+  # name      - The name of the conditional inclusion directive (ifdef, ifndef, ifeval, endif)
   # target    - The target, which is the name of one or more attributes that are
   #             used in the condition (blank in the case of the ifeval directive)
   # delimiter - The conditional delimiter for multiple attributes ('+' means all
@@ -888,11 +888,11 @@ class PreprocessorReader < Reader
   #             ifndef directives, and for the conditional expression for the ifeval directive.
   #
   # Returns a Boolean indicating whether the cursor should be advanced
-  def preprocess_conditional_directive keyword, target, delimiter, text
+  def preprocess_conditional_directive name, target, delimiter, text
     # attributes are case insensitive
     target = target.downcase unless (no_target = target.empty?)
 
-    if keyword == 'endif'
+    if name == 'endif'
       if text
         logger.error message_with_context %(malformed preprocessor directive - text not permitted: endif::#{target}[#{text}]), source_location: cursor
       elsif @conditional_stack.empty?
@@ -905,7 +905,7 @@ class PreprocessorReader < Reader
       end
       return true
     elsif @skipping
-      if keyword === 'ifeval'
+      if name === 'ifeval'
         return true unless no_target && text && (EvalExpressionRx.match? text.strip)
       elsif no_target
         return true
@@ -913,7 +913,7 @@ class PreprocessorReader < Reader
       skip = false
     else
       # QUESTION any way to wrap ifdef & ifndef logic up together?
-      case keyword
+      case name
       when 'ifdef'
         if no_target
           logger.error message_with_context %(malformed preprocessor directive - missing target: ifdef::[#{text}]), source_location: cursor
@@ -922,10 +922,10 @@ class PreprocessorReader < Reader
         case delimiter
         when ','
           # skip if no attribute is defined
-          skip = target.split(',', -1).none? {|name| @document.attributes.key? name }
+          skip = target.split(',', -1).none? {|attr_name| @document.attributes.key? attr_name }
         when '+'
           # skip if any attribute is undefined
-          skip = target.split('+', -1).any? {|name| !@document.attributes.key? name }
+          skip = target.split('+', -1).any? {|attr_name| !@document.attributes.key? attr_name }
         else
           # if the attribute is undefined, then skip
           skip = !(@document.attributes.key? target)
@@ -938,10 +938,10 @@ class PreprocessorReader < Reader
         case delimiter
         when ','
           # skip if any attribute is defined
-          skip = target.split(',', -1).any? {|name| @document.attributes.key? name }
+          skip = target.split(',', -1).any? {|attr_name| @document.attributes.key? attr_name }
         when '+'
           # skip if all attributes are defined
-          skip = target.split('+', -1).all? {|name| @document.attributes.key? name }
+          skip = target.split('+', -1).all? {|attr_name| @document.attributes.key? attr_name }
         else
           # if the attribute is defined, then skip
           skip = @document.attributes.key? target
@@ -968,7 +968,7 @@ class PreprocessorReader < Reader
     end
 
     # conditional inclusion block
-    if keyword == 'ifeval' || !text
+    if name == 'ifeval' || !text
       @skipping = true if skip
       @conditional_stack << { target: target, skip: skip, skipping: @skipping }
     # single line conditional inclusion
