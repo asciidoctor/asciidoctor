@@ -897,11 +897,11 @@ class PreprocessorReader < Reader
         logger.error message_with_context %(malformed preprocessor directive - text not permitted: endif::#{target}[#{text}]), source_location: cursor
       elsif @conditional_stack.empty?
         logger.error message_with_context %(unmatched preprocessor directive: endif::#{target}[]), source_location: cursor
-      elsif no_target || target == (pair = @conditional_stack[-1])[:target]
+      elsif no_target || target == @conditional_stack[-1][:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{pair[:target]}[]), source_location: cursor
+        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{@conditional_stack[-1][:target]}[]), source_location: cursor
       end
       return true
     elsif @skipping
