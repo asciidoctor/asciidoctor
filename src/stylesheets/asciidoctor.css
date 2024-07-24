@@ -647,10 +647,6 @@ pre pre {
   line-height: inherit;
 }
 
-pre > code {
-  display: block;
-}
-
 pre.nowrap,
 pre.nowrap pre {
   white-space: pre;
@@ -1314,6 +1310,10 @@ table.tableblock.fit-content > caption.title {
 
 .listingblock > .content {
   position: relative;
+}
+
+.listingblock pre > code {
+  display: block;
 }
 
 .listingblock code[data-lang]::before {

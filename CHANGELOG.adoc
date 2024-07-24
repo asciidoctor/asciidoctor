@@ -21,6 +21,7 @@ This project utilizes semantic versioning.
 Bug Fixes::
 
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
+  * Only style code tag as block element when inside pre in listing block; not inside verse block (#4610)
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
