@@ -17,6 +17,22 @@ To activate highlight.js, add the following attribute entry to the header of you
 By default, Asciidoctor will link to the highlight.js library and stylesheet hosted on {url-highlightjs-cdn}[cdnjs^].
 The version of the highlight.js library Asciidoctor loads from the CDN only includes support for languages in the common language bundle (apache, bash, coffeescript, cpp, cs, css, diff, http, ini, java, javascript, json, makefile, markdown, nginx, objectivec, perl, php, properties, python, ruby, shell, sql, xml, and yaml).
 
+== Change the theme
+
+The theme controls the colors that are used for the tokens (keywords, strings, methods, etc.) in the highlighted code.
+By default, highlight.js is configured to use the github theme.
+You can change the theme used by highlight.js by setting the `highlightjs-theme` attribute.
+
+[,asciidoc]
+----
+:source-highlighter: highlight.js
+:highlightjs-theme: monokai
+----
+
+The theme is loaded from the CDN, so any theme supported by the version of highlight.js that Asciidoctor uses is supported.
+Refer to https://cdnjs.com/libraries/highlight.js/9.18.3 for a list of themes (filter by *Asset Type: Styling*).
+The value of the `highlightjs-theme` attribute is the basename of the file minus the _.min.css_ file extension.
+
 == Load support for additional languages
 
 To load additional languages supported by highlight.js, list them in the value of the `highlightjs-languages` document attribute.
