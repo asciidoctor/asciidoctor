@@ -18,7 +18,7 @@ jobs:
       (github.event_name == 'schedule' && github.repository_owner == 'asciidoctor') ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'docs/'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Proceed
       run: echo ok go
@@ -26,20 +26,20 @@ jobs:
     needs: activate
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-22.04, windows-latest]
         ruby: [jruby-9.4.5.0, '2.7', '3.0', '3.3.4'] # use 3.3.4 to workaround time zone bug in 3.3.5
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.3.4 on ubuntu-latest to mark as primary
-        - os: ubuntu-latest
+        # remove 3.3.4 on ubuntu-22.04 to mark as primary
+        - os: ubuntu-22.04
           ruby: '3.3.4'
         include:
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: truffleruby-22.2.0
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: jruby-9.2.21.0
           pygments-version: ~
         - os: windows-latest
@@ -47,19 +47,19 @@ jobs:
           pygments-version: ~
         - os: macos-latest
           ruby: '3.3.4'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.7'
           asciimath-version: '~> 1.0.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.7'
           haml-version: '~> 5.2.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.7'
           pygments-version: '~> 1.2.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.7'
           rouge-version: '~> 2.0.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '3.3.4'
           primary: primary
     runs-on: ${{ matrix.os }}
@@ -76,7 +76,7 @@ jobs:
       if: matrix.pygments-version
       run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
     - name: Install prerequisites for Pygments ~> 1.2.0 (Linux)
-      if: matrix.os == 'ubuntu-latest' && matrix.pygments-version == '~> 1.2.0'
+      if: matrix.os == 'ubuntu-22.04' && matrix.pygments-version == '~> 1.2.0'
       run: sudo apt-get install python2
     - name: Set Rouge version
       if: matrix.rouge-version
@@ -133,7 +133,7 @@ jobs:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       BUNDLE_WITHOUT: docs:lint:coverage
     steps:
