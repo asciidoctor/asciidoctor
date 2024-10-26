@@ -1256,7 +1256,7 @@ class Document < AbstractBlock
   # localdatetime, docdate, docyear, doctime, and docdatetime. Honor the SOURCE_DATE_EPOCH environment variable, if set.
   def fill_datetime_attributes attrs, input_mtime
     # See https://reproducible-builds.org/specs/source-date-epoch/
-    now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc) : ::Time.now
+    now = ::ENV['SOURCE_DATE_EPOCH'].nil_or_empty? ? ::Time.now : (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc)
     if (localdate = attrs['localdate'])
       attrs['localyear'] ||= (localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil
     else
