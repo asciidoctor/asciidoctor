@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Improvements::
+
+  * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
+
 Bug Fixes::
 
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)

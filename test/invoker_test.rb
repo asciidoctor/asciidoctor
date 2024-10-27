@@ -797,6 +797,24 @@ context 'Invoker' do
     end
   end
 
+  test 'should ignore SOURCE_DATE_EPOCH is value is empty' do
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+    begin
+      ENV['SOURCE_DATE_EPOCH'] = ''
+      sample_filepath = fixture_path 'sample.adoc'
+      invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
+      doc = invoker.document
+      current_year = ::Time.now.strftime '%F'
+      assert (doc.attr 'localyear').to_i >= (current_year.to_i - 1)
+    ensure
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
+    end
+  end
+
   test 'should fail if SOURCE_DATE_EPOCH is malformed' do
     old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
     begin
