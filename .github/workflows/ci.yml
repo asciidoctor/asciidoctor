@@ -18,7 +18,7 @@ jobs:
       (github.event_name == 'schedule' && github.repository_owner == 'asciidoctor') ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' && !startsWith(github.head_ref, 'docs/'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
     - name: Proceed
       run: echo ok go
@@ -26,20 +26,20 @@ jobs:
     needs: activate
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-22.04, windows-latest]
         ruby: [jruby-9.4.5.0, '2.3', '2.7', '3.0', '3.3']
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.3 on ubuntu-latest to mark as primary
-        - os: ubuntu-latest
+        # remove 3.3 on ubuntu-22.04 to mark as primary
+        - os: ubuntu-22.04
           ruby: '3.3'
         include:
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: truffleruby-22.2.0
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: jruby-9.1.17.0
           pygments-version: ~
         - os: windows-latest
@@ -47,19 +47,19 @@ jobs:
           pygments-version: ~
         - os: macos-latest
           ruby: '3.3'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.3'
           haml-version: '~> 5.2.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.3'
           pygments-version: '~> 1.2.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '2.3'
           rouge-version: '~> 2.0.0'
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           ruby: '3.3'
           primary: primary
     runs-on: ${{ matrix.os }}
@@ -72,10 +72,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Install prerequisites for Nokogiri (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-22.04'
       run: sudo apt-get install libxslt1-dev
     - name: Configure Nokogiri installation (Linux, macOS)
-      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-22.04'
       run: echo 'BUNDLE_BUILD__NOKOGIRI=--use-system-libraries' >> $GITHUB_ENV
     - name: Set AsciiMath version
       if: matrix.asciimath-version
@@ -84,7 +84,7 @@ jobs:
       if: matrix.pygments-version
       run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
     - name: Install prerequisites for Pygments ~> 1.2.0 (Linux)
-      if: matrix.os == 'ubuntu-latest' && matrix.pygments-version == '~> 1.2.0'
+      if: matrix.os == 'ubuntu-22.04' && matrix.pygments-version == '~> 1.2.0'
       run: sudo apt-get install python2
     - name: Set Rouge version
       if: matrix.rouge-version
@@ -127,7 +127,8 @@ jobs:
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Install gem and doc
-      if: "!startsWith(matrix.ruby, 'truffleruby-')"
+      if: |
+        !startsWith(matrix.ruby, 'truffleruby-')
       run: |
         ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
         bundle exec rake build
@@ -137,7 +138,7 @@ jobs:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       BUNDLE_WITHOUT: docs:coverage
     steps:
