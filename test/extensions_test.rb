@@ -1468,17 +1468,17 @@ context 'Extensions' do
         ++++
         EOS
         expected = <<~'EOS'.chop
-        target="", attributes={}
-        target="value,key=val", attributes={1=>"value", "key"=>"val", "name"=>"value"}
-        target="", attributes={"text"=>""}
-        target="[text]", attributes={"text"=>"[text]"}
-        target="target", attributes={}
-        target="target", attributes={1=>"value", "key"=>"val", "name"=>"value"}
-        target="target", attributes={"text"=>""}
-        target="target", attributes={"text"=>"[text]"}
-        target="target", attributes={}
+        target="",attributes={}
+        target="value,key=val",attributes={1=>"value","key"=>"val","name"=>"value"}
+        target="",attributes={"text"=>""}
+        target="[text]",attributes={"text"=>"[text]"}
+        target="target",attributes={}
+        target="target",attributes={1=>"value","key"=>"val","name"=>"value"}
+        target="target",attributes={"text"=>""}
+        target="target",attributes={"text"=>"[text]"}
+        target="target",attributes={}
         EOS
-        output = convert_string_to_embedded input
+        output = ((convert_string_to_embedded input).gsub ' => ', '=>').gsub ', ', ','
         assert_equal expected, output
       ensure
         Asciidoctor::Extensions.unregister_all
