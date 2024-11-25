@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
     'mailing_list_uri' => 'https://chat.asciidoctor.org',
-    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
+    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor',
+    'funding_uri' => 'https://opencollective.com/asciidoctor'
   }
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
