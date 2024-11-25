@@ -85,7 +85,9 @@ jobs:
       run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
     - name: Install prerequisites for Pygments ~> 1.2.0 (Linux)
       if: matrix.os == 'ubuntu-22.04' && matrix.pygments-version == '~> 1.2.0'
-      run: sudo apt-get install python2
+      run: |
+        sudo apt-get update
+        sudo apt-get install python2
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
