@@ -39,7 +39,8 @@ Refer to the <<document-attributes>> section.
 The NAME Section::
 The first section is mandatory, must be titled "`Name`" (or "`NAME`"), and must contain a single paragraph (usually a single line) consisting of a list of one or more comma-separated command name(s) separated from the command's purpose by a dash character (e.g., `progname - does stuff` or `name1, name2 - does stuff`).
 The dash must have at least one space character on either side.
-If multiple names are given, Asciidoctor will generate alias files for the secondary names that point to the primary name.
+If multiple names are given, Asciidoctor will generate alias files for the secondary names that point to the primary name. +
+If you would like to change the path for the alias file, you can use the `:manvoldir:` attribute (see <<document-attributes, document attributes>>).
 
 The SYNOPSIS Section::
 The second section is recommended and, if present, must be titled "`Synopsis`" (or "`SYNOPSIS`").
@@ -230,6 +231,10 @@ Must include both the man page name and volume number.
 |Can be set by overriding the `doctitle` attribute.
 Must include both the man page name and volume number.
 |ASCIIDOCTOR(1)
+
+|`manvoldir`
+|Set the directory for the `.so` directive in the alias file(s).
+|
 
 |`manname`
 |Alternative way to set the command name.
