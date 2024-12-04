@@ -1205,7 +1205,14 @@ Your browser does not support the video tag.
     target = node.target
     if (type = node.type || 'image') == 'icon'
       if (icons = node.document.attr 'icons') == 'font'
-        i_class_attr_val = %(fa fa-#{target})
+        if node.attr? 'set'
+          icon_set = node.attr 'set'
+        elsif node.document.attr? 'icon_set'
+          icon_set = node.document.attr 'icon_set'
+        else
+          icon_set = 'fa'
+        end
+        i_class_attr_val = %(#{icon_set} fa-#{target})
         i_class_attr_val = %(#{i_class_attr_val} fa-#{node.attr 'size'}) if node.attr? 'size'
         if node.attr? 'flip'
           i_class_attr_val = %(#{i_class_attr_val} fa-flip-#{node.attr 'flip'})
