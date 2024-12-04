@@ -1007,29 +1007,41 @@ context 'Substitutions' do
       assert_equal '<span class="icon">[GitHub&#93;</span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
-    test 'an icon macro should be interpreted as a font-based icon when icons=font' do
-      para = block_from_string 'icon:github[]', attributes: { 'icons' => 'font' }
-      assert_equal '<span class="icon"><i class="fa fa-github"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+    context 'font-based icon' do
+      test 'an icon macro should be interpreted as a font-based icon when icons=font' do
+        para = block_from_string 'icon:github[]', attributes: { 'icons' => 'font' }
+        assert_equal '<span class="icon"><i class="fa fa-github"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
-      para = block_from_string 'icon:github[4x]', attributes: { 'icons' => 'font' }
-      assert_equal '<span class="icon"><i class="fa fa-github fa-4x"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      test 'an icon macro with a size should be interpreted as a font-based icon with a size when icons=font' do
+        para = block_from_string 'icon:github[4x]', attributes: { 'icons' => 'font' }
+        assert_equal '<span class="icon"><i class="fa fa-github fa-4x"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro with flip should be interpreted as a flipped font-based icon when icons=font' do
-      para = block_from_string 'icon:shield[fw,flip=horizontal]', attributes: { 'icons' => 'font' }
-      assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-flip-horizontal"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      test 'an icon macro with flip should be interpreted as a flipped font-based icon when icons=font' do
+        para = block_from_string 'icon:shield[fw,flip=horizontal]', attributes: { 'icons' => 'font' }
+        assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-flip-horizontal"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro with rotate should be interpreted as a rotated font-based icon when icons=font' do
-      para = block_from_string 'icon:shield[fw,rotate=90]', attributes: { 'icons' => 'font' }
-      assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-rotate-90"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
-    end
+      test 'an icon macro with rotate should be interpreted as a rotated font-based icon when icons=font' do
+        para = block_from_string 'icon:shield[fw,rotate=90]', attributes: { 'icons' => 'font' }
+        assert_equal '<span class="icon"><i class="fa fa-shield fa-fw fa-rotate-90"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
 
-    test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
-      para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
-      assert_equal '<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
+        para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
+        assert_equal '<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
+
+      test 'an icon macro should use document level icon-set attribute to overide icon class when icons=font' do
+        para = block_from_string 'icon:github[]', attributes: { 'icons' => 'font', 'icon_set' => 'foo' }
+        assert_equal '<span class="icon"><i class="foo fa-github"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
+
+      test 'an icon macro should use node level set attibute to override document level icon-set when icons=font' do
+        para = block_from_string 'icon:github[set=bar]', attributes: { 'icons' => 'font', 'icon_set' => 'foo' }
+        assert_equal '<span class="icon"><i class="bar fa-github"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+      end
     end
 
     test 'a single-line footnote macro should be registered and output as a footnote' do
