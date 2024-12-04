@@ -22,6 +22,15 @@ class Converter::Html5Converter < Converter::Base
     #latexmath: INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
+  FA_ICON_SET_CLASS_NAMES = {
+    'fa'  => 'fa',
+    'fab' => 'fa-brands',
+    'fad' => 'fa-duotone',
+    'fal' => 'fa-light',
+    'far' => 'fa-regular',
+    'fas' => 'fa-solid',
+  }
+
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
@@ -1205,6 +1214,7 @@ Your browser does not support the video tag.
     target = node.target
     if (type = node.type || 'image') == 'icon'
       if (icons = node.document.attr 'icons') == 'font'
+        # compute icon set by going from node => document => "fa" (default)
         if node.attr? 'set'
           icon_set = node.attr 'set'
         elsif node.document.attr? 'icon_set'
@@ -1212,15 +1222,29 @@ Your browser does not support the video tag.
         else
           icon_set = 'fa'
         end
-        i_class_attr_val = %(#{icon_set} fa-#{target})
-        i_class_attr_val = %(#{i_class_attr_val} fa-#{node.attr 'size'}) if node.attr? 'size'
-        if node.attr? 'flip'
-          i_class_attr_val = %(#{i_class_attr_val} fa-flip-#{node.attr 'flip'})
-        elsif node.attr? 'rotate'
-          i_class_attr_val = %(#{i_class_attr_val} fa-rotate-#{node.attr 'rotate'})
+
+        i_class_attr = []
+
+        # Foundation icons
+        if icon_set == 'fi'
+          i_class_attr << %(fi-#{target})
+          i_class_attr << %(size-#{node.attr 'size'}) if node.attr? 'size'
+        elsif icon_set.start_with? 'fa' # Font Awesome
+          # get actual class name from short name
+          i_class_attr << (FA_ICON_SET_CLASS_NAMES[icon_set] || icon_set)
+
+          i_class_attr << %(fa-#{target})
+          i_class_attr << %(fa-#{node.attr 'size'}) if node.attr? 'size'
+
+          if node.attr? 'flip'
+            i_class_attr << %(fa-flip-#{node.attr 'flip'})
+          elsif node.attr? 'rotate'
+            i_class_attr << %(fa-rotate-#{node.attr 'rotate'})
+          end
         end
+
         attrs = (node.attr? 'title') ? %( title="#{node.attr 'title'}") : ''
-        img = %(<i class="#{i_class_attr_val}"#{attrs}></i>)
+        img = %(<i class="#{i_class_attr.join(' ')}"#{attrs}></i>)
       elsif icons
         attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
         attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
