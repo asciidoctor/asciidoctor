@@ -1,7 +1,7 @@
 class ExtendedRougeSyntaxHighlighter < (Asciidoctor::SyntaxHighlighter.for 'rouge')
   register_for 'rouge'
 
-  def create_formatter node, source, lang, opts
+  def create_html_formatter opts
     formatter = super
     formatter.singleton_class.prepend (Module.new do
       def safe_span tok, safe_val
