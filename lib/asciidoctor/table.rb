@@ -3,6 +3,7 @@
 module Asciidoctor
 # Public: Methods and constants for managing AsciiDoc table content in a document.
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
+using NilOrEmptyRefinement
 class Table < AbstractBlock
   # precision of column widths
   DEFAULT_PRECISION = 4

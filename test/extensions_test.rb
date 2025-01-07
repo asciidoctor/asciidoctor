@@ -2,6 +2,7 @@
 
 require_relative 'test_helper'
 
+using NilOrEmptyRefinement
 class ExtensionsInitTest < Minitest::Test
   def test_autoload
     doc = empty_document

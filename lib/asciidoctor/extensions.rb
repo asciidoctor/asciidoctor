@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: tArue
 
 (require 'asciidoctor' unless defined? Asciidoctor.load) unless RUBY_ENGINE == 'opal'
 
@@ -23,6 +23,7 @@ module Asciidoctor
 # Extensions may be registered globally using the {Extensions.register} method
 # or added to a custom {Registry} instance and passed as an option to a single
 # Asciidoctor processor.
+using NilOrEmptyRefinement
 module Extensions
   # Public: An abstract base class for document and syntax processors.
   #

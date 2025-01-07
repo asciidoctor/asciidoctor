@@ -4,6 +4,7 @@ module Asciidoctor
 # Public: Methods to perform substitutions on lines of AsciiDoc text. This module
 # is intended to be mixed-in to Section and Block to provide operations for performing
 # the necessary substitutions.
+using NilOrEmptyRefinement
 module Substitutors
   SpecialCharsRx = /[<&>]/
   SpecialCharsTr = { '>' => '&gt;', '<' => '&lt;', '&' => '&amp;' }
