@@ -66,6 +66,7 @@ Improvements::
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
+  * Change Brazilian Portuguese translation for toc-title
 
 Bug Fixes::
 
