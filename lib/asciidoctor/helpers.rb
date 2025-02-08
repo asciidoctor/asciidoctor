@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Asciidoctor
+using NilOrEmptyRefinement
 # Internal: Except where noted, a module that contains internal helper functions.
 module Helpers
   module_function

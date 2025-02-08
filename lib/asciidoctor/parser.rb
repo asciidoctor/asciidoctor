@@ -23,6 +23,7 @@ module Asciidoctor
 #   block = Parser.next_block reader, doc
 #   block.class
 #   # => Asciidoctor::Block
+using NilOrEmptyRefinement
 class Parser
   include Logging
 

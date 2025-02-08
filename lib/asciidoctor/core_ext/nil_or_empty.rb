@@ -4,22 +4,24 @@
 # optimize checks for nil? or empty? on common object types such as NilClass,
 # String, Array, Hash, and Numeric.
 
-class NilClass
-  alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
-end
+module NilOrEmptyRefinement
+  refine NilClass do
+    alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
+  end
 
-class String
-  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
-end
+  refine String do
+    alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
+  end
 
-class Array
-  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
-end
+  refine Array do
+    alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
+  end
 
-class Hash
-  alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
-end
+  refine Hash do
+    alias nil_or_empty? empty? unless method_defined? :nil_or_empty?
+  end
 
-class Numeric
-  alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
+  refine  Numeric do
+    alias nil_or_empty? nil? unless method_defined? :nil_or_empty?
+  end
 end
