@@ -887,6 +887,27 @@ context 'Blocks' do
       assert_xpath '(/*[@class="exampleblock"])[3]/*[@class="title"][starts-with(text(), "Exhibit ")]', output, 1
     end
 
+    test 'caption punctuator can be modified and defaults to period' do
+      input = <<~'EOS'
+      .first example
+      ====
+      an example
+      ====
+
+      :example-caption-punctuator: :
+
+      .second example
+      ====
+      another example
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="exampleblock"]', output, 2
+      assert_xpath '(/*[@class="exampleblock"])[1]/*[@class="title"][starts-with(text(), "Example 1.")]', output, 1
+      assert_xpath '(/*[@class="exampleblock"])[2]/*[@class="title"][starts-with(text(), "Example 2:")]', output, 1
+    end
+
     test 'should use explicit caption if specified even if block-specific global caption is disabled' do
       input = <<~'EOS'
       :!example-caption:
