@@ -16,6 +16,8 @@ A preprocessor extension can still be used to modify options on the Document obj
 It can also be safely used as an event listener, perhaps to run other code.
 It may also be possible to avoid side effects by reading lines above the actual AsciiDoc document, as is shown in the example on this page.
 It's safe to do so because these lines are not interpreted as AsciiDoc.
+
+As a workaround, you can use https://github.com/asciidoctor/asciidoctor-reducer[Asciidoctor Reducer] to safely read and resolve the source lines of the document, independent of the current document reader.
 ====
 
 Prior to invoking the preprocessor extension, Asciidoctor splits the source text of the primary document into lines and xref:asciidoc::normalization.adoc[normalizes them].
