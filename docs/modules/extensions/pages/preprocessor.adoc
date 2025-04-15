@@ -26,7 +26,7 @@ It then creates an instance of PreprocessorReader from these lines.
 Asciidoctor then passes the Document and PreprocessorReader instances to the `Asciidoctor::Extensions::Processor#process` method of the extension.
 If the extension reads lines from reader, those lines will first be preprocessed by Asciidoctor's internal preprocessor.
 The extension can modify the Reader and either return the same Reader (or falsy, which is equivalent) or a new Reader instance to replace it.
-However, as stated above, be careful when reading lines from the original PreprocessorReader instance as it can have side effets.
+However, as stated above, be careful when reading lines from the original PreprocessorReader instance as it can have side effects.
 
 == Preprocessor Extension Example
 
