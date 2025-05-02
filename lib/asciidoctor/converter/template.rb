@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A {Converter} implementation that uses templates composed in template
 # languages supported by {https://github.com/rtomayko/tilt Tilt} to convert
@@ -154,12 +155,12 @@ class Converter::TemplateConverter < Converter::Base
     @template_dirs.each do |template_dir|
       # FIXME need to think about safe mode restrictions here
       # Ruby 2.3 requires the extra brackets around the path_resolver.system_path method call
-      next unless ::File.directory?(template_dir = (path_resolver.system_path template_dir))
+      next unless ::File.directory? (template_dir = (path_resolver.system_path template_dir))
 
       if engine
         file_pattern = %(*.#{engine})
         # example: templates/haml
-        if ::File.directory?(engine_dir = %(#{template_dir}/#{engine}))
+        if ::File.directory? (engine_dir = %(#{template_dir}/#{engine}))
           template_dir = engine_dir
         end
       else
@@ -168,7 +169,7 @@ class Converter::TemplateConverter < Converter::Base
       end
 
       # example: templates/html5 (engine not set) or templates/haml/html5 (engine set)
-      if ::File.directory?(backend_dir = %(#{template_dir}/#{backend}))
+      if ::File.directory? (backend_dir = %(#{template_dir}/#{backend}))
         template_dir = backend_dir
       end
 
@@ -183,7 +184,7 @@ class Converter::TemplateConverter < Converter::Base
           @templates[name] = template_cache[template.file] = template
         end
       else
-        @templates.update scan_dir(template_dir, pattern, @caches[:templates])
+        @templates.update scan_dir template_dir, pattern, @caches[:templates]
       end
     end
     nil
@@ -196,7 +197,7 @@ class Converter::TemplateConverter < Converter::Base
   def scan_dir template_dir, pattern, template_cache = nil
     result, helpers = {}, nil
     # Grab the files in the top level of the directory (do not recurse)
-    ::Dir.glob(pattern).keep_if {|match| ::File.file? match }.each do |file|
+    (::Dir.glob pattern).keep_if {|match| ::File.file? match }.each do |file|
       if (basename = ::File.basename file) == 'helpers.rb'
         helpers = file
         next
@@ -241,7 +242,7 @@ class Converter::TemplateConverter < Converter::Base
       end
       result[name] = template
     end
-    if helpers || ::File.file?(helpers = %(#{template_dir}/helpers.rb))
+    if helpers || (::File.file? (helpers = %(#{template_dir}/helpers.rb)))
       require helpers
     end
     result

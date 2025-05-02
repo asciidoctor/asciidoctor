@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ASCIIDOCTOR_TEST_DIR = File.absolute_path __dir__
 ASCIIDOCTOR_LIB_DIR = ENV['ASCIIDOCTOR_LIB_DIR'] || (File.join ASCIIDOCTOR_TEST_DIR, '../lib')
 
@@ -32,14 +33,6 @@ Minitest::Test = MiniTest::Unit::TestCase unless defined? Minitest::Test
 class Minitest::Test
   def jruby?
     RUBY_ENGINE == 'jruby'
-  end
-
-  def self.jruby_9_1_windows?
-    RUBY_ENGINE == 'jruby' && windows? && (JRUBY_VERSION.start_with? '9.1.')
-  end
-
-  def jruby_9_1_windows?
-    Minitest::Test.jruby_9_1_windows?
   end
 
   def self.windows?
@@ -196,7 +189,7 @@ class Minitest::Test
       Nokogiri::HTML::DocumentFragment.parse content
     elsif $1.start_with? 'html'
       Nokogiri::HTML::Document.parse content
-    else
+    else # rubocop:disable Lint/DuplicateBranch
       Nokogiri::XML::Document.parse content
     end
   end
@@ -231,7 +224,7 @@ class Minitest::Test
 
   def parse_header_metadata source, doc = nil
     reader = Asciidoctor::Reader.new source.split Asciidoctor::LF
-    [(Asciidoctor::Parser.parse_header_metadata reader, doc), reader]
+    Asciidoctor::Parser.parse_header_metadata reader, doc
   end
 
   def assign_default_test_options opts
@@ -343,8 +336,6 @@ class Minitest::Test
     [Gem.ruby, *ruby_args, (File.join bindir, 'asciidoctor')]
   end
 
-  # NOTE run_command fails on JRuby 9.1 for Windows with the following error:
-  # Java::JavaLang::ClassCastException at org.jruby.util.ShellLauncher.getModifiedEnv(ShellLauncher.java:271)
   def run_command cmd, *args, &block
     if Array === cmd
       args.unshift(*cmd)
@@ -353,21 +344,9 @@ class Minitest::Test
     kw_args = Hash === args[-1] ? args.pop : {}
     env = kw_args[:env]
     (env ||= {})['RUBYOPT'] = nil unless kw_args[:use_bundler]
-    # JRuby 9.1 on Windows doesn't support popen options; therefore, test cannot capture / assert on stderr
-    opts = jruby_9_1_windows? ? {} : { err: [:child, :out] }
+    opts = { err: [:child, :out] }
     if env
-      # NOTE while JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child
-      #if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
-      if jruby?
-        begin
-          env = (old_env = ENV.to_h).merge env
-          env.each {|key, val| env.delete key if val.nil? } if env.value? nil
-          ENV.replace env
-          popen [cmd, *args, opts], &block
-        ensure
-          ENV.replace old_env
-        end
-      elsif env.value? nil
+      if env.value? nil
         env = env.each_with_object ENV.to_h do |(key, val), accum|
           val.nil? ? (accum.delete key) : (accum[key] = val)
         end
@@ -381,11 +360,18 @@ class Minitest::Test
   end
 
   def popen args, &block
-    # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
     if jruby? && windows?
       result = nil
+      # While JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child process
+      if Hash === args[-1] && args[-1][:unsetenv_others] && Hash === (env = args[0])
+        old_env = ENV.to_h
+        ENV.replace env
+      end
+      # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
       IO.popen args do |io|
         result = yield io
+      ensure
+        ENV.replace old_env if old_env
       end
       result
     else
@@ -411,11 +397,11 @@ class Minitest::Test
         if resource == '/name/asciidoctor'
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
-        elsif File.file?(resource_file = (File.join base_dir, resource))
-          mimetype = if (ext = File.extname(resource_file)[1..-1])
-            ext == 'adoc' ? 'text/plain' : %(image/#{ext})
+        elsif File.file? resource_file = (File.join base_dir, resource)
+          if (ext = File.extname(resource_file)[1..-1])
+            mimetype = ext == 'adoc' ? 'text/plain' : %(image/#{ext})
           else
-            'text/plain'
+            mimetype = 'text/plain'
           end
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: #{mimetype}\r\n\r\n)
           File.open resource_file, Asciidoctor::FILE_READ_MODE do |fd|

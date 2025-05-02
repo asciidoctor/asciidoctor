@@ -1,26 +1,26 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Links' do
-
   test 'qualified url inline with text' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'http://asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org.")
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text() = "http://asciidoc.org"]', convert_string('The AsciiDoc project is located at http://asciidoc.org.')
   end
 
   test 'qualified url with role inline with text' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org[role=project].")
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare project"][text() = "http://asciidoc.org"]', convert_string('The AsciiDoc project is located at http://asciidoc.org[role=project].')
   end
 
   test 'qualified http url inline with hide-uri-scheme set' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare'][text() = 'asciidoc.org']", convert_string("The AsciiDoc project is located at http://asciidoc.org.", attributes: { 'hide-uri-scheme' => '' })
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text() = "asciidoc.org"]', convert_string('The AsciiDoc project is located at http://asciidoc.org.', attributes: { 'hide-uri-scheme' => '' })
   end
 
   test 'qualified file url inline with label' do
-    assert_xpath "//a[@href='file:///home/user/bookmarks.html'][text() = 'My Bookmarks']", convert_string_to_embedded('file:///home/user/bookmarks.html[My Bookmarks]')
+    assert_xpath '//a[@href="file:///home/user/bookmarks.html"][text() = "My Bookmarks"]', convert_string_to_embedded('file:///home/user/bookmarks.html[My Bookmarks]')
   end
 
   test 'qualified file url inline with hide-uri-scheme set' do
-    assert_xpath "//a[@href='file:///etc/app.conf'][text() = '/etc/app.conf']", convert_string('Edit the configuration file link:file:///etc/app.conf[]', attributes: { 'hide-uri-scheme' => '' })
+    assert_xpath '//a[@href="file:///etc/app.conf"][text() = "/etc/app.conf"]', convert_string('Edit the configuration file link:file:///etc/app.conf[]', attributes: { 'hide-uri-scheme' => '' })
   end
 
   test 'should not hide bare URI scheme in implicit text of link macro when hide-uri-scheme is set' do
@@ -33,23 +33,23 @@ context 'Links' do
   end
 
   test 'qualified url with label' do
-    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", convert_string("We're parsing http://asciidoc.org[AsciiDoc] markup")
+    assert_xpath '//a[@href="http://asciidoc.org"][text() = "AsciiDoc"]', convert_string("We're parsing http://asciidoc.org[AsciiDoc] markup")
   end
 
   test 'qualified url with label containing escaped right square bracket' do
-    assert_xpath "//a[@href='http://asciidoc.org'][text() = '[Ascii]Doc']", convert_string("We're parsing http://asciidoc.org[[Ascii\\]Doc] markup")
+    assert_xpath '//a[@href="http://asciidoc.org"][text() = "[Ascii]Doc"]', convert_string("We're parsing http://asciidoc.org[[Ascii\\]Doc] markup")
   end
 
   test 'qualified url with backslash label' do
-    assert_xpath "//a[@href='https://google.com'][text() = 'Google for \\']", convert_string("I advise you to https://google.com[Google for +\\+]")
+    assert_xpath '//a[@href="https://google.com"][text() = "Google for \\"]', convert_string('I advise you to https://google.com[Google for +\\+]')
   end
 
   test 'qualified url with label using link macro' do
-    assert_xpath "//a[@href='http://asciidoc.org'][text() = 'AsciiDoc']", convert_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
+    assert_xpath '//a[@href="http://asciidoc.org"][text() = "AsciiDoc"]', convert_string("We're parsing link:http://asciidoc.org[AsciiDoc] markup")
   end
 
   test 'qualified url with role using link macro' do
-    assert_xpath "//a[@href='http://asciidoc.org'][@class='bare project'][text() = 'http://asciidoc.org']", convert_string("We're parsing link:http://asciidoc.org[role=project] markup")
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare project"][text() = "http://asciidoc.org"]', convert_string("We're parsing link:http://asciidoc.org[role=project] markup")
   end
 
   test 'qualified url using macro syntax with multi-line label inline with text' do
@@ -254,17 +254,17 @@ context 'Links' do
   end
 
   test 'qualified url following smart apostrophe' do
-    output = convert_string_to_embedded("l&#8217;http://www.irit.fr[IRIT]")
+    output = convert_string_to_embedded 'l&#8217;http://www.irit.fr[IRIT]'
     assert_match(/l&#8217;<a href=/, output)
   end
 
   test 'should convert qualified url as macro enclosed in double quotes' do
-    output = convert_string_to_embedded('"https://asciidoctor.org[]"')
+    output = convert_string_to_embedded '"https://asciidoctor.org[]"'
     assert_include '"<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>"', output
   end
 
   test 'should convert qualified url as macro enclosed in single quotes' do
-    output = convert_string_to_embedded('\'https://asciidoctor.org[]\'')
+    output = convert_string_to_embedded '\'https://asciidoctor.org[]\''
     assert_include '\'<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>\'', output
   end
 
@@ -592,6 +592,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string '<<tigers#>>', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers#"][text() = "[tigers#]"]', doc.convert, 1
+      assert_empty logger
     end
   end
 
@@ -686,6 +687,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string '<<tigers.adoc>>', standalone: false
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+      assert_empty logger
     end
   end
 
@@ -703,6 +705,7 @@ context 'Links' do
     using_memory_logger do |logger|
       doc = document_from_string 'xref:tigers.adoc[]', standalone: false, attributes: { 'compat-mode' => '' }
       assert_xpath '//a[@href="#tigers.adoc"][text() = "[tigers.adoc]"]', doc.convert, 1
+      assert_empty logger
     end
   end
 

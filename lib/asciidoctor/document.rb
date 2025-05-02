@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: The Document class represents a parsed AsciiDoc document.
 #
@@ -81,15 +82,16 @@ module Asciidoctor
 # Loading a document object is the first step in the conversion process. You
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
-
   ImageReference = ::Struct.new :target, :imagesdir do
-    alias to_s target
+    alias to_s target # rubocop:disable Style/Alias
   end
 
   Footnote = ::Struct.new :index, :id, :text
 
   class AttributeEntry
-    attr_reader :name, :value, :negate
+    attr_reader :name
+    attr_reader :value
+    attr_reader :negate
 
     def initialize name, value, negate = nil
       @name = name
@@ -112,10 +114,10 @@ class Document < AbstractBlock
 
     def initialize val, opts = {}
       # TODO separate sanitization by type (:cdata for HTML/XML, :plain_text for non-SGML, false for none)
-      if (@sanitized = opts[:sanitize]) && val.include?('<')
+      if (@sanitized = opts[:sanitize]) && (val.include? '<')
         val = val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
       end
-      if (sep = opts[:separator] || ':').empty? || !val.include?(sep = %(#{sep} ))
+      if (sep = opts[:separator] || ':').empty? || !(val.include? (sep = %(#{sep} )))
         @main = val
         @subtitle = nil
       else
@@ -321,7 +323,7 @@ class Document < AbstractBlock
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
-        @safe = (SafeMode.value_for_name safe_mode) rescue SafeMode::SECURE
+        @safe = (SafeMode.value_for_name safe_mode) || SafeMode::SECURE
       end
       input_mtime = options.delete :input_mtime
       @compat_mode = attr_overrides.key? 'compat-mode'
@@ -412,7 +414,7 @@ class Document < AbstractBlock
       attr_overrides['source-highlighter'] ||= nil
       attr_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
-      if !parent_doc && attr_overrides.key?('docfile')
+      if !parent_doc && (attr_overrides.key? 'docfile')
         attr_overrides['docfile'] = attr_overrides['docfile'][(attr_overrides['docdir'].length + 1)..-1]
       end
       attr_overrides['docdir'] = ''
@@ -729,7 +731,7 @@ class Document < AbstractBlock
 
     if (separator = opts[:partition])
       Title.new val, opts.merge({ separator: (separator == true ? @attributes['title-separator'] : separator) })
-    elsif opts[:sanitize] && val.include?('<')
+    elsif opts[:sanitize] && (val.include? '<')
       val.gsub(XmlSanitizeRx, '').squeeze(' ').strip
     else
       val
@@ -822,17 +824,16 @@ class Document < AbstractBlock
   end
 
   # Public: Replay attribute assignments at the block level
-  def playback_attributes(block_attributes)
-    if block_attributes.key? :attribute_entries
-      block_attributes[:attribute_entries].each do |entry|
-        name = entry.name
-        if entry.negate
-          @attributes.delete name
-          @compat_mode = false if name == 'compat-mode'
-        else
-          @attributes[name] = entry.value
-          @compat_mode = true if name == 'compat-mode'
-        end
+  def playback_attributes block_attributes
+    return unless block_attributes.key? :attribute_entries
+    block_attributes[:attribute_entries].each do |entry|
+      name = entry.name
+      if entry.negate
+        @attributes.delete name
+        @compat_mode = false if name == 'compat-mode'
+      else
+        @attributes[name] = entry.value
+        @compat_mode = true if name == 'compat-mode'
       end
     end
   end
@@ -855,24 +856,23 @@ class Document < AbstractBlock
   #
   # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
-    unless attribute_locked? name
-      value = apply_attribute_value_subs value unless value.empty?
-      # NOTE if @header_attributes is set, we're beyond the document header
-      if @header_attributes
-        @attributes[name] = value
+    return if attribute_locked? name
+    value = apply_attribute_value_subs value unless value.empty?
+    # NOTE if @header_attributes is set, we're beyond the document header
+    if @header_attributes
+      @attributes[name] = value
+    else
+      case name
+      when 'backend'
+        update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
+      when 'doctype'
+        update_doctype_attributes value
       else
-        case name
-        when 'backend'
-          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
-        when 'doctype'
-          update_doctype_attributes value
-        else
-          @attributes[name] = value
-        end
-        @attributes_modified << name
+        @attributes[name] = value
       end
-      value
+      @attributes_modified << name
     end
+    value
   end
 
   # Public: Delete the specified attribute from the document if the name is not locked
@@ -882,11 +882,11 @@ class Document < AbstractBlock
   # name  - the String attribute name
   #
   # returns true if the attribute was deleted, false if it was not because it's locked
-  def delete_attribute(name)
-    if attribute_locked?(name)
+  def delete_attribute name
+    if attribute_locked? name
       false
     else
-      @attributes.delete(name)
+      @attributes.delete name
       @attributes_modified << name
       true
     end
@@ -897,8 +897,8 @@ class Document < AbstractBlock
   # key - The attribute key to check
   #
   # Returns true if the attribute is locked, false otherwise
-  def attribute_locked?(name)
-    @attribute_overrides.key?(name)
+  def attribute_locked? name
+    @attribute_overrides.key? name
   end
 
   # Public: Assign a value to the specified attribute in the document header.
@@ -923,7 +923,7 @@ class Document < AbstractBlock
   end
 
   # Public: Convert the AsciiDoc document using the templates
-  # loaded by the Converter. If a :template_dir is not specified,
+  # loaded by the Converter. If :template_dirs is not specified,
   # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
   def convert opts = {}
@@ -1008,7 +1008,7 @@ class Document < AbstractBlock
 
   def content
     # NOTE per AsciiDoc-spec, remove the title before converting the body
-    @attributes.delete('title')
+    @attributes.delete 'title'
     super
   end
 
@@ -1031,7 +1031,7 @@ class Document < AbstractBlock
 
       if (docinfo = @attributes['docinfo']).nil_or_empty?
         if @attributes.key? 'docinfo2'
-          docinfo = ['private', 'shared']
+          docinfo = %w(private shared)
         elsif @attributes.key? 'docinfo1'
           docinfo = ['shared']
         else
@@ -1072,12 +1072,12 @@ class Document < AbstractBlock
     end
   end
 
-  def docinfo_processors?(location = :head)
-    if @docinfo_processor_extensions.key?(location)
+  def docinfo_processors? location = :head
+    if @docinfo_processor_extensions.key? location
       # false means we already performed a lookup and didn't find any
       @docinfo_processor_extensions[location] != false
-    elsif @extensions && @document.extensions.docinfo_processors?(location)
-      !!(@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors(location))
+    elsif @extensions && (@document.extensions.docinfo_processors? location)
+      (@docinfo_processor_extensions[location] = @document.extensions.docinfo_processors location) ? true : false
     else
       @docinfo_processor_extensions[location] = false
     end
@@ -1157,8 +1157,8 @@ class Document < AbstractBlock
   end
 
   # Internal: Delete any attributes stored for playback
-  def clear_playback_attributes(attributes)
-    attributes.delete(:attribute_entries)
+  def clear_playback_attributes attributes
+    attributes.delete :attribute_entries
   end
 
   # Internal: Branch the attributes so that the original state can be restored
@@ -1243,8 +1243,8 @@ class Document < AbstractBlock
       FLEXIBLE_ATTRIBUTES.each do |name|
         # turning a flexible attribute off should be permanent
         # (we may need more config if that's not always the case)
-        if @attribute_overrides.key?(name) && @attribute_overrides[name]
-          @attribute_overrides.delete(name)
+        if (@attribute_overrides.key? name) && @attribute_overrides[name]
+          @attribute_overrides.delete name
         end
       end
     end
@@ -1287,108 +1287,106 @@ class Document < AbstractBlock
   #
   # Returns the resolved String backend if updated, nothing otherwise.
   def update_backend_attributes new_backend, init = nil
-    if init || new_backend != @backend
-      current_backend = @backend
-      current_basebackend = (attrs = @attributes)['basebackend']
-      current_doctype = @doctype
-      actual_backend, _, new_backend = new_backend.partition ':' if new_backend.include? ':'
-      if new_backend.start_with? 'xhtml'
-        attrs['htmlsyntax'] = 'xml'
-        new_backend = new_backend.slice 1, new_backend.length
-      elsif new_backend.start_with? 'html'
-        attrs['htmlsyntax'] ||= 'html'
-      end
-      new_backend = BACKEND_ALIASES[new_backend] || new_backend
-      new_backend, delegate_backend = actual_backend, new_backend if actual_backend
-      if current_doctype
-        if current_backend
-          attrs.delete %(backend-#{current_backend})
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-        end
-        attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
-        attrs[%(doctype-#{current_doctype})] = ''
-      elsif current_backend
-        attrs.delete %(backend-#{current_backend})
-      end
-      attrs[%(backend-#{new_backend})] = ''
-      # QUESTION should we defer the @backend assignment until after the converter is created?
-      @backend = attrs['backend'] = new_backend
-      # (re)initialize converter
-      if Converter::BackendTraits === (converter = create_converter new_backend, delegate_backend)
-        new_basebackend = converter.basebackend
-        new_filetype = converter.filetype
-        if (htmlsyntax = converter.htmlsyntax)
-          attrs['htmlsyntax'] = htmlsyntax
-        end
-        if init
-          attrs['outfilesuffix'] ||= converter.outfilesuffix
-        else
-          attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
-        end
-      elsif converter
-        backend_traits = Converter.derive_backend_traits new_backend
-        new_basebackend = backend_traits[:basebackend]
-        new_filetype = backend_traits[:filetype]
-        if init
-          attrs['outfilesuffix'] ||= backend_traits[:outfilesuffix]
-        else
-          attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
-        end
-      else
-        # NOTE ideally we shouldn't need the converter before the converter phase, but we do
-        raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
-      end
-      @converter = converter
-      if (current_filetype = attrs['filetype'])
-        attrs.delete %(filetype-#{current_filetype})
-      end
-      attrs['filetype'] = new_filetype
-      attrs[%(filetype-#{new_filetype})] = ''
-      if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
-        attrs['pagewidth'] = page_width
-      else
-        attrs.delete 'pagewidth'
-      end
-      if new_basebackend != current_basebackend
-        if current_doctype
-          if current_basebackend
-            attrs.delete %(basebackend-#{current_basebackend})
-            attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          end
-          attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
-        elsif current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend})
-        end
-        attrs[%(basebackend-#{new_basebackend})] = ''
-        attrs['basebackend'] = new_basebackend
-      end
-      new_backend
+    return unless init || new_backend != @backend
+    current_backend = @backend
+    current_basebackend = (attrs = @attributes)['basebackend']
+    current_doctype = @doctype
+    actual_backend, _, new_backend = new_backend.partition ':' if new_backend.include? ':'
+    if new_backend.start_with? 'xhtml'
+      attrs['htmlsyntax'] = 'xml'
+      new_backend = new_backend.slice 1, new_backend.length
+    elsif new_backend.start_with? 'html'
+      attrs['htmlsyntax'] ||= 'html'
     end
+    new_backend = BACKEND_ALIASES[new_backend] || new_backend
+    new_backend, delegate_backend = actual_backend, new_backend if actual_backend
+    if current_doctype
+      if current_backend
+        attrs.delete %(backend-#{current_backend})
+        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+      end
+      attrs[%(backend-#{new_backend}-doctype-#{current_doctype})] = ''
+      attrs[%(doctype-#{current_doctype})] = ''
+    elsif current_backend
+      attrs.delete %(backend-#{current_backend})
+    end
+    attrs[%(backend-#{new_backend})] = ''
+    # QUESTION should we defer the @backend assignment until after the converter is created?
+    @backend = attrs['backend'] = new_backend
+    # (re)initialize converter
+    if Converter::BackendTraits === (converter = create_converter new_backend, delegate_backend)
+      new_basebackend = converter.basebackend
+      new_filetype = converter.filetype
+      if (htmlsyntax = converter.htmlsyntax)
+        attrs['htmlsyntax'] = htmlsyntax
+      end
+      if init
+        attrs['outfilesuffix'] ||= converter.outfilesuffix
+      else
+        attrs['outfilesuffix'] = converter.outfilesuffix unless attribute_locked? 'outfilesuffix'
+      end
+    elsif converter
+      backend_traits = Converter.derive_backend_traits new_backend
+      new_basebackend = backend_traits[:basebackend]
+      new_filetype = backend_traits[:filetype]
+      if init
+        attrs['outfilesuffix'] ||= backend_traits[:outfilesuffix]
+      else
+        attrs['outfilesuffix'] = backend_traits[:outfilesuffix] unless attribute_locked? 'outfilesuffix'
+      end
+    else
+      # NOTE ideally we shouldn't need the converter before the converter phase, but we do
+      raise ::NotImplementedError, %(asciidoctor: FAILED: missing converter for backend '#{new_backend}'. Processing aborted.)
+    end
+    @converter = converter
+    if (current_filetype = attrs['filetype'])
+      attrs.delete %(filetype-#{current_filetype})
+    end
+    attrs['filetype'] = new_filetype
+    attrs[%(filetype-#{new_filetype})] = ''
+    if (page_width = DEFAULT_PAGE_WIDTHS[new_basebackend])
+      attrs['pagewidth'] = page_width
+    else
+      attrs.delete 'pagewidth'
+    end
+    if new_basebackend != current_basebackend
+      if current_doctype
+        if current_basebackend
+          attrs.delete %(basebackend-#{current_basebackend})
+          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+        end
+        attrs[%(basebackend-#{new_basebackend}-doctype-#{current_doctype})] = ''
+      elsif current_basebackend
+        attrs.delete %(basebackend-#{current_basebackend})
+      end
+      attrs[%(basebackend-#{new_basebackend})] = ''
+      attrs['basebackend'] = new_basebackend
+    end
+    new_backend
   end
 
   # Internal: Update the doctype and backend attributes to reflect a change in the active doctype.
   #
   # Returns the String doctype if updated, nothing otherwise.
   def update_doctype_attributes new_doctype
-    if new_doctype && new_doctype != @doctype
-      current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
-      if current_doctype
-        attrs.delete %(doctype-#{current_doctype})
-        if current_backend
-          attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
-          attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
-        end
-        if current_basebackend
-          attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
-          attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
-        end
-      else
-        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
-        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
+    return unless new_doctype && new_doctype != @doctype
+    current_backend, current_basebackend, current_doctype = @backend, (attrs = @attributes)['basebackend'], @doctype
+    if current_doctype
+      attrs.delete %(doctype-#{current_doctype})
+      if current_backend
+        attrs.delete %(backend-#{current_backend}-doctype-#{current_doctype})
+        attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = ''
       end
-      attrs[%(doctype-#{new_doctype})] = ''
-      @doctype = attrs['doctype'] = new_doctype
+      if current_basebackend
+        attrs.delete %(basebackend-#{current_basebackend}-doctype-#{current_doctype})
+        attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = ''
+      end
+    else
+      attrs[%(backend-#{current_backend}-doctype-#{new_doctype})] = '' if current_backend
+      attrs[%(basebackend-#{current_basebackend}-doctype-#{new_doctype})] = '' if current_basebackend
     end
+    attrs[%(doctype-#{new_doctype})] = ''
+    @doctype = attrs['doctype'] = new_doctype
   end
 end
 end

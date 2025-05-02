@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class AbstractBlock < AbstractNode
   # Public: Get the Array of {AbstractBlock} child blocks for this block. Only applies if content model is :compound.
@@ -184,12 +185,11 @@ class AbstractBlock < AbstractNode
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
   def next_adjacent_block
-    unless @context == :document
-      if (p = @parent).context == :dlist && @context == :list_item
-        (sib = p.items[(p.items.find_index {|terms, desc| (terms.include? self) || desc == self }) + 1]) ? sib : p.next_adjacent_block
-      else
-        (sib = p.blocks[(p.blocks.find_index self) + 1]) ? sib : p.next_adjacent_block
-      end
+    return if @context == :document
+    if (p = @parent).context == :dlist && @context == :list_item
+      (sib = p.items[(p.items.find_index {|terms, desc| (terms.include? self) || desc == self }) + 1]) ? sib : p.next_adjacent_block
+    else
+      (sib = p.blocks[(p.blocks.find_index self) + 1]) ? sib : p.next_adjacent_block
     end
   end
 
@@ -287,7 +287,7 @@ class AbstractBlock < AbstractNode
   # Returns the converted String title for this Block, or nil if the source title is falsy
   def title
     # prevent substitutions from being applied to title multiple times
-    @converted_title ||= @title && (apply_title_subs @title)
+    @converted_title ||= @title && (apply_title_subs @title) # rubocop:disable Naming/MemoizedInstanceVariableName
   end
 
   # Public: A convenience method that checks whether the title of this block is defined.
@@ -387,7 +387,7 @@ class AbstractBlock < AbstractNode
   #
   # Returns nothing.
   def assign_caption value, caption_context = @context
-    unless @caption || !@title || (@caption = value || @document.attributes['caption'])
+    unless @caption || !@title || (@caption = value || @document.attributes['caption']) # rubocop:disable Style/GuardClause
       if (attr_name = CAPTION_ATTRIBUTE_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
         @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
         nil

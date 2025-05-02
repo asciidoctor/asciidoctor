@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Syntax Highlighter' do
@@ -808,21 +809,43 @@ context 'Syntax Highlighter' do
       assert_css 'code span.gp', output, 1
     end
 
-    test 'should set starting line number to 1 by default in HTML output if linenums option is enabled' do
+    test 'should number lines using table layout if linenums option is enabled and linenums mode is not set' do
       input = <<~'EOS'
       [source%linenums,ruby]
       ----
-      puts 'Hello, World!'
-      puts 'Goodbye, World!'
+      puts 'Hello, world!'
+      puts 'Goodbye, world!'
       ----
       EOS
       output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
       assert_css 'table.linenotable', output, 1
-      assert_css 'table.linenotable td.linenos', output, 1
-      assert_css 'table.linenotable td.linenos pre.lineno', output, 1
-      assert_css 'table.linenotable td.code', output, 1
-      assert_css 'table.linenotable td.code pre:not([class])', output, 1
-      assert_xpath %(//pre[@class="lineno"][text()="1\n2\n"]), output, 1
+      assert_css 'table.linenotable td.linenos', output, 2
+      assert_css 'table.linenotable td.linenos pre', output, 2
+      assert_xpath '(//td[@class="linenos"])[1]/pre[text()="1"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[2]/pre[text()="2"]', output, 1
+      assert_css 'table.linenotable td.code', output, 2
+      assert_css 'table.linenotable td.code pre:not([class])', output, 2
+      assert_includes output, %(<td class="code"><pre><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>\n</pre></td>)
+      assert_includes output, %(<td class="code"><pre><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>\n</pre></td>)
+    end
+
+    test 'should number lines using inline element if linenums option is enabled and linenums mode is inline' do
+      input = <<~'EOS'
+      :rouge-linenums-mode: inline
+
+      [source%linenums,ruby]
+      ----
+      puts 'Hello, world!'
+      puts 'Goodbye, world!'
+      ----
+      EOS
+      expected = <<~EOS.chop
+      <span class="linenos">1</span><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
+      <span class="linenos">2</span><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>
+      EOS
+      output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
+      assert_css 'table.linenotable', output, 0
+      assert_includes output, expected
     end
 
     test 'should set starting line number in HTML output if linenums option is enabled and start attribute is set' do
@@ -835,17 +858,19 @@ context 'Syntax Highlighter' do
       EOS
       output = convert_string_to_embedded input, attributes: { 'source-highlighter' => 'rouge' }
       assert_css 'table.linenotable', output, 1
-      assert_css 'table.linenotable td.linenos', output, 1
-      assert_css 'table.linenotable td.linenos pre.lineno', output, 1
-      assert_css 'table.linenotable td.code', output, 1
-      assert_css 'table.linenotable td.code pre:not([class])', output, 1
-      assert_xpath %(//pre[@class="lineno"][text()=" 9\n10\n"]), output, 1
+      assert_css 'table.linenotable td.linenos', output, 2
+      assert_css 'table.linenotable td.linenos pre', output, 2
+      assert_css 'table.linenotable td.code', output, 2
+      assert_css 'table.linenotable td.code pre:not([class])', output, 2
+      assert_xpath '(//td[@class="linenos"])[1]/pre[text()="9"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[2]/pre[text()="10"]', output, 1
     end
 
     test 'should restore callout marks to correct lines' do
       ['', '%linenums'].each do |opts|
         input = <<~EOS
         :source-highlighter: rouge
+        :rouge-linenums-mode: inline
 
         [source#{opts},ruby]
         ----
@@ -866,8 +891,7 @@ context 'Syntax Highlighter' do
         assert_match(/<span class="s1">'rouge'<\/span>.* # <b class="conum">\(1\)<\/b>$/, output)
         assert_match(/<span class="s1">'puts "Hello, world!"'<\/span>.* # <b class="conum">\(2\)<\/b>$/, output)
         assert_match(/<span class="n">html<\/span>.* # <b class="conum">\(3\)<\/b> <b class="conum">\(4\)<\/b>$/, output)
-        # NOTE notice there's a newline before the closing </pre> tag when linenums are enabled
-        assert_match(/<span class="mi">0<\/span>.* # <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b>#{opts == '%linenums' ? ?\n : '</code>'}<\/pre>/, output)
+        assert_match(/<span class="mi">0<\/span>.* # <b class="conum">\(5\)<\/b> <b class="conum">\(6\)<\/b><\/code><\/pre>/, output)
       end
     end
 
@@ -875,6 +899,7 @@ context 'Syntax Highlighter' do
       ['', '%linenums'].each do |opts|
         input = <<~EOS
         :source-highlighter: rouge
+        :rouge-linenums-mode: inline
 
         [source#{opts},ruby,highlight=1]
         ----
@@ -882,10 +907,9 @@ context 'Syntax Highlighter' do
         puts 'Goodbye, world!'
         ----
         EOS
-        # NOTE notice the newline in inside the closing </span> of the highlight span
         expected = <<~EOS.chop
         <span class="hll"><span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
-        </span><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>#{opts == '%linenums' ? ?\n : '</code>'}</pre>
+        </span>#{opts == '%linenums' ? '<span class="linenos">2</span>' : ''}<span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span></code></pre>
         EOS
 
         output = convert_string_to_embedded input, safe: :safe
@@ -897,6 +921,7 @@ context 'Syntax Highlighter' do
       ['', '%linenums'].each do |opts|
         input = <<~EOS
         :source-highlighter: rouge
+        :rouge-linenums-mode: inline
 
         [source#{opts},ruby,highlight=2]
         ----
@@ -904,11 +929,10 @@ context 'Syntax Highlighter' do
         puts 'Goodbye, world!'
         ----
         EOS
-        # NOTE notice the newline in inside the closing </span> of the highlight span
         expected = <<~EOS.chop
         <span class="nb">puts</span> <span class="s1">'Hello, world!'</span>
-        <span class="hll"><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>
-        </span>#{opts == '%linenums' ? '' : '</code>'}</pre>
+        #{opts == '%linenums' ? '<span class="linenos">2</span>' : ''}<span class="hll"><span class="nb">puts</span> <span class="s1">'Goodbye, world!'</span>
+        </span></code></pre>
         EOS
 
         output = convert_string_to_embedded input, safe: :safe
@@ -916,7 +940,7 @@ context 'Syntax Highlighter' do
       end
     end
 
-    test 'should line highlight specified lines relative to start value' do
+    test 'should line highlight specified lines relative to start value when linenums mode is table' do
       input = <<~EOS
       :source-highlighter: rouge
 
@@ -928,11 +952,31 @@ context 'Syntax Highlighter' do
       ----
       EOS
 
+      output = convert_string_to_embedded input, safe: :safe
+      assert_css 'table.linenotable td.linenos', output, 3
+      assert_css 'table.linenotable td.linenos pre', output, 3
+      assert_xpath '(//td[@class="linenos"])[1]/pre[text()="5"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[2]/pre[text()="6"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[3]/pre[text()="7"]', output, 1
+    end
+
+    test 'should line highlight specified lines relative to start value when linenums mode is inline' do
+      input = <<~EOS
+      :source-highlighter: rouge
+      :rouge-linenums-mode: inline
+
+      [source%linenums,ruby,start=5,highlight=6]
+      ----
+      get {
+        render "Hello, World!"
+      }
+      ----
+      EOS
+
       expected = <<~EOS.chop
-      <span class="n">get</span> <span class="p">{</span>
-      <span class="hll">  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-      </span><span class="p">}</span>
-      </pre>
+      <span class="linenos">5</span><span class="n">get</span> <span class="p">{</span>
+      <span class="linenos">6</span><span class="hll">  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      </span><span class="linenos">7</span><span class="p">}</span></code></pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -942,6 +986,7 @@ context 'Syntax Highlighter' do
     test 'should ignore start attribute when the value is 0' do
       input = <<~EOS
       :source-highlighter: rouge
+      :rouge-linenums-mode: inline
 
       [source%linenums,ruby,start=0,highlight=6]
       ----
@@ -952,10 +997,9 @@ context 'Syntax Highlighter' do
       EOS
 
       expected = <<~EOS.chop
-      <span class="n">get</span> <span class="p">{</span>
-        <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-      <span class="p">}</span>
-      </pre>
+      <span class="linenos">1</span><span class="n">get</span> <span class="p">{</span>
+      <span class="linenos">2</span>  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      <span class="linenos">3</span><span class="p">}</span></code></pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -965,6 +1009,7 @@ context 'Syntax Highlighter' do
     test 'should not line highlight when the start attribute is greater than highlight' do
       input = <<~EOS
       :source-highlighter: rouge
+      :rouge-linenums-mode: inline
 
       [source%linenums,ruby,start=7,highlight=6]
       ----
@@ -975,10 +1020,9 @@ context 'Syntax Highlighter' do
       EOS
 
       expected = <<~EOS.chop
-      <span class="n">get</span> <span class="p">{</span>
-        <span class="n">render</span> <span class="s2">"Hello, World!"</span>
-      <span class="p">}</span>
-      </pre>
+      <span class="linenos">7</span><span class="n">get</span> <span class="p">{</span>
+      <span class="linenos">8</span>  <span class="n">render</span> <span class="s2">"Hello, World!"</span>
+      <span class="linenos">9</span><span class="p">}</span></code></pre>
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
@@ -1037,7 +1081,7 @@ context 'Syntax Highlighter' do
 
       output = convert_string_to_embedded input, safe: :safe
       # NOTE notice there's a newline before the closing </pre> tag, but not before the closing </td> tag
-      assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
+      assert_match(/<pre># <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
     end
 
     test 'should number all lines when isolated callout mark is on last line of source and starting line number is set' do
@@ -1055,9 +1099,13 @@ context 'Syntax Highlighter' do
       EOS
 
       output = convert_string_to_embedded input, safe: :safe
-      assert_xpath %(//pre[@class="lineno"][text()="5\n6\n7\n8\n"]), output, 1
+      assert_xpath '//td[@class="linenos"]', output, 4
+      assert_xpath '(//td[@class="linenos"])[1]/pre[text()="5"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[2]/pre[text()="6"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[3]/pre[text()="7"]', output, 1
+      assert_xpath '(//td[@class="linenos"])[4]/pre[text()="8"]', output, 1
       # NOTE notice there's a newline before the closing </pre> tag, but not before the closing </td> tag
-      assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
+      assert_match(/<pre># <b class="conum">\(1\)<\/b>\n<\/pre><\/td>/, output)
     end
 
     test 'should preserve guard in front of callout if icons are not enabled' do
@@ -1095,7 +1143,7 @@ context 'Syntax Highlighter' do
       assert_includes css, 'background-color: #49483e;'
     end
 
-    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace', unless: jruby_9_1_windows? do
+    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace' do
       result = run_command(asciidoctor_cmd, '-r', (fixture_path 'include-asciidoctor.rb'), '-s', '-o', '-', '-a', 'source-highlighter=rouge', (fixture_path 'source-block.adoc'), use_bundler: true) {|out| out.read }
       assert_xpath '//pre[@class="rouge highlight"]', result, 1
     end

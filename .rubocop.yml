@@ -1,0 +1,448 @@
+require:
+- rubocop-minitest
+- rubocop-rake
+AllCops:
+  TargetRubyVersion: 2.5
+Gemspec/DateAssignment:
+  Enabled: true
+Gemspec/RequireMFA:
+  Enabled: true
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/BeginEndAlignment:
+  Enabled: true
+Layout/CaseIndentation:
+  EnforcedStyle: end
+Layout/EndOfLine:
+  EnforcedStyle: lf
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false # reason: unnecessary extra space
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+Layout/FirstArgumentIndentation:
+  Enabled: true
+Layout/HashAlignment:
+  Enabled: true
+Layout/HeredocIndentation:
+  Enabled: false # reason: makes it harder to understand what indentation is significant
+Layout/IndentationWidth:
+  Enabled: true
+  IgnoredPatterns: ['^module Asciidoctor$'] # FIXME keep and remove indentation in CLI, Timings, and API, or remove and fix indentation
+Layout/LeadingCommentSpace:
+  Enabled: false # reason: this is just nitpicky
+Layout/LineEndStringConcatenationIndentation:
+  Enabled: true
+Layout/LineLength:
+  Enabled: false # FIXME enable me
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+  IndentationWidth: 4
+Layout/RescueEnsureAlignment:
+  Enabled: true
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+Layout/SpaceAroundOperators:
+  Enabled: true
+  EnforcedStyleForExponentOperator: space
+Layout/SpaceBeforeBrackets:
+  Enabled: true
+Layout/SpaceInsideBlockBraces:
+  SpaceBeforeBlockParameters: false
+Lint/AmbiguousAssignment:
+  Enabled: true
+Lint/AmbiguousBlockAssociation:
+  Enabled: true # NOTE this is pedantic when using braces for single-line blocks
+Lint/AmbiguousOperatorPrecedence:
+  Enabled: false
+Lint/AmbiguousRange:
+  Enabled: true
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+Lint/ConstantDefinitionInBlock:
+  Enabled: true
+  Exclude: [ test/*.rb ]
+Lint/DeprecatedConstants:
+  Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+Lint/DuplicateBranch:
+  Enabled: true
+Lint/DuplicateElsifCondition:
+  Enabled: true
+Lint/DuplicateRegexpCharacterClassElement:
+  Enabled: true
+Lint/DuplicateRequire:
+  Enabled: true
+Lint/DuplicateRescueException:
+  Enabled: true
+Lint/EmptyBlock:
+  Enabled: true
+Lint/EmptyClass:
+  Enabled: true
+Lint/EmptyConditionalBody:
+  Enabled: true
+Lint/EmptyFile:
+  Enabled: true
+Lint/EmptyInPattern:
+  Enabled: true
+Lint/EmptyWhen:
+  Enabled: false # reason: an empty when can be important for excluding matches
+Lint/FloatComparison:
+  Enabled: true
+Lint/IdentityComparison:
+  Enabled: true
+Lint/IncompatibleIoSelectWithFiberScheduler:
+  Enabled: true
+Lint/LambdaWithoutLiteralBlock:
+  Enabled: true
+Lint/MissingSuper:
+  Enabled: false # FIXME consider enabling
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+Lint/NonLocalExitFromIterator:
+  Enabled: false
+Lint/NoReturnInBeginEndBlocks:
+  Enabled: true
+Lint/NumberedParameterAssignment:
+  Enabled: true
+Style/NumberedParameters:
+  Enabled: true
+Style/NumberedParametersLimit:
+  Enabled: true
+Lint/OrAssignmentToConstant:
+  Enabled: true
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+Lint/ParenthesesAsGroupedExpression:
+  Enabled: false # reason: we prefer to enclose assignments
+Lint/RaiseException:
+  Enabled: true
+Lint/RedundantDirGlobSort:
+  Enabled: true
+Lint/RequireRelativeSelfPath:
+  Enabled: true
+Lint/SelfAssignment:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+Lint/SuppressedException:
+  Enabled: true
+Lint/SymbolConversion:
+  Enabled: true
+Lint/ToEnumArguments:
+  Enabled: true
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+Lint/TrailingCommaInAttributeDeclaration:
+  Enabled: true
+Lint/TripleQuotes:
+  Enabled: true
+Lint/UnexpectedBlockArity:
+  Enabled: true
+Lint/UnmodifiedReduceAccumulator:
+  Enabled: true
+Lint/UnreachableLoop:
+  Enabled: true
+Lint/UnusedMethodArgument:
+  Enabled: false # reason: these are important for defining API methods
+Lint/UselessMethodDefinition:
+  Enabled: true
+Lint/UselessRuby2Keywords:
+  Enabled: true
+Lint/UselessTimes:
+  Enabled: true
+Metrics/AbcSize:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/BlockNesting:
+  Max: 10
+Metrics/ClassLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/ParameterLists:
+  Max: 10
+  MaxOptionalParameters: 10
+Metrics/PerceivedComplexity:
+  Enabled: false
+Minitest/AssertInDelta:
+  Enabled: false
+Minitest/AssertionInLifecycleHook:
+  Enabled: true
+Minitest/AssertKindOf:
+  Enabled: true
+Minitest/AssertOutput:
+  Enabled: true
+Minitest/AssertPathExists:
+  Enabled: true
+Minitest/AssertSilent:
+  Enabled: true
+Minitest/AssertWithExpectedArgument:
+  Enabled: true
+Minitest/LiteralAsActualArgument:
+  Enabled: true
+Minitest/MultipleAssertions:
+  Enabled: false
+Minitest/RefuteInDelta:
+  Enabled: true
+Minitest/RefuteKindOf:
+  Enabled: true
+Minitest/RefutePathExists:
+  Enabled: true
+Minitest/TestMethodName:
+  Enabled: true
+Minitest/UnreachableAssertion:
+  Enabled: true
+Minitest/UnspecifiedException:
+  Enabled: true
+Naming/AccessorMethodName:
+  Enabled: true
+Naming/BlockForwarding:
+  Enabled: true
+Naming/ConstantName:
+  Enabled: false # FIXME consider reenabling
+Naming/FileName:
+  Enabled: true
+Naming/HeredocDelimiterNaming:
+  Enabled: false # reason: EOS is meaningful
+Naming/InclusiveLanguage:
+  Enabled: true
+Naming/MethodParameterName:
+  Enabled: true
+Naming/PredicateName:
+  Enabled: false # FIXME consider reenabling later (might impact API)
+Naming/VariableNumber:
+  Enabled: false # reason: this is just nitpicky
+Security/IoMethods:
+  Enabled: true
+Security/Open:
+  Enabled: true
+Style/AccessorGrouping:
+  Enabled: true
+  EnforcedStyle: separated
+Style/Alias:
+  Enabled: true
+  EnforcedStyle: prefer_alias
+Style/ArgumentsForwarding:
+  Enabled: true
+Style/ArrayCoercion:
+  Enabled: false # reason: using [*values] is faster
+Style/AsciiComments:
+  Enabled: false # reason: this is just nitpicky
+Style/Attr:
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/BlockComments:
+  Enabled: true
+Style/BlockDelimiters:
+  EnforcedStyle: line_count_based # FIXME we want this to be line_count_based except when chaining
+Style/CaseEquality:
+  Enabled: false # reason: === is a useful operator
+Style/CaseLikeIf:
+  Enabled: true
+Style/CharacterLiteral:
+  Enabled: false # reason: ? can make single characters easier to type
+Style/ClassAndModuleChildren:
+  Enabled: false # reason: both forms are useful
+Style/ClassVars:
+  Enabled: false # reason: an important language feature
+Style/CollectionCompact:
+  Enabled: true
+Style/CombinableLoops:
+  Enabled: true
+Style/CommandLiteral:
+  EnforcedStyle: percent_x
+Style/CommentAnnotation:
+  Enabled: true
+  Keywords:
+  - TODO
+  - FIXME
+  - HACK
+  - NOTE
+  - QUESTION
+  RequireColon: false
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+  IncludeTernaryExpressions: false
+Style/DocumentDynamicEvalDefinition:
+  Enabled: true
+Style/Documentation:
+  Enabled: false # FIXME reenable
+Style/DoubleNegation:
+  Enabled: true
+Style/EmptyLiteral:
+  Enabled: true
+Style/EndlessMethod:
+  Enabled: true
+Style/ExplicitBlockArgument:
+  Enabled: false # reason: yield is fine
+Style/ExponentialNotation:
+  Enabled: true
+Style/FileRead:
+  Enabled: true
+Style/FileWrite:
+  Enabled: true
+Style/FormatString:
+  EnforcedStyle: sprintf
+Style/FormatStringToken:
+  Enabled: true
+  EnforcedStyle: unannotated
+Style/GlobalStdStream:
+  Enabled: true
+Style/GuardClause:
+  Enabled: true
+  Exclude: [ lib/asciidoctor/substitutors.rb ]
+Style/HashConversion:
+  Enabled: true
+Style/HashAsLastArrayItem:
+  Enabled: true
+  EnforcedStyle: no_braces
+Style/HashEachMethods:
+  Enabled: true
+Style/HashExcept:
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+Style/IfWithBooleanLiteralBranches:
+  Enabled: true
+  AllowedMethods:
+  - empty?
+  - nil_or_empty?
+Style/IfUnlessModifier:
+  Enabled: false # reason: this gets crazy
+Style/IfUnlessModifierOfIfUnless:
+  Enabled: false # reason: we prefer this style to avoid extra nesting
+Style/InPatternThen:
+  Enabled: true
+Style/InfiniteLoop:
+  Enabled: false # reason: loop is measurably slower than while true
+Style/KeywordParametersOrder:
+  Enabled: true
+Style/MapToHash:
+  Enabled: true
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  EnforcedStyle: omit_parentheses
+Style/MethodDefParentheses:
+  EnforcedStyle: require_no_parentheses
+Style/MultilineBlockChain:
+  Enabled: false # reason: no reason not to allow method call on block result
+Style/MultilineInPatternThen:
+  Enabled: true
+Style/MultilineIfModifier:
+  Enabled: false # reason: we prefer this style to avoid extra nesting
+Style/MultilineTernaryOperator:
+  Enabled: false # reason: a ternary is a ternary
+Style/MultipleComparison:
+  Enabled: false # reason: faster than the alternative of using Array#include?
+Style/MutableConstant:
+  Enabled: false # reason: freezing constants is pendantic
+Style/NegatedIfElseCondition:
+  Enabled: true
+Style/NestedParenthesizedCalls:
+  Enabled: true
+Style/NestedTernaryOperator:
+  Enabled: false # reason: a ternary is a ternary
+Style/NilLambda:
+  Enabled: true
+Style/NumericLiterals:
+  Enabled: false # reason: makes large numbers unreadable and harder to copy
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+Style/OpenStructUse:
+  Enabled: true
+Style/OptionalBooleanParameter:
+  Enabled: false # reason: invasive
+Style/ParallelAssignment:
+  Enabled: false # reason: an important language feature
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: "()"
+    "%i": "()"
+    "%r": "//"
+    "%w": "()"
+    "%W": "()"
+Style/PerlBackrefs:
+  Enabled: false # reason: an important language feature
+Style/QuotedSymbols:
+  Enabled: true
+Style/RedundantArgument:
+  Enabled: true
+Style/RedundantAssignment:
+  Enabled: true
+Style/RedundantBegin:
+  Enabled: true
+  Exclude: [ test/*.rb ] # TODO remove once support for Ruby < 2.5 is dropped; rule does not allow exception for blocks
+Style/RedundantFetchBlock:
+  Enabled: true
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+Style/RedundantPercentQ:
+  Enabled: false # reason: needed to escape strings with both single and double quotes
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
+  Enabled: true
+Style/RedundantSelfAssignment:
+  Enabled: true
+Style/RedundantSelfAssignmentBranch:
+  Enabled: false
+Style/RegexpLiteral:
+  Enabled: true
+  Exclude: [ test/*.rb ]
+Style/RescueModifier:
+  Enabled: false # reason: a useful language feature
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+Style/MissingRespondToMissing:
+  Enabled: true
+Style/SafeNavigation:
+  Enabled: false # FIXME reenable in Asciidoctor 3
+Style/SelectByRegexp:
+  Enabled: true
+Style/SingleArgumentDig:
+  Enabled: true
+Style/SlicingWithRange:
+  Enabled: true
+Style/SoleNestedConditional:
+  Enabled: false # FIXME reenable to catch some helpful fixes, but causes RuboCop to crash
+Style/SpecialGlobalVars:
+  EnforcedStyle: use_perl_names
+Style/StderrPuts:
+  Enabled: true
+  Exclude: [ lib/asciidoctor/cli/options.rb ]
+Style/StringChars:
+  Enabled: true
+Style/StringConcatenation:
+  Enabled: false # reason: string concatenation can be faster
+Style/SwapValues:
+  Enabled: true
+Style/SymbolArray:
+  EnforcedStyle: brackets
+Style/SymbolProc:
+  Enabled: false # reason: using a symbol proc is measurably slower than using a block in Opal and Ruby < 3
+Style/TernaryParentheses:
+  Enabled: true
+  EnforcedStyle: require_parentheses_when_complex
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+Style/WordArray:
+  Enabled: true

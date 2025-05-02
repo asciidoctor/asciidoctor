@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
   module Cli
     # Public Invocation class for starting Asciidoctor via CLI
@@ -78,6 +79,11 @@ module Asciidoctor
           end
         end
 
+        if (logger_level = opts.delete :log_level) && !old_logger
+          old_logger_level ||= logger.level
+          logger.level = logger_level
+        end
+
         if infiles.size == 1
           if (infile0 = infiles[0]) == '-'
             outfile ||= infile0
@@ -131,19 +137,16 @@ module Asciidoctor
           end
         end
         @code = 1 if (logger.respond_to? :max_severity) && logger.max_severity && logger.max_severity >= opts[:failure_level]
-      rescue ::Exception => e
+      rescue ::Exception => e # rubocop:disable Lint/RescueException
         if ::SignalException === e
           @code = e.signo
           # add extra newline if Ctrl+C is used
           err.puts if ::Interrupt === e
         else
           @code = (e.respond_to? :status) ? e.status : 1
-          if @options[:trace]
-            raise e
-          else
-            err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
-            err.puts '  Use --trace to show backtrace'
-          end
+          raise e if @options[:trace]
+          err.puts ::RuntimeError === e ? %(#{e.message} (#{e.class})) : e.message
+          err.puts '  Use --trace to show backtrace'
         end
         nil
       ensure

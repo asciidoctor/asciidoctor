@@ -1,11 +1,9 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
-v2.0.23, 2024-05-17
 // settings:
 :idprefix:
 :idseparator: -
 :source-language: ruby
-:language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
 :status:
@@ -16,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.23
+:release-version: 2.0.22
 // URLs:
 :url-org: https://github.com/asciidoctor
 :url-repo: {url-org}/asciidoctor
@@ -43,7 +41,7 @@ endif::[]
 :url-license: {url-rel-file-base}LICENSE
 :url-tests: {url-rel-tree-base}test
 :url-discuss: https://discuss.asciidoctor.org
-:url-chat: https://asciidoctor.zulipchat.com
+:url-chat: https://chat.asciidoctor.org
 :url-rubygem: https://rubygems.org/gems/asciidoctor
 :url-what-is-asciidoc: {url-docs}/asciidoctor/latest/#relationship-to-asciidoc
 :url-install-docker: https://github.com/asciidoctor/docker-asciidoctor
@@ -62,7 +60,7 @@ In addition to running on Ruby, Asciidoctor can be executed on a JVM using {url-
 
 ifndef::env-site,env-yard[]
 This document is also available in the following languages: +
-{url-rel-file-base}README-zh_CN.adoc[汉语]
+{url-rel-file-base}README-zh_CN.adoc[简体中文]
 |
 {url-rel-file-base}README-de.adoc[Deutsch]
 |
@@ -130,8 +128,8 @@ If you're using AsciiDoc.py, see {url-docs}/asciidoctor/latest/migrate/asciidoc-
 
 Asciidoctor works on Linux, macOS and Windows and requires one of the following implementations of {url-ruby}[Ruby]:
 
-* CRuby (aka MRI) 2.3 - 3.3
-* JRuby 9.1 - 9.4
+* CRuby (aka MRI) 2.7 - 3.3
+* JRuby 9.2 - 9.4
 * TruffleRuby (GraalVM)
 
 [CAUTION]
@@ -226,10 +224,7 @@ To use Asciidoctor with Windows, you have two options.
 
 When you already use https://chocolatey.org[chocolatey] on your machine, you can use:
 
-[source]
-----
-choco install ruby
-----
+ choco install ruby
 
 Then follow <<gem-install,gem installation instructions>>.
 
@@ -262,7 +257,7 @@ See {url-install-docker}[Installing Asciidoctor using Docker].
 . Create a Gemfile in the root folder of your project (or the current directory)
 . Add the `asciidoctor` gem to your Gemfile as follows:
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -372,13 +367,15 @@ The API is intended for integration with other Ruby software, such as Rails, Git
 
 To use Asciidoctor in your application, you first need to require the gem:
 
-[source]
+----
 require 'asciidoctor'
+----
 
 You can then convert an AsciiDoc source file to an HTML file using:
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: When using Asciidoctor via the API, the default safe mode is `:secure`.
 In secure mode, several core features are disabled, including the `include` directive.
@@ -386,7 +383,6 @@ If you want to enable these features, you'll need to explicitly set the safe mod
 
 You can also convert an AsciiDoc string to embeddable HTML (for inserting in an HTML page) using:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -394,7 +390,6 @@ Asciidoctor.convert content, safe: :safe
 
 If you want the full HTML document, enable the `header_footer` option as follows:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -402,7 +397,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 If you need access to the parsed document, you can split the conversion into discrete steps:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe
@@ -448,12 +442,13 @@ The {url-contribute}[Contributing] guide provides information on how to create, 
 == Getting Help
 
 Asciidoctor is developed to help you easily write and publish your content.
-But we can't do it without your feedback!
-We encourage you to ask questions and discuss any aspects of the project on the discussion list, on Twitter or in the chat room.
+But we can't do it without your input.
+If you need assistance or want to provide feedback, please follow the links to the resources listed on the https://docs.asciidoctor.org/about/support/[Get Help] page in the docs.
+Here's a quick summary:
 
-Chat (Zulip):: {url-chat}
-Discussion list (Nabble):: {url-discuss}
-Twitter:: Follow https://twitter.com/asciidoctor[@asciidoctor] or search for the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
+Project chat (Zulip):: {url-chat}
+Discussion list (archived):: {url-discuss}
+Social media (Twitter):: Follow https://twitter.com/asciidoctor[@asciidoctor] or search the https://twitter.com/search?f=tweets&q=%23asciidoctor[#asciidoctor] hashtag
 
 ifdef::env-github[]
 Further information and documentation about Asciidoctor can be found on the project's website.

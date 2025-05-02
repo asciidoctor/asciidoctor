@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods for managing sections of AsciiDoc content in a document.
 # The section responds as an Array of content blocks by delegating
@@ -20,7 +21,6 @@ module Asciidoctor
 #   section.size
 #   => 1
 class Section < AbstractBlock
-
   # Public: Get/Set the 0-based index order of this section within the parent block
   attr_accessor :index
 
@@ -116,9 +116,9 @@ class Section < AbstractBlock
   #   # => 1,1,1
   #
   # Returns the section number as a String
-  def sectnum(delimiter = '.', append = nil)
+  def sectnum delimiter = '.', append = nil
     append ||= (append == false ? '' : delimiter)
-    @level > 1 && Section === @parent ? %(#{@parent.sectnum(delimiter, delimiter)}#{@numeral}#{append}) : %(#{@numeral}#{append})
+    @level > 1 && Section === @parent ? %(#{@parent.sectnum delimiter, delimiter}#{@numeral}#{append}) : %(#{@numeral}#{append})
   end
 
   # (see AbstractBlock#xreftext)

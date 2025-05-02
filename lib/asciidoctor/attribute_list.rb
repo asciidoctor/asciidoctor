@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Handles parsing AsciiDoc attribute lists into a Hash of key/value
 # pairs. By default, attributes must each be separated by a comma and quotes
@@ -30,25 +31,22 @@ class AttributeList
   BoundaryRx = {
     QUOT => /.*?[^\\](?=")/,
     APOS => /.*?[^\\](?=')/,
-    ',' => /.*?(?=[ \t]*(,|$))/
+    ',' => /.*?(?=[ \t]*(,|$))/,
   }
 
   # Public: Regular expressions for unescaping quoted characters
   EscapedQuotes = {
     QUOT => '\\"',
-    APOS => '\\\''
+    APOS => '\\\'',
   }
 
-  # Public: A regular expression for an attribute name (approx. name token from XML)
-  # TODO named attributes cannot contain dash characters
-  NameRx = /#{CG_WORD}[#{CC_WORD}\-.]*/
+  # Public: A regular expression for an attribute name (matches syntax of a document attribute)
+  NameRx = /#{CG_WORD}[#{CC_WORD}-]*/
 
   BlankRx = /[ \t]+/
 
   # Public: Regular expressions for skipping delimiters
-  SkipRx = {
-    ',' => /[ \t]*(,|$)/
-  }
+  SkipRx = { ',' => /[ \t]*(,|$)/ }
 
   def initialize source, block = nil, delimiter = ','
     @scanner = ::StringScanner.new source

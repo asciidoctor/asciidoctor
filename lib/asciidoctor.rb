@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'set'
 
 # NOTE RUBY_ENGINE == 'opal' conditional blocks like this are filtered by the Opal preprocessor
@@ -37,7 +38,7 @@ end
 #   puts Asciidoctor.convert "I'm using *Asciidoctor* version {asciidoctor-version}.", safe: :safe
 #
 #   # Convert an AsciiDoc file using Tilt-supported templates
-#   Asciidoctor.convert_file 'document.adoc', safe: :safe, template_dir: '/path/to/templates'
+#   Asciidoctor.convert_file 'document.adoc', safe: :safe, template_dirs: ['/path/to/templates']
 #
 #   # Parse an AsciiDoc file into a document object
 #   doc = Asciidoctor.load_file 'document.adoc', safe: :safe
@@ -90,7 +91,7 @@ module Asciidoctor
     @names_by_value = (constants false).map {|sym| [(const_get sym), sym.to_s.downcase] }.sort {|(a), (b)| a <=> b }.to_h
 
     def self.value_for_name name
-      const_get name.upcase, false
+      const_get name.upcase, false rescue nil
     end
 
     def self.name_for_value value
@@ -223,20 +224,18 @@ module Asciidoctor
   # The backend determines the format of the converted output, default to html5
   DEFAULT_BACKEND = 'html5'
 
-  DEFAULT_STYLESHEET_KEYS = ['', 'DEFAULT'].to_set
+  DEFAULT_STYLESHEET_KEYS = ::Set['', 'DEFAULT']
 
   DEFAULT_STYLESHEET_NAME = 'asciidoctor.css'
 
   # Pointers to the preferred version for a given backend.
   BACKEND_ALIASES = {
     'html' => 'html5',
-    'docbook' => 'docbook5'
+    'docbook' => 'docbook5',
   }
 
   # Default page widths for calculating absolute widths
-  DEFAULT_PAGE_WIDTHS = {
-    'docbook' => 425
-  }
+  DEFAULT_PAGE_WIDTHS = { 'docbook' => 425 }
 
   # Default extensions for the respective base backends
   DEFAULT_EXTENSIONS = {
@@ -245,7 +244,7 @@ module Asciidoctor
     'pdf' => '.pdf',
     'epub' => '.epub',
     'manpage' => '.man',
-    'asciidoc' => '.adoc'
+    'asciidoc' => '.adoc',
   }
 
   # A map of file extensions that are recognized as AsciiDoc documents
@@ -256,7 +255,7 @@ module Asciidoctor
     '.asc' => true,
     '.ad' => true,
     # TODO .txt should be deprecated
-    '.txt' => true
+    '.txt' => true,
   }
 
   SETEXT_SECTION_LEVELS = {
@@ -264,31 +263,31 @@ module Asciidoctor
     '-' => 1,
     '~' => 2,
     '^' => 3,
-    '+' => 4
+    '+' => 4,
   }
 
-  ADMONITION_STYLES = ['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION'].to_set
+  ADMONITION_STYLES = ::Set['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
-  ADMONITION_STYLE_HEADS = ::Set.new.tap {|accum| ADMONITION_STYLES.each {|s| accum << s.chr } }
+  ADMONITION_STYLE_HEADS = ::Set.new(ADMONITION_STYLES.map {|it| it.chr })
 
-  PARAGRAPH_STYLES = ['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro'].to_set
+  PARAGRAPH_STYLES = ::Set['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro']
 
-  VERBATIM_STYLES = ['literal', 'listing', 'source', 'verse'].to_set
+  VERBATIM_STYLES = ::Set['literal', 'listing', 'source', 'verse']
 
   DELIMITED_BLOCKS = {
-    '--' => [:open, ['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro'].to_set],
-    '----' => [:listing, ['literal', 'source'].to_set],
-    '....' => [:literal, ['listing', 'source'].to_set],
-    '====' => [:example, ['admonition'].to_set],
+    '--' => [:open, ::Set['comment', 'example', 'literal', 'listing', 'pass', 'quote', 'sidebar', 'source', 'verse', 'admonition', 'abstract', 'partintro']],
+    '----' => [:listing, ::Set['literal', 'source']],
+    '....' => [:literal, ::Set['listing', 'source']],
+    '====' => [:example, ::Set['admonition']],
     '****' => [:sidebar, ::Set.new],
-    '____' => [:quote, ['verse'].to_set],
-    '++++' => [:pass, ['stem', 'latexmath', 'asciimath'].to_set],
+    '____' => [:quote, ::Set['verse']],
+    '++++' => [:pass, ::Set['stem', 'latexmath', 'asciimath']],
     '|===' => [:table, ::Set.new],
     ',===' => [:table, ::Set.new],
     ':===' => [:table, ::Set.new],
     '!===' => [:table, ::Set.new],
     '////' => [:comment, ::Set.new],
-    '```' => [:fenced_code, ::Set.new]
+    '```' => [:fenced_code, ::Set.new],
   }
 
   DELIMITED_BLOCK_HEADS = {}.tap {|accum| DELIMITED_BLOCKS.each_key {|k| accum[k.slice 0, 2] = true } }
@@ -299,13 +298,13 @@ module Asciidoctor
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
-    '<' => :page_break
+    '<' => :page_break,
   }
 
   MARKDOWN_THEMATIC_BREAK_CHARS = {
     '-' => :thematic_break,
     '*' => :thematic_break,
-    '_' => :thematic_break
+    '_' => :thematic_break,
   }
 
   HYBRID_LAYOUT_BREAK_CHARS = LAYOUT_BREAK_CHARS.merge MARKDOWN_THEMATIC_BREAK_CHARS
@@ -324,7 +323,7 @@ module Asciidoctor
     'lowerroman' => 'i',
     #'lowergreek' => 'a',
     'upperalpha' => 'A',
-    'upperroman' => 'I'
+    'upperroman' => 'I',
   }
 
   ATTR_REF_HEAD = '{'
@@ -351,7 +350,7 @@ module Asciidoctor
   (STEM_TYPE_ALIASES = {
     'latexmath' => 'latexmath',
     'latex' => 'latexmath',
-    'tex' => 'latexmath'
+    'tex' => 'latexmath',
   }).default = 'asciimath'
 
   FONT_AWESOME_VERSION = '4.7.0'
@@ -419,7 +418,7 @@ module Asciidoctor
     'cpp' => 'C&#43;&#43;',
     'amp' => '&',
     'lt' => '<',
-    'gt' => '>'
+    'gt' => '>',
   }
 
   # Regular expression character classes (to ensure regexp compatibility between Ruby and JavaScript)
@@ -436,6 +435,8 @@ module Asciidoctor
     CC_WORD = CG_WORD = '\p{Word}'
   end
 
+  QuoteAttributeListRxt = %(\\[([^\\[\\]]+)\\])
+
   QUOTE_SUBS = {}.tap do |accum|
     # unconstrained quotes:: can appear anywhere
     # constrained quotes:: must be bordered by non-word characters
@@ -443,46 +444,46 @@ module Asciidoctor
     # the order in which they are replaced is important
     accum[false] = normal = [
       # **strong**
-      [:strong, :unconstrained, /\\?(?:\[([^\]]+)\])?\*\*(#{CC_ALL}+?)\*\*/m],
+      [:strong, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?\*\*(#{CC_ALL}+?)\*\*/m],
       # *strong*
-      [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\*(\S|\S#{CC_ALL}*?\S)\*(?!#{CG_WORD})/m],
+      [:strong, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?\*(\S|\S#{CC_ALL}*?\S)\*(?!#{CG_WORD})/m],
       # "`double-quoted`"
-      [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?"`(\S|\S#{CC_ALL}*?\S)`"(?!#{CG_WORD})/m],
+      [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?"`(\S|\S#{CC_ALL}*?\S)`"(?!#{CG_WORD})/m],
       # '`single-quoted`'
-      [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:\[([^\]]+)\])?'`(\S|\S#{CC_ALL}*?\S)`'(?!#{CG_WORD})/m],
+      [:single, :constrained, /(^|[^#{CC_WORD};:`}])(?:#{QuoteAttributeListRxt})?'`(\S|\S#{CC_ALL}*?\S)`'(?!#{CG_WORD})/m],
       # ``monospaced``
-      [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?``(#{CC_ALL}+?)``/m],
+      [:monospaced, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?``(#{CC_ALL}+?)``/m],
       # `monospaced`
-      [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)`(?![#{CC_WORD}"'`])/m],
+      [:monospaced, :constrained, /(^|[^#{CC_WORD};:"'`}])(?:#{QuoteAttributeListRxt})?`(\S|\S#{CC_ALL}*?\S)`(?![#{CC_WORD}"'`])/m],
       # __emphasis__
-      [:emphasis, :unconstrained, /\\?(?:\[([^\]]+)\])?__(#{CC_ALL}+?)__/m],
+      [:emphasis, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?__(#{CC_ALL}+?)__/m],
       # _emphasis_
-      [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
+      [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?_(\S|\S#{CC_ALL}*?\S)_(?!#{CG_WORD})/m],
       # ##mark## (referred to in AsciiDoc.py as unquoted)
-      [:mark, :unconstrained, /\\?(?:\[([^\]]+)\])?##(#{CC_ALL}+?)##/m],
+      [:mark, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?##(#{CC_ALL}+?)##/m],
       # #mark# (referred to in AsciiDoc.py as unquoted)
-      [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:\[([^\]]+)\])?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
+      [:mark, :constrained, /(^|[^#{CC_WORD}&;:}])(?:#{QuoteAttributeListRxt})?#(\S|\S#{CC_ALL}*?\S)#(?!#{CG_WORD})/m],
       # ^superscript^
-      [:superscript, :unconstrained, /\\?(?:\[([^\]]+)\])?\^(\S+?)\^/],
+      [:superscript, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?\^(\S+?)\^/],
       # ~subscript~
-      [:subscript, :unconstrained, /\\?(?:\[([^\]]+)\])?~(\S+?)~/]
+      [:subscript, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?~(\S+?)~/],
     ]
 
     accum[true] = compat = normal.drop 0
     # ``quoted''
-    compat[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
+    compat[2] = [:double, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?``(\S|\S#{CC_ALL}*?\S)''(?!#{CG_WORD})/m]
     # `quoted'
-    compat[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?`(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
+    compat[3] = [:single, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?`(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
     # ++monospaced++
-    compat[4] = [:monospaced, :unconstrained, /\\?(?:\[([^\]]+)\])?\+\+(#{CC_ALL}+?)\+\+/m]
+    compat[4] = [:monospaced, :unconstrained, /\\?(?:#{QuoteAttributeListRxt})?\+\+(#{CC_ALL}+?)\+\+/m]
     # +monospaced+
-    compat[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?\+(\S|\S#{CC_ALL}*?\S)\+(?!#{CG_WORD})/m]
+    compat[5] = [:monospaced, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?\+(\S|\S#{CC_ALL}*?\S)\+(?!#{CG_WORD})/m]
     # #unquoted#
     #compat[8] = [:unquoted, *compat[8][1..-1]]
     # ##unquoted##
     #compat[9] = [:unquoted, *compat[9][1..-1]]
     # 'emphasis'
-    compat.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:\[([^\]]+)\])?'(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
+    compat.insert 3, [:emphasis, :constrained, /(^|[^#{CC_WORD};:}])(?:#{QuoteAttributeListRxt})?'(\S|\S#{CC_ALL}*?\S)'(?!#{CG_WORD})/m]
   end
 
   # NOTE order of replacements is significant
@@ -513,7 +514,7 @@ module Asciidoctor
     # left double arrow <=
     [/\\?&lt;=/, '&#8656;', :none],
     # restore entities
-    [/\\?(&)amp;((?:[a-zA-Z][a-zA-Z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-fA-F][\da-fA-F][\da-fA-F]{0,3});)/, '', :bounding]
+    [/\\?(&)amp;((?:[a-zA-Z][a-zA-Z]+\d{0,2}|#\d\d\d{0,4}|#x[\da-fA-F][\da-fA-F][\da-fA-F]{0,3});)/, '', :bounding],
   ]
 
   # Internal: Automatically load the Asciidoctor::Extensions module.

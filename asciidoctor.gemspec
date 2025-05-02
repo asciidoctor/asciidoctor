@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://asciidoctor.org'
   s.license = 'MIT'
   # NOTE required ruby version is informational only; it's not enforced since it can't be overridden and can cause builds to break
-  #s.required_ruby_version = '>= 2.3.0'
+  #s.required_ruby_version = '>= 2.5.0'
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
@@ -41,7 +41,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'erubi', '~> 1.10.0'
   s.add_development_dependency 'haml', '~> 6.3.0'
   s.add_development_dependency 'minitest', '~> 5.22.0'
-  s.add_development_dependency 'nokogiri', '~> 1.13.0'
+  s.add_development_dependency 'nokogiri', '~> 1.14.0'
   s.add_development_dependency 'rake', '~> 12.3.0'
   s.add_development_dependency 'slim', '~> 4.1.0'
   s.add_development_dependency 'tilt', '~> 2.0.0'

@@ -1,11 +1,9 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
-v2.0.23, 2024-05-17
 // settings:
 :idprefix:
 :idseparator: -
 :source-language: ruby
-:language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
 :status:
@@ -16,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.23
+:release-version: 2.0.22
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -44,7 +42,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-chat: https://asciidoctor.zulipchat.com
+:uri-chat: https://chat.asciidoctor.org
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -74,7 +72,7 @@ ifndef::env-site,env-yard[]
 このドキュメントには以下の言語版が存在します: +
 {uri-rel-file-base}README.adoc[English]
 |
-{uri-rel-file-base}README-zh_CN.adoc[汉语]
+{uri-rel-file-base}README-zh_CN.adoc[简体中文]
 |
 {uri-rel-file-base}README-de.adoc[Deutsch]
 |
@@ -136,8 +134,8 @@ Chrome, Atom, Bracketsやその他のウェブベースのツールで, AsciiDoc
 
 AsciidoctorはLinux, macOS, およびWindowsで動作し, 下記の {uri-ruby}[Ruby]実装の一つを必要とします.
 
-* CRuby (aka MRI) 2.3 - 2.6
-* JRuby 9.1 - 9.2
+* CRuby (aka MRI) 2.5 - 3.1
+* JRuby 9.1 - 9.3
 * TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
@@ -218,10 +216,7 @@ WindowsでAsciidoctorを使う場合は, 簡単な方法が2つあります.
 
 すでにお使いのマシンで https://chocolatey.org[chocolatey] を使用しているなら, 以下の方法を使用することができます:
 
-[source]
-----
-choco install ruby
-----
+ choco install ruby
 
 そのあとは <<gem-install,gemのインストール方法>> に従ってください.
 
@@ -253,7 +248,7 @@ RVMを使用すると, システムから隔離された場所にgemがインス
 . プロジェクトのルートフォルダ(またはカレントディレクトリ)にGemfileを作成
 . `asciidoctor` gemをGemfileに以下のように追加:
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -322,7 +317,7 @@ AsciidoctorのバージョンとRuby環境についての情報がターミナ�
 [.output,subs=attributes+]
 ....
 Asciidoctor {release-version} [https://asciidoctor.org]
-Runtime Environment (ruby 2.6.0p0 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 3.0.1p64 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 AsciidoctorはAPIも提供します.
@@ -356,13 +351,15 @@ APIは他のRubyソフトウェア, たとえばRails, Sinatra, GitHub, そし�
 
 Asciidoctorをアプリケーションの中で使うには, まずgemをrequireする必要があります:
 
-[source]
+----
 require 'asciidoctor'
+----
 
 そうすると, 以下のようにしてAsciiDocソースファイルをHTMLファイルに変換できます:
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: AsciidoctorをAPI経由で使っているとき, デフォルトのセーフモードは `:secure` （セキュアモード）です.
 セキュアモードでは, `include` ディレクティブを含むいくつかのコア機能が無効化されています.
@@ -370,7 +367,6 @@ WARNING: AsciidoctorをAPI経由で使っているとき, デフォルトのセ�
 
 AsciiDoc文字列を, 埋め込み用HTML(HTMLページヘの挿入用)に変換することもできます:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -378,7 +374,6 @@ Asciidoctor.convert content, safe: :safe
 
 もし完全なHTMLドキュメントが必要であれば, 以下のように `header_footer` オプションを有効にしてください:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -386,7 +381,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 パースされたドキュメントにアクセスしたい場合は, 変換を複数のステップに分割します:
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

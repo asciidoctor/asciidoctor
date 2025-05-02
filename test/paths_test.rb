@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Path Resolver' do
@@ -113,18 +114,14 @@ context 'Path Resolver' do
     end
 
     test 'raises security error if jail is not an absolute path' do
-      begin
-        @resolver.system_path('images/tiger.png', '/etc', 'foo')
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
+      assert_raises SecurityError do
+        @resolver.system_path 'images/tiger.png', '/etc', 'foo'
       end
     end
 
     #test 'raises security error if jail is not a canonical path' do
-    #  begin
+    #  assert_raises SecurityError do
     #    @resolver.system_path('images/tiger.png', '/etc', %(#{JAIL}/../foo))
-    #    flunk 'Expecting SecurityError to be raised'
-    #  rescue SecurityError
     #  end
     #end
 
@@ -145,10 +142,8 @@ context 'Path Resolver' do
     end
 
     test 'throws exception for illegal path access if recover is false' do
-      begin
-        @resolver.system_path('../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
+      assert_raises SecurityError do
+        @resolver.system_path '../../../../../css', "#{JAIL}/assets/stylesheets", JAIL, recover: false
       end
     end
 
@@ -228,7 +223,7 @@ context 'Path Resolver' do
     test 'allows start path to be parent of jail if resolved target is inside jail' do
       assert_equal "#{JAIL}/foo/path", @resolver.system_path('foo/path', JAIL, "#{JAIL}/foo")
       @resolver.file_separator = '\\'
-      assert_equal "C:/dev/project/README.adoc", @resolver.system_path('project/README.adoc', 'C:/dev', 'C:/dev/project')
+      assert_equal 'C:/dev/project/README.adoc', @resolver.system_path('project/README.adoc', 'C:/dev', 'C:/dev/project')
     end
 
     test 'relocates target to jail if resolved value fails outside of jail' do
@@ -244,16 +239,11 @@ context 'Path Resolver' do
     end
 
     test 'raises security error if start is not contained within jail and recover is disabled' do
-      begin
-        @resolver.system_path('images/tiger.png', '/etc', JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
+      assert_raises SecurityError do
+        @resolver.system_path 'images/tiger.png', '/etc', JAIL, recover: false
       end
-
-      begin
-        @resolver.system_path('.', '/etc', JAIL, recover: false)
-        flunk 'Expecting SecurityError to be raised'
-      rescue SecurityError
+      assert_raises SecurityError do
+        @resolver.system_path '.', '/etc', JAIL, recover: false
       end
     end
 
@@ -274,11 +264,11 @@ context 'Path Resolver' do
     end
 
     test 'File.dirname preserves UNC path root on Windows', if: windows? do
-      assert_equal File.dirname('\\\\server\\docs\\file.html'), '\\\\server\\docs'
+      assert_equal '\\\\server\\docs', File.dirname('\\\\server\\docs\\file.html')
     end
 
     test 'File.dirname preserves posix-style UNC path root on Windows', if: windows? do
-      assert_equal File.dirname('//server/docs/file.html'), '//server/docs'
+      assert_equal '//server/docs', File.dirname('//server/docs/file.html')
     end
 
     test 'resolves UNC path if start is absolute and target is relative' do
@@ -307,14 +297,14 @@ context 'Path Resolver' do
     end
 
     test 'resolves relative target relative to current directory if start is empty' do
-      pwd = File.expand_path(Dir.pwd)
+      pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do
-      pwd = File.expand_path(Dir.pwd)
+      pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', '')
       assert_equal "#{pwd}/.images/tiger.png", @resolver.system_path('.images/tiger.png', nil)
     end
@@ -351,7 +341,7 @@ context 'Path Resolver' do
     end
 
     test 'should calculate relative path' do
-      filename = @resolver.system_path('part1/chapter1/section1.adoc', nil, JAIL)
+      filename = @resolver.system_path 'part1/chapter1/section1.adoc', nil, JAIL
       assert_equal "#{JAIL}/part1/chapter1/section1.adoc", filename
       assert_equal 'part1/chapter1/section1.adoc', @resolver.relative_path(filename, JAIL)
     end
@@ -373,7 +363,7 @@ context 'Path Resolver' do
     test 'should resolve relative path relative to base dir in unsafe mode' do
       base_dir = fixture_path 'base'
       doc = empty_document base_dir: base_dir, safe: Asciidoctor::SafeMode::UNSAFE
-      expected = ::File.join base_dir, 'images', 'tiger.png'
+      expected = File.join base_dir, 'images', 'tiger.png'
       actual = doc.normalize_system_path 'tiger.png', 'images'
       assert_equal expected, actual
     end

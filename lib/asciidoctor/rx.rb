@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
   # A collection of regular expression constants used by the parser. (For speed, these are not defined in the Rx module,
   # but rather directly in the Asciidoctor module).
@@ -341,7 +342,7 @@ module Asciidoctor
     '::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::)(?:$|[ \t]+(#{CC_ANY}*)$)),
     ':::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(:::)(?:$|[ \t]+(#{CC_ANY}*)$)),
     '::::' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?[^:]|[^ \t:])(::::)(?:$|[ \t]+(#{CC_ANY}*)$)),
-    ';;' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$))
+    ';;' => %r(^(?!//[^/])[ \t]*([^ \t]#{CC_ANY}*?)(;;)(?:$|[ \t]+(#{CC_ANY}*)$)),
   }
 
   # Matches a callout list item.
@@ -581,8 +582,8 @@ module Asciidoctor
   #
   # NOTE we always capture the attributes so we know when to use compatible (i.e., legacy) behavior
   InlinePassRx = {
-    false => ['+', '-]', /((?:^|[^#{CC_WORD};:\\])(?=(\[)|\+)|\\(?=\[)|(?=\\\+))(?:\2(x-|[^\]]+ x-)\]|(?:\[([^\]]+)\])?(?=(\\)?\+))(\5?(\+|`)(\S|\S#{CC_ALL}*?\S)\7)(?!#{CG_WORD})/m],
-    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:(\Z)()|\[([^\]]+)\](?=(\\))?)?(\5?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\7)(?![`#{CC_WORD}])/m],
+    false => ['+', '-]', /((?:^|[^#{CC_WORD};:\\])(?=(\[)|\+)|\\(?=\[)|(?=\\\+))(?:\2(x-|[^\[\]]+ x-)\]|(?:#{QuoteAttributeListRxt})?(?=(\\)?\+))(\5?(\+|`)(\S|\S#{CC_ALL}*?\S)\7)(?!#{CG_WORD})/m],
+    true => ['`', nil, /(^|[^`#{CC_WORD}])(?:(\Z)()|#{QuoteAttributeListRxt}(?=(\\))?)?(\5?(`)([^`\s]|[^`\s]#{CC_ALL}*?\S)\7)(?![`#{CC_WORD}])/m],
   }
 
   # Matches several variants of the passthrough inline macro, which may span multiple lines.
@@ -594,7 +595,7 @@ module Asciidoctor
   #   pass:quotes[text]
   #
   # NOTE we have to support an empty pass:[] for compatibility with AsciiDoc.py
-  InlinePassMacroRx = /(?:(?:(\\?)\[([^\]]+)\])?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
+  InlinePassMacroRx = /(?:(?:(\\?)#{QuoteAttributeListRxt})?(\\{0,2})(\+\+\+?|\$\$)(#{CC_ALL}*?)\4|(\\?)pass:([a-z]+(?:,[a-z-]+)*)?\[(|#{CC_ALL}*?[^\\])\])/m
 
   # Matches an xref (i.e., cross-reference) inline macro, which may span multiple lines.
   #

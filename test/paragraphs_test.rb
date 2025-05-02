@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Paragraphs' do
@@ -85,8 +86,7 @@ context 'Paragraphs' do
     end
 
     test 'removes indentation from literal paragraph marked as normal' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [normal]
         Normal paragraph.
           Nothing special.
@@ -265,8 +265,7 @@ context 'Paragraphs' do
 
   context 'Literal' do
     test 'single-line literal paragraphs' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       you know what?
 
        LITERALS
@@ -280,8 +279,7 @@ context 'Paragraphs' do
     end
 
     test 'multi-line literal paragraph' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       Install instructions:
 
        yum install ruby rubygems
@@ -352,8 +350,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block attribute list' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
        literal text
       [normal]
       normal text
@@ -364,8 +361,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at block delimiter' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
        literal text
       --
       normal text
@@ -377,8 +373,7 @@ context 'Paragraphs' do
     end
 
     test 'literal paragraph terminates at list continuation' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
        literal text
       +
       EOS
@@ -391,7 +386,7 @@ context 'Paragraphs' do
   end
 
   context 'Quote' do
-    test "single-line quote paragraph" do
+    test 'single-line quote paragraph' do
       input = <<~'EOS'
       [quote]
       Famous quote.
@@ -414,8 +409,8 @@ context 'Paragraphs' do
       assert_xpath %(/*[@class="paragraph"]/p[text() = "+"]), output, 1
     end
 
-    test "verse paragraph" do
-      output = convert_string("[verse]\nFamous verse.")
+    test 'verse paragraph' do
+      output = convert_string "[verse]\nFamous verse."
       assert_xpath '//*[@class = "verseblock"]', output, 1
       assert_xpath '//*[@class = "verseblock"]/pre', output, 1
       assert_xpath '//*[@class = "verseblock"]//p', output, 0
@@ -444,22 +439,22 @@ context 'Paragraphs' do
     end
   end
 
-  context "special" do
-    test "note multiline syntax" do
+  context 'special' do
+    test 'note multiline syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\nThis is a winner.")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%([#{style}]\nThis is a winner.))
       end
     end
 
-    test "note block syntax" do
+    test 'note block syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("[#{style}]\n====\nThis is a winner.\n====")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%([#{style}]\n====\nThis is a winner.\n====))
       end
     end
 
-    test "note inline syntax" do
+    test 'note inline syntax' do
       Asciidoctor::ADMONITION_STYLES.each do |style|
-        assert_xpath "//div[@class='admonitionblock #{style.downcase}']", convert_string("#{style}: This is important, fool!")
+        assert_xpath %(//div[@class='admonitionblock #{style.downcase}']), convert_string(%(#{style}: This is important, fool!))
       end
     end
 

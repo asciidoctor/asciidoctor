@@ -1,13 +1,13 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 BUILT_IN_ELEMENTS = %w(admonition audio colist dlist document embedded example floating_title image inline_anchor inline_break inline_button inline_callout inline_footnote inline_image inline_indexterm inline_kbd inline_menu inline_quoted listing literal stem olist open page_break paragraph pass preamble quote section sidebar table thematic_break toc ulist verse video)
 
 context 'Document' do
-
   context 'Example document' do
     test 'document title' do
-      doc = example_document(:asciidoc_index)
+      doc = example_document :asciidoc_index
       assert_equal 'AsciiDoc Home Page', doc.doctitle
       assert_equal 'AsciiDoc Home Page', doc.name
       refute_nil doc.header
@@ -19,7 +19,7 @@ context 'Document' do
 
       # verify compat-mode is set when atx-style doctitle is used
       result = doc.blocks[0].convert
-      assert_xpath %q(//em[text()="Stuart Rackham"]), result, 1
+      assert_xpath '//em[text()="Stuart Rackham"]', result, 1
     end
   end
 
@@ -69,11 +69,8 @@ context 'Document' do
     end
 
     test 'safe model level cannot be modified' do
-      doc = empty_document
-      begin
-        doc.safe = Asciidoctor::SafeMode::UNSAFE
-        flunk 'safe mode property of Asciidoctor::Document should not be writable!'
-      rescue
+      assert_raises NoMethodError, 'safe mode property of Asciidoctor::Document should not be writable!' do
+        empty_document.safe = Asciidoctor::SafeMode::UNSAFE
       end
     end
 
@@ -82,8 +79,8 @@ context 'Document' do
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
       result = doc.convert
-      assert_match('<?asciidoc-toc?>', result)
-      assert_match('<?asciidoc-numbered?>', result)
+      assert_match '<?asciidoc-toc?>', result
+      assert_match '<?asciidoc-numbered?>', result
     end
 
     test 'maxdepth attribute should be set on asciidoc-toc and asciidoc-numbered processing instructions in DocBook backend' do
@@ -91,8 +88,8 @@ context 'Document' do
       assert doc.attr?('toc')
       assert doc.attr?('sectnums')
       result = doc.convert
-      assert_match('<?asciidoc-toc maxdepth="1"?>', result)
-      assert_match('<?asciidoc-numbered maxdepth="1"?>', result)
+      assert_match '<?asciidoc-toc maxdepth="1"?>', result
+      assert_match '<?asciidoc-numbered maxdepth="1"?>', result
     end
 
     test 'should be able to disable toc and sectnums in document header in DocBook backend' do
@@ -130,27 +127,27 @@ context 'Document' do
 
   context 'Docinfo files' do
     test 'should include docinfo files for html backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
       cases = {
-        'docinfo'                => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
-        'docinfo=private'        => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
-        'docinfo1'               => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
-        'docinfo=shared'         => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
-        'docinfo2'               => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
-        'docinfo docinfo2'       => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo' => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo=private' => { head_script: 1, meta: 0, top_link: 0, footer_script: 1, navbar: 1 },
+        'docinfo1' => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=shared' => { head_script: 0, meta: 1, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo2' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
+        'docinfo docinfo2' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
         'docinfo=private,shared' => { head_script: 1, meta: 1, top_link: 1, footer_script: 1, navbar: 1 },
-        'docinfo=private-head'   => { head_script: 1, meta: 0, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=private-head' => { head_script: 1, meta: 0, top_link: 0, footer_script: 0, navbar: 0 },
         'docinfo=private-header' => { head_script: 0, meta: 0, top_link: 0, footer_script: 0, navbar: 1 },
-        'docinfo=shared-head'    => { head_script: 0, meta: 1, top_link: 0, footer_script: 0, navbar: 0 },
+        'docinfo=shared-head' => { head_script: 0, meta: 1, top_link: 0, footer_script: 0, navbar: 0 },
         'docinfo=private-footer' => { head_script: 0, meta: 0, top_link: 0, footer_script: 1, navbar: 0 },
-        'docinfo=shared-footer'  => { head_script: 0, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
+        'docinfo=shared-footer' => { head_script: 0, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
         'docinfo=private-head\ ,\ shared-footer' => { head_script: 1, meta: 0, top_link: 1, footer_script: 0, navbar: 0 },
       }
 
       cases.each do |attr_val, markup|
-        output = Asciidoctor.convert_file sample_input_path, to_file: false,
-            standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: %(linkcss copycss! #{attr_val})
+        output = Asciidoctor.convert_file sample_input_path,
+          to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: %(linkcss copycss! #{attr_val})
         refute_empty output
         assert_css 'script[src="modernizr.js"]', output, markup[:head_script]
         assert_css 'meta[http-equiv="imagetoolbar"]', output, markup[:meta]
@@ -162,18 +159,18 @@ context 'Document' do
     end
 
     test 'should include docinfo header even if noheader attribute is set' do
-      sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+      sample_input_path = fixture_path 'basic.adoc'
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
       refute_empty output
       assert_css 'body > nav.navbar', output, 1
       assert_css 'body > nav.navbar + #content', output, 1
     end
 
     test 'should include docinfo footer even if nofooter attribute is set' do
-      sample_input_path = fixture_path('basic.adoc')
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
+      sample_input_path = fixture_path 'basic.adoc'
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'nofooter' => '' }
       refute_empty output
       assert_css 'body > a#top', output, 1
     end
@@ -181,8 +178,8 @@ context 'Document' do
     test 'should include user docinfo after built-in docinfo' do
       sample_input_path = fixture_path 'basic.adoc'
       attrs = { 'docinfo' => 'shared', 'source-highlighter' => 'highlight.js', 'linkcss' => '', 'copycss' => nil }
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: :safe, attributes: attrs
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: :safe, attributes: attrs
       assert_css 'link[rel=stylesheet] + meta[http-equiv=imagetoolbar]', output, 1
       assert_css 'meta[http-equiv=imagetoolbar] + *', output, 0
       assert_css 'script + a#top', output, 1
@@ -190,44 +187,44 @@ context 'Document' do
     end
 
     test 'should include docinfo files for html backend with custom docinfodir' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '', 'docinfodir' => 'custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 1
       assert_css 'meta[name="robots"]', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'docinfodir' => 'custom-docinfodir' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '', 'docinfodir' => 'custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 0
       assert_css 'meta[name="robots"]', output, 1
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => './custom-docinfodir' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => './custom-docinfodir' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 1
       assert_css 'meta[name="robots"]', output, 1
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-                                        standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => 'custom-docinfodir/subfolder' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '', 'docinfodir' => 'custom-docinfodir/subfolder' }
       refute_empty output
       assert_css 'script[src="bootstrap.js"]', output, 0
       assert_css 'meta[name="robots"]', output, 0
     end
 
     test 'should include docinfo files in docbook backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 1
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'productname', output, 1
       assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
@@ -235,8 +232,8 @@ context 'Document' do
       assert_xpath '//xmlns:edition[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'copyright', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'productname', output, 1
       assert_xpath '//xmlns:productname[text()="Asciidoctor™"]', output, 1
@@ -246,8 +243,8 @@ context 'Document' do
     end
 
     test 'should use header docinfo in place of default header' do
-      output = Asciidoctor.convert_file fixture_path('sample.adoc'), to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
+      output = Asciidoctor.convert_file fixture_path('sample.adoc'),
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private-header', 'noheader' => '' }
       refute_empty output
       assert_css 'article > info', output, 1
       assert_css 'article > info > title', output, 1
@@ -256,45 +253,45 @@ context 'Document' do
     end
 
     test 'should include docinfo footer files for html backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'body script', output, 1
       assert_css 'a#top', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'body script', output, 0
       assert_css 'a#top', output, 1
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'body script', output, 1
       assert_css 'a#top', output, 1
     end
 
     test 'should include docinfo footer files in DocBook backend' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
       assert_css 'glossary', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo1' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 0
       assert_css 'glossary[xml|id="_glossary"]', output, 1
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'article > revhistory', output, 1
       assert_xpath '/xmlns:article/xmlns:revhistory/xmlns:revision/xmlns:revnumber[text()="1.0"]', output, 1 # verifies substitutions are performed
@@ -309,9 +306,9 @@ context 'Document' do
       begin
         $VERBOSE = nil # disable warnings since we have to modify constants
         Encoding.default_external = Encoding.default_internal = Encoding::IBM437
-        sample_input_path = fixture_path('basic.adoc')
-        output = Asciidoctor.convert_file sample_input_path, to_file: false, standalone: true,
-            backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private,shared' }
+        sample_input_path = fixture_path 'basic.adoc'
+        output = Asciidoctor.convert_file sample_input_path,
+          to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docinfo' => 'private,shared' }
         refute_empty output
         assert_css 'productname', output, 1
         assert_includes output, '<productname>Asciidoctor™</productname>'
@@ -326,32 +323,32 @@ context 'Document' do
     end
 
     test 'should not include docinfo files by default' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, safe: Asciidoctor::SafeMode::SERVER
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, safe: Asciidoctor::SafeMode::SERVER
       refute_empty output
       assert_css 'script[src="modernizr.js"]', output, 0
       assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', safe: Asciidoctor::SafeMode::SERVER
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 0
     end
 
     test 'should not include docinfo files if safe mode is SECURE or greater' do
-      sample_input_path = fixture_path('basic.adoc')
+      sample_input_path = fixture_path 'basic.adoc'
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, attributes: { 'docinfo2' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'script[src="modernizr.js"]', output, 0
       assert_css 'meta[http-equiv="imagetoolbar"]', output, 0
 
-      output = Asciidoctor.convert_file sample_input_path, to_file: false,
-          standalone: true, backend: 'docbook', attributes: { 'docinfo2' => '' }
+      output = Asciidoctor.convert_file sample_input_path,
+        to_file: false, standalone: true, backend: 'docbook', attributes: { 'docinfo2' => '' }
       refute_empty output
       assert_css 'productname', output, 0
       assert_css 'copyright', output, 0
@@ -361,10 +358,10 @@ context 'Document' do
       sample_input_path = fixture_path 'subs.adoc'
       using_memory_logger do |logger|
         output = Asciidoctor.convert_file sample_input_path,
-            to_file: false,
-            standalone: true,
-            safe: :server,
-            attributes: { 'docinfo' => '', 'bootstrap-version' => nil, 'linkcss' => '', 'attribute-missing' => 'drop-line' }
+          to_file: false,
+          standalone: true,
+          safe: :server,
+          attributes: { 'docinfo' => '', 'bootstrap-version' => nil, 'linkcss' => '', 'attribute-missing' => 'drop-line' }
         refute_empty output
         assert_css 'script', output, 0
         assert_xpath %(//meta[@name="copyright"][@content="(C) OpenDevise"]), output, 1
@@ -375,10 +372,10 @@ context 'Document' do
     test 'should apply explicit substitutions to docinfo files' do
       sample_input_path = fixture_path 'subs.adoc'
       output = Asciidoctor.convert_file sample_input_path,
-          to_file: false,
-          standalone: true,
-          safe: :server,
-          attributes: { 'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => '' }
+        to_file: false,
+        standalone: true,
+        safe: :server,
+        attributes: { 'docinfo' => '', 'docinfosubs' => 'attributes,replacements', 'linkcss' => '' }
       refute_empty output
       assert_css 'script[src="bootstrap.3.2.0.min.js"]', output, 1
       assert_xpath %(//meta[@name="copyright"][@content="#{decode_char 169} OpenDevise"]), output, 1
@@ -388,10 +385,10 @@ context 'Document' do
   context 'MathJax' do
     test 'should add MathJax script to HTML head if stem attribute is set' do
       output = convert_string '', attributes: { 'stem' => '' }
-      assert_match('<script type="text/x-mathjax-config">', output)
-      assert_match('inlineMath: [["\\\\(", "\\\\)"]]', output)
-      assert_match('displayMath: [["\\\\[", "\\\\]"]]', output)
-      assert_match('delimiters: [["\\\\$", "\\\\$"]]', output)
+      assert_match '<script type="text/x-mathjax-config">', output
+      assert_match 'inlineMath: [["\\\\(", "\\\\)"]]', output
+      assert_match 'displayMath: [["\\\\[", "\\\\]"]]', output
+      assert_match 'delimiters: [["\\\\$", "\\\\$"]]', output
     end
   end
 
@@ -439,7 +436,7 @@ context 'Document' do
 
   context 'Structure' do
     test 'document with no doctitle' do
-      doc = document_from_string('Snorf')
+      doc = document_from_string 'Snorf'
       assert_nil doc.doctitle
       assert_nil doc.name
       refute doc.has_header?
@@ -455,7 +452,7 @@ context 'Document' do
       EOS
 
       doc = document_from_string input
-      assert(doc.attr? 'compat-mode')
+      assert doc.attr? 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 1
     end
@@ -470,7 +467,7 @@ context 'Document' do
       EOS
 
       doc = document_from_string input
-      assert_nil(doc.attr 'compat-mode')
+      assert_nil doc.attr 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 0
     end
@@ -484,8 +481,8 @@ context 'Document' do
       EOS
 
       doc = document_from_string input, attributes: { 'compat-mode' => nil }
-      assert(doc.attribute_locked? 'compat-mode')
-      assert_nil(doc.attr 'compat-mode')
+      assert doc.attribute_locked? 'compat-mode'
+      assert_nil doc.attr 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 0
     end
@@ -831,9 +828,9 @@ context 'Document' do
 
       output = convert_string input
       assert_xpath '/html/head/title[text()="Document Title"]', output, 1
-      nodes = xmlnodes_at_xpath('//*[@id="header"]/h1', output)
+      nodes = xmlnodes_at_xpath '//*[@id="header"]/h1', output
       assert_equal 1, nodes.size
-      assert_match('<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output)
+      assert_match '<h1><strong>Document</strong> <span class="image"><img src="logo.png" alt="logo"></span> <em>Title</em> <span class="image"><img src="another-logo.png" alt="another logo"></span></h1>', output
     end
 
     test 'should not choke on empty source' do
@@ -1555,10 +1552,17 @@ context 'Document' do
       assert_equal 'foobar', (doc.resolve_id 'Foo Bar')
     end
 
+    test 'should return nil if there is already an entry for ID in the :refs table' do
+      doc = empty_document
+      ref = ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', type: :ref, target: 'tigers'), '[tigers]']
+      assert_equal ref[1], (doc.register :refs, ref)
+      assert_nil doc.register :refs, ref
+    end
+
     test 'should record imagesdir when image is registered with catalog' do
       doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
       doc.register :images, 'diagram.svg'
-      assert_equal doc.catalog[:images].size, 1
+      assert_equal 1, doc.catalog[:images].size
       assert_equal 'diagram.svg', doc.catalog[:images][0].target
       assert_equal 'img', doc.catalog[:images][0].imagesdir
     end
@@ -1577,13 +1581,13 @@ context 'Document' do
       images = doc.catalog[:images]
       refute_empty images
       assert_equal 2, images.size
-      assert_equal images.map(&:target), ['outer.png', 'inner.png']
+      assert_equal ['outer.png', 'inner.png'], images.map(&:target)
     end
   end
 
   context 'Backends and Doctypes' do
     test 'html5 backend doctype article' do
-      result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5' })
+      result = convert_string "= Title\n\nparagraph", attributes: { 'backend' => 'html5' }
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="article"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
@@ -1591,7 +1595,7 @@ context 'Document' do
     end
 
     test 'html5 backend doctype book' do
-      result = convert_string("= Title\n\nparagraph", attributes: { 'backend' => 'html5', 'doctype' => 'book' })
+      result = convert_string "= Title\n\nparagraph", attributes: { 'backend' => 'html5', 'doctype' => 'book' }
       assert_xpath '/html', result, 1
       assert_xpath '/html/body[@class="book"]', result, 1
       assert_xpath '/html//*[@id="header"]/h1[text()="Title"]', result, 1
@@ -1695,11 +1699,11 @@ context 'Document' do
       EOS
       result = convert_string input, safe: :safe, backend: :xhtml
       begin
-        Nokogiri::XML::Document.parse(result) do |config|
+        Nokogiri::XML::Document.parse result do |config|
           config.options = Nokogiri::XML::ParseOptions::STRICT | Nokogiri::XML::ParseOptions::NONET
         end
-      rescue => e
-        flunk "xhtml5 backend did not generate well-formed XML: #{e.message}\n#{result}"
+      rescue
+        flunk "xhtml5 backend did not generate well-formed XML: #{$!.message}\n#{result}"
       end
     end
 
@@ -1733,9 +1737,9 @@ context 'Document' do
 
       section body
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5' }
       assert_xpath '/xmlns:article', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:article', result, 1)
+      doc = xmlnodes_at_xpath '/xmlns:article', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:article[@version="5.0"]', result, 1
@@ -1746,7 +1750,7 @@ context 'Document' do
     end
 
     test 'should set doctype to article by default for document with no title when converting to DocBook' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook' })
+      result = convert_string 'text', attributes: { 'backend' => 'docbook' }
       assert_xpath '/article', result, 1
       assert_xpath '/article/info/title', result, 1
       assert_xpath '/article/info/title[text()="Untitled"]', result, 1
@@ -1839,9 +1843,9 @@ context 'Document' do
 
       chapter body
       EOS
-      result = convert_string(input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
+      result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'book' }
       assert_xpath '/xmlns:book', result, 1
-      doc = xmlnodes_at_xpath('/xmlns:book', result, 1)
+      doc = xmlnodes_at_xpath '/xmlns:book', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
       assert_xpath '/xmlns:book[@version="5.0"]', result, 1
@@ -1852,7 +1856,7 @@ context 'Document' do
     end
 
     test 'should be able to set doctype to book for document with no title when converting to DocBook' do
-      result = convert_string('text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' })
+      result = convert_string 'text', attributes: { 'backend' => 'docbook5', 'doctype' => 'book' }
       assert_xpath '/book', result, 1
       assert_xpath '/book/info/date', result, 1
       # NOTE simpara cannot be a direct child of book, so content must be treated as a preface
@@ -2129,7 +2133,7 @@ context 'Document' do
         doc = empty_document
         secure_path = doc.normalize_asset_path naughty_path
         refute_equal naughty_path, secure_path
-        assert_equal ::File.join(doc.base_dir, 'etc/passwd'), secure_path
+        assert_equal File.join(doc.base_dir, 'etc/passwd'), secure_path
         assert_message logger, :WARN, 'path is outside of jail; recovering automatically'
       end
     end
@@ -2174,19 +2178,19 @@ context 'Document' do
   context 'Timing report' do
     test 'print_report does not lose precision' do
       timings = Asciidoctor::Timings.new
-      log = timings.instance_variable_get(:@log)
+      log = timings.instance_variable_get :@log
       log[:read] = 0.00001
       log[:parse] = 0.00003
       log[:convert] = 0.00005
-      timings.print_report(sink = StringIO.new)
+      timings.print_report sink = StringIO.new
       expect = ['0.00004', '0.00005', '0.00009']
       result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
       assert_equal expect, result
     end
 
     test 'print_report should print 0 for untimed phases' do
-      Asciidoctor::Timings.new.print_report(sink = StringIO.new)
-      expect = [].fill('0.00000', 0..2)
+      Asciidoctor::Timings.new.print_report sink = StringIO.new
+      expect = [].fill '0.00000', 0..2
       result = sink.string.split("\n").map {|l| l.sub(/.*:\s*([\d.]+)/, '\1') }
       assert_equal expect, result
     end
@@ -2202,7 +2206,7 @@ context 'Document' do
     end
 
     test 'should allow docdate and doctime to be overridden' do
-      doc = Asciidoctor::Document.new [], input_mtime: ::Time.now, attributes: { 'docdate' => '2015-01-01', 'doctime' => '10:00:00-0700' }
+      doc = Asciidoctor::Document.new [], input_mtime: Time.now, attributes: { 'docdate' => '2015-01-01', 'doctime' => '10:00:00-0700' }
       assert_equal '2015-01-01', (doc.attr 'docdate')
       assert_equal '2015', (doc.attr 'docyear')
       assert_equal '10:00:00-0700', (doc.attr 'doctime')
@@ -2224,7 +2228,7 @@ context 'Document' do
     test 'should allow doctime to be overridden' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
-        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 1, 2, 3, 4, 5, "+06:00"), attributes: { 'doctime' => '10:00:00-0700' }
+        doc = Asciidoctor::Document.new [], input_mtime: Time.new(2019, 1, 2, 3, 4, 5, '+06:00'), attributes: { 'doctime' => '10:00:00-0700' }
         assert_equal '2019-01-02', (doc.attr 'docdate')
         assert_equal '2019', (doc.attr 'docyear')
         assert_equal '10:00:00-0700', (doc.attr 'doctime')
@@ -2237,7 +2241,7 @@ context 'Document' do
     test 'should allow docdate to be overridden' do
       old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
       begin
-        doc = Asciidoctor::Document.new [], input_mtime: ::Time.new(2019, 1, 2, 3, 4, 5, "+06:00"), attributes: { 'docdate' => '2015-01-01' }
+        doc = Asciidoctor::Document.new [], input_mtime: Time.new(2019, 1, 2, 3, 4, 5, '+06:00'), attributes: { 'docdate' => '2015-01-01' }
         assert_equal '2015-01-01', (doc.attr 'docdate')
         assert_equal '2015', (doc.attr 'docyear')
         assert_equal '2015-01-01 03:04:05 +0600', (doc.attr 'docdatetime')

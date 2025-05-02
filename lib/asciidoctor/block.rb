@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods for managing AsciiDoc content blocks.
 #
@@ -8,7 +9,6 @@ module Asciidoctor
 #   block.content
 #   => "<em>This</em> is a &lt;test&gt;"
 class Block < AbstractBlock
-
   (DEFAULT_CONTENT_MODEL = {
     # TODO should probably fill in all known blocks
     audio: :empty,
@@ -110,7 +110,7 @@ class Block < AbstractBlock
     when :compound
       super
     when :simple
-      apply_subs((@lines.join LF), @subs)
+      apply_subs (@lines.join LF), @subs
     when :verbatim, :raw
       # QUESTION could we use strip here instead of popping empty lines?
       # maybe apply_subs can know how to strip whitespace?

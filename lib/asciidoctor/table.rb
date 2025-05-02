@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods and constants for managing AsciiDoc table content in a document.
 # It supports all three of AsciiDoc's table formats: psv, dsv and csv.
@@ -8,7 +9,9 @@ class Table < AbstractBlock
 
   # Public: A data object that encapsulates the collection of rows (head, foot, body) for a table
   class Rows
-    attr_accessor :head, :foot, :body
+    attr_accessor :head
+    attr_accessor :foot
+    attr_accessor :body
 
     def initialize head = [], foot = [], body = []
       @head = head
@@ -152,7 +155,7 @@ class Table < AbstractBlock
   # by the options on the table
   #
   # returns nothing
-  def partition_header_footer(attrs)
+  def partition_header_footer attrs
     # set rowcount before splitting up body rows
     num_body_rows = @attributes['rowcount'] = (body = @rows.body).size
 
@@ -185,7 +188,7 @@ class Table::Column < AbstractNode
     attributes['width'] ||= 1
     attributes['halign'] ||= 'left'
     attributes['valign'] ||= 'top'
-    update_attributes(attributes)
+    update_attributes attributes
   end
 
   # Public: An alias to the parent block (which is always a Table)
@@ -236,7 +239,7 @@ class Table::Cell < AbstractBlock
     super column, :table_cell
     @cursor = @reinitialize_args = nil
     @source_location = opts[:cursor].dup if @document.sourcemap
-    # NOTE: column is always set when parsing; may not be set when building table from the API
+    # NOTE column is always set when parsing; may not be set when building table from the API
     if column
       if (in_header_row = column.table.header_row?)
         if in_header_row == :implicit && (cell_style = column.style || (attributes && attributes['style']))
@@ -292,7 +295,7 @@ class Table::Cell < AbstractBlock
     if asciidoc
       # FIXME hide doctitle from nested document; temporary workaround to fix
       # nested document seeing doctitle and assuming it has its own document title
-      parent_doctitle = @document.attributes.delete('doctitle')
+      parent_doctitle = @document.attributes.delete 'doctitle'
       # NOTE we need to process the first line of content as it may not have been processed
       # the included content cannot expect to match conditional terminators in the remaining
       # lines of table cell content, it must be self-contained logic
@@ -341,9 +344,8 @@ class Table::Cell < AbstractBlock
 
   def catalog_inline_anchor cell_text = @text, cursor = nil
     cursor, @cursor = @cursor, nil unless cursor
-    if (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
-      Parser.catalog_inline_anchor $1, $2, self, cursor, @document
-    end
+    return unless (cell_text.start_with? '[[') && LeadingInlineAnchorRx =~ cell_text
+    Parser.catalog_inline_anchor $1, $2, self, cursor, @document
   end
 
   # Public: Get the String text of this cell with substitutions applied.
@@ -419,7 +421,7 @@ class Table::ParserContext
   # Public: An Array of String keys that represent the table formats in AsciiDoc
   #--
   # QUESTION should we recognize !sv as a valid format value?
-  FORMATS = ['psv', 'csv', 'dsv', 'tsv'].to_set
+  FORMATS = ::Set['psv', 'csv', 'dsv', 'tsv']
 
   # Public: A Hash mapping the AsciiDoc table formats to default delimiters
   DELIMITERS = {
@@ -457,7 +459,7 @@ class Table::ParserContext
     @table = table
 
     if attributes.key? 'format'
-      if FORMATS.include?(xsv = attributes['format'])
+      if FORMATS.include? (xsv = attributes['format'])
         if xsv == 'tsv'
           # NOTE tsv is just an alias for csv with a tab separator
           @format = 'csv'
@@ -499,7 +501,7 @@ class Table::ParserContext
   # used by this table.
   #
   # returns true if the line starts with the delimiter, false otherwise
-  def starts_with_delimiter?(line)
+  def starts_with_delimiter? line
     line.start_with? @delimiter
   end
 
@@ -507,14 +509,14 @@ class Table::ParserContext
   # used by this table.
   #
   # returns Regexp MatchData if the line contains the delimiter, false otherwise
-  def match_delimiter(line)
-    @delimiter_rx.match(line)
+  def match_delimiter line
+    @delimiter_rx.match line
   end
 
   # Public: Skip past the matched delimiter because it's inside quoted text.
   #
   # Returns nothing
-  def skip_past_delimiter(pre)
+  def skip_past_delimiter pre
     @buffer = %(#{@buffer}#{pre}#{@delimiter})
     nil
   end
@@ -522,7 +524,7 @@ class Table::ParserContext
   # Public: Skip past the matched delimiter because it's escaped.
   #
   # Returns nothing
-  def skip_past_escaped_delimiter(pre)
+  def skip_past_escaped_delimiter pre
     @buffer = %(#{@buffer}#{pre.chop}#{@delimiter})
     nil
   end
@@ -531,7 +533,7 @@ class Table::ParserContext
   #
   # returns true if the buffer has unclosed quotes, false if it doesn't or it
   # isn't quoted data
-  def buffer_has_unclosed_quotes? append = nil, q = '"'
+  def buffer_has_unclosed_quotes? append = nil, q = '"' # rubocop:disable Naming/MethodParameterName
     if (record = append ? (@buffer + append).strip : @buffer.strip) == q
       true
     elsif record.start_with? q
@@ -559,7 +561,7 @@ class Table::ParserContext
   # stack is used to carry over the spec to the next cell.
   #
   # returns nothing
-  def push_cellspec(cellspec = {})
+  def push_cellspec cellspec = {}
     # this shouldn't be nil, but we check anyway
     @cellspecs << (cellspec || {})
     nil
@@ -602,9 +604,9 @@ class Table::ParserContext
   # by the next cell.
   #
   # returns nothing
-  def close_open_cell(next_cellspec = {})
+  def close_open_cell next_cellspec = {}
     push_cellspec next_cellspec
-    close_cell(true) if cell_open?
+    close_cell true if cell_open?
     advance
     nil
   end
@@ -614,7 +616,7 @@ class Table::ParserContext
   # row has been met, close the row and begin a new one.
   #
   # returns nothing
-  def close_cell(eol = false)
+  def close_cell eol = false
     if @format == 'psv'
       cell_text = @buffer
       @buffer = ''
@@ -634,7 +636,7 @@ class Table::ParserContext
         # this may not be perfect logic, but it hits the 99%
         if (cell_text.start_with? q) && (cell_text.end_with? q)
           # unquote
-          if (cell_text = cell_text.slice(1, cell_text.length - 2))
+          if (cell_text = cell_text.slice 1, cell_text.length - 2)
             # trim whitespace and collapse escaped quotes
             cell_text = cell_text.strip.squeeze q
           else
@@ -648,10 +650,10 @@ class Table::ParserContext
       end
     end
 
-    1.upto(repeat) do |i|
+    1.upto repeat do |i|
       # TODO make column resolving an operation
       if @colcount == -1
-        @table.columns << (column = Table::Column.new(@table, @table.columns.size + i - 1))
+        @table.columns << (column = Table::Column.new @table, @table.columns.size + i - 1)
         if cellspec && (cellspec.key? 'colspan') && (extra_cols = cellspec['colspan'].to_i - 1) > 0
           offset = @table.columns.size
           extra_cols.times do |j|
@@ -710,7 +712,7 @@ class Table::ParserContext
   # determining the effective number of cells in the current row.
   #
   # returns nothing
-  def activate_rowspan(rowspan, colspan)
+  def activate_rowspan rowspan, colspan
     1.upto(rowspan - 1) {|i| @active_rowspans[i] = (@active_rowspans[i] || 0) + colspan }
     nil
   end

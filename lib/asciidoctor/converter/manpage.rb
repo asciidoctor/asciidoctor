@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates the man page (groff) format.
 #
@@ -208,8 +209,12 @@ r lw(\n(.lu*75u/100u).'
 .RS 4)
       end
       if dd
-        result << (manify dd.text, whitespace: :normalize) if dd.text?
-        result << dd.content if dd.blocks?
+        result << (manify dd.text, whitespace: :normalize) if (has_text = dd.text?)
+        if dd.blocks?
+          dd_content = dd.content
+          dd_content = dd_content.slice 4, dd_content.length if !has_text && (dd_content.start_with? %(.sp\n))
+          result << dd_content
+        end
       end
       result << '.RE'
     end
@@ -299,9 +304,12 @@ r lw(\n(.lu*75u/100u).'
 .el \\{\\
 .  sp -1
 .  IP " #{numeral}." 4.2
-.\\}
-#{manify item.text, whitespace: :normalize})
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text})
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
@@ -375,12 +383,10 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  # FIXME: The reason this method is so complicated is because we are not
-  # receiving empty(marked) cells when there are colspans or rowspans. This
-  # method has to create a map of all cells and in the case of rowspans
-  # create empty cells as placeholders of the span.
-  # To fix this, asciidoctor needs to provide an API to tell the user if a
-  # given cell is being used as a colspan or rowspan.
+  # NOTE This handler inserts empty cells to account for colspans and rowspans.
+  # In order to support colspans and rowspans propertly, that information must
+  # be computed up front and consulted when rendering the cell as this information
+  # is not available on the cell itself.
   def convert_table node
     result = []
     if node.title?
@@ -392,8 +398,7 @@ r lw(\n(.lu*75u/100u).'
 .B #{manify node.captioned_title}
 )
     end
-    result << '.TS
-allbox tab(:);'
+    result << %(.TS#{LF}allbox tab(:);)
     row_header = []
     row_text = []
     row_index = 0
@@ -401,23 +406,15 @@ allbox tab(:);'
       rows.each do |row|
         row_header[row_index] ||= []
         row_text[row_index] ||= []
-        # result << LF
-        # l left-adjusted
-        # r right-adjusted
-        # c centered-adjusted
-        # n numerical align
-        # a alphabetic align
-        # s spanned
-        # ^ vertically spanned
         remaining_cells = row.size
         row.each_with_index do |cell, cell_index|
           remaining_cells -= 1
           row_header[row_index][cell_index] ||= []
-          # Add an empty cell if this is a rowspan cell
+          # add an empty cell as a placeholder if this is a rowspan cell
           if row_header[row_index][cell_index] == ['^t']
-            row_text[row_index] << %(T{#{LF}.sp#{LF}T}:)
+            row_text[row_index] << %(T{#{LF}T}:)
           end
-          row_text[row_index] << %(T{#{LF}.sp#{LF})
+          row_text[row_index] << %(T{#{LF})
           cell_halign = (cell.attr 'halign', 'left').chr
           if tsec == :body
             if row_header[row_index].empty? || row_header[row_index][cell_index].empty?
@@ -510,9 +507,12 @@ allbox tab(:);'
 .el \\{\\
 .  sp -1
 .  IP \\(bu 2.3
-.\\}
-#{manify item.text, whitespace: :normalize}]
-      result << item.content if item.blocks?
+.\\}#{(list_text = manify item.text, whitespace: :normalize).empty? ? '' : LF + list_text}]
+      if item.blocks?
+        item_content = item.content
+        item_content = item_content.slice 4, item_content.length if list_text.empty? && (item_content.start_with? %(.sp\n))
+        result << item_content
+      end
       result << '.RE'
     end
     result.join LF
@@ -549,7 +549,7 @@ allbox tab(:);'
     result << (node.title? ? %(.sp
 .B #{manify node.title}
 .br) : '.sp')
-    result << %(<#{node.media_uri(node.attr 'target')}#{start_param}#{end_param}> (video))
+    result << %(<#{node.media_uri node.attr 'target'}#{start_param}#{end_param}> (video))
     result.join LF
   end
 
@@ -669,18 +669,17 @@ allbox tab(:);'
   private
 
   def append_footnotes result, node
-    if node.footnotes? && !(node.attr? 'nofootnotes')
-      result << '.SH "NOTES"'
-      node.footnotes.each do |fn|
-        result << %(.IP [#{fn.index}])
-        # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
-        if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
-          text = (manify %(#{text.gsub MalformedEscapedMacroRx, %(\\1#{LF}\\2)} ), whitespace: :normalize).chomp ' '
-        else
-          text = manify text, whitespace: :normalize
-        end
-        result << text
+    return unless node.footnotes? && !(node.attr? 'nofootnotes')
+    result << '.SH "NOTES"'
+    node.footnotes.each do |fn|
+      result << %(.IP [#{fn.index}])
+      # NOTE restore newline in escaped macro that gets removed by normalize_text in substitutor
+      if (text = fn.text).include? %(#{ESC}\\c #{ESC}.)
+        text = (manify %(#{text.gsub MalformedEscapedMacroRx, %(\\1#{LF}\\2)} ), whitespace: :normalize).chomp ' '
+      else
+        text = manify text, whitespace: :normalize
       end
+      result << text
     end
   end
 
@@ -705,38 +704,38 @@ allbox tab(:);'
     else
       str = str.tr_s WHITESPACE, ' '
     end
-    str = str.
-      gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' }. # literal backslash (not a troff escape sequence)
-      gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
-      gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
-      gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) }. # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
-      gsub('-', '\-').
-      gsub('&lt;', '<').
-      gsub('&gt;', '>').
-      gsub('&#43;', '+').      # plus sign; alternately could use \c(pl
-      gsub('&#160;', '\~').    # non-breaking space
-      gsub('&#169;', '\(co').  # copyright sign
-      gsub('&#174;', '\(rg').  # registered sign
-      gsub('&#8482;', '\(tm'). # trademark sign
-      gsub('&#176;', '\(de').  # degree sign
-      gsub('&#8201;', ' ').    # thin space
-      gsub('&#8211;', '\(en'). # en dash
-      gsub(EmDashCharRefRx, '\(em'). # em dash
-      gsub('&#8216;', '\(oq'). # left single quotation mark
-      gsub('&#8217;', '\(cq'). # right single quotation mark
-      gsub('&#8220;', '\(lq'). # left double quotation mark
-      gsub('&#8221;', '\(rq'). # right double quotation mark
-      gsub('&#8592;', '\(<-'). # leftwards arrow
-      gsub('&#8594;', '\(->'). # rightwards arrow
-      gsub('&#8656;', '\(lA'). # leftwards double arrow
-      gsub('&#8658;', '\(rA'). # rightwards double arrow
-      gsub('&#8203;', '\:').   # zero width space
-      gsub('&amp;', '&').      # literal ampersand (NOTE must take place after any other replacement that includes &)
-      gsub('\'', '\*(Aq').     # apostrophe / neutral single quote
-      gsub(MockMacroRx, '\1'). # mock boundary
-      gsub(ESC_BS, '\\').      # unescape troff backslash (NOTE update if more escapes are added)
-      gsub(ESC_FS, '.').       # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
-      rstrip                   # strip trailing space
+    str = str
+      .gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' } # literal backslash (not a troff escape sequence)
+      .gsub(EllipsisCharRefRx, '...') # horizontal ellipsis
+      .gsub(LeadingPeriodRx, '\\\&.') # leading . is used in troff for macro call or other formatting; replace with \&.
+      .gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) } # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
+      .gsub('-', '\-')
+      .gsub('&lt;', '<')
+      .gsub('&gt;', '>')
+      .gsub('&#43;', '+')       # plus sign; alternately could use \c(pl
+      .gsub('&#160;', '\~')     # non-breaking space
+      .gsub('&#169;', '\(co')   # copyright sign
+      .gsub('&#174;', '\(rg')   # registered sign
+      .gsub('&#8482;', '\(tm')  # trademark sign
+      .gsub('&#176;', '\(de')   # degree sign
+      .gsub('&#8201;', ' ')     # thin space
+      .gsub('&#8211;', '\(en')  # en dash
+      .gsub(EmDashCharRefRx, '\(em') # em dash
+      .gsub('&#8216;', '\(oq')  # left single quotation mark
+      .gsub('&#8217;', '\(cq')  # right single quotation mark
+      .gsub('&#8220;', '\(lq')  # left double quotation mark
+      .gsub('&#8221;', '\(rq')  # right double quotation mark
+      .gsub('&#8592;', '\(<-')  # leftwards arrow
+      .gsub('&#8594;', '\(->')  # rightwards arrow
+      .gsub('&#8656;', '\(lA')  # leftwards double arrow
+      .gsub('&#8658;', '\(rA')  # rightwards double arrow
+      .gsub('&#8203;', '\:')    # zero width space
+      .gsub('&amp;', '&')       # literal ampersand (NOTE must take place after any other replacement that includes &)
+      .gsub('\'', '\*(Aq')      # apostrophe / neutral single quote
+      .gsub(MockMacroRx, '\1')  # mock boundary
+      .gsub(ESC_BS, '\\')       # unescape troff backslash (NOTE update if more escapes are added)
+      .gsub(ESC_FS, '.')        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
+      .rstrip                   # strip trailing space
     opts[:append_newline] ? %(#{str}#{LF}) : str
   end
 

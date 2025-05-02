@@ -1,21 +1,22 @@
 # frozen_string_literal: false
+
 require_relative 'test_helper'
 require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 
 context 'Invoker' do
   test 'should allow Options to be passed as first argument of constructor' do
-    opts = Asciidoctor::Cli::Options.new attributes: { 'toc' => '' }, doctype: 'book', eruby: 'erubis'
+    opts = Asciidoctor::Cli::Options.new attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true
     invoker = Asciidoctor::Cli::Invoker.new opts
     assert_same invoker.options, opts
   end
 
   test 'should allow options Hash to be passed as first argument of constructor' do
-    opts = { attributes: { 'toc' => '' }, doctype: 'book', eruby: 'erubis' }
+    opts = { attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true }
     invoker = Asciidoctor::Cli::Invoker.new opts
     resolved_opts = invoker.options
     assert_equal opts[:attributes], resolved_opts[:attributes]
     assert_equal 'book', resolved_opts[:attributes]['doctype']
-    assert_equal 'erubis', resolved_opts[:eruby]
+    assert resolved_opts[:sourcemap]
   end
 
   test 'should parse options from array passed as first argument of constructor' do
@@ -37,7 +38,7 @@ context 'Invoker' do
   test 'should parse source and convert to html5 article by default' do
     invoker = nil
     output = nil
-    redirect_streams do |out, err|
+    redirect_streams do |out|
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
@@ -104,7 +105,7 @@ context 'Invoker' do
     begin
       old_stdin = $stdin
       $stdin = StringIO.new 'paragraph'
-      invoker = invoke_cli_to_buffer(%w(-e), '-')
+      invoker = invoke_cli_to_buffer %w(-e), '-'
       assert_equal 0, invoker.code
       assert_equal 1, invoker.document.blocks.size
     ensure
@@ -126,9 +127,9 @@ context 'Invoker' do
       assert_equal doc.attr('docdatetime'), doc.attr('localdatetime')
       assert doc.attr?('outfile')
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -171,7 +172,7 @@ context 'Invoker' do
     expected = %(Asciidoctor #{Asciidoctor::VERSION} [https://asciidoctor.org]\nRuntime Environment (#{RUBY_DESCRIPTION}))
     ['--version', '-V'].each do |switch|
       actual = nil
-      redirect_streams do |out, err|
+      redirect_streams do |out|
         invoke_cli [switch]
         actual = out.string.rstrip
       end
@@ -186,11 +187,59 @@ context 'Invoker' do
     3. third
     EOS
     warnings = nil
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-o /dev/null), '-') { input }
       warnings = err.string
     end
     assert_match(/WARNING/, warnings)
+  end
+
+  test 'should change level on logger when --log-level is specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level info), '-') { input }
+      output = err.string
+    end
+    assert_equal 'asciidoctor: INFO: possible invalid reference: install', output.chomp
+  end
+
+  test 'should not log when --log-level and -q are both specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level info -q), '-') { input }
+      output = err.string
+    end
+    assert_empty output
+  end
+
+  test 'should use specified log level when --log-level and -v are both specified' do
+    input = <<~'EOS'
+    skip to <<install>>
+
+    . download
+    . install[[install]]
+    . run
+    EOS
+    output = nil
+    redirect_streams do |_, err|
+      invoke_cli(%w(--log-level warn -v), '-') { input }
+      output = err.string
+    end
+    assert_empty output
   end
 
   test 'should enable script warnings if -w flag is specified' do
@@ -204,7 +253,7 @@ context 'Invoker' do
         end
         warnings = err.string
       end
-      assert_equal false, $VERBOSE
+      assert_equal false, $VERBOSE # rubocop:disable Minitest/RefuteFalse
       refute_empty warnings
     ensure
       $VERBOSE = old_verbose
@@ -217,7 +266,7 @@ context 'Invoker' do
     3. third
     EOS
     warnings = nil
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-q -o /dev/null), '-') { input }
       warnings = err.string
     end
@@ -233,8 +282,8 @@ context 'Invoker' do
     . run
     EOS
     begin
-      old_stderr, $stderr = $stderr, ::StringIO.new
-      old_stdout, $stdout = $stdout, ::StringIO.new
+      old_stderr, $stderr = $stderr, StringIO.new
+      old_stdout, $stdout = $stdout, StringIO.new
       invoker = invoke_cli(%w(-q), '-') { input }
       assert_equal 0, invoker.code
     ensure
@@ -252,26 +301,51 @@ context 'Invoker' do
       [invoke_cli(%w(-q --failure-level=WARN -o /dev/null), '-') { input }.code, err.string]
     end
     assert_equal 1, exit_code
-    assert messages.empty?
+    assert_empty messages
   end
 
   test 'should report usage if no input file given' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoke_cli [], nil
       assert_match(/Usage:/, err.string)
     end
   end
 
   test 'should report error if input file does not exist' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoker = invoke_cli [], 'missing_file.adoc'
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
     end
   end
 
+  test 'should suggest --trace option if not present when program raises error' do
+    redirect_streams do |_, err|
+      sample_filepath = fixture_path 'sample.adoc'
+      invoker = invoke_cli ['-r', 'no-such-module'], sample_filepath
+      assert_match(/'no-such-module' could not be loaded\n *Use --trace to show backtrace/, err.string)
+      assert_equal 1, invoker.code
+    end
+  end
+
+  test 'should raise error when --trace option is specified and program raises error' do
+    sample_filepath = fixture_path 'sample.adoc'
+    assert_raises LoadError do
+      invoke_cli ['--trace', '-r', 'no-such-module'], sample_filepath
+    end
+  end
+
+  test 'should show backtrace when --trace option is specified and program raises error', unless: (jruby? && windows?) do
+    result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
+    if jruby?
+      assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
+    else
+      assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
+    end
+  end
+
   test 'should treat extra arguments as files' do
-    redirect_streams do |out, err|
+    redirect_streams do |_, err|
       invoker = invoke_cli %w(-o /dev/null extra arguments sample.adoc), nil
       assert_match(/input file .* is missing/, err.string)
       assert_equal 1, invoker.code
@@ -284,8 +358,8 @@ context 'Invoker' do
       invoker = invoke_cli
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
-      output = File.read(sample_outpath, mode: Asciidoctor::FILE_READ_MODE)
+      assert_path_exists sample_outpath
+      output = File.read sample_outpath, mode: Asciidoctor::FILE_READ_MODE
       refute_empty output
       assert_xpath '/html', output, 1
       assert_xpath '/html/head', output, 1
@@ -293,7 +367,7 @@ context 'Invoker' do
       assert_xpath '/html/head/title[text() = "Document Title"]', output, 1
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -301,16 +375,16 @@ context 'Invoker' do
     destination_path = File.join testdir, 'test_output'
     sample_outpath = File.join destination_path, 'sample.html'
     begin
-      FileUtils.mkdir_p(destination_path)
+      FileUtils.mkdir_p destination_path
       # QUESTION should -D be relative to working directory or source directory?
       invoker = invoke_cli %w(-D test/test_output)
       #invoker = invoke_cli %w(-D ../../test/test_output)
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_path
     end
   end
 
@@ -320,14 +394,14 @@ context 'Invoker' do
     destination_subdir_path = File.join destination_path, 'subdir'
     sample_outpath = File.join destination_subdir_path, 'index.html'
     begin
-      FileUtils.mkdir_p(destination_path)
+      FileUtils.mkdir_p destination_path
       invoke_cli %W(-D #{destination_path} -R test/fixtures), sample_inpath
       assert File.directory?(destination_subdir_path)
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_subdir_path)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_subdir_path
+      FileUtils.rmdir destination_path
     end
   end
 
@@ -337,9 +411,9 @@ context 'Invoker' do
       invoker = invoke_cli %W(-o #{sample_outpath})
       doc = invoker.document
       assert_equal sample_outpath, doc.attr('outfile')
-      assert File.exist?(sample_outpath)
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -349,9 +423,9 @@ context 'Invoker' do
     coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
     begin
       invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay), 'source-block.adoc'
-      assert_path_exists(sample_outpath)
-      assert_path_exists(asciidoctor_stylesheet)
-      assert_path_exists(coderay_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists asciidoctor_stylesheet
+      assert_path_exists coderay_stylesheet
       [sample_outpath, asciidoctor_stylesheet, coderay_stylesheet].each do |path|
         contents = File.read path, mode: Asciidoctor::FILE_READ_MODE
         assert_includes contents, ?\n
@@ -359,9 +433,9 @@ context 'Invoker' do
         refute contents.end_with? ?\n
       end
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(asciidoctor_stylesheet)
-      FileUtils.rm_f(coderay_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f asciidoctor_stylesheet
+      FileUtils.rm_f coderay_stylesheet
     end
   end
 
@@ -371,13 +445,13 @@ context 'Invoker' do
     coderay_stylesheet = fixture_path 'coderay-asciidoctor.css'
     begin
       invoke_cli %W(-o #{sample_outpath} -a linkcss -a source-highlighter=coderay)
-      assert File.exist?(sample_outpath)
-      assert File.exist?(asciidoctor_stylesheet)
-      refute File.exist?(coderay_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists asciidoctor_stylesheet
+      refute_path_exists coderay_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(asciidoctor_stylesheet)
-      FileUtils.rm_f(coderay_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f asciidoctor_stylesheet
+      FileUtils.rm_f coderay_stylesheet
     end
   end
 
@@ -387,11 +461,11 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss!)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(default_stylesheet)
+      assert_path_exists sample_outpath
+      refute_path_exists default_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(default_stylesheet)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f default_stylesheet
     end
   end
 
@@ -403,13 +477,13 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a copycss=stylesheets/custom.css -a stylesdir=./styles -a stylesheet=custom.css)
       invoker.document
-      assert File.exist?(sample_outpath)
-      assert File.exist?(custom_stylesheet)
+      assert_path_exists sample_outpath
+      assert_path_exists custom_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(custom_stylesheet)
-      FileUtils.rmdir(stylesdir)
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f custom_stylesheet
+      FileUtils.rmdir stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -421,13 +495,13 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=./styles -a stylesheet=custom.css -a copycss!)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(custom_stylesheet)
+      assert_path_exists sample_outpath
+      refute_path_exists custom_stylesheet
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rm_f(custom_stylesheet)
-      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rm_f custom_stylesheet
+      FileUtils.rmdir stylesdir if File.directory? stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -438,12 +512,12 @@ context 'Invoker' do
     begin
       invoker = invoke_cli %W(-o #{sample_outpath} -a linkcss -a stylesdir=http://example.org/styles -a stylesheet=custom.css)
       invoker.document
-      assert File.exist?(sample_outpath)
-      refute File.exist?(stylesdir)
+      assert_path_exists sample_outpath
+      refute_path_exists stylesdir
     ensure
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(stylesdir) if File.directory? stylesdir
-      FileUtils.rmdir(destdir)
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir stylesdir if File.directory? stylesdir
+      FileUtils.rmdir destdir
     end
   end
 
@@ -452,11 +526,11 @@ context 'Invoker' do
     sample_outpath = fixture_path 'sample.html'
     begin
       invoke_cli_with_filenames [], %w(basic.adoc sample.adoc)
-      assert File.exist?(basic_outpath)
-      assert File.exist?(sample_outpath)
+      assert_path_exists basic_outpath
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
-      FileUtils.rm_f(sample_outpath)
+      FileUtils.rm_f basic_outpath
+      FileUtils.rm_f sample_outpath
     end
   end
 
@@ -466,22 +540,22 @@ context 'Invoker' do
     sample_outpath = File.join destination_path, 'sample.htm'
     begin
       invoke_cli_with_filenames %w(-D test/test_output -a outfilesuffix=.htm), %w(basic.adoc sample.adoc)
-      assert File.exist?(basic_outpath)
-      assert File.exist?(sample_outpath)
+      assert_path_exists basic_outpath
+      assert_path_exists sample_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
-      FileUtils.rm_f(sample_outpath)
-      FileUtils.rmdir(destination_path)
+      FileUtils.rm_f basic_outpath
+      FileUtils.rm_f sample_outpath
+      FileUtils.rmdir destination_path
     end
   end
 
   test 'should convert all files that matches a glob expression' do
     basic_outpath = fixture_path 'basic.html'
     begin
-      invoke_cli_to_buffer [], "ba*.adoc"
-      assert File.exist?(basic_outpath)
+      invoke_cli_to_buffer [], 'ba*.adoc'
+      assert_path_exists basic_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f basic_outpath
     end
   end
 
@@ -495,9 +569,9 @@ context 'Invoker' do
 
     begin
       invoke_cli_to_buffer [], glob
-      assert File.exist?(basic_outpath)
+      assert_path_exists basic_outpath
     ensure
-      FileUtils.rm_f(basic_outpath)
+      FileUtils.rm_f basic_outpath
     end
   end
 
@@ -534,8 +608,8 @@ context 'Invoker' do
 
     begin
       invoke_cli(%W(-b manpage -o #{outfile_1}), '-') { input }
-      assert File.exist?(outfile_1)
-      assert File.exist?(outfile_2)
+      assert_path_exists outfile_1
+      assert_path_exists outfile_2
       assert_equal '.so eve.1', (File.read outfile_2, mode: Asciidoctor::FILE_READ_MODE).chomp
     ensure
       FileUtils.rm_f outfile_1
@@ -546,7 +620,7 @@ context 'Invoker' do
   test 'should output a trailing newline to stdout' do
     invoker = nil
     output = nil
-    redirect_streams do |out, err|
+    redirect_streams do |out|
       invoker = invoke_cli %w(-o -)
       output = out.string
     end
@@ -591,7 +665,7 @@ context 'Invoker' do
 
   test 'should warn if doctype is inline and the first block is not a candidate for inline conversion' do
     ['== Section Title', 'image::tiger.png[]'].each do |input|
-      warnings = redirect_streams do |out, err|
+      warnings = redirect_streams do |_, err|
         invoke_cli_to_buffer(%w(-d inline), '-') { input }
         err.string
       end
@@ -600,7 +674,7 @@ context 'Invoker' do
   end
 
   test 'should not warn if doctype is inline and the document has no blocks' do
-    warnings = redirect_streams do |out, err|
+    warnings = redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-d inline), '-') { '// comment' }
       err.string
     end
@@ -608,11 +682,24 @@ context 'Invoker' do
   end
 
   test 'should not warn if doctype is inline and the document contains multiple blocks' do
-    warnings = redirect_streams do |out, err|
+    warnings = redirect_streams do |_, err|
       invoke_cli_to_buffer(%w(-d inline), '-') { %(paragraph one\n\nparagraph two\n\nparagraph three) }
       err.string
     end
     refute_match(/WARNING/, warnings)
+  end
+
+  test 'should add source location to blocks when sourcemap option is specified' do
+    sample_filepath = fixture_path 'sample.adoc'
+    invoker = invoke_cli_to_buffer %w(--sourcemap -o -)
+    doc = invoker.document
+    all_blocks = doc.find_by
+    refute_equal 0, all_blocks.size
+    doc.find_by.each do |block|
+      refute_nil block.source_location
+    end
+    assert_equal sample_filepath, doc.blocks[0].source_location.file
+    assert_equal 6, doc.blocks[0].source_location.lineno
   end
 
   test 'should locate custom templates based on template dir, template engine and backend' do
@@ -652,11 +739,11 @@ context 'Invoker' do
 
   test 'should set attribute with quoted value containing a space' do
     # emulating commandline arguments: --trace -a toc -a note-caption="Note to self:" -o -
-    invoker = invoke_cli_to_buffer %w(--trace -a toc -a note-caption=Note\ to\ self: -o -)
+    invoker = invoke_cli_to_buffer ['--trace', '-a', 'toc', '-a', 'note-caption=Note to self:', '-o', '-']
     doc = invoker.document
     assert_equal 'Note to self:', doc.attr('note-caption')
     output = invoker.read_output
-    assert_xpath %(//*[#{contains_class('admonitionblock')}]//*[@class='title'][text() = 'Note to self:']), output, 1
+    assert_xpath %(//*[#{contains_class 'admonitionblock'}]//*[@class='title'][text() = 'Note to self:']), output, 1
   end
 
   test 'should not set attribute ending in @ if defined in document' do
@@ -697,16 +784,10 @@ context 'Invoker' do
   end
 
   test 'should set safe mode to specified level' do
-    levels = {
-      'unsafe' => Asciidoctor::SafeMode::UNSAFE,
-      'safe'   => Asciidoctor::SafeMode::SAFE,
-      'server' => Asciidoctor::SafeMode::SERVER,
-      'secure' => Asciidoctor::SafeMode::SECURE,
-    }
-    levels.each do |name, const|
+    Asciidoctor::SafeMode.names.each do |name|
       invoker = invoke_cli_to_buffer %W(-S #{name} -o /dev/null)
       doc = invoker.document
-      assert_equal const, doc.safe
+      assert_equal (Asciidoctor::SafeMode.value_for_name name), doc.safe
     end
   end
 

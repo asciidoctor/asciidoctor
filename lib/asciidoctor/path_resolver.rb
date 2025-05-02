@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Handles all operations for resolving, cleaning and joining paths.
 # This class includes operations for handling both web paths (request URIs) and
@@ -226,7 +227,7 @@ class PathResolver
         path.slice offset, path.length
       else
         begin
-          (Pathname.new path).relative_path_from(Pathname.new base).to_s
+          ((Pathname.new path).relative_path_from Pathname.new base).to_s
         rescue
           path
         end
@@ -371,14 +372,11 @@ class PathResolver
       if root? target
         target_path = expand_path target
         if jail && !(descends_from? target_path, jail)
-          if opts.fetch :recover, true
-            logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
-            target_segments, = partition_path target_path
-            jail_segments, jail_root = partition_path jail
-            return join_path jail_segments + target_segments, jail_root
-          else
-            raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode))
-          end
+          raise ::SecurityError, %(#{opts[:target_name] || 'path'} #{target} is outside of jail: #{jail} (disallowed in safe mode)) unless opts.fetch :recover, true
+          logger.warn %(#{opts[:target_name] || 'path'} is outside of jail; recovering automatically)
+          target_segments, = partition_path target_path
+          jail_segments, jail_root = partition_path jail
+          return join_path jail_segments + target_segments, jail_root
         end
         return target_path
       else
@@ -389,14 +387,11 @@ class PathResolver
     end
 
     if target_segments.empty?
-      if start.nil_or_empty?
+      if start.nil_or_empty? # rubocop:disable Style/GuardClause
         return jail || @working_dir
       elsif root? start
-        if jail
-          start = posixify start
-        else
-          return expand_path start
-        end
+        return expand_path start unless jail
+        start = posixify start
       else
         target_segments, = partition_path start
         start = jail || @working_dir
@@ -414,14 +409,11 @@ class PathResolver
     if jail && (recheck = !(descends_from? start, jail)) && @file_separator == BACKSLASH
       start_segments, start_root = partition_path start
       jail_segments, jail_root = partition_path jail
-      if start_root != jail_root
-        if opts.fetch :recover, true
-          logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root; recovering automatically)
-          start_segments = jail_segments
-          recheck = false
-        else
-          raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode))
-        end
+      unless start_root == jail_root
+        raise ::SecurityError, %(start path for #{opts[:target_name] || 'path'} #{start} refers to location outside jail root: #{jail} (disallowed in safe mode)) unless opts.fetch :recover, true
+        logger.warn %(start path for #{opts[:target_name] || 'path'} is outside of jail root; recovering automatically)
+        start_segments = jail_segments
+        recheck = false
       end
     else
       start_segments, jail_root = partition_path start

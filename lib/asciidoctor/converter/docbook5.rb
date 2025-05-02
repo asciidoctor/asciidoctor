@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates DocBook 5 output. The output is inspired by the output produced
 # by the docbook45 backend from AsciiDoc.py, except it has been migrated to the DocBook 5 specification.
@@ -12,18 +13,18 @@ class Converter::DocBook5Converter < Converter::Base
   }).default = { list: 'variablelist', entry: 'varlistentry', term: 'term', item: 'listitem' }
 
   (QUOTE_TAGS = {
-    monospaced:  ['<literal>', '</literal>'],
-    emphasis:    ['<emphasis>', '</emphasis>', true],
-    strong:      ['<emphasis role="strong">', '</emphasis>', true],
-    double:      ['<quote>', '</quote>', true],
-    single:      ['<quote>', '</quote>', true],
-    mark:        ['<emphasis role="marked">', '</emphasis>'],
+    monospaced: ['<literal>', '</literal>'],
+    emphasis: ['<emphasis>', '</emphasis>', true],
+    strong: ['<emphasis role="strong">', '</emphasis>', true],
+    double: ['<quote role="double">', '</quote>', true],
+    single: ['<quote role="single">', '</quote>', true],
+    mark: ['<emphasis role="marked">', '</emphasis>'],
     superscript: ['<superscript>', '</superscript>'],
-    subscript:   ['<subscript>', '</subscript>'],
+    subscript: ['<subscript>', '</subscript>'],
   }).default = ['', '', true]
 
   MANPAGE_SECTION_TAGS = { 'section' => 'refsection', 'synopsis' => 'refsynopsisdiv' }
-  TABLE_PI_NAMES = ['dbhtml', 'dbfo', 'dblatex']
+  TABLE_PI_NAMES = %w(dbhtml dbfo dblatex)
 
   CopyrightRx = /^(#{CC_ANY}+?)(?: ((?:\d{4}-)?\d{4}))?$/
   ImageMacroRx = /^image::?(\S|\S#{CC_ANY}*?\S)\[(#{CC_ANY}+)?\]$/
@@ -219,7 +220,8 @@ class Converter::DocBook5Converter < Converter::Base
     informal = !node.title?
     common_attrs = common_attributes node.id, node.role, node.reftext
     if node.style == 'source'
-      if (attrs = node.attributes).key? 'linenums'
+      attrs = node.attributes
+      if node.option? 'linenums'
         numbering_attrs = (attrs.key? 'start') ? %( linenumbering="numbered" startinglinenumber="#{attrs['start'].to_i}") : ' linenumbering="numbered"'
       else
         numbering_attrs = ' linenumbering="unnumbered"'
@@ -391,7 +393,7 @@ class Converter::DocBook5Converter < Converter::Base
     pgwide_attribute = (node.option? 'pgwide') ? ' pgwide="1"' : ''
     frame = 'topbot' if (frame = node.attr 'frame', 'all', 'table-frame') == 'ends'
     grid = node.attr 'grid', nil, 'table-grid'
-    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{['none', 'cols'].include?(grid) ? 0 : 1}" colsep="#{['none', 'rows'].include?(grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
+    result << %(<#{tag_name = node.title? ? 'table' : 'informaltable'}#{common_attributes node.id, node.role, node.reftext}#{pgwide_attribute} frame="#{frame}" rowsep="#{(%w(none cols).include? grid) ? 0 : 1}" colsep="#{(%w(none rows).include? grid) ? 0 : 1}"#{(node.attr? 'orientation', 'landscape', 'table-orientation') ? ' orient="land"' : ''}>)
     if node.option? 'unbreakable'
       result << '<?dbfo keep-together="always"?>'
     elsif node.option? 'breakable'
@@ -558,20 +560,20 @@ class Converter::DocBook5Converter < Converter::Base
     elsif (numterms = (terms = node.attr 'terms').size) > 2
       %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary><tertiary>#{terms[2]}</tertiary>#{rel}
-</indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
+</indexterm>#{(node.document.option? 'indexterm-promotion') ? %(
 <indexterm>
 <primary>#{terms[1]}</primary><secondary>#{terms[2]}</secondary>
 </indexterm>
 <indexterm>
 <primary>#{terms[2]}</primary>
-</indexterm>] : ''})
+</indexterm>) : ''})
     elsif numterms > 1
       %(<indexterm>
 <primary>#{terms[0]}</primary><secondary>#{terms[1]}</secondary>#{rel}
-</indexterm>#{(node.document.option? 'indexterm-promotion') ? %[
+</indexterm>#{(node.document.option? 'indexterm-promotion') ? %(
 <indexterm>
 <primary>#{terms[1]}</primary>
-</indexterm>] : ''})
+</indexterm>) : ''})
     else
       %(<indexterm>
 <primary>#{terms[0]}</primary>#{rel}
@@ -628,7 +630,7 @@ class Converter::DocBook5Converter < Converter::Base
 
   def common_attributes id, role = nil, reftext = nil
     if id
-      attrs = %( xml:id="#{id}"#{role ? %[ role="#{role}"] : ''})
+      attrs = %( xml:id="#{id}"#{role ? %( role="#{role}") : ''})
     elsif role
       attrs = %( role="#{role}")
     else

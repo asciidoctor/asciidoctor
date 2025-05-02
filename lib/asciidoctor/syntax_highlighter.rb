@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: A pluggable adapter for integrating a syntax (aka code) highlighter into AsciiDoc processing.
 #
@@ -145,11 +146,10 @@ module SyntaxHighlighter
     #
     # Returns a [SyntaxHighlighter] instance for the specified name.
     def create name, backend = 'html5', opts = {}
-      if (syntax_hl = self.for name)
-        syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
-        raise ::NameError, %(#{syntax_hl.class} must specify a value for `name') unless syntax_hl.name
-        syntax_hl
-      end
+      return unless (syntax_hl = self.for name)
+      syntax_hl = syntax_hl.new name, backend, opts if ::Class === syntax_hl
+      raise ::NameError, %(#{syntax_hl.class} must specify a value for `name') unless syntax_hl.name
+      syntax_hl
     end
 
     private
@@ -181,8 +181,8 @@ module SyntaxHighlighter
     def registry
       @@registry
     end
-
     unless RUBY_ENGINE == 'opal'
+
       public
 
       def register syntax_highlighter, *names
@@ -234,13 +234,13 @@ module SyntaxHighlighter
       class_attr_val = opts[:nowrap] ? %(#{@pre_class} highlight nowrap) : %(#{@pre_class} highlight)
       if (transform = opts[:transform])
         transform[(pre = { 'class' => class_attr_val }), (code = lang ? { 'data-lang' => lang } : {})]
-        # NOTE: make sure data-lang is the last attribute on the code tag to remain consistent with 1.5.x
+        # NOTE make sure data-lang is the last attribute on the code tag to remain consistent with 1.5.x
         if (lang = code.delete 'data-lang')
           code['data-lang'] = lang
         end
-        %(<pre#{pre.map {|k, v| %[ #{k}="#{v}"] }.join}><code#{code.map {|k, v| %[ #{k}="#{v}"] }.join}>#{node.content}</code></pre>)
+        %(<pre#{pre.map {|k, v| %( #{k}="#{v}") }.join}><code#{code.map {|k, v| %( #{k}="#{v}") }.join}>#{node.content}</code></pre>)
       else
-        %(<pre class="#{class_attr_val}"><code#{lang ? %[ data-lang="#{lang}"] : ''}>#{node.content}</code></pre>)
+        %(<pre class="#{class_attr_val}"><code#{lang ? %( data-lang="#{lang}") : ''}>#{node.content}</code></pre>)
       end
     end
   end

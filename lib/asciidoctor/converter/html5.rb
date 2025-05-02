@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # consistent with the html5 backend from AsciiDoc.py.
@@ -6,19 +7,19 @@ class Converter::Html5Converter < Converter::Base
   register_for 'html5'
 
   (QUOTE_TAGS = {
-    monospaced:  ['<code>', '</code>', true],
-    emphasis:    ['<em>', '</em>', true],
-    strong:      ['<strong>', '</strong>', true],
-    double:      ['&#8220;', '&#8221;'],
-    single:      ['&#8216;', '&#8217;'],
-    mark:        ['<mark>', '</mark>', true],
+    monospaced: ['<code>', '</code>', true],
+    emphasis: ['<em>', '</em>', true],
+    strong: ['<strong>', '</strong>', true],
+    double: ['&#8220;', '&#8221;'],
+    single: ['&#8216;', '&#8217;'],
+    mark: ['<mark>', '</mark>', true],
     superscript: ['<sup>', '</sup>', true],
-    subscript:   ['<sub>', '</sub>', true],
-    asciimath:   ['\$', '\$'],
-    latexmath:   ['\(', '\)'],
+    subscript: ['<sub>', '</sub>', true],
+    asciimath: ['\$', '\$'],
+    latexmath: ['\(', '\)'],
     # Opal can't resolve these constants when referenced here
-    #asciimath:  INLINE_MATH_DELIMITERS[:asciimath] + [false],
-    #latexmath:  INLINE_MATH_DELIMITERS[:latexmath] + [false],
+    #asciimath: INLINE_MATH_DELIMITERS[:asciimath] + [false],
+    #latexmath: INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
@@ -92,7 +93,7 @@ class Converter::Html5Converter < Converter::Base
 
   def convert_document node
     br = %(<br#{slash = @void_element_slash}>)
-    unless (asset_uri_scheme = (node.attr 'asset-uri-scheme', 'https')).empty?
+    unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
       asset_uri_scheme = %(#{asset_uri_scheme}:)
     end
     cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
@@ -104,8 +105,8 @@ class Converter::Html5Converter < Converter::Base
     result << %(<head>
 <meta charset="#{node.attr 'encoding', 'UTF-8'}"#{slash}>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"#{slash}>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>
-<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>)
+<meta name="viewport" content="width=device-width, initial-scale=1.0"#{slash}>)
+    result << %(<meta name="generator" content="Asciidoctor #{node.attr 'asciidoctor-version'}"#{slash}>) unless (reproducible = node.attr? 'reproducible')
     result << %(<meta name="application-name" content="#{node.attr 'app-name'}"#{slash}>) if node.attr? 'app-name'
     result << %(<meta name="description" content="#{node.attr 'description'}"#{slash}>) if node.attr? 'description'
     result << %(<meta name="keywords" content="#{node.attr 'keywords'}"#{slash}>) if node.attr? 'keywords'
@@ -124,12 +125,12 @@ class Converter::Html5Converter < Converter::Base
     end
     result << %(<title>#{node.doctitle sanitize: true, use_fallback: true}</title>)
 
-    if DEFAULT_STYLESHEET_KEYS.include?(node.attr 'stylesheet')
+    if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
         result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
       end
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
       else
         result << %(<style>
 #{Stylesheets.instance.primary_stylesheet_data}
@@ -137,7 +138,7 @@ class Converter::Html5Converter < Converter::Base
       end
     elsif node.attr? 'stylesheet'
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path((node.attr 'stylesheet'), (node.attr 'stylesdir', ''))}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir')}"#{slash}>)
       else
         result << %(<style>
 #{node.read_contents (node.attr 'stylesheet'), start: (node.attr 'stylesdir'), warn_on_failure: true, label: 'stylesheet'}
@@ -147,10 +148,10 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'icons', 'font'
       if node.attr? 'iconfont-remote'
-        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %[#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css]}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
       end
     end
 
@@ -242,7 +243,7 @@ class Converter::Html5Converter < Converter::Base
       result << %(<div id="footer"#{max_width_attr}>)
       result << '<div id="footer-text">'
       result << %(#{node.attr 'version-label'} #{node.attr 'revnumber'}#{br}) if node.attr? 'revnumber'
-      result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if (node.attr? 'last-update-label') && !(node.attr? 'reproducible')
+      result << %(#{node.attr 'last-update-label'} #{node.attr 'docdatetime'}) if (node.attr? 'last-update-label') && !reproducible
       result << '</div>'
       result << '</div>'
     end
@@ -421,9 +422,9 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     else
       %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
 <h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
-#{level == 1 ? %[<div class="sectionbody">
+#{level == 1 ? %(<div class="sectionbody">
 #{node.content}
-</div>] : node.content}
+</div>) : node.content}
 </div>)
     end
   end
@@ -466,7 +467,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
-<audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
+<audio src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
 Your browser does not support the audio tag.
 </audio>
 </div>
@@ -549,9 +550,9 @@ Your browser does not support the audio tag.
       result << '<table>'
       if (node.attr? 'labelwidth') || (node.attr? 'itemwidth')
         result << '<colgroup>'
-        col_style_attribute = (node.attr? 'labelwidth') ? %( style="width: #{(node.attr 'labelwidth').chomp '%'}%;") : ''
+        col_style_attribute = (node.attr? 'labelwidth') ? %( width="#{(node.attr 'labelwidth').chomp '%'}%") : ''
         result << %(<col#{col_style_attribute}#{slash}>)
-        col_style_attribute = (node.attr? 'itemwidth') ? %( style="width: #{(node.attr 'itemwidth').chomp '%'}%;") : ''
+        col_style_attribute = (node.attr? 'itemwidth') ? %( width="#{(node.attr 'itemwidth').chomp '%'}%") : ''
         result << %(<col#{col_style_attribute}#{slash}>)
         result << '</colgroup>'
       end
@@ -631,14 +632,16 @@ Your browser does not support the audio tag.
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif node.option? 'interactive'
         fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-        img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+        img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
       else
-        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       end
     else
-      img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     end
-    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
+    if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
+      img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+    end
     id_attr = node.id ? %( id="#{node.id}") : ''
     classes = ['imageblock']
     classes << (node.attr 'float') if node.attr? 'float'
@@ -664,7 +667,7 @@ Your browser does not support the audio tag.
         } : {}
         opts[:nowrap] = nowrap
       else
-        pre_open = %(<pre class="highlight#{nowrap ? ' nowrap' : ''}"><code#{lang ? %[ class="language-#{lang}" data-lang="#{lang}"] : ''}>)
+        pre_open = %(<pre class="highlight#{nowrap ? ' nowrap' : ''}"><code#{lang ? %( class="language-#{lang}" data-lang="#{lang}") : ''}>)
         pre_close = '</code></pre>'
       end
     else
@@ -729,7 +732,7 @@ Your browser does not support the audio tag.
 
     node.items.each do |item|
       if item.id
-        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+        result << %(<li id="#{item.id}"#{item.role ? %( class="#{item.role}") : ''}>)
       elsif item.role
         result << %(<li class="#{item.role}">)
       else
@@ -774,12 +777,12 @@ Your browser does not support the audio tag.
   end
 
   def convert_page_break node
-    '<div style="page-break-after: always;"></div>'
+    '<div class="page-break"></div>'
   end
 
   def convert_paragraph node
     if node.role
-      attributes = %(#{node.id ? %[ id="#{node.id}"] : ''} class="paragraph #{node.role}")
+      attributes = %(#{node.id ? %( id="#{node.id}") : ''} class="paragraph #{node.role}")
     elsif node.id
       attributes = %( id="#{node.id}" class="paragraph")
     else
@@ -800,7 +803,7 @@ Your browser does not support the audio tag.
   alias convert_pass content_only
 
   def convert_preamble node
-    if (doc = node.document).attr?('toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
+    if ((doc = node.document).attr? 'toc-placement', 'preamble') && doc.sections? && (doc.attr? 'toc')
       toc = %(
 <div id="toc" class="#{doc.attr 'toc-class', 'toc'}">
 <div id="toctitle">#{doc.attr 'toc-title'}</div>
@@ -840,7 +843,8 @@ Your browser does not support the audio tag.
   end
 
   def convert_thematic_break node
-    %(<hr#{@void_element_slash}>)
+    class_attribute = node.role ? %( class="#{node.role}") : ''
+    %(<hr#{class_attribute}#{@void_element_slash}>)
   end
 
   def convert_sidebar node
@@ -861,13 +865,13 @@ Your browser does not support the audio tag.
     if (stripes = node.attr 'stripes', nil, 'table-stripes')
       classes << %(stripes-#{stripes})
     end
-    style_attribute = ''
+    width_attribute = ''
     if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
       classes << 'fit-content'
     elsif (tablewidth = node.attr 'tablepcwidth') == 100
       classes << 'stretch'
     else
-      style_attribute = %( style="width: #{tablewidth}%;")
+      width_attribute = %( width="#{tablewidth}%")
     end
     classes << (node.attr 'float') if node.attr? 'float'
     if (role = node.role)
@@ -875,7 +879,7 @@ Your browser does not support the audio tag.
     end
     class_attribute = %( class="#{classes.join ' '}")
 
-    result << %(<table#{id_attribute}#{class_attribute}#{style_attribute}>)
+    result << %(<table#{id_attribute}#{class_attribute}#{width_attribute}>)
     result << %(<caption class="title">#{node.captioned_title}</caption>) if node.title?
     if (node.attr 'rowcount') > 0
       slash = @void_element_slash
@@ -884,7 +888,7 @@ Your browser does not support the audio tag.
         result += (Array.new node.columns.size, %(<col#{slash}>))
       else
         node.columns.each do |col|
-          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col style="width: #{col.attr 'colpcwidth'}%;"#{slash}>))
+          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col width="#{col.attr 'colpcwidth'}%"#{slash}>))
         end
       end
       result << '</colgroup>'
@@ -925,7 +929,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_toc node
-    unless (doc = node.document).attr?('toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
+    unless ((doc = node.document).attr? 'toc-placement', 'macro') && doc.sections? && (doc.attr? 'toc')
       return '<!-- toc disabled -->'
     end
 
@@ -978,7 +982,7 @@ Your browser does not support the audio tag.
 
     node.items.each do |item|
       if item.id
-        result << %(<li id="#{item.id}"#{item.role ? %[ class="#{item.role}"] : ''}>)
+        result << %(<li id="#{item.id}"#{item.role ? %( class="#{item.role}") : ''}>)
       elsif item.role
         result << %(<li class="#{item.role}">)
       else
@@ -1031,7 +1035,7 @@ Your browser does not support the audio tag.
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
     case node.attr 'poster'
     when 'vimeo'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       start_anchor = (node.attr? 'start') ? %(#at=#{node.attr 'start'}) : ''
@@ -1047,7 +1051,7 @@ Your browser does not support the audio tag.
 </div>
 </div>)
     when 'youtube'
-      unless (asset_uri_scheme = (node.document.attr 'asset-uri-scheme', 'https')).empty?
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
         asset_uri_scheme = %(#{asset_uri_scheme}:)
       end
       rel_param_val = (node.option? 'related') ? 1 : 0
@@ -1072,12 +1076,12 @@ Your browser does not support the audio tag.
 
       # parse video_id/list_id syntax where list_id (i.e., playlist) is optional
       target, list = (node.attr 'target').split '/', 2
-      if (list ||= (node.attr 'list'))
+      if (list ||= node.attr 'list') # rubocop:disable Style/ParenthesesAroundCondition
         list_param = %(&amp;list=#{list})
       else
         # parse dynamic playlist syntax: video_id1,video_id2,...
         target, playlist = target.split ',', 2
-        if (playlist ||= (node.attr 'playlist'))
+        if (playlist ||= node.attr 'playlist') # rubocop:disable Style/ParenthesesAroundCondition
           # INFO playlist bar doesn't appear in Firefox unless showinfo=1 and modestbranding=1
           list_param = %(&amp;playlist=#{target},#{playlist})
         else
@@ -1091,6 +1095,21 @@ Your browser does not support the audio tag.
 <iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
+    when 'wistia'
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
+        asset_uri_scheme = %(#{asset_uri_scheme}:)
+      end
+      delimiter = ['?']
+      start_anchor = (node.attr? 'start') ? %(#{delimiter.pop || '&amp;'}time=#{node.attr 'start'}) : ''
+      end_video_behavior_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=loop) : ((node.option? 'reset') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=reset) : '')
+      target = (node.attr 'target')
+      autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoPlay=true) : ''
+      muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=true) : ''
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<div class="content">
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{end_video_behavior_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
+</div>
+</div>)
     else
       poster_attribute = (val = node.attr 'poster').nil_or_empty? ? '' : %( poster="#{node.media_uri val}")
       preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
@@ -1099,7 +1118,7 @@ Your browser does not support the audio tag.
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
@@ -1160,7 +1179,7 @@ Your browser does not support the video tag.
     if node.document.attr? 'icons', 'font'
       %(<i class="conum" data-value="#{node.text}"></i><b>(#{node.text})</b>)
     elsif node.document.attr? 'icons'
-      src = node.icon_uri("callouts/#{node.text}")
+      src = node.icon_uri %(callouts/#{node.text})
       %(<img src="#{src}" alt="#{node.text}"#{@void_element_slash}>)
     elsif ::Array === (guard = node.attributes['guard'])
       %(&lt;!--<b class="conum">(#{node.text})</b>--&gt;)
@@ -1199,7 +1218,7 @@ Your browser does not support the video tag.
         attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
         attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
         attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
-        img = %(<img src="#{node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.icon_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       else
         img = %([#{node.alt}&#93;)
       end
@@ -1212,15 +1231,17 @@ Your browser does not support the video tag.
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
           fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-          img = %(<object type="image/svg+xml" data="#{node.image_uri target}"#{attrs}>#{fallback}</object>)
+          img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{attrs}>#{fallback}</object>)
         else
-          img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+          img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
       else
-        img = %(<img src="#{node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
     end
-    img = %(<a class="image" href="#{node.attr 'link'}"#{(append_link_constraint_attrs node).join}>#{img}</a>) if node.attr? 'link'
+    if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
+      img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
+    end
     class_attr_val = type
     if (role = node.role)
       class_attr_val = (node.attr? 'float') ? %(#{class_attr_val} #{node.attr 'float'} #{role}) : %(#{class_attr_val} #{role})
@@ -1284,7 +1305,7 @@ Your browser does not support the video tag.
       svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
       old_start_tag = new_start_tag = start_tag_match = nil
       # NOTE width, height and style attributes are removed if either width or height is specified
-      ['width', 'height'].each do |dim|
+      %w(width height).each do |dim|
         next unless node.attr? dim
         unless new_start_tag
           next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   register_for 'pygments'
@@ -63,7 +64,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
 
   def docinfo location, doc, opts
     if opts[:linkcss]
-      %(<link rel="stylesheet" href="#{doc.normalize_web_path (stylesheet_basename @style), (doc.attr 'stylesdir', ''), false}"#{opts[:self_closing_tag_slash]}>)
+      %(<link rel="stylesheet" href="#{doc.normalize_web_path (stylesheet_basename @style), (doc.attr 'stylesdir'), false}"#{opts[:self_closing_tag_slash]}>)
     else
       %(<style>
 #{read_stylesheet @style}
@@ -109,7 +110,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
     end
 
     def style_available? style
-      (((@@available_styles ||= ::Pygments.styles.to_set).include? style) rescue nil) && style
+      (((@@available_styles ||= (::Set.new ::Pygments.styles)).include? style) rescue nil) && style
     end
 
     @@base_style_cache = ::Hash.new do |cache, key|

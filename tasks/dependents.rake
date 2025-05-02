@@ -47,7 +47,7 @@ namespace :build do
       header = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/vnd.github.everest-preview+json',
-        'Authorization' => %(token #{github_token})
+        'Authorization' => %(token #{github_token}),
       }
       payload = {
         'event_type' => 'test_upstream',

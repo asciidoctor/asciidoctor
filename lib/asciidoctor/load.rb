@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
   class << self
     # Public: Parse the AsciiDoc source input into a {Document}
@@ -48,14 +49,13 @@ module Asciidoctor
         end
       elsif (attrs.respond_to? :keys) && (attrs.respond_to? :[])
         # coerce attrs to a real Hash
-        attrs = {}.tap {|accum| attrs.keys.each {|k| accum[k] = attrs[k] } }
+        attrs = {}.tap {|accum| attrs.keys.each {|k| accum[k] = attrs[k] } } # rubocop:disable Style/HashEachMethods
       else
         raise ::ArgumentError, %(illegal type for attributes option: #{attrs.class.ancestors.join ' < '})
       end
 
       if ::File === input
-        # File#mtime on JRuby 9.1 for Windows doesn't honor TZ environment variable; see https://github.com/jruby/jruby/issues/6659
-        options[:input_mtime] = RUBY_ENGINE == 'jruby' ? (::Time.at input.mtime.to_i) : input.mtime
+        options[:input_mtime] = input.mtime
         # NOTE defer setting infile and indir until we get a better sense of their purpose
         # TODO cli checks if input path can be read and is file, but might want to add check to API too
         attrs['docfile'] = input_path = ::File.absolute_path input.path

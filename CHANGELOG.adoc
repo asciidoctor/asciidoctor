@@ -18,8 +18,53 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Enhancements::
+
+  * Allow the CLI to control the logging level using the `--log-level` option (#3868)
+  * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
+  * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
+  * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) (*@rpavlik*)
+  * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) (*@hackingotter*)
+  * Allow section ID to be unset by assigning an empty value to the `id` block attribute (#4139)
+  * Add support for dropping principal text of list item if empty in an ordered or unordered list when converting to man page (#4182)
+  * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
+  * Add support for role on thematic break in HTML converter (#4101)
+  * Add support for link=self on image macros (#3656)
+  * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
+  * Update signature of Logger constructor so both positional arguments and keyword arguments are passed to super constructor (#4250)
+  * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
+  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
+  * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
+  * Add support for Wistia using the video macro
+
+Compliance::
+
+  * Don't promote level-0 special section at start of document to document title (#4151)
+  * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
+  * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
+  * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
+  * Drop support for Ruby < 2.7 and JRuby < 9.2
+  * Update latest JRuby in CI workflow to 9.4.2.0
+
 Improvements::
 
+  * Use width attribute to set table and column width instead of inline style (#4160)
+  * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
+  * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
+  * Use CSS class instead of inline style to apply page break behavior (#4051)
+  * Set width of line number table column of source block to 0.01% to restrict width and force table to span available width (#4137)
+  * Consolidate styles applied to primary containers (`#header`, `#content`, `#footnotes`, `#footer`) in default stylesheet (#4169)
+  * Constrain width of `<svg>` element to container in default stylesheet
+  * Target `<object>` element with image more accurately in default stylesheet
+  * Remove form styles from the default stylesheet (#4186)
+  * Set linenums option on source block when line numbering is enabled (#3313)
+  * Warn if include target is remote and `allow-uri-read` attribute is not set (#2284)
+  * Don't split value of `-r` CLI option; treat as single path (#4425)
+  * Add single and double role hint to `<quote>` tag in DocBook output (#2947)
+  * Use safe navigation to avoid crashing when querying for extensions
+  * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
+  * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
+  * Modify default stylesheet to honor text-* roles on quote blocks
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
   * Change Brazilian Portuguese translation for toc-title
 
@@ -183,15 +228,15 @@ Bug Fixes::
   * Ignore return value of process method for custom block or block macro if value matches parent argument
   * Remove unnamespaced selectors in Pygments stylesheet
   * Normalize output from Pygments to use `linenos` class for inline line numbering and trim space after number; update default stylesheet accordingly
-  * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) *@mogztter*
+  * Change `AbstractBlock#sections?` to return false when called on block that isn't a Section or Document (PR #3591) (*@mogztter*)
   * Hide built-in marker on HTML summary element in Safari when using default stylesheet (#4162)
   * Hide outline around HTML summary when activated in Safari (#4162)
-  * Include primary video in value of `playlist` attribute when embedding YouTube video (#4156)
-  * Honor `stripes=none` on nested table (#4165)
+  * Include primary video in value of `playlist` attribute when embeddding YouTube video (#4156)
+  * Honor stripes=none on nested table (#4165)
   * Update default stylesheet to fix spacing around empty list item (#4184)
   * Honor `:header_only` option when parsing document with manpage doctype (#4192)
   * Use numeric character reference for closing square bracket around alt text of icon
-  * Process `author` or `authors` document attribute in document header when implicit doctitle is absent (#4206)
+  * Process author or authors document attribute in document header when implicit doctitle is absent (#4206)
   * Patch open-uri-cached gem to work with Ruby 3.1 (update: drop patch now that open-uri-cached has been fixed) (#4227)
 
 Improvements::
@@ -604,7 +649,7 @@ Enhancements / Compliance::
   * always assume the target of a shorthand inter-document xref is a reference to an AsciiDoc document (source-to-source) (#3021)
   * if the target of a formal xref macro has a file extension, assume it's a path reference (#3021)
   * never assume target of a formal xref macro is a path reference unless a file extension or fragment is present (#3021)
-  * encode characters in URI to comply with RFC-3986
+  * encode characters in query string of mailto link to comply with RFC-3986; add Helpers.encode_uri_component to handle this logic
   * implement full support for styled xreftext in manpage converter (#3077)
   * allow the ID and role properties to be set on a list item of ordered and unordered lists via the API (#2840)
   * yield processor instance to registration block for document processor if block has non-zero arity (i.e., has parameters)
@@ -1049,7 +1094,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1...v1.5.6.2[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1\...v1.5.6.2[full diff]
 
 == 1.5.6.1 (2017-07-23) - @mojavelinux
 

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A module that can be used to mix the {#write} method into a {Converter} implementation to allow the converter to
 # control how the output is written to disk.

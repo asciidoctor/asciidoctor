@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # A module for defining converters that are used to convert {AbstractNode} objects in a parsed AsciiDoc document to an
 # output (aka backend) format such as HTML or DocBook.
@@ -293,8 +294,8 @@ module Converter
     def registry
       @@registry
     end
-
     unless RUBY_ENGINE == 'opal' # the following block adds support for synchronization and lazy registration
+
       public
 
       def register converter, *backends

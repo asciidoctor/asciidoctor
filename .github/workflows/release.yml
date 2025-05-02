@@ -12,17 +12,17 @@ on:
         required: false
 jobs:
   activate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.repository_owner == 'asciidoctor' && github.event_name == 'workflow_dispatch'
     steps:
     - run: echo ok go
   perform:
     needs: activate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment: releases
     env:
       SOURCE_DATE_EPOCH: '1521504000'
-      PYGMENTS_VERSION: '~> 2.3.0'
+      PYGMENTS_VERSION: '~> 2.0'
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -31,7 +31,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3'
+        ruby-version: '3.3.4'
         bundler-cache: false
     - name: Configure Bundler
       run: |
@@ -41,6 +41,8 @@ jobs:
       run: bundle --jobs 3 --retry 3
     - name: Run tests
       run: bundle exec rake test:all
+    - name: Run linter
+      run: bundle exec rake lint
     - name: Setup release environment
       run: |
         echo ${{ secrets[format('GH_TOKEN_{0}', github.actor)] }} | gh auth login --with-token

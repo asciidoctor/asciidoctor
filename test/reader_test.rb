@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 class ReaderTest < Minitest::Test
@@ -24,8 +25,8 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should remove UTF-8 BOM from first line of String data' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = String.new %(\xef\xbb\xbf#{SAMPLE_DATA.join ::Asciidoctor::LF}), encoding: start_encoding
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
+          data = String.new %(\xef\xbb\xbf#{SAMPLE_DATA.join Asciidoctor::LF}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -34,7 +35,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should remove UTF-8 BOM from first line of Array data' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = SAMPLE_DATA.drop 0
           data[0] = String.new %(\xef\xbb\xbf#{data.first}), encoding: start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
@@ -45,8 +46,8 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16LE string to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16LE').force_encoding(start_encoding)
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
+          data = "\ufeff#{SAMPLE_DATA.join Asciidoctor::LF}".encode('UTF-16LE').force_encoding start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -55,7 +56,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16LE string array to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           # NOTE can't split a UTF-16LE string using .lines when encoding is set to UTF-8
           data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
@@ -68,8 +69,8 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16BE string to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
-          data = "\ufeff#{SAMPLE_DATA.join ::Asciidoctor::LF}".encode('UTF-16BE').force_encoding(start_encoding)
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
+          data = "\ufeff#{SAMPLE_DATA.join Asciidoctor::LF}".encode('UTF-16BE').force_encoding start_encoding
           reader = Asciidoctor::Reader.new data, nil, normalize: true
           assert_equal Encoding::UTF_8, reader.lines[0].encoding
           assert_equal 'f', reader.lines[0].chr
@@ -78,7 +79,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'should encode UTF-16BE string array to UTF-8 when BOM is found' do
-        ['UTF-8', 'ASCII-8BIT'].each do |start_encoding|
+        %w(UTF-8 ASCII-8BIT).each do |start_encoding|
           data = SAMPLE_DATA.drop 0
           data.unshift %(\ufeff#{data.shift})
           data = data.map {|line| (line.encode 'UTF-16BE').force_encoding start_encoding }
@@ -96,7 +97,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'empty? should return true with empty data' do
-        assert Asciidoctor::Reader.new.empty?
+        assert_empty Asciidoctor::Reader.new
         assert Asciidoctor::Reader.new.eof?
       end
 
@@ -109,7 +110,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'peek_lines should return empty Array with empty data' do
-        assert_equal [], Asciidoctor::Reader.new.peek_lines(1)
+        assert_empty Asciidoctor::Reader.new.peek_lines(1)
       end
 
       test 'read_line should return nil with empty data' do
@@ -118,7 +119,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'read_lines should return empty Array with empty data' do
-        assert_equal [], Asciidoctor::Reader.new.read_lines
+        assert_empty Asciidoctor::Reader.new.read_lines
         #assert_equal [], Asciidoctor::Reader.new.get_lines
       end
     end
@@ -131,7 +132,7 @@ class ReaderTest < Minitest::Test
 
       test 'empty? should return false if there are lines remaining' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        refute reader.empty?
+        refute_empty reader
         refute reader.eof?
       end
 
@@ -219,7 +220,7 @@ class ReaderTest < Minitest::Test
 
       test 'read should return all lines joined as String' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
-        assert_equal SAMPLE_DATA.join(::Asciidoctor::LF), reader.read
+        assert_equal SAMPLE_DATA.join(Asciidoctor::LF), reader.read
       end
 
       test 'has_more_lines? should return false after read_lines is invoked' do
@@ -264,9 +265,8 @@ class ReaderTest < Minitest::Test
       test 'source should return original data Array joined as String' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         reader.read_lines
-        assert_equal SAMPLE_DATA.join(::Asciidoctor::LF), reader.source
+        assert_equal SAMPLE_DATA.join(Asciidoctor::LF), reader.source
       end
-
     end
 
     context 'Line context' do
@@ -320,7 +320,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until blank line preserving last line' do
-        lines = <<~'EOS'.split ::Asciidoctor::LF
+        lines = <<~'EOS'.split Asciidoctor::LF
         This is one paragraph.
 
         This is another paragraph.
@@ -334,7 +334,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true' do
-        lines = <<~'EOS'.split ::Asciidoctor::LF
+        lines = <<~'EOS'.split Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -353,7 +353,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true, taking last line' do
-        lines = <<~'EOS'.split ::Asciidoctor::LF
+        lines = <<~'EOS'.split Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -372,7 +372,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'Read lines until until condition is true, taking and preserving last line' do
-        lines = <<~'EOS'.split ::Asciidoctor::LF
+        lines = <<~'EOS'.split Asciidoctor::LF
         --
         This is one paragraph inside the block.
 
@@ -465,7 +465,7 @@ class ReaderTest < Minitest::Test
         data = SAMPLE_DATA.drop 0
         data.unshift ' '
         data.push ' '
-        data_as_string = data * ::Asciidoctor::LF
+        data_as_string = data * Asciidoctor::LF
         doc = Asciidoctor::Document.new data_as_string
         reader = doc.reader
         assert_equal [''] + SAMPLE_DATA, reader.lines
@@ -475,7 +475,7 @@ class ReaderTest < Minitest::Test
         data = ['', ' ', '', ' ']
         doc = Asciidoctor::Document.new data
         reader = doc.reader
-        assert reader.lines.empty?
+        assert_empty reader.lines
       end
 
       test 'should clean CRLF from end of lines' do
@@ -486,7 +486,7 @@ class ReaderTest < Minitest::Test
         line endings\r
         EOS
 
-        [input, input.lines, input.split(::Asciidoctor::LF), input.split(::Asciidoctor::LF).join(::Asciidoctor::LF)].each do |lines|
+        [input, input.lines, input.split(Asciidoctor::LF), input.split(Asciidoctor::LF).join(Asciidoctor::LF)].each do |lines|
           doc = Asciidoctor::Document.new lines
           reader = doc.reader
           reader.lines.each do |line|
@@ -560,6 +560,31 @@ class ReaderTest < Minitest::Test
         assert_equal front_matter, doc.attributes['front-matter']
         assert_equal 7, reader.lineno
       end
+
+      test 'should skip TOML front matter if specified by skip-front-matter attribute' do
+        front_matter = <<~'EOS'.chop
+        layout = 'post'
+        title = 'Document Title'
+        author = 'username'
+        tags = ['first', 'second']
+        EOS
+
+        input = <<~EOS
+        +++
+        #{front_matter}
+        +++
+        = Document Title
+        Author Name
+
+        preamble
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'skip-front-matter' => '' }
+        reader = doc.reader
+        assert_equal '= Document Title', reader.peek_line
+        assert_equal front_matter, doc.attributes['front-matter']
+        assert_equal 7, reader.lineno
+      end
     end
 
     context 'Include Stack' do
@@ -604,8 +629,8 @@ class ReaderTest < Minitest::Test
       end
 
       test 'PreprocessorReader#push_include method should accept file as a URI and compute dir and path' do
-        file_uri = ::URI.parse 'http://example.com/docs/file.adoc'
-        dir_uri = ::URI.parse 'http://example.com/docs'
+        file_uri = URI.parse 'http://example.com/docs/file.adoc'
+        dir_uri = URI.parse 'http://example.com/docs'
         reader = empty_document.reader
         reader.push_include %w(one two three), file_uri
         assert_same file_uri, reader.file
@@ -614,8 +639,8 @@ class ReaderTest < Minitest::Test
       end
 
       test 'PreprocessorReader#push_include method should accept file as a top-level URI and compute dir and path' do
-        file_uri = ::URI.parse 'http://example.com/index.adoc'
-        dir_uri = ::URI.parse 'http://example.com'
+        file_uri = URI.parse 'http://example.com/index.adoc'
+        dir_uri = URI.parse 'http://example.com'
         reader = empty_document.reader
         reader.push_include %w(one two three), file_uri
         assert_same file_uri, reader.file
@@ -659,21 +684,61 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:pass:c[foo bar baz.adoc][role=include]', reader.read_line
       end
 
+      test 'should preserve attrlist when replacing include directive with link macro' do
+        input = 'include::include-file.adoc[leveloffset=+1]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:include-file.adoc[role=include,leveloffset=+1]', reader.read_line
+      end
+
       test 'should replace include directive with link macro if safe mode allows it, but allow-uri-read is not set' do
         using_memory_logger do |logger|
           input = 'include::https://example.org/dist/info.adoc[]'
           doc = Asciidoctor::Document.new input, safe: :safe
           reader = doc.reader
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
-          assert_empty logger
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
         end
       end
 
       test 'should escape spaces in target when generating link from remote include directive' do
-        input = 'include::https://example.org/no such file.adoc[]'
-        doc = Asciidoctor::Document.new input, safe: :safe
-        reader = doc.reader
-        assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/no such file.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/no such file.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should preserve attrlist when replacing remove include directive with link macro' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/dist/info.adoc[leveloffset=+1]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[role=include,leveloffset=+1]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'include directive with remote target is converted to a link when allow-uri-read is not set' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: http://example.org/team.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'include directive with remote target is converted to a link when safe mode is secure' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :secure
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
+          assert_empty logger.messages
+        end
       end
 
       test 'include directive is enabled when safe mode is less than SECURE' do
@@ -709,7 +774,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         doc = document_from_string input, safe: :safe, standalone: false, base_dir: DIRNAME
-        assert doc.catalog[:includes].empty?
+        assert_empty doc.catalog[:includes]
       end
 
       test 'include directive should resolve file with spaces in name' do
@@ -890,15 +955,11 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 1, doc.blocks.size
-            assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on unresolved target'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 1, doc.blocks.size
+          assert_equal ['trailing content'], doc.blocks[0].lines
+          assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
         end
       end
 
@@ -909,15 +970,11 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 1, doc.blocks.size
-            assert_equal ['trailing content'], doc.blocks[0].lines
-            assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 1, doc.blocks.size
+          assert_equal ['trailing content'], doc.blocks[0].lines
+          assert_message logger, :INFO, '~<stdin>: line 1: optional include dropped because include file not found', Hash
         end
       end
 
@@ -928,16 +985,12 @@ class ReaderTest < Minitest::Test
         trailing content
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            doc = document_from_string input, safe: :safe, base_dir: DIRNAME
-            assert_equal 2, doc.blocks.size
-            assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
-            assert_equal ['trailing content'], doc.blocks[1].lines
-            assert_message logger, :ERROR, '~<stdin>: line 1: include file not found', Hash
-          end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+        using_memory_logger do |logger|
+          doc = document_from_string input, safe: :safe, base_dir: DIRNAME
+          assert_equal 2, doc.blocks.size
+          assert_equal ['Unresolved directive in <stdin> - include::fixtures/no-such-file.adoc[]'], doc.blocks[0].lines
+          assert_equal ['trailing content'], doc.blocks[1].lines
+          assert_message logger, :ERROR, '~<stdin>: line 1: include file not found', Hash
         end
       end
 
@@ -959,8 +1012,6 @@ class ReaderTest < Minitest::Test
             assert_equal ['trailing content'], doc.blocks[1].lines
             assert_message logger, :ERROR, '~<stdin>: line 1: include file not readable', Hash
           end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
         ensure
           FileUtils.chmod old_mode, include_file
         end
@@ -968,12 +1019,12 @@ class ReaderTest < Minitest::Test
 
       # IMPORTANT this test needs to be run on Windows to verify proper behavior in Windows
       test 'can resolve include directive with absolute path' do
-        include_path = ::File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
+        include_path = File.join DIRNAME, 'fixtures', 'chapter-a.adoc'
         input = %(include::#{include_path}[])
         result = document_from_string input, safe: :safe
         assert_equal 'Chapter A', result.doctitle
 
-        result = document_from_string input, safe: :unsafe, base_dir: ::Dir.tmpdir
+        result = document_from_string input, safe: :unsafe, base_dir: Dir.tmpdir
         assert_equal 'Chapter A', result.doctitle
       end
 
@@ -990,7 +1041,7 @@ class ReaderTest < Minitest::Test
         end
 
         refute_nil output
-        assert_match(expect, output)
+        assert_match expect, output
       end
 
       test 'nested include directives are resolved relative to current file' do
@@ -1052,16 +1103,12 @@ class ReaderTest < Minitest::Test
         include::#{include_url}[]
         ....
         EOS
-        begin
-          using_memory_logger do |logger|
-            result = using_test_webserver do
-              convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
-            end
-            assert_includes result, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
-            assert_message logger, :ERROR, %(#{include_url}: line 1: include uri not readable: http://#{resolve_localhost}:9876/fixtures/#{nested_include_url}), Hash
+        using_memory_logger do |logger|
+          result = using_test_webserver do
+            convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
           end
-        rescue
-          flunk 'include directive should not raise exception on missing file'
+          assert_includes result, %(Unresolved directive in #{include_url} - include::#{nested_include_url}[])
+          assert_message logger, :ERROR, %(#{include_url}: line 1: include uri not readable: http://#{resolve_localhost}:9876/fixtures/#{nested_include_url}), Hash
         end
       end
 
@@ -1077,8 +1124,7 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
         end
 
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         <code class="language-ruby" data-lang="ruby">def initialize breed
           @breed = breed
         end</code>
@@ -1094,17 +1140,13 @@ class ReaderTest < Minitest::Test
         ....
         EOS
 
-        begin
-          using_memory_logger do |logger|
-            output = using_test_webserver do
-              convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
-            end
-            refute_nil output
-            assert_match(/Unresolved directive/, output)
-            assert_message logger, :ERROR, %(<stdin>: line 2: include uri not readable: #{url}), Hash
+        using_memory_logger do |logger|
+          output = using_test_webserver do
+            convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
           end
-        rescue
-          flunk 'include directive should not raise exception on inaccessible uri'
+          refute_nil output
+          assert_match(/Unresolved directive/, output)
+          assert_message logger, :ERROR, %(<stdin>: line 2: include uri not readable: #{url}), Hash
         end
       end
 
@@ -1248,7 +1290,7 @@ class ReaderTest < Minitest::Test
           input = %(include::#{tmp_include_path}[tag=include-me])
           using_memory_logger do |logger|
             output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
-            assert_empty logger.messages
+            assert_empty logger
             assert_includes output, 'line included'
             refute_includes output, 'line not included'
           end
@@ -1283,8 +1325,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1302,8 +1343,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1329,8 +1369,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1348,8 +1387,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1400,8 +1438,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1428,8 +1465,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1475,11 +1511,10 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
-          def initialize breed
-            @breed = breed
+
+          def bark
           end
         end
         EOS
@@ -1509,8 +1544,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1558,8 +1592,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1585,8 +1618,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1610,8 +1642,7 @@ class ReaderTest < Minitest::Test
           EOS
 
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-          # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-          expected = <<~EOS.chop
+          expected = <<~'EOS'.chop
           class Dog
             def initialize breed
               @breed = breed
@@ -1630,8 +1661,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1719,8 +1749,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         def bark
           if @breed == 'beagle'
             'woof woof woof woof woof'
@@ -1762,7 +1791,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1804,7 +1833,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1856,7 +1885,7 @@ class ReaderTest < Minitest::Test
       end
 
       test 'include directive ignores tags attribute when empty' do
-        ['tag', 'tags'].each do |attr_name|
+        %w(tag tags).each do |attr_name|
           input = <<~EOS
           ++++
           include::fixtures/include-file.xml[#{attr_name}=]
@@ -1920,13 +1949,13 @@ class ReaderTest < Minitest::Test
         reader = Asciidoctor::PreprocessorReader.new document, input, nil, normalize: true
         reader.instance_variable_set '@include_processors', [include_processor.new(document)]
         lines = reader.read_lines
-        source = lines * ::Asciidoctor::LF
+        source = lines * Asciidoctor::LF
         assert_match(/included content/, source)
       end
 
       test 'leveloffset attribute entries should be added to content if leveloffset attribute is specified' do
         input = 'include::fixtures/main.adoc[]'
-        expected = <<~'EOS'.split ::Asciidoctor::LF
+        expected = <<~'EOS'.split Asciidoctor::LF
         = Main Document
 
         preamble
@@ -2079,7 +2108,7 @@ class ReaderTest < Minitest::Test
         doc = empty_safe_document base_dir: DIRNAME
         reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
         reader.read_line
-        result = reader.read_lines_until(terminator: '////', skip_processing: true)
+        result = reader.read_lines_until terminator: '////', skip_processing: true
         assert_equal lines.map(&:chomp)[1..1], result
       end
 
@@ -2094,8 +2123,8 @@ class ReaderTest < Minitest::Test
           doc = empty_safe_document base_dir: DIRNAME
           reader = Asciidoctor::PreprocessorReader.new doc, lines, nil, normalize: true
           reader.skip_comment_lines
-          assert reader.empty?
-          assert logger.empty?
+          assert_empty reader
+          assert_empty logger
         end
       end
     end
@@ -2156,7 +2185,7 @@ class ReaderTest < Minitest::Test
         EOS
         doc = Asciidoctor::Document.new input
         reader = doc.reader
-        result = reader.peek_lines 2, true
+        reader.peek_lines 2, true
         result = reader.peek_lines 2, false
         assert_equal ['The Asciidoctor', 'is in.'], result
       end
@@ -2226,10 +2255,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'There is a holy grail!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'There is a holy grail!', (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with defined attribute includes text in brackets' do
@@ -2242,10 +2269,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "On our quest we go...\nThere is a holy grail!\nThere was much rejoicing.", (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with defined attribute processes include directive in brackets' do
@@ -2253,9 +2278,7 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, safe: :safe, base_dir: DIRNAME
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
+        lines << reader.read_line while reader.has_more_lines?
         assert_equal 'snippetA content', lines[0]
       end
 
@@ -2281,10 +2304,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'hardships' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "On our quest we go...\nThere was no rejoicing.", (lines * Asciidoctor::LF)
       end
 
       test 'include with non-matching nested exclude' do
@@ -2301,10 +2322,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "holy\ngrail", (lines * Asciidoctor::LF)
       end
 
       test 'nested excludes with same condition' do
@@ -2319,10 +2338,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
       end
 
       test 'include with nested exclude of inverted condition' do
@@ -2339,10 +2356,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "holy\ngrail", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "holy\ngrail", (lines * Asciidoctor::LF)
       end
 
       test 'exclude with matching nested exclude' do
@@ -2361,10 +2376,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "poof\ngone", (lines * Asciidoctor::LF)
       end
 
       test 'exclude with nested include using shorthand end' do
@@ -2383,10 +2396,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'grail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "poof\ngone", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "poof\ngone", (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with one alternative attribute set includes content' do
@@ -2399,10 +2410,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'swallow' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Our quest is complete!', (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with no alternative attributes set does not include content' do
@@ -2415,10 +2424,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with all required attributes set includes content' do
@@ -2431,10 +2438,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '', 'swallow' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest is complete!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Our quest is complete!', (lines * Asciidoctor::LF)
       end
 
       test 'ifdef with missing required attributes does not include content' do
@@ -2447,10 +2452,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'holygrail' => '' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
       end
 
       test 'ifdef should permit leading, trailing, and repeat operators' do
@@ -2481,10 +2484,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Our quest continues to find the holy grail!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Our quest continues to find the holy grail!', (lines * Asciidoctor::LF)
       end
 
       test 'ifndef with one alternative attribute set does not include content' do
@@ -2617,10 +2618,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing missing attribute to nil includes content' do
@@ -2633,10 +2632,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'No foo for you!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'No foo for you!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing missing attribute to 0 drops content' do
@@ -2649,10 +2646,36 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
+      end
+
+      test 'ifeval running unsupported operation on missing attribute drops content' do
+        input = <<~'EOS'
+        ifeval::[{leveloffset} >= 3]
+        I didn't make the cut!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
+      end
+
+      test 'ifeval running invalid operation drops content' do
+        input = <<~'EOS'
+        ifeval::[{asciidoctor-version} > true]
+        I didn't make the cut!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval running unsupported operation on missing attribute drops content' do
@@ -2697,10 +2720,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Asciidoctor it is!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing single-quoted attribute to matching string includes content' do
@@ -2713,10 +2734,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'asciidoctor' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Asciidoctor it is!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing quoted attribute to non-matching string drops content' do
@@ -2729,10 +2748,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'tilt' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal '', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal '', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing attribute to lower version number includes content' do
@@ -2745,10 +2762,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'That version will do!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval comparing attribute to self includes content' do
@@ -2761,10 +2776,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'Of course it\'s the same!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Of course it\'s the same!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval arguments can be transposed' do
@@ -2777,10 +2790,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'That version will do!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'That version will do!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval matching numeric equality includes content' do
@@ -2793,10 +2804,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'rings' => '1' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'One ring to rule them all!', (lines * Asciidoctor::LF)
       end
 
       test 'ifeval matching numeric inequality includes content' do
@@ -2809,10 +2818,8 @@ class ReaderTest < Minitest::Test
         doc = Asciidoctor::Document.new input, attributes: { 'rings' => '1' }
         reader = doc.reader
         lines = []
-        while reader.has_more_lines?
-          lines << reader.read_line
-        end
-        assert_equal 'One ring to rule them all!', (lines * ::Asciidoctor::LF)
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'One ring to rule them all!', (lines * Asciidoctor::LF)
       end
 
       test 'should warn if ifeval has target' do
@@ -2826,7 +2833,7 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           lines = []
           lines << reader.read_line while reader.has_more_lines?
-          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_equal 'content', (lines * Asciidoctor::LF)
           assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - target not permitted: ifeval::target[1 == 1]', Hash
         end
       end
@@ -2842,7 +2849,7 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           lines = []
           lines << reader.read_line while reader.has_more_lines?
-          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_equal 'content', (lines * Asciidoctor::LF)
           assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - invalid expression: ifeval::[1 | 2]', Hash
         end
       end
@@ -2858,7 +2865,7 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           lines = []
           lines << reader.read_line while reader.has_more_lines?
-          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_equal 'content', (lines * Asciidoctor::LF)
           assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - missing expression: ifeval::[]', Hash
         end
       end
@@ -2874,7 +2881,7 @@ class ReaderTest < Minitest::Test
           reader = doc.reader
           lines = []
           lines << reader.read_line while reader.has_more_lines?
-          assert_equal 'content', (lines * ::Asciidoctor::LF)
+          assert_equal 'content', (lines * Asciidoctor::LF)
           assert_message logger, :ERROR, '~<stdin>: line 1: malformed preprocessor directive - missing target: ifdef::[]', Hash
         end
       end

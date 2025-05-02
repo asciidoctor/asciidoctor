@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Internal: Except where noted, a module that contains internal helper functions.
 module Helpers
@@ -243,21 +244,20 @@ module Helpers
 
   # Internal: Make a directory, ensuring all parent directories exist.
   def mkdir_p dir
-    unless ::File.directory? dir
-      unless (parent_dir = ::File.dirname dir) == '.'
-        mkdir_p parent_dir
-      end
-      begin
-        ::Dir.mkdir dir
-      rescue ::SystemCallError
-        raise unless ::File.directory? dir
-      end
+    return if ::File.directory? dir
+    unless (parent_dir = ::File.dirname dir) == '.'
+      mkdir_p parent_dir
+    end
+    begin
+      ::Dir.mkdir dir
+    rescue ::SystemCallError
+      raise unless ::File.directory? dir
     end
   end
 
   ROMAN_NUMERALS = {
     'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
-    'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1
+    'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1,
   }
   private_constant :ROMAN_NUMERALS
 

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods for managing inline elements in AsciiDoc block
 class Inline < AbstractNode
@@ -11,8 +12,8 @@ class Inline < AbstractNode
   # Public: Get/Set the target (e.g., uri) of this inline element
   attr_accessor :target
 
-  def initialize(parent, context, text = nil, opts = {})
-    super(parent, context, opts)
+  def initialize parent, context, text = nil, opts = {}
+    super parent, context, opts
     @node_name = %(inline_#{context})
     @text = text
     @id = opts[:id]
@@ -34,6 +35,9 @@ class Inline < AbstractNode
 
   # Deprecated: Use {Inline#convert} instead.
   alias render convert
+
+  # Public: Get the converted result of this node's primary content (aka text).
+  alias content text
 
   # Public: Returns the converted alt text for this inline image.
   #

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Logger' do
@@ -50,6 +51,36 @@ context 'Logger' do
   end
 
   context 'Logger' do
+    test 'should set logdev to $stderr by default' do
+      out_string, err_string = redirect_streams do |out, err|
+        logger = Asciidoctor::Logger.new
+        logger.warn 'this is a call'
+        [out.string, err.string]
+      end
+      assert_empty out_string
+      refute_empty err_string
+      assert_includes err_string, 'this is a call'
+    end
+
+    test 'should set level to value specified by level kwarg' do
+      out_string, err_string, log_level = redirect_streams do |out, err|
+        logger = Asciidoctor::Logger.new level: 'fatal'
+        logger.warn 'this is a call'
+        [out.string, err.string, logger.level]
+      end
+      assert_empty out_string
+      assert_empty err_string
+      assert_equal Logger::Severity::FATAL, log_level
+    end
+
+    test 'should configure logger with progname set to asciidoctor' do
+      assert_equal 'asciidoctor', Asciidoctor::Logger.new.progname
+    end
+
+    test 'should configure logger with level set to WARN by default' do
+      assert_equal Logger::Severity::WARN, Asciidoctor::Logger.new.level
+    end
+
     test 'configures default logger with progname set to asciidoctor' do
       assert_equal 'asciidoctor', Asciidoctor::LoggerManager.logger.progname
     end
@@ -81,7 +112,13 @@ context 'Logger' do
     test 'NullLogger level is not nil' do
       logger = Asciidoctor::NullLogger.new
       refute_nil logger.level
-      assert_equal Logger::WARN, logger.level
+      assert_equal Logger::UNKNOWN, logger.level
+    end
+
+    test 'MemoryLogger level is not nil' do
+      logger = Asciidoctor::MemoryLogger.new
+      refute_nil logger.level
+      assert_equal Logger::UNKNOWN, logger.level
     end
   end
 
@@ -147,7 +184,7 @@ context 'Logger' do
     test 'including Logging gives instance methods on module access to logging infrastructure' do
       module SampleModuleA
         include Asciidoctor::Logging
-        def get_logger
+        def retrieve_logger
           logger
         end
       end
@@ -155,42 +192,42 @@ context 'Logger' do
       class SampleClassA
         include SampleModuleA
       end
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassA.new.retrieve_logger
       assert SampleClassA.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on module access to logging infrastructure' do
       module SampleModuleB
         include Asciidoctor::Logging
-        def self.get_logger
+        def self.retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleModuleB.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleModuleB.retrieve_logger
     end
 
     test 'including Logging gives instance methods on class access to logging infrastructure' do
       class SampleClassC
         include Asciidoctor::Logging
-        def get_logger
+        def retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassC.new.retrieve_logger
       assert SampleClassC.public_method_defined? :logger
     end
 
     test 'including Logging gives static methods on class access to logging infrastructure' do
       class SampleClassD
         include Asciidoctor::Logging
-        def self.get_logger
+        def self.retrieve_logger
           logger
         end
       end
 
-      assert_same Asciidoctor::LoggerManager.logger, SampleClassD.get_logger
+      assert_same Asciidoctor::LoggerManager.logger, SampleClassD.retrieve_logger
     end
 
     test 'can create an auto-formatting message with context' do

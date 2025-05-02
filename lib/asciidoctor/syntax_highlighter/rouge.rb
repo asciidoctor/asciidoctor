@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   register_for 'rouge'
@@ -41,7 +42,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
 
   def docinfo location, doc, opts
     if opts[:linkcss]
-      %(<link rel="stylesheet" href="#{doc.normalize_web_path (stylesheet_basename @style), (doc.attr 'stylesdir', ''), false}"#{opts[:self_closing_tag_slash]}>)
+      %(<link rel="stylesheet" href="#{doc.normalize_web_path (stylesheet_basename @style), (doc.attr 'stylesdir'), false}"#{opts[:self_closing_tag_slash]}>)
     else
       %(<style>
 #{read_stylesheet @style}
@@ -75,10 +76,16 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     formatter = opts[:css_mode] == :class ?
       (::Rouge::Formatters::HTML.new inline_theme: @style) :
       (::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new)
-    if (highlight_lines = opts[:highlight_lines])
-      formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
+    if (number_lines = opts[:number_lines])
+      formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: opts[:highlight_lines]
+      number_lines == :table ?
+        (RougeExt::Formatters::HTMLTableLineNumberer.new formatter, start_line: opts[:start_line_number]) :
+        (RougeExt::Formatters::HTMLLineNumberer.new formatter, start_line: opts[:start_line_number])
+    elsif (highlight_lines = opts[:highlight_lines])
+      RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: highlight_lines
+    else
+      formatter
     end
-    opts[:number_lines] ? (RougeExt::Formatters::HTMLTable.new formatter, start_line: opts[:start_line_number]) : formatter
   end
 
   module Loader

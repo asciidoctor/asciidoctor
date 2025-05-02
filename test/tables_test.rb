@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Tables' do
@@ -18,8 +19,8 @@ context 'Tables' do
       output = doc.convert
       assert_css 'table', output, 1
       assert_css 'table.tableblock.frame-all.grid-all.stretch', output, 1
-      assert_css 'table > colgroup > col[style*="width: 33.3333%"]', output, 2
-      assert_css 'table > colgroup > col:last-of-type[style*="width: 33.3334%"]', output, 1
+      assert_css 'table > colgroup > col[width="33.3333%"]', output, 2
+      assert_css 'table > colgroup > col:last-of-type[width="33.3334%"]', output, 1
       assert_css 'table tr', output, 3
       assert_css 'table > tbody > tr', output, 3
       assert_css 'table td', output, 9
@@ -28,7 +29,7 @@ context 'Tables' do
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td", output, row.size
         assert_css "table > tbody > tr:nth-child(#{rowi + 1}) > td > p", output, row.size
         row.each_with_index do |cell, celli|
-          assert_xpath "(//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']", output, 1
+          assert_xpath %((//tr)[#{rowi + 1}]/td[#{celli + 1}]/p[text()='#{cell}']), output, 1
         end
       end
     end
@@ -261,13 +262,12 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>one\n*two*\nthree\n&lt;four&gt;</pre>), result.to_s
     end
 
     test 'should preserving leading spaces but not leading newlines or trailing spaces in literal table cells' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [cols=2*]
       |===
       l|
@@ -279,13 +279,12 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//pre', output, 1)
+      result = xmlnodes_at_xpath '/table//pre', output, 1
       assert_equal %(<pre>  one\n  two\nthree</pre>), result.to_s
     end
 
     test 'should ignore v table cell style' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [cols=2*]
       |===
       v|
@@ -297,7 +296,7 @@ context 'Tables' do
       |===
       EOS
       output = convert_string_to_embedded input
-      result = xmlnodes_at_xpath('/table//p[@class="tableblock"]', output, 1)
+      result = xmlnodes_at_xpath '/table//p[@class="tableblock"]', output, 1
       assert_equal %(<p class="tableblock">one\n  two\nthree</p>), result.to_s
     end
 
@@ -341,8 +340,8 @@ context 'Tables' do
       output = doc.convert standalone: false
       assert_css 'table', output, 1
       assert_css 'table colgroup col', output, 4
-      assert_css 'table colgroup col[style]', output, 1
-      assert_css 'table colgroup col[style*="width: 15%"]', output, 1
+      assert_css 'table colgroup col[width]', output, 1
+      assert_css 'table colgroup col[width="15%"]', output, 1
     end
 
     test 'can assign autowidth to all columns even when table has a width' do
@@ -363,7 +362,7 @@ context 'Tables' do
       end
       output = doc.convert standalone: false
       assert_css 'table', output, 1
-      assert_css 'table[style*="width: 50%"]', output, 1
+      assert_css 'table[width="50%"]', output, 1
       assert_css 'table colgroup col', output, 4
       assert_css 'table colgroup col[style]', output, 0
     end
@@ -416,7 +415,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table[style*="width"]', output, 1
+      assert_css 'table[width]', output, 1
       assert_css 'table colgroup col', output, 3
       assert_css 'table colgroup col[style*="width"]', output, 0
     end
@@ -502,8 +501,8 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 25%;"]', output, 1
-      assert_css 'col[style="width: 75%;"]', output, 1
+      assert_css 'col[width="25%"]', output, 1
+      assert_css 'col[width="75%"]', output, 1
       assert_xpath '(//td)[1]//strong', output, 1
       assert_xpath '(//td)[2]//code', output, 1
     end
@@ -518,7 +517,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -533,7 +532,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -548,7 +547,7 @@ context 'Tables' do
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
       assert_css 'table > colgroup > col', output, 2
-      assert_css 'col[style="width: 50%;"]', output, 2
+      assert_css 'col[width="50%"]', output, 2
       assert_css 'table > tbody > tr', output, 3
     end
 
@@ -820,8 +819,7 @@ context 'Tables' do
     end
 
     test 'should interpret leading indent if first cell is AsciiDoc and there is no implicit header row' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [cols="1a,1"]
       |===
       |
@@ -1022,13 +1020,13 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table[style*="width: 80%"]', output, 1
+      assert_css 'table[width="80%"]', output, 1
       assert_xpath '/table/caption[@class="title"][text()="Table 1. Horizontal and vertical source data"]', output, 1
       assert_css 'table > colgroup > col', output, 4
-      assert_css 'table > colgroup > col:nth-child(1)[style*="width: 17.647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(2)[style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(3)[style*="width: 11.7647%"]', output, 1
-      assert_css 'table > colgroup > col:nth-child(4)[style*="width: 58.8236%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(1)[width="17.647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(2)[width="11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(3)[width="11.7647%"]', output, 1
+      assert_css 'table > colgroup > col:nth-child(4)[width="58.8236%"]', output, 1
       assert_css 'table > thead', output, 1
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > thead > tr > th', output, 4
@@ -1036,7 +1034,7 @@ context 'Tables' do
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 4
       assert_css 'table > tbody > tr:nth-child(2) > td', output, 4
       assert_css 'table > tbody > tr:nth-child(3) > td', output, 4
-      assert_xpath "/table/tbody/tr[1]/td[4]/p[text()='Worked out MSHR (max sustainable heart rate) by going hard\nfor this interval.']", output, 1
+      assert_xpath %(/table/tbody/tr[1]/td[4]/p[text()='Worked out MSHR (max sustainable heart rate) by going hard\nfor this interval.']), output, 1
       assert_css 'table > tbody > tr:nth-child(3) > td:nth-child(4) > p', output, 2
       assert_xpath '/table/tbody/tr[3]/td[4]/p[2][text()="I am getting in shape!"]', output, 1
     end
@@ -1051,8 +1049,8 @@ context 'Tables' do
 
       output = convert_string_to_embedded input
       assert_xpath '/table/colgroup/col', output, 2
-      assert_xpath '(/table/colgroup/col)[1][@style="width: 10%;"]', output, 1
-      assert_xpath '(/table/colgroup/col)[2][@style="width: 90%;"]', output, 1
+      assert_xpath '(/table/colgroup/col)[1][@width="10%"]', output, 1
+      assert_xpath '(/table/colgroup/col)[2][@width="90%"]', output, 1
     end
 
     test 'spans, alignments and styles' do
@@ -1067,7 +1065,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 25%"]', output, 4
+      assert_css 'table > colgroup > col[width="25%"]', output, 4
       assert_css 'table > tbody > tr', output, 4
       assert_css 'table > tbody > tr > td', output, 10
       assert_css 'table > tbody > tr:nth-child(1) > td', output, 4
@@ -1694,8 +1692,7 @@ context 'Tables' do
     end
 
     test 'should preserve leading indentation in contents of AsciiDoc table cell if contents starts with newline' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       |===
       a|
        $ command
@@ -1889,12 +1886,12 @@ context 'Tables' do
       result = convert_string_to_embedded input, backend: 'docbook'
       conums = xmlnodes_at_xpath '//co', result
       assert_equal 3, conums.size
-      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |conum, idx|
+      %w(CO1-1 CO2-1 CO3-1).each_with_index do |conum, idx|
         assert_equal conum, conums[idx].attribute('xml:id').value
       end
       callouts = xmlnodes_at_xpath '//callout', result
       assert_equal 3, callouts.size
-      ['CO1-1', 'CO2-1', 'CO3-1'].each_with_index do |callout, idx|
+      %w(CO1-1 CO2-1 CO3-1).each_with_index do |callout, idx|
         assert_equal callout, callouts[idx].attribute('arearefs').value
       end
     end
@@ -2270,8 +2267,8 @@ context 'Tables' do
       assert_equal 100, table.columns.map {|col| col.attributes['colpcwidth'] }.reduce(:+)
       output = doc.convert
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 14.2857%"]', output, 6
-      assert_css 'table > colgroup > col:last-of-type[style*="width: 14.2858%"]', output, 1
+      assert_css 'table > colgroup > col[width="14.2857%"]', output, 6
+      assert_css 'table > colgroup > col:last-of-type[width="14.2858%"]', output, 1
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '//tr[4]/td[5]/p/text()', output, 0
       assert_xpath '//tr[3]/td[5]/p[text()="MySQL:Server"]', output, 1
@@ -2388,7 +2385,7 @@ context 'Tables' do
     end
 
     test 'should not drop trailing empty cell in TSV data when loaded from an include file' do
-      input  = <<~'EOS'
+      input = <<~'EOS'
       [%header,format=tsv]
       |===
       include::fixtures/data.tsv[]
@@ -2418,7 +2415,7 @@ context 'Tables' do
       EOS
       output = convert_string_to_embedded input
       assert_css 'table', output, 1
-      assert_css 'table > colgroup > col[style*="width: 20%"]', output, 5
+      assert_css 'table > colgroup > col[width="20%"]', output, 5
       assert_css 'table > thead > tr', output, 1
       assert_css 'table > tbody > tr', output, 6
       assert_xpath '((//tbody/tr)[1]/td)[4]/p[text()="ac, abs, moon"]', output, 1

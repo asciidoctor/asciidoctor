@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Blocks' do
@@ -60,11 +61,21 @@ context 'Blocks' do
       assert_xpath '/hr/following-sibling::*', output, 1
     end
 
+    test 'horizontal rule with role' do
+      input = <<~'EOS'
+      [.fancy]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'hr', output, 1
+      assert_css 'hr.fancy', output, 1
+    end
+
     test 'page break' do
       output = convert_string_to_embedded %(page 1\n\n<<<\n\npage 2)
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]', output, 1
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/preceding-sibling::div/p[text()="page 1"]', output, 1
-      assert_xpath '/*[translate(@style, ";", "")="page-break-after: always"]/following-sibling::div/p[text()="page 2"]', output, 1
+      assert_xpath '/*[@class="page-break"]', output, 1
+      assert_xpath '/*[@class="page-break"]/preceding-sibling::div/p[text()="page 1"]', output, 1
+      assert_xpath '/*[@class="page-break"]/following-sibling::div/p[text()="page 2"]', output, 1
     end
   end
 
@@ -91,7 +102,7 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       refute_match(/line comment/, output)
       assert_xpath '//p', output, 1
-      assert_xpath "//p[1][text()='first line\nsecond line']", output, 1
+      assert_xpath %(//p[1][text()='first line\nsecond line']), output, 1
     end
 
     test 'comment block between paragraphs offset by blank lines' do
@@ -139,7 +150,7 @@ context 'Blocks' do
       assert_xpath '//p', output, 2
     end
 
-    test "can convert with block comment at end of document with trailing newlines" do
+    test 'can convert with block comment at end of document with trailing newlines' do
       input = <<~'EOS'
       paragraph
 
@@ -153,7 +164,7 @@ context 'Blocks' do
       refute_match(/block comment/, output)
     end
 
-    test "trailing newlines after block comment at end of document does not create paragraph" do
+    test 'trailing newlines after block comment at end of document does not create paragraph' do
       input = <<~'EOS'
       paragraph
 
@@ -336,7 +347,7 @@ context 'Blocks' do
       ****
       EOS
       result = convert_string input
-      assert_xpath "//*[@class='sidebarblock']//p", result, 1
+      assert_xpath '//*[@class="sidebarblock"]//p', result, 1
     end
   end
 
@@ -732,8 +743,8 @@ context 'Blocks' do
     end
   end
 
-  context "Example Blocks" do
-    test "can convert example block" do
+  context 'Example Blocks' do
+    test 'can convert example block' do
       input = <<~'EOS'
       ====
       This is an example of an example block.
@@ -1061,7 +1072,7 @@ context 'Blocks' do
     end
   end
 
-  context "Preformatted Blocks" do
+  context 'Preformatted Blocks' do
     test 'should separate adjacent paragraphs and listing into blocks' do
       input = <<~'EOS'
       paragraph 1
@@ -1185,9 +1196,8 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
-      [subs="attributes"]
+      input = <<~'EOS'
+      [subs=attributes+]
       ....
 
 
@@ -1221,8 +1231,7 @@ context 'Blocks' do
     end
 
     test 'should remove block indent if indent attribute is 0' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="0"]
       ----
           def names
@@ -1233,8 +1242,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
         @names.split
@@ -1250,8 +1258,7 @@ context 'Blocks' do
     end
 
     test 'should not remove block indent if indent attribute is -1' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="-1"]
       ----
           def names
@@ -1272,8 +1279,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="1"]
       ----
           def names
@@ -1294,8 +1300,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent document attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       :source-indent: 1
 
       [source,ruby]
@@ -1331,8 +1336,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
           @names.split
@@ -1457,9 +1461,19 @@ context 'Blocks' do
       EOS
 
       output2 = convert_string_to_embedded input2
-      # FIXME JRuby is adding extra trailing newlines in the second document,
-      # for now, rstrip is necessary
-      assert_equal output.rstrip, output2.rstrip
+      assert_equal output, output2
+    end
+
+    test 'should not mangle array that contains formatted text with role in listing block with quotes sub enabled' do
+      input = <<~'EOS'
+      [,ruby,subs=+quotes]
+      ----
+      nums = [1, 2, 3, [.added]#4#]
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_includes output, 'nums = [1, 2, 3, <span class="added">4</span>]'
     end
 
     test 'first character of block title may be a period if not followed by space' do
@@ -1621,8 +1635,8 @@ context 'Blocks' do
     end
   end
 
-  context "Open Blocks" do
-    test "can convert open block" do
+  context 'Open Blocks' do
+    test 'can convert open block' do
       input = <<~'EOS'
       --
       This is an open block.
@@ -1635,7 +1649,7 @@ context 'Blocks' do
       assert_xpath '//*[@class="openblock"]//p', output, 2
     end
 
-    test "open block can contain another block" do
+    test 'open block can contain another block' do
       input = <<~'EOS'
       --
       This is an open block.
@@ -1810,8 +1824,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting raw block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       ++++
       line above
       ++++
@@ -2409,6 +2422,19 @@ context 'Blocks' do
       refute_match(/<svg\s[^>]*style="[^>]*>/, output)
     end
 
+    test 'should ignore link attribute if value is self and image target is inline SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      [%inline]
+      image::circle.svg[Tiger,100,link=self]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output)
+      refute_match(/<a href=/, output)
+    end
+
     test 'should honor percentage width for SVG image with inline option' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2610,7 +2636,7 @@ context 'Blocks' do
 
       doc = document_from_string input
       img = doc.blocks[0]
-      refute(img.attributes.key? 'style')
+      refute img.attributes.key? 'style'
       assert_nil img.style
     end
 
@@ -2637,7 +2663,7 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//img[@src="images/lions-and-tigers.png"][@alt="lions and tigers"]', output, 1
     end
 
-    test "can convert block image with alt text and height and width" do
+    test 'can convert block image with alt text and height and width' do
       input = 'image::images/tiger.png[Tiger, 200, 300]'
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"][@width="200"][@height="300"]', output, 1
@@ -2650,13 +2676,24 @@ context 'Blocks' do
       assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@width]', output, 0
     end
 
-    test "can convert block image with link" do
+    test 'can convert block image with link' do
       input = <<~'EOS'
       image::images/tiger.png[Tiger, link='http://en.wikipedia.org/wiki/Tiger']
       EOS
 
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="http://en.wikipedia.org/wiki/Tiger"]/img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
+    end
+
+    test 'can convert block image with link to self' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::tiger.png[Tiger, link=self]
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="img/tiger.png"]/img[@src="img/tiger.png"][@alt="Tiger"]', output, 1
     end
 
     test 'adds rel=noopener attribute to block image with link that targets _blank window' do
@@ -2882,6 +2919,19 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
       assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
+    end
+
+    test 'should link to data URI if value of link attribute is self and image is embedded' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+      :data-uri:
+
+      image::circle.svg[Tiger,100,link=self]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
+      assert_xpath '//a[starts-with(@href,"data:image/svg+xml;base64,")]', output, 1
     end
 
     test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
@@ -3210,6 +3260,26 @@ context 'Blocks' do
       assert_css 'iframe[height="360"]', output, 1
     end
 
+    test 'video macro should output custom HTML with iframe for wistia service' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,loop,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=loop&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should output custom HTML with iframe for wistia service with loop behavior set' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,reset,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
     test 'should detect and convert audio macro' do
       input = 'audio::podcast.mp3[]'
       output = convert_string_to_embedded input
@@ -3470,7 +3540,7 @@ context 'Blocks' do
       basedir = testdir
       block = block_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => basedir }
       doc = block.document
-      assert doc.safe == Asciidoctor::SafeMode::UNSAFE
+      assert_equal Asciidoctor::SafeMode::UNSAFE, doc.safe
 
       assert_equal File.join(basedir, 'images'), block.normalize_asset_path('images')
       absolute_path = "#{disk_root}etc/images"
@@ -3754,8 +3824,8 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 0
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 2
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 2
     end
 
     test 'should accept partintro on open block with title' do
@@ -3781,9 +3851,9 @@ context 'Blocks' do
       assert_css '.openblock.partintro', output, 1
       assert_css '.openblock .title', output, 1
       assert_css '.openblock .content', output, 1
-      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class(:openblock)}]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="title"][text()="Intro title"]), output, 1
-      assert_xpath %(//*[#{contains_class(:openblock)}]/*[@class="content"]/*[@class="paragraph"]), output, 1
+      assert_xpath %(//h1[@id="_part_1"]/following-sibling::*[#{contains_class :openblock}]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="title"][text()="Intro title"]), output, 1
+      assert_xpath %(//*[#{contains_class :openblock}]/*[@class="content"]/*[@class="paragraph"]), output, 1
     end
 
     test 'should exclude partintro if not a child of part' do
@@ -3898,7 +3968,7 @@ context 'Blocks' do
 
       doc = document_from_string input
       block = doc.blocks.first
-      assert_equal [], block.subs
+      assert_empty block.subs
     end
 
     test 'should be able to append subs to default block substitution list' do
@@ -3985,7 +4055,7 @@ context 'Blocks' do
       doc = document_from_string input
       block = doc.blocks.first
       assert_nil block.id
-      assert_nil(block.attr 'reftext')
+      assert_nil block.attr 'reftext'
       refute doc.catalog[:refs].key? 'illegal$id'
     end
 

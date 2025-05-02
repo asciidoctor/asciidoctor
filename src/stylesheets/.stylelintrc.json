@@ -1,0 +1,13 @@
+{
+  "extends": "stylelint-config-standard",
+  "rules": {
+    "alpha-value-notation": "number",
+    "comment-empty-line-before": null,
+    "property-no-vendor-prefix": [true, { "ignoreProperties": ["text-size-adjust", "interpolation-mode"] }],
+    "no-descending-specificity": null,
+    "number-max-precision": 6,
+    "selector-attribute-quotes": null,
+    "selector-class-pattern": null,
+    "value-keyword-case": ["lower", { "ignoreKeywords": ["currentColor", "optimizeLegibility", "optimizeSpeed"] }]
+  }
+}

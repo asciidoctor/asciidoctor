@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Manpage' do
@@ -311,10 +312,10 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       -x::
-	Ao gravar o commit, acrescente uma linha que diz "(cherry picked from commit
-	...)" à mensagem de commit original para indicar qual commit esta mudança
-	foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
-	EOS
+      Ao gravar o commit, acrescente uma linha que diz "(cherry picked from commit
+      ...)" à mensagem de commit original para indicar qual commit esta mudança
+      foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
       assert_equal '\&...', output.lines[-3][0..4].chomp
     end
@@ -324,14 +325,14 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       -x::
-	Ao gravar o commit, acrescente uma linha que diz
-	"(cherry picked from commit...)" à mensagem de commit
-	 original para indicar qual commit esta mudança
-	foi escolhida. Isso é feito apenas para picaretas
-	de cereja sem conflitos.
-	EOS
+      Ao gravar o commit, acrescente uma linha que diz
+      "(cherry picked from commit...)" à mensagem de commit
+      original para indicar qual commit esta mudança
+      foi escolhida. Isso é feito apenas para picaretas
+      de cereja sem conflitos.
+      EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert(output.lines[-5].include? 'commit...')
+      assert_include 'commit...', output.lines[-5]
     end
 
     test 'should normalize whitespace in a paragraph' do
@@ -353,31 +354,30 @@ context 'Manpage' do
       #{SAMPLE_MANPAGE_HEADER}
 
       ....
-      \x20 ,---.          ,-----.
-      \x20 |Bob|          |Alice|
-      \x20 `-+-'          `--+--'
-      \x20   |    hello      |
-      \x20   |-------------->|
-      \x20 ,-+-.          ,--+--.
-      \x20 |Bob|          |Alice|
-      \x20 `---'          `-----'
+        ,---.          ,-----.
+        |Bob|          |Alice|
+        `-+-'          `--+--'
+          |    hello      |
+          |-------------->|
+        ,-+-.          ,--+--.
+        |Bob|          |Alice|
+        `---'          `-----'
       ....
       EOS
 
       output = Asciidoctor.convert input, backend: :manpage
-      expects = <<~'EOS'.lines.map {|it| (' ' * it.chr.to_i) + (it.slice 1, it.length) }.join
-      0.fam C
-      2,\-\-\-.\&          ,\-\-\-\-\-.
-      2|Bob|\&          |Alice|
-      2`\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
-      4|\&    hello\&      |
-      4|\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
-      2,\-+\-.\&          ,\-\-+\-\-.
-      2|Bob|\&          |Alice|
-      2`\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
-      0.fam
+      assert_includes output, <<~'EOS'
+      .fam C
+        ,\-\-\-.\&          ,\-\-\-\-\-.
+        |Bob|\&          |Alice|
+        `\-+\-\*(Aq\&          `\-\-+\-\-\*(Aq
+          |\&    hello\&      |
+          |\-\-\-\-\-\-\-\-\-\-\-\-\-\->|
+        ,\-+\-.\&          ,\-\-+\-\-.
+        |Bob|\&          |Alice|
+        `\-\-\-\*(Aq\&          `\-\-\-\-\-\*(Aq
+      .fam
       EOS
-      assert_includes output, expects
     end
 
     test 'should preserve break between paragraphs in normal table cell' do
@@ -403,15 +403,12 @@ context 'Manpage' do
       allbox tab(:);
       lt lt lt.
       T{
-      .sp
       single paragraph
       T}:T{
-      .sp
       first paragraph
       .sp
       second paragraph
       T}:T{
-      .sp
       foo
       .sp
       more foo
@@ -437,6 +434,61 @@ context 'Manpage' do
 
       output = Asciidoctor.convert input, backend: :manpage
       assert_includes output, %(Oh, here it goes again\nI should have known,\nshould have known,\nshould have known again)
+    end
+
+    test 'should drop principal text of list item in ulist if empty' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      * {empty}
+      +
+      the main text
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .\}
+      the main text
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should drop principal text of list item in olist if empty' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      . {empty}
+      +
+      the main text
+      EOS
+      expected_coda = <<~'EOS'.chop
+      .\}
+      the main text
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
+    end
+
+    test 'should not add extra space before block content if dlist item has no text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      term::
+      +
+      description
+      EOS
+      expected_coda = <<~'EOS'.chop
+      term
+      .RS 4
+      description
+      .RE
+      EOS
+
+      output = Asciidoctor.convert input, backend: :manpage
+      assert output.end_with? expected_coda
     end
 
     test 'should honor start attribute on ordered list' do
@@ -739,21 +791,17 @@ context 'Manpage' do
       allbox tab(:);
       ltB.
       T{
-      .sp
       Header
       T}
       .T&
       lt.
       T{
-      .sp
       Body 1
       T}
       T{
-      .sp
       Body 2
       T}
       T{
-      .sp
       Footer
       T}
       .TE
@@ -801,25 +849,19 @@ context 'Manpage' do
       allbox tab(:);
       ltB ltB ltB.
       T{
-      .sp
       Name
       T}:T{
-      .sp
       Description
       T}:T{
-      .sp
       Default
       T}
       .T&
       lt lt lt.
       T{
-      .sp
       dim
       T}:T{
-      .sp
       dimension of the object
       T}:T{
-      .sp
       3
       T}
       .TE
@@ -844,10 +886,8 @@ context 'Manpage' do
       allbox tab(:);
       lt lt.
       T{
-      .sp
       a
       T}:T{
-      .sp
       .nf
       b
       c\&    _d_
@@ -1357,13 +1397,12 @@ context 'Manpage' do
     end
 
     test 'should fail if SOURCE_DATE_EPOCH is malformed' do
-      old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+      old_source_date_epoch = ENV['SOURCE_DATE_EPOCH']
       begin
         ENV['SOURCE_DATE_EPOCH'] = 'aaaaaaaa'
-        Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
-        assert false
-      rescue
-        assert true
+        assert_raises ArgumentError do
+          Asciidoctor.convert SAMPLE_MANPAGE_HEADER, backend: :manpage, standalone: true
+        end
       ensure
         if old_source_date_epoch
           ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch

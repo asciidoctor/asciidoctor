@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
   class << self
     # Public: Parse the AsciiDoc source input into an Asciidoctor::Document and
@@ -73,8 +74,8 @@ module Asciidoctor
         end
       end
 
-      # NOTE :to_dir is always set when outputting to a file
-      # NOTE :to_file option only passed if assigned an explicit path
+      # NOTE the :to_dir option is always set when outputting to a file
+      # NOTE the :to_file option is only passed if assigned an explicit path
       doc = load input, options
 
       if sibling_path # write to file in same directory
@@ -85,16 +86,16 @@ module Asciidoctor
         # QUESTION should the jail be the working_dir or doc.base_dir???
         jail = doc.safe >= SafeMode::SAFE ? working_dir : nil
         if to_dir
-          outdir = doc.normalize_system_path(to_dir, working_dir, jail, target_name: 'to_dir', recover: false)
+          outdir = doc.normalize_system_path to_dir, working_dir, jail, target_name: 'to_dir', recover: false
           if to_file
-            outfile = doc.normalize_system_path(to_file, outdir, nil, target_name: 'to_dir', recover: false)
+            outfile = doc.normalize_system_path to_file, outdir, nil, target_name: 'to_dir', recover: false
             # reestablish outdir as the final target directory (in the case to_file had directory segments)
             outdir = ::File.dirname outfile
           else
             outfile = ::File.join outdir, %(#{doc.attributes['docname']}#{doc.outfilesuffix})
           end
         elsif to_file
-          outfile = doc.normalize_system_path(to_file, working_dir, jail, target_name: 'to_dir', recover: false)
+          outfile = doc.normalize_system_path to_file, working_dir, jail, target_name: 'to_dir', recover: false
           # establish outdir as the final target directory (in the case to_file had directory segments)
           outdir = ::File.dirname outfile
         end
@@ -156,13 +157,10 @@ module Asciidoctor
               stylesheet_dest = doc.normalize_system_path stylesheet, stylesoutdir, (doc.safe >= SafeMode::SAFE ? outdir : nil)
               # NOTE don't warn if src can't be read and dest already exists (see #2323)
               if stylesheet_src != stylesheet_dest && (stylesheet_data = doc.read_asset stylesheet_src,
-                  warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
+                warn_on_failure: !(::File.file? stylesheet_dest), label: 'stylesheet')
                 if (stylesheet_outdir = ::File.dirname stylesheet_dest) != stylesoutdir && !(::File.directory? stylesheet_outdir)
-                  if mkdirs
-                    Helpers.mkdir_p stylesheet_outdir
-                  else
-                    raise ::IOError, %(target stylesheet directory does not exist: #{stylesheet_outdir} (hint: set :mkdirs option))
-                  end
+                  raise ::IOError, %(target stylesheet directory does not exist: #{stylesheet_outdir} (hint: set :mkdirs option)) unless mkdirs
+                  Helpers.mkdir_p stylesheet_outdir
                 end
                 ::File.write stylesheet_dest, stylesheet_data, mode: FILE_WRITE_MODE
               end

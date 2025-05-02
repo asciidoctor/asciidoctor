@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
   register_for 'prettify'
@@ -9,7 +10,7 @@ class SyntaxHighlighter::PrettifyAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    opts[:transform] = proc {|pre| pre['class'] += %( #{(start = node.attr 'start') ? %[linenums:#{start}] : 'linenums'}) } if node.attr? 'linenums'
+    opts[:transform] = proc {|pre| pre['class'] += %( #{(start = node.attr 'start') ? %(linenums:#{start}) : 'linenums'}) } if node.option? 'linenums'
     super
   end
 

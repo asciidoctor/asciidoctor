@@ -1,15 +1,17 @@
 # frozen_string_literal: true
+
 require 'logger'
 
 module Asciidoctor
 class Logger < ::Logger
   attr_reader :max_severity
 
-  def initialize *args
+  def initialize *args, **kwargs
+    args << $stderr if args.empty?
     super
     self.progname = 'asciidoctor'
-    self.formatter = BasicFormatter.new
-    self.level = WARN
+    self.formatter = kwargs[:formatter] || BasicFormatter.new
+    self.level = kwargs[:level] || WARN
   end
 
   def add severity, message = nil, progname = nil
@@ -40,8 +42,7 @@ class MemoryLogger < ::Logger
   attr_reader :messages
 
   def initialize
-    super nil
-    self.level = WARN
+    super nil, level: UNKNOWN
     @messages = []
   end
 
@@ -68,8 +69,7 @@ class NullLogger < ::Logger
   attr_reader :max_severity
 
   def initialize
-    super nil
-    self.level = WARN
+    super nil, level: UNKNOWN
   end
 
   def add severity, message = nil, progname = nil
@@ -100,8 +100,8 @@ module LoggerManager
 
     def memoize_logger
       class << self
-        alias logger logger # suppresses warning from CRuby
-        attr_reader :logger
+        alias logger logger # suppresses warning from CRuby # rubocop:disable Style/Alias
+        attr_reader :logger # rubocop:disable Lint/DuplicateMethods
       end
     end
   end

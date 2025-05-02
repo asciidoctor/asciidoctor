@@ -1,11 +1,9 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
-v2.0.23, 2024-05-17
 // settings:
 :idprefix:
 :idseparator: -
 :source-language: ruby
-:language: {source-language}
 ifndef::env-github[:icons: font]
 ifdef::env-github[]
 :status:
@@ -16,7 +14,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.23
+:release-version: 2.0.22
 // URIs:
 :uri-org: https://github.com/asciidoctor
 :uri-repo: {uri-org}/asciidoctor
@@ -40,7 +38,7 @@ endif::[]
 :uri-license: {uri-rel-file-base}LICENSE
 :uri-tests: {uri-rel-tree-base}test
 :uri-discuss: https://discuss.asciidoctor.org
-:uri-chat: https://asciidoctor.zulipchat.com
+:uri-chat: https://chat.asciidoctor.org
 :uri-rubygem: https://rubygems.org/gems/asciidoctor
 :uri-what-is-asciidoc: {uri-docs}/what-is-asciidoc
 :uri-user-manual: {uri-docs}/user-manual
@@ -65,11 +63,13 @@ Le projet Asciidoctor est {uri-repo}[hébergé sur GitHub].
 
 ifndef::env-site[]
 Ce document est traduit dans les langues suivantes : +
-{uri-rel-file-base}README.adoc[Anglais]
+{uri-rel-file-base}README.adoc[English]
 |
-{uri-rel-file-base}README-zh_CN.adoc[Chinois]
+{uri-rel-file-base}README-zh_CN.adoc[简体中文]
 |
-{uri-rel-file-base}README-jp.adoc[Japonais]
+{uri-rel-file-base}README-jp.adoc[日本語]
+|
+{uri-rel-file-base}README-de.adoc[Deutsch]
 endif::[]
 
 .Documentation clé
@@ -127,8 +127,8 @@ Asciidoctor.js est utilisé pour faire fonctionner les extensions AsciiDoc Previ
 
 Asciidoctor fonctionne sur Linux, macOS et Windows et requiert une des implémentations suivantes de {uri-ruby}[Ruby] :
 
-* CRuby (aka MRI) 2.3 - 2.6
-* JRuby 9.1 - 9.2
+* CRuby (aka MRI) 2.5 - 3.1
+* JRuby 9.1 - 9.3
 * TruffleRuby (GraalVM)
 * Opal (JavaScript)
 
@@ -219,7 +219,7 @@ Lire {uri-install-docker}[Installer Asciidoctor en utilisant Docker].
 . Créez un fichier Gemfile à la racine de votre projet (ou du répertoire courant)
 . Ajoutez la gemme `asciidoctor` dans votre fichier Gemfile comme ci-dessous :
 +
-[source,subs=attributes+]
+[subs=attributes+]
 ----
 source 'https://rubygems.org'
 gem 'asciidoctor'
@@ -288,7 +288,7 @@ Vous devriez voir les informations concernant la version d'Asciidoctor et celle 
 [.output,subs=attributes+]
 ....
 Asciidoctor {release-version} [https://asciidoctor.org]
-Runtime Environment (ruby 2.4.1p111 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
+Runtime Environment (ruby 3.0.1p64 [x86_64-linux]) (lc:UTF-8 fs:UTF-8 in:- ex:UTF-8)
 ....
 
 Asciidoctor fournit aussi une API.
@@ -322,13 +322,15 @@ Référez-vous aux ressources suivantes pour en apprendre davantage sur la faço
 
 Pour utiliser Asciidoctor dans votre application, vous avez tout d'abord besoin de faire un « require » sur la gemme :
 
-[source]
+----
 require 'asciidoctor'
+----
 
 Vous pouvez ensuite convertir un fichier AsciiDoc en fichier HTML en utilisant :
 
-[source]
+----
 Asciidoctor.convert_file 'README.adoc', to_file: true, safe: :safe
+----
 
 WARNING: Quand vous utilisez Asciidoctor via l'API, le mode de sûreté par défaut est `:secure`.
 Dans le mode « secure », plusieurs fonctionnalités centrales sont désactivées, comme la directive `include`.
@@ -336,7 +338,6 @@ Si vous souhaitez activer ces fonctionnalités, vous aurez besoin de définir ex
 
 Vous pouvez aussi convertir une chaîne de texte en fragment HTML (pour une insertion dans une page HTML) en utilisant :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 Asciidoctor.convert content, safe: :safe
@@ -344,7 +345,6 @@ Asciidoctor.convert content, safe: :safe
 
 Si vous voulez le document HTML complet, activez l'option `header_footer` comme ci-dessous :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 html = Asciidoctor.convert content, header_footer: true, safe: :safe
@@ -352,7 +352,6 @@ html = Asciidoctor.convert content, header_footer: true, safe: :safe
 
 Si vous avez besoin d'accéder au document analysé, vous pouvez séparer la conversion en deux étapes distinctes :
 
-[source]
 ----
 content = '_Zen_ in the art of writing https://asciidoctor.org[AsciiDoc].'
 document = Asciidoctor.load content, header_footer: true, safe: :safe

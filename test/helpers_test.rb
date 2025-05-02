@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Helpers' do
@@ -86,39 +87,31 @@ context 'Helpers' do
     end
 
     test 'should raise exception if cannot find class for name' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'InvalidModule::InvalidClass'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_match %r/^Could not resolve class for name: InvalidModule::InvalidClass$/, e.message
       end
+      assert_match %r/^Could not resolve class for name: InvalidModule::InvalidClass$/, ex.message
     end
 
     test 'should raise exception if constant name is invalid' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'foobar'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_match %r/^Could not resolve class for name: foobar$/, e.message
       end
+      assert_match %r/^Could not resolve class for name: foobar$/, ex.message
     end
 
     test 'should raise exception if class not found in scope' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions::String'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, e.message
       end
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String/, ex.message
     end
 
     test 'should raise exception if name resolves to module' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.class_for_name 'Asciidoctor::Extensions'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions$/, e.message
       end
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions/, ex.message
     end
 
     test 'should resolve class if class is given' do
@@ -134,11 +127,28 @@ context 'Helpers' do
     end
 
     test 'should not resolve class if not in scope' do
-      begin
+      ex = assert_raises NameError do
         Asciidoctor::Helpers.resolve_class 'Asciidoctor::Extensions::String'
-        flunk 'Expecting RuntimeError to be raised'
-      rescue NameError => e
-        assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, e.message
+      end
+      assert_match %r/^Could not resolve class for name: Asciidoctor::Extensions::String$/, ex.message
+    end
+  end
+
+  context 'Require Library' do
+    test 'should include backtrace in LoadError thrown by Helpers.require_library' do
+      ex = assert_raises LoadError do
+        Asciidoctor::Helpers.require_library 'does-not-exist'
+      end
+      expected_message = %(asciidoctor: FAILED: required gem 'does-not-exist' is not available. Processing aborted.)
+      expected_cause_message = %r/^(?:no such file to load|cannot load such file) -- does-not-exist$/
+      assert_equal expected_message, ex.message
+      assert_match expected_cause_message, ex.cause.message
+      if (ex.respond_to? :full_message) && !jruby? && (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '2.7.0')
+        assert_match %r/helpers\.rb.*in.*require_library/, ex.full_message
+        assert_match %r/(?:no such file to load|cannot load such file) -- does-not-exist/, ex.full_message
+      else
+        assert_match %r/helpers\.rb.*in.*require_library/, (ex.backtrace.join ?\n)
+        assert_match %r/helpers\.rb.*in.*require_library/, (ex.cause.backtrace.join ?\n)
       end
     end
   end

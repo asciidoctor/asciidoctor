@@ -16,13 +16,13 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |Supported Runtime |Supported Versions
 
 |Ruby
-|{ge} 2.3
+|{ge} 2.7
 
 |JRuby
-|{ge} 9.1
+|{ge} 9.2
 
 |TruffleRuby
-|{ge} 20.2
+|{ge} 22.2
 |===
 
 == Operating systems

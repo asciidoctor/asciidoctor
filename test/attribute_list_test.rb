@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'AttributeList' do
@@ -6,7 +7,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'quote'
     expected = { 1 => 'quote' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -14,7 +15,7 @@ context 'AttributeList' do
     attributes = {}
     line = '"quote"'
     expected = { 1 => 'quote' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -22,7 +23,7 @@ context 'AttributeList' do
     attributes = {}
     line = '""'
     expected = { 1 => '' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -30,7 +31,7 @@ context 'AttributeList' do
     attributes = {}
     line = '"ba\"zaar"'
     expected = { 1 => 'ba"zaar' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -38,7 +39,7 @@ context 'AttributeList' do
     attributes = {}
     line = '\'quote\''
     expected = { 1 => 'quote' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -46,7 +47,7 @@ context 'AttributeList' do
     attributes = {}
     line = '\'\''
     expected = { 1 => '' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -58,7 +59,7 @@ context 'AttributeList' do
     def doc.apply_subs *args
       raise 'apply_subs should not be called'
     end
-    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line, doc).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -70,7 +71,7 @@ context 'AttributeList' do
     def doc.apply_subs *args
       raise 'apply_subs should not be called'
     end
-    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line, doc).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -82,7 +83,7 @@ context 'AttributeList' do
     def doc.apply_subs *args
       raise 'apply_subs should not be called'
     end
-    Asciidoctor::AttributeList.new(line, doc).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line, doc).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -90,7 +91,7 @@ context 'AttributeList' do
     attributes = {}
     line = '\'ba\\\'zaar\''
     expected = { 1 => 'ba\'zaar' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -98,7 +99,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'quote , '
     expected = { 1 => 'quote', 2 => nil }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -106,7 +107,7 @@ context 'AttributeList' do
     attributes = {}
     line = ', John Smith'
     expected = { 1 => nil, 2 => 'John Smith' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -114,7 +115,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first, second one, third'
     expected = { 1 => 'first', 2 => 'second one', 3 => 'third' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -122,7 +123,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first,,third,'
     expected = { 1 => 'first', 2 => nil, 3 => 'third', 4 => nil }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -130,7 +131,7 @@ context 'AttributeList' do
     attributes = {}
     line = '=foo='
     expected = { 1 => '=foo=' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -138,7 +139,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'foo=bar'
     expected = { 'foo' => 'bar' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -146,7 +147,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'foo="bar"'
     expected = { 'foo' => 'bar' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -154,7 +155,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'height=100,caption="",link="images/octocat.png"'
     expected = { 'height' => '100', 'caption' => '', 'link' => 'images/octocat.png' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -162,7 +163,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'foo=\'bar\''
     expected = { 'foo' => 'bar' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -170,7 +171,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(height=100,caption='',link='images/octocat.png')
     expected = { 'height' => '100', 'caption' => '', 'link' => 'images/octocat.png' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -178,7 +179,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'foo='
     expected = { 'foo' => '' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -186,7 +187,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'foo=,bar=baz'
     expected = { 'foo' => '', 'bar' => 'baz' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -194,7 +195,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first=value, second=two, third=3'
     expected = { 'first' => 'value', 'second' => 'two', 'third' => '3' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -202,7 +203,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(first='value', second="value two", third=three)
     expected = { 'first' => 'value', 'second' => 'value two', 'third' => 'three' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -210,7 +211,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(     first    =     'value', second     ="value two"     , third=       three      )
     expected = { 'first' => 'value', 'second' => 'value two', 'third' => 'three' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -218,7 +219,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(first, second="value two", third=three, Sherlock Holmes)
     expected = { 1 => 'first', 'second' => 'value two', 'third' => 'three', 4 => 'Sherlock Holmes' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -226,7 +227,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first,,third=,,fifth=five'
     expected = { 1 => 'first', 2 => nil, 'third' => '', 4 => nil, 'fifth' => 'five' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -234,7 +235,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(quote, options='opt1,,opt2 , opt3')
     expected = { 1 => 'quote', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -242,7 +243,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(quote, opts='opt1,,opt2 , opt3')
     expected = { 1 => 'quote', 'opt1-option' => '', 'opt2-option' => '', 'opt3-option' => '' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -250,7 +251,7 @@ context 'AttributeList' do
     attributes = {}
     line = %(quote, opts=)
     expected = { 1 => 'quote' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes)
+    (Asciidoctor::AttributeList.new line).parse_into attributes
     assert_equal expected, attributes
   end
 
@@ -258,7 +259,7 @@ context 'AttributeList' do
     attributes = {}
     line = 'first, second one, third, fourth'
     expected = { 1 => 'first', 2 => 'second one', 3 => 'third', 4 => 'fourth', 'a' => 'first', 'b' => 'second one', 'c' => 'third' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes, ['a', 'b', 'c'])
+    (Asciidoctor::AttributeList.new line).parse_into attributes, %w(a b c)
     assert_equal expected, attributes
   end
 
@@ -266,14 +267,14 @@ context 'AttributeList' do
     attributes = {}
     line = 'alt text,,100'
     expected = { 1 => 'alt text', 2 => nil, 3 => '100', 'alt' => 'alt text', 'height' => '100' }
-    Asciidoctor::AttributeList.new(line).parse_into(attributes, %w(alt width height))
+    (Asciidoctor::AttributeList.new line).parse_into attributes, %w(alt width height)
     assert_equal expected, attributes
   end
 
   test 'rekey positional attributes' do
     attributes = { 1 => 'source', 2 => 'java' }
     expected = { 1 => 'source', 2 => 'java', 'style' => 'source', 'language' => 'java' }
-    Asciidoctor::AttributeList.rekey(attributes, ['style', 'language', 'linenums'])
+    Asciidoctor::AttributeList.rekey attributes, %w(style language linenums)
     assert_equal expected, attributes
   end
 end

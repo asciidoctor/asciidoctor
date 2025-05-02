@@ -792,7 +792,7 @@ Feature: Cross References
     """
     table.tableblock.frame-all.grid-all.stretch
       colgroup
-        col style='width: 100%;'
+        col width="100%"
       tbody
         tr
           td.tableblock.halign-left.valign-top
@@ -916,6 +916,33 @@ Feature: Cross References
         .sectionbody: .paragraph: p content
       .sect1
         h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#Section One' [Section One]
+      """
+
+    Scenario: Does not process a natural cross reference if sectids is not set
+    Given the AsciiDoc source
+      """
+      :!sectids:
+
+      == Section One
+
+      content
+
+      == Section Two
+
+      refer to <<Section One>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2
+          |Section One
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2 Section Two
         .sectionbody: .paragraph: p
           |refer to
           a< href='#Section One' [Section One]

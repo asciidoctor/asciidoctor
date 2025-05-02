@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'test_helper'
 
 context 'Preamble' do
@@ -12,7 +13,7 @@ context 'Preamble' do
 
     Section paragraph 1.
     EOS
-    result = convert_string(input)
+    result = convert_string input
     assert_xpath '//p', result, 2
     assert_xpath '//*[@id="preamble"]', result, 1
     assert_xpath '//*[@id="preamble"]//p', result, 1
@@ -65,7 +66,7 @@ context 'Preamble' do
 
     Section paragraph 1.
     EOS
-    result = convert_string(input)
+    result = convert_string input
     assert_xpath '//p', result, 3
     assert_xpath '//*[@id="preamble"]', result, 1
     assert_xpath '//*[@id="preamble"]//p', result, 2
@@ -79,7 +80,7 @@ context 'Preamble' do
 
     paragraph
     EOS
-    result = convert_string(input)
+    result = convert_string input
     assert_xpath '//p', result, 1
     assert_xpath '//*[@id="content"]/*[@class="paragraph"]/p', result, 1
     assert_xpath '//*[@id="content"]/*[@class="paragraph"]/following-sibling::*', result, 0
@@ -93,7 +94,7 @@ context 'Preamble' do
 
     Section paragraph 1.
     EOS
-    result = convert_string(input)
+    result = convert_string input
     assert_xpath '//p', result, 1
     assert_xpath '//*[@id="preamble"]', result, 0
     assert_xpath '//h2[@id="_first_section"]', result, 1
@@ -107,43 +108,43 @@ context 'Preamble' do
 
     Section paragraph 1.
     EOS
-    result = convert_string(input)
+    result = convert_string input
     assert_xpath '//p', result, 2
     assert_xpath '//*[@id="preamble"]', result, 0
     assert_xpath '//h2[@id="_first_section"]/preceding::p', result, 1
   end
 
   test 'preamble in book doctype' do
-      input = <<~'EOS'
-      = Book
-      :doctype: book
+    input = <<~'EOS'
+    = Book
+    :doctype: book
 
-      Back then...
+    Back then...
 
-      = Chapter One
+    = Chapter One
 
-      [partintro]
-      It was a dark and stormy night...
+    [partintro]
+    It was a dark and stormy night...
 
-      == Scene One
+    == Scene One
 
-      Someone's gonna get axed.
+    Someone's gonna get axed.
 
-      = Chapter Two
+    = Chapter Two
 
-      [partintro]
-      They couldn't believe their eyes when...
+    [partintro]
+    They couldn't believe their eyes when...
 
-      == Scene One
+    == Scene One
 
-      The axe came swinging.
-      EOS
+    The axe came swinging.
+    EOS
 
-      d = document_from_string(input)
-      assert_equal 'book', d.doctype
-      output = d.convert
-      assert_xpath '//h1', output, 3
-      assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
+    d = document_from_string input
+    assert_equal 'book', d.doctype
+    output = d.convert
+    assert_xpath '//h1', output, 3
+    assert_xpath %{//*[@id="preamble"]//p[text() = "Back then#{decode_char 8230}#{decode_char 8203}"]}, output, 1
   end
 
   test 'should output table of contents in preamble if toc-placement attribute value is preamble' do

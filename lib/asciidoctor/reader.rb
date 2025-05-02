@@ -1,11 +1,15 @@
 # frozen_string_literal: true
+
 module Asciidoctor
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
   include Logging
 
   class Cursor
-    attr_reader :file, :dir, :path, :lineno
+    attr_reader :file
+    attr_reader :dir
+    attr_reader :path
+    attr_reader :lineno
 
     def initialize file, dir = nil, path = nil, lineno = 1
       @file, @dir, @path, @lineno = file, dir, path, lineno
@@ -127,9 +131,8 @@ class Reader
   def peek_line direct = false
     while true
       next_line = @lines[-1]
-      if direct || @look_ahead > 0
-        return @unescape_next_line ? (next_line.slice 1, next_line.length) : next_line
-      elsif next_line
+      return @unescape_next_line ? (next_line.slice 1, next_line.length) : next_line if direct || @look_ahead > 0
+      if next_line
         # FIXME the problem with this approach is that we aren't
         # retaining the modified line (hence the @unescape_next_line tweak)
         # perhaps we need a stack of proxied lines
@@ -282,12 +285,9 @@ class Reader
     num_skipped = 0
     # optimized code for shortest execution path
     while (next_line = peek_line)
-      if next_line.empty?
-        shift
-        num_skipped += 1
-      else
-        return num_skipped
-      end
+      return num_skipped unless next_line.empty?
+      shift
+      num_skipped += 1
     end
   end
 
@@ -308,18 +308,12 @@ class Reader
     return if empty?
 
     while (next_line = peek_line) && !next_line.empty?
-      if next_line.start_with? '//'
-        if next_line.start_with? '///'
-          if (ll = next_line.length) > 3 && next_line == '/' * ll
-            read_lines_until terminator: next_line, skip_first_line: true, read_last_line: true, skip_processing: true, context: :comment
-          else
-            break
-          end
-        else
-          shift
-        end
+      break unless next_line.start_with? '//'
+      if next_line.start_with? '///'
+        break unless (ll = next_line.length) > 3 && next_line == '/' * ll
+        read_lines_until terminator: next_line, skip_first_line: true, read_last_line: true, skip_processing: true, context: :comment
       else
-        break
+        shift
       end
     end
 
@@ -335,11 +329,8 @@ class Reader
     comment_lines = []
     # optimized code for shortest execution path
     while (next_line = peek_line) && !next_line.empty?
-      if next_line.start_with? '//'
-        comment_lines << shift
-      else
-        break
-      end
+      break unless next_line.start_with? '//'
+      comment_lines << shift
     end
 
     comment_lines
@@ -548,12 +539,11 @@ class Reader
 
   # Internal: Restore the state of the reader at cursor
   def restore_save
-    if @saved
-      @saved.each do |name, val|
-        instance_variable_set name, val
-      end
-      @saved = nil
+    return unless @saved
+    @saved.each do |name, val|
+      instance_variable_set name, val
     end
+    @saved = nil
   end
 
   # Internal: Discard a previous saved state
@@ -590,11 +580,8 @@ class Reader
       []
     end
   rescue
-    if (::Array === data ? data.join : data.to_s).valid_encoding?
-      raise
-    else
-      raise ::ArgumentError, 'source is either binary or contains invalid Unicode data'
-    end
+    raise if (::Array === data ? data.join : data.to_s).valid_encoding?
+    raise ::ArgumentError, 'source is either binary or contains invalid Unicode data'
   end
 
   # Internal: Processes a previously unvisited line
@@ -771,8 +758,8 @@ class PreprocessorReader < Reader
 
   def include_processors?
     if @include_processor_extensions.nil?
-      if @document.extensions? && @document.extensions.include_processors?
-        !!(@include_processor_extensions = @document.extensions.include_processors)
+      if @document.extensions? && (@include_processor_extensions = @document.extensions.include_processors)
+        true
       else
         @include_processor_extensions = false
       end
@@ -785,7 +772,7 @@ class PreprocessorReader < Reader
     if ::String === file
       dir = ::File.dirname file
     elsif RUBY_ENGINE_OPAL
-      dir = ::File.dirname(file = file.to_s)
+      dir = ::File.dirname (file = file.to_s)
     else
       dir = (dir = ::File.dirname file.path) == '' ? '/' : dir
       file = file.to_s
@@ -829,7 +816,7 @@ class PreprocessorReader < Reader
     end
 
     # NOTE highly optimized
-    if line.end_with?(']') && !line.start_with?('[') && line.include?('::')
+    if (line.end_with? ']') && !(line.start_with? '[') && (line.include? '::')
       if (line.include? 'if') && ConditionalDirectiveRx =~ line
         # if escaped, mark as processed and return line unescaped
         if $1 == '\\'
@@ -941,7 +928,7 @@ class PreprocessorReader < Reader
           skip = target.split('+', -1).any? {|attr_name| !@document.attributes.key? attr_name }
         else
           # if the attribute is undefined, then skip
-          skip = !@document.attributes.key?(target)
+          skip = !(@document.attributes.key? target)
         end
       when 'ifndef'
         if no_target
@@ -957,7 +944,7 @@ class PreprocessorReader < Reader
           skip = target.split('+', -1).all? {|attr_name| @document.attributes.key? attr_name }
         else
           # if the attribute is defined, then skip
-          skip = @document.attributes.key?(target)
+          skip = @document.attributes.key? target
         end
       when 'ifeval'
         if no_target
@@ -1054,7 +1041,7 @@ class PreprocessorReader < Reader
     elsif doc.safe >= SafeMode::SECURE
       expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
       # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{expanded_target}[role=include])
+      replace_next_line %(link:#{expanded_target}[role=include#{attrlist ? ',' + attrlist : ''}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1253,8 +1240,9 @@ class PreprocessorReader < Reader
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       unless doc.attr? 'allow-uri-read'
+        logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
         target = %(pass:c[#{target}]) if target.include? ' '
-        return replace_next_line %(link:#{target}[role=include])
+        return replace_next_line %(link:#{target}[role=include#{attrlist ? ',' + attrlist : ''}])
       end
       if doc.attr? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
@@ -1286,14 +1274,13 @@ class PreprocessorReader < Reader
   end
 
   def pop_include
-    unless @include_stack.empty?
-      @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
-      # FIXME kind of a hack
-      #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
-      #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
-      @look_ahead = 0
-      nil
-    end
+    return if @include_stack.empty?
+    @lines, @file, @dir, @path, @lineno, @maxdepth, @process_lines = @include_stack.pop
+    # FIXME kind of a hack
+    #Document::AttributeEntry.new('infile', @file).save_to_next_block @document
+    #Document::AttributeEntry.new('indir', ::File.dirname(@file)).save_to_next_block @document
+    @look_ahead = 0
+    nil
   end
 
   # Private: Split delimited value on comma (if found), otherwise semi-colon
@@ -1303,7 +1290,7 @@ class PreprocessorReader < Reader
 
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
-    return unless (delim = data[0]) == '---'
+    return unless (delim = data[0]) == '---' || delim == '+++'
     original_data = data.drop 0
     data.shift
     front_matter = []

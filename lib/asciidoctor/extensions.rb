@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 (require 'asciidoctor' unless defined? Asciidoctor.load) unless RUBY_ENGINE == 'opal'
 
 module Asciidoctor
@@ -23,7 +24,6 @@ module Asciidoctor
 # or added to a custom {Registry} instance and passed as an option to a single
 # Asciidoctor processor.
 module Extensions
-
   # Public: An abstract base class for document and syntax processors.
   #
   # This class provides access to a class-level Hash for holding default
@@ -64,12 +64,11 @@ module Extensions
       #
       # Returns self
       def enable_dsl
-        if const_defined? :DSL
-          if singleton_class?
-            include const_get :DSL
-          else
-            extend const_get :DSL
-          end
+        return unless const_defined? :DSL
+        if singleton_class?
+          include const_get :DSL
+        else
+          extend const_get :DSL
         end
       end
       alias use_dsl enable_dsl
@@ -192,7 +191,7 @@ module Extensions
       unless (target = attrs['target'])
         raise ::ArgumentError, 'Unable to create an image block, target attribute is required'
       end
-      attrs['alt'] ||= (attrs['default-alt'] = Helpers.basename(target, true).tr('_-', ' '))
+      attrs['alt'] ||= (attrs['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
       title = (attrs.key? 'title') ? (attrs.delete 'title') : nil
       block = create_block parent, :image, nil, attrs, opts
       if title
@@ -202,6 +201,20 @@ module Extensions
       block
     end
 
+    # Public: Creates an inline node and binds it to the specified parent.
+    #
+    # parent  - The parent Block of this new inline node.
+    # context - The context of the inline node to create (e.g., :quoted, :anchor, etc).
+    # text    - The text of the inline node.
+    # opts    - An optional Hash of options (default: {}):
+    #           :type - The subtype of the inline node context. For a :quoted node, this can be
+    #                   :strong, :emphasis, :monospaced, etc. For an :anchor node, this can be
+    #                   :xref, :link, :ref, etc.
+    #           :attributes - The attributes to set on the inline node. If the "subs" attribute is
+    #                         specified, the convert will apply the specified substitutions to the
+    #                         text of the inline node.
+    #
+    # Returns an [Inline] node with all properties properly initialized.
     def create_inline parent, context, text, opts = {}
       Inline.new parent, context, text, context == :quoted ? ({ type: :unquoted }.merge opts) : opts
     end
@@ -544,11 +557,11 @@ module Extensions
       # assign fallbacks
       case @config[:contexts]
       when ::NilClass
-        @config[:contexts] ||= [:open, :paragraph].to_set
+        @config[:contexts] ||= ::Set[:open, :paragraph]
       when ::Symbol
-        @config[:contexts] = [@config[:contexts]].to_set
-      else
-        @config[:contexts] = @config[:contexts].to_set
+        @config[:contexts] = ::Set[@config[:contexts]]
+      when ::Array
+        @config[:contexts] = ::Set.new @config[:contexts]
       end
       # QUESTION should the default content model be raw??
       @config[:content_model] ||= :compound
@@ -563,7 +576,7 @@ module Extensions
     include SyntaxProcessorDsl
 
     def contexts *value
-      option :contexts, value.flatten.to_set
+      option :contexts, (::Set.new value.flatten)
     end
     alias on_contexts contexts
     alias on_context contexts
@@ -722,8 +735,6 @@ module Extensions
     def initialize groups = {}
       @groups = groups
       reset
-      @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
-      @document = nil
     end
 
     # Public: Activates all the global extension {Group}s and the extension {Group}s
@@ -1030,13 +1041,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def docinfo_processors location = nil
-      if @docinfo_processor_extensions
-        if location
-          @docinfo_processor_extensions.select {|ext| ext.config[:location] == location }
-        else
-          @docinfo_processor_extensions
-        end
-      end
+      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : (@docinfo_processor_extensions || [])
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
@@ -1115,11 +1120,7 @@ module Extensions
     # Returns the [Extension] proxy object for the BlockProcessor that matches
     # the block name and context or false if no match is found.
     def registered_for_block? name, context
-      if (ext = @block_extensions[name.to_sym])
-        (ext.config[:contexts].include? context) ? ext : false
-      else
-        false
-      end
+      (ext = @block_extensions&.[] name.to_sym) ? (ext.config[:contexts].include? context) && ext : false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockProcessor registered
@@ -1133,7 +1134,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockProcessor or nil if a match is not found.
     def find_block_extension name
-      @block_extensions[name.to_sym]
+      @block_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {BlockMacroProcessor} with the extension registry to
@@ -1214,7 +1215,7 @@ module Extensions
     #--
     # TODO only allow blank target if format is :short
     def registered_for_block_macro? name
-      (ext = @block_macro_extensions[name.to_sym]) ? ext : false
+      (@block_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockMacroProcessor registered
@@ -1228,7 +1229,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockMacroProcessor or nil if a match is not found.
     def find_block_macro_extension name
-      @block_macro_extensions[name.to_sym]
+      @block_macro_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {InlineMacroProcessor} with the extension registry to
@@ -1307,7 +1308,7 @@ module Extensions
     # Returns the [Extension] proxy object for the InlineMacroProcessor that matches
     # the macro name or false if no match is found.
     def registered_for_inline_macro? name
-      (ext = @inline_macro_extensions[name.to_sym]) ? ext : false
+      (@inline_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the InlineMacroProcessor registered
@@ -1321,7 +1322,7 @@ module Extensions
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding InlineMacroProcessor or nil if a match is not found.
     def find_inline_macro_extension name
-      @inline_macro_extensions[name.to_sym]
+      @inline_macro_extensions&.[] name.to_sym
     end
 
     # Public: Retrieves the {Extension} proxy objects for all
@@ -1332,7 +1333,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def inline_macros
-      @inline_macro_extensions.values
+      (@inline_macro_extensions || {}).values
     end
 
     # Public: Inserts the document processor {Extension} instance as the first
@@ -1350,7 +1351,7 @@ module Extensions
     # of this processor.
     def prefer *args, &block
       extension = ProcessorExtension === (arg0 = args.shift) ? arg0 : (send arg0, *args, &block)
-      extensions_store = instance_variable_get(%(@#{extension.kind}_extensions).to_sym)
+      extensions_store = instance_variable_get %(@#{extension.kind}_extensions).to_sym
       extensions_store.unshift extensions_store.delete extension
       extension
     end
