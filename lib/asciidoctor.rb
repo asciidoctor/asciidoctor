@@ -295,6 +295,7 @@ module Asciidoctor
 
   # NOTE the 'figure' key as a string is historical and used by image blocks
   CAPTION_ATTRIBUTE_NAMES = { example: 'example-caption', 'figure' => 'figure-caption', listing: 'listing-caption', table: 'table-caption' }
+  CAPTION_PUNCTUATOR_ATTRIBUTE_NAMES = { example: 'example-caption-punctuator', 'figure' => 'figure-caption-punctuator', listing: 'listing-caption-punctuator', table: 'table-caption-punctuator' }
 
   LAYOUT_BREAK_CHARS = {
     '\'' => :thematic_break,
