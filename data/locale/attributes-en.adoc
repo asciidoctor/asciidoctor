@@ -21,3 +21,5 @@ ifdef::preface-title[:preface-title: Preface]
 :untitled-label: Untitled
 :version-label: Version
 :warning-caption: Warning
+:view-footnote-tip: View footnote.
+:unresolved-footnoteref-tip: Unresolved footnote reference.
