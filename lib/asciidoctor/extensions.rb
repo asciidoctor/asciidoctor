@@ -1114,9 +1114,6 @@ module Extensions
     # Public: Checks whether any {BlockProcessor} extensions are registered to
     # handle the specified block name appearing on the specified context.
     #
-    # This method assumes you've called blocks? first to check whether any
-    # block extensions are registered.
-    #
     # Returns the [Extension] proxy object for the BlockProcessor that matches
     # the block name and context or false if no match is found.
     def registered_for_block? name, context
@@ -1127,9 +1124,6 @@ module Extensions
     # to handle block content with the name.
     #
     # name - the String or Symbol (coersed to a Symbol) macro name
-    #
-    # This method assumes you've called blocks? first to check whether any
-    # block extensions are registered.
     #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockProcessor or nil if a match is not found.
@@ -1207,9 +1201,6 @@ module Extensions
     #
     # name - the String or Symbol (coersed to a Symbol) macro name
     #
-    # This method assumes you've called block_macros? first to check whether any
-    # block macro extensions are registered.
-    #
     # Returns the [Extension] proxy object for the BlockMacroProcessor that matches
     # the macro name or false if no match is found.
     #--
@@ -1222,9 +1213,6 @@ module Extensions
     # to handle a block macro with the specified name.
     #
     # name - the String or Symbol (coersed to a Symbol) macro name
-    #
-    # This method assumes you've called block_macros? first to check whether any
-    # block macro extensions are registered.
     #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockMacroProcessor or nil if a match is not found.
@@ -1302,9 +1290,6 @@ module Extensions
     #
     # name - the String or Symbol (coersed to a Symbol) macro name
     #
-    # This method assumes you've called inline_macros? first to check whether any
-    # inline macro extensions are registered.
-    #
     # Returns the [Extension] proxy object for the InlineMacroProcessor that matches
     # the macro name or false if no match is found.
     def registered_for_inline_macro? name
@@ -1316,9 +1301,6 @@ module Extensions
     #
     # name - the String or Symbol (coersed to a Symbol) macro name
     #
-    # This method assumes you've called inline_macros? first to check whether any
-    # inline macro extensions are registered.
-    #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding InlineMacroProcessor or nil if a match is not found.
     def find_inline_macro_extension name
@@ -1327,9 +1309,6 @@ module Extensions
 
     # Public: Retrieves the {Extension} proxy objects for all
     # InlineMacroProcessor instances in this registry.
-    #
-    # This method assumes you've called inline_macros? first to check whether any
-    # inline macro extensions are registered.
     #
     # Returns an [Array] of Extension proxy objects.
     def inline_macros

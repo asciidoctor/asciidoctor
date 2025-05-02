@@ -50,12 +50,6 @@ class Parser
 
   ListContinuationString = (::String.new LIST_CONTINUATION).extend ListContinuationMarker
 
-  ListContinuationMarker = ::Module.new
-
-  ListContinuationPlaceholder = ::String.new.extend ListContinuationMarker
-
-  ListContinuationString = (::String.new LIST_CONTINUATION).extend ListContinuationMarker
-
   # Internal: A Hash mapping horizontal alignment abbreviations to alignments
   # that can be applied to a table cell (or to all cells in a column)
   TableCellHorzAlignments = {
@@ -1510,9 +1504,6 @@ class Parser
               has_text = false
             end
           end
-        else # only dlist in need of item text, so slurp it up!
-          # pop the blank line so it's not interpreted as a list continuation
-          buffer.pop unless within_nested_list
           buffer << this_line
           continuation = :inactive
         end

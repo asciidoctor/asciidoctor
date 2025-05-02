@@ -67,8 +67,6 @@ jobs:
     env:
       BUNDLE_WITHOUT: coverage:docs:lint
       SOURCE_DATE_EPOCH: '1521504000'
-      # work around `Permission denied - NUL' error when installing/using the bundler gem on JRuby for Windows
-      JRUBY_OPTS: '-J-Djdk.io.File.enableADS=true'
     steps:
     - name: Checkout
       uses: actions/checkout@v4
