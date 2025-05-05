@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Asciidoctor
+using NilOrEmptyRefinement
 # Public: Methods for managing AsciiDoc content blocks.
 #
 # Examples

@@ -101,6 +101,7 @@ module Asciidoctor
 #     end
 #     => start path /etc is outside of jail: /path/to/docs'
 #
+using NilOrEmptyRefinement
 class PathResolver
   include Logging
 

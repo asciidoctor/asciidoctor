@@ -2,6 +2,7 @@
 
 module Asciidoctor
 # Public: Methods for managing AsciiDoc lists (ordered, unordered and description lists)
+using NilOrEmptyRefinement
 class List < AbstractBlock
   # Public: Create alias for blocks
   alias items blocks
