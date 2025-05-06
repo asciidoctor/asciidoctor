@@ -37,6 +37,7 @@ Skim off front matter from the top of the document that gets used by site genera
 
 [source,asciidoc]
 ....
+---
 tags: [announcement, website]
 ---
 = Document Title
