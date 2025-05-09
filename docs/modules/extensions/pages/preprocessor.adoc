@@ -33,6 +33,9 @@ However, as stated above, be careful when reading lines from the original Prepro
 Purpose::
 Skim off front matter from the top of the document that gets used by site generators like Jekyll.
 
+NOTE: This extension emulates the built-in behavior when the `skip-front-matter` attribute is set from the API or CLI.
+See xref:html-backend:skip-front-matter.adoc[] for details.
+
 === sample-with-front-matter.adoc
 
 [source,asciidoc]
@@ -59,21 +62,20 @@ content
 class FrontMatterPreprocessor < Asciidoctor::Extensions::Preprocessor
   def process document, reader
     lines = reader.lines # get raw lines
-    return reader if lines.empty?
-    front_matter = []
-    if lines.first.chomp == '---'
+    if lines.first == '---'
+      front_matter = []
       original_lines = lines.dup
       lines.shift
-      while !lines.empty? && lines.first.chomp != '---'
+      while !lines.empty? && lines.first != '---'
         front_matter << lines.shift
       end
 
-      if (first = lines.first).nil? || first.chomp != '---'
+      if (first = lines.first).nil? || first != '---'
         lines = original_lines
       else
         lines.shift
-        document.attributes['front-matter'] = front_matter.join.chomp
-        # advance the reader by the number of lines taken
+        document.attributes['front-matter'] = front_matter * ?\n
+        # advance the reader by number of lines taken
         (front_matter.length + 2).times { reader.advance }
       end
     end
