@@ -40,6 +40,7 @@ See xref:html-backend:skip-front-matter.adoc[] for details.
 
 [source,asciidoc]
 ....
+---
 tags: [announcement, website]
 ---
 = Document Title
