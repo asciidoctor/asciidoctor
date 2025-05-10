@@ -412,6 +412,19 @@ context 'Converter' do
       assert_equal 'document', doc.convert
     end
 
+    test 'should warn about unimplemented converter methods' do
+      class CustomConverterWithNoConvertions < Asciidoctor::Converter::Base
+      end
+
+      doc = document_from_string '', converter: CustomConverterWithNoConvertions
+      assert_respond_to doc, 'convert'
+      assert_raises(::NoMethodError) { doc.convert_document }
+      using_memory_logger do |logger|
+        assert_nil doc.convert
+        assert_message logger, :WARN, '~missing convert handler for document node'
+      end
+    end
+
     test 'should get converter from specified converter factory' do
       input = <<~'EOS'
       = Document Title
