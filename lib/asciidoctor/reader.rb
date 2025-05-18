@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Asciidoctor
+using NilOrEmptyRefinement
 # Public: Methods for retrieving lines from AsciiDoc source files
 class Reader
   include Logging
