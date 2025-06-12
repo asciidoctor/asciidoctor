@@ -1,0 +1,126 @@
+:table-cell-data-row-header-separator: _
+:table-cell-data-column-header-separator: _
+
+// example taken from https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Planet_data_table#example (https://mdn.github.io/learning-area/html/tables/assessment-finished/planets-data.html) and translated to AsciiDoc table syntax
+.Data about the planets of our solar system (Planetary facts taken from https://nssdc.gsfc.nasa.gov/planetary/factsheet/[Nasa's Planetary Fact Sheet - Metric]).
+[%header,cols="11*1,3"]
+|===
+2+|
+h|Name
+|Mass (10²⁴kg)
+|Diameter (km)
+|Density (kg/m³)
+|Gravity (m/s³)
+|Length of day (hours)
+|Distance from sum (10⁶km)
+|Mean temperature (°C)
+|Number of moons
+|Notes
+
+2.4+h|Terrestrial planets
+h|Mercury
+|0.330
+|4,879
+|5472
+|3.7
+|4222.6
+|57.9
+|167
+|0
+|Closest to the Sun
+
+h|Venus
+|4.87
+|12,104
+|5243
+|8.9
+|2802.0
+|108.2
+|464
+|0
+|
+
+h|Earth
+|5.97
+|12,756
+|5514
+|9.8
+|24.0
+|149.6
+|15
+|1
+|Our world
+
+h|Mars
+|0.642
+|6,792
+|3933
+|3.7
+|24.7
+|227.9
+|-65
+|2
+|The red planet
+
+.4+h|Jovian planets
+.2+h|Gas giants
+
+h|Jupiter
+|1898
+|142,984
+|1326
+|23.1
+|9.9
+|778.6
+|-110
+|67
+|The largest planet
+
+h|Saturn
+|568
+|120,536
+|687
+|9.0
+|10.7
+|1433.5
+|-140
+|62
+|
+
+.2+h|Ice giants
+
+h|Uranus
+|86.8
+|51,118
+|1271
+|8.7
+|17.2
+|2872.5
+|-195
+|27
+|
+
+h|Neptune
+|102
+|49,528
+|1638
+|11.0
+|16.1
+|4495.1
+|-200
+|14
+|
+
+2+h|Dwarf planets
+h|Pluto
+|0.0146
+|2,370
+|2095
+|0.7
+|153.3
+|5906.4
+|-225
+|5
+|Declassified as a planet in 2006, but this remains controversial.
+
+|===
