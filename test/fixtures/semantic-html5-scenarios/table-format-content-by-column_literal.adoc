@@ -1,0 +1,10 @@
+[cols="d,l"]
+|===
+|Default Column 1 |Literal Column 2
+
+|This column's content is default
+|This column's content is treated as literal. That _ * or `` are literal chars and aren't formatting characters in this cell.
+
+|This column's content is default
+|This column's content is treated as literal. That _ * or `` are literal chars and aren't formatting characters in this cell.
+|===
