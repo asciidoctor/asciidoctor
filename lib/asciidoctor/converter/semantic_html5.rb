@@ -96,6 +96,185 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_util_array_dynamic_add_child_array(arr, index, content)
+    if arr[index] == nil
+      arr.push([content])
+    else
+      arr[index].push(content)
+    end
+  end
+
+  def convert_util_array_add_number(arr, index, number)
+    if arr[index] == nil
+      arr.push(number)
+    else
+      arr[index]+=number
+    end
+  end
+
+  def convert_util_array_dynamic_start_with_index(arr, index)
+    if arr[index] == nil
+      return 0
+    end
+    return arr[index]
+  end
+
+  def convert_table node
+    result = []
+    id_attribute = node.id ? %( id="#{node.id}") : ''
+    frame = 'ends' if (frame = node.attr 'frame', 'all', 'table-frame') == 'topbot'
+    classes = ['tableblock', %(frame-#{frame}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
+    if (stripes = node.attr 'stripes', nil, 'table-stripes')
+      classes << %(stripes-#{stripes})
+    end
+    width_attribute = ''
+    if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
+      classes << 'fit-content'
+    elsif (tablewidth = node.attr 'tablepcwidth') == 100
+      classes << 'stretch'
+    else
+      width_attribute = %( width="#{tablewidth}%")
+    end
+    classes << (node.attr 'float') if node.attr? 'float'
+    if (role = node.role)
+      classes << role
+    end
+    class_attribute = %( class="#{classes.join ' '}")
+
+    result << %(<table#{id_attribute}#{class_attribute}#{width_attribute}>)
+    if node.title?
+      result << %(<caption class="title">#{node.captioned_title}</caption>)
+    end
+    if (node.attr 'rowcount') > 0
+      slash = @void_element_slash
+      result << '<colgroup>'
+      if autowidth
+        result += (Array.new node.columns.size, %(<col#{slash}>))
+      else
+        node.columns.each do |col|
+          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col style="width: #{col.attr 'colpcwidth'}%"#{slash}>))
+        end
+      end
+      result << '</colgroup>'
+
+      # A table can contain nested column and row level headings. The two array declarations help us to keep track of them.
+      # Containing the column level heading cells in a nested array. The index of 'header_titles_by_column' represents the index number of a column. It reveils a sub array holding the cell text of all column level heading cells belonging to the column.
+      # Example: [['cell text of column level heading cell A', ['cell text of column level heading cell B']]
+      header_titles_by_column = Array.new
+      # Containing the column level heading cells in a nested array. The index of 'header_titles_by_row' represents the index number of a row. It reveils a sub array holding the cell text of all row level heading cells belonging to the row.
+      # Example: [['cell text of row level heading cell A', ['cell text of row level heading cell B']]
+      header_titles_by_row = Array.new
+
+      # Containing the number of columns per row which we need as an offset so we assign the non-heading cells the correct text of their corresponding heading cells. The index of 'reserved_columns_per_row_for_headings' represents the index number of a row. It reveils a number indicating the amount of cells defined in an earlier row spawning into this one.
+      # Example: [3,3]
+      reserved_columns_per_row_for_headings = Array.new
+      # The current normalized column index accounting for cells spawning multiple columns in a row. The use of the loop variable 'cell_index' is unsufficient as it does not account for cells spawning multiple columns in a row.
+      current_column_index = 0
+      # There are three possible row sections: 'header', 'body' and 'footer' AsciiDoc knows. In order to give each non-heading cells info about the corresponding heading cells, the algorithm needs to see all rows from the table comming from the same array.
+      # The variable `current_row_index` simulates exavtly that. The loop variable 'row_index' is unsufficient as it is scoped to just one array at a time.
+      current_row_index = 0
+
+      node.rows.to_h.each do |tsec, rows|
+        next if rows.empty?
+        result << %(<t#{tsec}>)
+        rows.each_with_index do |row, row_index|
+          result << '<tr>'
+          # Make aware of cells that span multiple columns per row and were defined in an earlier row as these influence the normalized index of columns in this row
+          current_column_index = convert_util_array_dynamic_start_with_index(reserved_columns_per_row_for_headings, current_row_index)
+          logger.debug %(Starting with normalized column index #{current_column_index} in row #{current_row_index})
+          row.each_with_index do |cell, cell_index|
+            logger.debug %(  column: #{current_column_index}, col_index: #{cell_index})
+
+            if tsec == :head || cell.style == :header
+              # cell is a heading cell so we need to add their text to our lists of column and row level headings.
+              logger.debug '    add to header_titles_by_column'
+              if cell.colspan != nil
+                # account for cells spawning multiple columns by resolving their colspan value to separate cells internally
+                logger.debug '      colspan specified!'
+                (current_column_index..current_column_index+cell.colspan-1).each do | index |
+                  logger.debug %(      add "#{cell.text}" at column index position "#{current_column_index}" to header_titles_by_column)
+                  convert_util_array_dynamic_add_child_array(header_titles_by_column, current_column_index, cell)
+                  current_column_index += 1
+                end
+                current_column_index -= 1
+              else
+                logger.debug %(      add "#{cell.text}" at column index position "#{current_column_index}" to header_titles_by_column)
+                convert_util_array_dynamic_add_child_array(header_titles_by_column, current_column_index, cell)
+              end
+
+              logger.debug '    add to header_titles_by_row'
+              if cell.rowspan != nil
+                # account for cells spawning multiple rows by resolving their rowspan value to separate cells internally
+                logger.debug '      rowspan specified'
+                (0..cell.rowspan-1).each do | index |
+                  logger.debug %(      add "#{cell.text}" at row index position "#{current_row_index+index}" to header_titles_by_row)
+                  convert_util_array_dynamic_add_child_array(header_titles_by_row, current_row_index+index, cell)
+                  convert_util_array_add_number(reserved_columns_per_row_for_headings, current_row_index+index, (cell.colspan ? cell.colspan : 1))
+                end
+              else
+                logger.debug %(      add "#{cell.text}" at row index position "#{current_row_index}" to header_titles_by_row)
+                convert_util_array_dynamic_add_child_array(header_titles_by_row, current_row_index, cell)
+
+                convert_util_array_add_number(reserved_columns_per_row_for_headings, current_row_index, (cell.colspan ? cell.colspan : 1))
+              end
+            else
+              # Non-heading cells spawning more than just one column also disturb the normalized column index `current_column_index` so we need to sum up their colspawn to our self maintained index
+              if cell.colspan != nil
+                  current_column_index += cell.colspan-1
+              end
+            end
+
+            if tsec == :head
+              cell_content = cell.text
+            else
+              case cell.style
+              when :asciidoc
+                cell_content = %(<div class="content">#{cell.content}</div>)
+              when :literal
+                cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
+              else
+                cell_content = (cell_content = cell.content).empty? ? '' : %(<p class="tableblock">#{cell_content.join '</p>
+<p class="tableblock">'}</p>)
+              end
+            end
+
+            cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
+            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
+            cell_colspan_attribute = (cell.colspan ? %( colspan="#{cell.colspan}") : '')
+            cell_rowspan_attribute = (cell.rowspan ? %( rowspan="#{cell.rowspan}") : '')
+            cell_scope_attribute = (tsec == :head ? %( scope="col") : (cell.style == :header ? %( scope="row") : ''))
+            cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : ''
+            if cell_tag_name == "td"
+              cell_data_column_header_separator = " " + (node.document.attributes['table-cell-data-column-header-separator'] || '-') + " "
+              cell_data_column_header = " data-column-header=\""
+              cell_data_column_header += (header_titles_by_column[current_column_index] != nil ? header_titles_by_column[current_column_index].map{|cell| cell.text}.join(cell_data_column_header_separator) : "")
+              cell_data_column_header += "\""
+
+              cell_data_row_header_separator = " " + (node.document.attributes['table-cell-data-row-header-separator'] || '-') + " "
+              cell_data_row_header = " data-row-header=\""
+              cell_data_row_header += (header_titles_by_row[current_row_index] != nil ? header_titles_by_row[current_row_index].map{|cell| cell.text}.join(cell_data_row_header_separator) : "")
+              cell_data_row_header += "\""
+            else
+              cell_data_column_header = ""
+              cell_data_row_header = ""
+            end
+            cell_data_header_column_attribute = 
+            result << %(<#{cell_tag_name}#{cell_scope_attribute}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}#{cell_data_column_header}#{cell_data_row_header}>#{cell_content}</#{cell_tag_name}>)
+          current_column_index += 1
+          end
+          result << '</tr>'
+          current_row_index += 1
+        end
+        result << %(</t#{tsec}>)
+      end
+    end
+    result << '</table>'
+    if node.title?
+      result << %(</figure>)
+    end
+    result.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role

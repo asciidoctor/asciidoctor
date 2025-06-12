@@ -1,0 +1,19 @@
+:table-caption: Data Set
+
+.A table with an header row and a title
+|===
+|Cell in column 1, row 1|Cell in column 2, row 1
+
+|Cell in column 1, row 1|Cell in column 2, row 1
+|Cell in column 1, row 2|Cell in column 2, row 2
+|Cell in column 1, row 3|Cell in column 2, row 3
+|===
+
+.A table with an header row and a title
+|===
+|Cell in column 1, row 1|Cell in column 2, row 1
+
+|Cell in column 1, row 1|Cell in column 2, row 1
+|Cell in column 1, row 2|Cell in column 2, row 2
+|Cell in column 1, row 3|Cell in column 2, row 3
+|===
