@@ -2026,6 +2026,66 @@ context 'Substitutions' do
       assert_equal '&lt;{backend}&gt;', para.content
     end
 
+    test 'should support constrained passthrough in middle of monospace span' do
+      input = 'a `foo +bar+ baz` kind of thing'
+      para = block_from_string input
+      assert_equal 'a <code>foo bar baz</code> kind of thing', para.content
+    end
+
+    test 'should support constrained passthrough in monospace span preceded by escaped boxed attrlist with transitional role' do
+      input = %(#{BACKSLASH}[x-]`foo +bar+ baz`)
+      para = block_from_string input
+      assert_equal '[x-]<code>foo bar baz</code>', para.content
+    end
+
+    test 'should treat monospace phrase with escaped boxed attrlist with transitional role as monospace' do
+      input = %(#{BACKSLASH}[x-]`*foo* +bar+ baz`)
+      para = block_from_string input
+      assert_equal '[x-]<code><strong>foo</strong> bar baz</code>', para.content
+    end
+
+    test 'should ignore escaped attrlist with transitional role on monospace phrase if not proceeded by [' do
+      input = %(#{BACKSLASH}x-]`*foo* +bar+ baz`)
+      para = block_from_string input
+      assert_equal %(#{BACKSLASH}x-]<code><strong>foo</strong> bar baz</code>), para.content
+    end
+
+    test 'should not process passthrough inside transitional literal monospace span' do
+      input = 'a [x-]`foo +bar+ baz` kind of thing'
+      para = block_from_string input
+      assert_equal 'a <code>foo +bar+ baz</code> kind of thing', para.content
+    end
+
+    test 'should support constrained passthrough in monospace phrase with attrlist' do
+      input = '[.role]`foo +bar+ baz`'
+      para = block_from_string input
+      assert_equal '<code class="role">foo bar baz</code>', para.content
+    end
+
+    test 'should support attrlist on a literal monospace phrase' do
+      input = '[.baz]`+foo--bar+`'
+      para = block_from_string input
+      assert_equal '<code class="baz">foo--bar</code>', para.content
+    end
+
+    test 'should not process an escaped passthrough macro inside a monospaced phrase' do
+      input = 'use the `\pass:c[]` macro'
+      para = block_from_string input
+      assert_equal 'use the <code>pass:c[]</code> macro', para.content
+    end
+
+    test 'should not process an escaped passthrough macro inside a monospaced phrase with attributes' do
+      input = 'use the [syntax]`\pass:c[]` macro'
+      para = block_from_string input
+      assert_equal 'use the <code class="syntax">pass:c[]</code> macro', para.content
+    end
+
+    test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
+      input = 'use `\+{author}+` to show an attribute reference'
+      para = block_from_string input, attributes: { 'author' => 'Dan' }
+      assert_equal 'use <code>+Dan+</code> to show an attribute reference', para.content
+    end
+
     context 'Math macros' do
       test 'should passthrough text in asciimath macro and surround with AsciiMath delimiters' do
         using_memory_logger do |logger|
@@ -2138,66 +2198,6 @@ context 'Substitutions' do
         input = 'the text `+asciimath:[x = y]+` should be passed through as `literal` text'
         para = block_from_string input
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
-      end
-
-      test 'should support constrained passthrough in middle of monospace span' do
-        input = 'a `foo +bar+ baz` kind of thing'
-        para = block_from_string input
-        assert_equal 'a <code>foo bar baz</code> kind of thing', para.content
-      end
-
-      test 'should support constrained passthrough in monospace span preceded by escaped boxed attrlist with transitional role' do
-        input = %(#{BACKSLASH}[x-]`foo +bar+ baz`)
-        para = block_from_string input
-        assert_equal '[x-]<code>foo bar baz</code>', para.content
-      end
-
-      test 'should treat monospace phrase with escaped boxed attrlist with transitional role as monospace' do
-        input = %(#{BACKSLASH}[x-]`*foo* +bar+ baz`)
-        para = block_from_string input
-        assert_equal '[x-]<code><strong>foo</strong> bar baz</code>', para.content
-      end
-
-      test 'should ignore escaped attrlist with transitional role on monospace phrase if not proceeded by [' do
-        input = %(#{BACKSLASH}x-]`*foo* +bar+ baz`)
-        para = block_from_string input
-        assert_equal %(#{BACKSLASH}x-]<code><strong>foo</strong> bar baz</code>), para.content
-      end
-
-      test 'should not process passthrough inside transitional literal monospace span' do
-        input = 'a [x-]`foo +bar+ baz` kind of thing'
-        para = block_from_string input
-        assert_equal 'a <code>foo +bar+ baz</code> kind of thing', para.content
-      end
-
-      test 'should support constrained passthrough in monospace phrase with attrlist' do
-        input = '[.role]`foo +bar+ baz`'
-        para = block_from_string input
-        assert_equal '<code class="role">foo bar baz</code>', para.content
-      end
-
-      test 'should support attrlist on a literal monospace phrase' do
-        input = '[.baz]`+foo--bar+`'
-        para = block_from_string input
-        assert_equal '<code class="baz">foo--bar</code>', para.content
-      end
-
-      test 'should not process an escaped passthrough macro inside a monospaced phrase' do
-        input = 'use the `\pass:c[]` macro'
-        para = block_from_string input
-        assert_equal 'use the <code>pass:c[]</code> macro', para.content
-      end
-
-      test 'should not process an escaped passthrough macro inside a monospaced phrase with attributes' do
-        input = 'use the [syntax]`\pass:c[]` macro'
-        para = block_from_string input
-        assert_equal 'use the <code class="syntax">pass:c[]</code> macro', para.content
-      end
-
-      test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
-        input = 'use `\+{author}+` to show an attribute reference'
-        para = block_from_string input, attributes: { 'author' => 'Dan' }
-        assert_equal 'use <code>+Dan+</code> to show an attribute reference', para.content
       end
 
       test 'should not recognize stem macro with no content' do
