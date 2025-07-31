@@ -2474,6 +2474,10 @@ class Parser
           spec['style'] = TableCellStyles[m[4]]
         end
 
+        if m[5]
+          spec['role'] = m[5].split('.').map {|r| r.strip }.reject { |r| r.empty? }.join(' ')
+        end
+
         if m[1]
           1.upto(m[1].to_i) { specs << spec.merge }
         else
@@ -2537,6 +2541,10 @@ class Parser
 
     if m[4] && (TableCellStyles.key? m[4])
       spec['style'] = TableCellStyles[m[4]]
+    end
+
+    if m[5]
+      spec['role'] = m[5].split('.').map {|r| r.strip }.reject { |r| r.empty? }.join(' ')
     end
 
     [spec, rest]
