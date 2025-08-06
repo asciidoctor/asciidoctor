@@ -9,6 +9,8 @@
 No substitutions are applied to the value of these attributes.
 In the Hash format, the name *must* be a String, not a Symbol (e.g., `name: 'value'` is *invalid*).
 In this format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
+In the String format, entries are separated by a space.
+To include a space in the value, place a backslash in front of it.
 |_not set_
 a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the following formats:
 
@@ -18,7 +20,7 @@ a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the 
 *Array* +
 `[ 'name=value' ]`
 
-*String* (space separated) +
+*String* +
 `'name=value'`
 
 |`:backend`
