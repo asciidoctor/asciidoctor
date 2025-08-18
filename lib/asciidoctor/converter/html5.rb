@@ -339,33 +339,42 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     result.join LF
   end
 
+  def build_title node, opts = {}
+    doc_attrs = node.document.attributes
+    sectnumlevels = opts[:sectnumlevels] || (doc_attrs['sectnumlevels'] || 3).to_i
+    level = node.level
+    if node.caption
+      title = node.captioned_title
+    elsif node.numbered && level <= sectnumlevels
+      if level < 2 && node.document.doctype == 'book'
+        case node.sectname
+        when 'chapter'
+          title =  %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{node.sectnum} #{node.title})
+        when 'part'
+          title =  %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{node.sectnum nil, ':'} #{node.title})
+        else
+          title = %(#{node.sectnum} #{node.title})
+        end
+      else
+        title = %(#{node.sectnum} #{node.title})
+      end
+    else
+      title = node.title
+    end
+    title
+  end
+
   def convert_outline node, opts = {}
     return unless node.sections?
-    sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
-    toclevels = opts[:toclevels] || (node.document.attributes['toclevels'] || 2).to_i
+    doc_attrs = node.document.attributes
+    sectnumlevels = opts[:sectnumlevels] || (doc_attrs['sectnumlevels'] || 3).to_i
+    toclevels = opts[:toclevels] || (doc_attrs['toclevels'] || 2).to_i
     sections = node.sections
     # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
     result = [%(<ul class="sectlevel#{sections[0].level}">)]
     sections.each do |section|
       slevel = section.level
-      if section.caption
-        stitle = section.captioned_title
-      elsif section.numbered && slevel <= sectnumlevels
-        if slevel < 2 && node.document.doctype == 'book'
-          case section.sectname
-          when 'chapter'
-            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
-          when 'part'
-            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
-          else
-            stitle = %(#{section.sectnum} #{section.title})
-          end
-        else
-          stitle = %(#{section.sectnum} #{section.title})
-        end
-      else
-        stitle = section.title
-      end
+      stitle = build_title section, opts
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
       if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
         result << %(<li><a href="##{section.id}">#{stitle}</a>)
@@ -382,24 +391,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   def convert_section node
     doc_attrs = node.document.attributes
     level = node.level
-    if node.caption
-      title = node.captioned_title
-    elsif node.numbered && level <= (doc_attrs['sectnumlevels'] || 3).to_i
-      if level < 2 && node.document.doctype == 'book'
-        case node.sectname
-        when 'chapter'
-          title = %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{node.sectnum} #{node.title})
-        when 'part'
-          title = %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{node.sectnum nil, ':'} #{node.title})
-        else
-          title = %(#{node.sectnum} #{node.title})
-        end
-      else
-        title = %(#{node.sectnum} #{node.title})
-      end
-    else
-      title = node.title
-    end
+    title = build_title node
     if node.id
       id_attr = %( id="#{id = node.id}")
       if doc_attrs['sectlinks']
