@@ -3,6 +3,7 @@
 module Asciidoctor
 # A built-in {Converter} implementation that generates HTML 5 output
 # consistent with the html5 backend from AsciiDoc.py.
+using NilOrEmptyRefinement
 class Converter::Html5Converter < Converter::Base
   register_for 'html5'
 
