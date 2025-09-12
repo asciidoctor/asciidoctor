@@ -91,12 +91,83 @@ class Converter::Html5Converter < Converter::Base
     end
   end
 
-  def convert_document node
-    br = %(<br#{slash = @void_element_slash}>)
-    unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
-      asset_uri_scheme = %(#{asset_uri_scheme}:)
+  # build up the full resource URI's based on a sequence of parameters and overrides
+  def build_uri scheme, authority, path, query
+
+    # when scheme not provided, fall-back to '//', which implicitly uses current scheme
+    uri = (!scheme.nil? && !scheme.empty?) ? "#{scheme}://" : "//"
+    uri += !authority.nil? && !authority.empty? ? authority : ""
+    uri += !path.nil? && !path.empty? ? path : ""
+    uri += !query.nil? && !query.empty? ? "?#{query}" : ""
+    return uri 
+  end
+
+  def initialize_asset_uri node
+    uri = {}
+
+    # asset uri defaults to https (when nil)
+    # may be user-override to empty, in which case will be implied by current session '//'
+    # may be user-override to http, in which case will use http://
+    asset_uri_scheme = node.attr 'asset-uri-scheme', 'https'
+
+    # https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
+    # uri_scheme
+    # uri_authority
+    # uri_path
+    # uri_query
+    # uri_fragment (disregarded)
+    # uri (override)
+
+    uri[:fontawesome_uri_scheme] = node.attr "fontawesome-uri-scheme", "#{asset_uri_scheme}"
+    uri[:fontawesome_uri_authority] = node.attr "fontawesome-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:fontawesome_uri_path] = node.attr "fontawesome-uri-path", "/ajax/libs/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css"
+    uri[:fontawesome_uri_query] = node.attr "fontawesome-uri-query", ""
+    if !(tmp_uri = node.attr "fontawesome-uri", "").empty? then
+      uri[:fontawesome_uri] = tmp_uri
+    else
+      uri[:fontawesome_uri] = build_uri(uri[:fontawesome_uri_scheme], uri[:fontawesome_uri_authority], uri[:fontawesome_uri_path], uri[:fontawesome_uri_query])
     end
-    cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
+
+    uri[:highlightjs_uri_scheme] = node.attr "highlightjs-uri-scheme", "#{asset_uri_scheme}"
+    uri[:highlightjs_uri_authority] = node.attr "highlightjs-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:highlightjs_uri_path] = node.attr "highlightjs-uri-path", "/ajax/libs/highlight.js/#{HIGHLIGHT_JS_VERSION}/highlight.min.js"
+    uri[:highlightjs_uri_query] = node.attr "highlightjs-uri-query", ""
+    if !(tmp_uri = node.attr "highlightjs-uri", "").empty? then
+      uri[:highlightjs_uri] = tmp_uri
+    else
+      uri[:highlightjs_uri] = build_uri(uri[:highlightjs_uri_scheme], uri[:highlightjs_uri_authority], uri[:highlightjs_uri_path], uri[:highlightjs_uri_query])
+    end
+
+    uri[:mathjax_uri_scheme] = node.attr "mathjax-uri-scheme", "#{asset_uri_scheme}"
+    uri[:mathjax_uri_authority] = node.attr "mathjax-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:mathjax_uri_path]   = node.attr "mathjax-uri-path", "/ajax/libs/mathjax/#{MATHJAX_VERSION}/MathJax.js"
+    uri[:mathjax_uri_query] = node.attr "mathjax-uri-query", "config=TeX-MML-AM_HTMLorMML"
+    if !(tmp_uri = node.attr "mathjax-uri", "").empty? then
+      uri[:mathjax_uri] = tmp_uri
+    else
+      uri[:mathjax_uri] = build_uri(uri[:mathjax_uri_scheme], uri[:mathjax_uri_authority], uri[:mathjax_uri_path], uri[:mathjax_uri_query])
+    end
+
+    if (webfonts = node.attr 'webfonts')
+      uri[:webfonts_uri_scheme] = node.attr "webfonts-uri-scheme", "#{asset_uri_scheme}"
+      uri[:webfonts_uri_authority] = node.attr "webfonts-uri-authority", "fonts.googleapis.com"
+      uri[:webfonts_uri_path] = node.attr "webfonts-uri-path", "/css"
+      uri[:webfonts_uri_query] = "family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"
+      uri[:webfonts_uri_query] = node.attr "webfonts-uri-query", uri[:webfonts_uri_query] # overrides classic behavior
+      if !(tmp_uri = node.attr "webfonts-uri", "").empty? then
+        uri[:webfonts_uri] = tmp_uri
+      else
+        uri[:webfonts_uri] = build_uri(uri[:webfonts_uri_scheme], uri[:webfonts_uri_authority], uri[:webfonts_uri_path], uri[:webfonts_uri_query])
+      end
+    end
+    @asset_uri = uri
+  end
+
+  def convert_document node
+    initialize_asset_uri(node)
+
+    br = %(<br#{slash = @void_element_slash}>)
+
     linkcss = node.attr? 'linkcss'
     max_width_attr = (node.attr? 'max-width') ? %( style="max-width: #{node.attr 'max-width'};") : ''
     result = ['<!DOCTYPE html>']
@@ -127,7 +198,7 @@ class Converter::Html5Converter < Converter::Base
 
     if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
-        result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{@asset_uri[:webfonts_uri]}"#{slash}>)
       end
       if linkcss
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
@@ -148,7 +219,7 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'icons', 'font'
       if node.attr? 'iconfont-remote'
-        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', @asset_uri[:fontawesome_uri]}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
@@ -253,12 +324,12 @@ class Converter::Html5Converter < Converter::Base
 
     if syntax_hl
       if syntax_hl.docinfo? :head
-        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
+        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash
       else
         result.delete_at syntax_hl_docinfo_head_idx
       end
       if syntax_hl.docinfo? :footer
-        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+        result << (syntax_hl.docinfo :footer, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
@@ -290,7 +361,8 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   })
 })
 </script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{@asset_uri[:mathjax_uri]}"></script>
+)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?

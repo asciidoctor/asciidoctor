@@ -3469,7 +3469,7 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
-      assert_css %(html > head > link[rel="stylesheet"][href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
+      assert_css %(html > head > link[rel="stylesheet"][href="https://#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
       assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/i[@class="fa icon-tip"]', output, 1
     end
 
@@ -3500,8 +3500,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
-      assert_css %(html > head > link[rel="stylesheet"][href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
-      assert_css %(html > body > script[src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js"]), output, 1
+      assert_css %(html > head > link[rel="stylesheet"][href="http://#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
+      assert_css %(html > body > script[src="http://#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js"]), output, 1
     end
 
     test 'should use no uri scheme for assets when asset-uri-scheme is blank' do
@@ -3517,8 +3517,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
-      assert_css %(html > head > link[rel="stylesheet"][href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
-      assert_css %(html > body > script[src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js"]), output, 1
+      assert_css %(html > head > link[rel="stylesheet"][href="//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css"]), output, 1
+      assert_css %(html > body > script[src="//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js"]), output, 1
     end
   end
 
@@ -4191,6 +4191,160 @@ context 'Blocks' do
       refute_nil ref
       assert_equal 'Debian Install', ref.reftext
       assert_equal 'debian', (doc.resolve_id 'Debian Install')
+    end
+
+    # test the uri management of the html5 converter
+
+  end
+
+  UriTestCase = Struct.new(:scheme, :authority, :path, :query, :override, :full_uri)
+
+  context 'Asset URI User Configuration' do
+
+    test 'verify fontawesome and mathjax uri overrides' do
+
+      assets = {
+        fontawesome: {
+          type: :css,
+          uris: [
+            UriTestCase.new("ftp", "authority", "/path", "param=1", nil, "ftp://authority/path?param=1"),
+            UriTestCase.new("ftp", "authority", "/path", "param=1", "overridden", "overridden"),
+            UriTestCase.new("", "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+            UriTestCase.new(nil, "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+            UriTestCase.new(nil, nil, "/path", "param=1", nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/path?param=1"),
+            UriTestCase.new(nil, nil, nil, "param=1", nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css?param=1"),
+            UriTestCase.new(nil, nil, nil, nil, nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/font-awesome/#{Asciidoctor::FONT_AWESOME_VERSION}/css/font-awesome.min.css")
+          ]
+        },
+        mathjax: {
+          type: :js,
+          uris: [
+            UriTestCase.new("gopher", "authority", "/path", "param=1", nil, "gopher://authority/path?param=1"),
+            UriTestCase.new("gopher", "authority", "/path", "param=1", "overridden", "overridden"),
+            UriTestCase.new("", "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+            UriTestCase.new(nil, "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+            UriTestCase.new(nil, nil, "/path", "param=1", nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/path?param=1"),
+            UriTestCase.new(nil, nil, nil, "param=1", nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/mathjax/#{Asciidoctor::MATHJAX_VERSION}/MathJax.js?param=1"),
+            UriTestCase.new(nil, nil, nil, nil, nil, "//#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/mathjax/#{Asciidoctor::MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML")
+          ]
+        }
+      }
+
+      assets.each do |product, asset_hash|
+        asset_hash[:uris].each do |uri|
+          attr_block = ""
+          [:scheme, :authority, :path, :query].each do |x|
+            attr_block += ":#{product.to_s}-uri-#{x.to_s}: #{uri[x]}\n" unless uri[x].nil?
+          end
+          if uri[:override] then
+            attr_block += ":#{product.to_s}-uri: #{uri[:override]}\n"
+          end
+          input = "#{attr_block}" + <<~'EOS'
+          :asset-uri-scheme:
+          :icons: font
+          :iconfont-remote:
+          :source-highlighter: highlightjs
+          :stem: latexmath
+    
+          TIP: You can control the URI scheme used for assets with the asset-uri-scheme attribute
+    
+          [source,ruby]
+          puts "AsciiDoc, FTW!"
+          }
+          EOS
+          output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+          if asset_hash[:type] == :css then
+            assert_css %(html > head > link[rel="stylesheet"][href="#{uri[:full_uri]}"]), output, 1
+          elsif asset_hash[:type] == :js then
+            assert_css %(html > body > script[src="#{uri[:full_uri]}"]), output, 1
+          end
+          #
+        end
+      end
+    end
+
+    test 'verify highlight-js uri overrides' do
+
+      highlightjs = {
+        uris: [
+          UriTestCase.new("gopher", "authority", "/path", "param=1", nil, "gopher://authority/path?param=1"),
+          UriTestCase.new("gopher", "authority", "/path", "param=1", "overridden", "overridden"),
+          UriTestCase.new("", "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+          UriTestCase.new(nil, "authority", "/path", "param=1", nil, "https://authority/path?param=1"),
+          UriTestCase.new(nil, nil, "/path", "param=1", nil, "https://#{Asciidoctor::CDN_URI_AUTHORITY}/path?param=1"),
+          UriTestCase.new(nil, nil, nil, "param=1", nil, "https://#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js?param=1"),
+          UriTestCase.new(nil, nil, nil, nil, nil, "https://#{Asciidoctor::CDN_URI_AUTHORITY}/ajax/libs/highlight.js/#{Asciidoctor::HIGHLIGHT_JS_VERSION}/highlight.min.js")
+        ]
+      }
+
+      highlightjs[:uris].each do |uri|
+        attr_block = ""
+        [:scheme, :authority, :path, :query].each do |x|
+          attr_block += ":highlightjs-uri-#{x.to_s}: #{uri[x]}\n" unless uri[x].nil?
+        end
+        if uri[:override] then
+          attr_block += ":highlightjs-uri: #{uri[:override]}\n"
+        end
+        input = "#{attr_block}" + <<~'EOS'
+        :source-highlighter: highlightjs
+        :highlightjs-languages: ruby
+
+        [source,ruby]
+        puts "AsciiDoc, FTW!"
+        }
+        EOS
+        output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+        ["gopher://authority/styles/github.min.css"]
+        # the highlight-js stylesheets are expected to be in leaf directories nearby the script file
+        base_uri = uri[:full_uri].rpartition('/')[0]
+        stylesheet = "#{base_uri}/styles/github.min.css"
+        assert_css %(html > head > link[rel="stylesheet"][href="#{stylesheet}"]), output, 1
+
+        [uri[:full_uri], "#{base_uri}/languages/ruby.min.js"].each do | script |
+          assert_css %(html > body > script[src="#{script}"]), output, 1
+        end
+      end
+    end
+
+    test 'verify webfonts uri overrides' do
+
+      WebfontUriTestCase = Struct.new(:webfont, :scheme, :authority, :path, :query, :override, :full_uri)
+      standard_uri = "fonts.googleapis.com/css?family='Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"
+      webfont_assets = {
+        uris: [
+          WebfontUriTestCase.new(nil, "gopher", "authority", "/path", "param=1", nil, "gopher://authority/path?param=1"),
+          WebfontUriTestCase.new(nil, "gopher", "authority", "/path", "param=1", "./overridden", "./overridden"),
+          WebfontUriTestCase.new(nil, "", "authority", "/path", "param=1", nil, "//authority/path?param=1"),
+          WebfontUriTestCase.new(nil, nil, "authority", "/path", "param=1", nil, "https://authority/path?param=1"),
+          WebfontUriTestCase.new(nil, nil, nil, "/path", "param=1", nil, "https://fonts.googleapis.com/path?param=1"),
+          WebfontUriTestCase.new(nil, nil, nil, nil, "param=1", nil, "https://fonts.googleapis.com/css?param=1"),
+          WebfontUriTestCase.new(nil, nil, nil, nil, nil, nil, "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"),
+          WebfontUriTestCase.new("FontFamily", nil, nil, nil, nil, nil, "https://fonts.googleapis.com/css?family=FontFamily")
+        ]
+      }
+
+      webfont_assets[:uris].each do |uri|
+        attr_block = ""
+        [:scheme, :authority, :path, :query].each do |x|
+          attr_block += ":webfonts-uri-#{x.to_s}: #{uri[x]}\n" unless uri[x].nil?
+        end
+        if uri[:override] then
+          attr_block += ":webfonts-uri: #{uri[:override]}\n"
+        end
+        # when test case 'webfont' exists, use it to provide a
+        # :webfont: document attribute
+        # this in turn defines the font family in the URI request
+        attr_block += ":webfonts: #{uri[:webfont]}" unless uri[:webfont].nil?
+
+        input = "#{attr_block}" + <<~'EOS'
+        
+        hello fonts
+        EOS
+        output = convert_string input, safe: Asciidoctor::SafeMode::SAFE
+
+        assert_css %(html > head > link[rel="stylesheet"][href="#{uri[:full_uri]}"]), output, 1
+
+      end
     end
   end
 end

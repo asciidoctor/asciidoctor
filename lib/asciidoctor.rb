@@ -359,6 +359,8 @@ module Asciidoctor
 
   MATHJAX_VERSION = '2.7.9'
 
+  CDN_URI_AUTHORITY = "cdnjs.cloudflare.com"
+
   DEFAULT_ATTRIBUTES = {
     'appendix-caption' => 'Appendix',
     'appendix-refsig' => 'Appendix',
