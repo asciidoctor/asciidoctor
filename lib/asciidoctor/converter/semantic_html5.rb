@@ -97,15 +97,6 @@ class Converter::SemanticHtml5Converter < Converter::Base
   end
 
   def convert_table node
-    # Adds content to a nested array and initiates new nested arrays when an index does not exist already
-    convert_util_array_dynamic_add_child_array = lambda do |arr, index, content|
-      if arr[index] == nil
-        arr.push([content])
-      else
-        arr[index].push(content)
-      end
-    end
-
     result = []
     id_attribute = node.id ? %( id="#{node.id}") : ''
     frame = 'ends' if (frame = node.attr 'frame', 'all', 'table-frame') == 'topbot'
@@ -166,87 +157,8 @@ class Converter::SemanticHtml5Converter < Converter::Base
         next if rows.empty?
         result << %(<t#{tsec}>)
         rows.each_with_index do |row, row_index|
-          tr_html = []
-          # result << '<tr>'
-          # Make aware of cells that span multiple columns per row and were defined in an earlier row as these influence the normalized index of columns in this row
-          logger.debug %(Starting with first cell in row #{current_row_index} (#{tsec} row #{row_index}))
-          logger.debug %(Cells: #{rows[row_index].map{|cell| (cell.class == Hash ? "Cell [SHADOW CELL]" : cell.text)}})
+          result << '<tr>'
           row.each_with_index do |cell, cell_index|
-            logger.debug %(  index of cell: #{cell_index}, cell content: #{(cell.class == Hash ? "Cell [SHADOW CELL]" : cell.text)})
-            cell_is_shadow = false
-            duplicated_row_heading = false
-            duplicated_column_heading = false
-            if cell.class == Hash
-              logger.debug '    is virtual column added by cells from previous rows spawning into the current row'
-              cell_is_shadow = true
-              duplicated_row_heading = cell['duplicated_row_heading']
-              duplicated_column_heading = cell['duplicated_column_heading']
-              cell = cell['cell']
-            end
-
-            # deal with heading cells
-            # TODO: fix duplication like `ch_a - ch_a` - ch_aa` (two level deep column headings where one spawns two rows) to `ch_a - ch_aa` (target) in the headers_titles_by_column
-            #  this bug arises when AsciiDoc starts supporting more than just one header column inside thead
-            #  developers can add a second row in thead array inside `convert_table` function to debug and fix this bug before it arises
-            #  this bug has probably been fixed by introducing variable 'duplicated_column_heading'
-            if (tsec == :head || cell.style == :header)
-              # cell is a heading cell so we need to add their text to our lists of column and row level headings.
-
-              # this condition probably prevents duplications like this `ch_a - ch_a` - ch_aa` in column headers (header_titles_by_column)
-              if duplicated_column_heading == false
-                logger.debug %(    add "#{cell.text}" at column index position #{cell_index} to header_titles_by_column)
-                convert_util_array_dynamic_add_child_array[header_titles_by_column, cell_index, cell]
-              end
-
-              # this condition prevents duplications like this `rh_a - rh_a - rh_ad` in row headers (header_titles_by_row)
-              if duplicated_row_heading == false
-                logger.debug %(      add "#{cell.text}" at row index position #{current_row_index} to header_titles_by_row)
-                convert_util_array_dynamic_add_child_array[header_titles_by_row, current_row_index, cell]
-              end
-            end
-
-            # deal with virtual/shadow cells/columns to create
-            if cell_is_shadow == false
-              if cell.colspan != nil
-                # account for cells spawning multiple columns by resolving their colspan value to separate cells internally
-                (1..cell.colspan-1).each do | index |
-                  logger.debug %(      add virtual cell before column index #{cell_index+index} to the current row)
-                  shadow_cell = {
-                    'cell' => cell,
-                    'shadow' => true,
-                    'duplicated_column_heading' => false,
-                    'duplicated_row_heading' => (index == 0 ? false : true),
-                    'heading' => (tsec == :head || cell.style == :header ? true : false)
-                  }
-                  rows[row_index].insert(cell_index+index, shadow_cell)
-                end
-              end
-
-              if cell.rowspan != nil
-                # account for cells spawning multiple rows by resolving their rowspan value to separate cells internally
-                (1..cell.rowspan-1).each do | rowspan_index |
-                  colspan = (cell.colspan ? cell.colspan : 1)
-                  (0..colspan-1).each do | colspan_index |
-                    if rows.count > row_index+rowspan_index
-                      logger.debug %(        add it to next row #{row_index+rowspan_index} before column index #{cell_index+colspan_index})
-                      shadow_cell = {
-                        'cell' => cell,
-                        'shadow' => true,
-                        'duplicated_column_heading' => (rowspan_index == 0 ? false : true),
-                        'duplicated_row_heading' => (colspan_index == 0 ? false : true),
-                        'heading' => (tsec == :head || cell.style == :header ? true : false)
-                      }
-                      rows[row_index+rowspan_index].insert(cell_index+colspan_index, shadow_cell)
-                    end
-                  end
-                end
-              end
-            end
-
-            # Header cells which are declared as shadow (hidden) cells are not necessary in the HTML output for responsive tables (turning multi column layout into two-column layout on small screens), so we skip the HTML code generation for them
-            if cell_is_shadow && (tsec == :head || cell.style == :header)
-              next
-            end
 
             if tsec == :head
               cell_content = cell.text
@@ -263,57 +175,15 @@ class Converter::SemanticHtml5Converter < Converter::Base
             end
 
             cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
-            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}#{( cell_is_shadow == true ? ' shadow-cell': '')}")
-            if cell_is_shadow
-              cell_colspan_attribute = ''
-              cell_rowspan_attribute = ''
-              cell_html_attributes = ' hidden'
-            else
-              cell_colspan_attribute = (cell.colspan && cell_is_shadow == false ? %( colspan="#{cell.colspan}") : '')
-              cell_rowspan_attribute = (cell.rowspan && cell_is_shadow == false ? %( rowspan="#{cell.rowspan}") : '')
-              cell_html_attributes = ''
-            end
+            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
+            cell_colspan_attribute = (cell.colspan ? %( colspan="#{cell.colspan}") : '')
+            cell_rowspan_attribute = (cell.rowspan ? %( rowspan="#{cell.rowspan}") : '')
             cell_scope_attribute = (tsec == :head ? %( scope="col") : (cell.style == :header ? %( scope="row") : ''))
             cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : ''
 
-            if cell_tag_name == 'td'
-              cell_data_column_header_separator = ' ' + (node.document.attributes['table-cell-data-column-header-separator'] || '-') + ' '
-              cell_data_column_header = ' data-column-header="'
-              cell_data_column_header += (header_titles_by_column[cell_index] != nil ? header_titles_by_column[cell_index].map{|cell| cell.text}.join(cell_data_column_header_separator) : '')
-              cell_data_column_header += '"'
-
-              cell_data_row_header_separator = ' ' + (node.document.attributes['table-cell-data-row-header-separator'] || '-') + ' '
-              cell_data_row_header = ' data-row-header="'
-              cell_data_row_header += (header_titles_by_row[current_row_index] != nil ? header_titles_by_row[current_row_index].map{|cell| cell.text}.join(cell_data_row_header_separator) : '')
-              cell_data_row_header += '"'
-            else
-              cell_data_column_header = ''
-              cell_data_row_header = ''
-            end
-            # if cell has colspan specified and is not a shadow cell
-            if cell.colspan != nil && cell_is_shadow == false
-              # then add it without `cell_data_column_header` and `cell_data_row_header`
-              tr_html << %(<#{cell_tag_name}#{cell_html_attributes}#{cell_scope_attribute}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}>#{cell_content}</#{cell_tag_name}>)
-              # and add a shadow cell for it because cells with colspan and rowspan must be hidden in two-column layout and replaced by their shadow cells like this one. Shadow cells always have `cell_data_column_header` and `cell_data_row_header` HTML attributes
-              tr_html << %(<#{cell_tag_name} hidden #{cell_html_attributes}#{cell_scope_attribute}#{cell_class_attribute}#{cell_style_attribute}#{cell_data_column_header}#{cell_data_row_header}>#{cell_content}</#{cell_tag_name}>)
-            else
-              tr_html << %(<#{cell_tag_name}#{cell_html_attributes}#{cell_scope_attribute}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}#{cell_data_column_header}#{cell_data_row_header}>#{cell_content}</#{cell_tag_name}>)
-            end
+            result << %(<#{cell_tag_name}#{cell_scope_attribute}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}>#{cell_content}</#{cell_tag_name}>)
           end
-          
-          if header_titles_by_row[current_row_index] != nil && tsec != :head
-            cell_data_row_header_separator = ' ' + (node.document.attributes['table-cell-data-row-header-separator'] || '-') + ' '
-            cell_data_row_header = ' data-row-header="'
-            cell_data_row_header += header_titles_by_row[current_row_index].map{|cell| cell.text}.join(cell_data_row_header_separator)
-            cell_data_row_header += '"'
-          else
-            cell_data_row_header = ''
-          end
-          result << %(<tr#{cell_data_row_header}>)
-          result << tr_html.join(LF)
           result << '</tr>'
-
-          current_row_index += 1
         end
         result << %(</t#{tsec}>)
       end
