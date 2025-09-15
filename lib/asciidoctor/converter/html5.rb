@@ -23,7 +23,7 @@ class Converter::Html5Converter < Converter::Base
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
-  StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
+
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
     SvgPreambleRx = /^#{CC_ALL}*?(?=<svg[\s>])/
@@ -36,6 +36,7 @@ class Converter::Html5Converter < Converter::Base
 
   def initialize backend, opts = {}
     @backend = backend
+    @stem_adapters = {}
     if opts[:htmlsyntax] == 'xml'
       syntax = 'xml'
       @xml_mode = true
@@ -226,15 +227,14 @@ class Converter::Html5Converter < Converter::Base
       end
     end
 
-    if (syntax_hl = node.syntax_highlighter)
-      result << (syntax_hl_docinfo_head_idx = result.size)
-    end
+    result << (syntax_hl_docinfo_head_idx = result.size)
 
     unless (docinfo_content = node.docinfo).empty?
       result << docinfo_content
     end
 
     result << '</head>'
+
     id_attr = node.id ? %( id="#{node.id}") : ''
     if (sectioned = node.sections?) && (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
       classes = [node.doctype, (node.attr 'toc-class'), %(toc-#{node.attr 'toc-position', 'header'})]
@@ -322,48 +322,35 @@ class Converter::Html5Converter < Converter::Base
     # JavaScript (and auxiliary stylesheets) loaded at the end of body for performance reasons
     # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
 
-    if syntax_hl
-      if syntax_hl.docinfo? :head
-        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash
-      else
-        result.delete_at syntax_hl_docinfo_head_idx
+    deferred_head_elements = []
+
+    # this uses the index computed previously to insert more elements into the html head
+    if node.syntax_highlighter
+      if node.syntax_highlighter.docinfo? :head
+        deferred_head_elements << (node.syntax_highlighter.docinfo :head, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
       end
-      if syntax_hl.docinfo? :footer
-        result << (syntax_hl.docinfo :footer, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
+      if node.syntax_highlighter.docinfo? :footer
+        result << (node.syntax_highlighter.docinfo :footer, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
-    if node.attr? 'stem'
-      eqnums_val = node.attr 'eqnums', 'none'
-      eqnums_val = 'AMS' if eqnums_val.empty?
-      eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
-      # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-      result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="#{@asset_uri[:mathjax_uri]}"></script>
-)
+    # accumulate additional content from the deferred-processing
+    # stem block adapters
+    @stem_adapters.each do |k, adapter|
+      if adapter.docinfo? :head
+        deferred_head_elements << adapter.docinfo(:head, node, {asset_uri: @asset_uri})
+      end
+      if adapter.docinfo? :footer
+        result << adapter.docinfo(:footer, node, {asset_uri: @asset_uri})
+      end
     end
+
+    if deferred_head_elements.empty?
+      result.delete_at syntax_hl_docinfo_head_idx
+    else
+      result[syntax_hl_docinfo_head_idx] = deferred_head_elements
+    end
+
 
     unless (docinfo_content = node.docinfo :footer).empty?
       result << docinfo_content
@@ -767,25 +754,11 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    id_attribute = node.id ? %( id="#{node.id}") : ''
-    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
-    if (equation = node.content)
-      if style == :asciimath && (equation.include? LF)
-        br = %(#{LF}<br#{@void_element_slash}>)
-        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
-      end
-      unless (equation.start_with? open) && (equation.end_with? close)
-        equation = %(#{open}#{equation}#{close})
-      end
-    else
-      equation = ''
+    k = "#{node.style}-#{node.attributes['stem-renderer']}-#{node.document.backend}".to_sym
+    unless @stem_adapters.has_key?(k)
+      @stem_adapters[k] = Asciidoctor::StemAdapter::Factory.new.make(k)
     end
-    %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
-#{title_element}<div class="content">
-#{equation}
-</div>
-</div>)
+    @stem_adapters[k].convert node
   end
 
   def convert_olist node
@@ -1439,5 +1412,6 @@ Your browser does not support the video tag.
   def respond_to_missing? id, *options
     !((name = id.to_s).start_with? 'convert_') && (handles? name)
   end
+
 end
 end

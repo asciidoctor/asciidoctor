@@ -383,15 +383,36 @@ context 'Document' do
   end
 
   context 'MathJax' do
-    test 'should add MathJax script to HTML head if stem attribute is set' do
-      output = convert_string '', attributes: { 'stem' => '' }
+    test 'should add MathJax script to HTML head if page renders stem block' do
+      input = <<~'EOS'
+
+        [stem]
+        ++++
+        ++++
+      EOS
+      output = convert_string input, attributes: { 'stem' => '' }
       assert_match '<script type="text/x-mathjax-config">', output
       assert_match 'inlineMath: [["\\\\(", "\\\\)"]]', output
       assert_match 'displayMath: [["\\\\[", "\\\\]"]]', output
       assert_match 'delimiters: [["\\\\$", "\\\\$"]]', output
     end
+
+    test 'should render a document with asciimath-mathml' do
+      input = <<~'EOS'
+        :stem-renderer: mathml
+
+        [asciimath]
+        ++++
+        x+b/(2a)<+-sqrt((b^2)/(4a^2)-c/a)
+        ++++
+      EOS
+      output = convert_string input, attributes: { 'stem' => '' }
+    end
+    
   end
 
+  
+  
   context 'Converter' do
     test 'convert methods on built-in converter are registered by default' do
       doc = document_from_string ''

@@ -544,6 +544,8 @@ module Asciidoctor
   end
 end
 
+autoload :StemAdapter, %(#{__dir__}/asciidoctor/stem_adapter)
+
 # core extensions
 require_relative 'asciidoctor/core_ext'
 
@@ -573,6 +575,7 @@ require_relative 'asciidoctor/section'
 require_relative 'asciidoctor/stylesheets'
 require_relative 'asciidoctor/table'
 require_relative 'asciidoctor/writer'
+require_relative 'asciidoctor/stem_adapter'
 
 # main API entry points
 require_relative 'asciidoctor/load'

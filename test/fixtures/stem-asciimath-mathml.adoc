@@ -1,0 +1,7 @@
+:stem:
+:stem-renderer: mathml
+
+[asciimath]
+++++
+[[a,b],[c,d]](e,f)
+++++
