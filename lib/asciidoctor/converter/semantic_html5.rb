@@ -96,6 +96,102 @@ class Converter::SemanticHtml5Converter < Converter::Base
     '<hr>'
   end
 
+  def convert_table node
+    result = []
+    id_attribute = node.id ? %( id="#{node.id}") : ''
+    frame = 'ends' if (frame = node.attr 'frame', 'all', 'table-frame') == 'topbot'
+    classes = ['tableblock', %(frame-#{frame}), %(grid-#{node.attr 'grid', 'all', 'table-grid'})]
+    if (stripes = node.attr 'stripes', nil, 'table-stripes')
+      classes << %(stripes-#{stripes})
+    end
+    width_attribute = ''
+    if (autowidth = node.option? 'autowidth') && !(node.attr? 'width')
+      classes << 'fit-content'
+    elsif (tablewidth = node.attr 'tablepcwidth') == 100
+      classes << 'stretch'
+    else
+      width_attribute = %( width="#{tablewidth}%")
+    end
+    classes << (node.attr 'float') if node.attr? 'float'
+    if (role = node.role)
+      classes << role
+    end
+    class_attribute = %( class="#{classes.join ' '}")
+
+    result << %(<table#{id_attribute}#{class_attribute}#{width_attribute}>)
+    if node.title?
+      result << %(<caption class="title">#{node.captioned_title}</caption>)
+    end
+    if (node.attr 'rowcount') > 0
+      slash = @void_element_slash
+      result << '<colgroup>'
+      if autowidth
+        result += (Array.new node.columns.size, %(<col#{slash}>))
+      else
+        node.columns.each do |col|
+          result << ((col.option? 'autowidth') ? %(<col#{slash}>) : %(<col style="width: #{col.attr 'colpcwidth'}%"#{slash}>))
+        end
+      end
+      result << '</colgroup>'
+
+      # A table can contain nested column and row level headings. The two array declarations help us to keep track of them.
+      # Containing the column level heading cells in a nested array. The index of 'header_titles_by_column' represents the index number of a column. It reveils a sub array holding the cell text of all column level heading cells belonging to the column.
+      # Example: [['cell text of column level heading cell A', ['cell text of column level heading cell B']]
+      header_titles_by_column = Array.new
+      # Containing the column level heading cells in a nested array. The index of 'header_titles_by_row' represents the index number of a row. It reveils a sub array holding the cell text of all row level heading cells belonging to the row.
+      # Example: [['cell text of row level heading cell A', ['cell text of row level heading cell B']]
+      header_titles_by_row = Array.new
+
+      # Containing the number of columns per row which we need as an offset so we assign the non-heading cells the correct text of their corresponding heading cells. The index of 'reserved_columns_per_row_for_headings' represents the index number of a row. It reveils a number indicating the amount of cells defined in an earlier row spawning into this one.
+      # Example: [3,3]
+      reserved_columns_per_row_for_headings = Array.new
+
+      # There are three possible row sections: 'header', 'body' and 'footer' AsciiDoc knows. In order to give each non-heading cells info about the corresponding heading cells, the algorithm needs to see all rows from the table comming from the same array.
+      # The variable `current_row_index` simulates exactly that. The loop variable 'row_index' is unsufficient as it is scoped to just one array at a time.
+      current_row_index = 0
+
+      # TODO: make the following tests have `data-column-header` and `data-row-header` HTML attribute on non-heading cells populated properly:
+      #  - table-ultracomplex-combined-non-heading-cell-at-row-begin.adoc
+      #  - table-ultracomplex-combined-non-heading-cell-in-body.adoc
+      node.rows.to_h.each do |tsec, rows|
+        next if rows.empty?
+        result << %(<t#{tsec}>)
+        rows.each_with_index do |row, row_index|
+          result << '<tr>'
+          row.each_with_index do |cell, cell_index|
+
+            if tsec == :head
+              cell_content = cell.text
+            else
+              case cell.style
+              when :asciidoc
+                cell_content = %(<div class="content">#{cell.content}</div>)
+              when :literal
+                cell_content = %(<div class="literal"><pre>#{cell.text}</pre></div>)
+              else
+                cell_content = (cell_content = cell.content).empty? ? '' : %(<p class="tableblock">#{cell_content.join '</p>
+<p class="tableblock">'}</p>)
+              end
+            end
+
+            cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
+            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
+            cell_colspan_attribute = (cell.colspan ? %( colspan="#{cell.colspan}") : '')
+            cell_rowspan_attribute = (cell.rowspan ? %( rowspan="#{cell.rowspan}") : '')
+            cell_scope_attribute = (tsec == :head ? %( scope="col") : (cell.style == :header ? %( scope="row") : ''))
+            cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : ''
+
+            result << %(<#{cell_tag_name}#{cell_scope_attribute}#{cell_class_attribute}#{cell_colspan_attribute}#{cell_rowspan_attribute}#{cell_style_attribute}>#{cell_content}</#{cell_tag_name}>)
+          end
+          result << '</tr>'
+        end
+        result << %(</t#{tsec}>)
+      end
+    end
+    result << '</table>'
+    result.join LF
+  end
+
   def convert_image node
     roles = []
     roles << node.role if node.role

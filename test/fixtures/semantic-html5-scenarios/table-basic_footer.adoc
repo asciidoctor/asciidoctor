@@ -1,0 +1,14 @@
+[%header%footer,cols="2,2,1"] 
+|===
+|Column 1, header row
+|Column 2, header row
+|Column 3, header row
+
+|Cell in column 1, row 2
+|Cell in column 2, row 2
+|Cell in column 3, row 2
+
+|Column 1, footer row
+|Column 2, footer row
+|Column 3, footer row
+|===
