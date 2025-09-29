@@ -129,7 +129,7 @@ hr {
   border-width: 1px 0 0;
   clear: both;
   height: 0;
-  margin: 1.25em 0 1.1875em;
+  margin-block: 1.25em 1.1875em;
 }
 
 mark {
@@ -205,21 +205,21 @@ audio:not([controls]) {
 }
 
 .left {
-  float: left !important;
+  float: inline-start !important;
 }
 
 .right {
-  float: right !important;
+  float: inline-end !important;
 }
 
 .text-left,
 div.text-left > * {
-  text-align: left !important;
+  text-align: start !important;
 }
 
 .text-right,
 div.text-right > * {
-  text-align: right !important;
+  text-align: end !important;
 }
 
 .text-center,
@@ -333,12 +333,12 @@ dl {
 
 ul,
 ol {
-  margin-left: 1.5em;
+  margin-inline-start: 1.5em;
 }
 
 ul li ul,
 ul li ol {
-  margin-left: 1.25em;
+  margin-inline-start: 1.25em;
   margin-bottom: 0;
 }
 
@@ -362,7 +362,7 @@ ul.square ul:not([class]) {
 
 ol li ul,
 ol li ol {
-  margin-left: 1.25em;
+  margin-inline-start: 1.25em;
   margin-bottom: 0;
 }
 
@@ -373,13 +373,14 @@ dl dt {
 
 dl dd {
   margin-bottom: 1.25em;
-  margin-left: 1.125em;
+  margin-inline-start: 1.125em;
 }
 
 blockquote {
   margin: 0 0 1.25em;
-  padding: 0.5625em 1.25em 0 1.1875em;
-  border-left: 1px solid #ddd;
+  padding-block: 0.5625em 0;
+  padding-inline: 1.25em 1.1875em;
+  border-inline-start: 1px solid #ddd;
 }
 
 blockquote,
@@ -426,10 +427,11 @@ table thead tr th,
 table thead tr td,
 table tfoot tr th,
 table tfoot tr td {
-  padding: 0.5em 0.625em 0.625em;
+  padding-block: 0.5em 0.625em;
+  padding-inline: 0.625em;
   font-size: inherit;
   color: rgb(0 0 0 / 0.8);
-  text-align: left;
+  text-align: inline-start;
 }
 
 table tr th,
@@ -464,8 +466,7 @@ h6 strong {
 }
 
 .center {
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
 }
 
 .stretch {
@@ -544,11 +545,11 @@ kbd {
 }
 
 .keyseq kbd:first-child {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 .keyseq kbd:last-child {
-  margin-right: 0;
+  margin-inline-end: 0;
 }
 
 .menuseq,
@@ -585,12 +586,12 @@ b.button::after {
 
 b.button::before {
   content: "[";
-  padding: 0 3px 0 2px;
+  padding-inline: 3px 2px;
 }
 
 b.button::after {
   content: "]";
-  padding: 0 2px 0 3px;
+  padding-inline: 2px 3px;
 }
 
 p a > code:hover {
@@ -601,8 +602,7 @@ body > div[id] {
   margin: 0 auto;
   max-width: 62.5em;
   position: relative;
-  padding-left: 0.9375em;
-  padding-right: 0.9375em;
+  padding-inline: 0.9375em;
   width: 100%;
 }
 
@@ -644,14 +644,14 @@ body > div[id]::after,
   line-height: 1.45;
   padding-top: 0.25em;
   padding-bottom: 0.25em;
-  padding-left: 0.25em;
+  padding-inline-start: 0.25em;
   color: rgb(0 0 0 / 0.6);
   display: flex;
   flex-flow: row wrap;
 }
 
 #header .details span:first-child {
-  margin-left: -0.125em;
+  margin-inline-start: -0.125em;
 }
 
 #header .details span.email a {
@@ -698,7 +698,7 @@ body > div[id]::after,
 }
 
 #toc > ul {
-  margin-left: 0.125em;
+  margin-inline-start: 0.125em;
 }
 
 #toc ul.sectlevel0 > li > a {
@@ -738,8 +738,8 @@ body > div[id]::after,
   }
 
   body.toc2 {
-    padding-left: 15em;
-    padding-right: 0;
+    padding-inline-start: 15em;
+    padding-inline-end: 0;
   }
 
   body.toc2 #header > h1:nth-last-child(2) {
@@ -752,9 +752,9 @@ body > div[id]::after,
     background: #f8f8f7;
     position: fixed;
     width: 15em;
-    left: 0;
+    inset-inline-start: 0;
     top: 0;
-    border-right: 1px solid #e7e7e9;
+    border-inline-end: 1px solid #e7e7e9;
     border-top-width: 0 !important;
     border-bottom-width: 0 !important;
     z-index: 1000;
@@ -775,33 +775,33 @@ body > div[id]::after,
   }
 
   #toc.toc2 ul ul {
-    margin-left: 0;
-    padding-left: 1em;
+    margin-inline-start: 0;
+    padding-inline-start: 1em;
   }
 
   #toc.toc2 ul.sectlevel0 ul.sectlevel1 {
-    padding-left: 0;
+    padding-inline-start: 0;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
   }
 
   body.toc2.toc-right {
-    padding-left: 0;
-    padding-right: 15em;
+    padding-inline-start: 0;
+    padding-inline-end: 15em;
   }
 
   body.toc2.toc-right #toc.toc2 {
-    border-right-width: 0;
-    border-left: 1px solid #e7e7e9;
-    left: auto;
-    right: 0;
+    border-inline-end-width: 0;
+    border-inline-start: 1px solid #e7e7e9;
+    inset-inline-start: auto;
+    inset-inline-end: 0;
   }
 }
 
 @media screen and (min-width: 1280px) {
   body.toc2 {
-    padding-left: 20em;
-    padding-right: 0;
+    padding-inline-start: 20em;
+    padding-inline-end: 0;
   }
 
   #toc.toc2 {
@@ -817,12 +817,12 @@ body > div[id]::after,
   }
 
   #toc.toc2 ul ul {
-    padding-left: 1.25em;
+    padding-inline-start: 1.25em;
   }
 
   body.toc2.toc-right {
-    padding-left: 0;
-    padding-right: 20em;
+    padding-inline-start: 0;
+    padding-inline-end: 20em;
   }
 }
 
@@ -878,7 +878,7 @@ h6 > a.anchor {
   position: absolute;
   z-index: 1001;
   width: 1.5ex;
-  margin-left: -1.5ex;
+  margin-inline-start: -1.5ex;
   display: block;
   text-decoration: none !important;
   visibility: hidden;
@@ -953,7 +953,7 @@ details,
 }
 
 details {
-  margin-left: 1.25rem;
+  margin-inline-start: 1.25rem;
 }
 
 details > summary {
@@ -973,11 +973,11 @@ details > summary::-webkit-details-marker {
 details > summary::before {
   content: "";
   border: solid transparent;
-  border-left-color: currentColor;
+  border-inline-start-color: currentColor;
   border-width: 0.3em 0 0.3em 0.5em;
   position: absolute;
   top: 0.5em;
-  left: -1.25rem;
+  inset-inline-start: -1.25rem;
   transform: translateX(15%);
 }
 
@@ -994,7 +994,7 @@ details > summary::after {
   height: 1em;
   position: absolute;
   top: 0.3em;
-  left: -1.25rem;
+  inset-inline-start: -1.25rem;
 }
 
 .admonitionblock td.content > .title,
@@ -1016,7 +1016,7 @@ table.tableblock > .title,
 .qlist > .title,
 .hdlist > .title {
   text-rendering: optimizeLegibility;
-  text-align: left;
+  text-align: start;
   font-family: "Noto Serif", "DejaVu Serif", serif;
   font-size: 1rem;
   font-style: italic;
@@ -1057,9 +1057,9 @@ table.tableblock.fit-content > caption.title {
 }
 
 .admonitionblock > table td.content {
-  padding-left: 1.125em;
-  padding-right: 1.25em;
-  border-left: 1px solid #dddddf;
+  padding-inline-start: 1.125em;
+  padding-inline-end: 1.25em;
+  border-inline-start: 1px solid #dddddf;
   color: rgb(0 0 0 / 0.6);
   word-wrap: anywhere;
 }
@@ -1159,7 +1159,7 @@ table.tableblock.fit-content > caption.title {
   position: absolute;
   font-size: 0.75em;
   top: 0.425rem;
-  right: 0.5rem;
+  inset-inline-end: 0.5rem;
   line-height: 1;
   text-transform: uppercase;
   color: inherit;
@@ -1172,7 +1172,7 @@ table.tableblock.fit-content > caption.title {
 
 .listingblock.terminal pre .command::before {
   content: attr(data-prompt);
-  padding-right: 0.5em;
+  padding-inline-end: 0.5em;
   color: inherit;
   opacity: 0.5;
 }
@@ -1200,13 +1200,13 @@ table.tableblock.fit-content > caption.title {
 
 pre.prettyprint .linenums {
   line-height: 1.45;
-  margin-left: 2em;
+  margin-inline-start: 2em;
 }
 
 pre.prettyprint li {
   background: none;
   list-style-type: inherit;
-  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 pre.prettyprint li code[data-lang]::before {
@@ -1233,7 +1233,7 @@ table.linenotable td[class] {
 }
 
 table.linenotable td.code {
-  padding-left: 0.75em;
+  padding-inline-start: 0.75em;
 }
 
 table.linenotable td.linenos {
@@ -1243,25 +1243,26 @@ table.linenotable td.linenos {
 table.linenotable td.linenos,
 pre.pygments .linenos,
 pre.rouge .linenos {
-  border-right: 1px solid;
+  border-inline-end: 1px solid;
   opacity: 0.35;
-  padding-right: 0.5em;
+  padding-inline-end: 0.5em;
   user-select: none;
 }
 
 pre.pygments span.linenos,
 pre.rouge span.linenos {
   display: inline-block;
-  margin-right: 0.75em;
+  margin-inline-end: 0.75em;
 }
 
 .quoteblock {
-  margin: 0 1em 1.25em 1.5em;
+  margin-block: 0 1.25em;
+  margin-inline: 1em 1.5em;
   display: table;
 }
 
 .quoteblock:not(.excerpt) > .title {
-  margin-left: -1.5em;
+  margin-inline-start: -1.5em;
   margin-bottom: 0.75em;
 }
 
@@ -1284,13 +1285,17 @@ pre.rouge span.linenos {
 
 .quoteblock blockquote::before {
   content: "\201c";
-  float: left;
+  float: inline-start;
   font-size: 2.75em;
   font-weight: bold;
   line-height: 0.6em;
-  margin-left: -0.6em;
+  margin-inline-start: -0.6em;
   color: #7a2518;
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.1);
+}
+
+.quoteblock blockquote:dir(rtl)::before {
+  content: "\201d";
 }
 
 .quoteblock blockquote > .paragraph:last-child p {
@@ -1299,12 +1304,13 @@ pre.rouge span.linenos {
 
 .quoteblock .attribution {
   margin-top: 0.75em;
-  margin-right: 0.5ex;
-  text-align: right;
+  margin-inline-end: 0.5ex;
+  text-align: end;
 }
 
 .verseblock {
-  margin: 0 1em 1.25em;
+  margin-block: 0 1.25em;
+  margin-inline: 1em;
 }
 
 .verseblock pre {
@@ -1321,7 +1327,7 @@ pre.rouge span.linenos {
 
 .verseblock .attribution {
   margin-top: 1.25rem;
-  margin-left: 0.5ex;
+  margin-inline-start: 0.5ex;
 }
 
 .quoteblock .attribution,
@@ -1360,25 +1366,27 @@ pre.rouge span.linenos {
 }
 
 .quoteblock.abstract {
-  margin: 0 1em 1.25em;
+  margin-block: 0 1.25em;
+  margin-inline: 1em;
   display: block;
 }
 
 .quoteblock.abstract > .title {
-  margin: 0 0 0.375em;
+  margin-block: 0 0.375em;
   font-size: 1.15em;
   text-align: center;
 }
 
 .quoteblock.excerpt > blockquote,
 .quoteblock .quoteblock {
-  padding: 0 0 0.25em 1em;
-  border-left: 0.25em solid #dddddf;
+  padding-block: 0 0.25em;
+  padding-inline: 0 1em;
+  border-inline-start: 0.25em solid #dddddf;
 }
 
 .quoteblock.excerpt,
 .quoteblock .quoteblock {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 .quoteblock.excerpt blockquote,
@@ -1393,8 +1401,8 @@ pre.rouge span.linenos {
 .quoteblock .quoteblock .attribution {
   color: inherit;
   font-size: 0.85rem;
-  text-align: left;
-  margin-right: 0;
+  text-align: start;
+  margin-inline-end: 0;
 }
 
 p.tableblock:last-child {
@@ -1452,12 +1460,12 @@ table.frame-sides > :last-child > :last-child > * {
 
 table.frame-none > * > tr > :first-child,
 table.frame-ends > * > tr > :first-child {
-  border-left-width: 0;
+  border-inline-start-width: 0;
 }
 
 table.frame-none > * > tr > :last-child,
 table.frame-ends > * > tr > :last-child {
-  border-right-width: 0;
+  border-inline-end-width: 0;
 }
 
 table.stripes-all > * > tr,
@@ -1469,12 +1477,12 @@ table.stripes-hover > * > tr:hover {
 
 th.halign-left,
 td.halign-left {
-  text-align: left;
+  text-align: start;
 }
 
 th.halign-right,
 td.halign-right {
-  text-align: right;
+  text-align: end;
 }
 
 th.halign-center,
@@ -1524,11 +1532,11 @@ p.tableblock {
 }
 
 ol {
-  margin-left: 1.75em;
+  margin-inline-start: 1.75em;
 }
 
 ul li ol {
-  margin-left: 1.5em;
+  margin-inline-start: 1.5em;
 }
 
 dl dd:last-child,
@@ -1560,12 +1568,12 @@ ol.unstyled {
 ul.no-bullet,
 ol.no-bullet,
 ol.unnumbered {
-  margin-left: 0.625em;
+  margin-inline-start: 0.625em;
 }
 
 ul.unstyled,
 ol.unstyled {
-  margin-left: 0;
+  margin-inline-start: 0;
 }
 
 li > p:empty:only-child::before {
@@ -1574,7 +1582,7 @@ li > p:empty:only-child::before {
 }
 
 ul.checklist > li > p:first-child {
-  margin-left: -1em;
+  margin-inline-start: -1em;
 }
 
 ul.checklist > li > p:first-child > .fa-square-o:first-child,
@@ -1587,7 +1595,8 @@ ul.checklist > li > p:first-child > .fa-check-square-o:first-child {
 
 ul.checklist > li > p:first-child > input[type=checkbox]:first-child {
   font: inherit;
-  margin: 0 0.25em 0 0;
+  margin-block: 0;
+  margin-inline: 0.25em 0;
   padding: 0;
 }
 
@@ -1595,11 +1604,12 @@ ul.inline {
   display: flex;
   flex-flow: row wrap;
   list-style: none;
-  margin: 0 0 0.625em -1.25em;
+  margin-block: 0 0.625em;
+  margin-inline: 0 -1.25em;
 }
 
 ul.inline > li {
-  margin-left: 1.25em;
+  margin-inline-start: 1.25em;
 }
 
 .unstyled dl dt {
@@ -1667,7 +1677,8 @@ td.hdlist2 {
 }
 
 .colist td:not([class]):first-child {
-  padding: 0.4em 0.75em 0;
+  padding-block: 0.4em 0;
+  padding-inline: 0.75em;
   line-height: 1;
   vertical-align: top;
 }
@@ -1689,11 +1700,13 @@ td.hdlist2 {
 }
 
 .imageblock.left {
-  margin: 0.25em 0.625em 1.25em 0;
+  margin-block: 0.25em 1.25em;
+  margin-inline: 0.625em 0;
 }
 
 .imageblock.right {
-  margin: 0.25em 0 1.25em 0.625em;
+  margin-block: 0.25em 1.25em;
+  margin-inline: 0 0.625em;
 }
 
 .imageblock > .title {
@@ -1719,11 +1732,11 @@ td.hdlist2 {
 }
 
 .image.left {
-  margin-right: 0.625em;
+  margin-inline-end: 0.625em;
 }
 
 .image.right {
-  margin-left: 0.625em;
+  margin-inline-start: 0.625em;
 }
 
 a.image {
@@ -1762,22 +1775,22 @@ sup.footnoteref a:active,
 #footnotes hr {
   width: 20%;
   min-width: 6.25em;
-  margin: -0.25em 0 0.75em;
+  margin-block: -0.25em 0.75em;
   border-width: 1px 0 0;
 }
 
 #footnotes .footnote {
-  padding: 0 0.375em 0 0.225em;
+  padding-inline: 0.375em 0.225em;
   line-height: 1.3334;
   font-size: 0.875em;
-  margin-left: 1.2em;
+  margin-inline-start: 1.2em;
   margin-bottom: 0.2em;
 }
 
 #footnotes .footnote a:first-of-type {
   font-weight: bold;
   text-decoration: none;
-  margin-left: -1.05em;
+  margin-inline-start: -1.05em;
 }
 
 #footnotes .footnote:last-of-type {
@@ -2099,7 +2112,7 @@ p.tableblock {
     content: "(" attr(href) ")";
     display: inline-block;
     font-size: 0.875em;
-    padding-left: 0.25em;
+    padding-inline-start: 0.25em;
   }
 
   abbr[title] {
@@ -2160,7 +2173,7 @@ p.tableblock {
 
   body.book #header > h1:first-child {
     border: 0 !important;
-    margin: 2.5em 0 1em;
+    margin-block: 2.5em 1em;
   }
 
   body.book #header .details {
@@ -2170,7 +2183,7 @@ p.tableblock {
   }
 
   body.book #header .details span:first-child {
-    margin-left: 0 !important;
+    margin-inline-start: 0 !important;
   }
 
   body.book #header .details br {
@@ -2183,7 +2196,7 @@ p.tableblock {
 
   body.book #toc {
     border: 0 !important;
-    text-align: left !important;
+    text-align: start !important;
     padding: 0 !important;
     margin: 0 !important;
   }
