@@ -603,7 +603,7 @@ class Parser
               if blk_attrs
                 case blk_ctx
                 when :video
-                  posattrs = %w(poster width height)
+                  posattrs = %w(poster width height aspect-ratio)
                 when :audio
                   posattrs = []
                 else # :image
