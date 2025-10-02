@@ -1033,9 +1033,11 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(\n<div class="title">#{node.title}</div>) : ''
     width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attribute = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-		iframe_styles = []
-		iframe_styles << %(aspect-ratio:#{node.attr 'aspect-ratio'}) if node.attr? 'aspect-ratio'
-		iframe_style_attribute = iframe_styles.empty? ? "" : %(style="#{iframe_styles.join '; '};")
+		aspect_ratio_attribute = (node.attr? 'aspect-ratio') ? %(aspect-ratio:#{node.attr 'aspect-ratio'}) : ''
+		extra_styles = []
+		extra_styles << aspect_ratio_attribute if !aspect_ratio_attribute.empty?
+		extra_styles_attribute = extra_styles.empty? ? "" : %(style="#{extra_styles.join '; '};")
+
     case node.attr 'poster'
     when 'vimeo'
       unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
@@ -1050,7 +1052,7 @@ Your browser does not support the audio tag.
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=1) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} #{iframe_style_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{target}#{hash_param}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
+<iframe#{width_attribute}#{height_attribute} #{extra_styles_attribute} src="#{asset_uri_scheme}//player.vimeo.com/video/#{target}#{hash_param}#{autoplay_param}#{loop_param}#{muted_param}#{start_anchor}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)}></iframe>
 </div>
 </div>)
     when 'youtube'
@@ -1095,7 +1097,7 @@ Your browser does not support the audio tag.
 
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} #{iframe_style_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} #{extra_styles_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
 </div>
 </div>)
     when 'wistia'
@@ -1110,7 +1112,7 @@ Your browser does not support the audio tag.
       muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=true) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} #{iframe_style_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{end_video_behavior_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
+<iframe#{width_attribute}#{height_attribute} #{extra_styles_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{end_video_behavior_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
 </div>
 </div>)
     else
@@ -1121,7 +1123,7 @@ Your browser does not support the audio tag.
       time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{extra_styles_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
