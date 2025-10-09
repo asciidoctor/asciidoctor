@@ -32,9 +32,9 @@ group :docs do
 end
 
 group :lint do
-  gem 'rubocop', '~> 1.24.0', require: false
-  gem 'rubocop-minitest', '~> 0.17.0', require: false
-  gem 'rubocop-rake', '~> 0.6.0', require: false
+  gem 'rubocop', '~> 1.81.0', require: false
+  gem 'rubocop-minitest', '~> 0.38.0', require: false
+  gem 'rubocop-rake', '~> 0.7.0', require: false
 end
 
 group :coverage do

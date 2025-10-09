@@ -461,7 +461,7 @@ context 'Syntax Highlighter' do
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       # NOTE notice there's a newline before the closing </pre> tag
-      assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre>/, output)
+      assert_match %r/\n# <b class="conum">\(1\)<\/b>\n<\/pre>/, output
     end
 
     test 'should preserve space before callout on final line' do

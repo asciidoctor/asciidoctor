@@ -458,7 +458,7 @@ class Reader
       if lines_to_restore.respond_to? :reverse
         @lines.push(*lines_to_restore.reverse)
       else
-        lines_to_restore.reverse_each {|it| @lines.push it }
+        lines_to_restore.reverse_each {|l| @lines.push l }
       end
       nil
     end

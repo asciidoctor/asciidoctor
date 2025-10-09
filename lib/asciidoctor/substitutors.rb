@@ -385,7 +385,7 @@ module Substitutors
           if (items = $2)
             items = items.gsub ESC_R_SB, R_SB if items.include? R_SB
             if (delim = (items.include? '&gt;') ? '&gt;' : ((items.include? ',') ? ',' : nil))
-              submenus = items.split(delim).map {|it| it.strip }
+              submenus = items.split(delim).map {|item| item.strip }
               menuitem = submenus.pop
             else
               submenus, menuitem = [], items.rstrip
@@ -403,7 +403,7 @@ module Substitutors
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
-          menu, *submenus = $1.split('&gt;').map {|it| it.strip }
+          menu, *submenus = $1.split('&gt;').map {|item| item.strip }
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
         end
@@ -455,7 +455,7 @@ module Substitutors
               end
               attrs['terms'] = terms
               if (see_also = attrs['see-also'])
-                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
               end
             else
               attrs = { 'terms' => attrlist }
@@ -472,7 +472,7 @@ module Substitutors
           if (term = normalize_text $2, true, true).include? '='
             term = (attrs = (AttributeList.new term, self).parse)[1] || (attrs = nil) || term
             if attrs && (see_also = attrs['see-also'])
-              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
             end
           end
           (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
@@ -1006,7 +1006,7 @@ module Substitutors
     end
     # If the start attribute is defined, then the lines to highlight specified by the provided spec should be relative to the start value.
     unless (shift = start ? start - 1 : 0) == 0
-      lines = lines.map {|it| it - shift }
+      lines = lines.map {|l| l - shift }
     end
     lines.sort
   end
@@ -1541,7 +1541,7 @@ module Substitutors
       end
       values << accum.strip
     else
-      str.split(',').map {|it| it.strip }
+      str.split(',').map {|item| item.strip }
     end
   end
 end

@@ -3,7 +3,7 @@
 module Asciidoctor
   module Cli
     FS = ?/
-    RS = ?\\
+    RS = '\\'
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash

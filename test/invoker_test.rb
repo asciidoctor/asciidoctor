@@ -344,7 +344,7 @@ context 'Invoker' do
   test 'should show backtrace when --trace option is specified and program raises error', unless: (jruby? && windows?) do
     result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
     if jruby?
-      assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
+      assert_match(/LoadError: (?:no such file to load|cannot load such file) -- no-such-module\n *require at /, result)
     else
       assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
     end
@@ -891,7 +891,7 @@ context 'Invoker' do
       sample_filepath = fixture_path 'sample.adoc'
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
-      current_year = ::Time.now.strftime '%F'
+      current_year = Time.now.strftime '%F'
       assert (doc.attr 'localyear').to_i >= (current_year.to_i - 1)
     ensure
       if old_source_date_epoch
