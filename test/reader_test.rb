@@ -2790,7 +2790,7 @@ class ReaderTest < Minitest::Test
         assert_equal 'One ring to rule them all!', (lines * Asciidoctor::LF)
       end
 
-      test 'should warn if ifeval has target' do
+      test 'should log error if ifeval has target' do
         input = <<~'EOS'
         ifeval::target[1 == 1]
         content
@@ -2806,7 +2806,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should warn if ifeval has invalid expression' do
+      test 'should log error if ifeval has invalid expression' do
         input = <<~'EOS'
         ifeval::[1 | 2]
         content
@@ -2822,7 +2822,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should warn if ifeval is missing expression' do
+      test 'should log error if ifeval is missing expression' do
         input = <<~'EOS'
         ifeval::[]
         content
