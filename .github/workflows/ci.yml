@@ -28,15 +28,15 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         #os: [ubuntu-22.04, windows-latest]
-        ruby: [jruby-10.0.2, '2.7', '3.0', '3.3.4'] # use 3.3.4 to workaround time zone bug in 3.3.5
+        ruby: [jruby-10.0.2, '2.7', '3.0', '3.4']
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.3.4 on ubuntu-22.04 to mark as primary
+        # remove 3.4 on ubuntu-22.04 to mark as primary
         - os: ubuntu-22.04
-          ruby: '3.3.4'
+          ruby: '3.4'
         include:
         - os: ubuntu-22.04
           ruby: truffleruby-22.2.0
@@ -47,7 +47,7 @@ jobs:
         #  ruby: jruby-9.4.0.0
         #  pygments-version: ~
         - os: macos-latest
-          ruby: '3.3.4'
+          ruby: '3.4'
         - os: ubuntu-22.04
           ruby: '2.7'
           asciimath-version: '~> 1.0.0'
@@ -61,7 +61,7 @@ jobs:
           ruby: '2.7'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-22.04
-          ruby: '3.3.4'
+          ruby: '3.4'
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
@@ -145,7 +145,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3.4'
+        ruby-version: '3.4'
         bundler-cache: true
     - name: Build dependents
       env:
