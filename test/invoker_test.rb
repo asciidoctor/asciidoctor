@@ -843,7 +843,7 @@ context 'Invoker' do
   test 'should show timezone as UTC if system TZ is set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' UTC')
     assert localtime.end_with?(' UTC')
   end
@@ -851,7 +851,7 @@ context 'Invoker' do
   test 'should show timezone as offset if system TZ is not set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' -0500')
     assert localtime.end_with?(' -0500')
   end
