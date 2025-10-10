@@ -12,7 +12,10 @@ The sourcemap provides line and file information for all blocks in the parsed do
 Specifically, it provides information about the start of each block.
 The start of the block does not include any block metadata (block anchor and block attributes) above the block.
 
-The sourcemap only works for blocks.
+TIP: The sourcemap also tracks the start line of every preprocessor conditional directive so its position can be reported if the directive isn't closed.
+If the sourcemap isn't enabled, the location at the end of the document is used instead.
+
+The sourcemap only adds source location information to blocks.
 It does not track the source location for inline elements, such as formatted text or an inline image, or for attribute entries.
 
 The sourcemap information is available on the `source_location` property of the block.
