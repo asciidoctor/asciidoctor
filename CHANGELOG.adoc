@@ -21,6 +21,7 @@ This project utilizes semantic versioning.
 Improvements::
 
   * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4684)
+  * Log error if unterminated preprocessor conditional directive is detected (#3545)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
   * Change Brazilian Portuguese translation for toc-title
 
