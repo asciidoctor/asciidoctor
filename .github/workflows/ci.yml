@@ -130,7 +130,7 @@ jobs:
         ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
         bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
         bundle exec gem install --local --document rdoc,ri asciidoctor.gem
-        bundle exec gem uninstall -ax asciidoctor
+        gem uninstall -i $(bundle exec ruby -e 'print ENV[:GEM_HOME.to_s]') -ax asciidoctor
   build-dependents:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
