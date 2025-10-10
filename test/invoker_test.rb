@@ -810,7 +810,7 @@ context 'Invoker' do
       sample_filepath = fixture_path 'sample.adoc'
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
-      current_year = ::Time.now.strftime '%F'
+      current_year = Time.now.strftime '%F'
       assert (doc.attr 'localyear').to_i >= (current_year.to_i - 1)
     ensure
       if old_source_date_epoch
