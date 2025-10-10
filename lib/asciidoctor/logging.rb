@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require 'logger'
+proc do
+  old_verbose, $VERBOSE = $VERBOSE, nil
+  require 'logger' # suppress warning in Ruby 3.4 about loading logger from stdlib
+  $VERBOSE = old_verbose
+end.call
 
 module Asciidoctor
 class Logger < ::Logger
