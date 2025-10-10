@@ -1902,7 +1902,7 @@ class Parser
               implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
               implicit_author_metadata[%(middlename_#{name_idx})],
               implicit_author_metadata[%(lastname_#{name_idx})],
-            ].compact.map {|it| it.tr ' ', '_' }.join ' '
+            ].compact.map {|name| name.tr ' ', '_' }.join ' '
           end if sparse
           # process as names only
           author_metadata = process_authors authors, true, false
@@ -2073,7 +2073,7 @@ class Parser
           return true
         end
       elsif !normal || (next_line.start_with? '/')
-        if next_line == '//' # rubocop:disable Style/GuardClause
+        if next_line == '//'
           return true
         elsif normal && (uniform? next_line, '/', (ll = next_line.length))
           unless ll == 3

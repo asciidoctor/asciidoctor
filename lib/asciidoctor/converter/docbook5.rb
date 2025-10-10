@@ -749,7 +749,7 @@ class Converter::DocBook5Converter < Converter::Base
       return first_block if first_block.sectname == 'abstract'
       return unless first_block.sectname == 'preface' && (first_block = first_block.blocks[0])
     end
-    return first_block if first_block.style == 'abstract' && first_block.context == :open
+    first_block.style == 'abstract' && first_block.context == :open ? first_block : nil
   end
 
   def extract_abstract document, abstract

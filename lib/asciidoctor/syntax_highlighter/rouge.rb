@@ -103,6 +103,9 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
   module Styles
     include Loader
 
+    DEFAULT_STYLE = 'github'
+    BASE_SELECTOR = 'pre.rouge'
+
     def read_stylesheet style
       library_available? ? @@stylesheet_cache[style || DEFAULT_STYLE] : '/* Rouge CSS disabled because Rouge is not available. */'
     end
@@ -132,9 +135,6 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
       @@stylesheet_cache = cache.merge key => (stylesheet = ((::Rouge::Theme.find key).render scope: BASE_SELECTOR))
       stylesheet
     end
-
-    DEFAULT_STYLE = 'github'
-    BASE_SELECTOR = 'pre.rouge'
 
     private_constant :BASE_SELECTOR
   end

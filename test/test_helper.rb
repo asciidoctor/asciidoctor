@@ -131,17 +131,13 @@ class Minitest::Test
     results = xmlnodes_at_path type, path, content
 
     if count == true || count == false
-      if count == results
-        assert true
-      else
+      unless count == results
         flunk %(#{type_name} #{path} yielded #{results} rather than #{count} for:\n#{content})
       end
     elsif count && results.size != count
       flunk %(#{type_name} #{path} yielded #{results.size} elements rather than #{count} for:\n#{content})
     elsif count.nil? && results.empty?
       flunk %(#{type_name} #{path} not found in:\n#{content})
-    else
-      assert true
     end
   end
 
@@ -485,11 +481,11 @@ class Minitest::Test
     private
 
     def context_name name
-      %(Test#{(sanitize_name name).gsub(/(^| )(\w)/) { $2.upcase }}).to_sym
+      %(Test#{(sanitize_name name).gsub(/(^| )(\w)/) { $2.upcase }})
     end
 
     def test_name name
-      %(test_#{(sanitize_name name).gsub %r/\s+/, '_'}).to_sym
+      %(test_#{(sanitize_name name).gsub %r/\s+/, '_'})
     end
 
     def sanitize_name name

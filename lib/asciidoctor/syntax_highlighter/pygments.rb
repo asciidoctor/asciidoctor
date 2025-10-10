@@ -95,6 +95,11 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   module Styles
     include Loader
 
+    DEFAULT_STYLE = 'default'
+    BASE_SELECTOR = 'pre.pygments'
+    TOKEN_CLASS_PREFIX = 'tok-'
+    BaseStyleRx = /^#{BASE_SELECTOR.gsub '.', '\\.'} +\{([^}]+?)\}/
+
     def read_stylesheet style
       library_available? ? @@stylesheet_cache[style || DEFAULT_STYLE] || '/* Failed to load Pygments CSS. */' : '/* Pygments CSS disabled because Pygments is not available. */'
     end
@@ -126,11 +131,6 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
         stylesheet
       end
     end
-
-    DEFAULT_STYLE = 'default'
-    BASE_SELECTOR = 'pre.pygments'
-    TOKEN_CLASS_PREFIX = 'tok-'
-    BaseStyleRx = /^#{BASE_SELECTOR.gsub '.', '\\.'} +\{([^}]+?)\}/
 
     private_constant :BASE_SELECTOR, :TOKEN_CLASS_PREFIX, :BaseStyleRx
   end

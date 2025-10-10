@@ -186,7 +186,7 @@ module Asciidoctor
 
   # The user's home directory, as best we can determine it
   # IMPORTANT this rescue is required for running Asciidoctor on GitHub.com
-  USER_HOME = ::Dir.home rescue (::ENV['HOME'] || ::Dir.pwd)
+  USER_HOME = ::Dir.home rescue (::ENV['HOME'] || ::Dir.pwd) # rubocop:disable Style/EnvHome
 
   # The newline character used for output; stored in constant table as an optimization
   LF = ?\n
@@ -268,7 +268,7 @@ module Asciidoctor
 
   ADMONITION_STYLES = ::Set['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
 
-  ADMONITION_STYLE_HEADS = ::Set.new(ADMONITION_STYLES.map {|it| it.chr })
+  ADMONITION_STYLE_HEADS = ::Set.new(ADMONITION_STYLES.map {|s| s.chr })
 
   PARAGRAPH_STYLES = ::Set['comment', 'example', 'literal', 'listing', 'normal', 'open', 'pass', 'quote', 'sidebar', 'source', 'verse', 'abstract', 'partintro']
 

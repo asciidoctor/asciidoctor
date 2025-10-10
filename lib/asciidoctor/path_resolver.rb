@@ -387,7 +387,7 @@ class PathResolver
     end
 
     if target_segments.empty?
-      if start.nil_or_empty? # rubocop:disable Style/GuardClause
+      if start.nil_or_empty?
         return jail || @working_dir
       elsif root? start
         return expand_path start unless jail
