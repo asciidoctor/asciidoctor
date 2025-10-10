@@ -606,7 +606,7 @@ class PreprocessorReader < Reader
 
   # Public: Initialize the PreprocessorReader object
   def initialize document, data = nil, cursor = nil, opts = {}
-    @document = document
+    @sourcemap = (@document = document).sourcemap
     super data, cursor, opts
     if (default_include_depth = (document.attributes['max-include-depth'] || 64).to_i) > 0
       # track absolute max depth, current max depth for comparing to include stack size, and relative max depth for reporting
@@ -644,6 +644,11 @@ class PreprocessorReader < Reader
     if (line = super)
       line
     elsif @include_stack.empty?
+      end_cursor = nil
+      @conditional_stack.delete_if do |conditional|
+        logger.error message_with_context %(detected unterminated preprocessor conditional directive: #{conditional[:name]}::#{conditional[:target] || ''}[#{conditional[:expr] || ''}]), source_location: conditional[:source_location] || (end_cursor ||= cursor_at_prev_line)
+        true
+      end
       nil
     else
       pop_include
@@ -970,7 +975,7 @@ class PreprocessorReader < Reader
     # conditional inclusion block
     if name == 'ifeval'
       @skipping = true if skip
-      @conditional_stack << { name: name, expr: text, skip: skip, skipping: @skipping }
+      @conditional_stack << { name: name, expr: text, skip: skip, skipping: @skipping, source_location: @sourcemap ? cursor : nil }
     # single line conditional inclusion
     elsif text
       unless @skipping || skip
@@ -984,7 +989,7 @@ class PreprocessorReader < Reader
     # conditional inclusion block
     else
       @skipping = true if skip
-      @conditional_stack << { name: name, target: target, skip: skip, skipping: @skipping }
+      @conditional_stack << { name: name, target: target, skip: skip, skipping: @skipping, source_location: @sourcemap ? cursor : nil }
     end
 
     true
