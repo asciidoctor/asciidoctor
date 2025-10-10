@@ -485,7 +485,7 @@ module Extensions
   # to add content to the header.
   class DocinfoProcessor < Processor
     def initialize config = {}
-      super config
+      super
       @config[:location] ||= :head
     end
 
