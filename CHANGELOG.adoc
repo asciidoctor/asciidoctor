@@ -43,8 +43,8 @@ Compliance::
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
-  * Drop support for Ruby < 2.7 and JRuby < 9.2
-  * Update latest JRuby in CI workflow to 9.4.2.0
+  * Drop support for Ruby < 2.7 and JRuby < 9.4
+  * Update latest JRuby in CI workflow to 10.0.2.0
 
 Improvements::
 
