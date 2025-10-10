@@ -48,8 +48,8 @@ context 'Helpers' do
     end
 
     test 'UriSniffRx should not detect an absolute Windows path as a URI' do
-      assert Asciidoctor::UriSniffRx !~ 'c:/sample.adoc'
-      assert Asciidoctor::UriSniffRx !~ 'c:\\sample.adoc'
+      refute_match Asciidoctor::UriSniffRx, 'c:/sample.adoc'
+      refute_match Asciidoctor::UriSniffRx, 'c:\\sample.adoc'
     end
 
     test 'uriish? should not detect a classloader path as a URI on JRuby' do
@@ -63,7 +63,7 @@ context 'Helpers' do
     end
 
     test 'UriSniffRx should not detect URI that does not start on first line' do
-      assert Asciidoctor::UriSniffRx !~ %(text\nhttps://example.org)
+      refute_match Asciidoctor::UriSniffRx, %(text\nhttps://example.org)
     end
   end
 
