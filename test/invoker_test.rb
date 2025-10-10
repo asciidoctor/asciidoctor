@@ -193,6 +193,12 @@ context 'Invoker' do
     assert_match(/WARNING/, warnings)
   end
 
+  test 'should not emit any unexpected warnings' do
+    input_path = fixture_path 'basic.adoc'
+    output = run_command(asciidoctor_cmd, '-o', '/dev/null', '-w', input_path) {|out| out.read }
+    assert_empty output
+  end
+
   test 'should enable script warnings if -w flag is specified' do
     old_verbose, $VERBOSE = $VERBOSE, false
     begin
