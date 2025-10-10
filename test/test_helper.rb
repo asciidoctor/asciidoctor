@@ -138,17 +138,13 @@ class Minitest::Test
     results = xmlnodes_at_path type, path, content
 
     if count == true || count == false
-      if count == results
-        assert true
-      else
+      unless count == results
         flunk %(#{type_name} #{path} yielded #{results} rather than #{count} for:\n#{content})
       end
     elsif count && results.size != count
       flunk %(#{type_name} #{path} yielded #{results.size} elements rather than #{count} for:\n#{content})
     elsif count.nil? && results.empty?
       flunk %(#{type_name} #{path} not found in:\n#{content})
-    else
-      assert true
     end
   end
 
