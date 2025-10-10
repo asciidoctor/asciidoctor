@@ -673,8 +673,8 @@ context 'API' do
       EOS
 
       doc = Asciidoctor.load input
-      result = doc.find_by context: :list_item do |it|
-        it.text == 'yin' ? :prune : false
+      result = doc.find_by context: :list_item do |li|
+        li.text == 'yin' ? :prune : false
       end
       assert_equal 1, result.size
       assert_equal 'yin', result[0].text

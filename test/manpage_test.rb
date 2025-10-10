@@ -365,7 +365,7 @@ context 'Manpage' do
       EOS
 
       output = Asciidoctor.convert input, backend: :manpage
-      expects = <<~'EOS'.lines.map {|it| (' ' * it.chr.to_i) + (it.slice 1, it.length) }.join
+      expects = <<~'EOS'.lines.map {|l| (' ' * l.chr.to_i) + (l.slice 1, l.length) }.join
       0.fam C
       2,\-\-\-.\&          ,\-\-\-\-\-.
       2|Bob|\&          |Alice|
@@ -958,7 +958,7 @@ context 'Manpage' do
   context 'Verse Block' do
     test 'should preserve hard line breaks in verse block' do
       input = SAMPLE_MANPAGE_HEADER.lines
-      synopsis_idx = input.find_index {|it| it == %(== SYNOPSIS\n) } + 2
+      synopsis_idx = input.find_index {|l| l == %(== SYNOPSIS\n) } + 2
       input[synopsis_idx..synopsis_idx] = <<~'EOS'.lines
       [verse]
       _command_ [_OPTION_]... _FILE_...

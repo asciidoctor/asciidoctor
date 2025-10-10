@@ -1898,7 +1898,7 @@ class Parser
               implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
               implicit_author_metadata[%(middlename_#{name_idx})],
               implicit_author_metadata[%(lastname_#{name_idx})]
-            ].compact.map {|it| it.tr ' ', '_' }.join ' '
+            ].compact.map {|name| name.tr ' ', '_' }.join ' '
           end if sparse
           # process as names only
           author_metadata = process_authors authors, true, false

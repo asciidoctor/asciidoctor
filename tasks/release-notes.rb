@@ -15,10 +15,10 @@ release_user = ENV['RELEASE_USER'] || 'mojavelinux'
 release_beer = ENV['RELEASE_BEER'] || 'TBD'
 release_tag = %(v#{gem_version})
 previous_tag = (`git -c versionsort.suffix=. -c versionsort.suffix=- ls-remote --tags --refs --sort -v:refname origin`.each_line chomp: true)
-  .map {|it| (it.rpartition '/')[-1] }
-  .drop_while {|it| it != release_tag }
-  .reject {|it| it == release_tag }
-  .find {|it| (Gem::Version.new it.slice 1, it.length) < gem_version }
+  .map {|l| (l.rpartition '/')[-1] }
+  .drop_while {|l| l != release_tag }
+  .reject {|l| l == release_tag }
+  .find {|l| (Gem::Version.new l.slice 1, l.length) < gem_version }
 issues_url = spec.metadata['bug_tracker_uri']
 repo_url = spec.metadata['source_code_uri']
 changelog = (File.readlines 'CHANGELOG.adoc', chomp: true, mode: 'r:UTF-8').reduce nil do |accum, line|

@@ -59,7 +59,7 @@ class Callouts
   #
   # Returns A space-separated String of callout ids associated with the specified list item
   def callout_ids li_ordinal
-    current_list.map {|it| it[:ordinal] == li_ordinal ? %(#{it[:id]} ) : '' }.join.chop
+    current_list.map {|item| item[:ordinal] == li_ordinal ? %(#{item[:id]} ) : '' }.join.chop
   end
 
   # Public: The current list for which callouts are being collected
