@@ -16,6 +16,11 @@ class Logger < ::Logger
     opts[:level] = WARN unless opts.key? :level
     args = [$stderr] if args.empty?
     super
+    if @progname.nil? && (method __method__).super_method.parameters.size == 3
+      @progname = opts[:progname]
+      @formatter = opts[:formatter]
+      @level = opts[:level]
+    end
   end
 
   def add severity, message = nil, progname = nil
