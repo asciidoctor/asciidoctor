@@ -5,7 +5,6 @@ begin
   Cucumber::Rake::Task.new :features do |t|
     t.cucumber_opts = %w(-f progress --publish-quiet)
     t.cucumber_opts << '--no-color' if ENV['CI']
-    t.fork = false
   end
 rescue LoadError
   warn $!.message
