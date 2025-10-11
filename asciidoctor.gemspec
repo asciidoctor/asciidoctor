@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'concurrent-ruby', '~> 1.3.0'
   s.add_development_dependency 'cucumber', '~> 9.2.0'
   # erubi is needed for testing alternate eRuby impls
-  s.add_development_dependency 'erubi', '~> 1.10.0'
+  s.add_development_dependency 'erubi', '~> 1.13.0'
   s.add_development_dependency 'haml', '~> 6.3.0'
   s.add_development_dependency 'minitest', '~> 5.26.0'
   s.add_development_dependency 'nokogiri', '~> 1.14.0'
