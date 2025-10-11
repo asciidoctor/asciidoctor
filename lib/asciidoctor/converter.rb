@@ -391,8 +391,8 @@ module Converter
     def convert node, transform = node.node_name, opts = nil
       opts ? (send 'convert_' + transform, node, opts) : (send 'convert_' + transform, node)
     rescue
-      raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == transform
-      logger.warn %(missing convert handler for #{ex.name} node in #{@backend} backend (#{self.class}))
+      raise unless ::NoMethodError === (ex = $!) && ex.receiver == self && ex.name.to_s == 'convert_' + transform
+      logger.warn %(missing convert handler for #{transform} node in #{@backend} backend (#{self.class}))
       nil
     end
 
