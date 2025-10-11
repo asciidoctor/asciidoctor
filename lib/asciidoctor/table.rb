@@ -84,7 +84,7 @@ class Table < AbstractBlock
   # Internal: Returns the current state of the header option (true or :implicit) if
   # the row being processed is (or is assumed to be) the header row, otherwise nil
   def header_row?
-    (val = @has_header_option) && @rows.body.empty? ? val : nil
+    (val = @has_header_option) && @rows.body.empty? ? val : false
   end
 
   # Internal: Creates the Column objects from the column spec

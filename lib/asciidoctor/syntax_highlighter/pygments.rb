@@ -95,6 +95,11 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   module Styles
     include Loader
 
+    DEFAULT_STYLE = 'default'
+    BASE_SELECTOR = 'pre.pygments'
+    TOKEN_CLASS_PREFIX = 'tok-'
+    BaseStyleRx = /^#{BASE_SELECTOR.gsub '.', '\\.'} +\{([^}]+?)\}/
+
     def read_stylesheet style
       library_available? ? @@stylesheet_cache[style || DEFAULT_STYLE] || '/* Failed to load Pygments CSS. */' : '/* Pygments CSS disabled because Pygments is not available. */'
     end
@@ -127,11 +132,6 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
       end
     end
 
-    DEFAULT_STYLE = 'default'
-    BASE_SELECTOR = 'pre.pygments'
-    TOKEN_CLASS_PREFIX = 'tok-'
-    BaseStyleRx = /^#{BASE_SELECTOR.gsub '.', '\\.'} +\{([^}]+?)\}/
-
     private_constant :BASE_SELECTOR, :TOKEN_CLASS_PREFIX, :BaseStyleRx
   end
 
@@ -146,7 +146,7 @@ class SyntaxHighlighter::PygmentsAdapter < SyntaxHighlighter::Base
   LinenoSpanTagCs = '<span class="linenos">\1</span>'
   PreTagCs = '<pre>\1</pre>'
   StyledLinenoColumnStartTagsRx = /<td><div class="linenodiv" style="[^"]+?"><pre style="[^"]+?">/
-  StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>) # rubocop:disable Lint/MixedRegexpCaptureTypes
+  StyledLinenoSpanTagRx = %r((?<=^|<span></span>)<span style="[^"]+">( *\d+) ?</span>)
   WRAPPER_CLASS = 'lineno' # doesn't appear in output; Pygments appends "table" to this value to make nested table class
   # NOTE <pre> has style attribute when pygments-css=style
   # NOTE <div> has trailing newline when pygments-linenums-mode=table

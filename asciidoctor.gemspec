@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
     'mailing_list_uri' => 'https://chat.asciidoctor.org',
-    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
+    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor',
+    'funding_uri' => 'https://opencollective.com/asciidoctor'
   }
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
@@ -38,10 +39,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'cucumber', '~> 3.1.0'
   # erubi is needed for testing alternate eRuby impls
   s.add_development_dependency 'erubi', '~> 1.10.0'
-  s.add_development_dependency 'haml', '~> 6.1.0', '!= 6.1.2'
-  s.add_development_dependency 'minitest', '~> 5.22.0'
+  s.add_development_dependency 'haml', '~> 6.3.0'
+  s.add_development_dependency 'minitest', '~> 5.26.0'
   s.add_development_dependency 'nokogiri', '~> 1.14.0'
-  s.add_development_dependency 'rake', '~> 12.3.0'
+  s.add_development_dependency 'rake', '~> 13.3.0'
   s.add_development_dependency 'slim', '~> 5.2.1'
   s.add_development_dependency 'tilt', '~> 2.1.0'
+
 end

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require 'logger'
+proc do
+  old_verbose, $VERBOSE = $VERBOSE, nil
+  require 'logger' # suppress warning in Ruby 3.4 about loading logger from stdlib
+  $VERBOSE = old_verbose
+end.call
 
 module Asciidoctor
 class Logger < ::Logger
@@ -37,7 +41,7 @@ class Logger < ::Logger
 end
 
 class MemoryLogger < ::Logger
-  SEVERITY_SYMBOL_BY_VALUE = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h
+  SEVERITY_SYMBOL_BY_VALUE = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h # rubocop:disable Style/MapToHash
 
   attr_reader :messages
 
@@ -100,8 +104,8 @@ module LoggerManager
 
     def memoize_logger
       class << self
-        alias logger logger # suppresses warning from CRuby # rubocop:disable Style/Alias
-        attr_reader :logger # rubocop:disable Lint/DuplicateMethods
+        alias logger logger # suppresses warning from CRuby
+        attr_reader :logger
       end
     end
   end

@@ -194,6 +194,12 @@ context 'Invoker' do
     assert_match(/WARNING/, warnings)
   end
 
+  test 'should not emit any unexpected warnings' do
+    input_path = fixture_path 'basic.adoc'
+    output = run_command(asciidoctor_cmd, '-o', '/dev/null', '-w', input_path) {|out| out.read }
+    assert_empty output
+  end
+
   test 'should change level on logger when --log-level is specified' do
     input = <<~'EOS'
     skip to <<install>>
@@ -338,7 +344,7 @@ context 'Invoker' do
   test 'should show backtrace when --trace option is specified and program raises error', unless: (jruby? && windows?) do
     result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
     if jruby?
-      assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
+      assert_match(/LoadError: (?:no such file to load|cannot load such file) -- no-such-module\n *require at /, result)
     else
       assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
     end
@@ -843,7 +849,7 @@ context 'Invoker' do
   test 'should show timezone as UTC if system TZ is set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' UTC')
     assert localtime.end_with?(' UTC')
   end
@@ -851,7 +857,7 @@ context 'Invoker' do
   test 'should show timezone as offset if system TZ is not set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' -0500')
     assert localtime.end_with?(' -0500')
   end
@@ -885,7 +891,7 @@ context 'Invoker' do
       sample_filepath = fixture_path 'sample.adoc'
       invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
       doc = invoker.document
-      current_year = ::Time.now.strftime '%F'
+      current_year = Time.now.strftime '%F'
       assert (doc.attr 'localyear').to_i >= (current_year.to_i - 1)
     ensure
       if old_source_date_epoch

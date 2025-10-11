@@ -498,7 +498,7 @@ module Extensions
   # to add content to the header.
   class DocinfoProcessor < Processor
     def initialize config = {}
-      super config
+      super
       @config[:location] ||= :head
     end
 
@@ -1330,7 +1330,7 @@ module Extensions
     # of this processor.
     def prefer *args, &block
       extension = ProcessorExtension === (arg0 = args.shift) ? arg0 : (send arg0, *args, &block)
-      extensions_store = instance_variable_get %(@#{extension.kind}_extensions).to_sym
+      extensions_store = instance_variable_get %(@#{extension.kind}_extensions)
       extensions_store.unshift extensions_store.delete extension
       extension
     end
@@ -1339,10 +1339,10 @@ module Extensions
 
     def add_document_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = kind_name.split.map {|it| it.capitalize }.join.to_sym
+      kind_class_symbol = kind_name.split.map {|segment| segment.capitalize }.join.to_sym
       kind_class = Extensions.const_get kind_class_symbol, false
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
-      kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
+      kind_store = (instance_variable_get %(@#{kind}_extensions)) || (instance_variable_set %(@#{kind}_extensions), [])
       # style 1: specified as block
       if block_given?
         config = resolve_args args, 1
@@ -1383,10 +1383,10 @@ module Extensions
 
     def add_syntax_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = (kind_name.split.map {|it| it.capitalize } << 'Processor').join.to_sym
+      kind_class_symbol = (kind_name.split.map {|segment| segment.capitalize } << 'Processor').join.to_sym
       kind_class = Extensions.const_get kind_class_symbol, false
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
-      kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, {})
+      kind_store = (instance_variable_get %(@#{kind}_extensions)) || (instance_variable_set %(@#{kind}_extensions), {})
       # style 1: specified as block
       if block_given?
         name, config = resolve_args args, 2

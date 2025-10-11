@@ -497,7 +497,7 @@ context 'Links' do
   end
 
   test 'does not match bibliography anchor in prose when scanning for inline anchor' do
-    doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry.'
+    doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry, but not in a paragraph.'
     refute doc.catalog[:refs].key? 'label'
   end
 

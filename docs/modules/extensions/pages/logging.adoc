@@ -182,7 +182,7 @@ Here's an example of what Asciidoctor will print:
 asciidoctor (custom-block-extension): WARNING: test.adoc: line 4: Something is out of sorts.
 ....
 
-In a tree processor extension, you can get the source location from any block if the sourcemap is enabled.
+In a tree processor extension, you can get the source location of any block from its `source_location` property if the sourcemap is enabled.
 If it's not enabled, the code will degrade gracefully by logging the message without the source location.
 
 [,ruby]

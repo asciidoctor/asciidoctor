@@ -92,6 +92,10 @@ To generate a man page, run:
 
  $ asciidoctor -b manpage progname.adoc
 
+The `-b` CLI option is shorthand for `--backend`, and thus the previous command can be written as follows:
+
+ $ asciidoctor --backend manpage progname.adoc
+
 You can then view the resulting man page using the `man` command:
 
  $ man ./progname.1

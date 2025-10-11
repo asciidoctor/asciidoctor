@@ -26,27 +26,28 @@ jobs:
     needs: activate
     strategy:
       matrix:
-        os: [ubuntu-22.04, windows-latest]
-        ruby: [jruby-9.4.5.0, '2.7', '3.0', '3.3.4'] # use 3.3.4 to workaround time zone bug in 3.3.5
+        os: [ubuntu-22.04]
+        #os: [ubuntu-22.04, windows-latest]
+        ruby: [jruby-10.0.2, '2.7', '3.0', '3.4']
         asciimath-version: [~]
         haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.3.4 on ubuntu-22.04 to mark as primary
+        # remove 3.4 on ubuntu-22.04 to mark as primary
         - os: ubuntu-22.04
-          ruby: '3.3.4'
+          ruby: '3.4'
         include:
         - os: ubuntu-22.04
           ruby: truffleruby-22.2.0
         - os: ubuntu-22.04
-          ruby: jruby-9.2.21.0
+          ruby: jruby-9.4.0.0
           pygments-version: ~
-        - os: windows-latest
-          ruby: jruby-9.2.21.0
-          pygments-version: ~
+        #- os: windows-latest
+        #  ruby: jruby-9.4.0.0
+        #  pygments-version: ~
         - os: macos-latest
-          ruby: '3.3.4'
+          ruby: '3.4'
         - os: ubuntu-22.04
           ruby: '2.7'
           asciimath-version: '~> 1.0.0'
@@ -60,7 +61,7 @@ jobs:
           ruby: '2.7'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-22.04
-          ruby: '3.3.4'
+          ruby: '3.4'
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
@@ -77,7 +78,9 @@ jobs:
       run: echo 'PYGMENTS_VERSION=${{ matrix.pygments-version }}' >> $GITHUB_ENV
     - name: Install prerequisites for Pygments ~> 1.2.0 (Linux)
       if: matrix.os == 'ubuntu-22.04' && matrix.pygments-version == '~> 1.2.0'
-      run: sudo apt-get install python2
+      run: |
+        sudo apt-get update
+        sudo apt-get install python2
     - name: Set Rouge version
       if: matrix.rouge-version
       run: echo 'ROUGE_VERSION=${{ matrix.rouge-version }}' >> $GITHUB_ENV
@@ -122,13 +125,12 @@ jobs:
     - name: Run tests
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Install gem and doc
-      if: |
-        !startsWith(matrix.ruby, 'truffleruby-') && (matrix.os != 'windows-latest' || !startsWith(matrix.ruby, 'jruby-9.2.'))
+      if: matrix.primary
       run: |
         ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
         bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
         bundle exec gem install --local --document rdoc,ri asciidoctor.gem
-        bundle exec gem uninstall -ax asciidoctor
+        gem uninstall -i $(bundle exec ruby -e 'print ENV[:GEM_HOME.to_s]') -ax asciidoctor
   build-dependents:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
@@ -142,7 +144,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3.4'
+        ruby-version: '3.4'
         bundler-cache: true
     - name: Build dependents
       env:

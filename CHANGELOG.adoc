@@ -43,11 +43,12 @@ Compliance::
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
-  * Drop support for Ruby < 2.7 and JRuby < 9.2
-  * Update latest JRuby in CI workflow to 9.4.2.0
+  * Drop support for Ruby < 2.7 and JRuby < 9.4
+  * Update latest JRuby in CI workflow to 10.0.2.0
 
 Improvements::
 
+  * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4769)
   * Use width attribute to set table and column width instead of inline style (#4160)
   * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
   * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
@@ -65,7 +66,9 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+  * Log error if unterminated preprocessor conditional directive is detected (#3545)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
+  * Change Brazilian Portuguese translation for toc-title
 
 Bug Fixes::
 

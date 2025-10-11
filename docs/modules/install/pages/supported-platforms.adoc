@@ -19,7 +19,7 @@ Asciidoctor requires one of the following implementations of {url-ruby}[Ruby^].
 |{ge} 2.7
 
 |JRuby
-|{ge} 9.2
+|{ge} 9.4
 
 |TruffleRuby
 |{ge} 22.2

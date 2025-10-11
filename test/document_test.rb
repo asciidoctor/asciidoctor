@@ -408,7 +408,6 @@ context 'Document' do
 
     test 'convert methods on built-in converter are registered when backend is docbook5' do
       doc = document_from_string '', attributes: { 'backend' => 'docbook5' }
-      converter = doc.converter
       assert_equal 'docbook5', doc.attributes['backend']
       assert doc.attributes.key? 'backend-docbook5'
       assert_equal 'docbook', doc.attributes['basebackend']

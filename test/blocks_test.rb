@@ -1070,6 +1070,29 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
+
+    test 'should generate appropriate tag based on admonition type in DocBook output' do
+      input = <<~'EOS'
+      NOTE: Remember the oat milk.
+
+      IMPORTANT: Don't forget the children!
+
+      [caption=Pro Tip]
+      TIP: Look for the warp under the bridge.
+
+      CAUTION: Slippery when wet.
+
+      WARNING: The software you're about to use has *not* been tested.
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      %w(note important tip caution warning).each do |type|
+        assert_css type, output, 1
+        assert_css %(#{type} > simpara), output, 1
+      end
+      assert_xpath '/tip/simpara[text()="Look for the warp under the bridge."]', output, 1
+      refute_includes output, 'Pro Tip'
+    end
   end
 
   context 'Preformatted Blocks' do
