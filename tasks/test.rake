@@ -5,7 +5,13 @@ def prepare_test_env
   # could use https://gist.github.com/benders/788695
   ENV['RUBY_GC_MALLOC_LIMIT'] = 128_000_000.to_s
   ENV['RUBY_GC_OLDMALLOC_LIMIT'] = 128_000_000.to_s
-  ENV['RUBY_GC_HEAP_INIT_SLOTS'] = 750_000.to_s
+  if RUBY_VERSION >= '3.4.0'
+    (0..4).each do |slot|
+      ENV[%(RUBY_GC_HEAP_#{slot}_INIT_SLOTS)] = 750_000.to_s
+    end
+  else
+    ENV['RUBY_GC_HEAP_INIT_SLOTS'] = 750_000.to_s
+  end
   ENV['RUBY_GC_HEAP_FREE_SLOTS'] = 750_000.to_s
   ENV['RUBY_GC_HEAP_GROWTH_MAX_SLOTS'] = 50_000.to_s
   ENV['RUBY_GC_HEAP_GROWTH_FACTOR'] = 2.to_s
