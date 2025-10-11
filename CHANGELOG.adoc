@@ -27,6 +27,7 @@ Improvements::
 
 Bug Fixes::
 
+  * Consider `convert_` prefix when looking for missing convert method in converter (#4669) (*@eugoka*)
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
   * Only style code tag as block element when inside pre in listing block; not inside verse block (#4610)
   * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)

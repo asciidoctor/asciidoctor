@@ -398,6 +398,22 @@ context 'Converter' do
       assert_equal 'document', doc.convert
     end
 
+    test 'should warn when convert method for node is missing' do
+      class CustomConverterWithMissingHandlers < Asciidoctor::Converter::Base
+        register_for :fizzbuzz
+      end
+
+      doc = document_from_string 'word', backend: 'fizzbuzz'
+      assert_respond_to doc, 'convert'
+      assert_raises NoMethodError do
+        doc.convert_document
+      end
+      using_memory_logger do |logger|
+        assert_nil doc.convert
+        assert_message logger, :WARN, '~missing convert handler for document node in fizzbuzz backend (CustomConverterWithMissingHandlers)'
+      end
+    end
+
     test 'should get converter from specified converter factory' do
       input = <<~'EOS'
       = Document Title
