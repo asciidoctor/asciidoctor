@@ -126,8 +126,10 @@ Extensions can introduce additional contexts.
 |convert_video
 |===
 
-The converter is not called to handle nodes with the `:list_item` or `:table_cell` contexts.
+IMPORTANT: The converter is not called to handle nodes with the `:list_item` or `:table_cell` contexts.
 Instead, it's up to the converter to access these nodes from the parent node and convert them directly.
+The reason for this is because list items and table cells are not true blocks, they have a compound structure, and information or markup from the parent is often required in order to convert them properly.
+Refer to the built-in converters to learn how to handle them.
 
 When a method to convert a block is called, the inline markup has not yet been parsed.
 That parsing and subsequent conversion happens when the `#content` method is called on the node.
