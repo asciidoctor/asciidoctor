@@ -198,23 +198,11 @@ Now that you've successfully extended and replaced a registered converter, let's
 == Create and register a new converter
 
 Instead of modifying the behavior of a built-in converter, you can create a converter from scratch for a new or existing backend.
-Let's create a new converter that converts (some) AsciiDoc to DITA.
-Here's the AsciiDoc sample we're aiming to convert.
+Let's create a new converter that's mapped to to the `dita` backend that converts (some) AsciiDoc to DITA.
 
-[,asciidoc]
-----
-= Document Title
-
-== Section Title
-
-This is the *main* content.
-----
-
-Once again, you'll begin by creating a Ruby source file, this time naming it [.path]_dita-converter.rb_.
+You'll begin by creating a Ruby source file, this time naming it [.path]_dita-converter.rb_.
 We'll start by mixing in the {apidoc-converter}[`Asciidoctor::Converter`] module, which turns the class into a converter class.
-You'll quickly learn, however, that this is tedious and that extending the base converter is an easier route.
-
-Let's set up our converter and map it to the backend named `dita`.
+(You'll quickly learn that this is a tedious approach and that extending the base converter is an easier route.)
 
 [,ruby]
 ----
@@ -225,7 +213,8 @@ end
 ----
 
 By default, a converter will assume it produces a file with the `.html` extension.
-Since we intend to create a DITA file, we'll need to call the `outfilesuffix` in the constructor to change that to `.dita`.
+Since we intend to create a DITA file, we'll need to call the `outfilesuffix` in the constructor to change the suffix to `.dita`.
+Let's apply that update.
 
 [,ruby]
 ----
@@ -240,8 +229,55 @@ class DitaConverter
 end
 ----
 
-Now let's implement the required `convert` method so the converter can start receiving the nodes to convert.
-We'll only process the main structural nodes to start, then pass through the raw output for the remaining nodes (to finish later).
+Before continuing, we need to back up and talk about how nodes are converted by a converter.
+
+== How conversion is carried out 
+
+When conversion begins, Asciidoctor passes the document node to a method named `convert`.
+That method is expected to start and carry out the conversion process.
+Thus, it's the converter than controls the traversal of the document tree, not the processor.
+
+One approach is to use a gigantic switch statement for each convertible context and handle all the conversion logic directly inside the `convert` method.
+However, that approach quickly becomes unwieldy.
+
+A more typical approach is to iterate over a node's children and pass each child to a method prefixed with the `convert_` that matches that node's context as a string (e.g., `convert_section`).
+The convert method joins the return values from these calls using newlines and returns the result, which becomes the result of the conversion process.
+This happens to be the implementation that the {apidoc-converter-base}[`Asciidoctor::Converter::Base`] class provides.
+
+When then happens in each of these named convert methods?
+Are they expected to iterate over the children too and call the appropriately named convert method?
+They certainly could, but there's a simpler approach.
+
+The `content` method on a block automatically visits each child node in document order, passes the child to the `convert` method to be converted (thus calling the converter again), and returns the results joined using newlines.
+For blocks that only have inlines as children, this method also effectively invokes the convert method for all inline nodes (even though inlines are technically substituted in place rather than being arranged in a tree).
+
+Thus, when converting a block element, the converter should invoke the `content` method on the node (e.g., `node.content`).
+This method call is what continues the document traversal from that node and returns the converted result from its subtree.
+If you don't call this method--and don't otherwise handle the children--the child nodes will be skipped.
+
+There are two exceptions to when the `content` method can be used in this way, lists and tables.
+Lists and tables do not provide a (functioning) `content` method.
+That's because the children of lists and tables aren't true blocks, but rather complex structures.
+Therefore, the converter must handle its own traversal of the direct children of these blocks.
+Refer to the built-in converters to learn how to handle them.
+
+== Convert to DITA
+
+With what we've learned, let's continue with our AsciiDoc to DITA converter.
+Here's the AsciiDoc sample we're aiming to convert.
+
+[,asciidoc]
+----
+= Document Title
+
+== Section Title
+
+This is the *main* content.
+----
+
+Now let's implement the required `convert` method using the switch statement approach mentioned earlier.
+Once this method is implemented, the converter can start receiving the nodes to convert.
+We'll only process the main structural nodes to start, then pass through the raw output for the remaining nodes (to finish later on).
 
 [,ruby]
 ----
@@ -285,27 +321,23 @@ end
 <2> The `transform` parameter is only set in special cases, such as for an embedded document.
 <3> Calling `node.content` on a block continues the traversal of the document structure from that node.
 
-IMPORTANT: The `#content` method controls whether a block is traversed, not the processor.
-Thus, when converting a block element, the converter should invoke the `#content` method on the node (e.g., `node.content`).
-This method call is what continues the document traversal from that node and returns the converted subtree.
-When the method is called, Asciidoctor visits each child node in document order and passes it to the `convert` method of the converter to be converted.
-The return values are then joined.
-If you don't call this method, the child nodes will be skipped.
-
 As you can see, having to write a switch statement to handle each type of node is more clumsy than the discrete methods we were writing when extending a built-in converter.
-If we change the definition of our converter class to extend {apidoc-converter-base}[`Asciidoctor::Converter::Base`], Asciidoctor will handle this dispatching for us.
-One noticeable difference is that we now either have to provide a handler for every xref:contexts-ref.adoc[convertible context], or implement a `method_missing` method as a catch all.
+As discussed earlier, we can use method dispatching instead.
 Here's how that looks:
 
-.dita-converter.rb
 [,ruby]
 ----
-class DitaConverter < Asciidoctor::Converter::Base
+class DitaConverter
+  include Asciidoctor::Converter
   register_for 'dita'
 
   def initialize *args
     super
     outfilesuffix '.dita'
+  end
+
+  def convert node, transform = node.node_name, opts = nil
+    opts ? (send 'convert_' + transform, node, opts) : (send 'convert_' + transform, node)
   end
 
   def convert_document node
@@ -320,24 +352,24 @@ class DitaConverter < Asciidoctor::Converter::Base
     EOS
   end
 
-  def convert_section node
-    <<~EOS.chomp
-    <section id="#{node.id}">
-    <title>#{node.title}</title>
-    #{node.content}
-    </section>
-    EOS
-  end
-
-  def convert_paragraph node
-    %(<p>#{node.content}</p>)
-  end
-
-  def convert_inline_quoted node
-    node.type == :strong ? %(<b>#{node.text}</b>) : node.text
-  end
+  # ...
 end
 ----
+
+But hold on.
+The dispatching in the `convert` method is precisely the functionality {apidoc-converter-base}[`Asciidoctor::Converter::Base`] provides when used as the converter's base class.
+Furthermore, any time it encounters a node without a corresponding convert method, it will log a warning.
+
+Let's change the definition of our converter to extend this base class.
+The main difference is that now we just have to implement a convert method for each xref:contexts-ref.adoc[convertible context], prefixed with `convert_`.
+
+.dita-converter.rb
+[,ruby]
+----
+include::example$dita-converter.rb[]
+----
+
+CAUTION: This converter is only provided for illustrative purposes and must be further developed to be fully functional.
 
 You can now use this converter to convert the sample AsciiDoc document to DITA.
 To do so, pass the converter to the `-r` CLI option and set the backend to `dita` using the `b` CLI option.
@@ -378,33 +410,23 @@ To write a fully-functional converter, you'll need to provide a convert method f
 
 == Convert to text only
 
-You may want to extract the text from an AsciiDoc document without any markup.
+You may want to extract the text from an AsciiDoc document without including any of the markup.
 Since there's no single definition of what "plain text" is, this is a perfect opportunity to use a custom converter.
 
-Begin by defining a `TextConverter` that is registered with the `text` backend, as follows:
+Since the focus of converting to text is merely to extract the content, we can utilize a lot of shared logic.
+Therefore, we'll only mix in `Asciidoctor::Converter` rather than extending `Asciidoctor::Converter::Base`.
+All blocks will simply delegate to their `content` method (except for lists and tables) and inlines to their `text` method.
+
+Define a converter named `TextConverter` in the file [.path]_text-converter.rb_, register it for the `text` backend, and implemtned the `convert` method as shown here:
 
 .text-converter.rb
 [,ruby]
 ----
-class TextConverter
-  include Asciidoctor::Converter
-  register_for 'text'
-  def initialize *args
-    super
-    outfilesuffix '.txt'
-  end
-  def convert node, transform = node.node_name, opts = nil
-    case transform
-    when 'document', 'section'
-      [node.title, node.content].join %(\n\n)
-    when 'paragraph'
-      (node.content.tr ?\n, ' ') << ?\n
-    else
-      (transform.start_with? 'inline_') ? node.text : node.content
-    end
-  end
-end
+include::example$text-converter.rb[]
 ----
+
+CAUTION: This converter is only provided for illustrative purposes and must be further developed to be fully functional.
+While some attempt is made to eliminate superfluous newlines, the logic isn't perfect.
 
 You can now use this converter to convert the sample AsciiDoc document to text.
 To do so, pass the converter to the `-r` CLI option and set the backend to `text` using the `b` CLI option.
