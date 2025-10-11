@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Compliance::
+
+  * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
+
 Improvements::
 
   * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4769)
