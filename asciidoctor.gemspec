@@ -43,6 +43,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'minitest', '~> 5.26.0'
   s.add_development_dependency 'nokogiri', '~> 1.14.0'
   s.add_development_dependency 'rake', '~> 13.3.0'
-  s.add_development_dependency 'slim', '~> 4.1.0'
-  s.add_development_dependency 'tilt', '~> 2.0.0'
+  s.add_development_dependency 'slim', '~> 5.2.1'
+  s.add_development_dependency 'tilt', '~> 2.1.0'
+
 end
