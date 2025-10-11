@@ -68,6 +68,24 @@ context 'Logger' do
       assert_includes err_string, 'this is a call'
     end
 
+    test 'should set logdev to specified file' do
+      log_file = Tempfile.new %w(asciidoctor- .log)
+      logger = Asciidoctor::Logger.new log_file
+      logger.warn 'this is a call'
+      logger.close
+      log_file_contents = File.read log_file
+      assert_equal 'asciidoctor: WARNING: this is a call', log_file_contents.lines.pop.chomp
+    end
+
+    test 'should set logdev to specified file with additional options' do
+      log_file = Tempfile.new %w(asciidoctor- .log)
+      logger = Asciidoctor::Logger.new log_file, formatter: nil, level: Asciidoctor::Logger::DEBUG
+      logger.debug 'this is a sign of life'
+      logger.close
+      log_file_contents = File.read log_file
+      assert_includes log_file_contents.lines.pop.chomp, 'DEBUG -- asciidoctor: this is a sign of life'
+    end
+
     test 'configures default logger to use a formatter that matches traditional format' do
       err_string = redirect_streams do |_, err|
         Asciidoctor::LoggerManager.logger.warn 'this is a call'
