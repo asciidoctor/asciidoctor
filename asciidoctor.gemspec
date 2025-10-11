@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
 
   # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
   s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
-  s.add_development_dependency 'cucumber', '~> 3.1.0'
+  s.add_development_dependency 'cucumber', '~> 9.2.0'
   # erubi is needed for testing alternate eRuby impls
   s.add_development_dependency 'erubi', '~> 1.10.0'
   s.add_development_dependency 'haml', '~> 6.3.0'
