@@ -1643,6 +1643,25 @@ context 'Extensions' do
       end
     end
 
+    test 'should coerce names of positional attributes to strings' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :attrs do
+            match_format :short
+            positional_attributes :a, 'b'
+            process do |parent, _, attrs|
+              create_inline_pass parent, %(a=#{attrs['a']},b=#{attrs['b']})
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'attrs:[A,B]', doctype: :inline
+        assert_equal 'a=A,b=B', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should not carry over attributes if block processor returns nil' do
       begin
         Asciidoctor::Extensions.register do
