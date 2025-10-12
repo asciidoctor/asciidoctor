@@ -652,6 +652,13 @@ class ReaderTest < Minitest::Test
         assert_equal 'link:include-file.adoc[role=include]', reader.read_line
       end
 
+      test 'should not add role to link macro used to replace include directive in compat mode' do
+        input = 'include::include-file.adoc[]'
+        doc = Asciidoctor::Document.new input, attributes: { 'compat-mode' => '' }
+        reader = doc.reader
+        assert_equal 'link:include-file.adoc[]', reader.read_line
+      end
+
       test 'should escape spaces in target when generating link from include directive' do
         input = 'include::foo bar baz.adoc[]'
         doc = Asciidoctor::Document.new input
@@ -667,6 +674,13 @@ class ReaderTest < Minitest::Test
           assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
           assert_empty logger
         end
+      end
+
+      test 'should not add role to link macro that replaces include directive with remote target in compat mode' do
+        input = 'include::https://example.org/dist/info.adoc[]'
+        doc = Asciidoctor::Document.new input, safe: :safe, attributes: { 'compat-mode' => '' }
+        reader = doc.reader
+        assert_equal 'link:https://example.org/dist/info.adoc[]', reader.read_line
       end
 
       test 'should escape spaces in target when generating link from remote include directive' do

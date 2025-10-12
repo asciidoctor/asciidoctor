@@ -1057,9 +1057,9 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif doc.safe >= SafeMode::SECURE
+      # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
       expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
-      # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{expanded_target}[role=include])
+      replace_next_line %(link:#{expanded_target}[#{(doc.attr? 'compat-mode') ? '' : 'role=include'}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1258,8 +1258,9 @@ class PreprocessorReader < Reader
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       unless doc.attr? 'allow-uri-read'
+       # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
         target = %(pass:c[#{target}]) if target.include? ' '
-        return replace_next_line %(link:#{target}[role=include])
+        return replace_next_line %(link:#{target}[#{(doc.attr? 'compat-mode') ? '' : 'role=include'}])
       end
       if doc.attr? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
