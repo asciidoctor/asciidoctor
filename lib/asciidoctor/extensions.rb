@@ -309,7 +309,7 @@ module Extensions
     alias parse_content_as content_model
 
     def positional_attributes *value
-      option :positional_attrs, value.flatten
+      option :positional_attrs, (value.flatten.map {|name| name.to_s })
     end
     alias name_positional_attributes positional_attributes
     # NOTE positional_attrs alias is deprecated
