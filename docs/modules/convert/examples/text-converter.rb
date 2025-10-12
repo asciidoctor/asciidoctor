@@ -24,13 +24,13 @@ class TextConverter
           (dd&.blocks? ? ?\n + dd.content : '')
       end.join(?\n)
     when 'table'
-      ?\n + node.rows.th_h.map do |_, rows|
-        rows.each do |cells|
-          cell.each do |cell|
-            cell.content
+      ?\n + node.rows.to_h.map do |_, rows|
+        rows.map do |cells|
+          cells.map do |cell|
+            cell.style == :asciidoc ? cell.content.lstrip : cell.content.join(%(\n\n))
           end
         end
-      end.join(?\n)
+      end.flatten.join(%(\n\n))
     else
       transform.start_with?('inline_') ? node.text : [?\n, node.content].compact.join
     end
