@@ -68,6 +68,7 @@ Improvements::
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
   * Log error if unterminated preprocessor conditional directive is detected (#3545)
+  * Coerce names passed to the `positional_attrs` directive on an extension to strings (#4674)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
   * Change Brazilian Portuguese translation for toc-title
 
@@ -77,7 +78,6 @@ Bug Fixes::
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
   * Only style code tag as block element when inside pre in listing block; not inside verse block (#4610)
   * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
-  * Coerce names passed to the `positional_attrs` directive on an extension to strings (#4674)
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
