@@ -24,13 +24,25 @@ class TextConverter
           (dd&.blocks? ? ?\n + dd.content : '')
       end.join(?\n)
     when 'table'
-      ?\n + node.rows.th_h.map do |_, rows|
-        rows.each do |cells|
-          cell.each do |cell|
-            cell.content
-          end
-        end
-      end.join(?\n)
+      ?\n + node.rows.to_h.map do |tsec, rows|
+        rows.map do |row|
+          row.map do |cell|
+            if tsec == :head
+              cell.text
+            else
+              case cell.style
+              when :asciidoc
+                cell.content
+              when :literal
+                cell.text
+              else
+                # In this case it is an array of paragraphs.
+                cell.content.join ?\n
+              end
+            end
+          end.join ?|
+        end.join ?\n
+      end.join "\n===\n"
     else
       transform.start_with?('inline_') ? node.text : [?\n, node.content].compact.join
     end
