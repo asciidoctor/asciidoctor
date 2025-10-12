@@ -1044,9 +1044,10 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif doc.safe >= SafeMode::SECURE
+      # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
       expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
-      # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{expanded_target}[role=include#{attrlist ? ',' + attrlist : ''}])
+      link_attrlist = (doc.attr? 'compat-mode') ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+      replace_next_line %(link:#{expanded_target}[#{link_attrlist}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1246,8 +1247,10 @@ class PreprocessorReader < Reader
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
       unless doc.attr? 'allow-uri-read'
         logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
+        # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
         target = %(pass:c[#{target}]) if target.include? ' '
-        return replace_next_line %(link:#{target}[role=include#{attrlist ? ',' + attrlist : ''}])
+        link_attrlist = (doc.attr? 'compat-mode') ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+        return replace_next_line %(link:#{target}[#{link_attrlist}])
       end
       if doc.attr? 'cache-uri'
         # caching requires the open-uri-cached gem to be installed
