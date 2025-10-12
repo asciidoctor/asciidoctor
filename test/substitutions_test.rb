@@ -873,9 +873,21 @@ context 'Substitutions' do
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'an inline image macro with link should be interpreted as a linked image in docbook' do
+      para = block_from_string 'image:apache license 2_0.png[Apache License 2.0,link=http://www.apache.org/licenses/LICENSE-2.0]', backend: 'docbook'
+      assert_equal '<link xl:href="http://www.apache.org/licenses/LICENSE-2.0"><inlinemediaobject><imageobject><imagedata fileref="apache%20license%202_0.png"/></imageobject><textobject><phrase>Apache License 2.0</phrase></textobject></inlinemediaobject></link>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text and link to self should be interpreted as a self-referencing image with alt text' do
       para = block_from_string 'image:tiger.png[Tiger, link=self]', attributes: { 'imagesdir' => 'img' }
       assert_equal '<span class="image"><a class="image" href="img/tiger.png"><img src="img/tiger.png" alt="Tiger"></a></span>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an inline image macro with text and link to self should be interpreted as a self-referencing image in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,link=self]', attributes: { 'imagesdir' => 'img' }, backend: 'docbook'
+      assert_equal '<link xl:href="img/tiger.png"><inlinemediaobject><imageobject><imagedata fileref="img/tiger.png"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject></link>',
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
