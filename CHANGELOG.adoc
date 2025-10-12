@@ -42,6 +42,7 @@ Compliance::
   * Don't promote level-0 special section at start of document to document title (#4151)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
+  * Support link attribute on inline image macro when converting to DocBook (#4385)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
   * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
   * Drop support for Ruby < 2.7 and JRuby < 9.4
