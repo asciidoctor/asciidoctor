@@ -535,12 +535,15 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_inline_image node
-    %(<inlinemediaobject#{common_attributes nil, node.role}>
+    img = %(<inlinemediaobject#{common_attributes nil, node.role}>
 <imageobject>
-<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
+<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (fileref = node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </inlinemediaobject>)
+    fileref && (node.attr? 'link') && (link_href = node.attr 'link') ?
+      %(<link xl:href="#{link_href}">#{img}</link>) :
+      img
   end
 
   def convert_inline_indexterm node

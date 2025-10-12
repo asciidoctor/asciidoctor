@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 
 Compliance::
 
+  * Support link attribute on inline image macro when converting to DocBook (#4385)
   * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
 
 Improvements::
