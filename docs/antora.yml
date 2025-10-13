@@ -1,11 +1,11 @@
 name: asciidoctor
 title: Asciidoctor
-version: '2.0'
+version: '2.0.24'
 asciidoc:
   attributes:
     xrefstyle: short@
     listing-caption: Example@
-    release-version: '2.0.23'
+    release-version: '2.0.24'
     ruby-description: 'ruby 3.3.0 [x86_64-linux]'
     ruby-version: '3.3'
     url-api-gems: https://www.rubydoc.info/gems

@@ -1,6 +1,6 @@
 = Asciidoctor
 Dan Allen <https://github.com/mojavelinux[@mojavelinux]>; Sarah White <https://github.com/graphitefriction[@graphitefriction]>
-v2.0.23, 2024-05-17
+v2.0.24, 2025-10-13
 // settings:
 :idprefix:
 :idseparator: -
@@ -16,7 +16,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 // Variables:
-:release-version: 2.0.23
+:release-version: 2.0.24
 // URLs:
 :url-org: https://github.com/asciidoctor
 :url-repo: {url-org}/asciidoctor

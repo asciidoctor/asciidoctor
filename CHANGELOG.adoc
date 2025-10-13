@@ -16,7 +16,7 @@ For an even more detailed look at what has changed, refer to the {url-repo}/comm
 This project utilizes semantic versioning.
 
 // tag::compact[]
-== Unreleased
+== 2.0.24 (2025-10-13) - @mojavelinux
 
 Compliance::
 
@@ -48,6 +48,11 @@ Build / Infrastructure::
 
   * Fix classification of several substitution tests (#4691) (*@scouten*)
 
+=== Details
+
+{url-repo}/releases/tag/v2.0.24[git tag] | {url-repo}/compare/v2.0.23\...v2.0.24[full diff]
+// end::compact[]
+
 == 2.0.23 (2024-05-17) - @mojavelinux
 
 Compliance::
@@ -70,7 +75,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.23[git tag] | {url-repo}/compare/v2.0.22\...v2.0.23[full diff]
-// end::compact[]
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 
