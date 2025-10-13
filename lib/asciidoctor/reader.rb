@@ -615,7 +615,6 @@ class PreprocessorReader < Reader
       # if @maxdepth is not set, built-in include functionality is disabled
       @maxdepth = nil
     end
-    @eof = nil
     @include_stack = []
     @includes = document.catalog[:includes]
     @skipping = false
@@ -644,15 +643,12 @@ class PreprocessorReader < Reader
   def peek_line direct = false
     if (line = super)
       line
-    elsif @eof
-      nil
     elsif @include_stack.empty?
       end_cursor = nil
       @conditional_stack.delete_if do |conditional|
         logger.error message_with_context %(detected unterminated preprocessor conditional directive: #{conditional[:name]}::#{conditional[:target] || ''}[#{conditional[:expr] || ''}]), source_location: conditional[:source_location] || (end_cursor ||= cursor_at_prev_line)
         true
       end
-      @eof = true
       nil
     else
       pop_include
