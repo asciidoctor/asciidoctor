@@ -30,7 +30,7 @@ Improvements::
   * Log error if unterminated preprocessor conditional directive is detected (#3545)
   * Coerce names passed to the `positional_attrs` directive on an extension to strings (#4674)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
-  * Change Brazilian Portuguese translation for toc-title
+  * Change Brazilian Portuguese translation for toc-title (#4653) (*@giflw*)
 
 Bug Fixes::
 
@@ -43,6 +43,10 @@ Bug Fixes::
 Documentation::
 
   * Rewrite documentation for how to create a custom converter from scratch and make examples more thorough (#4699)
+
+Build / Infrastructure::
+
+  * Fix classification of several substitution tests (#4691) (*@scouten*)
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
