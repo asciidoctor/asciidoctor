@@ -22,6 +22,7 @@ Compliance::
 
   * Support link attribute on inline image macro when converting to DocBook (#4385)
   * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
+  * Extract the require logic of the OpenURI library for Asciidoctor.js compatibility (#4244) (*@ggrossetie*)
 
 Improvements::
 

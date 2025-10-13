@@ -49,6 +49,25 @@ module Helpers
     nil
   end
 
+  # Internal: Require the OpenURI library.
+  #
+  # Attempts to load `open-uri-cached` if the cache argument is true otherwise autoload `open-uri`.
+  #
+  # cache - A Boolean flag indicating whether to activate content cache URI
+  #
+  # Returns nothing
+  def require_open_uri cache = false
+    if cache
+      # caching requires the open-uri-cached gem to be installed
+      # processing will be automatically aborted if these libraries can't be opened
+      require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
+    else
+      # autoload open-uri
+      ::OpenURI
+    end
+    nil
+  end
+
   # Internal: Prepare the source data Array for parsing.
   #
   # Encodes the data to UTF-8, if necessary, and removes any trailing
