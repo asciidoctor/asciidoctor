@@ -40,6 +40,10 @@ Bug Fixes::
   * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
   * Don't add role=include to link macro that replaces include directive when running in compat mode (#4608)
 
+Documentation::
+
+  * Rewrite documentation for how to create a custom converter from scratch and make examples more thorough (#4699)
+
 == 2.0.23 (2024-05-17) - @mojavelinux
 
 Compliance::
