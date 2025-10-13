@@ -3174,6 +3174,20 @@ context 'Blocks' do
       assert_css '.videoblock.text-center', output, 1
     end
 
+		test 'video macro shuold set aspect-ratio style for video tag if aspect-ratio attribute is set' do
+      input = 'video::cats-vs-dogs.avi[aspect-ratio=16/9]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 1
+      assert_css 'video[style="aspect-ratio:16/9;"]', output, 1
+		end
+
+		test 'video macro shuold not set aspect-ratio style for video tag if aspect-ratio is not set' do
+      input = 'video::cats-vs-dogs.avi[]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 1
+      assert_css 'video[style="aspect-ratio:16/9;"]', output, 0
+		end
+
     test 'video macro should honor all options' do
       input = 'video::cats-vs-dogs.avi[options="autoplay,muted,nocontrols,loop",preload="metadata"]'
       output = convert_string_to_embedded input
@@ -3263,6 +3277,22 @@ context 'Blocks' do
       assert_css 'iframe[height="300"]', output, 1
     end
 
+    test 'video macro should set aspect-ratio in custom HTML with iframe for vimeo service if aspect-ratio attribute is set' do
+      input = 'video::67480300[vimeo, aspect-ratio=16/9]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 1
+    end
+
+    test 'video macro should not set aspect-ratio in custom HTML with iframe for vimeo service if aspect-ratio attribute is not set' do
+      input = 'video::67480300[vimeo]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 0
+    end
+
     test 'video macro should output custom HTML with iframe for youtube service' do
       input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]'
       output = convert_string_to_embedded input
@@ -3283,6 +3313,22 @@ context 'Blocks' do
       assert_css 'iframe[height="360"]', output, 1
     end
 
+    test 'video macro should set aspect-ratio in custom HTML with iframe for youtube service if aspect-ratio attribute is set' do
+      input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, aspect-ratio=16/9]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 1
+    end
+
+    test 'video macro should not set aspect-ratio in custom HTML with iframe for youtube service if aspect-ratio attribute is not set' do
+      input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 0
+    end
+
     test 'video macro should output custom HTML with iframe for wistia service' do
       input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,loop,muted"]'
       output = convert_string_to_embedded input
@@ -3301,6 +3347,22 @@ context 'Blocks' do
       assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
       assert_css 'iframe[width="640"]', output, 1
       assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should set aspect-ratio in custom HTML with iframe for wistia service if aspect-ratio attribute is set' do
+      input = 'video::be5gtsbaco[wistia, aspect-ratio=16/9]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 1
+    end
+
+    test 'video macro should not set aspect-ratio in custom HTML with iframe for wistia service if aspect-ratio attribute is not set' do
+      input = 'video::be5gtsbaco[wistia]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[style="aspect-ratio:16/9;"]', output, 0
     end
 
     test 'should detect and convert audio macro' do
