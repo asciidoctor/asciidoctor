@@ -23,7 +23,7 @@ class Converter::Html5Converter < Converter::Base
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
-  StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
+
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
     SvgPreambleRx = /^#{CC_ALL}*?(?=<svg[\s>])/
@@ -36,6 +36,7 @@ class Converter::Html5Converter < Converter::Base
 
   def initialize backend, opts = {}
     @backend = backend
+    @stem_adapters = {}
     if opts[:htmlsyntax] == 'xml'
       syntax = 'xml'
       @xml_mode = true
@@ -91,12 +92,83 @@ class Converter::Html5Converter < Converter::Base
     end
   end
 
-  def convert_document node
-    br = %(<br#{slash = @void_element_slash}>)
-    unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
-      asset_uri_scheme = %(#{asset_uri_scheme}:)
+  # build up the full resource URI's based on a sequence of parameters and overrides
+  def build_uri scheme, authority, path, query
+
+    # when scheme not provided, fall-back to '//', which implicitly uses current scheme
+    uri = (!scheme.nil? && !scheme.empty?) ? "#{scheme}://" : "//"
+    uri += !authority.nil? && !authority.empty? ? authority : ""
+    uri += !path.nil? && !path.empty? ? path : ""
+    uri += !query.nil? && !query.empty? ? "?#{query}" : ""
+    return uri 
+  end
+
+  def initialize_asset_uri node
+    uri = {}
+
+    # asset uri defaults to https (when nil)
+    # may be user-override to empty, in which case will be implied by current session '//'
+    # may be user-override to http, in which case will use http://
+    asset_uri_scheme = node.attr 'asset-uri-scheme', 'https'
+
+    # https://en.wikipedia.org/wiki/Uniform_Resource_Identifier
+    # uri_scheme
+    # uri_authority
+    # uri_path
+    # uri_query
+    # uri_fragment (disregarded)
+    # uri (override)
+
+    uri[:fontawesome_uri_scheme] = node.attr "fontawesome-uri-scheme", "#{asset_uri_scheme}"
+    uri[:fontawesome_uri_authority] = node.attr "fontawesome-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:fontawesome_uri_path] = node.attr "fontawesome-uri-path", "/ajax/libs/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css"
+    uri[:fontawesome_uri_query] = node.attr "fontawesome-uri-query", ""
+    if !(tmp_uri = node.attr "fontawesome-uri", "").empty? then
+      uri[:fontawesome_uri] = tmp_uri
+    else
+      uri[:fontawesome_uri] = build_uri(uri[:fontawesome_uri_scheme], uri[:fontawesome_uri_authority], uri[:fontawesome_uri_path], uri[:fontawesome_uri_query])
     end
-    cdn_base_url = %(#{asset_uri_scheme}//cdnjs.cloudflare.com/ajax/libs)
+
+    uri[:highlightjs_uri_scheme] = node.attr "highlightjs-uri-scheme", "#{asset_uri_scheme}"
+    uri[:highlightjs_uri_authority] = node.attr "highlightjs-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:highlightjs_uri_path] = node.attr "highlightjs-uri-path", "/ajax/libs/highlight.js/#{HIGHLIGHT_JS_VERSION}/highlight.min.js"
+    uri[:highlightjs_uri_query] = node.attr "highlightjs-uri-query", ""
+    if !(tmp_uri = node.attr "highlightjs-uri", "").empty? then
+      uri[:highlightjs_uri] = tmp_uri
+    else
+      uri[:highlightjs_uri] = build_uri(uri[:highlightjs_uri_scheme], uri[:highlightjs_uri_authority], uri[:highlightjs_uri_path], uri[:highlightjs_uri_query])
+    end
+
+    uri[:mathjax_uri_scheme] = node.attr "mathjax-uri-scheme", "#{asset_uri_scheme}"
+    uri[:mathjax_uri_authority] = node.attr "mathjax-uri-authority", Asciidoctor::CDN_URI_AUTHORITY
+    uri[:mathjax_uri_path]   = node.attr "mathjax-uri-path", "/ajax/libs/mathjax/#{MATHJAX_VERSION}/MathJax.js"
+    uri[:mathjax_uri_query] = node.attr "mathjax-uri-query", "config=TeX-MML-AM_HTMLorMML"
+    if !(tmp_uri = node.attr "mathjax-uri", "").empty? then
+      uri[:mathjax_uri] = tmp_uri
+    else
+      uri[:mathjax_uri] = build_uri(uri[:mathjax_uri_scheme], uri[:mathjax_uri_authority], uri[:mathjax_uri_path], uri[:mathjax_uri_query])
+    end
+
+    if (webfonts = node.attr 'webfonts')
+      uri[:webfonts_uri_scheme] = node.attr "webfonts-uri-scheme", "#{asset_uri_scheme}"
+      uri[:webfonts_uri_authority] = node.attr "webfonts-uri-authority", "fonts.googleapis.com"
+      uri[:webfonts_uri_path] = node.attr "webfonts-uri-path", "/css"
+      uri[:webfonts_uri_query] = "family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"
+      uri[:webfonts_uri_query] = node.attr "webfonts-uri-query", uri[:webfonts_uri_query] # overrides classic behavior
+      if !(tmp_uri = node.attr "webfonts-uri", "").empty? then
+        uri[:webfonts_uri] = tmp_uri
+      else
+        uri[:webfonts_uri] = build_uri(uri[:webfonts_uri_scheme], uri[:webfonts_uri_authority], uri[:webfonts_uri_path], uri[:webfonts_uri_query])
+      end
+    end
+    @asset_uri = uri
+  end
+
+  def convert_document node
+    initialize_asset_uri(node)
+
+    br = %(<br#{slash = @void_element_slash}>)
+
     linkcss = node.attr? 'linkcss'
     max_width_attr = (node.attr? 'max-width') ? %( style="max-width: #{node.attr 'max-width'};") : ''
     result = ['<!DOCTYPE html>']
@@ -127,7 +199,7 @@ class Converter::Html5Converter < Converter::Base
 
     if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
-        result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{@asset_uri[:webfonts_uri]}"#{slash}>)
       end
       if linkcss
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
@@ -148,22 +220,21 @@ class Converter::Html5Converter < Converter::Base
 
     if node.attr? 'icons', 'font'
       if node.attr? 'iconfont-remote'
-        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', @asset_uri[:fontawesome_uri]}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
         result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
       end
     end
 
-    if (syntax_hl = node.syntax_highlighter)
-      result << (syntax_hl_docinfo_head_idx = result.size)
-    end
+    result << (syntax_hl_docinfo_head_idx = result.size)
 
     unless (docinfo_content = node.docinfo).empty?
       result << docinfo_content
     end
 
     result << '</head>'
+
     id_attr = node.id ? %( id="#{node.id}") : ''
     if (sectioned = node.sections?) && (node.attr? 'toc-class') && (node.attr? 'toc') && (node.attr? 'toc-placement', 'auto')
       classes = [node.doctype, (node.attr 'toc-class'), %(toc-#{node.attr 'toc-position', 'header'})]
@@ -251,47 +322,35 @@ class Converter::Html5Converter < Converter::Base
     # JavaScript (and auxiliary stylesheets) loaded at the end of body for performance reasons
     # See http://www.html5rocks.com/en/tutorials/speed/script-loading/
 
-    if syntax_hl
-      if syntax_hl.docinfo? :head
-        result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
-      else
-        result.delete_at syntax_hl_docinfo_head_idx
+    deferred_head_elements = []
+
+    # this uses the index computed previously to insert more elements into the html head
+    if node.syntax_highlighter
+      if node.syntax_highlighter.docinfo? :head
+        deferred_head_elements << (node.syntax_highlighter.docinfo :head, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
       end
-      if syntax_hl.docinfo? :footer
-        result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
+      if node.syntax_highlighter.docinfo? :footer
+        result << (node.syntax_highlighter.docinfo :footer, node, asset_uri: @asset_uri, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
-    if node.attr? 'stem'
-      eqnums_val = node.attr 'eqnums', 'none'
-      eqnums_val = 'AMS' if eqnums_val.empty?
-      eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
-      # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-      result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+    # accumulate additional content from the deferred-processing
+    # stem block adapters
+    @stem_adapters.each do |k, adapter|
+      if adapter.docinfo? :head
+        deferred_head_elements << adapter.docinfo(:head, node, {asset_uri: @asset_uri})
+      end
+      if adapter.docinfo? :footer
+        result << adapter.docinfo(:footer, node, {asset_uri: @asset_uri})
+      end
     end
+
+    if deferred_head_elements.empty?
+      result.delete_at syntax_hl_docinfo_head_idx
+    else
+      result[syntax_hl_docinfo_head_idx] = deferred_head_elements
+    end
+
 
     unless (docinfo_content = node.docinfo :footer).empty?
       result << docinfo_content
@@ -695,25 +754,11 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    id_attribute = node.id ? %( id="#{node.id}") : ''
-    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
-    if (equation = node.content)
-      if style == :asciimath && (equation.include? LF)
-        br = %(#{LF}<br#{@void_element_slash}>)
-        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
-      end
-      unless (equation.start_with? open) && (equation.end_with? close)
-        equation = %(#{open}#{equation}#{close})
-      end
-    else
-      equation = ''
+    k = "#{node.style}-#{node.attributes['stem-renderer']}-#{node.document.backend}".to_sym
+    unless @stem_adapters.has_key?(k)
+      @stem_adapters[k] = Asciidoctor::StemAdapter::Factory.new.make(k)
     end
-    %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
-#{title_element}<div class="content">
-#{equation}
-</div>
-</div>)
+    @stem_adapters[k].convert node
   end
 
   def convert_olist node
@@ -1367,5 +1412,6 @@ Your browser does not support the video tag.
   def respond_to_missing? id, *options
     !((name = id.to_s).start_with? 'convert_') && (handles? name)
   end
+
 end
 end

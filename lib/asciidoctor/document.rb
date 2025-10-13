@@ -1219,6 +1219,7 @@ class Document < AbstractBlock
 
     unless @parent_document
       if (basebackend = attrs['basebackend']) == 'html'
+        attrs['stem-renderer'] ||= 'mathjax'
         # QUESTION should we allow source-highlighter to be disabled in AsciiDoc table cell?
         if (syntax_hl_name = attrs['source-highlighter']) && !attrs[%(#{syntax_hl_name}-unavailable)]
           if (syntax_hl_factory = @options[:syntax_highlighter_factory])

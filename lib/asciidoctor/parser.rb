@@ -895,6 +895,7 @@ class Parser
         block = build_block block_context, (block_context == :verse ? :verbatim : :compound), terminator, parent, reader, attributes
       when :stem, :latexmath, :asciimath
         attributes['style'] = STEM_TYPE_ALIASES[attributes[2] || doc_attrs['stem']] if block_context == :stem
+        attributes['stem-renderer'] = doc_attrs['stem-renderer']
         block = build_block :stem, :raw, terminator, parent, reader, attributes
       when :pass
         block = build_block block_context, :raw, terminator, parent, reader, attributes
