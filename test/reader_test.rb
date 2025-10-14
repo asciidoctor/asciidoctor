@@ -603,6 +603,7 @@ class ReaderTest < Minitest::Test
           '....',
         ]
         assert_equal expected, reader.readlines
+        refute doc.attr? 'front-matter'
       end
 
       test 'should skip front matter in include file if skip-front-matter option is set on include directiv' do
@@ -619,6 +620,7 @@ class ReaderTest < Minitest::Test
           '....',
         ]
         assert_equal expected, reader.readlines
+        refute doc.attr? 'front-matter'
       end
     end
 

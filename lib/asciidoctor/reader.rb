@@ -717,7 +717,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: false, indent: attributes['indent'], skip_front_matter: attributes['skip-front-matter-option']).empty?
+    if (@lines = prepare_lines data, include: true, normalize: @process_lines || :chomp, indent: attributes['indent'], skip_front_matter: attributes['skip-front-matter-option']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
@@ -796,14 +796,14 @@ class PreprocessorReader < Reader
     result = super
 
     if opts[:skip_front_matter] && (front_matter = skip_front_matter! result)
-      @document.attributes['front-matter'] = front_matter.join LF
+      @document.attributes['front-matter'] = front_matter.join LF unless opts[:include]
     end
 
-    if opts.fetch :condense, true
+    if opts[:include]
+      Parser.adjust_indentation! result, opts[:indent].to_i, (@document.attr 'tabsize').to_i if opts[:indent]
+    else
       result.pop while (last = result[-1]) && last.empty?
     end
-
-    Parser.adjust_indentation! result, opts[:indent].to_i, (@document.attr 'tabsize').to_i if opts[:indent]
 
     result
   end
