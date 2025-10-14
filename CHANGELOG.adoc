@@ -76,8 +76,6 @@ Compliance::
 Improvements::
 
   * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4769)
-  * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
-  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
   * Log error if unterminated preprocessor conditional directive is detected (#3545)
   * Coerce names passed to the `positional_attrs` directive on an extension to strings (#4674)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
@@ -86,6 +84,8 @@ Improvements::
 Bug Fixes::
 
   * Consider `convert_` prefix when looking for missing convert method in converter (#4669) (*@eugoka*)
+  * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
+  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
   * Only style code tag as block element when inside pre in listing block; not inside verse block (#4610)
   * Don't add role=include to link macro that replaces include directive when running in compat mode (#4608)
