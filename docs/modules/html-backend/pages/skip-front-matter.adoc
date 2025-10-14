@@ -25,6 +25,15 @@ Outside of the tool, however, these extra lines can throw off the processor.
 
 == skip-front-matter attribute
 
-If the `skip-front-matter` attribute is set via the API or CLI (e.g., `-a skip-front-matter`), Asciidoctor will recognize the front matter and consume it before parsing the document.
+If the `skip-front-matter` attribute is set via the API or CLI (e.g., `-a skip-front-matter`), Asciidoctor will recognize the front matter and consume it before parsing the primary document (not include files).
 Asciidoctor stores the content it extracts in the `front-matter` attribute to make it available for integrations.
-Asciidoctor also removes front matter when reading xref:asciidoc:directives:include.adoc[include files].
+
+Asciidoctor can also remove front matter when reading xref:asciidoc:directives:include.adoc[include files].
+When the `skip-front-matter` option is set on the include directive, Asciidoctor drops the front matter from the included content.
+
+[,asciidoc]
+----
+\include::post.adoc[opts=skip-front-matter]
+----
+
+In this case, the front matter is not stored.
