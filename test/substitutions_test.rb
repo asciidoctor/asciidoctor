@@ -1348,6 +1348,19 @@ context 'Substitutions' do
       assert_equal ['1. second footnote', '1. first footnote', '2. third footnote'], footnote_defs.map(&:text).map(&:strip)
     end
 
+    test 'footnote localization' do
+      using_memory_logger do |logger|
+        attributes = {
+          'view-footnote-tip' => 'Voir la note de bas de page.',
+          'unresolved-footnoteref-tip' => 'Référence de note de bas de page non résolue.',
+        }
+        para = block_from_string 'Sentence textfootnote:[An example footnote.].footnote:ex1[]', attributes: attributes
+        output = para.sub_macros para.source
+        assert_equal 'Sentence text<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="Voir la note de bas de page.">1</a>]</sup>.<sup class="footnoteref red" title="Référence de note de bas de page non résolue.">[ex1]</sup>', output
+        assert_message logger, :WARN, 'invalid footnote reference: ex1'
+      end
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
