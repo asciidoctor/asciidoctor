@@ -35,6 +35,7 @@ Enhancements::
   * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro
+  * Skip front matter in included content if skip-front-matter option is set on include directive (#3437)
 
 Compliance::
 
@@ -63,6 +64,10 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+
+Bug Fixes::
+
+  * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 

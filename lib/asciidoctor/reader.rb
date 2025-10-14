@@ -607,6 +607,7 @@ class PreprocessorReader < Reader
   # Public: Initialize the PreprocessorReader object
   def initialize document, data = nil, cursor = nil, opts = {}
     @sourcemap = (@document = document).sourcemap
+    opts = opts.merge skip_front_matter: true if document.attributes['skip-front-matter'] && (!opts.key? :skip_front_matter)
     super data, cursor, opts
     if (default_include_depth = (document.attributes['max-include-depth'] || 64).to_i) > 0
       # track absolute max depth, current max depth for comparing to include stack size, and relative max depth for reporting
@@ -716,7 +717,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: false, indent: attributes['indent']).empty?
+    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: false, indent: attributes['indent'], skip_front_matter: attributes['skip-front-matter-option']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
@@ -794,8 +795,7 @@ class PreprocessorReader < Reader
   def prepare_lines data, opts = {}
     result = super
 
-    # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
-    if @document && @document.attributes['skip-front-matter'] && (front_matter = skip_front_matter! result)
+    if opts[:skip_front_matter] && (front_matter = skip_front_matter! result)
       @document.attributes['front-matter'] = front_matter.join LF
     end
 

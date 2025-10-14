@@ -585,6 +585,41 @@ class ReaderTest < Minitest::Test
         assert_equal front_matter, doc.attributes['front-matter']
         assert_equal 7, reader.lineno
       end
+
+      test 'should not skip front matter in include file if skip-front-matter attribute is set' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/with-front-matter.adoc[]
+        ....
+        EOS
+        doc = document_from_string input, safe: :safe, parse: false, base_dir: DIRNAME
+        reader = doc.reader
+        expected = [
+          '....',
+          '---',
+          'name: value',
+          '---',
+          'content',
+          '....',
+        ]
+        assert_equal expected, reader.readlines
+      end
+
+      test 'should skip front matter in include file if skip-front-matter option is set on include directiv' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/with-front-matter.adoc[opts=skip-front-matter]
+        ....
+        EOS
+        doc = document_from_string input, safe: :safe, parse: false, base_dir: DIRNAME
+        reader = doc.reader
+        expected = [
+          '....',
+          'content',
+          '....',
+        ]
+        assert_equal expected, reader.readlines
+      end
     end
 
     context 'Include Stack' do
