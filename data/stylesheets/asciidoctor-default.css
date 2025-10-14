@@ -1,6 +1,6 @@
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
-/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
+/* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CNoto+Sans+Mono:400,700"; */
 *,::before,::after{box-sizing:border-box}
 html{font-size:100%;-webkit-text-size-adjust:100%}
 body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-size:inherit;line-height:1;position:relative;cursor:auto;-moz-tab-size:4;-o-tab-size:4;tab-size:4;word-wrap:anywhere;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
@@ -13,7 +13,7 @@ abbr{font-size:.9em}
 abbr[title]{cursor:help;border-bottom:1px dotted #dddddf;text-decoration:none}
 b,strong{font-weight:bold;line-height:inherit}
 strong strong{font-weight:400}
-code,kbd,pre{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-size:1em}
+code,kbd,pre{font-family:"Noto Sans Mono","Droid Sans Mono",monospace;font-size:1em}
 code{font-weight:400;color:rgba(0,0,0,.9)}
 pre{color:rgba(0,0,0,.9);line-height:1.45;text-rendering:optimizeSpeed;white-space:pre-wrap}
 dfn{font-style:italic}
