@@ -23,6 +23,7 @@ Enhancements::
   * Allow the CLI to control the logging level using the `--log-level` option (#3868)
   * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
   * Add support for inline linenums mode when using Rouge as source highlighter (`rouge-linenums-mode=inline`) (#3641)
+  * Look up asset dir attribute (i.e., `imagesdir` or `iconsdir`) on node to resolve asset path prefix, inheriting from document if not otherwise set (#3661) (*@mogztter*)
   * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) (*@rpavlik*)
   * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) (*@hackingotter*)
   * Allow section ID to be unset by assigning an empty value to the `id` block attribute (#4139)

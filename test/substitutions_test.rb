@@ -774,6 +774,17 @@ context 'Substitutions' do
       assert_equal '<span class="image"><img src="tiger.png" alt="tiger"></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should use the imagesdir attribute defined on image macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      Great job! image:rainbow.png[imagesdir=stickers]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="stickers/rainbow.png"'
+    end
+
     test 'should replace underscore and hyphen with space in generated alt text for an inline image' do
       para = block_from_string 'image:tiger-with-family_1.png[]'
       assert_equal '<span class="image"><img src="tiger-with-family_1.png" alt="tiger with family 1"></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
@@ -1042,6 +1053,13 @@ context 'Substitutions' do
     test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
       para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
       assert_equal '<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should use the imagesdir attribute on the node when resolving the icon path' do
+      doc = empty_document attributes: { 'iconsdir' => 'assets/icons', 'icons' => 'image' }
+      icon = Asciidoctor::Inline.new doc, :image, nil, type: 'icon', attributes: { 'iconsdir' => 'chapter-1/icons' }
+      icon_uri = icon.icon_uri 'wave'
+      assert_equal 'chapter-1/icons/wave.png', icon_uri
     end
 
     test 'a single-line footnote macro should be registered and output as a footnote' do

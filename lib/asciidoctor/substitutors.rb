@@ -425,7 +425,7 @@ module Substitutors
         attrs = parse_attributes $2, posattrs, unescape_input: true
         unless type == 'icon'
           doc.register :images, target
-          attrs['imagesdir'] = doc_attrs['imagesdir']
+          attrs['imagesdir'] ||= doc_attrs['imagesdir']
         end
         attrs['alt'] ||= (attrs['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
         Inline.new(self, :image, nil, type: type, target: target, attributes: attrs).convert
