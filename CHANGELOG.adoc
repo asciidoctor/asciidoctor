@@ -33,7 +33,6 @@ Enhancements::
   * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
   * Update signature of Logger constructor so both positional arguments and keyword arguments are passed to super constructor (#4250)
   * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
-  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro
 
@@ -42,16 +41,12 @@ Compliance::
   * Don't promote level-0 special section at start of document to document title (#4151)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
-  * Support link attribute on inline image macro when converting to DocBook (#4385)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
-  * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
-  * Extract the require logic of the OpenURI library for Asciidoctor.js compatibility (#4244) (*@ggrossetie*)
   * Drop support for Ruby < 2.7 and JRuby < 9.4
   * Update latest JRuby in CI workflow to 10.0.2.0
 
 Improvements::
 
-  * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4769)
   * Use width attribute to set table and column width instead of inline style (#4160)
   * Layout lines of a source block with table-based line numbering as rows in the table when using Rouge as source highlighter (#4130)
   * Remove duplicate selectors in default stylesheet; enable stylelint rule to check for them
@@ -69,18 +64,44 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+
+== 2.0.24 (2025-10-13) - @mojavelinux
+
+Compliance::
+
+  * Support link attribute on inline image macro when converting to DocBook (#4385)
+  * Add magic comment `backticks_javascript: true` to achieve compatibility with Opal 2.0 (#4775) (*@janbiedermann*)
+  * Extract the require logic of the OpenURI library for Asciidoctor.js compatibility (#4244) (*@ggrossetie*)
+
+Improvements::
+
+  * Suppress warning about loading logger from stdlib when using Ruby 3.4 (#4769)
+  * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
+  * Set logdev to $stderr if no arguments are passed to Logger constructor (#4250)
   * Log error if unterminated preprocessor conditional directive is detected (#3545)
   * Coerce names passed to the `positional_attrs` directive on an extension to strings (#4674)
   * Ignore `SOURCE_DATE_EPOCH` environment variable if value is empty instead of exiting with non-zero exit code (#4631)
-  * Change Brazilian Portuguese translation for toc-title
+  * Change Brazilian Portuguese translation for toc-title (#4653) (*@giflw*)
 
 Bug Fixes::
 
   * Consider `convert_` prefix when looking for missing convert method in converter (#4669) (*@eugoka*)
   * Don't push conditional onto stack if conditional preprocessor directive is invalid when skipping lines (#4603)
   * Only style code tag as block element when inside pre in listing block; not inside verse block (#4610)
-  * Pass kwargs to Logger superclass and only assign defaults when kwarg is not specified (#4773)
   * Don't add role=include to link macro that replaces include directive when running in compat mode (#4608)
+
+Documentation::
+
+  * Rewrite documentation for how to create a custom converter from scratch and make examples more thorough (#4699)
+
+Build / Infrastructure::
+
+  * Fix classification of several substitution tests (#4691) (*@scouten*)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.24[git tag] | {url-repo}/compare/v2.0.23\...v2.0.24[full diff]
+// end::compact[]
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
@@ -104,7 +125,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.23[git tag] | {url-repo}/compare/v2.0.22\...v2.0.23[full diff]
-// end::compact[]
 
 == 2.0.22 (2024-03-08) - @mojavelinux
 
