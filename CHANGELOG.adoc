@@ -1123,7 +1123,7 @@ Distribution Packages::
 
 https://github.com/asciidoctor/asciidoctor/issues?q=milestone%3Av1.5.6.2[issues resolved] |
 https://github.com/asciidoctor/asciidoctor/releases/tag/v1.5.6.2[git tag] |
-https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1\...v1.5.6.2[full diff]
+https://github.com/asciidoctor/asciidoctor/compare/v1.5.6.1...v1.5.6.2[full diff]
 
 == 1.5.6.1 (2017-07-23) - @mojavelinux
 
