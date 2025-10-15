@@ -37,6 +37,7 @@ Enhancements::
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro
   * Skip front matter in included content if skip-front-matter option is set on include directive (#3437)
+  * Allow handles? method on include processor to accept doc as first argument; mixin adapter to support old method signature (#2895)
   * Add support disablePictureInPicture to video tag (#3935)
 
 Compliance::

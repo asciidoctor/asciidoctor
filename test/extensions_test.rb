@@ -28,6 +28,9 @@ class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
 end
 
 class SampleIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
+  def handles? target
+    'affirmative'
+  end
 end
 
 class SampleDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
@@ -477,6 +480,9 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleIncludeProcessor, extensions.first.instance
+      # verify that legacy handles? method is adapted
+      assert_equal 2, (extensions.first.instance.method :handles?).arity
+      assert_equal 'affirmative', (extensions.first.instance.handles? nil, 'include.adoc')
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -685,7 +691,7 @@ context 'Extensions' do
       end
     end
 
-    test 'should invoke include processor if it offers to handle include directive' do
+    test 'should invoke include processor if it requests to handle include directive' do
       input = <<~'EOS'
       include::skip-me.adoc[]
       line after skip
@@ -699,7 +705,8 @@ context 'Extensions' do
 
       registry = Asciidoctor::Extensions.create do
         include_processor do
-          handles? do |target|
+          # test handles? registered as block
+          handles? do |_doc, target|
             target == 'skip-me.adoc'
           end
 
@@ -709,7 +716,8 @@ context 'Extensions' do
         end
 
         include_processor do
-          handles? do |target|
+          # tests handles? defined as method
+          def handles? _doc, target
             target == 'include-file.adoc'
           end
 
@@ -740,6 +748,28 @@ context 'Extensions' do
       assert_match(/^middle line$/, source)
       assert_match(/^last line of grandchild$/, source)
       assert_match(/^last line$/, source)
+    end
+
+    test 'should invoke include processor if it requests to handle include directive using legacy method' do
+      input = 'include::include-file.adoc[]'
+
+      registry = Asciidoctor::Extensions.create do
+        include_processor do
+          handles? do |target|
+            target == 'include-file.adoc'
+          end
+
+          process do |_doc, reader, target, attributes|
+            reader.push_include ['included'], target, target, 1, attributes
+          end
+        end
+      end
+      # safe mode only required for built-in include processor
+      document = empty_document base_dir: testdir, extension_registry: registry, safe: :safe
+      reader = Asciidoctor::PreprocessorReader.new document, input, nil, normalize: true
+      lines = []
+      lines << reader.read_line
+      assert_equal 'included', lines.last
     end
 
     test 'should invoke tree processors after parsing document' do
