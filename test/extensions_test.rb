@@ -699,6 +699,7 @@ context 'Extensions' do
 
       registry = Asciidoctor::Extensions.create do
         include_processor do
+          # test handles? registered as block
           handles? do |target|
             target == 'skip-me.adoc'
           end
@@ -709,7 +710,8 @@ context 'Extensions' do
         end
 
         include_processor do
-          handles? do |target|
+          # tests handles? defined as method
+          def handles? target
             target == 'include-file.adoc'
           end
 
