@@ -462,7 +462,7 @@ module Extensions
       raise ::NotImplementedError, %(#{IncludeProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
 
-    def handles? target
+    def handles? doc, target
       true
     end
   end
@@ -473,20 +473,26 @@ module Extensions
     def handles? *args, &block
       if block_given?
         raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
-        @handles_block = block
+        @handles_block = block.arity == 1 ? proc {|_doc, target| block[target] } : block
       # TODO enable if we want to support passing proc or lambda as argument instead of block
       #elsif ::Proc === args[0]
       #  block = args.shift
       #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
       #  @handles_block = block
       elsif defined? @handles_block
-        @handles_block.call args[0]
+        @handles_block.call args[0], args[1]
       else
         true
       end
     end
   end
   IncludeProcessor::DSL = IncludeProcessorDsl
+
+  module LegacyHandlesMethodAdapter
+    def handles? _doc, target
+      super target
+    end
+  end
 
   # Public: DocinfoProcessors are used to add additional content to
   # the header and/or footer of the generated document.
@@ -1372,7 +1378,9 @@ module Extensions
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
-
+      if kind == :include_processor && (processor_instance.method :handles?)&.arity == 1
+        processor_instance.singleton_class.prepend LegacyHandlesMethodAdapter
+      end
       processor_instance.freeze
       extension = ProcessorExtension.new kind, processor_instance
       extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
