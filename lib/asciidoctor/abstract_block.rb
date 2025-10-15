@@ -157,7 +157,8 @@ class AbstractBlock < AbstractNode
   # the node is accepted and node traversal continues. If the filter returns false (which implies :skip), the node is
   # skipped, but its children are still visited. If the filter returns :reject, the node and all its descendants are
   # rejected. If the filter returns :prune, the node is accepted, but its descendants are rejected. If no selector
-  # or filter block is supplied, all block-level nodes in the tree are returned.
+  # or filter block is supplied, all block-level nodes in the tree are returned. If the :first_result option is true,
+  # the search stops at the first match.
   #
   # Examples
   #
@@ -181,6 +182,14 @@ class AbstractBlock < AbstractNode
   end
 
   alias query find_by
+
+  # Like find_by, but only returns the first result or nil if no matching block-level node is found
+  def get_by selector = {}, &block
+    find_by_internal (selector.merge first_result: true), (result = []), &block
+    result[0]
+  rescue ::StopIteration
+    result[0]
+  end
 
   # Move to the next adjacent block in document order. If the current block is the last
   # item in a list, this method will return the following sibling of the list block.
@@ -451,28 +460,29 @@ class AbstractBlock < AbstractNode
         (!(style_selector = selector[:style]) || style_selector == @style) &&
         (!(role_selector = selector[:role]) || (has_role? role_selector)) &&
         (!(id_selector = selector[:id]) || id_selector == @id)
+      first_result = id_selector ? true : selector[:first_result]
       if block_given?
         if (verdict = yield self)
           case verdict
           when :prune
             result << self
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if first_result
             return result
           when :reject
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if first_result
             return result
           when :stop
             raise ::StopIteration
           else
             result << self
-            raise ::StopIteration if id_selector
+            raise ::StopIteration if first_result
           end
         elsif id_selector
           raise ::StopIteration
         end
       else
         result << self
-        raise ::StopIteration if id_selector
+        raise ::StopIteration if first_result
       end
     end
     case @context

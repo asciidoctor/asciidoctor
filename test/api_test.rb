@@ -665,6 +665,37 @@ context 'API' do
       assert_equal 'shoe.png', result[1].attr('target')
     end
 
+    test 'find_by with :first_result option should return first block that match criteria' do
+      input = <<~'EOS'
+      = Document Title
+
+      preamble
+
+      == Section A
+
+      paragraph
+
+      --
+      Exhibit A::
+      +
+      [#tiger.animal]
+      image::tiger.png[Tiger]
+      --
+
+      image::shoe.png[Shoe]
+
+      == Section B
+
+      paragraph
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.find_by context: :image, first_result: true
+      assert_equal 1, result.size
+      assert_equal :image, result[0].context
+      assert_equal 'tiger.png', result[0].attr('target')
+    end
+
     test 'find_by should return an empty Array if no matches are found' do
       input = 'paragraph'
       doc = Asciidoctor.load input
@@ -1061,6 +1092,60 @@ context 'API' do
       assert_kind_of Asciidoctor::Document, result[0]
       assert_kind_of Asciidoctor::List, result[1]
       assert_kind_of Asciidoctor::ListItem, result[2]
+    end
+
+    test 'get_by should return nil if no matches are found' do
+      doc = Asciidoctor.load 'paragraph'
+      assert_nil doc.get_by context: :section
+    end
+
+    test 'get_by should return first block in document tree that match criteria' do
+      input = <<~'EOS'
+      = Document Title
+
+      preamble
+
+      == Section A
+
+      paragraph
+
+      --
+      Exhibit A::
+      +
+      [#tiger.animal]
+      image::tiger.png[Tiger]
+      --
+
+      image::shoe.png[Shoe]
+
+      == Section B
+
+      paragraph
+      EOS
+
+      doc = Asciidoctor.load input
+      result = doc.get_by context: :image
+      refute_nil result
+      assert_equal :image, result.context
+      assert_equal 'tiger.png', (result.attr 'target')
+    end
+
+    test 'get_by should return result when matching by id' do
+      input = <<~'EOS'
+      == Section
+
+      content
+
+      [#subsection]
+      === Subsection
+
+      content
+      EOS
+      doc = Asciidoctor.load input
+      result = doc.get_by id: 'subsection'
+      refute_nil result
+      assert_equal :section, result.context
+      assert_equal 'Subsection', result.title
     end
 
     test 'dlist item should always have two entries for terms and desc' do
