@@ -1036,7 +1036,7 @@ class PreprocessorReader < Reader
         # QUESTION should this line include target or expanded_target (or escaped target?)
         replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
-    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
+    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? doc, expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
       ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], sub_input: true)]
