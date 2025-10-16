@@ -644,8 +644,8 @@ class Parser
               block.parse_attributes $1, [], into: attributes if $1
               break
 
-            elsif block_macro_extensions ? (CustomBlockMacroRx =~ this_line &&
-                (extension = extensions.registered_for_block_macro? $1) || (report_unknown_block_macro = logger.debug?)) :
+            elsif block_macro_extensions ? CustomBlockMacroRx =~ this_line &&
+                ((extension = extensions.registered_for_block_macro? $1) || (report_unknown_block_macro = logger.debug?)) :
                 (logger.debug? && (report_unknown_block_macro = CustomBlockMacroRx =~ this_line))
               if report_unknown_block_macro
                 logger.debug message_with_context %(unknown name for block macro: #{$1}), source_location: reader.cursor_at_mark

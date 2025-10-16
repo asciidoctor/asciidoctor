@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Fix false positive when looking for custom block macro, leading to superfluous debug message (#4785)
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 
