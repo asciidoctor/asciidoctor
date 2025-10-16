@@ -70,6 +70,7 @@ Improvements::
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+  * Fix false positive when looking for custom block macro, leading to superfluous debug message (#4785)
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 
