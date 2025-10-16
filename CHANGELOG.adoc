@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Improvements::
+
+  * Don't freeze processor instance of extension to allow use of instance variables (#4782)
+
 Bug Fixes::
 
   * Fix false positive when looking for custom block macro, leading to superfluous debug message (#4785)

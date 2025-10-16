@@ -1392,8 +1392,6 @@ module Extensions
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
-
-      processor_instance.freeze
       extension = ProcessorExtension.new kind, processor_instance
       extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
       extension
@@ -1444,7 +1442,6 @@ module Extensions
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
-      processor_instance.freeze
       kind_store[name] = ProcessorExtension.new kind, processor_instance
     end
 

@@ -465,6 +465,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePreprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -477,6 +478,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleIncludeProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -490,6 +492,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleDocinfoProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -503,6 +506,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleTreeprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -515,6 +519,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePostprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -527,6 +532,7 @@ context 'Extensions' do
       extension = registry.find_block_extension :sample
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
       assert_kind_of SampleBlock, extension.instance
+      refute extension.instance.frozen?
       assert_kind_of Method, extension.process_method
     end
 
