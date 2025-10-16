@@ -2039,6 +2039,22 @@ context 'Sections' do
       assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a[@class="link"][@href="#_linux"]', output, 1
       assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a[text()="Linux"]', output, 1
     end
+
+    test 'should start section link after supplemental anchors when sectlinks is set' do
+      input = <<~'EOS'
+      :sectlinks:
+
+      [#foo]
+      == [[fu]]Foo
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a', output, 2
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@id="fu"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@class="link"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@id="fu"]/following-sibling::a[@class="link"]', output, 1
+    end
   end
 
   context 'Special sections' do

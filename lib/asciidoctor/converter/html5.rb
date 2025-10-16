@@ -22,6 +22,7 @@ class Converter::Html5Converter < Converter::Base
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
+  LeadingAnchorsRx = %r(^(?:<a id="[^"]+"></a>)+)
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
@@ -402,7 +403,11 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     if node.id
       id_attr = %( id="#{id = node.id}")
       if doc_attrs['sectlinks']
-        title = %(<a class="link" href="##{id}">#{title}</a>)
+        if (title.start_with? '<a ') && LeadingAnchorsRx =~ title
+          title = %(#{$&}<a class="link" href="##{id}">#{title.slice $&.length, title.length}</a>)
+        else
+          title = %(<a class="link" href="##{id}">#{title}</a>)
+        end
       end
       if doc_attrs['sectanchors']
         # QUESTION should we add a font-based icon in anchor if icons=font?

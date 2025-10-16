@@ -25,6 +25,7 @@ Improvements::
 Bug Fixes::
 
   * Fix false positive when looking for custom block macro, leading to superfluous debug message (#4785)
+  * Start sectlink after any supplemental anchors on section title when sectlinks is set (#2934)
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 
