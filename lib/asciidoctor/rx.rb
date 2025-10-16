@@ -441,10 +441,10 @@ module Asciidoctor
   #   anchor:idname[]
   #   anchor:idname[Reference Text]
   #
-  InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\]))/
+  InlineAnchorRx = /(\\)?(?:\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))? ?\]\]|anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\]))/
 
   # Scans for a non-escaped anchor (i.e., id + optional reference text) in the flow of text.
-  InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\])/
+  InlineAnchorScanRx = /(?:^|[^\\\[])\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))? ?\]\]|(?:^|[^\\])anchor:([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)\[(?:\]|(#{CC_ANY}*?[^\\])\])/
 
   # Scans for a leading, non-escaped anchor (i.e., id + optional reference text).
   LeadingInlineAnchorRx = /^\[\[([#{CC_ALPHA}_:][#{CC_WORD}\-:.]*)(?:, *(#{CC_ANY}+?))?\]\]/

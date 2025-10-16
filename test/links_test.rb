@@ -520,6 +520,27 @@ context 'Links' do
     end
   end
 
+  test 'should remove trailing space on reftext of inline anchor shorthand' do
+    input = <<~'EOS'
+    see <<foo>>
+
+    [[foo,[FOO] ]]foo
+    EOS
+    result = convert_string_to_embedded input
+    assert_includes result, 'see <a href="#foo">[FOO]</a>'
+  end
+
+  test 'should remove trailing space on reftext of inline anchor shorthand when converting to DocBook' do
+    input = <<~'EOS'
+    see <<foo>>
+
+    [[foo,[FOO] ]]foo
+    EOS
+    result = convert_string_to_embedded input, backend: 'docbook'
+    puts result
+    assert_includes result, ' xreflabel="[FOO]"'
+  end
+
   test 'unescapes square bracket in reftext of anchor macro' do
     input = <<~'EOS'
     see <<foo>>
