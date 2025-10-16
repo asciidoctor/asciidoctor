@@ -1375,8 +1375,7 @@ module Extensions
         unless processor.process_block_given?
           raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
-        processor.freeze
-        extension = ProcessorExtension.new kind, processor
+        processor_instance = processor
       else
         processor, config = resolve_args args, 2
         # style 2: specified as Class or String class name
@@ -1385,18 +1384,17 @@ module Extensions
             raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
           processor_instance = processor_class.new config
-          processor_instance.freeze
-          extension = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
-          processor.freeze
-          extension = ProcessorExtension.new kind, processor
+          processor_instance = processor
         else
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
 
+      processor_instance.freeze
+      extension = ProcessorExtension.new kind, processor_instance
       extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
       extension
     end
@@ -1422,8 +1420,7 @@ module Extensions
         unless processor.process_block_given?
           raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
-        processor.freeze
-        kind_store[name] = ProcessorExtension.new kind, processor
+        processor_instance = processor
       else
         processor, name, config = resolve_args args, 3
         # style 2: specified as Class or String class name
@@ -1435,8 +1432,6 @@ module Extensions
           unless (name = as_symbol processor_instance.name)
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
-          processor_instance.freeze
-          kind_store[name] = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
@@ -1444,12 +1439,13 @@ module Extensions
           unless (name = name ? (processor.name = as_symbol name) : (as_symbol processor.name))
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
-          processor.freeze
-          kind_store[name] = ProcessorExtension.new kind, processor
+          processor_instance = processor
         else
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
+      processor_instance.freeze
+      kind_store[name] = ProcessorExtension.new kind, processor_instance
     end
 
     def reset
