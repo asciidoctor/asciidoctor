@@ -1381,7 +1381,6 @@ module Extensions
       if kind == :include_processor && (processor_instance.method :handles?)&.arity == 1
         processor_instance.singleton_class.prepend LegacyHandlesMethodAdapter
       end
-      processor_instance.freeze
       extension = ProcessorExtension.new kind, processor_instance
       extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
       extension
@@ -1432,7 +1431,6 @@ module Extensions
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
-      processor_instance.freeze
       kind_store[name] = ProcessorExtension.new kind, processor_instance
     end
 

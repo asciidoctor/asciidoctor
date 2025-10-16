@@ -468,6 +468,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePreprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -480,6 +481,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleIncludeProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       # verify that legacy handles? method is adapted
       assert_equal 2, (extensions.first.instance.method :handles?).arity
       assert_equal 'affirmative', (extensions.first.instance.handles? nil, 'include.adoc')
@@ -496,6 +498,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleDocinfoProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -509,6 +512,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleTreeprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -521,6 +525,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePostprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -533,6 +538,7 @@ context 'Extensions' do
       extension = registry.find_block_extension :sample
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
       assert_kind_of SampleBlock, extension.instance
+      refute extension.instance.frozen?
       assert_kind_of Method, extension.process_method
     end
 
@@ -751,7 +757,8 @@ context 'Extensions' do
     end
 
     test 'should invoke include processor if it requests to handle include directive using legacy method' do
-      input = 'include::include-file.adoc[]'
+      input = %(include::include-file.adoc[]\ninclude::include-file.adoc[])
+      content_cache = {}
 
       registry = Asciidoctor::Extensions.create do
         include_processor do
@@ -760,7 +767,10 @@ context 'Extensions' do
           end
 
           process do |_doc, reader, target, attributes|
-            reader.push_include ['included'], target, target, 1, attributes
+            # demonstrate that we can use instance variables
+            @content_cache ||= content_cache
+            content = (@content_cache['include-file.adoc'] ||= 'contents of include-file.adoc')
+            reader.push_include content, target, target, 1, attributes
           end
         end
       end
@@ -769,7 +779,10 @@ context 'Extensions' do
       reader = Asciidoctor::PreprocessorReader.new document, input, nil, normalize: true
       lines = []
       lines << reader.read_line
-      assert_equal 'included', lines.last
+      lines << reader.read_line
+      assert_equal 'contents of include-file.adoc', lines.last
+      assert_equal 1, content_cache.size
+      assert_equal content_cache['include-file.adoc'], lines.last
     end
 
     test 'should invoke tree processors after parsing document' do
