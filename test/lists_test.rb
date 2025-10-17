@@ -2035,6 +2035,23 @@ context 'Ordered lists (:olist)' do
       assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
     end
 
+    test 'should not warn if explicit numbering starts at value of start attribute' do
+      input = <<~'EOS'
+      == List
+
+      [start=7]
+      7. item 7
+      8. item 8
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=7]', output, 1
+        assert_css 'ol.arabic', output, 1
+        assert_empty logger.messages
+      end
+    end
+
     test 'should match trailing line separator in text of list item' do
       input = <<~EOS.chop
       . a
