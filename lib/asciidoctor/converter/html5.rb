@@ -1247,13 +1247,14 @@ Your browser does not support the video tag.
     if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
       img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
     end
+    id_attr = node.id ? %( id="#{node.id}") : ''
     class_attr_val = type
     if (role = node.role)
       class_attr_val = (node.attr? 'float') ? %(#{class_attr_val} #{node.attr 'float'} #{role}) : %(#{class_attr_val} #{role})
     elsif node.attr? 'float'
       class_attr_val = %(#{class_attr_val} #{node.attr 'float'})
     end
-    %(<span class="#{class_attr_val}">#{img}</span>)
+    %(<span#{id_attr} class="#{class_attr_val}">#{img}</span>)
   end
 
   def convert_inline_indexterm node

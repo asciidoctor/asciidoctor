@@ -537,7 +537,7 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_inline_image node
-    img = %(<inlinemediaobject#{common_attributes nil, node.role}>
+    img = %(<inlinemediaobject#{common_attributes node.id, node.role}>
 <imageobject>
 <imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (fileref = node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
 </imageobject>
