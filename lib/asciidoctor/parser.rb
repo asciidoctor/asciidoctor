@@ -698,7 +698,7 @@ class Parser
 
       elsif OrderedListRx.match? this_line
         reader.unshift_line this_line
-        block = parse_list reader, :olist, parent, style
+        block = parse_list reader, :olist, parent, style, start: (attributes.delete 'start')
         attributes['style'] = block.style if block.style
         break
 
@@ -1109,8 +1109,10 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
-  def self.parse_list reader, list_type, parent, style
-    list_block = List.new parent, list_type
+  def self.parse_list reader, list_type, parent, style, start: nil
+    list_block = start && (start = start.to_i) > 1 ?
+      (List.new parent, list_type, attributes: { 'start' => start }) :
+      (List.new parent, list_type)
     list_rx = ListRxMap[list_type]
 
     while reader.has_more_lines? && list_rx =~ reader.peek_line
@@ -1332,9 +1334,13 @@ class Parser
           end
         end
       when :olist
-        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, (ordinal = list_block.items.size), true, reader
+        first = (ordinal = list_block.items.size) == 0
+        if (start = list_block.attributes['start']) && start > 1
+          ordinal += start.pred
+        end
+        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, ordinal, true, reader
         list_item.marker = sibling_trait
-        if ordinal == 0 && !style
+        if first && !style
           # using list level makes more sense, but we don't track it
           # basing style on marker level is compliant with AsciiDoc.py
           list_block.style = implicit_style || (ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s
