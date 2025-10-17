@@ -66,14 +66,27 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
-  * Don't freeze processor instance of extension to allow use of instance variables (#4782)
 
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+
+== 2.0.25 (2025-10-16) - @mojavelinux
+
+Improvements::
+
+  * Don't freeze processor instance of extension to allow use of instance variables (#4782)
+
+Bug Fixes::
+
   * Fix false positive when looking for custom block macro, leading to superfluous debug message (#4785)
   * Start sectlink after any supplemental anchors on section title when sectlinks is set (#2934)
   * Remove trailing space after reftext in inline anchor shorthand (to accomodate trailing `]` in reftext) (#4789)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.25[git tag] | {url-repo}/compare/v2.0.24\...v2.0.25[full diff]
+// end::compact[]
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 
@@ -111,7 +124,6 @@ Build / Infrastructure::
 === Details
 
 {url-repo}/releases/tag/v2.0.24[git tag] | {url-repo}/compare/v2.0.23\...v2.0.24[full diff]
-// end::compact[]
 
 == 2.0.23 (2024-05-17) - @mojavelinux
 
