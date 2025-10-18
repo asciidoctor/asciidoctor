@@ -2239,13 +2239,13 @@ class Parser
       marker = '1.'
     when :loweralpha
       if validate
-        expected = ('a'[0].ord + ordinal).chr
+        expected = (97 + ordinal).chr # 97 is a
         actual = marker.chop # remove trailing .
       end
       marker = 'a.'
     when :upperalpha
       if validate
-        expected = ('A'[0].ord + ordinal).chr
+        expected = (65 + ordinal).chr # 65 is A
         actual = marker.chop # remove trailing .
       end
       marker = 'A.'
