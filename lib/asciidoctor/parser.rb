@@ -2188,16 +2188,14 @@ class Parser
   #
   # list_type  - The Symbol context of the list
   # marker     - The String marker for this list item
-  # ordinal    - The position of this list item in the list
-  # validate   - Whether to validate the value of the marker
   #
   # Returns the String 0-index marker for this list item
-  def self.resolve_list_marker list_type, marker, ordinal = 0, validate = false, reader = nil
+  def self.resolve_list_marker list_type, marker
     case list_type
     when :ulist
       marker
     when :olist
-      (resolve_ordered_list_marker marker, ordinal, validate, reader)[0]
+      (resolve_ordered_list_marker marker)[0]
     else # :colist
       '<1>'
     end
