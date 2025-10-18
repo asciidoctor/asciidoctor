@@ -2263,11 +2263,12 @@ class Parser
       marker = 'I)'
     end
 
-    if validate && expected != actual
-      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor
+    if validate
+      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor unless expected == actual
+      [marker, style]
+    else
+      [marker]
     end
-
-    [marker, style]
   end
 
   # Internal: Determine whether the this line is a sibling list item
