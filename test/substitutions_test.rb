@@ -945,6 +945,18 @@ context 'Substitutions' do
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should propagate id attribute on inline image' do
+      para = block_from_string %(image:ruby.png[Ruby logo,id=ruby-logo] is the Ruby logo)
+      assert_equal '<span id="ruby-logo" class="image"><img src="ruby.png" alt="Ruby logo"></span> is the Ruby logo',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should propagate id attribute on inline image and use alt text as reftext when converting to DocBook' do
+      para = block_from_string %(image:ruby.png[Ruby logo,id=ruby-logo] is the Ruby logo), backend: 'docbook'
+      assert_equal '<inlinemediaobject xml:id="ruby-logo"><imageobject><imagedata fileref="ruby.png"/></imageobject><textobject><phrase>Ruby logo</phrase></textobject></inlinemediaobject> is the Ruby logo',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'should prepend value of imagesdir attribute to inline image target if target is relative path' do
       para = block_from_string %(Beware of the image:tiger.png[tiger].), attributes: { 'imagesdir' => './images' }
       assert_equal 'Beware of the <span class="image"><img src="./images/tiger.png" alt="tiger"></span>.',
