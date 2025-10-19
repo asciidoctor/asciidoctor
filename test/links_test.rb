@@ -537,7 +537,6 @@ context 'Links' do
     [[foo,[FOO] ]]foo
     EOS
     result = convert_string_to_embedded input, backend: 'docbook'
-    puts result
     assert_includes result, ' xreflabel="[FOO]"'
   end
 
