@@ -1335,7 +1335,7 @@ class Parser
         end
       when :olist
         first = (ordinal = list_block.items.size) == 0
-        if (start = list_block.attributes['start']) && start > 1
+        if (start = list_block.attributes['start'])
           ordinal += start.pred
         end
         sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, ordinal, true, reader
