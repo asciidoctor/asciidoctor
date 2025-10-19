@@ -182,7 +182,7 @@ context 'Invoker' do
 
   test 'should print warnings to stderr by default' do
     input = <<~'EOS'
-    2. second
+    1. first
     3. third
     EOS
     warnings = nil
@@ -251,7 +251,7 @@ context 'Invoker' do
 
   test 'should return non-zero exit code if failure level is reached' do
     input = <<~'EOS'
-    2. second
+    1. first
     3. third
     EOS
     exit_code, messages = redirect_streams do |_, err|
