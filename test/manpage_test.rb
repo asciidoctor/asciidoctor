@@ -335,6 +335,21 @@ context 'Manpage' do
       assert_include 'commit...', output.lines[-5]
     end
 
+    test 'should space dots that are not meant to be an ellipsis' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      -x::
+      Ao gravar o commit, acrescente uma linha que diz
+      "(cherry picked from commit\\...)" à mensagem de commit
+      original para indicar qual commit esta mudança
+      foi escolhida. Isso é feito apenas para picaretas
+      de cereja sem conflitos.
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_include 'commit.\\|.\\|.', output.lines[-5]
+    end
+
     test 'should normalize whitespace in a paragraph' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
