@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 

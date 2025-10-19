@@ -623,7 +623,7 @@ class Converter::DocBook5Converter < Converter::Base
         quoted_text = %(#{open}#{text}#{close})
       end
 
-      node.id ? %(<anchor#{common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
+      node.id ? %(<anchor#{common_attributes node.id}/>#{quoted_text}) : quoted_text
     end
   end
 
