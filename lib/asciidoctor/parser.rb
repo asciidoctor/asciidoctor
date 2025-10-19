@@ -2222,7 +2222,7 @@ class Parser
   # so that they can be compared against other list items.
   #
   # marker   - The marker used for this list item
-  # ordinal  - The 0-based index of the list item (default: 0)
+  # ordinal  - The 0-based index of the list item; must be provided if validate is true
   # validate - Perform validation that the marker provided is the proper
   #            marker in the sequence (default: false)
   #
@@ -2237,7 +2237,7 @@ class Parser
   #  # => ['.']
   #
   # Returns a tuple that contains the String of the first marker in this number
-  # series and the implicit list style, if applicable
+  # series and, if the ordinal is specified, the implicit list style when applicable
   def self.resolve_ordered_list_marker marker, ordinal = nil, validate = false, reader = nil
     return [marker] if marker.start_with? '.'
     # NOTE case statement is guaranteed to match one of the conditions
