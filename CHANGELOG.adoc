@@ -39,6 +39,7 @@ Enhancements::
   * Skip front matter in included content if skip-front-matter option is set on include directive (#3437)
   * Allow handles? method on include processor to accept doc as first argument; mixin adapter to support old method signature (#2895)
   * Take start value into account when validating explicit numbering on ordered list (#3252)
+  * Allow ordered list with explicit numbering to set start value using first item (#2218)
   * Pass through id attribute defined on inline image to output (#4311)
 
 Compliance::
