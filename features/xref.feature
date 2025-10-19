@@ -894,6 +894,34 @@ Feature: Cross References
           a< href='#_section_one' Section <strong>One</strong>
       """
 
+    Scenario: Create a cross reference to a section whose title contains a stem expression
+    Given the AsciiDoc source
+      """
+      :stem: latexmath
+
+      [#squares]
+      == Squares (stem:[x^2])
+
+      content
+
+      == Section Two
+
+      refer to <<squares>>
+      """
+    When it is converted to html
+    Then the result should match the HTML structure
+      """
+      .sect1
+        h2#squares
+          |Squares (\(x^2\))
+        .sectionbody: .paragraph: p content
+      .sect1
+        h2#_section_two Section Two
+        .sectionbody: .paragraph: p
+          |refer to
+          a< href='#squares' Squares (\(x^2\))
+      """
+
     Scenario: Does not process a natural cross reference in compat mode
     Given the AsciiDoc source
       """
