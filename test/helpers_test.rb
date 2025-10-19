@@ -152,4 +152,18 @@ context 'Helpers' do
       end
     end
   end
+
+  context 'Roman Numeral Conversion' do
+    test 'should convert integer to roman numeral' do
+      assert_equal 'I', (Asciidoctor::Helpers.int_to_roman 1)
+      assert_equal 'IV', (Asciidoctor::Helpers.int_to_roman 4)
+      assert_equal 'LXIV', (Asciidoctor::Helpers.int_to_roman 64)
+    end
+
+    test 'should convert roman numeral to integer' do
+      assert_equal 1, (Asciidoctor::Helpers.roman_to_int 'I')
+      assert_equal 4, (Asciidoctor::Helpers.roman_to_int 'IV')
+      assert_equal 64, (Asciidoctor::Helpers.roman_to_int 'LXIV')
+    end
+  end
 end
