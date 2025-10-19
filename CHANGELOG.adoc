@@ -75,6 +75,7 @@ Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
   * Use thin space between a sequence of three dots that are not intended to be an ellipsis (U+2026) in the manpage output (#4568)
+  * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 
