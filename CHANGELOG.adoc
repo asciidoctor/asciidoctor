@@ -73,6 +73,7 @@ Improvements::
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+  * Space out dots that are not meant to be an ellipsis in the man output (#4568)
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 
