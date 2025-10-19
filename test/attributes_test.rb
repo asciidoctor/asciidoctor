@@ -996,7 +996,7 @@ context 'Attributes' do
 
   context 'Intrinsic attributes' do
     test 'substitute intrinsics' do
-      Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
+      Asciidoctor::INTRINSIC_ATTRIBUTES.each do |key, value|
         html = convert_string %(Look, a {#{key}} is here)
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
         assert_match(/Look, a #{Regexp.escape value} is here/, html)

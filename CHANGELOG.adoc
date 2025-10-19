@@ -41,6 +41,7 @@ Enhancements::
   * Take start value into account when validating explicit numbering on ordered list (#3252)
   * Allow ordered list with explicit numbering to set start value using first item (#2218)
   * Pass through id attribute defined on inline image to output (#4311)
+  * Add cxx attribute for C++ as preferred alternative to cpp (#4442)
 
 Compliance::
 
