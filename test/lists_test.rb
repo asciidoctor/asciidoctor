@@ -2048,7 +2048,59 @@ context 'Ordered lists (:olist)' do
         output = convert_string_to_embedded input
         assert_css 'ol[start=7]', output, 1
         assert_css 'ol.arabic', output, 1
+        assert_css 'ol li', output, 2
         assert_empty logger.messages
+      end
+    end
+
+    test 'should implicitly set start on ordered list if explicit arabic numbering does not start at 1' do
+      input = <<~'EOS'
+      == List
+
+      7. item 7
+      8. item 8
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=7]', output, 1
+        assert_css 'ol.arabic', output, 1
+        assert_css 'ol li', output, 2
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should implicitly set start on ordered list if explicit roman numbering does not start at 1' do
+      input = <<~'EOS'
+      == List
+
+      IV) item 4
+      V) item 5
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=4]', output, 1
+        assert_css 'ol.upperroman', output, 1
+        assert_css 'ol li', output, 2
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should warn if item with explicit numbering in ordered list is out of sequence' do
+      input = <<~'EOS'
+      == List
+
+      x. x
+      z. z
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=24]', output, 1
+        assert_css 'ol.loweralpha', output, 1
+        assert_css 'ol li', output, 2
+        assert_message logger, :WARN, '<stdin>: line 4: list item index: expected y, got z', Hash
       end
     end
 

@@ -293,6 +293,23 @@ module Helpers
     end.join
   end
 
+  ROMAN_NUMERALS = { 'I' => 1, 'V' => 5, 'X' => 10, 'L' => 50, 'C' => 100, 'D' => 500, 'M' => 1000 }
+  private_constant :ROMAN_NUMERALS
+
+  # Internal: Converts an uppercase Roman numeral to an integer.
+  #
+  # val - the [String] Roman numeral in uppercase to convert
+  #
+  # Returns the [Integer] integer for this Roman numeral
+  def roman_to_int val
+    result = 0
+    valmap = val.each_char.map {|c| ROMAN_NUMERALS[c] }
+    valmap.each_with_index do |v, idx|
+      (succ = valmap[idx + 1]) && succ > v ? (result -= v) : (result += v)
+    end
+    result
+  end
+
   # Internal: Get the next value in the sequence.
   #
   # Handles both integer and character sequences.

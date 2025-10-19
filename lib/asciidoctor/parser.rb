@@ -1335,10 +1335,15 @@ class Parser
         end
       when :olist
         first = (ordinal = list_block.items.size) == 0
+        validate = true
         if (start = list_block.attributes['start'])
           ordinal += start.pred
+        elsif first && (start = resolve_ordered_list_start sibling_trait) > 1
+          list_block.attributes['start'] = start
+          ordinal += start.pred
+          validate = false
         end
-        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, ordinal, true, reader
+        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, ordinal, validate, reader
         list_item.marker = sibling_trait
         if first && !style
           # using list level makes more sense, but we don't track it
@@ -2233,7 +2238,7 @@ class Parser
   #
   # Returns a tuple that contains the String of the first marker in this number
   # series and the implicit list style, if applicable
-  def self.resolve_ordered_list_marker marker, ordinal = 0, validate = false, reader = nil
+  def self.resolve_ordered_list_marker marker, ordinal = nil, validate = false, reader = nil
     return [marker] if marker.start_with? '.'
     # NOTE case statement is guaranteed to match one of the conditions
     case (style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker })
@@ -2269,12 +2274,32 @@ class Parser
       marker = 'I)'
     end
 
-    if validate
-      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor unless expected == actual
+    if ordinal
+      if validate && expected != actual
+        logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor
+      end
       [marker, style]
     else
       [marker]
     end
+  end
+
+  def self.resolve_ordered_list_start marker
+    start = 1
+    return start if marker.start_with? '.'
+    case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
+    when :arabic
+      start = marker.to_i # remove trailing . and coerce to int
+    when :loweralpha
+      start = marker.chop.ord - 96 # remove trailing .
+    when :upperalpha
+      start = marker.chop.ord - 64 # remove trailing .
+    when :lowerroman
+      start = Helpers.roman_to_int marker.chop.upcase # remove trailing )
+    when :upperroman
+      start = Helpers.roman_to_int marker.chop # remove trailing )
+    end
+    start
   end
 
   # Internal: Determine whether the this line is a sibling list item
