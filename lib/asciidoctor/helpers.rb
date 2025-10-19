@@ -275,11 +275,11 @@ module Helpers
     end
   end
 
-  ROMAN_NUMERALS = {
+  ROMAN_NUMERALS_WITH_REDUCERS = {
     'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
     'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1,
   }
-  private_constant :ROMAN_NUMERALS
+  private_constant :ROMAN_NUMERALS_WITH_REDUCERS
 
   # Internal: Converts an integer to a Roman numeral.
   #
@@ -287,7 +287,7 @@ module Helpers
   #
   # Returns the [String] roman numeral for this integer
   def int_to_roman val
-    ROMAN_NUMERALS.map do |l, i|
+    ROMAN_NUMERALS_WITH_REDUCERS.map do |l, i|
       repeat, val = val.divmod i
       l * repeat
     end.join
