@@ -71,6 +71,7 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+  * Use MathJax config recommended by MathJax itself; see https://docs.mathjax.org/en/latest/output/html.html#html-support (#4424)
 
 Bug Fixes::
 
