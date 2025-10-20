@@ -51,6 +51,7 @@ Compliance::
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
   * Update stylesheet to use break-after in place of page-break-before/after/inside (#3466)
   * Change deprecated Droid Sans Mono font to its successor Noto Sans Mono (#4586)
+  * Only apply table strips to rows in table body (i.e., tbody) (#3881)
 
 Improvements::
 
