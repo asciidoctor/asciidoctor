@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Improvement::
+
+  * Use MathJax config recommended by MathJax itself; see https://docs.mathjax.org/en/latest/output/html.html#html-support (#4424)
+
 Bug Fixes::
 
   * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
