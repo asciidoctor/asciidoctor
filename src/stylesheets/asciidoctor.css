@@ -1460,10 +1460,10 @@ table.frame-ends > * > tr > :last-child {
   border-right-width: 0;
 }
 
-table.stripes-all > * > tr,
-table.stripes-odd > * > tr:nth-of-type(odd),
-table.stripes-even > * > tr:nth-of-type(even),
-table.stripes-hover > * > tr:hover {
+table.stripes-all > tbody > tr,
+table.stripes-odd > tbody > tr:nth-of-type(odd),
+table.stripes-even > tbody > tr:nth-of-type(even),
+table.stripes-hover > tbody > tr:hover {
   background: #f8f8f7;
 }
 
