@@ -341,9 +341,15 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
 
   def convert_outline node, opts = {}
     return unless node.sections?
-    sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
-    toclevels = opts[:toclevels] || (node.document.attributes['toclevels'] || 2).to_i
     sections = node.sections
+    sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
+    unless (toclevels = opts[:toclevels])
+      if (toclevels = node.document.attributes['toclevels'])
+        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && sections[0].level != 0
+      else
+        toclevels = 2
+      end
+    end
     # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
     result = [%(<ul class="sectlevel#{sections[0].level}">)]
     sections.each do |section|
