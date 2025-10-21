@@ -43,6 +43,7 @@ Enhancements::
   * Allow ordered list with explicit numbering to set start value using first item (#2218)
   * Pass through id attribute defined on inline image to output (#4311)
   * Add cxx attribute for C++ as preferred alternative to cpp (#4442)
+  * Don't add highlight class to pre tag when `nohighlight` option is set (highlight.js only) (#4804)
 
 Compliance::
 
