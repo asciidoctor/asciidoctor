@@ -612,6 +612,20 @@ context 'Syntax Highlighter' do
       assert_css 'code.language-none', output, 1
     end
 
+    test 'should not add highlight class if nohighlight option is set' do
+      input = <<~'EOS'
+      :source-highlighter: highlight.js
+
+      [%nohighlight,ruby]
+      ----
+      puts "hi"
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe
+      assert_css 'pre.highlightjs', output, 1
+      assert_css 'pre.highlight', output, 0
+    end
+
     test 'should load additional languages specified by highlightjs-languages' do
       input = <<~'EOS'
       :source-highlighter: highlight.js

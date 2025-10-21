@@ -10,7 +10,11 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    super node, lang, (opts.merge transform: proc {|_, code| code['class'] = %(language-#{lang || 'none'} hljs) })
+    transform = proc do |pre, code|
+      pre['class'] = pre['class'].sub ' highlight', '' if node.attr? 'nohighlight-option'
+      code['class'] = %(language-#{lang || 'none'} hljs)
+    end
+    super node, lang, (opts.merge transform: transform)
   end
 
   def docinfo? location
