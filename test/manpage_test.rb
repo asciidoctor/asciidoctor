@@ -317,7 +317,7 @@ context 'Manpage' do
       foi escolhida. Isso é feito apenas para picaretas de cereja sem conflitos.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_equal '\&...', output.lines[-3][0..4].chomp
+      assert_equal '\&.\|.\|.', (output.lines[-3].partition ')')[0]
     end
 
     test 'should not escape ellipsis in the middle of a line' do
@@ -332,10 +332,10 @@ context 'Manpage' do
       de cereja sem conflitos.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_include 'commit...', output.lines[-5]
+      assert_include 'commit.\|.\|.', output.lines[-5]
     end
 
-    test 'should space dots that are not meant to be an ellipsis' do
+    test 'should not space dots that are not meant to be an ellipsis' do
       input = <<~EOS.chop
       #{SAMPLE_MANPAGE_HEADER}
 
@@ -347,7 +347,7 @@ context 'Manpage' do
       de cereja sem conflitos.
       EOS
       output = Asciidoctor.convert input, backend: :manpage
-      assert_include 'commit.\\|.\\|.', output.lines[-5]
+      assert_include 'commit...', output.lines[-5]
     end
 
     test 'should normalize whitespace in a paragraph' do
@@ -1027,7 +1027,7 @@ context 'Manpage' do
       .SH "SYNOPSIS"
       .sp
       .nf
-      \fIcommand\fP [\fIOPTION\fP]... \fIFILE\fP...
+      \fIcommand\fP [\fIOPTION\fP].\|.\|. \fIFILE\fP.\|.\|.
       .fi
       .br
       .SH "DESCRIPTION"
