@@ -642,7 +642,7 @@ class Parser
 
             elsif ch0 == 't' && (this_line.start_with? 'toc:') && BlockTocMacroRx =~ this_line
               block = Block.new parent, :toc, content_model: :empty
-              block.parse_attributes $1, [], into: attributes if $1
+              block.parse_attributes $1, [], sub_input: true, into: attributes if $1
               break
 
             elsif block_macro_extensions ? CustomBlockMacroRx =~ this_line &&

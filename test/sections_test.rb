@@ -3458,15 +3458,14 @@ context 'Sections' do
       :toc-placement: macro
       :toc-title: Ignored
       :toc-class: ignored
-      :toclevels: 5
-      :tocdepth: 1
+      :tocmacrolevels: 3
 
       Preamble.
 
       [[contents]]
       [role="contents"]
       .Contents
-      toc::[levels={tocdepth}]
+      toc::[levels={tocmacrolevels}]
 
       == Section 1
 
@@ -3489,9 +3488,10 @@ context 'Sections' do
       assert_css '#preamble #contents', output, 1
       assert_css '#preamble #contents.contents', output, 1
       assert_xpath '//*[@id="contents"]/*[@class="title"][text() = "Contents"]', output, 1
-      assert_css '#contents li', output, 2
-      assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "Section 1"]', output, 1
-      assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "Section 2"]', output, 1
+      assert_css '#contents li', output, 6
+      assert_css '#contents a[href="#_section_1"]', output, 1
+      assert_css '#contents a[href="#_section_1_1"]', output, 1
+      assert_css '#contents a[href="#_section_1_1_1"]', output, 1
     end
 
     test 'child toc levels should not have additional bullet at parent level in html' do
