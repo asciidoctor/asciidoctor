@@ -1110,7 +1110,7 @@ class Parser
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
   def self.parse_list reader, list_type, parent, style, start: nil
-    list_block = start && (start = start.to_i) > 1 ?
+    list_block = start && (start = start.to_i) != 1 ?
       (List.new parent, list_type, attributes: { 'start' => start }) :
       (List.new parent, list_type)
     list_rx = ListRxMap[list_type]
@@ -1338,7 +1338,7 @@ class Parser
         validate = true
         if (start = list_block.attributes['start'])
           ordinal += start.pred
-        elsif first && (start = resolve_ordered_list_start sibling_trait) > 1
+        elsif first && (start = resolve_ordered_list_start sibling_trait) != 1
           list_block.attributes['start'] = start
           ordinal += start.pred
           validate = false

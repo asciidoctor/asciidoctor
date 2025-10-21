@@ -1796,6 +1796,7 @@ context 'Ordered lists (:olist)' do
       EOS
       output = convert_string input
       assert_xpath '//ol', output, 1
+      assert_css 'ol[start]', output, 0
       assert_xpath '//ol/li', output, 3
     end
 
@@ -2018,6 +2019,50 @@ context 'Ordered lists (:olist)' do
       assert_xpath '//ol', output, 2
       assert_xpath '(//ol)[1]/li', output, 2
       assert_xpath '(//ol)[2]/li', output, 1
+    end
+
+    test 'should honor start attribute on ordered list' do
+      input = <<~'EOS'
+      == List
+
+      [start=7]
+      . item 7
+      . item 8
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=7]', output, 1
+    end
+
+    test 'should allow value of start attribute to be 0' do
+      input = <<~'EOS'
+      == List
+
+      [start=0]
+      . item 0
+      . item 1
+      . item 2
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=0]', output, 1
+    end
+
+    test 'should allow value of start attribute to be negative' do
+      input = <<~'EOS'
+      == List
+
+      [start=-10]
+      . -10
+      . -9
+      . -8
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=-10]', output, 1
     end
 
     test 'should use start number in docbook5 backend' do
