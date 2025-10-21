@@ -192,7 +192,7 @@ Style/PercentLiteralDelimiters:
 Style/PerlBackrefs:
   Enabled: false # reason: an important language feature
 Style/RedundantBegin:
-  Exclude: [ test/*.rb ] # TODO remove once support for Ruby < 2.5 is dropped; rule does not allow exception for blocks
+  Exclude: [ test/*.rb ] # reason: we often need to set up variables before begin to use in ensure
 Style/RedundantHeredocDelimiterQuotes:
   Enabled: false # reason: we know what we are doing
 Style/RedundantParentheses:
