@@ -3494,6 +3494,55 @@ context 'Sections' do
       assert_css '#contents a[href="#_section_1_1_1"]', output, 1
     end
 
+    test 'should allow section to override toclevels for descendant sections' do
+      input = <<~'EOS'
+      = Document Title
+      :toc:
+      :toclevels: 1
+      :nofooter:
+
+      == Level 1
+
+      === Level 2
+
+      [toclevels=2]
+      == Another Level 1
+
+      === Another Level 2
+      EOS
+
+      output = convert_string input
+      assert_css '#toc a[href="#_level_2"]', output, 0
+      assert_css '#toc a[href="#_another_level_2"]', output, 1
+    end
+
+    test 'should allow section to remove itself from toc by setting toclevels to less than own section level' do
+      input = <<~'EOS'
+      = Document Title
+      :doctype: book
+      :toc:
+      :toclevels: 3
+
+      [#ch1]
+      == Chapter
+
+      [#ch1-s1]
+      === Chapter Section
+
+      [appendix#app1,toclevels=0]
+      == Lorem Ipsum
+
+      [#app1-s1]
+      === Appendix Section
+      EOS
+
+      output = convert_string input
+      assert_css '#toc a[href="#ch1"]', output, 1
+      assert_css '#toc a[href="#ch1-s1"]', output, 1
+      assert_css '#toc a[href="#app1"]', output, 0
+      assert_css '#toc a[href="#app1-s1"]', output, 0
+    end
+
     test 'child toc levels should not have additional bullet at parent level in html' do
       input = <<~'EOS'
       = Article

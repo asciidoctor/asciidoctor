@@ -28,6 +28,7 @@ Enhancements::
   * Omit meta generator tag in HTML output if `reproducible` document attribute is set (#4143) (*@rpavlik*)
   * Add `--sourcemap` option to the CLI to enable the `:sourcemap` option on the parser (#3569) (*@hackingotter*)
   * Allow section ID to be unset by assigning an empty value to the `id` block attribute (#4139)
+  * Allow section to override toclevels for itself and descendant sections (#2618)
   * Add support for dropping principal text of list item if empty in an ordered or unordered list when converting to man page (#4182)
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
   * Add support for role on thematic break in HTML converter (#4101)
