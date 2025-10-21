@@ -3230,6 +3230,46 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
     end
 
+    test 'should only show parts in toc if toclevels is 0' do
+      input = <<~'EOS'
+      = Article
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc a[href="#_part_1"]', output, 1
+      assert_css '#toc a[href="#_part_2"]', output, 1
+      assert_css '#toc a[href="#_chapter_1"]', output, 0
+      assert_css '#toc a[href="#_chapter_2"]', output, 0
+    end
+
+    test 'should coerce minimum toclevels to 1 if first section of document is not a part' do
+      input = <<~'EOS'
+      = Article
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      == Chapter 1
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc a[href="#_chapter_1"]', output, 1
+      assert_css '#toc a[href="#_chapter_2"]', output, 1
+    end
+
     test 'should not output table of contents if toc-placement attribute is unset' do
       input = <<~'EOS'
       = Article
