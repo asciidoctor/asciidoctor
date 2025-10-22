@@ -1967,6 +1967,16 @@ context 'Substitutions' do
       end
     end
 
+    test 'should warn if substitutions on pass macro are invalid' do
+      subs = 'bogus'
+      input = %(pass:#{subs}[++])
+      using_memory_logger do |logger|
+        para = block_from_string input, attributes: { 'stem' => 'asciimath' }
+        assert_equal '++', para.content
+        assert_message logger, :WARN, %(invalid substitution type for passthrough macro: #{subs})
+      end
+    end
+
     test 'should allow content of inline pass macro to be empty' do
       para = block_from_string 'pass:[]'
       result = para.extract_passthroughs para.source
@@ -2273,6 +2283,16 @@ context 'Substitutions' do
           input = %(stem:#{subs}[x^2])
           para = block_from_string input, attributes: { 'stem' => 'asciimath' }
           assert_equal %(stem:#{subs}[x^2]), para.content
+        end
+      end
+
+      test 'should warn if substitutions on stem macro are invalid' do
+        subs = 'bogus'
+        input = %(stem:#{subs}[x^2])
+        using_memory_logger do |logger|
+          para = block_from_string input, attributes: { 'stem' => 'asciimath' }
+          assert_equal '\\$x^2\\$', para.content
+          assert_message logger, :WARN, %(invalid substitution type for stem macro: #{subs})
         end
       end
     end
