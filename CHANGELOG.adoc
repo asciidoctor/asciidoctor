@@ -26,6 +26,7 @@ Bug Fixes::
 
   * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
   * Resolve attribute references (attributes substitution) in attrlist of toc macro (#4806)
+  * Use thin space between dots of an ellipsis (U+2026) in manpage output (#4568)
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 

@@ -707,7 +707,7 @@ allbox tab(:);'
     end
     str = str.
       gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' }. # literal backslash (not a troff escape sequence)
-      gsub(EllipsisCharRefRx, '...'). # horizontal ellipsis
+      gsub(EllipsisCharRefRx, '.\|.\|.'). # horizontal ellipsis (emulate appearance)
       gsub(LeadingPeriodRx, '\\\&.'). # leading . is used in troff for macro call or other formatting; replace with \&.
       gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) }. # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
       gsub('-', '\-').
