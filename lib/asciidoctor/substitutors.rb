@@ -1136,7 +1136,7 @@ module Substitutors
       content = normalize_text $3, nil, true
       # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc.py
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
-      subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      subs = subs ? (resolve_pass_subs subs, 'stem macro') : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
@@ -1244,8 +1244,8 @@ module Substitutors
   end
 
   # Public: Call resolve_subs for the :inline type with the subject set as passthrough macro.
-  def resolve_pass_subs subs
-    resolve_subs subs, :inline, nil, 'passthrough macro'
+  def resolve_pass_subs subs, subject = 'passthrough macro'
+    resolve_subs subs, :inline, nil, subject
   end
 
   # Public: Expand all groups in the subs list and return. If no subs are resolved, return nil.
