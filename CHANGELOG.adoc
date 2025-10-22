@@ -78,7 +78,7 @@ Improvements::
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
-  * Honor escaped ellipsis and use thin space between dots of an ellipsis (U+2026) in the manpage output (#4568)
+  * Use thin space between dots of an ellipsis (U+2026) in manpage output (#4568)
   * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
   * Resolve attribute references (attributes substitution) in attrlist of toc macro (#4806)
 

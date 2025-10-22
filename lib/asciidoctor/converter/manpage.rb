@@ -26,7 +26,6 @@ class Converter::ManPageConverter < Converter::Base
   MalformedEscapedMacroRx = /(#{ESC}\\c) (#{ESC}\.(?:URL|MTO) )/
   MockMacroRx = %r(</?(#{ESC}\\[^>]+)>)
   EmDashCharRefRx = /&#8212;(?:&#8203;)?/
-  EscapedEllipsisRx = /[.]{3}/
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
   WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
   XMLMarkupRx = /&#?[a-z\d]+;|</
@@ -707,7 +706,6 @@ r lw(\n(.lu*75u/100u).'
     end
     str = str
       .gsub(LiteralBackslashRx) { $1 ? $& : '\\(rs' } # literal backslash (not a troff escape sequence)
-      .gsub(EscapedEllipsisRx, '...') # escaped horizontal ellipsis
       .gsub(EllipsisCharRefRx, '.\|.\|.') # horizontal ellipsis (emulate appearance)
       .gsub(LeadingPeriodRx, '\\\&.') # leading . is used in troff for macro call or other formatting; replace with \&.
       .gsub(EscapedMacroRx) { (rest = $3.lstrip).empty? ? %(.#{$1}"#{$2}") : %(.#{$1}"#{$2.rstrip}"#{LF}#{rest}) } # drop orphaned \c escape lines, unescape troff macro, quote adjacent character, isolate macro line
