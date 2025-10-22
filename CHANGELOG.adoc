@@ -81,6 +81,7 @@ Bug Fixes::
   * Honor escaped ellipsis and use thin space between dots of an ellipsis (U+2026) in the manpage output (#4568)
   * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
   * Resolve attribute references (attributes substitution) in attrlist of toc macro (#4806)
+  * Cite stem macro specifically in warning message when macro has invalid substitutions (#4808)
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 
