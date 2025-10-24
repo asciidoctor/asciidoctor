@@ -73,15 +73,28 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
-  * Use MathJax config recommended by MathJax itself; see https://docs.mathjax.org/en/latest/output/html.html#html-support (#4424)
 
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+
+== 2.0.26 (2025-10-24) - @mojavelinux
+
+Improvement::
+
+  * Use MathJax config recommended by MathJax itself; see https://docs.mathjax.org/en/latest/output/html.html#html-support (#4424)
   * Use thin space between dots of an ellipsis (U+2026) in manpage output (#4568)
+
+Bug Fixes::
+
   * Don't use text of span as value of xreflabel when node has ID in DocBook output (#4539)
   * Resolve attribute references (attributes substitution) in attrlist of toc macro (#4806)
   * Cite stem macro specifically in warning message when macro has invalid substitutions (#4808)
+
+=== Details
+
+{url-repo}/releases/tag/v2.0.26[git tag] | {url-repo}/compare/v2.0.25\...v2.0.26[full diff]
+// end::compact[]
 
 == 2.0.25 (2025-10-16) - @mojavelinux
 
@@ -98,7 +111,6 @@ Bug Fixes::
 === Details
 
 {url-repo}/releases/tag/v2.0.25[git tag] | {url-repo}/compare/v2.0.24\...v2.0.25[full diff]
-// end::compact[]
 
 == 2.0.24 (2025-10-13) - @mojavelinux
 
