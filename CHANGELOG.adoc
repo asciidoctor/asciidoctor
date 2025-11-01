@@ -34,8 +34,6 @@ Enhancements::
   * Add support for role on thematic break in HTML converter (#4101)
   * Add support for link=self on image macros (#3656)
   * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
-  * Update signature of Logger constructor so both positional arguments and keyword arguments are passed to super constructor (#4250)
-  * Honor `level` and `formatter` keyword arguments passed to Logger constructor (#4250)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro
   * Skip front matter in included content if skip-front-matter option is set on include directive (#3437)
