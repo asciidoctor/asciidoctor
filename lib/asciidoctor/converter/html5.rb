@@ -354,9 +354,9 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
     result = [%(<ul class="sectlevel#{sections[0].level}">)]
     sections.each do |section|
-      slevel = section.level
-      next if slevel > (stoclevels = (section.attr? 'toclevels') ? (section.attr 'toclevels').to_i : toclevels)
-      if section.caption
+      if (slevel = section.level) > (stoclevels = (section.attr? 'toclevels') ? (section.attr 'toclevels').to_i : toclevels)
+        next
+      elsif section.caption
         stitle = section.captioned_title
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
