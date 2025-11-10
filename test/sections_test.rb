@@ -3166,7 +3166,7 @@ context 'Sections' do
 
     test 'should only show parts in toc if toclevels is 0' do
       input = <<~'EOS'
-      = Article
+      = Book
       :doctype: book
       :toc:
       :toclevels: 0
@@ -3190,7 +3190,7 @@ context 'Sections' do
 
     test 'should only show parts in toc if toclevels is 0 and book starts with special section' do
       input = <<~'EOS'
-      = Article
+      = Book
       :doctype: book
       :toc:
       :toclevels: 0
