@@ -21,6 +21,7 @@ This project utilizes semantic versioning.
 Bug Fixes::
 
   * When normalizing toclevels, detect part even when book starts with special section (#4814)
+  * Don't show special sections defined in level 0 when toclevels is 0
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
