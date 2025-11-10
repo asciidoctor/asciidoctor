@@ -76,6 +76,7 @@ Improvements::
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+  * When normalizing toclevels, detect part even when book starts with special section (#4814)
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 

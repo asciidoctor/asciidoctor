@@ -346,7 +346,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
     unless (toclevels = opts[:toclevels])
       if (toclevels = node.document.attributes['toclevels'])
-        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && sections[0].level != 0
+        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && node.context == :document && !node.multipart?
       else
         toclevels = 2
       end
