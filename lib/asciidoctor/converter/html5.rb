@@ -342,16 +342,16 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   def convert_outline node, opts = {}
     return unless node.sections?
     sections = node.sections
+    sectlevel = (parts = node.context == :document && node.multipart?) ? 0 : sections[0].level
     sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
     unless (toclevels = opts[:toclevels])
       if (toclevels = node.document.attributes['toclevels'])
-        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && node.context == :document && !node.multipart?
+        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && !parts
       else
         toclevels = 2
       end
     end
-    # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
-    result = [%(<ul class="sectlevel#{sections[0].level}">)]
+    result = [%(<ul class="sectlevel#{sectlevel}">)]
     sections.each do |section|
       if (slevel = section.level) > toclevels
         next
@@ -374,12 +374,13 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         stitle = section.title
       end
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
+      otag = slevel == sectlevel ? '<li>' : %(<li class="sectlevel#{slevel}">)
       if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
-        result << %(<li><a href="##{section.id}">#{stitle}</a>)
+        result << %(#{otag}<a href="##{section.id}">#{stitle}</a>)
         result << child_toc_level
         result << '</li>'
       else
-        result << %(<li><a href="##{section.id}">#{stitle}</a></li>)
+        result << %(#{otag}<a href="##{section.id}">#{stitle}</a></li>)
       end
     end
     result << '</ul>'
