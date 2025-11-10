@@ -639,6 +639,18 @@ class Document < AbstractBlock
     @next_section_index > 0
   end
 
+  def multipart?
+    return unless @doctype == 'book'
+    @blocks.any? do |b|
+      next unless b.context == :section
+      if b.level == 0
+        true
+      elsif !b.special
+        break
+      end
+    end
+  end
+
   def footnotes?
     @catalog[:footnotes].empty? ? false : true
   end

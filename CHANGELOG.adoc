@@ -18,7 +18,9 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
-_No changes since previous release._
+Bug Fixes::
+
+  * When normalizing toclevels, detect part even when book starts with special section (#4814)
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 

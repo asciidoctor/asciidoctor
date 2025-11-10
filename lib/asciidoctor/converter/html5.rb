@@ -345,7 +345,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
     unless (toclevels = opts[:toclevels])
       if (toclevels = node.document.attributes['toclevels'])
-        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && sections[0].level != 0
+        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && node.context == :document && !node.multipart?
       else
         toclevels = 2
       end
@@ -353,8 +353,9 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
     result = [%(<ul class="sectlevel#{sections[0].level}">)]
     sections.each do |section|
-      slevel = section.level
-      if section.caption
+      if (slevel = section.level) > toclevels
+        next
+      elsif section.caption
         stitle = section.captioned_title
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
