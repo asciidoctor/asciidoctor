@@ -3283,6 +3283,64 @@ context 'Sections' do
       assert_css '#toc a[href="#_chapter_2"]', output, 0
     end
 
+    test 'should not move parts down a level in toc if book starts with special section' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      [dedication]
+      = Dedication
+
+      For my family.
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc > ul.sectlevel0', output, 1
+      assert_css '#toc > ul.sectlevel0 > li:not([class])', output, 2
+      assert_css '#toc a', output, 2
+      assert_css '#toc a[href="#_part_1"]', output, 1
+      assert_css '#toc a[href="#_part_2"]', output, 1
+    end
+
+    test 'should add class to special sections in TOC that precede first part' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 1
+
+      [dedication]
+      = Dedication
+
+      For my family.
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc > ul.sectlevel0', output, 1
+      assert_css '#toc a', output, 5
+      assert_css '#toc > ul.sectlevel0 > li.sectlevel1', output, 1
+      assert_css '#toc > ul.sectlevel0 > li.sectlevel1 a[href="#_dedication"]', output, 1
+      assert_css '#toc > ul.sectlevel0 ul.sectlevel1', output, 2
+    end
+
     test 'should coerce minimum toclevels to 1 if first section of document is not a part' do
       input = <<~'EOS'
       = Article

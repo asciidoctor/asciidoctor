@@ -701,7 +701,7 @@ body > div[id]::after,
   margin-left: 0.125em;
 }
 
-#toc ul.sectlevel0 > li > a {
+#toc ul.sectlevel0 > li:not([class]) > a {
   font-style: italic;
 }
 
