@@ -926,7 +926,7 @@ Your browser does not support the audio tag.
             end
 
             cell_tag_name = (tsec == :head || cell.style == :header ? 'th' : 'td')
-            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}")
+            cell_class_attribute = %( class="tableblock halign-#{cell.attr 'halign'} valign-#{cell.attr 'valign'}#{(role = cell.role) ? " #{role}" : ''}")
             cell_colspan_attribute = cell.colspan ? %( colspan="#{cell.colspan}") : ''
             cell_rowspan_attribute = cell.rowspan ? %( rowspan="#{cell.rowspan}") : ''
             cell_style_attribute = (node.document.attr? 'cellbgcolor') ? %( style="background-color: #{node.document.attr 'cellbgcolor'};") : ''
