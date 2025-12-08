@@ -85,7 +85,7 @@ First, ensure your source document conforms to the <<doctype,manpage doctype str
 Then, to activate the man page converter, you must assign `manpage` to the `backend` option.
 Doing so will instruct the processor to use the man page converter to convert the document.
 
-For the purpose of this example, we'll assue that the doctitle in [.path]_progname.adoc_ is `progname(1)`, where `progname` is the name of the command and `1` is the volume number.
+For the purpose of this example, we'll assume that the doctitle in [.path]_progname.adoc_ is `progname(1)`, where `progname` is the name of the command and `1` is the volume number.
 Based on this information, the man page converter will set the output file name to [.path]_progname.1_.
 
 To generate a man page, run:
