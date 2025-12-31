@@ -501,3 +501,17 @@ endif::[]
 
 Refer to the {url-changelog}[CHANGELOG] for a complete list of changes in older releases.
 endif::[]
+
+== Example: Using :sectnums:
+
+The `:sectnums:` attribute enables automatic numbering of section headings.
+This is useful for large documents where numbered sections improve readability.
+
+[source,asciidoc]
+----
+:sectnums:
+
+== Introduction
+== Getting Started
+----
+
