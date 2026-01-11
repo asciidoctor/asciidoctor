@@ -309,12 +309,14 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       # QUESTION should notitle control the manual page title?
       unless node.notitle
         id_attr = node.id ? %( id="#{node.id}") : ''
-        result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
+        class_attr = node.role ? %( class="#{node.role}") : ''
+        result << %(<h1#{id_attr}#{class_attr}>#{node.doctitle} Manual Page</h1>)
       end
       result << (generate_manname_section node) if node.attr? 'manpurpose'
     elsif node.header? && !node.notitle
       id_attr = node.id ? %( id="#{node.id}") : ''
-      result << %(<h1#{id_attr}>#{node.header.title}</h1>)
+      class_attr = node.role ? %( class="#{node.role}") : ''
+      result << %(<h1#{id_attr}#{class_attr}>#{node.header.title}</h1>)
     end
 
     if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
