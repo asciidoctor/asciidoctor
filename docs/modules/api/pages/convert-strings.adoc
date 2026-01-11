@@ -103,6 +103,9 @@ Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDo
 Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
 ----
 
+NOTE: When converting standalone output to a file, additional files may be written.
+For example, if the `linkcss` and `copycss` attributes are both set, the processor will write the default stylesheet to a file as well.
+
 If you want to generate embedded output when starting with a file, set the `:standalone` option to `false`.
 However, most of the time you'll want to generate a standalone document when converting a file (which is why it's default).
 

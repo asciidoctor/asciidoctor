@@ -28,6 +28,8 @@ This can be beneficial if you're converting numerous AsciiDoc documents to HTML 
 It can also make inspecting the HTML a little simpler.
 
 If the `linkcss` document attribute is set, the converter will link to the stylesheet instead of embedding it.
+When the `linkcss` attribute is set, the safe mode is safe or lower, standalone output is used, and the target is a file, Asciidoctor will also copy the CSS file to linked destination (unless configured otherwise).
+
 To link to the stylesheet, the converter uses a `<link>` element specialized by the `rel="stylesheet"` attribute.
 The `href` attribute will reference the stylesheet using a relative path.
 
@@ -64,7 +66,10 @@ Let's find out.
 If you're linking to a stylesheet file, the stylesheet file has to be available at the referenced path so the browser can access it.
 For simple cases, Asciidoctor takes care of this for you.
 
-If the safe mode is server or lower, and the `linkcss` document attribute is set, Asciidoctor will copy the stylesheet to the output directory so the HTML can link to it.
+If the safe mode is server or lower, standalone output is used, the output target is a file, and the `linkcss` document attribute is set, Asciidoctor will copy the stylesheet to the output directory so the HTML can link to it.
+
+NOTE: The stylesheet is not copied when the output target is not a file or when generating embedded HTML.
+
 When using the default stylesheet, Asciidoctor writes the CSS to the file [.path]_asciidoctor.css_ in the output directory.
 If you specify a custom stylesheet, Asciidoctor will copy that file instead, retaining the name of the file.
 This utility works even if you specify an xref:cli:output-file.adoc[output file in a different directory] from the source file.
