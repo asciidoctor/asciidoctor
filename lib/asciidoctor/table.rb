@@ -257,6 +257,12 @@ class Table::Cell < AbstractBlock
       if attributes.empty?
         @colspan = @rowspan = nil
       else
+        if (column_role = column.role)
+          role = attributes.delete('role')
+          if role
+            attributes['role'] = column_role + ' ' + role
+          end
+        end
         @colspan, @rowspan = (attributes.delete 'colspan'), (attributes.delete 'rowspan')
         # TODO delete style attribute from @attributes if set
         cell_style = attributes['style'] || cell_style unless in_header_row
