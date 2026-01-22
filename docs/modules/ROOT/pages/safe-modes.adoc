@@ -34,6 +34,8 @@ Its integer value is `0`.
 
 The `SAFE` safe mode level prevents access to files which reside outside of the parent directory of the source file.
 Include directives (`+include::[]+`) are enabled, but paths to include files must be within the parent directory.
+Note that the processor does not validate symlink targets, so a symlink can be used to bypass this restriction.
+
 This mode allows assets (such as the stylesheet) to be embedded in the document.
 
 Its integer value is `1`.
