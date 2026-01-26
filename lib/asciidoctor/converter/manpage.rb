@@ -384,7 +384,7 @@ r lw(\n(.lu*75u/100u).'
   end
 
   # NOTE This handler inserts empty cells to account for colspans and rowspans.
-  # In order to support colspans and rowspans propertly, that information must
+  # In order to support colspans and rowspans properly, that information must
   # be computed up front and consulted when rendering the cell as this information
   # is not available on the cell itself.
   def convert_table node

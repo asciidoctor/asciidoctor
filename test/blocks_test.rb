@@ -1711,7 +1711,7 @@ tab two
       assert_css '.openblock .openblock', output, 2
     end
 
-    test 'open block ~ variant cannot masquarade as another block context' do
+    test 'open block ~ variant cannot masquerade as another block context' do
       input = <<-EOS
 [sidebar]
 ~~~~
