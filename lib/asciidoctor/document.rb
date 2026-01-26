@@ -1011,7 +1011,7 @@ class Document < AbstractBlock
         ::File.write target, output, mode: FILE_WRITE_MODE
       end
       if @backend == 'manpage' && ::String === target && (@converter.class.respond_to? :write_alternate_pages)
-        @converter.class.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], target
+        @converter.class.write_alternate_pages @attributes['mannames'], @attributes['manvolnum'], @attributes['manvoldir'], target
       end
     end
     @timings.record :write if @timings

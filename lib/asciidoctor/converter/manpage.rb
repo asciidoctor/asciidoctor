@@ -42,6 +42,7 @@ class Converter::ManPageConverter < Converter::Base
     end
     mantitle = (node.attr 'mantitle').gsub InvalidSectionIdCharsRx, ''
     manvolnum = node.attr 'manvolnum', '1'
+    manvoldir = node.attr 'manvoldir', ''
     manname = node.attr 'manname', mantitle
     manmanual = node.attr 'manmanual'
     mansource = node.attr 'mansource'
@@ -656,13 +657,17 @@ r lw(\n(.lu*75u/100u).'
     end
   end
 
-  def self.write_alternate_pages mannames, manvolnum, target
+  def self.write_alternate_pages mannames, manvolnum, manvoldir, target
     return unless mannames && mannames.size > 1
     mannames.shift
     manvolext = %(.#{manvolnum})
+    manvoldir = manvoldir.strip
+    if not manvoldir.empty? then
+      manvoldir = manvoldir + "/"
+    end
     dir, basename = ::File.split target
     mannames.each do |manname|
-      ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{basename}), mode: FILE_WRITE_MODE
+      ::File.write ::File.join(dir, %(#{manname}#{manvolext})), %(.so #{manvoldir}#{basename}), mode: FILE_WRITE_MODE
     end
   end
 
