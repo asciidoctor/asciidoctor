@@ -450,7 +450,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
         label = %(<i class="fa icon-#{name}" title="#{node.attr 'textlabel'}"></i>)
       else
-        label = %(<img src="#{node.icon_uri name}" alt="#{node.attr 'textlabel'}"#{@void_element_slash}>)
+        label = %(<img src="#{node.icon_uri name}" title="#{node.attr 'textlabel'}" alt="#{node.attr 'textlabel'}"#{@void_element_slash}>)
       end
     else
       label = %(<div class="title">#{node.attr 'textlabel'}</div>)
