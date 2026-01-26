@@ -1595,7 +1595,7 @@ context 'Substitutions' do
       #assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
     end
 
-    test 'index term 2 macro with round bracket syntex should not interfere with index term macro with round bracket syntax' do
+    test 'index term 2 macro with round bracket syntax should not interfere with index term macro with round bracket syntax' do
       sentence = "The ((panthera tigris)) is the largest cat species.\n(((Big cats,Tigers)))"
       para = block_from_string sentence
       output = para.sub_macros para.source
