@@ -1304,7 +1304,7 @@ module Substitutors
       @subs = default_subs.drop 0
     end
 
-    # QUESION delegate this logic to a method?
+    # QUESTION delegate this logic to a method?
     if @context == :listing && @style == 'source' && (syntax_hl = @document.syntax_highlighter) &&
         syntax_hl.highlight? && (idx = @subs.index :specialcharacters)
       @subs[idx] = :highlight

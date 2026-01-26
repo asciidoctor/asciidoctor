@@ -52,7 +52,7 @@ If you want to exclude that block, slice it off from the results:
 puts doc.find_by.slice 1..-1
 ----
 
-If youre just looking for the first result, you can pluck it from the result array:
+If you're just looking for the first result, you can pluck it from the result array:
 
 [,ruby]
 ----

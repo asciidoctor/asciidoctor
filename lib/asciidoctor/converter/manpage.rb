@@ -375,12 +375,10 @@ r lw(\n(.lu*75u/100u).'
     result.join LF
   end
 
-  # FIXME: The reason this method is so complicated is because we are not
-  # receiving empty(marked) cells when there are colspans or rowspans. This
-  # method has to create a map of all cells and in the case of rowspans
-  # create empty cells as placeholders of the span.
-  # To fix this, asciidoctor needs to provide an API to tell the user if a
-  # given cell is being used as a colspan or rowspan.
+  # NOTE This handler inserts empty cells to account for colspans and rowspans.
+  # In order to support colspans and rowspans properly, that information must
+  # be computed up front and consulted when rendering the cell as this information
+  # is not available on the cell itself.
   def convert_table node
     result = []
     if node.title?

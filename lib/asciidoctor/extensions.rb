@@ -1051,7 +1051,7 @@ module Extensions
     # * A method block (i.e., Proc) that conforms to the BlockProcessor contract
     #
     # Unless the BlockProcessor is passed as the method block, it must be the
-    # first argument to this method. The second argument is the name (coersed
+    # first argument to this method. The second argument is the name (coerced
     # to a Symbol) of the AsciiDoc block content (i.e., delimited block or
     # paragraph) that this processor is registered to handle. If a block name
     # is not passed as an argument, it gets read from the name property of the
@@ -1125,7 +1125,7 @@ module Extensions
     # Public: Retrieves the {Extension} proxy object for the BlockProcessor registered
     # to handle block content with the name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # This method assumes you've called blocks? first to check whether any
     # block extensions are registered.
@@ -1148,7 +1148,7 @@ module Extensions
     #
     # Unless the BlockMacroProcessor is passed as the method block, it must be
     # the first argument to this method. The second argument is the name
-    # (coersed to a Symbol) of the AsciiDoc block macro that this processor is
+    # (coerced to a Symbol) of the AsciiDoc block macro that this processor is
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the BlockMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
@@ -1204,7 +1204,7 @@ module Extensions
     # Public: Checks whether any {BlockMacroProcessor} extensions are registered to
     # handle the block macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # This method assumes you've called block_macros? first to check whether any
     # block macro extensions are registered.
@@ -1220,7 +1220,7 @@ module Extensions
     # Public: Retrieves the {Extension} proxy object for the BlockMacroProcessor registered
     # to handle a block macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # This method assumes you've called block_macros? first to check whether any
     # block macro extensions are registered.
@@ -1243,7 +1243,7 @@ module Extensions
     #
     # Unless the InlineMacroProcessor is passed as the method block, it must be
     # the first argument to this method. The second argument is the name
-    # (coersed to a Symbol) of the AsciiDoc block macro that this processor is
+    # (coerced to a Symbol) of the AsciiDoc block macro that this processor is
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the InlineMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
@@ -1299,7 +1299,7 @@ module Extensions
     # Public: Checks whether any {InlineMacroProcessor} extensions are registered to
     # handle the inline macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # This method assumes you've called inline_macros? first to check whether any
     # inline macro extensions are registered.
@@ -1313,7 +1313,7 @@ module Extensions
     # Public: Retrieves the {Extension} proxy object for the InlineMacroProcessor registered
     # to handle an inline macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # This method assumes you've called inline_macros? first to check whether any
     # inline macro extensions are registered.

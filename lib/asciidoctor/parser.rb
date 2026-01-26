@@ -2650,7 +2650,7 @@ class Parser
   # This method preserves the significant indentation (that exceeding the block indent) on each line.
   #
   # lines       - The Array of String lines to process (no trailing newlines)
-  # indent_size - The Integer number of spaces to readd to the start of non-empty lines after removing the indentation.
+  # indent_size - The Integer number of spaces to read to the start of non-empty lines after removing the indentation.
   #               If this value is < 0, the existing indentation is preserved (optional, default: 0)
   # tab_size    - the Integer number of spaces to use in place of a tab. A value of <= 0 disables the replacement
   #               (optional, default: 0)
