@@ -130,7 +130,7 @@ Check the URI.
 |An attribute cannot be resolved and the `attribute-missing` attribute is set to `skip`.
 
 |tables must have at least one body row
-|
+|When converting to DocBook, a table must have at least one body row (excluding the header row).
 
 |tag '<x>' not found in include file: <file>
 |You tried to include by tagged region, but the included document does not have that tag.
