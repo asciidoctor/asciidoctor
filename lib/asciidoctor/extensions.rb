@@ -624,7 +624,7 @@ module Extensions
   #
   # If the process method returns an instance of Block, the content model of that
   # Block is :compound, and the Block contains at least one line, the parser will
-  # parse those lines into blocks an assigned them to the returned block.
+  # parse those lines into blocks and assign them to the returned block.
   #
   # BlockMacroProcessor implementations must extend BlockMacroProcessor.
   class BlockMacroProcessor < MacroProcessor
