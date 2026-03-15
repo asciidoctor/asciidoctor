@@ -3093,6 +3093,154 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
     end
 
+    test 'should not use reftext in table of contents by default' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+
+      [reftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="Long Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="Long Section One"]', output, 1
+    end
+
+    test 'should use reftext in table of contents if toc-use-reftext is set' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+      :toc-use-reftext:
+
+      [reftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="Long Section One"]', output, 1
+    end
+
+    test 'should use reftext in table of contents if toc-use-reftext and numbered is set' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+      :toc-use-reftext:
+      :numbered:
+
+      [reftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="1. Long Section One"]', output, 1
+    end
+
+    test 'should use tocreftext in table of contents when available' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+
+      [tocreftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="Long Section One"]', output, 1
+    end
+
+    test 'should use tocreftext in table of contents when numbered' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+      :numbered:
+
+      [tocreftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="1. Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="1. Long Section One"]', output, 1
+    end
+
+    test 'should use tocreftext over reftext even if toc-use-reftext is set' do
+      input = <<~'EOS'
+      = Article
+      :toc:
+      :toc-use-reftext:
+
+      [reftext="Reftext", reftext="Section One"]
+      == Long Section One
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_section_one"][text()="Section One"]', output, 1
+      assert_xpath '//h2[@id="_long_section_one"][text()="Long Section One"]', output, 1
+    end
+
+    test 'should use reftext in table of contents on special sections if toc-use-reftext is set' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :part-signifier: PS
+      :chapter-signifier: CS
+      :partnums:
+      :sectnums:
+      :toc:
+      :toc-use-reftext:
+
+      [reftext="Part"]
+      = Long Part
+
+      [reftext="Chapter"]
+      == Long Chapter
+
+      [appendix, reftext="Appendix"]
+      == Long Appendix
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_part"][text()="PS I: Part"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_chapter"][text()="CS 1. Chapter"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_appendix"][text()="Appendix A: Appendix"]', output, 1
+      assert_xpath '//h1[text()="PS I: Long Part"]', output, 1
+      assert_xpath '//h2[text()="CS 1. Long Chapter"]', output, 1
+      assert_xpath '//h2[text()="Appendix A: Long Appendix"]', output, 1
+    end
+
+    test 'should use tocreftext in table of contents on special sections' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :part-signifier: PS
+      :chapter-signifier: CS
+      :partnums:
+      :sectnums:
+      :toc:
+
+      [tocreftext="Part"]
+      = Long Part
+
+      [tocreftext="Chapter"]
+      == Long Chapter
+
+      [appendix, tocreftext="Appendix"]
+      == Long Appendix
+      EOS
+
+      output = convert_string input
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_part"][text()="PS I: Part"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_chapter"][text()="CS 1. Chapter"]', output, 1
+      assert_xpath '//*[@id="toc"]//a[@href="#_long_appendix"][text()="Appendix A: Appendix"]', output, 1
+      assert_xpath '//h1[text()="PS I: Long Part"]', output, 1
+      assert_xpath '//h2[text()="CS 1. Long Chapter"]', output, 1
+      assert_xpath '//h2[text()="Appendix A: Long Appendix"]', output, 1
+    end
+
     test 'should set toc position if toc attribute is set to position' do
       input = <<~'EOS'
       = Article
