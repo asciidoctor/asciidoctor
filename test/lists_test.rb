@@ -5475,6 +5475,38 @@ context 'Checklists' do
       refute list.option?('checklist')
     end
   end
+
+  test 'should create interactive checklists without any textual space between the checkbox and the content' do
+    input = <<~'EOS'
+    [%interactive]
+    - [ ] todo
+    - [x] done
+    EOS
+
+    doc = document_from_string input
+    checklist = doc.blocks[0]
+    assert checklist.option?('checklist')
+    assert checklist.option?('interactive')
+
+    output = doc.convert standalone: false
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[1]/p[text()="todo"]', output, 1
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[2]/p[text()="done"]', output, 1
+  end
+
+  test 'should create font-icon checklists without any textual space between the icon and the content' do
+    input = <<~'EOS'
+    - [ ] todo
+    - [x] done
+    EOS
+
+    doc = document_from_string input
+    checklist = doc.blocks[0]
+    assert checklist.option?('checklist')
+
+    output = convert_string_to_embedded input, attributes: { 'icons' => 'font' }
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[1]/p[text()="todo"]', output, 1
+    assert_xpath '(/*[@class="ulist checklist"]/ul/li)[2]/p[text()="done"]', output, 1
+  end
 end
 
 context 'Lists model' do
