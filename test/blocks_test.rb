@@ -1093,6 +1093,19 @@ context 'Blocks' do
       assert_xpath '/tip/simpara[text()="Look for the warp under the bridge."]', output, 1
       refute_includes output, 'Pro Tip'
     end
+
+    test 'should not drop paragraph body in DocBook output when paragraph starts with inline role and contains a footnote' do
+      input = <<~'EOS'
+      [TIP]
+      ====
+      [.smallcaps]#Tip#: Some content here.footnote:[A footnote.]
+      ====
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_css 'tip > simpara', output, 1
+      assert_xpath '//tip/simpara[contains(text(), "Some content here.")]', output, 1
+    end
   end
 
   context 'Preformatted Blocks' do

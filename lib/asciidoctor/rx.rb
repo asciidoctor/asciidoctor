@@ -177,12 +177,12 @@ module Asciidoctor
   #   # as attribute reference
   #   [{lead}]
   #
-  BlockAttributeListRx = /^\[(|[#{CC_WORD}.#%{,"']#{CC_ANY}*)\]$/
+  BlockAttributeListRx = /^\[(|[#{CC_WORD}.#%{,"'][^\]]*)\]$/
 
   # A combined pattern that matches either a block anchor or a block attribute list.
   #
   # TODO this one gets hit a lot, should be optimized as much as possible
-  BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"']#{CC_ANY}*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}\-:.]*(?:, *#{CC_ANY}+)?)\])\]$/
+  BlockAttributeLineRx = /^\[(?:|[#{CC_WORD}.#%{,"'][^\]]*|\[(?:|[#{CC_ALPHA}_:][#{CC_WORD}\-:.]*(?:, *[^\]]+)?)\])\]$/
 
   # Matches a title above a block.
   #
