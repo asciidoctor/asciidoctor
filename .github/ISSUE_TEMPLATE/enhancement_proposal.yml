@@ -1,0 +1,45 @@
+name: Submit a formal proposal for a vetted enhancement
+description: >-
+  Submit a formal proposal for an enhancement that has been discussed and vetted in the project chat.
+  Informal ideas should first be discussed in the project chat at https://chat.asciidoctor.org.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Enhancement proposals require prior discussion and vetting in the [project chat](https://chat.asciidoctor.org).
+        If you haven't discussed this enhancement there yet, please do so before submitting a proposal here.
+  - type: input
+    id: chat_link
+    attributes:
+      label: Link to prior discussion
+      description: Provide a link to the project chat thread where this enhancement was discussed and vetted.
+      placeholder: "e.g., https://chat.asciidoctor.org/#narrow/..."
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the proposed enhancement.
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: Describe the use case(s) this enhancement addresses. What problem does it solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the solution you'd like to see implemented, including any relevant examples.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any alternative solutions or workarounds you've considered.

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project Chat
+    url: https://chat.asciidoctor.org
+    about: Please direct usage questions and informal enhancement ideas here.
