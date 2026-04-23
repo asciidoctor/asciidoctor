@@ -29,12 +29,8 @@ Adds additional content to the header or footer regions of the generated documen
 See xref:docinfo-processor.adoc[].
 
 Block processor::
-Processes a block of content marked with a custom block style (i.e., `[custom]`). (similar to an AsciiDoc filter)
-See xref:block-processor.adoc[].
-
-Compound block processor::
-Register a custom block named `collapsible` that transforms a listing block into a compound block.
-See xref:compound-block-processor.adoc[].
+Processes a block of content marked with a custom block style (e.g., `[custom]`).
+See xref:block-processor.adoc[] and xref:compound-block-processor.adoc[].
 
 Block macro processor::
 Registers a custom block macro and processes it (e.g., `gist::12345[]`).
