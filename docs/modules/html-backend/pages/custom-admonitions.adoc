@@ -1,0 +1,57 @@
+= Custom Admonitions
+
+== Overview
+
+By default, Asciidoctor provides five built-in admonition types: NOTE, TIP, IMPORTANT, WARNING, and CAUTION.
+You can customize this list and define your own admonition types using document attributes.
+
+== Configuring Custom Admonition Types
+
+Use the `admonition-types` attribute to define which admonition types are recognized:
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,important,warning,caution,hint,danger
+----
+
+== Setting Custom Tags and Labels
+
+Each admonition type requires a tag (the uppercase identifier) and optional label:
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,hint
+:admonition-hint-tag: HINT
+:admonition-hint-label: Hinweis
+----
+
+== Mapping to DocBook Backend
+
+When converting to DocBook, you can map custom admonition types to DocBook elements:
+
+[source,asciidoc]
+----
+:admonition-hint-backend-docbook: tip
+----
+
+Valid DocBook admonition tags include: `caution`, `important`, `note`, `tip`, `warning`.
+
+=== Example
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,hint
+:admonition-hint-tag: HINT
+:admonition-hint-label: Hint
+:admonition-hint-backend-docbook: tip
+
+HINT: This is a custom admonition type.
+----
+
+== Validation Rules
+
+- Type names must start with a lowercase letter and contain only lowercase letters, digits, underscores, and hyphens
+- Tags must be uppercase letters, digits, and underscores
+- Tags must be unique across all admonition types
+- Invalid configurations are skipped with a warning message
+

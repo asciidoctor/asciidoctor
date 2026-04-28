@@ -541,7 +541,7 @@ class Parser
         unless style == block_context.to_s
           if delimited_block.masq.include? style
             block_context = style.to_sym
-          elsif (delimited_block.masq.include? 'admonition') && (ADMONITION_STYLES.include? style)
+          elsif (delimited_block.masq.include? 'admonition') && (document.admonition_type_for_tag style)
             block_context = :admonition
           elsif block_extensions && (extensions.registered_for_block? style, block_context) # rubocop:disable Lint/DuplicateBranch
             block_context = style.to_sym
@@ -728,7 +728,7 @@ class Parser
           reader.unshift_line this_line
           # advance to block parsing =>
           break
-        elsif ADMONITION_STYLES.include? style
+        elsif document.admonition_type_for_tag style
           block_context = :admonition
           cloaked_context = :paragraph
           reader.unshift_line this_line
@@ -770,10 +770,11 @@ class Parser
           # QUESTION do we even need to shift since whitespace is normalized by XML in this case?
           adjust_indentation! lines if indented && style == 'normal'
           block = Block.new parent, :paragraph, content_model: :simple, source: lines, attributes: attributes
-        elsif (ADMONITION_STYLE_HEADS.include? ch0) && (this_line.include? ':') && (AdmonitionParagraphRx =~ this_line)
-          lines[0] = $' # string after match
-          attributes['name'] = admonition_name = (attributes['style'] = $1).downcase
-          attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
+        elsif (document.admonition_style_heads.include? ch0) && (this_line.include? ':') && (admonition_match = document.parse_admonition_paragraph(this_line))
+          admonition_type, lines[0] = admonition_match
+          attributes['style'] = admonition_type['tag']
+          attributes['name'] = admonition_type['name']
+          attributes['textlabel'] = document.resolve_admonition_textlabel admonition_type, (attributes.delete 'caption')
           block = Block.new parent, :admonition, content_model: :simple, source: lines, attributes: attributes
         elsif md_syntax && ch0 == '>' && (this_line.start_with? '> ')
           lines.map! {|line| line == '>' ? (line.slice 1, line.length) : ((line.start_with? '> ') ? (line.slice 2, line.length) : line) }
@@ -880,8 +881,15 @@ class Parser
       when :sidebar
         block = build_block block_context, :compound, terminator, parent, reader, attributes
       when :admonition
-        attributes['name'] = admonition_name = style.downcase
-        attributes['textlabel'] = (attributes.delete 'caption') || doc_attrs[%(#{admonition_name}-caption)]
+        admonition_type = document.admonition_type_for_tag(style) || {
+          'name' => style.downcase,
+          'tag' => style,
+          'label' => style.capitalize,
+          'docbook' => nil,
+        }
+        attributes['name'] = admonition_type['name']
+        attributes['style'] = admonition_type['tag']
+        attributes['textlabel'] = document.resolve_admonition_textlabel admonition_type, (attributes.delete 'caption')
         block = build_block block_context, :compound, terminator, parent, reader, attributes
       when :open, :abstract, :partintro
         block = build_block :open, :compound, terminator, parent, reader, attributes
