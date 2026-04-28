@@ -342,6 +342,8 @@ class Document < AbstractBlock
     @admonition_types_by_name = @admonition_types_by_tag = @admonition_style_heads = nil
     @admonition_config_version = 0
     @admonition_cache_version = -1
+    @admonition_counters = {}
+    @admonition_catalog = ::Hash.new {|h, k| h[k] = [] }
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -972,6 +974,31 @@ class Document < AbstractBlock
       tag_name
     end
   end
+
+  # Register an admonition occurrence: increments the per-type counter, assigns
+  # an auto-generated anchor id when none is set, and records the entry in the
+  # admonition catalog for later use by admonition-table:: macros.
+  #
+  # admonition_type - the admonition type Hash with at least 'name'
+  # block           - the Block being registered (id may be set already)
+  # title           - optional user-supplied title String
+  #
+  # Returns the [Integer] counter value for this occurrence.
+  def register_admonition_occurrence admonition_type, block, title = nil
+    name = admonition_type['name']
+    number = (@admonition_counters[name] = (@admonition_counters[name] || 0) + 1)
+    # Assign auto-id only if the user hasn't already set one; let the
+    # parser's normal ref-registration logic handle :refs cataloging.
+    unless block.id
+      block.id = %(#{name}-#{number})
+    end
+    @admonition_catalog[name] << { 'id' => block.id, 'number' => number, 'title' => title }
+    number
+  end
+
+  # Returns the admonition catalog (Hash {name => Array of entries}).
+  # Each entry: { 'id', 'number', 'title' }
+  attr_reader :admonition_catalog
 
   # Public: Determine if the attribute has been locked by being assigned in document options
   #

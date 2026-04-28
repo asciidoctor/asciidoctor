@@ -88,6 +88,7 @@ class Converter::Html5Converter < Converter::Base
     when 'toc' then convert_toc node
     when 'pass' then convert_pass node
     when 'audio' then convert_audio node
+    when 'admonition_table' then convert_admonition_table node
     else; super
     end
   end
@@ -478,6 +479,32 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
 </table>
 </div>)
     end
+  end
+
+  def convert_admonition_table node
+    doc = node.document
+    type_name = (node.attr 'admonition-table-type').to_s.strip.downcase
+    adm_type = doc.admonition_type_for_name type_name
+    entries = doc.admonition_catalog[type_name]
+    if adm_type.nil? || entries.nil? || entries.empty?
+      return %(<div class="admonition-table admonition-table-#{type_name}"><!-- no admonitions of type: #{type_name} --></div>)
+    end
+    textlabel = adm_type['label'] || type_name.capitalize
+    title = node.title? ? node.title : %(List of #{textlabel}s)
+    id_attr = node.id ? %( id="#{node.id}") : ''
+    rows = entries.map do |entry|
+      entry_title = entry['title'] || ''
+      %(<tr><td class="admonition-table-number"><a href="##{entry['id']}">#{textlabel} #{entry['number']}</a></td><td class="admonition-table-title">#{entry_title}</td></tr>)
+    end.join LF
+    %(<div#{id_attr} class="admonition-table admonition-table-#{type_name}">
+<div class="title">#{title}</div>
+<table>
+<thead><tr><th>#{textlabel}</th><th>Title</th></tr></thead>
+<tbody>
+#{rows}
+</tbody>
+</table>
+</div>)
   end
 
   def convert_audio node

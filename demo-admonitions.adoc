@@ -110,3 +110,12 @@ It can also contain lists:
 [EXAMPLE]
 .Override with custom caption
 This admonition demonstrates label precedence: the caption attribute overrides the default label.
+
+== Admonition Tables
+
+admonition-table::note[]
+
+admonition-table::example[title="List of Examples"]
+
+admonition-table::definition[]
+
