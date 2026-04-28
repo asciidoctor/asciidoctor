@@ -67,6 +67,45 @@ The second paragraph can provide further elaboration or examples.
  A literal block inside a definition admonition.
 ====
 
+== Collapsible Admonitions
+
+NOTE%collapsible: This note is hidden by default. Click to expand.
+
+TIP%collapsible%open: This tip starts open and can be collapsed.
+
+[WARNING%collapsible]
+.Click to see the warning
+====
+This is a collapsible block-style warning with a title.
+
+[EXAMPLE%collapsible%open]
+=====
+Can even be a block-style admonition within another admonition.
+
+This one is open.
+
+[CAUTION%collapsible]
+.Should be closed by default
+======
+Can even be a block-style admonition within another admonition.
+======
+
+=====
+
+It spans multiple paragraphs.
+====
+
+[DEFINITION%collapsible%open]
+.What is a Definition?
+====
+A *definition* block that is open by default.
+
+It can also contain lists:
+
+* item one
+* item two
+====
+
 == Admonition with Caption Override
 
 [EXAMPLE]

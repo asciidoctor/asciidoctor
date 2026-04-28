@@ -340,7 +340,8 @@ class Document < AbstractBlock
 
     @parsed = @reftexts = @header = @header_attributes = nil
     @admonition_types_by_name = @admonition_types_by_tag = @admonition_style_heads = nil
-    @admonition_config_version = @admonition_cache_version = 0
+    @admonition_config_version = 0
+    @admonition_cache_version = -1
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -929,17 +930,26 @@ class Document < AbstractBlock
     @admonition_style_heads
   end
 
-  # Parse admonition paragraph marker at the start of line (e.g., NOTE: text).
+  # Parse admonition paragraph marker at the start of line (e.g., NOTE: text,
+  # NOTE%collapsible: text).
   def parse_admonition_paragraph line
     return unless (idx = line.index ':') && idx > 0
-    tag = line.slice 0, idx
+    marker = line.slice 0, idx
+    tag, marker_options = marker.split '%', 2
     return unless (admonition_type = admonition_type_for_tag tag)
     return unless (char = line.getbyte idx + 1) && (char == 32 || char == 9)
+    attributes = {}
+    if marker_options
+      marker_options.split('%').each do |opt|
+        return if opt.empty?
+        attributes[%(#{opt}-option)] = ''
+      end
+    end
     pos = idx + 1
     while (char = line.getbyte pos) == 32 || char == 9
       pos += 1
     end
-    [admonition_type, (line.slice pos, line.length) || '']
+    [admonition_type, (line.slice pos, line.length) || '', attributes]
   end
 
   # Resolve effective text label with precedence: caption > admonition-*-label > *-caption > default.

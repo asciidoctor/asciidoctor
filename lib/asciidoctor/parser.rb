@@ -771,7 +771,8 @@ class Parser
           adjust_indentation! lines if indented && style == 'normal'
           block = Block.new parent, :paragraph, content_model: :simple, source: lines, attributes: attributes
         elsif (document.admonition_style_heads.include? ch0) && (this_line.include? ':') && (admonition_match = document.parse_admonition_paragraph(this_line))
-          admonition_type, lines[0] = admonition_match
+          admonition_type, lines[0], admonition_attrs = admonition_match
+          attributes.update admonition_attrs unless admonition_attrs.empty?
           attributes['style'] = admonition_type['tag']
           attributes['name'] = admonition_type['name']
           attributes['textlabel'] = document.resolve_admonition_textlabel admonition_type, (attributes.delete 'caption')

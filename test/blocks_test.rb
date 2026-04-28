@@ -1130,6 +1130,54 @@ context 'Blocks' do
       assert_xpath '(//*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"])[1]', output, 1
     end
 
+    test 'should render admonition paragraph as collapsible when collapsible option is attached to tag' do
+      input = <<~'EOS'
+      NOTE%collapsible: Hidden in details.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.note', output, 1
+      assert_css 'details[open]', output, 0
+      assert_xpath '//details/summary[text()="Note"]', output, 1
+      assert_includes output, 'Hidden in details.'
+    end
+
+    test 'should render admonition paragraph as open collapsible when open option is attached to tag' do
+      input = <<~'EOS'
+      TIP%collapsible%open: Starts open.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.tip[open]', output, 1
+      assert_xpath '//details/summary[text()="Tip"]', output, 1
+      assert_includes output, 'Starts open.'
+    end
+
+    test 'should render block admonition as collapsible when collapsible option is attached to admonition style' do
+      input = <<~'EOS'
+      [TIP%collapsible%open]
+      .Toggle tip
+      ====
+      Keep this open by default.
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.tip[open]', output, 1
+      assert_xpath '//details/summary[text()="Toggle tip"]', output, 1
+      assert_xpath '//details/div[@class="content"]//p[text()="Keep this open by default."]', output, 1
+    end
+
+    test 'should ignore collapsible admonition options in DocBook output' do
+      input = <<~'EOS'
+      NOTE%collapsible%open: Still a normal DocBook note.
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_xpath '/note/simpara[text()="Still a normal DocBook note."]', output, 1
+      refute_includes output, '<details'
+    end
+
     test 'should skip invalid custom admonition type and continue conversion' do
       input = <<~'EOS'
       :admonition-types: note,hint

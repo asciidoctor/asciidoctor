@@ -446,6 +446,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     id_attr = node.id ? %( id="#{node.id}") : ''
     name = node.attr 'name'
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
+    class_attr = %( class="admonitionblock #{name}#{(role = node.role) ? " #{role}" : ''}")
     if node.document.attr? 'icons'
       if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
         label = %(<i class="fa icon-#{name}" title="#{node.attr 'textlabel'}"></i>)
@@ -455,7 +456,16 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     else
       label = %(<div class="title">#{node.attr 'textlabel'}</div>)
     end
-    %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) ? " #{role}" : ''}">
+    if node.option? 'collapsible'
+      summary_element = %(<summary class="title">#{node.title? ? node.title : (node.attr 'textlabel')}</summary>)
+      %(<details#{id_attr}#{class_attr}#{(node.option? 'open') ? ' open' : ''}>
+#{summary_element}
+<div class="content">
+#{node.content}
+</div>
+</details>)
+    else
+      %(<div#{id_attr}#{class_attr}>
 <table>
 <tr>
 <td class="icon">
@@ -467,6 +477,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
 </tr>
 </table>
 </div>)
+    end
   end
 
   def convert_audio node
