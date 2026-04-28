@@ -37,9 +37,38 @@ Custom admonitions can also be used as block-style admonitions with titles.
 .A formal definition
 This demonstrates the flexibility of the new admonition system - types can be configured per document.
 
+== Multi-Paragraph Admonitions
+
+[NOTE]
+====
+This is the first paragraph of a multi-paragraph note.
+
+This is the second paragraph with more details.
+
+* A list item inside an admonition
+* Another list item
+====
+
+[DEFINITION]
+====
+A *definition* can span multiple paragraphs.
+
+NOTE: A NOTE admonition within another admonition.
+
+[EXAMPLE]
+=====
+Can even be a block-style admonition within another admonition.
+
+With several paragraphs.
+=====
+
+The second paragraph can provide further elaboration or examples.
+
+ A literal block inside a definition admonition.
+====
+
 == Admonition with Caption Override
 
 [EXAMPLE]
 .Override with custom caption
 This admonition demonstrates label precedence: the caption attribute overrides the default label.
-
