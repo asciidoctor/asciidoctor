@@ -1,0 +1,46 @@
+= Demo: Configurable Admonitions
+Demo User
+:doctype: book
+:admonition-types: note,tip,important,warning,caution,hint,trick
+:admonition-hint-tag: HINT
+:admonition-hint-label: Hinweis
+:admonition-hint-backend-docbook: note
+:admonition-trick-tag: TRICK
+:admonition-trick-label: Trick
+:admonition-trick-backend-docbook: tip
+
+== Standard Admonitions
+
+NOTE: This is a standard note admonition.
+
+TIP: This is a standard tip admonition.
+
+IMPORTANT: This is a standard important admonition.
+
+WARNING: This is a standard warning admonition.
+
+CAUTION: This is a standard caution admonition.
+
+== Custom Admonitions
+
+HINT: This is a custom hint admonition configured with tag HINT, label "Hinweis", and DocBook mapping to "note".
+
+TRICK: This is a custom trick admonition configured with tag TRICK, label "Trick", and DocBook mapping to "tip".
+
+== Block-style Custom Admonitions
+
+[HINT]
+.A configurable hint block
+Custom admonitions can also be used as block-style admonitions with titles.
+
+[TRICK]
+.A clever trick
+This demonstrates the flexibility of the new admonition system - types can be configured per document.
+
+== Admonition with Caption Override
+
+[HINT]
+.Override with custom caption
+caption:: Custom Override Label
+This admonition demonstrates label precedence: the caption attribute overrides the default label.
+
