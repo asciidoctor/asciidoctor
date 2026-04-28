@@ -89,7 +89,6 @@ This one is open.
 ======
 Can even be a block-style admonition within another admonition.
 ======
-
 =====
 
 It spans multiple paragraphs.
