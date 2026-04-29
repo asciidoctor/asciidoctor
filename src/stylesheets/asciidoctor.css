@@ -1968,7 +1968,7 @@ a span.icon > .fa {
 .admonitionblock td.icon .icon-tip::before {
   content: "\f0eb";
   text-shadow: 1px 1px 2px rgb(155 155 0 / 0.8);
-  color: #111;
+  color: #404040;
 }
 
 .admonitionblock td.icon .icon-warning::before {
@@ -1987,9 +1987,10 @@ a span.icon > .fa {
 }
 
 .admonitionblock td.icon .icon-example::before {
-  content: "\f02d";
+  content: "\f06e";
   color: #007a70;
 }
+
 
 .admonitionblock td.icon i.fa[class*="icon-"]:not(.icon-note):not(.icon-tip):not(.icon-warning):not(.icon-caution):not(.icon-important):not(.icon-example)::before {
   content: attr(title);
