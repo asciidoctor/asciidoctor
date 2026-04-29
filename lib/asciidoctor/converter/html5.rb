@@ -458,13 +458,27 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       label = %(<div class="title">#{node.attr 'textlabel'}</div>)
     end
     if node.option? 'collapsible'
-      summary_element = %(<summary class="title">#{node.title? ? node.title : (node.attr 'textlabel')}</summary>)
-      %(<details#{id_attr}#{class_attr}#{(node.option? 'open') ? ' open' : ''}>
-#{summary_element}
-<div class="content">
+      open_attr = (node.option? 'open') ? ' open' : ''
+      summary_text = if node.title?
+        node.title
+      else
+        node.document.attr('admonition-collapsible-label') || 'Details'
+      end
+      %(<div#{id_attr}#{class_attr}>
+<table>
+<tr>
+<td class="icon">
+#{label}
+</td>
+<td class="content">
+<details#{open_attr}>
+<summary class="collapsible-summary">#{summary_text}</summary>
 #{node.content}
-</div>
-</details>)
+</details>
+</td>
+</tr>
+</table>
+</div>)
     else
       %(<div#{id_attr}#{class_attr}>
 <table>
@@ -487,23 +501,20 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     adm_type = doc.admonition_type_for_name type_name
     entries = doc.admonition_catalog[type_name]
     if adm_type.nil? || entries.nil? || entries.empty?
-      return %(<div class="admonition-table admonition-table-#{type_name}"><!-- no admonitions of type: #{type_name} --></div>)
+      return %(<div class="admonition-index admonition-index-#{type_name}"><!-- no admonitions of type: #{type_name} --></div>)
     end
     textlabel = adm_type['label'] || type_name.capitalize
     title = node.title? ? node.title : %(List of #{textlabel}s)
     id_attr = node.id ? %( id="#{node.id}") : ''
-    rows = entries.map do |entry|
-      entry_title = entry['title'] || ''
-      %(<tr><td class="admonition-table-number"><a href="##{entry['id']}">#{textlabel} #{entry['number']}</a></td><td class="admonition-table-title">#{entry_title}</td></tr>)
+    items = entries.map do |entry|
+      link_text = (entry['title'] && !entry['title'].empty?) ? entry['title'] : %(#{textlabel} #{entry['number']})
+      %(<li><a href="##{entry['id']}">#{link_text}</a></li>)
     end.join LF
-    %(<div#{id_attr} class="admonition-table admonition-table-#{type_name}">
-<div class="title">#{title}</div>
-<table>
-<thead><tr><th>#{textlabel}</th><th>Title</th></tr></thead>
-<tbody>
-#{rows}
-</tbody>
-</table>
+    %(<div#{id_attr} class="admonition-index admonition-index-#{type_name}">
+<div class="admonition-index-title">#{title}</div>
+<ul>
+#{items}
+</ul>
 </div>)
   end
 

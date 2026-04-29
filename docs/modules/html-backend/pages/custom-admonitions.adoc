@@ -5,9 +5,13 @@
 By default, Asciidoctor provides five built-in admonition types: NOTE, TIP, IMPORTANT, WARNING, and CAUTION.
 You can customize this list and define your own admonition types using document attributes.
 
+This page is a compact entry point.
+For practical usage patterns, see xref:admonition-quickstart.adoc[Admonition Extensions Quickstart].
+For implementation details and full technical documentation, see xref:admonition-extensions.adoc[Extended Admonition Features].
+
 == Configuring Custom Admonition Types
 
-Use the `admonition-types` attribute to define which admonition types are recognized:
+Use the `admonition-types` attribute to define which admonition types are recognized.
 
 [source,asciidoc]
 ----
@@ -16,7 +20,7 @@ Use the `admonition-types` attribute to define which admonition types are recogn
 
 == Setting Custom Tags and Labels
 
-Each admonition type requires a tag (the uppercase identifier) and optional label:
+Each custom type requires a tag (the uppercase identifier) and can define a label.
 
 [source,asciidoc]
 ----
@@ -27,7 +31,7 @@ Each admonition type requires a tag (the uppercase identifier) and optional labe
 
 == Mapping to DocBook Backend
 
-When converting to DocBook, you can map custom admonition types to DocBook elements:
+When converting to DocBook, map custom admonition types to DocBook elements:
 
 [source,asciidoc]
 ----
@@ -36,7 +40,7 @@ When converting to DocBook, you can map custom admonition types to DocBook eleme
 
 Valid DocBook admonition tags include: `caution`, `important`, `note`, `tip`, `warning`.
 
-=== Example
+== Minimal Example
 
 [source,asciidoc]
 ----
@@ -54,4 +58,9 @@ HINT: This is a custom admonition type.
 - Tags must be uppercase letters, digits, and underscores
 - Tags must be unique across all admonition types
 - Invalid configurations are skipped with a warning message
+
+== See Also
+
+* xref:admonition-quickstart.adoc[Admonition Extensions Quickstart]
+* xref:admonition-extensions.adoc[Extended Admonition Features]
 

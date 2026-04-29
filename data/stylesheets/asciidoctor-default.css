@@ -336,12 +336,14 @@ div.unbreakable{-moz-column-break-inside:avoid;break-inside:avoid}
 .yellow-background{background:#fafa00}
 span.icon>.fa{cursor:default}
 a span.icon>.fa{cursor:inherit}
-.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon i.fa[class*="icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
 .admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
 .admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.admonitionblock td.icon .icon-example::before{content:"\f02d";color:#007a70}
+.admonitionblock td.icon i.fa[class*="icon-"]:not(.icon-note):not(.icon-tip):not(.icon-warning):not(.icon-caution):not(.icon-important):not(.icon-example)::before{content:attr(title);display:inline-block;font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:.375em;font-style:normal;text-shadow:none;font-weight:bold;text-transform:uppercase;white-space:nowrap;word-break:normal;overflow-wrap:normal;color:#7a2518;line-height:1.2}
 .conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
 .conum[data-value] *{color:#fff!important}
 .conum[data-value]+b{display:none}
@@ -391,3 +393,17 @@ div.page-break{display:block;-moz-column-break-after:page;break-after:page}
 #footer{background:none}
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{body>div[id]{padding:0}}
+/* Admonition index lists (styled like TOC) */
+.admonition-index{border-bottom:1px solid #e7e7e9;padding-bottom:.5em;margin-bottom:1.25em}
+.admonition-index-title{color:#7a2518;font-size:1.2em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;line-height:1.2;margin-top:0;margin-bottom:.5em}
+.admonition-index>ul{margin-left:.125em;font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none;margin-bottom:0}
+.admonition-index li{line-height:1.3334;margin-top:.3334em}
+.admonition-index a{text-decoration:none}
+.admonition-index a:active{text-decoration:underline}
+/* Collapsible admonitions: inner details/summary inside admonition content cell */
+.admonitionblock td.content>details{margin-left:1.25rem;margin-bottom:0}
+.admonitionblock td.content>details>summary.collapsible-summary{cursor:pointer;display:block;position:relative;line-height:1.6;margin-bottom:.625rem;outline:none;-webkit-tap-highlight-color:transparent;font-style:italic;color:rgba(0,0,0,.6)}
+.admonitionblock td.content>details>summary.collapsible-summary::-webkit-details-marker{display:none}
+.admonitionblock td.content>details>summary.collapsible-summary::before{content:"";border:solid transparent;border-left:solid;border-width:.3em 0 .3em .5em;position:absolute;top:.5em;left:-1.25rem;transform:translateX(15%)}
+.admonitionblock td.content>details[open]>summary.collapsible-summary::before{border:solid transparent;border-top:solid;border-width:.5em .3em 0;transform:translateY(15%)}
+.admonitionblock td.content>details>summary.collapsible-summary::after{content:"";width:1.25rem;height:1em;position:absolute;top:.3em;left:-1.25rem}

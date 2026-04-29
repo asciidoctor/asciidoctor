@@ -1,0 +1,126 @@
+= Admonition Extensions Quickstart
+
+This page explains how to use the extended admonition features in day-to-day authoring.
+For implementation details, validation internals, and code-level references, see xref:admonition-extensions.adoc[Extended Admonition Features].
+
+== 1) Configure Types in the Header
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,important,warning,caution,example,definition
+:admonition-example-tag: EXAMPLE
+:admonition-example-label: Example
+:admonition-example-backend-docbook: note
+:admonition-definition-tag: DEFINITION
+:admonition-definition-label: Definition
+:admonition-definition-backend-docbook: note
+----
+
+== 2) Use Standard and Custom Admonitions
+
+Paragraph style:
+
+[source,asciidoc]
+----
+NOTE: Standard admonition.
+EXAMPLE: Custom admonition.
+DEFINITION: Another custom admonition.
+----
+
+Block style:
+
+[source,asciidoc]
+----
+[EXAMPLE]
+.A block-style example
+====
+Block-style custom admonition content.
+====
+----
+
+== 3) Use Collapsible Admonitions
+
+Paragraph style:
+
+[source,asciidoc]
+----
+NOTE%collapsible: Hidden by default.
+TIP%collapsible%open: Open by default.
+----
+
+Block style:
+
+[source,asciidoc]
+----
+[WARNING%collapsible]
+.Click to see details
+====
+This warning is collapsible.
+====
+----
+
+Summary text priority:
+
+. block title
+. `admonition-collapsible-label` document attribute
+. fallback `Details`
+
+== 4) Insert Admonition Index Lists
+
+[source,asciidoc]
+----
+admonition-table::note[]
+admonition-table::example[title="List of Examples"]
+admonition-table::definition[]
+----
+
+Current output behavior:
+
+* rendered as a list of links
+* each link points to the admonition anchor
+* link text is admonition title if available
+* otherwise link text falls back to `{Label} {Number}`
+
+== 5) Style Custom Icons
+
+Enable font icons:
+
+[source,asciidoc]
+----
+:icons: font
+----
+
+Add icon rules in stylesheet:
+
+[source,css]
+----
+.admonitionblock td.icon .icon-example::before {
+  content: "\f02d";
+  color: #007a70;
+}
+----
+
+If no custom icon is configured for a type, fallback text is shown in the icon column.
+
+== 6) Minimal End-to-End Example
+
+[source,asciidoc]
+----
+= Demo
+:icons: font
+:admonition-types: note,example
+:admonition-example-tag: EXAMPLE
+:admonition-example-label: Example
+:admonition-example-backend-docbook: note
+
+EXAMPLE: A custom admonition.
+
+[NOTE%collapsible]
+.More details
+====
+This section can be collapsed.
+====
+
+admonition-table::example[]
+----
+

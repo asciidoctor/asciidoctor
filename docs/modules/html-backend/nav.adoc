@@ -10,3 +10,5 @@
 ** xref:verbatim-line-wrap.adoc[]
 ** xref:skip-front-matter.adoc[]
 ** xref:custom-admonitions.adoc[]
+** xref:admonition-quickstart.adoc[]
+** xref:admonition-extensions.adoc[]

@@ -1,6 +1,7 @@
 = Demo: Configurable Admonitions
 Demo User
 :doctype: book
+:toc:
 :admonition-types: note,tip,important,warning,caution,example,definition
 :admonition-example-tag: EXAMPLE
 :admonition-example-label: Example
@@ -8,6 +9,14 @@ Demo User
 :admonition-definition-tag: DEFINITION
 :admonition-definition-label: Definition
 :admonition-definition-backend-docbook: note
+
+== Admonition Tables
+
+admonition-table::note[]
+
+admonition-table::example[title="List of Examples"]
+
+admonition-table::definition[]
 
 == Standard Admonitions
 
@@ -110,12 +119,3 @@ It can also contain lists:
 [EXAMPLE]
 .Override with custom caption
 This admonition demonstrates label precedence: the caption attribute overrides the default label.
-
-== Admonition Tables
-
-admonition-table::note[]
-
-admonition-table::example[title="List of Examples"]
-
-admonition-table::definition[]
-
