@@ -74,7 +74,7 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
 
   def create_formatter node, source, lang, opts
     formatter = opts[:css_mode] == :class ?
-      (::Rouge::Formatters::HTML.new inline_theme: @style) :
+      (::Rouge::Formatters::HTML.new) :
       (::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new)
     if (number_lines = opts[:number_lines])
       formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: opts[:highlight_lines]
