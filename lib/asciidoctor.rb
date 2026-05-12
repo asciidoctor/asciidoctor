@@ -7,7 +7,8 @@ if RUBY_ENGINE == 'opal'
   # this require is satisfied by the Asciidoctor.js build; it augments the Ruby environment for Asciidoctor.js
   require 'asciidoctor/js'
 else
-  require 'cgi/util'
+  require 'cgi/escape'
+  require 'cgi/util' unless ::CGI.respond_to?(:escape_html)
   autoload :OpenURI, 'open-uri'
   autoload :Pathname, 'pathname'
   autoload :StringScanner, 'strscan'
