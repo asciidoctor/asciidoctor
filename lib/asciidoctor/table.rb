@@ -161,8 +161,10 @@ class Table < AbstractBlock
 
     if num_body_rows > 0
       if @has_header_option
-        @rows.head = [body.shift.map {|cell| cell.reinitialize true }]
-        num_body_rows -= 1
+        hrows = (attrs.key? 'hrows') ? attrs['hrows'].to_i : 1
+        hrows = [hrows, num_body_rows].min
+        @rows.head = body.shift(hrows).map.with_index {|row, i| i == 0 ? row.map {|cell| cell.reinitialize true } : row }
+        num_body_rows = body.size
       elsif @has_header_option.nil?
         @has_header_option = false
         body.unshift(body.shift.map {|cell| cell.reinitialize false })
