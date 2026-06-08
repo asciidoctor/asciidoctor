@@ -3,13 +3,13 @@
 require_relative 'test_helper'
 
 context 'Logger' do
-  MyLogger = Class.new Logger
+  MyLogger = Class.new Asciidoctor::Logger
 
   context 'LoggerManager' do
     test 'provides access to logger via static logger method' do
       logger = Asciidoctor::LoggerManager.logger
       refute_nil logger
-      assert_kind_of Logger, logger
+      assert_kind_of Asciidoctor::Logger, logger
     end
 
     test 'allows logger instance to be changed' do
@@ -29,7 +29,7 @@ context 'Logger' do
         Asciidoctor::LoggerManager.logger = MyLogger.new $stdout
         Asciidoctor::LoggerManager.logger = nil
         refute_nil Asciidoctor::LoggerManager.logger
-        assert_kind_of Logger, Asciidoctor::LoggerManager.logger
+        assert_kind_of Asciidoctor::Logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
       end
@@ -88,7 +88,7 @@ context 'Logger' do
       end
       assert_empty out_string
       assert_empty err_string
-      assert_equal Logger::Severity::FATAL, log_level
+      assert_equal Asciidoctor::Logger::Severity::FATAL, log_level
     end
 
     test 'should configure logger with progname set to asciidoctor' do
@@ -96,7 +96,7 @@ context 'Logger' do
     end
 
     test 'should configure logger with level set to WARN by default' do
-      assert_equal Logger::Severity::WARN, Asciidoctor::Logger.new.level
+      assert_equal Asciidoctor::Logger::Severity::WARN, Asciidoctor::Logger.new.level
     end
 
     test 'configures default logger with progname set to asciidoctor' do
@@ -104,7 +104,7 @@ context 'Logger' do
     end
 
     test 'configures default logger with level set to WARN' do
-      assert_equal Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
+      assert_equal Asciidoctor::Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
     end
 
     test 'configures default logger to write messages to $stderr' do
@@ -130,13 +130,13 @@ context 'Logger' do
     test 'NullLogger level is not nil' do
       logger = Asciidoctor::NullLogger.new
       refute_nil logger.level
-      assert_equal Logger::UNKNOWN, logger.level
+      assert_equal Asciidoctor::Logger::UNKNOWN, logger.level
     end
 
     test 'MemoryLogger level is not nil' do
       logger = Asciidoctor::MemoryLogger.new
       refute_nil logger.level
-      assert_equal Logger::UNKNOWN, logger.level
+      assert_equal Asciidoctor::Logger::UNKNOWN, logger.level
     end
   end
 

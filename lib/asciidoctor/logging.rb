@@ -1,28 +1,102 @@
 # frozen_string_literal: true
 
-proc do
-  old_verbose, $VERBOSE = $VERBOSE, nil
-  require 'logger' # suppress warning in Ruby 3.4 about loading logger from stdlib
-  $VERBOSE = old_verbose
-end.call
-
 module Asciidoctor
-class Logger < ::Logger
+class Logger
+  module Severity
+    DEBUG   = 0
+    INFO    = 1
+    WARN    = 2
+    ERROR   = 3
+    FATAL   = 4
+    UNKNOWN = 5
+  end
+
+  # Makes severity constants (DEBUG, WARN, etc.) directly accessible on the class, e.g. Logger::WARN
+  include Severity
+
+  # Index matches the Severity integer value; index 5 (UNKNOWN) maps to 'ANY' to match stdlib Logger output
+  SEVERITY_LABELS = %w(DEBUG INFO WARN ERROR FATAL ANY).freeze
+
+  attr_reader :level
+  attr_accessor :progname
+  attr_accessor :formatter
   attr_reader :max_severity
 
-  def initialize *args, **opts
-    opts[:progname] = 'asciidoctor'
-    opts[:formatter] = BasicFormatter.new unless opts.key? :formatter
-    opts[:level] = WARN unless opts.key? :level
-    args = [$stderr] if args.empty?
-    super
+  def initialize logdev = $stderr, *_, level: WARN, progname: 'asciidoctor', **opts
+    # *_ absorbs positional args from stdlib Logger's shift_age/shift_size (ignored, no log rotation)
+    @logdev = logdev && (::String === logdev ? (::File.open logdev, 'a') : logdev)
+    @logdev.sync = true if @logdev.respond_to? :sync=
+    @level = resolve_level level
+    @progname = progname
+    # formatter: nil is an explicit opt-in to the plain Formatter; absence of the key uses BasicFormatter
+    @formatter = opts.key?(:formatter) ? (opts[:formatter] || Formatter.new) : BasicFormatter.new
+  end
+
+  def level= value
+    @level = resolve_level value
   end
 
   def add severity, message = nil, progname = nil
+    # Initialize @max_severity lazily on first call; update only when severity increases
     if (severity ||= UNKNOWN) > (@max_severity ||= severity)
       @max_severity = severity
     end
-    super
+    return true if severity < @level || !@logdev
+    progname ||= @progname
+    if message.nil?
+      if block_given?
+        message = yield
+      else
+        message = progname
+        progname = @progname
+      end
+    end
+    @logdev.write (@formatter || Formatter.new).call(SEVERITY_LABELS[severity] || 'ANY', ::Time.now, progname, message)
+    true
+  end
+  alias log add
+
+  def close
+    @logdev&.close
+    @logdev = nil
+  end
+
+  # Generates debug/info/warn/error/fatal/unknown and their predicate variants (debug?, etc.)
+  # severity_val is captured in the closure so each method gets its own fixed integer
+  (Severity.constants false).sort_by {|c| Severity.const_get c }.each do |const|
+    method_name = const.to_s.downcase
+    severity_val = Severity.const_get const
+    define_method method_name do |message = nil, &block|
+      add severity_val, message, &block
+    end
+    define_method :"#{method_name}?" do
+      @level <= severity_val
+    end
+  end
+
+  # 'warning' accepted as an alias for 'warn' for compatibility with CLI input
+  LEVEL_COERCE = {
+    'debug' => DEBUG,
+    'info' => INFO,
+    'warn' => WARN,
+    'warning' => WARN,
+    'error' => ERROR,
+    'fatal' => FATAL,
+    'unknown' => UNKNOWN,
+  }.freeze
+
+  def resolve_level value
+    ::Integer === value ? value : (LEVEL_COERCE[value.to_s.downcase] || UNKNOWN)
+  end
+
+  class Formatter
+    def call severity, time, progname, msg
+      datetime = time.strftime '%Y-%m-%dT%H:%M:%S.%6N'
+      # $$ is the PID of the current process (see https://ruby-doc.org/3.4/globals_rdoc.html)
+      # ##{$$} produces a literal '#' followed by the interpolated PID, e.g. #12345
+      # Output: "D, [2026-06-08T12:00:00.000000 #12345] DEBUG -- asciidoctor: message\n"
+      %(#{severity[0]}, [#{datetime} ##{$$}] #{severity.rjust 5} -- #{progname}: #{::String === msg ? msg : msg.inspect}\n)
+    end
   end
 
   class BasicFormatter < Formatter
@@ -40,7 +114,8 @@ class Logger < ::Logger
   end
 end
 
-class MemoryLogger < ::Logger
+class MemoryLogger < Logger
+  # Reverse map: integer severity value → symbol name (e.g. 2 → :WARN), built once at class load time
   SEVERITY_SYMBOL_BY_VALUE = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h # rubocop:disable Style/MapToHash
 
   attr_reader :messages
@@ -69,9 +144,7 @@ class MemoryLogger < ::Logger
   end
 end
 
-class NullLogger < ::Logger
-  attr_reader :max_severity
-
+class NullLogger < Logger
   def initialize
     super nil, level: UNKNOWN
   end
@@ -103,8 +176,9 @@ module LoggerManager
     private
 
     def memoize_logger
+      # Redefine logger as a plain attr_reader so subsequent calls bypass the lazy-init branch
       class << self
-        alias logger logger # suppresses warning from CRuby
+        alias logger logger # suppresses redefinition warning from CRuby
         attr_reader :logger
       end
     end
