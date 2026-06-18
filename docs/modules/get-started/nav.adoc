@@ -1,1 +1,2 @@
 * xref:index.adoc[]
+* xref:write-your-first-document.adoc[]
