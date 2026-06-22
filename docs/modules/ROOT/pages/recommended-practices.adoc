@@ -445,11 +445,15 @@ To force the start of a new list, offset the two lists by an empty line comment:
 AsciiDoc offers several ways to mark up text that should be rendered verbatim (i.e., in a monospace font and free of formatting substitutions).
 Choosing consistent forms keeps your source predictable and avoids surprises.
 
-*Do:* use single backticks to mark up inline monospace text, such as file names, commands, and code.
+*Do:* use single backticks to mark up inline monospace text, such as commands and code.
+
+*Don't:* use monospace (backticks) for file and directory names.
+
+*Do:* use the `path` role on an italic phrase (i.e., `[.path]_name_`) to mark up file and directory names.
 
 [,asciidoc]
 ----
-Run `asciidoctor` to convert the `recommended-practices.adoc` file.
+Run `asciidoctor` to convert the [.path]_recommended-practices.adoc_ file.
 ----
 
 *Do:* enclose the text in a pair of `+` characters inside the backticks when it contains characters that would otherwise be interpreted, such as attribute references or inline formatting.
@@ -459,8 +463,8 @@ Run `asciidoctor` to convert the `recommended-practices.adoc` file.
 The placeholder syntax is `+{name}+`.
 ----
 
-*Don't:* indent a line with a leading space to create literal text.
-An accidental indent silently turns the line into a literal block, producing output you didn't intend.
+*Do:* start paragraphs at the left margin, not with an indent like you might in a manuscript.
+Be mindful that an initial indented line is treated as a literal block, silently producing output you didn't intend.
 
 [,asciidoc]
 ----
