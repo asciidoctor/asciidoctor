@@ -1,0 +1,550 @@
+= Recommended Practices
+:description: This page catalogs a set of recommended practices for composing documents in AsciiDoc.
+:url-neo4j-docs: https://neo4j.com/docs/2.2.8/community-docs.html#_writing
+:url-ventilated-prose: https://vanemden.wordpress.com/2009/01/01/ventilated-prose/
+:url-semantic-linefeeds: https://rhodesmill.org/brandon/2012/one-sentence-per-line/
+
+{description}
+
+AsciiDoc offers multiple ways to accomplish the same thing, and is often very lenient with the syntax.
+The recommendations on this page bring consistency to your documents in a way that maximizes efficiency, improves readability, and minimizes maintenance.
+
+[NOTE]
+====
+These recommendations are opinionated.
+They reflect conventions the Asciidoctor project has found valuable, but they are not part of the xref:asciidoc::index.adoc[AsciiDoc language] itself and are not enforced by the processor.
+====
+
+== File extension
+
+AsciiDoc doesn't care which extension you use.
+The most common extensions for AsciiDoc files are `.adoc`, `.asciidoc`, and `.asc`.
+
+*Do:* use the `.adoc` extension.
+It does not conflict with other well-known applications, it's distinct, it's not excessively long (like `.asciidoc`), and it reads as "`a doc`".
+
+*Don't:* use the `.asc` extension.
+The connection to AsciiDoc isn't immediately obvious, and it gets falsely identified as a PGP file on Linux.
+
+== One sentence per line
+
+*Don't:* wrap text at a fixed column width.
+
+*Do:* put each sentence on its own line, a technique called _sentence per line_.
+This technique is similar to how you write and organize source code.
+
+Here are some of the advantages of using the sentence per line style:
+
+* It prevents reflows (a change early in the paragraph won't cause the remaining lines in the paragraph to reposition).
+* You can easily swap sentences.
+* You can easily separate or join paragraphs.
+* You can comment out sentences or add commentary to them.
+* You can spot sentences that are too long or that vary widely in length.
+* You can spot redundant (and thus mundane) patterns in your writing.
+
+This idea comes from the writing guide in the {url-neo4j-docs}[Neo4j documentation^].
+The idea dates back to a discovery by Buckminster Fuller in the 1930s, who called it {url-ventilated-prose}[ventilated prose^].
+The technique was also recommended in 2009 by Brandon Rhodes in a blog post about {url-semantic-linefeeds}[semantic linefeeds^].
+
+This technique works because AsciiDoc doesn't treat wrapped lines in prose as hard line breaks.
+The line breaks between contiguous lines of prose are not visible in the rendered document (i.e., as the reader sees it).
+
+CAUTION: While a single line break doesn't appear in the output, two consecutive line breaks start a new paragraph (or other block).
+
+== Section titles
+
+There are three ways to define a section title.
+These variants can be classified into two types of styles, _Atx_ and _Setext_ (historical names).
+
+*Do:* use the asymmetric Atx style for your section titles.
+It's the simplest and most intuitive method for writing, as well as for reading in the plain text (source) file.
+
+.Atx style
+In the Atx style, the section title is defined on a single line.
+The section title begins with one or more equals characters (i.e., `=`) followed by a space and the section title.
+The number of leading characters represents the depth.
+The top-level section is reserved for the document title, so the first section in the document has two leading characters.
+
+[,asciidoc]
+----
+== First Section
+----
+
+This example uses the asymmetric Atx style.
+It requires the least number of characters, and it's intuitive since the number of leading characters represents the heading level.
+
+When using the HTML backend, this section title is transformed into an `h2` heading (likely wrapped in a section block for styling):
+
+[,html]
+----
+<h2>First Section</h2>
+----
+
+The symmetric Atx style bookends the section title between a matching pair of delimiters.
+
+*Don't:* bookend the section title with a matching pair of delimiters.
+While this syntax may look nicer to some, it requires twice the number of delimiters without adding any additional semantics.
+
+[,asciidoc]
+----
+== First Section ==
+----
+
+.Setext style
+In the Setext style, the section title is defined on two lines.
+The second line is a string of characters that form an underline below the section title.
+Here's the section title from above defined in the Setext style.
+
+[,asciidoc]
+----
+First Section
+-------------
+----
+
+Since the length of the line is determined by the number of characters in the section title, another dimension must be introduced to determine the level.
+That dimension is the character used for the underline.
+The characters used are (sorted from document title to level 5 section) `=`, `-`, `~`, `^`, and `+`.
+
+*Don't:* use the Setext style for section titles.
+Keeping the length of the underline in sync with the title length is an unnecessary task and time waster.
+A more substantial reason is that the mapping between character and heading level is *very* difficult to remember and not obvious to new AsciiDoc adopters.
+
+=== Document title
+
+The document title uses the same asymmetric Atx style we recommend for section titles.
+Since the document title is the top-level title, it begins with a single equals character.
+
+*Do:* define the document title with the asymmetric Atx style.
+
+[,asciidoc]
+----
+= Document Title
+Author Name <author@example.org>
+----
+
+Be sure to include your name immediately following the document title.
+
+NOTE: AsciiDoc.py only supports an email following the author line.
+It does not support a personal URL.
+Asciidoctor supports a raw URL as well as an inline link macro.
+
+It's a good practice to also include a revision line following the author line.
+
+[,asciidoc]
+----
+= Document Title
+Author Name <author@example.org>
+v1.0, 2012-02-10
+----
+
+The version number is optional.
+The revision line may consist of a date only.
+
+[,asciidoc]
+----
+= Document Title
+Author Name <author@example.org>
+2012-02-10
+----
+
+*Don't:* use the Setext style for the document title.
+Although the document title occurs only once, the Setext style automatically puts the processor into compatibility mode, which you then have to disable with the `compat-mode!` attribute.
+
+[,asciidoc]
+----
+Document Title
+==============
+Author Name <author@example.org>
+:compat-mode!:
+----
+
+IMPORTANT: Compatibility mode is automatically enabled when using the Setext style document title.
+You must explicitly disable it (i.e., `compat-mode!`) if you don't want it enabled.
+See the xref:migrate:asciidoc-py.adoc[migration guide] for details.
+
+== Delimited blocks
+
+Delimited blocks contain special text such as code listings, quotes, sidebar text, tables, and so on.
+As you may have guessed, they are bounded by a string of delimiters.
+The delimiters are defined on a line by themselves, and the content goes in between the delimiter lines.
+Here's an example of a listing:
+
+[,asciidoc]
+------
+----
+$ asciidoctor -b html5 recommended-practices.adoc
+----
+------
+
+Delimited blocks require four or more repeating characters on a line by themselves to mark the boundary of the block.
+The one exception is the open block, which only requires two `-` characters.
+
+You may be tempted to extend the line further, either to a predetermined length or to match the length of the content.
+
+*Don't:* extend the delimiter line to a predetermined length or to match the length of the content.
+
+[,asciidoc]
+------
+-------------------------------------------------
+$ asciidoctor -b html5 recommended-practices.adoc
+-------------------------------------------------
+------
+
+Maintaining long delimiter lines is _a colossal waste of time_, not to mention arbitrary and error prone.
+The reader never sees these long strings of delimiters anyway, since they are not carried over to the output (HTML, DocBook, etc.).
+
+*Do:* use the minimum number of characters necessary to form a delimited block, then move on to drafting the content.
+
+NOTE: Asciidoctor enforces that the length of the line that opens the delimited block matches the length of the line that closes it, so make sure they match!
+
+== Document attributes
+
+You can save yourself a lot of typing by leveraging document attributes.
+Document attributes promote frequently occurring references and phrases to the top of the document (or section).
+You can declare information once by assigning it to an attribute, then refer to that attribute throughout the document.
+In that sense, you can think of attributes like variables for AsciiDoc.
+
+Storing information in attributes that you declare at the top of the document makes finding the information easy and saves you from having to update the information in multiple places (i.e., it keeps the document DRY).
+When you update the value of the attribute, the value changes everywhere in the document that the attribute is referenced.
+
+=== DRY URLs
+
+A common use for attributes is to store URLs.
+URLs frequently change, can be rather long, and often have special characters that need escaping.
+All of these challenges are solved by declaring the URLs in attributes.
+
+Assign the URL to a short, easy to remember attribute:
+
+[,asciidoc]
+----
+:url-issues: https://github.com/asciidoctor/asciidoctor/issues
+----
+
+Then reference this attribute whenever you want to use the URL in your document, such as to make a link:
+
+[,asciidoc]
+----
+Submit bug fixes and feature requests to the {url-issues}[issue tracker].
+----
+
+*Do:* employ a system to keep your attributes organized, since you may define attributes for many different things.
+
+=== Attribute groups
+
+If you define a lot of document attributes, the document header can get messy.
+
+*Do:* keep the header tidy by:
+
+* Naming related attributes using a common prefix (i.e., give them a namespace).
+* Grouping related attributes together underneath a banner.
+
+*Do:* use either the prefix `url-` or `uri-` when declaring attributes that hold URL values.
+This is recommended for several reasons:
+
+. It communicates the type of value the attribute holds (e.g., `url-issues` is a URL for the issue tracker).
+. It avoids collisions with attributes used for other purposes (e.g., using `org` for the organization URL could collide with `org` used for the organization name).
+. It causes a code assist tool in an editor (such as text auto-completion) to naturally group related attributes (e.g., bring up a list of all URL attributes by typing `url-`).
+
+Grouping related attributes makes it easy to see where new attributes should be added, thus helping to keep the document header tidy.
+It also opens the door for reorganizing the groups into separate files in the future.
+*Do:* alphabetize the attributes within a group.
+One exception to this rule is when an attribute references another attribute, in which case you have to define the attribute being referenced first.
+
+Here are some of the banners we recommend for grouping related attributes in the document header:
+
+_Metadata_:: Attributes that define information that goes into the header of the output document for indexing.
+_Settings_:: Attributes that control built-in conversion and formatting behavior.
+_Refs_:: Attributes that are referenced in the content, such as URLs; prefix each attribute by its type to make auto-complete work nicer, such as `url-` for a URL.
+
+You can use whatever additional groups feel natural to you.
+
+Here's how that looks when you put these recommendations together:
+
+[,asciidoc]
+----
+= Document Title
+Author Name
+// Metadata:
+:description: The description of this page.
+:keywords: writing, documentation, publishing
+// Settings:
+:icons: font
+:idprefix:
+:idseparator: -
+// Refs:
+:url-project: https://asciidoctor.org
+:url-docs: {url-project}/docs
+:url-issues: https://github.com/asciidoctor/asciidoctor
+:img-ci: https://github.com/asciidoctor/asciidoctor/workflows/CI/badge.svg
+----
+
+=== Counters
+
+Counters are backed by document attributes.
+
+*Do:* apply a prefix to counter names to avoid collisions with other attributes, since they share the same global namespace as all other document attributes.
+For example:
+
+[,asciidoc]
+----
+{counter:cnt-step}
+----
+
+=== Document settings
+
+Most document settings are controlled using attributes.
+Document settings are configured using attribute entries immediately following the document title (without any blank lines in between).
+There are several options of interest.
+
+.Section numbering
+You can enable numbering of sections using the `sectnums` attribute (off by default).
+
+[,asciidoc]
+----
+:sectnums:
+----
+
+.Document description
+You can set the description of the document using the `description` attribute.
+The description is included in the header of the output document.
+
+[,asciidoc]
+----
+:description: This document catalogs a set of recommended practices for writing in AsciiDoc.
+----
+
+You can break any xref:asciidoc::attributes/wrap-values.adoc[attribute value across several lines] by ending the lines in a `{backslash}` preceded by a space.
+
+[,asciidoc]
+----
+:description: This document catalogs a set of recommended practices \
+              for composing documents in AsciiDoc.
+----
+
+You can use this text anywhere in the document by referencing it as an attribute.
+
+[,asciidoc]
+----
+{description}
+----
+
+.Section title IDs and ID prefixes
+IDs are generated for each section title by default.
+The ID is generated from the section title, prefixed with an underscore (i.e., `_`) by default.
+You can change the prefix using the `idprefix` attribute.
+
+[,asciidoc]
+----
+:idprefix: id_
+----
+
+If you want to remove the prefix, assign it an empty value:
+
+[,asciidoc]
+----
+:idprefix:
+----
+
+To disable the auto-generation of section IDs, unset the `sectids` attribute:
+
+[,asciidoc]
+----
+:sectids!:
+----
+
+.Table of contents
+Set the `toc` attribute to activate an auto-generated table of contents at the top of the document:
+
+[,asciidoc]
+----
+:toc:
+----
+
+== Lists
+
+.Unordered list markers
+AsciiDoc supports both `*` (one or more) and `-` (only one) as markers for a top-level list item.
+
+[,asciidoc]
+----
+* first
+* second
+* third
+----
+
+or
+
+[,asciidoc]
+----
+- first
+- second
+- third
+----
+
+However, the dash marker _cannot_ be repeated when defining a list item.
+This can lead to confusion, since AsciiDoc increases the nesting level each time it encounters a _different_ marker.
+For instance, in the following case, the item that has an asterisk marker is *nested* inside the first item.
+
+[,asciidoc]
+----
+- first
+* nested item
+- second
+- third
+----
+
+This nesting rule is true even when the number of asterisks seems to indicate the level:
+
+[,asciidoc]
+----
+*** first
+* nested item
+*** second
+*** third
+----
+
+_Yep, that's right, the second list item is nested inside the first list item._
+
+If you stick to convention, the number of asterisks _can_ represent the nesting level:
+
+[,asciidoc]
+----
+* first
+** nested item
+* second
+* third
+----
+
+Now *that's* intuitive.
+
+*Do:* use the asterisk marker if you are going to be using nested lists.
+
+If you only have top-level list items, then using either marker is reasonable.
+You might even use the dash marker for lists that are not intended to have nested items and the asterisk marker for lists that do have nested items.
+That way it's easy to identify them as different types.
+
+.Separating lists
+Adjacent lists sometimes like to fuse.
+To force the start of a new list, offset the two lists by an empty line comment:
+
+[,asciidoc]
+----
+* apples
+* oranges
+* bananas
+
+//-
+
+* carrots
+* tomatoes
+* celery
+----
+
+== Literal text
+
+AsciiDoc offers several ways to mark up text that should be rendered verbatim (i.e., in a monospace font and free of formatting substitutions).
+Choosing consistent forms keeps your source predictable and avoids surprises.
+
+*Do:* use single backticks to mark up inline monospace text, such as file names, commands, and code.
+
+[,asciidoc]
+----
+Run `asciidoctor` to convert the `recommended-practices.adoc` file.
+----
+
+*Do:* enclose the text in a pair of `+` characters inside the backticks when it contains characters that would otherwise be interpreted, such as attribute references or inline formatting.
+
+[,asciidoc]
+----
+The placeholder syntax is `+{name}+`.
+----
+
+*Don't:* indent a line with a leading space to create literal text.
+An accidental indent silently turns the line into a literal block, producing output you didn't intend.
+
+[,asciidoc]
+----
+ This indented line becomes a literal block.
+----
+
+*Do:* mark up verbatim content explicitly, using a literal block (delimited by `....`) for plain text and a listing block (delimited by `----`) for source code.
+
+[,asciidoc]
+------
+....
+This text is shown verbatim,
+preserving    the    spacing.
+....
+------
+
+*Do:* specify the source language on a listing block so the code gets syntax highlighting.
+
+[,asciidoc]
+------
+[,ruby]
+----
+puts 'Hello, World!'
+----
+------
+
+== Tables
+
+Tables are one of the more verbose structures in AsciiDoc, so a consistent style makes them far easier to write, read, and maintain.
+
+*Do:* use stacked cells, placing each cell on its own line and separating rows with a blank line.
+Stacked cells keep wide tables readable in the source and produce clean diffs when a single cell changes.
+
+[,asciidoc]
+----
+|===
+|Name |Type |Description
+
+|sectnums
+|boolean
+|Numbers the sections.
+
+|toc
+|boolean
+|Generates a table of contents.
+|===
+----
+
+*Don't:* pack an entire row onto a single line.
+It's hard to scan, and editing one cell forces the whole row to reflow.
+
+[,asciidoc]
+----
+|===
+|Name |Type |Description
+|sectnums |boolean |Numbers the sections.
+|toc |boolean |Generates a table of contents.
+|===
+----
+
+*Do:* declare the columns explicitly with the `cols` attribute when you want to control the number of columns or their relative widths.
+
+[,asciidoc]
+----
+[cols="1,1,2"]
+|===
+|Name |Type |Description
+
+|sectnums
+|boolean
+|Numbers the sections.
+|===
+----
+
+*Do:* use an AsciiDoc cell (the `a` modifier) when a cell contains block content, such as a list or a nested block.
+
+[,asciidoc]
+----
+|===
+|Feature |Notes
+
+|Lists
+a|
+* supports nesting
+* supports multiple markers
+|===
+----
