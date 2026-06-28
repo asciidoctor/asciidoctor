@@ -700,6 +700,15 @@ class Converter::DocBook5Converter < Converter::Base
       result << %(<year>#{$2}</year>) if $2
       result << '</copyright>'
     end
+    if doc.attr? 'keywords'
+      unless (keywords = doc.attr('keywords').split(/\s*,\s*/).map(&:strip).reject(&:empty?)).empty?
+        result << '<keywordset>'
+        keywords.each do |keyword|
+          result << %(<keyword>#{keyword}</keyword>)
+        end
+        result << '</keywordset>'
+      end
+    end
     if doc.header?
       unless (authors = doc.authors).empty?
         if authors.size > 1
