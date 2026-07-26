@@ -549,7 +549,7 @@ context 'API' do
     end
 
     # FIXME see #3966
-    test 'should assign incorrect lineno for single-line paragraph inside a conditional preprocessor directive' do
+    test 'should assign incorrect lineno for paragraph inside a conditional preprocessor directive' do
       input = <<~'EOS'
       :conditional-attribute:
 
@@ -565,6 +565,27 @@ context 'API' do
       doc = document_from_string input, sourcemap: true
       # FIXME the second line number should be 6 instead of 7
       assert_equal [3, 7, 9], (doc.find_by context: :paragraph).map(&:lineno)
+    end
+
+    # related to #3966
+    test 'should assign correct lineno for paragraph inside a conditional preprocessor directive when underline style off' do
+      input = <<~'EOS'
+      :conditional-attribute:
+
+      before
+
+      ifdef::conditional-attribute[]
+      subject
+      endif::[]
+
+      after
+      EOS
+
+      Asciidoctor::Compliance.underline_style_section_titles = false
+      doc = document_from_string input, sourcemap: true
+      assert_equal [3, 6, 9], (doc.find_by context: :paragraph).map(&:lineno)
+    ensure
+      Asciidoctor::Compliance.underline_style_section_titles = true
     end
 
     test 'should assign correct lineno for multi-line paragraph inside a conditional preprocessor directive' do
