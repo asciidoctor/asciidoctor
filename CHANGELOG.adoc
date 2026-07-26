@@ -73,6 +73,10 @@ Improvements::
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
 
+Infrastructure::
+
+  * Inline a minimal logger implementation to remove the runtime dependency on the stdlib `logger` gem (#4684)
+
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)

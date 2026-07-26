@@ -3,13 +3,13 @@
 require_relative 'test_helper'
 
 context 'Logger' do
-  MyLogger = Class.new Logger
+  MyLogger = Class.new Asciidoctor::Logger
 
   context 'LoggerManager' do
     test 'provides access to logger via static logger method' do
       logger = Asciidoctor::LoggerManager.logger
       refute_nil logger
-      assert_kind_of Logger, logger
+      assert_kind_of Asciidoctor::Logger, logger
     end
 
     test 'allows logger instance to be changed' do
@@ -29,7 +29,7 @@ context 'Logger' do
         Asciidoctor::LoggerManager.logger = MyLogger.new $stdout
         Asciidoctor::LoggerManager.logger = nil
         refute_nil Asciidoctor::LoggerManager.logger
-        assert_kind_of Logger, Asciidoctor::LoggerManager.logger
+        assert_kind_of Asciidoctor::Logger, Asciidoctor::LoggerManager.logger
       ensure
         Asciidoctor::LoggerManager.logger = old_logger
       end
@@ -88,7 +88,7 @@ context 'Logger' do
       end
       assert_empty out_string
       assert_empty err_string
-      assert_equal Logger::Severity::FATAL, log_level
+      assert_equal Asciidoctor::Logger::Severity::FATAL, log_level
     end
 
     test 'should configure logger with progname set to asciidoctor' do
@@ -96,7 +96,7 @@ context 'Logger' do
     end
 
     test 'should configure logger with level set to WARN by default' do
-      assert_equal Logger::Severity::WARN, Asciidoctor::Logger.new.level
+      assert_equal Asciidoctor::Logger::Severity::WARN, Asciidoctor::Logger.new.level
     end
 
     test 'configures default logger with progname set to asciidoctor' do
@@ -104,7 +104,7 @@ context 'Logger' do
     end
 
     test 'configures default logger with level set to WARN' do
-      assert_equal Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
+      assert_equal Asciidoctor::Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
     end
 
     test 'configures default logger to write messages to $stderr' do
@@ -127,16 +127,121 @@ context 'Logger' do
       assert_includes err_string, %(asciidoctor: FAILED: it cannot be done)
     end
 
+    test 'should accept level as an integer' do
+      logger = Asciidoctor::Logger.new level: Asciidoctor::Logger::Severity::ERROR
+      assert_equal Asciidoctor::Logger::Severity::ERROR, logger.level
+    end
+
+    test 'should accept warning as an alias for warn when setting level' do
+      logger = Asciidoctor::Logger.new level: 'warning'
+      assert_equal Asciidoctor::Logger::Severity::WARN, logger.level
+    end
+
+    test 'should support severity predicate methods' do
+      logger = Asciidoctor::Logger.new level: Asciidoctor::Logger::Severity::WARN
+      refute logger.debug?
+      refute logger.info?
+      assert logger.warn?
+      assert logger.error?
+      assert logger.fatal?
+    end
+
+    test 'should evaluate block lazily when message is a block' do
+      evaluated = false
+      redirect_streams do
+        logger = Asciidoctor::Logger.new level: Asciidoctor::Logger::Severity::FATAL
+        logger.warn do
+          evaluated = true
+          'lazy message'
+        end
+      end
+      refute evaluated
+    end
+
+    test 'should write message returned by block' do
+      err_string = redirect_streams do |_, err|
+        logger = Asciidoctor::Logger.new
+        logger.warn { 'block message' }
+        err.string
+      end
+      assert_includes err_string, 'block message'
+    end
+
+    test 'log is an alias for add' do
+      err_string = redirect_streams do |_, err|
+        logger = Asciidoctor::Logger.new
+        logger.log Asciidoctor::Logger::Severity::WARN, 'via log alias'
+        err.string
+      end
+      assert_includes err_string, 'via log alias'
+    end
+
+    test 'should track max severity across calls' do
+      logger = Asciidoctor::Logger.new level: Asciidoctor::Logger::Severity::UNKNOWN
+      assert_nil logger.max_severity
+      logger.add Asciidoctor::Logger::Severity::WARN
+      assert_equal Asciidoctor::Logger::Severity::WARN, logger.max_severity
+      logger.add Asciidoctor::Logger::Severity::ERROR
+      assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
+      logger.add Asciidoctor::Logger::Severity::INFO
+      assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
+    end
+
     test 'NullLogger level is not nil' do
       logger = Asciidoctor::NullLogger.new
       refute_nil logger.level
-      assert_equal Logger::UNKNOWN, logger.level
+      assert_equal Asciidoctor::Logger::UNKNOWN, logger.level
+    end
+
+    test 'NullLogger tracks max severity without writing' do
+      logger = Asciidoctor::NullLogger.new
+      assert_nil logger.max_severity
+      logger.warn 'discarded'
+      assert_equal Asciidoctor::Logger::Severity::WARN, logger.max_severity
+      logger.error 'discarded'
+      assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
     end
 
     test 'MemoryLogger level is not nil' do
       logger = Asciidoctor::MemoryLogger.new
       refute_nil logger.level
-      assert_equal Logger::UNKNOWN, logger.level
+      assert_equal Asciidoctor::Logger::UNKNOWN, logger.level
+    end
+
+    test 'MemoryLogger stores messages with their severity' do
+      logger = Asciidoctor::MemoryLogger.new
+      logger.warn 'first'
+      logger.error 'second'
+      assert_equal 2, logger.messages.size
+      assert_equal :WARN, logger.messages[0][:severity]
+      assert_equal :ERROR, logger.messages[1][:severity]
+    end
+
+    test 'MemoryLogger#add accepts a block for the message' do
+      logger = Asciidoctor::MemoryLogger.new
+      logger.add(Asciidoctor::Logger::Severity::WARN) { 'block message' }
+      assert_equal 'block message', logger.messages[0][:message]
+    end
+
+    test 'MemoryLogger#clear empties the message list' do
+      logger = Asciidoctor::MemoryLogger.new
+      logger.warn 'one'
+      refute_empty logger
+      logger.clear
+      assert_empty logger
+      assert_nil logger.max_severity
+    end
+
+    test 'MemoryLogger#max_severity returns nil when empty' do
+      assert_nil Asciidoctor::MemoryLogger.new.max_severity
+    end
+
+    test 'MemoryLogger#max_severity returns highest severity logged' do
+      logger = Asciidoctor::MemoryLogger.new
+      logger.warn 'w'
+      logger.error 'e'
+      logger.info 'i'
+      assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
     end
   end
 
