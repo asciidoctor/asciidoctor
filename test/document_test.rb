@@ -1412,6 +1412,20 @@ context 'Document' do
       end
     end
 
+    test 'should add role on document to heading tag of embedded document' do
+      input = <<~'EOS'
+      [.rolename]
+      = Document Title
+      :showtitle:
+
+      content
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_xpath '/h1', result, 1
+      assert_xpath '/h1[@class="rolename"]', result, 1
+    end
+
     test 'parse header only' do
       input = <<~'EOS'
       = Document Title
