@@ -1,0 +1,411 @@
+= Extended Admonitions Guide
+:toc:
+:toclevels: 3
+
+== Overview
+
+By default, Asciidoctor provides five built-in admonition types: NOTE, TIP, IMPORTANT, WARNING, and CAUTION.
+This standard behavior was extended with a configurable admonition system.
+The goal is to support project-specific admonition types while keeping the standard types fully compatible.
+
+The following capabilities were added:
+
+* Configurable admonition type registry (`admonition-types` and per-type attributes)
+* Custom admonition tags, labels, and DocBook mappings
+* Strict validation with warnings (invalid entries are skipped, conversion continues)
+* Collapsible admonitions using `%collapsible` and `%open`
+* Per-type counters and automatic anchors for each admonition occurrence
+* Admonition index macro (`admonition-table::type[]`) rendered as a link list
+* Styling hooks for custom icons and fallback text icons
+
+
+== Quickstart
+
+=== Minimal End-to-End Example
+
+[source,asciidoc]
+----
+= Demo
+:icons: font
+:admonition-types: note,example
+:admonition-example-tag: EXAMPLE
+:admonition-example-label: Example
+:admonition-example-backend-docbook: note
+
+EXAMPLE: A custom admonition.
+
+[NOTE%collapsible]
+.More details
+====
+This section can be collapsed.
+====
+
+admonition-table::example[]
+----
+
+
+== Using Admonition Features
+
+=== Step 1: Declare the Active Admonition Types
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,important,warning,caution,example,definition
+----
+
+If `admonition-types` is not set, the five built-in standard types are used as defaults.
+
+=== Step 2: Configure Each Custom Type
+
+Each custom type requires a tag (the uppercase identifier used in source) and optionally a label and a DocBook mapping:
+
+[source,asciidoc]
+----
+:admonition-example-tag: EXAMPLE
+:admonition-example-label: Example
+:admonition-example-backend-docbook: note
+
+:admonition-definition-tag: DEFINITION
+:admonition-definition-label: Definition
+:admonition-definition-backend-docbook: note
+----
+
+=== Step 3: Use Admonitions — Paragraph and Block Style
+
+Paragraph style:
+
+[source,asciidoc]
+----
+NOTE: Standard admonition.
+EXAMPLE: Custom admonition.
+DEFINITION: Another custom admonition.
+----
+
+Block style:
+
+[source,asciidoc]
+----
+[EXAMPLE]
+.A block-style example
+====
+Block-style custom admonition content.
+====
+----
+
+=== Step 4: Use Collapsible Admonitions
+
+Collapsible admonitions can be created in both paragraph and block style.
+
+Paragraph style:
+
+[source,asciidoc]
+----
+NOTE%collapsible: Hidden by default.
+TIP%collapsible%open: Open by default.
+----
+
+Block style:
+
+[source,asciidoc]
+----
+[WARNING%collapsible]
+.Click to see details
+====
+This warning is collapsible.
+====
+----
+
+The summary text displayed on the collapsed bar uses the following priority:
+
+. Block title (e.g., `.Click to see details`)
+. Document attribute `admonition-collapsible-label`
+. Fallback text `Details`
+
+=== Step 5: Insert Admonition Index Lists
+
+The `admonition-table::` macro inserts a link list of all occurrences of a given admonition type:
+
+[source,asciidoc]
+----
+admonition-table::note[]
+admonition-table::example[title="List of Examples"]
+admonition-table::definition[]
+----
+
+Current output behavior:
+
+* Rendered as an unstyled list of links (not a table)
+* Each link points to the automatically generated anchor of the admonition occurrence
+* Link text is the admonition title if one is present
+* If no title is present, link text falls back to `{Label} {Number}`
+
+
+== Configuring Custom Admonition Types
+
+=== Standard Types
+
+The five standard types are always available:
+
+* `note`
+* `tip`
+* `important`
+* `warning`
+* `caution`
+
+These types have built-in tag, label, and icon definitions.
+No extra configuration is required unless you want to change them.
+
+=== Adding a Custom Type
+
+To add a custom type (for example `hint`):
+
+[source,asciidoc]
+----
+:admonition-types: note,tip,important,warning,caution,hint
+:admonition-hint-tag: HINT
+:admonition-hint-label: Hint
+:admonition-hint-backend-docbook: tip
+----
+
+Then use it in content:
+
+[source,asciidoc]
+----
+HINT: Remember to cache this response.
+
+[HINT]
+====
+This can also be used as a block admonition.
+====
+----
+
+=== DocBook Backend Mapping
+
+When converting to DocBook, you map a custom admonition type to one of the standard DocBook admonition elements:
+
+[source,asciidoc]
+----
+:admonition-hint-backend-docbook: tip
+----
+
+Valid DocBook admonition values: `caution`, `important`, `note`, `tip`, `warning`.
+
+If no mapping is configured or the mapping is invalid, conversion falls back to `note` with a warning.
+
+=== Validation Rules
+
+The configuration is validated strictly at document processing time:
+
+* Type name format: `^[a-z][a-z0-9_\-]*$`
+* Tag format: `^[A-Z][A-Z0-9_]*$`
+* Tags must be unique across all configured types
+* DocBook mapping must be one of the five valid values listed above
+
+Invalid entries are skipped and a warning is logged.
+Conversion continues with the remaining valid types.
+
+
+== Customizing the Rendering via Stylesheets
+
+=== Source Files
+
+Rendering can be customized in either of these two stylesheet files:
+
+* `src/stylesheets/asciidoctor.css` — source stylesheet (edit this for permanent changes)
+* `data/stylesheets/asciidoctor-default.css` — generated default stylesheet (overwritten on regeneration)
+
+NOTE: Always edit `src/stylesheets/asciidoctor.css` for permanent changes.
+The `data/stylesheets/asciidoctor-default.css` file is generated from the source stylesheet.
+
+=== Enabling Font Icons
+
+To use Font Awesome icons for admonitions, set in your document header:
+
+[source,asciidoc]
+----
+:icons: font
+----
+
+This can also be passed on the command line:
+
+[source,bash]
+----
+ruby bin/asciidoctor -a icons=font demo.adoc
+----
+
+=== Configuring a Custom Icon for a Type
+
+Add a CSS rule targeting the `.icon-{typename}::before` pseudo-element.
+The icon code must be a valid Font Awesome 4 glyph code (see https://fontawesome.com/v4/icons/[Font Awesome 4 icon list]):
+
+[source,css]
+----
+.admonitionblock td.icon .icon-example::before {
+  content: "\f02d";   /* fa-book */
+  color: #007a70;
+}
+----
+
+The standard types already have their icon rules defined.
+Custom types without an explicit icon rule use the fallback behavior described below.
+
+=== Fallback Text Icon for Types Without a Dedicated Icon
+
+If no custom icon glyph is configured for a type, the icon cell displays the admonition label text.
+The fallback is styled to stay on one line and keep the content aligned to the right of the icon column:
+
+[source,css]
+----
+.admonitionblock td.icon i.fa[class*="icon-"]:not(.icon-note):not(.icon-tip)...::before {
+  content: attr(title);
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+----
+
+To extend this rule to also exclude your custom type once you add a dedicated icon glyph, add `:not(.icon-{typename})` to the selector.
+
+=== Collapsible Admonition Rendering
+
+Collapsible admonitions use the standard admonition table layout (icon column + content column).
+The expand/collapse region is an inner `<details>` element inside the content cell.
+The triangle expand/collapse indicator is controlled by the `details > summary` CSS rules.
+The admonition icon and type are always visible, even when the content is collapsed.
+
+=== Admonition Index List Styling
+
+The admonition index list rendered by `admonition-table::...[]` uses these CSS classes:
+
+* `.admonition-index` — the container div
+* `.admonition-index-title` — the list title heading
+* `.admonition-index-{typename}` — type-specific container modifier
+
+To customize the list title appearance (styled similarly to the TOC title):
+
+[source,css]
+----
+.admonition-index-title {
+  color: #7a2518;
+  font-size: 1.2em;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-weight: 300;
+}
+----
+
+
+== Tests
+
+Test coverage is primarily in:
+
+* `test/blocks_test.rb`
+* `test/lists_test.rb`
+
+Covered scenarios include:
+
+* Parsing and rendering of custom admonition types
+* Label precedence behavior (`caption` attribute vs. configured labels)
+* Validation warnings for invalid type names, invalid tags, duplicate tags, and invalid DocBook mappings
+* DocBook fallback behavior for missing or invalid mappings
+* Collapsible admonition options (`%collapsible`, `%open`) in both paragraph and block style
+* Integration with list continuation scenarios
+
+[NOTE]
+====
+There are no dedicated automated tests yet for `admonition-table::...[]` output format.
+Behavior is currently verified via manual demo output (`demo-admonitions.adoc` / `demo-admonitions.html`).
+====
+
+
+== Source Code Changes and Additions
+
+=== Core Constants and Defaults
+
+File: `lib/asciidoctor.rb`
+
+* Added `ADMONITION_TYPES` as a configurable default registry
+* Added `DOCBOOK_ADMONITION_TAGS` validation set
+* Kept compatibility constant `ADMONITION_STYLES`
+
+=== Document-Level Admonition Registry and Cache
+
+File: `lib/asciidoctor/document.rb`
+
+Added parsing and lookup methods:
+
+* `parse_admonition_paragraph` — detects admonition paragraphs using the document registry
+* `admonition_type_for_tag` — looks up a type by its uppercase tag
+* `admonition_type_for_name` — looks up a type by its lowercase name
+* `resolve_admonition_textlabel` — resolves the display label for a type
+* `resolve_admonition_docbook_tag` — resolves the DocBook element tag for a type
+
+Added cached registry management:
+
+* `refresh_admonition_types` — re-reads document attributes and rebuilds the registry
+* `register_admonition_occurrence` — increments per-type counter and stores occurrence in catalog
+
+Cache is invalidated when the relevant document attributes change.
+
+=== Parser Integration
+
+File: `lib/asciidoctor/parser.rb`
+
+* Replaced static admonition type checks with dynamic document registry lookups
+* Added parsing of options appended to admonition tags in paragraph form (`%collapsible`, `%open`)
+* Added parsing of the `admonition-table::...[]` block macro
+* Creates `:admonition_table` block nodes with parsed attributes for the converter
+
+=== Regex for Admonition Index Macro
+
+File: `lib/asciidoctor/rx.rb`
+
+* Added `BlockAdmonitionTableMacroRx` for parsing `admonition-table::type[...]`
+
+=== HTML Converter
+
+File: `lib/asciidoctor/converter/html5.rb`
+
+Method `convert_admonition`:
+
+* Reads `collapsible` and `open` options from the block
+* Always renders the icon+content admonition table layout
+* Wraps content in `<details>`/`<summary>` when collapsible
+* Summary text respects block title, document attribute, and fallback priority
+
+Method `convert_admonition_table`:
+
+* Resolves all occurrences of the given type from the document admonition catalog
+* Renders a link list (`<ul>`) with styled title and per-type CSS class
+* Each list item links to the occurrence anchor
+* Link text uses occurrence title if present, otherwise `{Label} {Number}`
+
+=== DocBook Converter
+
+File: `lib/asciidoctor/converter/docbook5.rb`
+
+Method `convert_admonition`:
+
+* Resolves the configured DocBook element tag per type
+* Falls back to `note` with a warning if the mapping is missing or invalid
+
+=== Locale Defaults
+
+File: `data/locale/attributes-en.adoc` (and equivalents per locale)
+
+* Added default `admonition-{type}-tag` and `admonition-{type}-label` attributes for standard types
+
+=== Stylesheet Extensions
+
+Files:
+
+* `src/stylesheets/asciidoctor.css`
+* `data/stylesheets/asciidoctor-default.css`
+
+Changes include:
+
+* Custom icon rule for the `example` type (Font Awesome glyph)
+* Text fallback icon styling for custom types without an explicit icon rule
+* `white-space: nowrap` fallback behavior to prevent label text wrapping in the icon column
+* CSS rules for collapsible admonitions (`details`/`summary` inside `.admonitionblock td.content`)
+* CSS rules for admonition index lists (`.admonition-index`, `.admonition-index-title`)
+

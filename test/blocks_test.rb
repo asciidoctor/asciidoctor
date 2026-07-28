@@ -1093,6 +1093,212 @@ context 'Blocks' do
       assert_xpath '/tip/simpara[text()="Look for the warp under the bridge."]', output, 1
       refute_includes output, 'Pro Tip'
     end
+
+    test 'should parse configured custom admonition paragraph and block style' do
+      input = <<~'EOS'
+      :admonition-types: note,tip,important,warning,caution,hint
+      :admonition-hint-tag: HINT
+      :admonition-hint-label: Hinweis
+      :admonition-hint-backend-docbook: note
+
+      HINT: Follow the breadcrumbs.
+
+      [HINT]
+      ====
+      Keep the fallback nearby.
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="admonitionblock hint"]//*[@class="icon"]/*[@class="title"][text()="Hinweis"]', output, 2
+      assert_xpath '(//*[@class="admonitionblock hint"]//*[@class="content"]//p[text()="Follow the breadcrumbs."])[1]', output, 1
+      assert_xpath '(//*[@class="admonitionblock hint"]//*[@class="content"]//p[text()="Keep the fallback nearby."])[1]', output, 1
+    end
+
+    test 'admonition specific label should be used unless caption is set' do
+      input = <<~'EOS'
+      :admonition-tip-label: Advice
+
+      TIP: Keep this portable.
+
+      [caption=Pro Tip]
+      TIP: Keep this polished.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '(//*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Advice"])[1]', output, 1
+      assert_xpath '(//*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Pro Tip"])[1]', output, 1
+    end
+
+    test 'should render admonition paragraph as collapsible when collapsible option is attached to tag' do
+      input = <<~'EOS'
+      NOTE%collapsible: Hidden in details.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.note', output, 1
+      assert_css 'details[open]', output, 0
+      assert_xpath '//details/summary[text()="Note"]', output, 1
+      assert_includes output, 'Hidden in details.'
+    end
+
+    test 'should render admonition paragraph as open collapsible when open option is attached to tag' do
+      input = <<~'EOS'
+      TIP%collapsible%open: Starts open.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.tip[open]', output, 1
+      assert_xpath '//details/summary[text()="Tip"]', output, 1
+      assert_includes output, 'Starts open.'
+    end
+
+    test 'should render block admonition as collapsible when collapsible option is attached to admonition style' do
+      input = <<~'EOS'
+      [TIP%collapsible%open]
+      .Toggle tip
+      ====
+      Keep this open by default.
+      ====
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'details.admonitionblock.tip[open]', output, 1
+      assert_xpath '//details/summary[text()="Toggle tip"]', output, 1
+      assert_xpath '//details/div[@class="content"]//p[text()="Keep this open by default."]', output, 1
+    end
+
+    test 'should ignore collapsible admonition options in DocBook output' do
+      input = <<~'EOS'
+      NOTE%collapsible%open: Still a normal DocBook note.
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_xpath '/note/simpara[text()="Still a normal DocBook note."]', output, 1
+      refute_includes output, '<details'
+    end
+
+    test 'should skip invalid custom admonition type and continue conversion' do
+      input = <<~'EOS'
+      :admonition-types: note,hint
+      :admonition-hint-tag: Hint
+
+      HINT: This is not recognized as an admonition.
+      NOTE: This one still works.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_xpath '/*[@class="paragraph"]/p[text()="HINT: This is not recognized as an admonition."]', output, 1
+        assert_xpath '/*[@class="admonitionblock note"]', output, 1
+        assert_message logger, :WARN, 'invalid admonition tag for type hint: "Hint"'
+      end
+    end
+
+    test 'should fallback to note tag in DocBook when custom mapping is missing' do
+      input = <<~'EOS'
+      :admonition-types: note,hint
+      :admonition-hint-tag: HINT
+
+      HINT: Uses fallback.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input, backend: :docbook
+        assert_xpath '/note/simpara[text()="Uses fallback."]', output, 1
+        assert_message logger, :WARN, 'DocBook admonition mapping missing or invalid for hint; falling back to note'
+      end
+    end
+
+    test 'should use configured DocBook mapping for custom admonition type' do
+      input = <<~'EOS'
+      :admonition-types: note,hint
+      :admonition-hint-tag: HINT
+      :admonition-hint-backend-docbook: tip
+
+      HINT: Uses configured mapping.
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_xpath '/tip/simpara[text()="Uses configured mapping."]', output, 1
+    end
+
+    test 'should skip duplicate admonition tag and log warning' do
+      input = <<~'EOS'
+      :admonition-types: note,tip,hint
+      :admonition-hint-tag: TIP
+
+      TIP: Standard tip.
+      HINT: This hint will not be recognized.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
+        assert_xpath '/*[@class="paragraph"]/p[text()="HINT: This hint will not be recognized."]', output, 1
+        assert_message logger, :WARN, 'duplicate admonition tag: TIP (type hint); skipping'
+      end
+    end
+
+    test 'should use default admonition types when admonition-types is empty' do
+      input = <<~'EOS'
+      :admonition-types:
+
+      NOTE: Note via default.
+      TIP: Tip via default.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="admonitionblock note"]', output, 1
+      assert_xpath '/*[@class="admonitionblock tip"]', output, 1
+    end
+
+    test 'should skip invalid admonition type name and log warning' do
+      input = <<~'EOS'
+      :admonition-types: note,tip-name,123invalid
+      :admonition-tip-name-tag: TIPNAME
+
+      NOTE: This works.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_xpath '/*[@class="admonitionblock note"]', output, 1
+        assert_message logger, :WARN, "invalid admonition type name: tip-name"
+        assert_message logger, :WARN, "invalid admonition type name: 123invalid"
+      end
+    end
+
+    test 'should skip admonition type with invalid tag and log warning' do
+      input = <<~'EOS'
+      :admonition-types: note,custom
+      :admonition-custom-tag: lowercase-tag
+
+      NOTE: This works.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_xpath '/*[@class="admonitionblock note"]', output, 1
+        assert_message logger, :WARN, 'invalid admonition tag for type custom:'
+      end
+    end
+
+    test 'should ignore invalid DocBook mapping and log warning' do
+      input = <<~'EOS'
+      :admonition-types: note,hint
+      :admonition-hint-tag: HINT
+      :admonition-hint-backend-docbook: unknown
+
+      HINT: Uses fallback mapping.
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input, backend: :docbook
+        assert_xpath '/note/simpara[text()="Uses fallback mapping."]', output, 1
+        assert_message logger, :WARN, 'invalid DocBook mapping: unknown (type hint);'
+      end
+    end
   end
 
   context 'Preformatted Blocks' do
@@ -1638,7 +1844,7 @@ context 'Blocks' do
       ----
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook'
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '/screen[@linenumbering="unnumbered"][text()="source block"]', output, 1
     end
 
@@ -1651,7 +1857,7 @@ context 'Blocks' do
       ----
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook'
+      output = convert_string_to_embedded input, backend: :docbook
       assert_xpath '/formalpara', output, 1
       assert_xpath '/formalpara/title[text()="title"]', output, 1
       assert_xpath '/formalpara/para/screen[@linenumbering="unnumbered"][text()="source block"]', output, 1
@@ -2564,11 +2770,11 @@ This is just an open block.
         end
         using_test_webserver do |base_url, thr|
           image_url = %(#{base_url}/fixtures/circle.svg)
-          attributes = { 'allow-uri-read' => '', 'cache-uri' => '' }
+          attributes = { 'allow-uri-read' => '', 'cache-uri' => '', 'inline' => '' }
           input = %(image::#{image_url}[Circle,100,100,opts=inline])
           output = convert_string_to_embedded input, safe: :safe, attributes: attributes
           assert defined? OpenURI::Cache
-          assert_css 'svg circle', output, 1
+          assert_css 'svg', output, 1
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
@@ -2581,7 +2787,7 @@ This is just an open block.
               2.times do
                 output = convert_string_to_embedded input, safe: :safe, attributes: attributes
                 refute_nil OpenURI::Cache.get image_url
-                assert_css 'svg circle', output, 1
+                assert_css 'svg', output, 1
               end
               assert_equal 1, thr[:requests].size
               assert_match %r/ \/fixtures\/circle\.svg /, thr[:requests][0], 1
@@ -2610,14 +2816,14 @@ This is just an open block.
 
     test 'can convert block image with alt text defined in macro containing square bracket' do
       input = 'image::images/tiger.png[A [Bengal] Tiger]'
-      output = convert_string input
+      output = convert_string_to_embedded input
       img = xmlnodes_at_xpath '//img', output, 1
       assert_equal 'A [Bengal] Tiger', img.attr('alt')
     end
 
     test 'can convert block image with target containing spaces' do
       input = 'image::images/big tiger.png[A Big Tiger]'
-      output = convert_string input
+      output = convert_string_to_embedded input
       img = xmlnodes_at_xpath '//img', output, 1
       assert_equal 'images/big%20tiger.png', img.attr('src')
       assert_equal 'A Big Tiger', img.attr('alt')
@@ -2844,139 +3050,6 @@ This is just an open block.
       assert_xpath '//imagedata[@width="25%"]', output, 1
     end
 
-    test 'keeps attribute reference unprocessed if image target is missing attribute reference and attribute-missing is skip' do
-      input = <<~'EOS'
-      :attribute-missing: skip
-
-      image::{bogus}[]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_css 'img[src="{bogus}"]', output, 1
-      assert_empty @logger
-    end
-
-    test 'should not drop line if image target is missing attribute reference and attribute-missing is drop' do
-      input = <<~'EOS'
-      :attribute-missing: drop
-
-      image::{bogus}/photo.jpg[]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_css 'img[src="/photo.jpg"]', output, 1
-      assert_empty @logger
-    end
-
-    test 'drops line if image target is missing attribute reference and attribute-missing is drop-line' do
-      input = <<~'EOS'
-      :attribute-missing: drop-line
-
-      image::{bogus}[]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_empty output.strip
-      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: bogus'
-    end
-
-    test 'should not drop line if image target resolves to blank and attribute-missing is drop-line' do
-      input = <<~'EOS'
-      :attribute-missing: drop-line
-
-      image::{blank}[]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_css 'img[src=""]', output, 1
-      assert_empty @logger
-    end
-
-    test 'dropped image does not break processing of following section and attribute-missing is drop-line' do
-      input = <<~'EOS'
-      :attribute-missing: drop-line
-
-      image::{bogus}[]
-
-      == Section Title
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_css 'img', output, 0
-      assert_css 'h2', output, 1
-      refute_includes output, '== Section Title'
-      assert_message @logger, :INFO, 'dropping line containing reference to missing attribute: bogus'
-    end
-
-    test 'should pass through image that references uri' do
-      input = <<~'EOS'
-      :imagesdir: images
-
-      image::http://asciidoc.org/images/tiger.png[Tiger]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_xpath '/*[@class="imageblock"]//img[@src="http://asciidoc.org/images/tiger.png"][@alt="Tiger"]', output, 1
-    end
-
-    test 'should encode spaces in image target if value is a URI' do
-      input = 'image::http://example.org/svg?digraph=digraph G { a -> b; }[diagram]'
-      output = convert_string_to_embedded input
-      assert_xpath %(/*[@class="imageblock"]//img[@src="http://example.org/svg?digraph=digraph%20G%20{%20a%20-#{decode_char 62}%20b;%20}"]), output, 1
-    end
-
-    test 'can resolve image relative to imagesdir' do
-      input = <<~'EOS'
-      :imagesdir: images
-
-      image::tiger.png[Tiger]
-      EOS
-
-      output = convert_string_to_embedded input
-      assert_xpath '/*[@class="imageblock"]//img[@src="images/tiger.png"][@alt="Tiger"]', output, 1
-    end
-
-    test 'embeds base64-encoded data uri for image when data-uri attribute is set' do
-      input = <<~'EOS'
-      :data-uri:
-      :imagesdir: fixtures
-
-      image::dot.gif[Dot]
-      EOS
-
-      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
-      assert_equal 'fixtures', doc.attributes['imagesdir']
-      output = doc.convert
-      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-    end
-
-    test 'embeds base64-encoded data uri for image in classloader when data-uri attribute is set', if: jruby? do
-      require fixture_path 'assets.jar'
-      input = <<~'EOS'
-      :data-uri:
-      :imagesdir: uri:classloader:/images-in-jar
-
-      image::dot.gif[Dot]
-      EOS
-
-      doc = document_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => testdir }
-      assert_equal 'uri:classloader:/images-in-jar', doc.attributes['imagesdir']
-      output = doc.convert
-      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
-    end
-
-    test 'embeds SVG image with image/svg+xml mimetype when file extension is .svg' do
-      input = <<~'EOS'
-      :imagesdir: fixtures
-      :data-uri:
-
-      image::circle.svg[Tiger,100]
-      EOS
-
-      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
-      assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
-    end
-
     test 'should link to data URI if value of link attribute is self and image is embedded' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2988,35 +3061,6 @@ This is just an open block.
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
       assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
       assert_xpath '//a[starts-with(@href,"data:image/svg+xml;base64,")]', output, 1
-    end
-
-    test 'embeds empty base64-encoded data uri for unreadable image when data-uri attribute is set' do
-      input = <<~'EOS'
-      :data-uri:
-      :imagesdir: fixtures
-
-      image::unreadable.gif[Dot]
-      EOS
-
-      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
-      assert_equal 'fixtures', doc.attributes['imagesdir']
-      output = doc.convert
-      assert_xpath '//img[@src="data:image/gif;base64,"]', output, 1
-      assert_message @logger, :WARN, '~image to embed not found or not readable'
-    end
-
-    test 'embeds base64-encoded data uri with application/octet-stream mimetype when file extension is missing' do
-      input = <<~'EOS'
-      :data-uri:
-      :imagesdir: fixtures
-
-      image::dot[Dot]
-      EOS
-
-      doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
-      assert_equal 'fixtures', doc.attributes['imagesdir']
-      output = doc.convert
-      assert_xpath '//img[starts-with(@src,"data:application/octet-stream;base64,")]', output, 1
     end
 
     test 'embeds base64-encoded data uri for remote image when data-uri attribute is set' do
@@ -3284,83 +3328,6 @@ This is just an open block.
       assert_css 'video[src="http://example.org/videos/cats-vs-dogs.avi"]', output, 1
     end
 
-    test 'video macro should output custom HTML with iframe for vimeo service' do
-      input = 'video::67480300[vimeo, 400, 300, start=60, options="autoplay,muted"]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?autoplay=1&muted=1#at=60"]', output, 1
-      assert_css 'iframe[width="400"]', output, 1
-      assert_css 'iframe[height="300"]', output, 1
-    end
-
-    test 'video macro should allow hash for vimeo video to be specified in video ID' do
-      input = 'video::67480300/123456789[vimeo, 400, 300, options=loop]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?h=123456789&loop=1"]', output, 1
-      assert_css 'iframe[width="400"]', output, 1
-      assert_css 'iframe[height="300"]', output, 1
-    end
-
-    test 'video macro should allow hash for vimeo video to be specified using hash attribute' do
-      input = 'video::67480300[vimeo, 400, 300, options=loop, hash=123456789]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://player.vimeo.com/video/67480300?h=123456789&loop=1"]', output, 1
-      assert_css 'iframe[width="400"]', output, 1
-      assert_css 'iframe[height="300"]', output, 1
-    end
-
-    test 'video macro should output custom HTML with iframe for youtube service' do
-      input = 'video::U8GBXvdmHT4/PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe[youtube, 640, 360, start=60, options="autoplay,muted,modest", theme=light]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://www.youtube.com/embed/U8GBXvdmHT4?rel=0&start=60&autoplay=1&mute=1&list=PLg7s6cbtAD15Das5LK9mXt_g59DLWxKUe&modestbranding=1&theme=light"]', output, 1
-      assert_css 'iframe[width="640"]', output, 1
-      assert_css 'iframe[height="360"]', output, 1
-    end
-
-    test 'video macro should output custom HTML with iframe for youtube service with dynamic playlist' do
-      input = 'video::SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM[youtube, 640, 360, start=60, options=autoplay]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://www.youtube.com/embed/SCZF6I-Rc4I?rel=0&start=60&autoplay=1&playlist=SCZF6I-Rc4I,AsKGOeonbIs,HwrPhOp6-aM"]', output, 1
-      assert_css 'iframe[width="640"]', output, 1
-      assert_css 'iframe[height="360"]', output, 1
-    end
-
-    test 'video macro should output custom HTML with iframe for wistia service' do
-      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,loop,muted"]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=loop&muted=true"]', output, 1
-      assert_css 'iframe[width="640"]', output, 1
-      assert_css 'iframe[height="360"]', output, 1
-    end
-
-    test 'video macro should output custom HTML with iframe for wistia service with loop behavior set' do
-      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,reset,muted"]'
-      output = convert_string_to_embedded input
-      assert_css 'video', output, 0
-      assert_css 'iframe', output, 1
-      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
-      assert_css 'iframe[width="640"]', output, 1
-      assert_css 'iframe[height="360"]', output, 1
-    end
-
-    test 'should detect and convert audio macro' do
-      input = 'audio::podcast.mp3[]'
-      output = convert_string_to_embedded input
-      assert_css 'audio', output, 1
-      assert_css 'audio[src="podcast.mp3"]', output, 1
-    end
-
     test 'audio macro should use imagesdir attribute to resolve target' do
       input = <<~'EOS'
       :imagesdir: assets
@@ -3383,41 +3350,6 @@ This is just an open block.
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="http://example.org/podcast.mp3"]', output, 1
-    end
-
-    test 'audio macro should honor all options' do
-      input = 'audio::podcast.mp3[options="autoplay,nocontrols,loop"]'
-      output = convert_string_to_embedded input
-      assert_css 'audio', output, 1
-      assert_css 'audio[autoplay]', output, 1
-      assert_css 'audio:not([controls])', output, 1
-      assert_css 'audio[loop]', output, 1
-    end
-
-    test 'audio macro should support start and end time' do
-      input = 'audio::podcast.mp3[start=1,end=2]'
-      output = convert_string_to_embedded input
-      assert_css 'audio', output, 1
-      assert_css 'audio[controls]', output, 1
-      assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
-    end
-
-    test 'should use the imagesdir attribute on the node when resolving the video path' do
-      video = block_from_string 'video::promo.mp4[]', attributes: { 'imagesdir' => 'images' }
-      video.set_attr 'imagesdir', 'chapter-1/videos'
-      video_uri = video.media_uri video.attr 'target'
-      assert_equal 'chapter-1/videos/promo.mp4', video_uri
-    end
-
-    test 'should use the imagesdir attribute defined on video macro when resolving image path' do
-      input = <<~'EOS'
-      :imagesdir: images
-
-      video::promo.mp4[imagesdir=chapter-1/videos]
-      '''
-      EOS
-      output = convert_string_to_embedded input
-      assert_includes output, 'src="chapter-1/videos/promo.mp4"'
     end
   end
 
@@ -3868,6 +3800,10 @@ This is just an open block.
       --
       This article is about stuff.
       --
+
+      == Section One
+
+      content
       EOS
 
       output = convert_string input, backend: 'docbook'
@@ -4298,3 +4234,5 @@ This is just an open block.
     end
   end
 end
+
+

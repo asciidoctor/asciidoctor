@@ -88,6 +88,7 @@ class Converter::Html5Converter < Converter::Base
     when 'toc' then convert_toc node
     when 'pass' then convert_pass node
     when 'audio' then convert_audio node
+    when 'admonition_table' then convert_admonition_table node
     else; super
     end
   end
@@ -446,6 +447,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     id_attr = node.id ? %( id="#{node.id}") : ''
     name = node.attr 'name'
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
+    class_attr = %( class="admonitionblock #{name}#{(role = node.role) ? " #{role}" : ''}")
     if node.document.attr? 'icons'
       if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
         label = %(<i class="fa icon-#{name}" title="#{node.attr 'textlabel'}"></i>)
@@ -455,7 +457,30 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     else
       label = %(<div class="title">#{node.attr 'textlabel'}</div>)
     end
-    %(<div#{id_attr} class="admonitionblock #{name}#{(role = node.role) ? " #{role}" : ''}">
+    if node.option? 'collapsible'
+      open_attr = (node.option? 'open') ? ' open' : ''
+      summary_text = if node.title?
+        node.title
+      else
+        node.document.attr('admonition-collapsible-label') || 'Details'
+      end
+      %(<div#{id_attr}#{class_attr}>
+<table>
+<tr>
+<td class="icon">
+#{label}
+</td>
+<td class="content">
+<details#{open_attr}>
+<summary class="collapsible-summary">#{summary_text}</summary>
+#{node.content}
+</details>
+</td>
+</tr>
+</table>
+</div>)
+    else
+      %(<div#{id_attr}#{class_attr}>
 <table>
 <tr>
 <td class="icon">
@@ -466,6 +491,30 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
 </td>
 </tr>
 </table>
+</div>)
+    end
+  end
+
+  def convert_admonition_table node
+    doc = node.document
+    type_name = (node.attr 'admonition-table-type').to_s.strip.downcase
+    adm_type = doc.admonition_type_for_name type_name
+    entries = doc.admonition_catalog[type_name]
+    if adm_type.nil? || entries.nil? || entries.empty?
+      return %(<div class="admonition-index admonition-index-#{type_name}"><!-- no admonitions of type: #{type_name} --></div>)
+    end
+    textlabel = adm_type['label'] || type_name.capitalize
+    title = node.title? ? node.title : %(List of #{textlabel}s)
+    id_attr = node.id ? %( id="#{node.id}") : ''
+    items = entries.map do |entry|
+      link_text = (entry['title'] && !entry['title'].empty?) ? entry['title'] : %(#{textlabel} #{entry['number']})
+      %(<li><a href="##{entry['id']}">#{link_text}</a></li>)
+    end.join LF
+    %(<div#{id_attr} class="admonition-index admonition-index-#{type_name}">
+<div class="admonition-index-title">#{title}</div>
+<ul>
+#{items}
+</ul>
 </div>)
   end
 

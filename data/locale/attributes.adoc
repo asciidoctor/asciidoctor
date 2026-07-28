@@ -8,4 +8,15 @@
 //
 // NOTE: Please wrap the listing-caption and preface-title entries in a preprocessor conditional directive.
 // These attributes should only be updated if set explicitly by the user.
+:admonition-types: note,tip,important,warning,caution
+:admonition-note-tag: NOTE
+:admonition-note-backend-docbook: note
+:admonition-tip-tag: TIP
+:admonition-tip-backend-docbook: tip
+:admonition-important-tag: IMPORTANT
+:admonition-important-backend-docbook: important
+:admonition-warning-tag: WARNING
+:admonition-warning-backend-docbook: warning
+:admonition-caution-tag: CAUTION
+:admonition-caution-backend-docbook: caution
 ifdef::lang[include::attributes-{lang}.adoc[]]

@@ -82,6 +82,9 @@ module Asciidoctor
 # Loading a document object is the first step in the conversion process. You
 # can take the process to completion by calling the {Document#convert} method.
 class Document < AbstractBlock
+  AdmonitionTypeNameRx = /^[a-z][a-z0-9_\-]*$/
+  AdmonitionTagRx = /^[A-Z][A-Z0-9_]*$/
+
   ImageReference = ::Struct.new :target, :imagesdir do
     alias to_s target # rubocop:disable Style/Alias
   end
@@ -336,6 +339,11 @@ class Document < AbstractBlock
     end
 
     @parsed = @reftexts = @header = @header_attributes = nil
+    @admonition_types_by_name = @admonition_types_by_tag = @admonition_style_heads = nil
+    @admonition_config_version = 0
+    @admonition_cache_version = -1
+    @admonition_counters = {}
+    @admonition_catalog = ::Hash.new {|h, k| h[k] = [] }
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -884,6 +892,7 @@ class Document < AbstractBlock
       end
       @attributes_modified << name
     end
+    touch_admonition_types_cache if admonition_config_attribute? name
     value
   end
 
@@ -900,9 +909,96 @@ class Document < AbstractBlock
     else
       @attributes.delete name
       @attributes_modified << name
+      touch_admonition_types_cache if admonition_config_attribute? name
       true
     end
   end
+
+  # Resolve the admonition type config by tag (e.g., NOTE).
+  def admonition_type_for_tag tag
+    refresh_admonition_types
+    @admonition_types_by_tag[tag]
+  end
+
+  # Resolve the admonition type config by internal name (e.g., note).
+  def admonition_type_for_name name
+    refresh_admonition_types
+    @admonition_types_by_name[name]
+  end
+
+  # A compact index of first characters used for fast admonition prefix checks.
+  def admonition_style_heads
+    refresh_admonition_types
+    @admonition_style_heads
+  end
+
+  # Parse admonition paragraph marker at the start of line (e.g., NOTE: text,
+  # NOTE%collapsible: text).
+  def parse_admonition_paragraph line
+    return unless (idx = line.index ':') && idx > 0
+    marker = line.slice 0, idx
+    tag, marker_options = marker.split '%', 2
+    return unless (admonition_type = admonition_type_for_tag tag)
+    return unless (char = line.getbyte idx + 1) && (char == 32 || char == 9)
+    attributes = {}
+    if marker_options
+      marker_options.split('%').each do |opt|
+        return if opt.empty?
+        attributes[%(#{opt}-option)] = ''
+      end
+    end
+    pos = idx + 1
+    while (char = line.getbyte pos) == 32 || char == 9
+      pos += 1
+    end
+    [admonition_type, (line.slice pos, line.length) || '', attributes]
+  end
+
+  # Resolve effective text label with precedence: caption > admonition-*-label > *-caption > default.
+  def resolve_admonition_textlabel admonition_type, caption = nil
+    return caption unless caption.nil?
+    name = admonition_type['name']
+    attrs = @attributes
+    if (label = attrs[%(admonition-#{name}-label)]) && !label.empty?
+      label
+    elsif (legacy_caption = attrs[%(#{name}-caption)]) && !legacy_caption.empty?
+      legacy_caption
+    else
+      admonition_type['label']
+    end
+  end
+
+  # Resolve DocBook tag from type config; returns nil if missing/invalid.
+  def resolve_admonition_docbook_tag admonition_type
+    if (tag_name = admonition_type['docbook']) && DOCBOOK_ADMONITION_TAGS.include?(tag_name)
+      tag_name
+    end
+  end
+
+  # Register an admonition occurrence: increments the per-type counter, assigns
+  # an auto-generated anchor id when none is set, and records the entry in the
+  # admonition catalog for later use by admonition-table:: macros.
+  #
+  # admonition_type - the admonition type Hash with at least 'name'
+  # block           - the Block being registered (id may be set already)
+  # title           - optional user-supplied title String
+  #
+  # Returns the [Integer] counter value for this occurrence.
+  def register_admonition_occurrence admonition_type, block, title = nil
+    name = admonition_type['name']
+    number = (@admonition_counters[name] = (@admonition_counters[name] || 0) + 1)
+    # Assign auto-id only if the user hasn't already set one; let the
+    # parser's normal ref-registration logic handle :refs cataloging.
+    unless block.id
+      block.id = %(#{name}-#{number})
+    end
+    @admonition_catalog[name] << { 'id' => block.id, 'number' => number, 'title' => title }
+    number
+  end
+
+  # Returns the admonition catalog (Hash {name => Array of entries}).
+  # Each entry: { 'id', 'number', 'title' }
+  attr_reader :admonition_catalog
 
   # Public: Determine if the attribute has been locked by being assigned in document options
   #
@@ -911,6 +1007,63 @@ class Document < AbstractBlock
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked? name
     @attribute_overrides.key? name
+  end
+
+  def admonition_config_attribute? name
+    name == 'admonition-types' || name.start_with?('admonition-') || name.end_with?('-caption')
+  end
+
+  def touch_admonition_types_cache
+    @admonition_config_version += 1
+    nil
+  end
+
+  def refresh_admonition_types
+    return if @admonition_cache_version == @admonition_config_version
+    @admonition_types_by_name = {}
+    @admonition_types_by_tag = {}
+    @admonition_style_heads = ::Set.new
+    names = if (types = @attributes['admonition-types']) && !types.empty?
+      types.split(',').map {|name| name.strip.downcase }.reject &:empty?
+    else
+      ADMONITION_TYPES.keys
+    end
+    names.each do |name|
+      unless AdmonitionTypeNameRx.match? name
+        logger.warn %(invalid admonition type name: #{name}; expected format '^[a-z][a-z0-9_\-]*$'; skipping)
+        next
+      end
+      if @admonition_types_by_name.key? name
+        logger.warn %(duplicate admonition type name: #{name}; skipping)
+        next
+      end
+      default_conf = ADMONITION_TYPES[name] || {}
+      tag = @attributes[%(admonition-#{name}-tag)] || default_conf['tag']
+      unless tag && AdmonitionTagRx.match?(tag)
+        logger.warn %(invalid admonition tag for type #{name}: #{tag.inspect}; expected uppercase tag in admonition-#{name}-tag; skipping)
+        next
+      end
+      if @admonition_types_by_tag.key? tag
+        logger.warn %(duplicate admonition tag: #{tag} (type #{name}); skipping)
+        next
+      end
+      docbook_tag = @attributes[%(admonition-#{name}-backend-docbook)] || default_conf['docbook']
+      if docbook_tag && !DOCBOOK_ADMONITION_TAGS.include?(docbook_tag)
+        logger.warn %(invalid DocBook mapping: #{docbook_tag} (type #{name}); expected one of #{DOCBOOK_ADMONITION_TAGS.to_a.sort.join ', '}; ignoring mapping)
+        docbook_tag = nil
+      end
+      admonition_type = {
+        'name' => name,
+        'tag' => tag,
+        'label' => default_conf['label'] || (name.capitalize),
+        'docbook' => docbook_tag,
+      }
+      @admonition_types_by_name[name] = admonition_type
+      @admonition_types_by_tag[tag] = admonition_type
+      @admonition_style_heads << tag.chr
+    end
+    @admonition_cache_version = @admonition_config_version
+    nil
   end
 
   # Public: Assign a value to the specified attribute in the document header.
