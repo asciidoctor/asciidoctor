@@ -2247,6 +2247,78 @@ context 'Tables' do
       assert_css 'table > tbody > tr', output, 2
       assert_xpath %((//td)[1]//pre[text()="A1\n\nA1 continued"]), output, 1
     end
+
+    test 'table with roles on columns' do
+      input = <<~'EOS'
+      [cols="1,1[.role1.role2]"]
+      |===
+      |Cell in column 1, row 1
+      |Cell in column 2, row 1
+      
+      |Cell in column 1, row 2
+      |Cell in column 2, row 2
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table', output, 1
+      assert_xpath '//tr[1]/td[1][not(contains(@class, "role1"))]', output, 1
+      assert_xpath '//tr[1]/td[2][contains(@class, "role1") and contains(@class , "role2")]', output, 1
+      assert_xpath '//tr[2]/td[1][not(contains(@class, "role1"))]', output, 1
+      assert_xpath '//tr[2]/td[2][contains(@class, "role1") and contains(@class , "role2")]', output, 1
+    end
+
+    test 'table with roles on columns docbook 5' do
+      input = <<~'EOS'
+      [cols="1,1[.role1.role2]"]
+      |===
+      |Cell in column 1, row 1
+      |Cell in column 2, row 1
+      
+      |Cell in column 1, row 2
+      |Cell in column 2, row 2
+      |===
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook5'
+      assert_includes output, '<entry align="left" valign="top" role="role1 role2">'
+    end
+
+    test 'table with roles on cells' do
+      input = <<~'EOS'
+      [cols="1,1"]
+      |===
+      [role1]|Cell in column 1, row 1
+      [role2]|Cell in column 2, row 1
+      
+      [.role3.role4]|Cell in column 1, row 2
+      [.role5]|Cell in column 2, row 2
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table', output, 1
+      assert_xpath '//tr[1]/td[1][contains(@class, "role1")]', output, 1
+      assert_xpath '//tr[1]/td[2][contains(@class, "role2")]', output, 1
+      assert_xpath '//tr[2]/td[1][contains(@class, "role3") and contains(@class , "role4")]', output, 1
+      assert_xpath '//tr[2]/td[2][contains(@class, "role5")]', output, 1
+    end
+
+    test 'table with roles on columns and cells' do
+      input = <<~'EOS'
+      [cols="1,1[role1]"]
+      |===
+      [role2]|Cell in column 1, row 1
+      [role3]|Cell in column 2, row 1
+      
+      [role4]|Cell in column 1, row 2
+      [role5]|Cell in column 2, row 2
+      |===
+      EOS
+      output = convert_string_to_embedded input
+      assert_css 'table', output, 1
+      assert_xpath '//tr[1]/td[1][not(contains(@class, "role1")) and contains(@class , "role2")]', output, 1
+      assert_xpath '//tr[1]/td[2][contains(@class, "role1") and contains(@class , "role3")]', output, 1
+      assert_xpath '//tr[2]/td[1][not(contains(@class, "role1")) and contains(@class , "role4")]', output, 1
+      assert_xpath '//tr[2]/td[2][contains(@class, "role1") and contains(@class , "role5")]', output, 1
+    end
   end
 
   context 'DSV' do
