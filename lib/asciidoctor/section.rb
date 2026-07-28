@@ -156,6 +156,37 @@ class Section < AbstractBlock
     end
   end
 
+  # Public: A convenience method that returns the value of the tocreftext
+  # attribute with title substitutions applied.
+  def tocreftext
+    (val = @attributes['tocreftext']) ? (apply_title_subs val) : nil
+  end
+
+  # Public: Returns the title to be used in the table of contents.
+  #
+  # Use 'tocreftext' if defined. Fall back to 'reftext' if {toc-use-reftext} is set.
+  # Fall back to the title otherwise.
+  #
+  # @return [String] The title for the TOC.
+  def toc_title
+    if tocreftext
+      tocreftext
+    elsif @document.attr?('toc-use-reftext') && reftext?
+      apply_title_subs @attributes['reftext']
+    else
+      title
+    end
+  end
+
+  # Public: Returns the captioned title to be used in the table of contents.
+  #
+  # See AbstractBlock#captioned_title for details.
+  #
+  # @return [String] The captioned title for the TOC.
+  def captioned_toc_title
+    %(#{@caption}#{toc_title})
+  end
+
   # Public: Append a content block to this block's list of blocks.
   #
   # If the child block is a Section, assign an index to it.
