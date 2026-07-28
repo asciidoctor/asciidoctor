@@ -1,0 +1,2 @@
+[]
+* xref:recommended-practices.adoc[]
