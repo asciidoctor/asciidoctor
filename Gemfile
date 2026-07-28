@@ -15,7 +15,7 @@ group :development do
   # pygments.rb is needed for testing source highlighting; Asciidoctor supports pygments.rb >= 1.2.0
   gem 'pygments.rb', ENV['PYGMENTS_VERSION'] if ENV.key? 'PYGMENTS_VERSION'
   # rouge is needed for testing source highlighting; Asciidoctor supports rouge >= 2
-  gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '~> 3.0')
+  gem 'rouge', (ENV.fetch 'ROUGE_VERSION', '>= 4.0')
   if RUBY_ENGINE == 'truffleruby'
     gem 'nokogiri', '~> 1.10.0'
   elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '2.6.0')
