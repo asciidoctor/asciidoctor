@@ -72,6 +72,7 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
+  * Track source of valign and halign attibute on table cell (#3335)
 
 Bug Fixes::
 
