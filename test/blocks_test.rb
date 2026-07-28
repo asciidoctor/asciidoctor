@@ -2528,6 +2528,43 @@ This is just an open block.
       assert_match(/<svg\s[^>]*width="100">/, output, 1)
     end
 
+    test 'converts to inline SVG image when target is a Base64-encoded data URI' do
+      svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg].pack 'm0'})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output, 1)
+      assert_includes output, '<circle r="1"/>'
+      refute_includes output, '<img'
+    end
+
+    test 'converts to inline SVG image when target is a percent-encoded data URI' do
+      svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml,#{Asciidoctor::Helpers.encode_uri_component svg})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output, 1)
+      assert_includes output, '<circle r="1"/>'
+      refute_includes output, '<img'
+    end
+
+    test 'infers SVG format from a data URI media type without an explicit format attribute' do
+      svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg].pack 'm0'})
+      doc = document_from_string %(image::#{data_uri}[Circle,opts=inline]), safe: :safe
+      refute doc.blocks[0].attr? 'format'
+      output = doc.convert
+      assert_includes output, '<circle r="1"/>'
+    end
+
+    test 'passes a data URI image target through to the img src unchanged' do
+      data_uri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+      input = %(image::#{data_uri}[Dot])
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      assert_css %(img[src="#{data_uri}"]), output, 1
+      assert_empty @logger.messages
+    end
+
     test 'should not throw exception if SVG to inline is empty' do
       input = 'image::empty.svg[nada,opts=inline]'
       output = convert_string_to_embedded input, safe: :safe, attributes: { 'docdir' => testdir, 'imagesdir' => 'fixtures' }

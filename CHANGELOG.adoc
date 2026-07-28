@@ -33,6 +33,7 @@ Enhancements::
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
   * Add support for role on thematic break in HTML converter (#4101)
   * Add support for link=self on image macros (#3656)
+  * Support a `data:` URI as the target of a block or inline image; embed inline SVG (Base64 or percent-encoded) when the `inline` option is set and infer the SVG format from the `image/svg+xml` media type (#3791)
   * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro
@@ -76,6 +77,7 @@ Improvements::
 Bug Fixes::
 
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
+  * Don't attempt to read a `data:` URI image target as a file or remote URI when `data-uri` and `allow-uri-read` are set (avoids a spurious "could not retrieve image data from URI" warning) (#3791)
   * When normalizing toclevels, detect part even when book starts with special section (#4814)
   * Add parts at correct level in TOC even when book starts with special section (#2262)
 
