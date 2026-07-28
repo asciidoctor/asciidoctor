@@ -377,7 +377,7 @@ class AbstractBlock < AbstractNode
   #
   # If a caption has already been assigned to this block, do nothing.
   #
-  # The parts of a complete caption are: <prefix> <number>. <title>
+  # The parts of a complete caption are: <prefix> <number><punctuator> <title>
   # This partial caption represents the part the precedes the title.
   #
   # value           - The String caption to assign to this block or nil to use document attribute.
@@ -388,8 +388,12 @@ class AbstractBlock < AbstractNode
   # Returns nothing.
   def assign_caption value, caption_context = @context
     unless @caption || !@title || (@caption = value || @document.attributes['caption']) # rubocop:disable Style/GuardClause
+      punctuator = '.'
+      if (attr_name = CAPTION_PUNCTUATOR_ATTRIBUTE_NAMES[caption_context]) && document.attributes[attr_name]
+        punctuator = @document.attributes[attr_name]
+      end
       if (attr_name = CAPTION_ATTRIBUTE_NAMES[caption_context]) && (prefix = @document.attributes[attr_name])
-        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}. )
+        @caption = %(#{prefix} #{@numeral = @document.increment_and_store_counter %(#{caption_context}-number), self}#{punctuator} )
         nil
       end
     end
