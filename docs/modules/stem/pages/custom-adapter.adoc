@@ -1,0 +1,107 @@
+= Custom STEM Adapter
+:navtitle: Custom Adapter
+
+You can integrate an alternate STEM renderer into Asciidoctor by implementing and registering a STEM adapter.
+This allows you to replace the built-in MathJax integration with another library such as KaTeX, or to pre-process STEM expressions during conversion.
+
+[#new]
+== Create a new adapter
+
+To implement a new adapter, create a class that includes the `Asciidoctor::StemAdapter` module, register the adapter for a name, and implement the required methods.
+
+A STEM adapter can implement three integration points:
+
+`convert(node, opts = {})`::
+Converts the STEM content of a block or inline node, including adding delimiters.
+Called for both block and inline STEM nodes.
+
+`format(node, opts = {})`::
+Formats the enclosing element of a STEM block (e.g., the outer `<div>`).
+Typically calls `convert` internally.
+
+`docinfo?(location)`::
+Returns `true` if the adapter needs to inject markup at the given location (`:head` or `:footer`).
+
+`docinfo(location, doc, opts)`::
+Returns the markup to inject at the specified location.
+Only called if `docinfo?` returns `true` for that location.
+
+Here's an example of a STEM adapter for the https://katex.org[KaTeX^] rendering library.
+KaTeX is a client-side renderer, so the adapter injects a stylesheet in the `<head>` and a script at the end of `<body>`, and wraps each STEM expression in the delimiters KaTeX expects.
+
+.STEM adapter for KaTeX
+[,ruby]
+----
+class KaTeXAdapter
+  include Asciidoctor::StemAdapter
+
+  register_for 'katex'
+
+  KATEX_VERSION = '0.16.9'
+  KATEX_BASE_URL = %(https://cdn.jsdelivr.net/npm/katex@#{KATEX_VERSION}/dist)
+
+  def docinfo? location
+    location == :head || location == :footer
+  end
+
+  def docinfo location, doc, opts
+    if location == :head
+      slash = opts[:self_closing_tag_slash]
+      %(<link rel="stylesheet" href="#{KATEX_BASE_URL}/katex.min.css"#{slash}>)
+    else
+      %(<script defer src="#{KATEX_BASE_URL}/katex.min.js"></script>
+<script defer src="#{KATEX_BASE_URL}/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body)"></script>)
+    end
+  end
+
+  def convert node, opts = {}
+    if node.block?
+      %(\\[#{node.content}\\])
+    else
+      %(\\(#{node.text}\\))
+    end
+  end
+
+  def format node, opts = {}
+    id_attribute = node.id ? %( id="#{node.id}") : ''
+    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
+    %(<div#{id_attribute} class="stemblock">
+#{title_element}<div class="content">
+#{convert node}
+</div>
+</div>)
+  end
+end
+----
+
+Save this code to a file named [.path]_katex-stem-adapter.rb_.
+Then, require this file when invoking Asciidoctor, set `stem` to activate STEM processing, and set `stem-adapter=katex` to use your adapter:
+
+ $ asciidoctor -r ./katex-stem-adapter.rb -a stem -a stem-adapter=katex document.adoc
+
+Or, declare the attributes in the document header:
+
+[,asciidoc]
+----
+:stem:
+:stem-adapter: katex
+----
+
+[#extend]
+== Extend the built-in MathJax adapter
+
+You can also customize the built-in MathJax adapter by extending it and overriding specific methods.
+Look up the built-in adapter using `Asciidoctor::StemAdapter.for`, extend it, and register the subclass under the same name (or a new one).
+
+[,ruby]
+----
+class CustomMathJaxAdapter < (Asciidoctor::StemAdapter.for 'mathjax')
+  register_for 'mathjax'
+
+  def docinfo location, doc, opts
+    # prepend custom styles then delegate to built-in MathJax docinfo
+    location == :head ? '<style>.stemblock { border-left: 3px solid #ccc; }</style>' : super
+  end
+end
+----
