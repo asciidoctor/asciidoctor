@@ -33,6 +33,7 @@ Enhancements::
   * Don't add empty line before block content if principal text of dlist item is not specified when converting to man page (#4182)
   * Add support for role on thematic break in HTML converter (#4101)
   * Add support for link=self on image macros (#3656)
+  * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
   * Alias Inline#content to Inline#text so Inline node quacks like other nodes (#3220)
   * Add support for skipping TOML front matter (Hugo) when `skip-front-matter` attribute is set (#4300) (*@abhinav*)
   * Add support for Wistia using the video macro

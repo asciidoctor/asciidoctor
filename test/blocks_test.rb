@@ -2806,6 +2806,22 @@ This is just an open block.
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
 
+    test 'can convert block image with link in DocBook backend' do
+      input = 'image::images/tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]'
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_match '<link xl:href="http://en.wikipedia.org/wiki/Tiger"><mediaobject>', output
+    end
+
+    test 'can convert block image with link to self in DocBook backend' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::tiger.png[Tiger, link=self]
+      EOS
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_match '<link xl:href="img/tiger.png"><mediaobject>', output
+    end
+
     test 'should set content width and depth in DocBook backend if no scaling' do
       input = 'image::images/sunset.jpg[Sunset,500,332]'
       output = convert_string_to_embedded input, backend: :docbook
