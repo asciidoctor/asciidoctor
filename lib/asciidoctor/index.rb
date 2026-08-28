@@ -6,14 +6,9 @@ class IndexCatalog
   LeadingAlphaRx = /^\p{Alpha}/
 
   def initialize
-    clear
-  end
-
-  def clear
     @categories = {}
     @anchors = {}
     @anchor_sequence = @term_sequence = 0
-    self
   end
 
   def next_anchor_name key = nil
@@ -26,26 +21,12 @@ class IndexCatalog
     names.reject! {|name| IndexTermGroup.sort_key_for(name).empty? }
     return if names.empty?
 
-    case names.size
-    when 1
-      store_primary_term names[0], dest, assoc
-    when 2
-      store_secondary_term names[0], names[1], dest, assoc
-    else
-      store_tertiary_term names[0], names[1], names[2], dest, assoc
+    last_idx = names.length - 1
+    group = init_category names[0]
+    names.each_with_index do |name, idx|
+      group = group.store_term name, (dest if idx == last_idx), (idx == last_idx ? assoc : {})
     end
-  end
-
-  def store_primary_term name, dest = nil, assoc = {}
-    (init_category name).store_term name, dest, assoc
-  end
-
-  def store_secondary_term primary_name, secondary_name, dest = nil, assoc = {}
-    (store_primary_term primary_name).store_term secondary_name, dest, assoc
-  end
-
-  def store_tertiary_term primary_name, secondary_name, tertiary_name, dest = nil, assoc = {}
-    (store_secondary_term primary_name, secondary_name).store_term tertiary_name, dest, assoc
+    group
   end
 
   def find_primary_term name
@@ -166,10 +147,6 @@ class IndexTerm < IndexTermGroup
 
   def dests
     @dests.to_a
-  end
-
-  def container?
-    @dests.empty?
   end
 
   def leaf?

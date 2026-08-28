@@ -1,5 +1,4 @@
 = Generate an index
-:navtitle: Generate an index
 
 The built-in HTML converter generates an index when the document contains an index section.
 Index terms may be visible in the text or concealed.
