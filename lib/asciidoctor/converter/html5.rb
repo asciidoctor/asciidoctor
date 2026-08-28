@@ -93,6 +93,7 @@ class Converter::Html5Converter < Converter::Base
   end
 
   def convert_document node
+    @index_section = node.find_by(context: :section).find {|section| section.sectname == 'index' }
     br = %(<br#{slash = @void_element_slash}>)
     unless (asset_uri_scheme = node.attr 'asset-uri-scheme', 'https').empty?
       asset_uri_scheme = %(#{asset_uri_scheme}:)
@@ -304,6 +305,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   end
 
   def convert_embedded node
+    @index_section = node.find_by(context: :section).find {|section| section.sectname == 'index' }
     result = []
     if node.doctype == 'manpage'
       # QUESTION should notitle control the manual page title?
@@ -429,17 +431,76 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     else
       id_attr = ''
     end
+    content = node.sectname == 'index' ? (convert_index_section node) : node.content
     if level == 0
       %(<h1#{id_attr} class="sect0#{(role = node.role) ? " #{role}" : ''}">#{title}</h1>
-#{node.content})
+#{content})
     else
       %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
 <h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
 #{level == 1 ? %(<div class="sectionbody">
-#{node.content}
-</div>) : node.content}
+#{content}
+</div>) : content}
 </div>)
     end
+  end
+
+  def convert_index_section node
+    content = node.content
+    index = node.document.catalog[:indexterms]
+    return content if index.empty?
+
+    index.link_associations
+    result = content.empty? ? [] : [content]
+    category_heading_level = [node.level + 2, 6].min
+    index.categories.each do |category|
+      result << %(<div class="index-category">
+<h#{category_heading_level}>#{category.name}</h#{category_heading_level}>
+#{convert_index_terms category.terms, node.document}
+</div>)
+    end
+    result.join LF
+  end
+
+  def convert_index_terms terms, doc
+    result = ['<div class="index-entries" role="list">']
+    terms.each do |term|
+      entry = %(<div id="#{term.anchor}" class="index-entry" role="listitem">#{term.name}#{convert_index_term_references term, doc})
+      entry = %(#{entry}
+#{convert_index_terms term.subterms, doc}) unless term.leaf?
+      result << %(#{entry}</div>)
+    end
+    result << '</div>'
+    result.join LF
+  end
+
+  def convert_index_term_references term, doc
+    if (see = term.see)
+      %(, see #{convert_index_association see})
+    else
+      result = term.dests.map do |dest|
+        %(<a href="##{index_destination_anchor dest}">#{index_destination_label dest[:node], doc}</a>)
+      end
+      if (see_also = term.see_also)
+        result << %(see also #{see_also.map {|associated_term| convert_index_association associated_term }.join ', '})
+      end
+      result.empty? ? '' : %(, #{result.join '; '})
+    end
+  end
+
+  def convert_index_association term
+    term.respond_to?(:anchor) ? %(<a href="##{term.anchor}">#{term.name}</a>) : term.name
+  end
+
+  def index_destination_anchor dest
+    node = dest[:node]
+    (node.context == :section || node.context == :document) && node.id ? node.id : dest[:anchor]
+  end
+
+  def index_destination_label node, doc
+    node = node.parent until !node || node.context == :section
+    label = node ? node.xreftext : (doc.doctitle use_fallback: true)
+    (label.include? '<a') ? (label.gsub DropAnchorRx, '') : label
   end
 
   def convert_admonition node
@@ -1266,7 +1327,8 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_indexterm node
-    node.type == :visible ? node.text : ''
+    text = node.type == :visible ? node.text : ''
+    node.id && @index_section ? %(<span id="#{node.id}" class="indexterm"></span>#{text}) : text
   end
 
   def convert_inline_kbd node

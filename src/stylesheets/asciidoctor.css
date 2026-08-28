@@ -376,6 +376,22 @@ dl dd {
   margin-left: 1.125em;
 }
 
+.index-category > :first-child {
+  margin-top: 1.5em;
+}
+
+.index-entries {
+  margin-left: 1.125em;
+}
+
+.index-category > .index-entries {
+  margin-left: 0;
+}
+
+.index-entry {
+  margin-bottom: 0.3125em;
+}
+
 blockquote {
   margin: 0 0 1.25em;
   padding: 0.5625em 1.25em 0 1.1875em;
