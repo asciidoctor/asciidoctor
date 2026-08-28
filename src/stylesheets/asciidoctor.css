@@ -381,7 +381,9 @@ dl dd {
 }
 
 .index-entries {
+  margin-bottom: 0;
   margin-left: 1.125em;
+  list-style: none;
 }
 
 .index-category > .index-entries {

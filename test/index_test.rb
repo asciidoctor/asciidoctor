@@ -59,6 +59,60 @@ context 'HTML index' do
     assert_equal %(<div class="paragraph">\n<p>A visible and  term.</p>\n</div>), output
   end
 
+  test 'renders formal index term macros and associations' do
+    output = convert_string_to_embedded <<~'EOS'
+    = Felines
+    :doctype: book
+
+    == Cats
+
+    indexterm2:[Tiger]
+    indexterm:[Animals,Cats,Tiger]
+    indexterm2:[Flash,see=HTML 5]
+    indexterm2:[HTML 5,see-also=CSS]
+    indexterm2:[CSS]
+
+    [index]
+    == Index
+    EOS
+
+    assert_css 'span.indexterm', output, 5
+    assert_css 'li.index-entry li.index-entry li.index-entry', output, 1
+    assert_xpath '//li[starts-with(., "Flash, see HTML 5")]/a[.="HTML 5"]', output, 1
+    assert_xpath '//li[starts-with(., "HTML 5, Cats; see also CSS")]/a[.="CSS"]', output, 1
+  end
+
+  test 'does not catalog escaped or empty index term macros' do
+    doc = document_from_string <<~'EOS', standalone: false
+    \indexterm2:[visible] \indexterm:[concealed] indexterm:[ ]
+
+    [index]
+    == Index
+    EOS
+
+    output = doc.convert
+
+    assert_include 'indexterm2:[visible] indexterm:[concealed]', output
+    assert_empty doc.catalog[:indexterms]
+    assert_css 'span.indexterm', output, 0
+    refute_include 'index-category', output
+  end
+
+  test 'uses the document title for preamble terms and leaves unresolved associations unlinked' do
+    output = convert_string_to_embedded <<~'EOS'
+    = Web
+    :doctype: book
+
+    ((Preamble)) and ((Flash >> Missing)).
+
+    [index]
+    == Index
+    EOS
+
+    assert_xpath '//li[starts-with(., "Preamble, Web")]/a[.="Web"]', output, 1
+    assert_xpath '//li[starts-with(., "Flash, see Missing")]/a', output, 0
+  end
+
   test 'renders visible, concealed, nested, and repeated terms with occurrence links' do
     doc = document_from_string <<~'EOS', standalone: false
     = Felines
@@ -79,9 +133,9 @@ context 'HTML index' do
 
     assert_css 'span.indexterm', output, 3
     assert_css 'div.index-category', output, 2
-    assert_css 'div.index-category div.index-entry div.index-entry div.index-entry', output, 1
-    assert_css 'div#__indextermdef-1 a[href="#__indexterm-1"]', output, 1
-    assert_css 'div#__indextermdef-1 a[href="#__indexterm-2"]', output, 1
+    assert_css 'div.index-category li.index-entry li.index-entry li.index-entry', output, 1
+    assert_css 'li#__indextermdef-1 a[href="#__indexterm-1"]', output, 1
+    assert_css 'li#__indextermdef-1 a[href="#__indexterm-2"]', output, 1
     assert_include 'Index introduction.', output
   end
 
@@ -98,8 +152,8 @@ context 'HTML index' do
     == Index
     EOS
 
-    assert_xpath '//div[@role="listitem" and starts-with(., "Flash, see HTML 5")]/a[.="HTML 5"]', output, 1
-    assert_xpath '//div[@role="listitem" and starts-with(., "HTML 5, Formats; see also CSS")]/a[.="CSS"]', output, 1
+    assert_xpath '//li[starts-with(., "Flash, see HTML 5")]/a[.="HTML 5"]', output, 1
+    assert_xpath '//li[starts-with(., "HTML 5, Formats; see also CSS")]/a[.="CSS"]', output, 1
   end
 
   test 'preserves formatting and XML-sensitive characters in index terms' do
@@ -115,8 +169,8 @@ context 'HTML index' do
     == Index
     EOS
 
-    assert_xpath '//div[@role="listitem"]/strong[.="Tigers"]', output, 1
-    assert_xpath '//div[@role="listitem" and starts-with(., "Cats & kittens")]', output, 1
+    assert_xpath '//li[@class="index-entry"]/strong[.="Tigers"]', output, 1
+    assert_xpath '//li[starts-with(., "Cats & kittens")]', output, 1
   end
 
   test 'uses a span destination when an index term is inside a link' do
@@ -147,7 +201,28 @@ context 'HTML index' do
     == Index
     EOS
 
-    assert_css 'div.index-entry a[href="#_cats"]', output, 1
+    assert_css 'li.index-entry a[href="#_cats"]', output, 1
+  end
+
+  test 'only includes terms before the index section' do
+    output = convert_string_to_embedded <<~'EOS'
+    = Terms
+    :doctype: book
+
+    == Before
+
+    ((Before))
+
+    [index]
+    == Index
+
+    == After
+
+    ((After))
+    EOS
+
+    assert_xpath '//li[starts-with(., "Before,")]', output, 1
+    assert_xpath '//li[starts-with(., "After,")]', output, 0
   end
 
   test 'produces the same index when a document is converted twice' do

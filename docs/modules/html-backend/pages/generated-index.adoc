@@ -1,0 +1,88 @@
+= Generate an index
+:navtitle: Generate an index
+
+The built-in HTML converter generates an index when the document contains an index section.
+Index terms may be visible in the text or concealed.
+Asciidoctor maintains one index catalog per document; assigning terms to separate typed indices is not supported.
+
+== Define index terms
+
+AsciiDoc provides shorthand and macro forms for defining index terms.
+
+[cols="1,1,2"]
+|===
+|Type |Shorthand |Macro
+
+|Visible primary term
+|`+((Tiger))+`
+|`+indexterm2:[Tiger]+`
+
+|Concealed primary term
+|`+(((Tiger)))+`
+|`+indexterm:[Tiger]+`
+
+|Concealed nested terms
+|`+(((Animals,Cats,Tiger)))+`
+|`+indexterm:[Animals,Cats,Tiger]+`
+|===
+
+A concealed index term may contain primary, secondary, and tertiary terms.
+Repeated terms share one index entry, with a link to each occurrence.
+
+Use `>>` to define a _see_ association and `&>` to define one or more _see also_ associations:
+
+[,asciidoc]
+----
+((Flash >> HTML 5))
+((HTML 5 &> CSS &> SVG))
+----
+
+The macro forms use the `see` and `see-also` attributes:
+
+[,asciidoc]
+----
+indexterm2:[Flash,see=HTML 5]
+indexterm2:[HTML 5,see-also="CSS, SVG"]
+----
+
+A _see_ association replaces the occurrence links for that term.
+A _see also_ association follows the occurrence links.
+When the associated primary term exists, the association links to it in the index.
+
+== Add the index section
+
+Apply the `index` style to the section where the generated index should appear:
+
+[,asciidoc]
+----
+= Felines
+:doctype: book
+
+== Cats
+
+A ((tiger)) is a large cat.
+(((Animals,Cats,Tiger)))
+
+[index]
+== Index
+----
+
+The index section must follow all document content that contains index terms.
+Index terms are collected while the document is converted, so terms after the index section are not included.
+
+The generated index:
+
+* groups primary terms by their initial letter, or under `@` if they don't begin with a letter;
+* nests secondary and tertiary terms below their parent term;
+* links each occurrence using the nearest section title, or the document title for occurrences outside a section;
+* preserves authored content in the index section before the generated entries; and
+* uses styles provided by the default stylesheet.
+
+If the document has no index section, visible terms remain visible and concealed terms remain hidden, but the HTML converter does not add occurrence anchors.
+If the index section contains authored content but there are no index terms, that content is preserved without generated entries.
+
+== Access the index catalog
+
+During conversion, Asciidoctor stores index terms in `document.catalog[:indexterms]` as an `IndexCatalog`.
+Converters and extensions can use this presentation-neutral catalog to generate backend-specific indexes.
+See xref:api:catalog-assets.adoc#indexterms[Index terms in the document catalog] for the API.

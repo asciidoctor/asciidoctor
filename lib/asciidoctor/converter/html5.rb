@@ -463,14 +463,14 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   end
 
   def convert_index_terms terms, doc
-    result = ['<div class="index-entries" role="list">']
+    result = ['<ul class="index-entries">']
     terms.each do |term|
-      entry = %(<div id="#{term.anchor}" class="index-entry" role="listitem">#{term.name}#{convert_index_term_references term, doc})
+      entry = %(<li id="#{term.anchor}" class="index-entry">#{term.name}#{convert_index_term_references term, doc})
       entry = %(#{entry}
 #{convert_index_terms term.subterms, doc}) unless term.leaf?
-      result << %(#{entry}</div>)
+      result << %(#{entry}</li>)
     end
-    result << '</div>'
+    result << '</ul>'
     result.join LF
   end
 

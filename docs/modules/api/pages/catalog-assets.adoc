@@ -15,10 +15,11 @@ When this feature is enabled, the processor catalogs the following assets:
 * links (but not xrefs) (key: `:links`)
 * block or inline images (key: `:images`)
 
-The processor always cataloged the following assets, regardless of this setting:
+The processor always catalogs the following assets, regardless of this setting:
 
 * block or inline anchors (key: `:refs`)
 * footnotes (key: `:footnotes`)
+* index terms (key: `:indexterms`)
 
 Generally speaking, inline elements are not cataloged until conversion.
 Therefore, they're only available after the document has been converted, not after it has been loaded.
@@ -259,3 +260,31 @@ section: _ci => CI
 ....
 
 An idea of something you can do with the refs table is validate deep xrefs across documents.
+
+[#indexterms]
+=== :indexterms
+
+Visible and concealed index terms are stored in an `IndexCatalog` under the `:indexterms` key.
+Since index terms are inline elements, the catalog is populated while the document is converted.
+
+[,ruby]
+----
+doc = Asciidoctor.load_file 'doc.adoc'
+doc.convert
+index = doc.catalog[:indexterms]
+----
+
+The catalog provides the following public API:
+
+`categories`:: Returns sorted `IndexTermCategory` objects.
+Each category has a `name` and sorted primary `terms`.
+`find_primary_term(name)`:: Finds a primary term by its plain-text sort key.
+`link_associations`:: Resolves `see` and `see-also` names to primary terms when possible.
+`empty?`:: Reports whether the catalog contains terms.
+
+Each `IndexTerm` provides its display `name`, plain-text `sort_key`, nested `subterms`, occurrence `dests`, and resolved `see` and `see_also` associations.
+Each destination is a hash containing the occurrence `anchor` and source `node`.
+
+The catalog is presentation-neutral.
+Converters decide how to render terms, links, labels, and associations.
+See xref:html-backend:generated-index.adoc[] for how the built-in HTML converter uses it.
