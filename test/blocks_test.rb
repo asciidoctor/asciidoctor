@@ -2603,9 +2603,20 @@ This is just an open block.
       image::no-such-image.svg[Alt Text]
       EOS
 
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docfile' => 'document.adoc' }
+      assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
+      assert_message @logger, :WARN, '~document.adoc: SVG does not exist or cannot be read'
+    end
+
+    test 'reports document as <stdin> if SVG to inline cannot be read and document is string' do
+      input = <<~'EOS'
+      [%inline]
+      image::no-such-image.svg[Alt Text]
+      EOS
+
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
-      assert_message @logger, :WARN, '~SVG does not exist or cannot be read'
+      assert_message @logger, :WARN, '~<stdin>: SVG does not exist or cannot be read'
     end
 
     test 'can convert block image with alt text defined in macro containing square bracket' do
