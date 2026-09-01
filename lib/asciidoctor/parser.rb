@@ -2486,9 +2486,11 @@ class Parser
           colspec, rowspec = m[2].split '.'
           if !colspec.nil_or_empty? && (TableCellHorzAlignments.key? colspec)
             spec['halign'] = TableCellHorzAlignments[colspec]
+            spec['halign-source'] = 'column'
           end
           if !rowspec.nil_or_empty? && (TableCellVertAlignments.key? rowspec)
             spec['valign'] = TableCellVertAlignments[rowspec]
+            spec['valign-source'] = 'column'
           end
         end
 
@@ -2559,9 +2561,11 @@ class Parser
       colspec, rowspec = m[3].split '.'
       if !colspec.nil_or_empty? && (TableCellHorzAlignments.key? colspec)
         spec['halign'] = TableCellHorzAlignments[colspec]
+        spec['halign-source'] = 'cell'
       end
       if !rowspec.nil_or_empty? && (TableCellVertAlignments.key? rowspec)
         spec['valign'] = TableCellVertAlignments[rowspec]
+        spec['valign-source'] = 'cell'
       end
     end
 
