@@ -72,10 +72,14 @@ class SyntaxHighlighter::RougeAdapter < SyntaxHighlighter::Base
     lexer || ::Rouge::Lexers::PlainText.new
   end
 
-  def create_formatter node, source, lang, opts
-    formatter = opts[:css_mode] == :class ?
+  def create_html_formatter opts
+    opts[:css_mode] == :class ?
       (::Rouge::Formatters::HTML.new inline_theme: @style) :
       (::Rouge::Formatters::HTMLInline.new (::Rouge::Theme.find @style).new)
+  end
+
+  def create_formatter node, source, lang, opts
+    formatter = create_html_formatter opts
     if (number_lines = opts[:number_lines])
       formatter = RougeExt::Formatters::HTMLLineHighlighter.new formatter, lines: opts[:highlight_lines]
       number_lines == :table ?
