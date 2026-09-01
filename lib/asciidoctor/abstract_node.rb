@@ -302,7 +302,8 @@ class AbstractNode
 
   # Public: Construct a URI reference or data URI to the target image.
   #
-  # If the target image is a URI reference, then leave it untouched.
+  # If the target image is a URI reference, then leave it untouched. If the target image is a data
+  # URI, then it is already an embedded image, so it is returned as-is.
   #
   # The target image is resolved relative to the directory retrieved from the
   # specified attribute key, if provided.
@@ -320,6 +321,8 @@ class AbstractNode
   #
   # Returns A String reference or data URI for the target image
   def image_uri target_image, asset_dir_key = 'imagesdir'
+    # A data URI is already an embedded image, so use it as-is rather than reading or re-encoding it.
+    return target_image if target_image.start_with? 'data:'
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
           (asset_dir_key && (images_base = attr asset_dir_key, nil, true) && (Helpers.uriish? images_base) &&

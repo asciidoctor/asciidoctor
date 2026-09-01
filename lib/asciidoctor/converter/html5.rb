@@ -640,7 +640,7 @@ Your browser does not support the audio tag.
     target = node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+    if ((node.attr? 'format', 'svg') || (target.include? '.svg') || (target.start_with? 'data:image/svg+xml')) && node.document.safe < SafeMode::SECURE
       if node.option? 'inline'
         img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
       elsif node.option? 'interactive'
@@ -1239,7 +1239,7 @@ Your browser does not support the video tag.
       attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
       attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
       attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
-      if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      if ((node.attr? 'format', 'svg') || (target.include? '.svg') || (target.start_with? 'data:image/svg+xml')) && node.document.safe < SafeMode::SECURE
         if node.option? 'inline'
           img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
@@ -1314,7 +1314,12 @@ Your browser does not support the video tag.
 
   # NOTE expose read_svg_contents for Bespoke converter
   def read_svg_contents node, target
-    if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true)
+    # A data URI carries the SVG in the target itself (e.g., an embedded diagram produced with the
+    # data-uri attribute set), so decode it directly rather than trying to read it as a file or URI.
+    svg = (target.start_with? 'data:') ?
+        (decode_data_uri target) :
+        (node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true)
+    if svg
       return if svg.empty?
       svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
       old_start_tag = new_start_tag = start_tag_match = nil
@@ -1334,6 +1339,24 @@ Your browser does not support the video tag.
   end
 
   private
+
+  # Internal: Decode the contents of an inline data URI (e.g., an SVG document) so an image whose
+  # target is a data URI can be embedded inline. Supports both Base64 (;base64) and percent-encoded
+  # payloads.
+  #
+  # target - the data URI String (i.e., a target that starts with data:)
+  #
+  # Returns the decoded contents as a String, or nil if the data URI has no payload.
+  def decode_data_uri target
+    return unless (comma = target.index ',')
+    data = target.slice comma + 1, target.length
+    if (target.slice 0, comma).downcase.end_with? ';base64'
+      # NOTE unpack1 'm' is equivalent to Base64.decode64
+      (data.unpack1 'm').force_encoding ::Encoding::UTF_8
+    else
+      Helpers.decode_uri_component data
+    end
+  end
 
   def append_boolean_attribute name, xml
     xml ? %( #{name}="#{name}") : %( #{name})

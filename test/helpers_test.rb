@@ -16,6 +16,23 @@ context 'Helpers' do
       expect = given
       assert_equal expect, (Asciidoctor::Helpers.encode_uri_component given)
     end
+
+    test 'should URI decode percent-encoded octets' do
+      given = '%20%21%2A%2F%25%26%3F%5C%3D'
+      expect = ' !*/%&?\\='
+      assert_equal expect, (Asciidoctor::Helpers.decode_uri_component given)
+    end
+
+    test 'should not decode a literal plus sign to a space when URI decoding' do
+      given = 'a+b%20c'
+      expect = 'a+b c'
+      assert_equal expect, (Asciidoctor::Helpers.decode_uri_component given)
+    end
+
+    test 'should round trip a string through URI encode and decode' do
+      given = ' !*/%&?\\=+'
+      assert_equal given, (Asciidoctor::Helpers.decode_uri_component Asciidoctor::Helpers.encode_uri_component given)
+    end
   end
 
   context 'URIs and Paths' do
