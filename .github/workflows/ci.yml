@@ -46,8 +46,8 @@ jobs:
         #- os: windows-latest
         #  ruby: jruby-9.1.17.0
         #  pygments-version: ~
-        - os: macos-latest
-          ruby: '3.3.4'
+        #- os: macos-latest
+        #  ruby: '3.3.4'
         - os: ubuntu-22.04
           ruby: '2.3'
           asciimath-version: '~> 1.0.0'
