@@ -973,15 +973,15 @@ Your browser does not support the audio tag.
       ul_class_attribute = ' class="checklist"'
       if node.option? 'interactive'
         if @xml_mode
-          marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked"/> '
-          marker_unchecked = '<input type="checkbox" data-item-complete="0"/> '
+          marker_checked = '<input type="checkbox" data-item-complete="1" checked="checked"/>'
+          marker_unchecked = '<input type="checkbox" data-item-complete="0"/>'
         else
-          marker_checked = '<input type="checkbox" data-item-complete="1" checked> '
-          marker_unchecked = '<input type="checkbox" data-item-complete="0"> '
+          marker_checked = '<input type="checkbox" data-item-complete="1" checked>'
+          marker_unchecked = '<input type="checkbox" data-item-complete="0">'
         end
       elsif node.document.attr? 'icons', 'font'
-        marker_checked = '<i class="fa fa-check-square-o"></i> '
-        marker_unchecked = '<i class="fa fa-square-o"></i> '
+        marker_checked = '<i class="fa fa-check-square-o"></i>'
+        marker_unchecked = '<i class="fa fa-square-o"></i>'
       else
         marker_checked = '&#10003; '
         marker_unchecked = '&#10063; '
