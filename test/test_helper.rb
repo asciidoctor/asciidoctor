@@ -321,7 +321,7 @@ class Minitest::Test
 
   def in_verbose_mode
     begin
-      old_logger_level, Asciidoctor::LoggerManager.logger.level = Asciidoctor::LoggerManager.logger.level, Logger::Severity::DEBUG
+      old_logger_level, Asciidoctor::LoggerManager.logger.level = Asciidoctor::LoggerManager.logger.level, Asciidoctor::Logger::Severity::DEBUG
       yield
     ensure
       Asciidoctor::LoggerManager.logger.level = old_logger_level
