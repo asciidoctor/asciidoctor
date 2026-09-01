@@ -498,7 +498,7 @@ class AbstractNode
       # QUESTION should we chomp content if normalize is false?
       opts[:normalize] ? ((Helpers.prepare_source_string ::File.read path, mode: FILE_READ_MODE).join LF) : (::File.read path, mode: FILE_READ_MODE)
     elsif opts[:warn_on_failure]
-      logger.warn %(#{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
+      logger.warn %(#{(@document.attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
       nil
     end
   end

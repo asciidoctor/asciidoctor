@@ -23,6 +23,7 @@ Bug Fixes::
   * When normalizing toclevels, detect part even when book starts with special section (#4814)
   * Don't show special sections defined in level 0 when toclevels is 0
   * Add parts at correct level in TOC even when book starts with special section (#2262)
+  * Retrieve docfile attribute from document for warning message when asset cannot be found or read (#4873)
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
