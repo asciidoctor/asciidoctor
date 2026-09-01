@@ -60,6 +60,10 @@ ul.circle ul:not([class]),ul.disc ul:not([class]),ul.square ul:not([class]){list
 ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
 dl dt{margin-bottom:.3125em;font-weight:bold}
 dl dd{margin-bottom:1.25em;margin-left:1.125em}
+.index-category>:first-child{margin-top:1.5em}
+.index-entries{margin-bottom:0;margin-left:1.125em;list-style:none}
+.index-category>.index-entries{margin-left:0}
+.index-entry{margin-bottom:.3125em}
 blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
 blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
 @media screen and (min-width:768px){h1{font-size:2.75em}
