@@ -9,3 +9,4 @@
 ** xref:favicon.adoc[]
 ** xref:verbatim-line-wrap.adoc[]
 ** xref:skip-front-matter.adoc[]
+** xref:extended-admonitions.adoc[]

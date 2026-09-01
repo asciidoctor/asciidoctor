@@ -430,6 +430,15 @@ module Asciidoctor
   #
   BlockTocMacroRx = /^toc::\[(#{CC_ANY}+)?\]$/
 
+  # Matches an admonition table macro (list of all admonitions of a given type).
+  #
+  # Examples
+  #
+  #   admonition-table::note[]
+  #   admonition-table::warning[title="List of Warnings"]
+  #
+  BlockAdmonitionTableMacroRx = /^admonition-table::(#{CC_ANY}+?)?\[(#{CC_ANY}+)?\]$/
+
   ## Inline macros
 
   # Matches an anchor (i.e., id + optional reference text) in the flow of text.

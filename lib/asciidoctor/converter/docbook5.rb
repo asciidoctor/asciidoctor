@@ -100,7 +100,13 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_admonition node
-    %(<#{tag_name = node.attr 'name'}#{common_attributes node.id, node.role, node.reftext}>
+    if (admonition_type = node.document.admonition_type_for_name(node.attr 'name')) && (mapped_tag = node.document.resolve_admonition_docbook_tag admonition_type)
+      tag_name = mapped_tag
+    else
+      logger.warn %(DocBook admonition mapping missing or invalid for #{node.attr 'name'}; falling back to note)
+      tag_name = 'note'
+    end
+    %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 #{title_tag node}#{enclose_content node}
 </#{tag_name}>)
   end

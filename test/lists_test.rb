@@ -373,6 +373,22 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
     end
 
+    test 'a configured custom admonition paragraph attached by a line continuation should produce admonition' do
+      input = <<~'EOS'
+      :admonition-types: note,hint
+      :admonition-hint-tag: HINT
+      :admonition-hint-label: Hint
+
+      - keep this in mind
+      +
+      HINT: This is a hint.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ul > li > p + .admonitionblock.hint', output, 1
+      assert_xpath '//ul/li/*[@class="admonitionblock hint"]//td[@class="content"][normalize-space(text())="This is a hint."]', output, 1
+    end
+
     test 'paragraph-like blocks attached to an ancestor list item by a list continuation should produce blocks' do
       input = <<~'EOS'
       * parent
