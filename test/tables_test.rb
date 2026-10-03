@@ -199,6 +199,23 @@ context 'Tables' do
       assert_xpath '/table/tbody/tr[2]/td[2]/p[text()="B2|"]', output, 1
     end
 
+    test 'should accumulate content of cell that spans multiple lines' do
+      input = <<~'EOS'
+      [cols=1]
+      |===
+      |cell content
+      and more
+      and more again
+      |next row
+      |===
+      EOS
+      doc = document_from_string input, standalone: false
+      table = doc.blocks[0]
+      assert_equal 2, table.rows.body.size
+      assert_equal %(cell content\nand more\nand more again), table.rows.body[0][0].text
+      assert_equal 'next row', table.rows.body[1][0].text
+    end
+
     test 'should treat trailing pipe as an empty cell' do
       input = <<~'EOS'
       |===

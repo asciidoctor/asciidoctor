@@ -488,7 +488,8 @@ class Table::ParserContext
     end
 
     @colcount = table.columns.empty? ? -1 : table.columns.size
-    @buffer = ''
+    # start with a mutable String so the cell buffer can be appended to in place
+    @buffer = (+'')
     @cellspecs = []
     @cell_open = false
     @active_rowspans = [0]
@@ -517,7 +518,7 @@ class Table::ParserContext
   #
   # Returns nothing
   def skip_past_delimiter pre
-    @buffer = %(#{@buffer}#{pre}#{@delimiter})
+    @buffer << pre << @delimiter
     nil
   end
 
@@ -525,7 +526,19 @@ class Table::ParserContext
   #
   # Returns nothing
   def skip_past_escaped_delimiter pre
-    @buffer = %(#{@buffer}#{pre.chop}#{@delimiter})
+    @buffer << pre.chop << @delimiter
+    nil
+  end
+
+  # Public: Appends the String to the buffer of the currently open cell.
+  #
+  # Appending in place avoids allocating a new String the size of the whole
+  # buffer for every accumulated line, which makes parsing a table quadratic
+  # when a cell spans many lines.
+  #
+  # Returns nothing
+  def append_to_buffer str
+    @buffer << str
     nil
   end
 
@@ -619,7 +632,7 @@ class Table::ParserContext
   def close_cell eol = false
     if @format == 'psv'
       cell_text = @buffer
-      @buffer = ''
+      @buffer = (+'')
       if (cellspec = take_cellspec)
         repeat = cellspec.delete('repeatcol') || 1
       else
@@ -629,7 +642,7 @@ class Table::ParserContext
       end
     else
       cell_text = @buffer.strip
-      @buffer = ''
+      @buffer = (+'')
       cellspec = nil
       repeat = 1
       if @format == 'csv' && !cell_text.empty? && (cell_text.include? (q = '"'))

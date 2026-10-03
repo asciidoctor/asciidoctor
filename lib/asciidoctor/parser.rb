@@ -2390,23 +2390,23 @@ class Parser
               break if (line = post_match).empty?
               redo
             end
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{pre_match})
+            parser_ctx.append_to_buffer pre_match
           when 'dsv'
             if pre_match.end_with? '\\'
               parser_ctx.skip_past_escaped_delimiter pre_match
               if (line = post_match).empty?
-                parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
+                parser_ctx.append_to_buffer LF
                 parser_ctx.keep_cell_open
                 break
               end
               redo
             end
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{pre_match})
+            parser_ctx.append_to_buffer pre_match
           else # psv
             if pre_match.end_with? '\\'
               parser_ctx.skip_past_escaped_delimiter pre_match
               if (line = post_match).empty?
-                parser_ctx.buffer = %(#{parser_ctx.buffer}#{LF})
+                parser_ctx.append_to_buffer LF
                 parser_ctx.keep_cell_open
                 break
               end
@@ -2414,14 +2414,14 @@ class Parser
             end
             next_cellspec, cell_text = parse_cellspec pre_match
             parser_ctx.push_cellspec next_cellspec
-            parser_ctx.buffer = %(#{parser_ctx.buffer}#{cell_text})
+            parser_ctx.append_to_buffer cell_text
           end
           # don't break if empty to preserve empty cell found at end of line (see issue #1106)
           line = nil if (line = post_match).empty?
           parser_ctx.close_cell
         else
           # no other delimiters to see here; suck up this line into the buffer and move on
-          parser_ctx.buffer = %(#{parser_ctx.buffer}#{line}#{LF})
+          parser_ctx.append_to_buffer %(#{line}#{LF})
           case format
           when 'csv'
             if parser_ctx.buffer_has_unclosed_quotes?
