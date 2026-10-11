@@ -82,7 +82,7 @@ context 'Logger' do
       assert_nil logger.instance_variable_get :@logdev
       assert logger.warn 'this is a call'
       logger.close
-    end
+    end if (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '3.0.0')
 
     test 'should set logdev to specified file with additional options' do
       log_file = Tempfile.new %w(asciidoctor- .log)
