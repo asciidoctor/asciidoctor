@@ -199,10 +199,14 @@ class Converter::DocBook5Converter < Converter::Base
 
     mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri node.attr 'target'}"#{image_size_attributes node.attributes}#{align_attribute}/>
+<imagedata fileref="#{fileref = node.image_uri node.attr 'target'}"#{image_size_attributes node.attributes}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
+
+    if (node.attr? 'link') && (link_href = node.attr 'link')
+      mediaobject = %(<link xl:href="#{link_href == 'self' ? fileref : link_href}">#{mediaobject}</link>)
+    end
 
     if node.title?
       %(<figure#{common_attributes node.id, node.role, node.reftext}>
