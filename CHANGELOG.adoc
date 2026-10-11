@@ -18,6 +18,10 @@ This project utilizes semantic versioning.
 // tag::compact[]
 == Unreleased
 
+Compliance::
+
+  * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
+
 Bug Fixes::
 
   * When normalizing toclevels, detect part even when book starts with special section (#4814)

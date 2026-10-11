@@ -195,14 +195,15 @@ class Converter::DocBook5Converter < Converter::Base
 
   def convert_image node
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
-
     mediaobject = %(<mediaobject>
 <imageobject>
 <imagedata fileref="#{node.image_uri node.attr 'target'}"#{image_size_attributes node.attributes}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
-
+    if (node.attr? 'link') && (href_attr_val = node.attr 'link')
+      mediaobject = %(<link xl:href="#{href_attr_val}">#{mediaobject}</link>)
+    end
     if node.title?
       %(<figure#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
@@ -537,11 +538,11 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_inline_image node
     img = %(<inlinemediaobject#{common_attributes nil, node.role}>
 <imageobject>
-<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (fileref_attr_val = node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
+<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </inlinemediaobject>)
-    if fileref_attr_val && (node.attr? 'link') && (href_attr_val = node.attr 'link')
+    if node.type != 'icon' && (node.attr? 'link') && (href_attr_val = node.attr 'link')
       %(<link xl:href="#{href_attr_val}">#{img}</link>)
     else
       img
