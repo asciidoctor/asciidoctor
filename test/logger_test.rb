@@ -71,6 +71,13 @@ context 'Logger' do
       assert_equal 'asciidoctor: WARNING: this is a call', log_file_contents.lines.pop.chomp
     end
 
+    test 'should set logdev to /dev/null' do
+      logger = Asciidoctor::Logger.new File::NULL
+      assert_nil logger.instance_variable_get :@logdev
+      assert logger.warn 'this is a call'
+      logger.close
+    end
+
     test 'should set logdev to specified file with additional options' do
       log_file = Tempfile.new %w(asciidoctor- .log)
       logger = Asciidoctor::Logger.new log_file, formatter: nil, level: Asciidoctor::Logger::DEBUG
