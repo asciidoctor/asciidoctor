@@ -466,7 +466,7 @@ To use Pry, you first need to install it, either using `gem install`:
 
  $ gem install pry
 
-or by adding it to your [.path]_Gemfile_ and running `bundle`.
+or by adding it to your [.path]_Gemfile_ and running `bundle install`.
 
 In order to be dropped into the debugger at a specific point in a template, add the following two lines to the template you want to inspect:
 
@@ -561,7 +561,7 @@ gem 'slim'
 
 Then, you install the gems using Bundler:
 
- $ bundle
+ $ bundle install
 
 If you're not using Bundler, and you have configured Ruby to install gems in your user/home directory, then you can use the `gem` command instead:
 
@@ -646,7 +646,7 @@ gem 'concurrent-ruby'
 
 Run Bundler to install the gems into your project.
 
- $ bundle
+ $ bundle install
 
 If you're not using Bundler, and you have configured Ruby to install gems in your user/home directory, then you can use the `gem` command instead:
 
@@ -717,7 +717,7 @@ Now that you've created your first converter template, you're well on your way t
 
 Here's a quick review for how to start using templates written in Slim to customize the output of the built-in HTML 5 converter.
 
-. Install the `tilt`, `slim`, and `concurrent-ruby` gems using `bundle` or `gem install`.
+. Install the `tilt`, `slim`, and `concurrent-ruby` gems using `bundle install` or `gem install`.
 . Create a folder named [.path]_templates/html5_ to store the templates.
 . Create a template named [.path]_paragraph.html.slim_ in that folder.
 . Populate the template with your own template logic.

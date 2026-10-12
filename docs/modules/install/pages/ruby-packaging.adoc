@@ -64,9 +64,9 @@ gem 'asciidoctor'
 . Save the Gemfile
 . Open a terminal and install the gem using:
 
- $ bundle
+ $ bundle install
 
-To upgrade the gem, specify the new version in the Gemfile and run `bundle` again.
+To upgrade the gem, specify the new version in the Gemfile and run `bundle install` again.
 Using `bundle update` (without specifying a gem) is *not* recommended as it will also update other gems, which may not be the desired result.
 
 IMPORTANT: Once you install using Bundler, you must run any executables provided by the gems (e.g., `asciidoctor`) from the directory where [.path]_Gemfile_ is located and also prefix the executable name with `bundle exec` (e.g., `bundle exec asciidoctor`).
