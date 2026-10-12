@@ -254,7 +254,9 @@ context 'Paragraphs' do
 
       :!hardbreaks:
 
-      roll it back
+      roll
+      it
+      back
       EOS
 
       output = convert_string_to_embedded input
