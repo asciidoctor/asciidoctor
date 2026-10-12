@@ -174,7 +174,7 @@ module Substitutors
     CGI = ::CGI
     def sub_specialchars text
       if (text.include? ?>) || (text.include? ?&) || (text.include? ?<)
-        (text.include? ?') || (text.include? ?") ? (text.gsub SpecialCharsRx, SpecialCharsTr) : (CGI.escape_html text)
+        (text.include? ?') || (text.include? ?") ? (text.gsub SpecialCharsRx, SpecialCharsTr) : (CGI.escapeHTML text)
       else
         text
       end

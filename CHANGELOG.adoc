@@ -53,6 +53,7 @@ Compliance::
   * Change deprecated Droid Sans Mono font to its successor Noto Sans Mono (#4586)
   * Only apply table strips to rows in table body (i.e., tbody) (#3881)
   * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
+  * Switch to the portable `cgi/escape` require from stdlib to provide CGI.escape, CGI.escapeHTML, and, (in Ruby 3.2+) CGI.escapeURIComponent
 
 Improvements::
 
