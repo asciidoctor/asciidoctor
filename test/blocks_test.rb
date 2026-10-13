@@ -2295,7 +2295,7 @@ This is just an open block.
       bar
       --
       EOS
-      using_memory_logger Logger::Severity::DEBUG do |logger|
+      using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
         convert_string_to_embedded input
         assert_message logger, :DEBUG, '<stdin>: line 2: unknown style for open block: foo', Hash
       end

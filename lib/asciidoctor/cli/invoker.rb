@@ -72,7 +72,7 @@ module Asciidoctor
               $VERBOSE = nil
               old_logger, LoggerManager.logger = logger, NullLogger.new
             when 2
-              old_logger_level, logger.level = logger.level, ::Logger::Severity::DEBUG
+              old_logger_level, logger.level = logger.level, Logger::Severity::DEBUG
             end
           else
             opts[key] = val unless val.nil?
