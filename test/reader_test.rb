@@ -2053,7 +2053,7 @@ class ReaderTest < Minitest::Test
 
       test 'include is dropped if target contains missing attribute and attribute-missing is drop-line' do
         input = 'include::{foodir}/include-file.adoc[]'
-        using_memory_logger Logger::INFO do |logger|
+        using_memory_logger Asciidoctor::Logger::INFO do |logger|
           doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'drop-line' }
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
