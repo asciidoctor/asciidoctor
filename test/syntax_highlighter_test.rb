@@ -763,7 +763,7 @@ context 'Syntax Highlighter' do
       assert_include '<span class="cp">&lt;?php</span>', output
     end
 
-    test 'should preserve cgi-style options on language when setting start_inline option for PHP', if: (Rouge.version >= '2.1.0') do
+    test 'should preserve cgi-style options on language when setting start_inline option for PHP', if: (Gem::Version.new Rouge.version) >= (Gem::Version.new '2.1.0') do
       input = <<~'EOS'
       [,php?funcnamehighlighting=0]
       ----
@@ -809,7 +809,7 @@ context 'Syntax Highlighter' do
       assert_xpath %(//code[text()='CAN HAS STDIO?\nPLZ OPEN FILE "LOLCATS.TXT"?\nKTHXBYE']), output, 1
     end
 
-    test 'should honor cgi-style options on language', if: (Rouge.version >= '2.1.0') do
+    test 'should honor cgi-style options on language', if: (Gem::Version.new Rouge.version) >= (Gem::Version.new '2.1.0') do
       input = <<~'EOS'
       :source-highlighter: rouge
 
