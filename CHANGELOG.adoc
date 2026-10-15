@@ -22,6 +22,7 @@ Compliance::
 
   * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
   * Switch to the portable `cgi/escape` require from stdlib to provide CGI.escape, CGI.escapeHTML, and, (in Ruby 3.2+) CGI.escapeURIComponent
+  * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684) (*@ggrossetie*)
 
 Bug Fixes::
 

@@ -1,13 +1,97 @@
 # frozen_string_literal: true
 
-proc do
-  old_verbose, $VERBOSE = $VERBOSE, nil
-  require 'logger' # suppress warning in Ruby 3.4 about loading logger from stdlib
-  $VERBOSE = old_verbose
-end.call
+require 'logger' if (defined? Gem) && (Gem.loaded_specs.key? 'logger')
 
 module Asciidoctor
-class Logger < ::Logger
+class BasicLogger
+  module Severity
+    DEBUG = 0
+    INFO = 1
+    WARN = 2
+    ERROR = 3
+    FATAL = 4
+    UNKNOWN = 5
+  end
+
+  include Severity
+
+  class Formatter
+    def call severity, time, progname, msg
+      %(#{severity[0]}, [#{time.strftime '%Y-%m-%dT%H:%M:%S.%6N'} ##{$$}] #{severity.rjust 5} -- #{progname}: #{::String === msg ? msg : msg.inspect}#{LF})
+    end
+  end
+
+  attr_reader :level
+
+  attr_accessor :progname
+
+  attr_accessor :formatter
+
+  # NOTE shift_age, shift_size, and other options are accepted for compatibility with ::Logger, but ignored
+  def initialize logdev, _shift_age = nil, _shift_size = nil, level: DEBUG, progname: nil, formatter: nil, **_opts
+    if logdev && logdev != ::File::NULL
+      @logdev = ::String === logdev ? (::File.open logdev, 'a') : logdev
+      @logdev.sync = true if @logdev.respond_to? :sync=
+    else
+      @logdev = nil
+    end
+    self.level = level
+    @progname = progname
+    @formatter = formatter
+    @default_formatter = Formatter.new
+  end
+
+  def level= severity
+    @level = ::Integer === severity ? severity : (LEVELS[severity.to_s.downcase] || UNKNOWN)
+  end
+
+  def add severity, message = nil, progname = nil
+    return true if (severity ||= UNKNOWN) < @level || !@logdev
+    progname ||= @progname
+    if message.nil?
+      if block_given?
+        message = yield
+      else
+        message = progname
+        progname = @progname
+      end
+    end
+    formatter = @formatter || @default_formatter
+    @logdev.write formatter.call (SEVERITY_LABELS[severity] || 'ANY'), ::Time.now, progname, message
+    true
+  end
+
+  alias log add
+
+  def << msg
+    @logdev&.write msg
+  end
+
+  def close
+    @logdev&.close
+    @logdev = nil
+  end
+
+  (Severity.constants false).each do |const|
+    severity = Severity.const_get const
+    method_name = const.to_s.downcase
+    define_method method_name do |message = nil, &block|
+      add severity, message, &block
+    end
+    define_method %(#{method_name}?) do
+      @level <= severity
+    end
+  end
+
+  LEVELS = (Severity.constants false).map {|c| [c.to_s.downcase, (Severity.const_get c)] }.to_h
+  private_constant :LEVELS
+
+  SEVERITY_LABELS = %w(DEBUG INFO WARN ERROR FATAL ANY)
+  private_constant :SEVERITY_LABELS
+end
+
+# NOTE extend ::Logger if the logger gem is available to give users access to all its features
+class Logger < ((defined? ::Logger) ? ::Logger : BasicLogger)
   attr_reader :max_severity
 
   def initialize *args, **opts
@@ -21,6 +105,10 @@ class Logger < ::Logger
       @formatter = opts[:formatter]
       @level = opts[:level]
     end
+  end
+
+  def level= severity
+    super (severity.to_s.downcase == 'warning' ? WARN : severity)
   end
 
   def add severity, message = nil, progname = nil
@@ -45,7 +133,7 @@ class Logger < ::Logger
   end
 end
 
-class MemoryLogger < ::Logger
+class MemoryLogger < Logger
   SEVERITY_SYMBOL_BY_VALUE = (Severity.constants false).map {|c| [(Severity.const_get c), c] }.to_h
 
   attr_reader :messages
@@ -75,9 +163,7 @@ class MemoryLogger < ::Logger
   end
 end
 
-class NullLogger < ::Logger
-  attr_reader :max_severity
-
+class NullLogger < Logger
   def initialize
     super nil
     self.level = WARN

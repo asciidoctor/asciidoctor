@@ -1059,7 +1059,7 @@ context 'Extensions' do
 
     test 'should log debug message if custom block macro is unknown' do
       input = 'unknown::[]'
-      using_memory_logger Logger::Severity::DEBUG do |logger|
+      using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
         result = convert_string_to_embedded input
         assert_message logger, :DEBUG, '<stdin>: line 1: unknown name for block macro: unknown', Hash
         assert_xpath %(/*[@class="paragraph"]/p[text()="#{input}"]), result, 1
@@ -1072,7 +1072,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block_macro SampleBlockMacro, :sample
         end
-        using_memory_logger Logger::Severity::DEBUG do |logger|
+        using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
           result = convert_string_to_embedded input
           assert_message logger, :DEBUG, '<stdin>: line 1: unknown name for block macro: unknown', Hash
           assert_xpath %(/*[@class="paragraph"]/p[text()="#{input}"]), result, 1
@@ -1088,7 +1088,7 @@ context 'Extensions' do
         Asciidoctor::Extensions.register do
           block_macro SampleBlockMacro, :sample
         end
-        using_memory_logger Logger::Severity::DEBUG do |logger|
+        using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
           result = convert_string_to_embedded input
           assert_empty logger.messages
           assert_css 'ul li a[href="component::page.html"]', result, 1

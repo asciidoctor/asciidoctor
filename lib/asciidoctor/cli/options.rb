@@ -25,7 +25,7 @@ module Asciidoctor
         self[:base_dir] = options[:base_dir]
         self[:source_dir] = options[:source_dir]
         self[:destination_dir] = options[:destination_dir]
-        self[:failure_level] = ::Logger::Severity::FATAL
+        self[:failure_level] = Logger::Severity::FATAL
         self[:trace] = false
         self[:timings] = false
       end
@@ -125,7 +125,7 @@ module Asciidoctor
           end
           opts.on('--failure-level LEVEL', %w(info INFO warning WARNING error ERROR fatal FATAL), 'set minimum log level that yields a non-zero exit code: [INFO, WARN, ERROR, FATAL] (default: FATAL)') do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
-            self[:failure_level] = ::Logger::Severity.const_get level
+            self[:failure_level] = Logger::Severity.const_get level
           end
           opts.on('-q', '--quiet', 'silence application log messages and script warnings (default: false)') do
             self[:verbose] = 0
