@@ -54,6 +54,7 @@ Compliance::
   * Only apply table strips to rows in table body (i.e., tbody) (#3881)
   * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
   * Switch to the portable `cgi/escape` require from stdlib to provide CGI.escape, CGI.escapeHTML, and, (in Ruby 3.2+) CGI.escapeURIComponent
+  * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684) (*@ggrossetie*)
 
 Improvements::
 
@@ -74,10 +75,6 @@ Improvements::
   * Remove empty line at top of table cells in manpage output (#4482) (*@strager*)
   * Return `nil` if name passed to `Asciidoctor::SafeMode.value_for_name` is not recognized (#3526)
   * Modify default stylesheet to honor text-* roles on quote blocks
-
-Infrastructure::
-
-  * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684)
 
 Bug Fixes::
 

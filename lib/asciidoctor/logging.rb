@@ -17,7 +17,7 @@ class BasicLogger
 
   class Formatter
     def call severity, time, progname, msg
-      %(#{severity[0]}, [#{time.strftime '%Y-%m-%dT%H:%M:%S.%6N'} ##{$$}] #{severity.rjust 5} -- #{progname}: #{::String === msg ? msg : msg.inspect}\n)
+      %(#{severity[0]}, [#{time.strftime '%Y-%m-%dT%H:%M:%S.%6N'} ##{$$}] #{severity.rjust 5} -- #{progname}: #{::String === msg ? msg : msg.inspect}#{LF})
     end
   end
 
