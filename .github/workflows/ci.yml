@@ -101,7 +101,7 @@ jobs:
       if: github.event_name == 'schedule'
       run: |
         bundle config --local path vendor/bundle
-        bundle --jobs 3 --retry 3
+        bundle install --jobs 3 --retry 3
     - name: Run linter
       if: matrix.primary
       run: bundle exec rake lint
