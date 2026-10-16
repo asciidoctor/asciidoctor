@@ -28,7 +28,7 @@ jobs:
       matrix:
         #os: [ubuntu-22.04, windows-latest]
         os: [ubuntu-22.04]
-        ruby: [jruby-9.4.5.0, '2.3', '2.7', '3.0', '3.3.4'] # use 3.3.4 to workaround time zone bug in 3.3.5
+        ruby: [jruby-9.4.5.0, '2.3', '2.7', '3.0', '3.4']
         asciimath-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
@@ -146,7 +146,7 @@ jobs:
     - name: Install Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3.4'
+        ruby-version: '3.4'
         bundler-cache: true
     - name: Build dependents
       env:
