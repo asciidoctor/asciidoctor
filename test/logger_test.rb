@@ -50,17 +50,10 @@ context 'Logger' do
   end
 
   context 'Logger' do
-    test 'configures default logger with progname set to asciidoctor' do
-      assert_equal 'asciidoctor', Asciidoctor::LoggerManager.logger.progname
-    end
-
-    test 'configures default logger with level set to WARN' do
-      assert_equal Logger::Severity::WARN, Asciidoctor::LoggerManager.logger.level
-    end
-
-    test 'configures default logger to write messages to $stderr' do
+    test 'should set logdev to $stderr by default' do
       out_string, err_string = redirect_streams do |out, err|
-        Asciidoctor::LoggerManager.logger.warn 'this is a call'
+        logger = Asciidoctor::Logger.new
+        logger.warn 'this is a call'
         [out.string, err.string]
       end
       assert_empty out_string
