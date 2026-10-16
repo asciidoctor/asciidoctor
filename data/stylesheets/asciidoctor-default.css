@@ -336,12 +336,14 @@ div.unbreakable{-moz-column-break-inside:avoid;break-inside:avoid}
 .yellow-background{background:#fafa00}
 span.icon>.fa{cursor:default}
 a span.icon>.fa{cursor:inherit}
-.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon i.fa[class*=icon-]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
 .admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
-.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#404040}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.admonitionblock td.icon .icon-example::before{content:"\f06e";color:#007a70}
+.admonitionblock td.icon i.fa[class*=icon-]:not(.icon-note):not(.icon-tip):not(.icon-warning):not(.icon-caution):not(.icon-important):not(.icon-example)::before{content:attr(title);display:inline-block;font-family:"Open Sans","DejaVu Sans",sans-serif;font-size:.375em;font-style:normal;text-shadow:none;font-weight:bold;text-transform:uppercase;white-space:nowrap;word-break:normal;overflow-wrap:normal;color:#7a2518;line-height:1.2}
 .conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);border-radius:50%;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
 .conum[data-value] *{color:#fff!important}
 .conum[data-value]+b{display:none}

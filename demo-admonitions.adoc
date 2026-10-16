@@ -1,0 +1,121 @@
+= Demo: Configurable Admonitions
+Demo User
+:doctype: book
+:toc:
+:admonition-types: note,tip,important,warning,caution,example,definition
+:admonition-example-tag: EXAMPLE
+:admonition-example-label: Example
+:admonition-example-backend-docbook: note
+:admonition-definition-tag: DEFINITION
+:admonition-definition-label: Definition
+:admonition-definition-backend-docbook: note
+
+== Admonition Tables
+
+admonition-table::note[]
+
+admonition-table::example[title="List of Examples"]
+
+admonition-table::definition[]
+
+== Standard Admonitions
+
+NOTE: This is a standard note admonition.
+
+TIP: This is a standard tip admonition.
+
+IMPORTANT: This is a standard important admonition.
+
+WARNING: This is a standard warning admonition.
+
+CAUTION: This is a standard caution admonition.
+
+== Custom Admonitions
+
+EXAMPLE: This is a custom example admonition configured with tag EXAMPLE, label "Example", and DocBook mapping to "note".
+
+DEFINITION: This is a custom definition admonition configured with tag DEFINITION, label "Definition", and DocBook mapping to "note".
+
+== Block-style Custom Admonitions
+
+[EXAMPLE]
+.A block-style example
+Custom admonitions can also be used as block-style admonitions with titles.
+
+[DEFINITION]
+.A formal definition
+This demonstrates the flexibility of the new admonition system - types can be configured per document.
+
+== Multi-Paragraph Admonitions
+
+[NOTE]
+====
+This is the first paragraph of a multi-paragraph note.
+
+This is the second paragraph with more details.
+
+* A list item inside an admonition
+* Another list item
+====
+
+[DEFINITION]
+====
+A *definition* can span multiple paragraphs.
+
+NOTE: A NOTE admonition within another admonition.
+
+[EXAMPLE]
+=====
+Can even be a block-style admonition within another admonition.
+
+With several paragraphs.
+=====
+
+The second paragraph can provide further elaboration or examples.
+
+ A literal block inside a definition admonition.
+====
+
+== Collapsible Admonitions
+
+NOTE%collapsible: This note is hidden by default. Click to expand.
+
+TIP%collapsible%open: This tip starts open and can be collapsed.
+
+[WARNING%collapsible]
+.Click to see the warning
+====
+This is a collapsible block-style warning with a title.
+
+[EXAMPLE%collapsible%open]
+=====
+Can even be a block-style admonition within another admonition.
+
+This one is open.
+
+[CAUTION%collapsible]
+.Should be closed by default
+======
+Can even be a block-style admonition within another admonition.
+======
+=====
+
+It spans multiple paragraphs.
+====
+
+[DEFINITION%collapsible%open]
+.What is a Definition?
+====
+A *definition* block that is open by default.
+
+It can also contain lists:
+
+* item one
+* item two
+====
+
+== Admonition with Caption Override
+
+[EXAMPLE]
+.Override with custom caption
+This admonition demonstrates label precedence: the caption attribute overrides the default label.

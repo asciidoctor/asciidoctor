@@ -266,7 +266,17 @@ module Asciidoctor
     '+' => 4,
   }
 
-  ADMONITION_STYLES = ::Set['NOTE', 'TIP', 'IMPORTANT', 'WARNING', 'CAUTION']
+  ADMONITION_TYPES = {
+    'note' => { 'tag' => 'NOTE', 'label' => 'Note', 'docbook' => 'note' },
+    'tip' => { 'tag' => 'TIP', 'label' => 'Tip', 'docbook' => 'tip' },
+    'important' => { 'tag' => 'IMPORTANT', 'label' => 'Important', 'docbook' => 'important' },
+    'warning' => { 'tag' => 'WARNING', 'label' => 'Warning', 'docbook' => 'warning' },
+    'caution' => { 'tag' => 'CAUTION', 'label' => 'Caution', 'docbook' => 'caution' },
+  }
+
+  ADMONITION_STYLES = ::Set.new ADMONITION_TYPES.values.map {|conf| conf['tag'] }
+
+  DOCBOOK_ADMONITION_TAGS = ::Set.new %w(note tip important warning caution)
 
   ADMONITION_STYLE_HEADS = ::Set.new(ADMONITION_STYLES.map {|s| s.chr })
 

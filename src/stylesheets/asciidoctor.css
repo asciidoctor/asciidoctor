@@ -1954,7 +1954,7 @@ a span.icon > .fa {
   cursor: inherit;
 }
 
-.admonitionblock td.icon [class^="fa icon-"] {
+.admonitionblock td.icon i.fa[class*="icon-"] {
   font-size: 2.5em;
   text-shadow: 1px 1px 2px rgb(0 0 0 / 0.5);
   cursor: default;
@@ -1968,7 +1968,7 @@ a span.icon > .fa {
 .admonitionblock td.icon .icon-tip::before {
   content: "\f0eb";
   text-shadow: 1px 1px 2px rgb(155 155 0 / 0.8);
-  color: #111;
+  color: #404040;
 }
 
 .admonitionblock td.icon .icon-warning::before {
@@ -1984,6 +1984,28 @@ a span.icon > .fa {
 .admonitionblock td.icon .icon-important::before {
   content: "\f06a";
   color: #bf0000;
+}
+
+.admonitionblock td.icon .icon-example::before {
+  content: "\f06e";
+  color: #007a70;
+}
+
+
+.admonitionblock td.icon i.fa[class*="icon-"]:not(.icon-note):not(.icon-tip):not(.icon-warning):not(.icon-caution):not(.icon-important):not(.icon-example)::before {
+  content: attr(title);
+  display: inline-block;
+  font-family: "Open Sans", "DejaVu Sans", sans-serif;
+  font-size: 0.375em;
+  font-style: normal;
+  text-shadow: none;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+  color: #7a2518;
+  line-height: 1.2;
 }
 
 .conum[data-value] {
