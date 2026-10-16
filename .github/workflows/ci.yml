@@ -132,7 +132,7 @@ jobs:
         ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
         bundle exec rake build
         bundle exec gem --backtrace install --local --document rdoc,ri pkg/*.gem
-        bundle exec gem uninstall -ax asciidoctor
+        bundle clean
   build-dependents:
     name: build:dependents
     if: success() && github.event_name == 'push' && github.repository == 'asciidoctor/asciidoctor'
