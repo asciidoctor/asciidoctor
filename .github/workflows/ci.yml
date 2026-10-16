@@ -128,10 +128,10 @@ jobs:
     - name: Install gem and doc
       if: |
         !startsWith(matrix.ruby, 'truffleruby-')
+      # alt to bundle clean: gem uninstall -i $(bundle exec ruby -e 'print ENV[:GEM_HOME.to_s]') -ax asciidoctor
       run: |
-        ruby -r fileutils -e "FileUtils.rmtree 'pkg'"
-        bundle exec rake build
-        bundle exec gem --backtrace install --local --document rdoc,ri pkg/*.gem
+        bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
+        bundle exec gem install --local --document rdoc,ri asciidoctor.gem
         bundle clean
   build-dependents:
     name: build:dependents
