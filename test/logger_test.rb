@@ -250,31 +250,33 @@ context 'Logger' do
       assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
     end
 
-    test 'should extend Logger from logger gem if gem is loaded' do
-      script = <<~'EOS'
-        $stdout.sync = true
-        require 'asciidoctor'
-        puts Asciidoctor::Logger.superclass
-        puts Asciidoctor::MemoryLogger < ::Logger
-        puts Asciidoctor::NullLogger < ::Logger
-        Asciidoctor::LoggerManager.logger.warn 'logger gem works'
-        puts Asciidoctor::LoggerManager.logger.max_severity
-      EOS
-      output = run_command(Gem.ruby, '-W0', '-r', 'logger', '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read }
-      assert_equal %(Logger\ntrue\ntrue\nasciidoctor: WARNING: logger gem works\n2\n), output
-    end
-
-    test 'should extend BasicLogger if logger gem is not loaded' do
-      script = <<~'EOS'
-        $stdout.sync = true
-        require 'asciidoctor'
-        puts defined?(::Logger).inspect
-        puts Asciidoctor::Logger.superclass
-        Asciidoctor::LoggerManager.logger.warn 'basic logger works'
-        puts Asciidoctor::LoggerManager.logger.max_severity
-      EOS
-      output = run_command(Gem.ruby, '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read }
-      assert_equal %(nil\nAsciidoctor::BasicLogger\nasciidoctor: WARNING: basic logger works\n2\n), output
+    if Gem.loaded_specs.key? 'logger'
+      test 'should extend Logger from logger gem if gem is loaded' do
+        script = <<~'EOS'
+          $stdout.sync = true
+          require 'asciidoctor'
+          puts Asciidoctor::Logger.superclass
+          puts Asciidoctor::MemoryLogger < ::Logger
+          puts Asciidoctor::NullLogger < ::Logger
+          Asciidoctor::LoggerManager.logger.warn 'logger gem works'
+          puts Asciidoctor::LoggerManager.logger.max_severity
+        EOS
+        output = run_command(Gem.ruby, '-W0', '-r', 'logger', '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read }
+        assert_equal %(Logger\ntrue\ntrue\nasciidoctor: WARNING: logger gem works\n2\n), output
+      end
+    else
+      test 'should extend BasicLogger if logger gem is not loaded' do
+        script = <<~'EOS'
+          $stdout.sync = true
+          require 'asciidoctor'
+          puts defined?(::Logger).inspect
+          puts Asciidoctor::Logger.superclass
+          Asciidoctor::LoggerManager.logger.warn 'basic logger works'
+          puts Asciidoctor::LoggerManager.logger.max_severity
+        EOS
+        output = run_command(Gem.ruby, '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read }
+        assert_equal %(nil\nAsciidoctor::BasicLogger\nasciidoctor: WARNING: basic logger works\n2\n), output
+      end
     end
 
     test 'should write message to logdev using << method' do
