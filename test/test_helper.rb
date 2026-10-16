@@ -42,6 +42,10 @@ class Minitest::Test
     Minitest::Test.jruby_9_1_windows?
   end
 
+  def self.rouge_2_1?
+    (Gem::Version.new Rouge.version) >= (Gem::Version.new '2.1.0')
+  end
+
   def self.windows?
     /mswin|msys|mingw/.match? RbConfig::CONFIG['host_os']
   end
