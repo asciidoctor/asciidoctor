@@ -122,10 +122,10 @@ jobs:
       run: bundle exec ruby -w $(bundle exec ruby -e 'print File.join Gem.bindir, %q(rake)') test:all
     - name: Install gem and doc
       if: matrix.primary
+      # alt to bundle clean: gem uninstall -i $(bundle exec ruby -e 'print ENV[:GEM_HOME.to_s]') -ax asciidoctor
       run: |
         bundle exec gem build asciidoctor.gemspec -o asciidoctor.gem
         bundle exec gem install --local --document rdoc,ri asciidoctor.gem
-        #gem uninstall -i $(bundle exec ruby -e 'print ENV[:GEM_HOME.to_s]') -ax asciidoctor
         bundle clean
   build-dependents:
     name: build:dependents
