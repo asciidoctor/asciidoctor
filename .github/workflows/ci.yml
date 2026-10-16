@@ -30,7 +30,6 @@ jobs:
         #os: [ubuntu-22.04, windows-latest]
         ruby: [jruby-10.0.2, '2.7', '3.0', '3.4']
         asciimath-version: [~]
-        haml-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
@@ -51,9 +50,6 @@ jobs:
         - os: ubuntu-22.04
           ruby: '2.7'
           asciimath-version: '~> 1.0.0'
-        - os: ubuntu-22.04
-          ruby: '2.7'
-          haml-version: '~> 5.2.0'
         - os: ubuntu-22.04
           ruby: '2.7'
           pygments-version: '~> 1.2.0'
