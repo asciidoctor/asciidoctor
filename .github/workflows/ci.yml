@@ -28,23 +28,20 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         #os: [ubuntu-22.04, windows-latest]
-        ruby: [jruby-10.0.2, '2.7', '3.0', '3.4']
+        ruby: [jruby-10.0.2, '2.7', '3.0', '3.4', '4.0']
         asciimath-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
         exclude:
-        # remove 3.4 on ubuntu-22.04 to mark as primary
+        # remove 4.0 on ubuntu-22.04 to mark as primary
         - os: ubuntu-22.04
-          ruby: '3.4'
+          ruby: '4.0'
         include:
         - os: ubuntu-22.04
           ruby: truffleruby-22.2.0
         - os: ubuntu-22.04
           ruby: jruby-9.4.0.0
           pygments-version: ~
-        #- os: windows-latest
-        #  ruby: jruby-9.4.0.0
-        #  pygments-version: ~
         - os: macos-latest
           ruby: '3.4'
         - os: ubuntu-22.04
@@ -57,7 +54,11 @@ jobs:
           ruby: '2.7'
           rouge-version: '~> 2.0.0'
         - os: ubuntu-22.04
-          ruby: '3.4'
+          ruby: '2.7'
+          rouge-version: '~> 3.0.0'
+        - os: ubuntu-22.04
+          ruby: '4.0'
+          rouge-version: '~> 5.1.0'
           primary: primary
     runs-on: ${{ matrix.os }}
     env:
