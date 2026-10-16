@@ -539,6 +539,7 @@ module Asciidoctor
   end unless RUBY_ENGINE == 'opal'
 
   unless RUBY_ENGINE == 'opal'
+    autoload :StemAdapter, %(#{__dir__}/asciidoctor/stem_adapter)
     autoload :SyntaxHighlighter, %(#{__dir__}/asciidoctor/syntax_highlighter)
     autoload :Timings, %(#{__dir__}/asciidoctor/timings)
   end
@@ -579,6 +580,7 @@ require_relative 'asciidoctor/load'
 require_relative 'asciidoctor/convert'
 
 if RUBY_ENGINE == 'opal'
+  require_relative 'asciidoctor/stem_adapter'
   require_relative 'asciidoctor/syntax_highlighter'
   require_relative 'asciidoctor/timings'
   # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js

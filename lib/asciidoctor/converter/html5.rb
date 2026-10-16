@@ -159,6 +159,9 @@ class Converter::Html5Converter < Converter::Base
     if (syntax_hl = node.syntax_highlighter)
       result << (syntax_hl_docinfo_head_idx = result.size)
     end
+    if (stem_adpt = node.stem_adapter)
+      result << (stem_adpt_docinfo_head_idx = result.size)
+    end
 
     unless (docinfo_content = node.docinfo).empty?
       result << docinfo_content
@@ -257,41 +260,22 @@ class Converter::Html5Converter < Converter::Base
         result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
       else
         result.delete_at syntax_hl_docinfo_head_idx
+        stem_adpt_docinfo_head_idx -= 1 if stem_adpt
       end
       if syntax_hl.docinfo? :footer
         result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
-    if node.attr? 'stem'
-      eqnums_val = node.attr 'eqnums', 'none'
-      eqnums_val = 'AMS' if eqnums_val.empty?
-      eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
-      # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-      result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_CHTML"></script>)
+    if stem_adpt
+      if stem_adpt.docinfo? :head
+        result[stem_adpt_docinfo_head_idx] = stem_adpt.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
+      else
+        result.delete_at stem_adpt_docinfo_head_idx
+      end
+      if stem_adpt.docinfo? :footer
+        result << (stem_adpt.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
+      end
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -708,6 +692,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
+    return node.document.stem_adapter.format node if node.document.stem_adapter
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
@@ -1293,22 +1278,33 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_quoted node
-    open, close, tag = QUOTE_TAGS[node.type]
-    if node.id
-      class_attr = node.role ? %( class="#{node.role}") : ''
-      if tag
-        %(#{open.chop} id="#{node.id}"#{class_attr}>#{node.text}#{close})
+    if (node.type == :asciimath || node.type == :latexmath) && (stem_adpt = node.document.stem_adapter)
+      content = stem_adpt.convert node
+      if node.id
+        %(<span id="#{node.id}"#{node.role ? %( class="#{node.role}") : ''}>#{content}</span>)
+      elsif node.role
+        %(<span class="#{node.role}">#{content}</span>)
       else
-        %(<span id="#{node.id}"#{class_attr}>#{open}#{node.text}#{close}</span>)
-      end
-    elsif node.role
-      if tag
-        %(#{open.chop} class="#{node.role}">#{node.text}#{close})
-      else
-        %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
+        content
       end
     else
-      %(#{open}#{node.text}#{close})
+      open, close, tag = QUOTE_TAGS[node.type]
+      if node.id
+        class_attr = node.role ? %( class="#{node.role}") : ''
+        if tag
+          %(#{open.chop} id="#{node.id}"#{class_attr}>#{node.text}#{close})
+        else
+          %(<span id="#{node.id}"#{class_attr}>#{open}#{node.text}#{close}</span>)
+        end
+      elsif node.role
+        if tag
+          %(#{open.chop} class="#{node.role}">#{node.text}#{close})
+        else
+          %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
+        end
+      else
+        %(#{open}#{node.text}#{close})
+      end
     end
   end
 

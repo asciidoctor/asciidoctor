@@ -233,6 +233,9 @@ class Document < AbstractBlock
   # Public: Get the Converter associated with this document
   attr_reader :converter
 
+  # Public: Get the StemAdapter associated with this document
+  attr_reader :stem_adapter
+
   # Public: Get the SyntaxHighlighter associated with this document
   attr_reader :syntax_highlighter
 
@@ -280,6 +283,7 @@ class Document < AbstractBlock
       @converter = parent_doc.converter
       initialize_extensions = nil
       @extensions = parent_doc.extensions
+      @stem_adapter = parent_doc.stem_adapter
       @syntax_highlighter = parent_doc.syntax_highlighter
     else
       @parent_document = nil
@@ -1239,6 +1243,17 @@ class Document < AbstractBlock
             @syntax_highlighter = (SyntaxHighlighter::DefaultFactoryProxy.new syntax_hls).create syntax_hl_name, @backend, document: self
           else
             @syntax_highlighter = SyntaxHighlighter.create syntax_hl_name, @backend, document: self
+          end
+        end
+        if attrs.key? 'stem'
+          stem_adpt_name = (adpt_val = attrs['stem-adapter']) && !adpt_val.empty? ? adpt_val : 'mathjax'
+          if (stem_adpt_factory = @options[:stem_adapter_factory])
+            @stem_adapter = stem_adpt_factory.create stem_adpt_name, @backend, document: self
+          elsif (stem_adpts = @options[:stem_adapters])
+            @stem_adapter = (StemAdapter::DefaultFactoryProxy.new stem_adpts).create stem_adpt_name, @backend, document: self
+          else
+            @stem_adapter = StemAdapter.create(stem_adpt_name, @backend, document: self) ||
+              StemAdapter.create('mathjax', @backend, document: self)
           end
         end
       # enable toc and sectnums (i.e., numbered) by default in DocBook backend
