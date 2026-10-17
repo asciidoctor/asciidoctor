@@ -28,7 +28,7 @@ jobs:
       matrix:
         #os: [ubuntu-22.04, windows-latest]
         os: [ubuntu-22.04]
-        ruby: [jruby-10.1.2, '2.7', '3.0', '3.4', '4.0']
+        ruby: ['2.7', '3.0', '3.4', '4.0']
         asciimath-version: [~]
         pygments-version: ['~> 2.3.0']
         rouge-version: [~]
@@ -38,10 +38,11 @@ jobs:
           ruby: '4.0'
         include:
         - os: ubuntu-22.04
-          ruby: truffleruby-22.2.0
-        - os: ubuntu-22.04
           ruby: jruby-9.4.0.0
-          pygments-version: ~
+        - os: ubuntu-22.04
+          ruby: jruby-10.1.2
+        - os: ubuntu-22.04
+          ruby: truffleruby-22.2.0
         #- os: macos-latest
         #  ruby: '3.4'
         - os: ubuntu-22.04
