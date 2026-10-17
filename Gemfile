@@ -10,7 +10,11 @@ group :development do
   gem 'asciimath', (ENV.fetch 'ASCIIMATH_VERSION', '~> 2.0')
   # coderay is needed for testing source highlighting
   gem 'coderay', '~> 1.1.0'
-  gem 'cucumber', '~> 9.2.0' if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.2.0')
+  if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.0.0')
+    gem 'cucumber', '~> 3.2.0'
+  elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.2.0')
+    gem 'cucumber', '~> 9.2.0'
+  end
   gem 'minitest', '~> 5.25.0' if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.2.0')
   gem 'nokogiri', '~> 1.10.0' if RUBY_ENGINE == 'truffleruby'
   gem 'open-uri-cached', '~> 1.0.0'
