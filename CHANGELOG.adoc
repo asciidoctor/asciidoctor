@@ -46,6 +46,7 @@ Enhancements::
 
 Compliance::
 
+  * Set minimum supported Ruby version to 2.7
   * Don't promote level-0 special section at start of document to document title (#4151)
   * Disallow the use of dot (`.`) in the name of a named element attribute (#4147)
   * Disallow the use of the left square bracket in an attribute list on formatted text (#4306)
@@ -55,7 +56,7 @@ Compliance::
   * Add support for the link attribute on block image macro when converting to DocBook (#4870) (*@youdie006*)
   * Switch to the portable `cgi/escape` require from stdlib to provide CGI.escape, CGI.escapeHTML, and, (in Ruby 3.2+) CGI.escapeURIComponent
   * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684) (*@ggrossetie*)
-  * Set minimum supported Ruby version to 2.7
+  * Set default severity level for MemoryLogger and NullLogger to unknown instead of warn
 
 Improvements::
 
