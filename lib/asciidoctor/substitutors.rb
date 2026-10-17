@@ -1464,8 +1464,12 @@ module Substitutors
     end
   end
 
-  # Internal: Inserts text into a formatted text enclosure; used by xreftext
-  alias sub_placeholder sprintf unless RUBY_ENGINE == 'opal'
+  unless RUBY_ENGINE == 'opal'
+    include ::Kernel
+
+    # Internal: Inserts text into a formatted text enclosure; used by xreftext
+    alias sub_placeholder sprintf
+  end
 
   # Internal: Parse the attributes that are defined on quoted (aka formatted) text
   #
