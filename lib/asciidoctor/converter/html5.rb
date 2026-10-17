@@ -357,22 +357,22 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       if (slevel = section.level) > (stoclevels = (section.attr? 'toclevels') ? (section.attr 'toclevels').to_i : toclevels)
         next
       elsif section.caption
-        stitle = section.captioned_title
+        stitle = section.captioned_toc_title
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
           case section.sectname
           when 'chapter'
-            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
+            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.toc_title})
           when 'part'
-            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
+            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.toc_title})
           else
-            stitle = %(#{section.sectnum} #{section.title})
+            stitle = %(#{section.sectnum} #{section.toc_title})
           end
         else
-          stitle = %(#{section.sectnum} #{section.title})
+          stitle = %(#{section.sectnum} #{section.toc_title})
         end
       else
-        stitle = section.title
+        stitle = section.toc_title
       end
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
       otag = slevel == sectlevel ? '<li>' : %(<li class="sectlevel#{slevel}">)
