@@ -859,15 +859,17 @@ context 'Document' do
       :description: AsciiDoc user guide
       :keywords: asciidoc,documentation
       :copyright: Stuart Rackham
+      :app-name: AsciiDoc
 
       == Version 8.6.8
 
       more info...
       EOS
       output = convert_string input
-      assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
+      assert_xpath '//meta[@name="application-name"][@content="AsciiDoc"]', output, 1
       assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
       assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
+      assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
       assert_xpath '//meta[@name="copyright"][@content="Stuart Rackham"]', output, 1
       assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="author"][text()="Stuart Rackham"]', output, 1
       assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text()="founder@asciidoc.org"]', output, 1
@@ -942,6 +944,7 @@ context 'Document' do
       input = <<~'EOS'
       = AsciiDoc
       Stuart Rackham <founder@asciidoc.org>
+      :orgname: AsciiDoc Makers
 
       == Version 8.6.8
 
@@ -954,6 +957,7 @@ context 'Document' do
       assert_xpath '/article/info/author/personname/firstname[text()="Stuart"]', output, 1
       assert_xpath '/article/info/author/personname/surname[text()="Rackham"]', output, 1
       assert_xpath '/article/info/author/email[text()="founder@asciidoc.org"]', output, 1
+      assert_xpath '/article/info/orgname[text()="AsciiDoc Makers"]', output, 1
       assert_css 'article:root:not([xml|id])', output, 1
       assert_css 'article:root[xml|lang="en"]', output, 1
     end
