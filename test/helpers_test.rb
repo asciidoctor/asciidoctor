@@ -143,7 +143,7 @@ context 'Helpers' do
       expected_cause_message = %r/^(?:no such file to load|cannot load such file) -- does-not-exist$/
       assert_equal expected_message, ex.message
       assert_match expected_cause_message, ex.cause.message
-      if (ex.respond_to? :full_message) && !jruby? && (Gem::Version.new RUBY_VERSION) >= (Gem::Version.new '2.7.0')
+      if (ex.respond_to? :full_message) && !jruby?
         assert_match %r/helpers\.rb.*in.*require_library/, ex.full_message
         assert_match %r/(?:no such file to load|cannot load such file) -- does-not-exist/, ex.full_message
       else
