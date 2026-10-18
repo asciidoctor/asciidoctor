@@ -942,6 +942,7 @@ context 'Document' do
       = AsciiDoc
       Stuart Rackham <founder@asciidoc.org>
       :orgname: AsciiDoc Makers
+      :keywords: text, markup,,processor, asciidoc , documentation
 
       == Version 8.6.8
 
@@ -955,6 +956,9 @@ context 'Document' do
       assert_xpath '/article/info/author/personname/surname[text()="Rackham"]', output, 1
       assert_xpath '/article/info/author/email[text()="founder@asciidoc.org"]', output, 1
       assert_xpath '/article/info/orgname[text()="AsciiDoc Makers"]', output, 1
+      assert_xpath '/article/info/keywordset', output, 1
+      assert_xpath '/article/info/keywordset/keyword', output, 5
+      assert_xpath '(/article/info/keywordset/keyword)[4][text()="asciidoc"]', output, 1
       assert_css 'article:root:not([xml|id])', output, 1
       assert_css 'article:root[xml|lang="en"]', output, 1
     end

@@ -60,6 +60,7 @@ Compliance::
   * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684) (*@ggrossetie*)
   * Set default severity level for MemoryLogger and NullLogger to unknown instead of warn
   * Add seemingly meaningless referrerpolicy="strict-origin-when-cross-origin" attribute to iframe of embedded YouTube video (#4711)
+  * Include keywords in info element of DocBook output (#4866)
 
 Improvements::
 
