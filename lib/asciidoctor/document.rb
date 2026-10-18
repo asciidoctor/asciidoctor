@@ -783,6 +783,14 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: Convenience method to retrieve the keywords of this document as an Array of keyword strings.
+  #
+  # returns the keywords as an Array of String objects, or an empty Array if no keywords are defined
+  def keywords
+    return [] unless (val = @attributes['keywords'])
+    (val.to_s.split ',').each_with_object([]) {|kw, accum| accum << kw unless (kw = kw.strip).empty? }
+  end
+
   # Public: Convenience method to retrieve the document attribute 'revdate'
   #
   # returns the date of last revision for the document as a String

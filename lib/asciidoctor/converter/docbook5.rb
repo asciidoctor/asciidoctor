@@ -733,6 +733,11 @@ class Converter::DocBook5Converter < Converter::Base
         end
       end
       result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
+      unless (keywords = doc.keywords).empty?
+        result << '<keywordset>'
+        keywords.each {|keyword| result << %(<keyword>#{keyword}</keyword>) }
+        result << '</keywordset>'
+      end
       unless (docinfo_content = doc.docinfo).empty?
         result << docinfo_content
       end
