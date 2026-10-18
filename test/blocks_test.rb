@@ -2572,7 +2572,7 @@ This is just an open block.
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
-          thr[:requests].clear
+          thr[:requests].clear rescue nil
           Dir.mktmpdir do |cache_path|
             original_cache_path = OpenURI::Cache.cache_path
             begin
