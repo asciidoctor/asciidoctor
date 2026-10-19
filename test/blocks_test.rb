@@ -3253,13 +3253,14 @@ This is just an open block.
     end
 
     test 'video macro should honor all options' do
-      input = 'video::cats-vs-dogs.avi[options="autoplay,muted,nocontrols,loop",preload="metadata"]'
+      input = 'video::cats-vs-dogs.avi[options="autoplay,muted,nocontrols,loop,nopip",preload="metadata"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[autoplay]', output, 1
       assert_css 'video[muted]', output, 1
       assert_css 'video:not([controls])', output, 1
       assert_css 'video[loop]', output, 1
+      assert_css 'video[disablepictureinpicture]', output, 1
       assert_css 'video[preload=metadata]', output, 1
     end
 
