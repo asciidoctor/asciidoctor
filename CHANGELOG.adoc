@@ -25,6 +25,10 @@ Compliance::
   * Remove the runtime dependency on the `logger` gem; extend Logger from the `logger` gem if loaded, otherwise extend the minimal built-in `BasicLogger` (#4684) (*@ggrossetie*)
   * Add seemingly meaningless referrerpolicy="strict-origin-when-cross-origin" attribute to iframe of embedded YouTube video (#4711)
 
+Improvements::
+
+  * Prevent admonition icon from being selected when selecting surrounding text (i.e., `user-select: none`) (#4824)
+
 Bug Fixes::
 
   * When normalizing toclevels, detect part even when book starts with special section (#4814)

@@ -1214,6 +1214,7 @@ table.tableblock.fit-content > caption.title {
 
 .admonitionblock > table td.icon img {
   max-width: none;
+  user-select: none;
 }
 
 .admonitionblock > table td.icon .title {
