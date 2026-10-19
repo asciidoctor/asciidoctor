@@ -27,7 +27,8 @@ Compliance::
 
 Improvements::
 
-  * Prevent admonition icon from being selected when selecting surrounding text (i.e., `user-select: none`) (#4824)
+  * Add title attribute to admonition icon image like a font-based icon (#4820)
+  * Prevent admonition icon image from being selected when selecting surrounding text (i.e., `user-select: none`) (#4824)
 
 Bug Fixes::
 
