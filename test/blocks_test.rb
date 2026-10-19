@@ -3458,7 +3458,7 @@ This is just an open block.
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
-      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@title="Tip"][@alt="Tip"]', output, 1
     end
 
     test 'can resolve icon relative to custom iconsdir' do
