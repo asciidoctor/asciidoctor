@@ -183,9 +183,15 @@ class Table::Column < AbstractNode
     @style = attributes['style']
     attributes['colnumber'] = index + 1
     attributes['width'] ||= 1
-    attributes['halign'] ||= 'left'
-    attributes['valign'] ||= 'top'
-    update_attributes(attributes)
+    unless attributes['halign']
+      attributes['halign'] = 'left'
+      attributes['halign-source'] = 'default'
+    end
+    unless attributes['valign']
+      attributes['valign'] = 'top'
+      attributes['valign-source'] = 'default'
+    end
+    update_attributes attributes
   end
 
   # Public: An alias to the parent block (which is always a Table)
