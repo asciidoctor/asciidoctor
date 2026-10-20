@@ -1213,6 +1213,7 @@ table.tableblock.fit-content > caption.title {
 }
 
 .admonitionblock > table td.icon img {
+  height: 2.5em;
   max-width: none;
   user-select: none;
 }
