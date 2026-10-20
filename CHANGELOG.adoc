@@ -84,6 +84,7 @@ Improvements::
   * Modify default stylesheet to honor text-* roles on quote blocks
   * Add title attribute to admonition icon image like a font-based icon (#4820)
   * Prevent admonition icon image from being selected when selecting surrounding text (i.e., `user-select: none`) (#4824)
+  * Set the height of the image-based admonition icon to 2.5em to match the height of the font-based icon (#4822)
 
 Bug Fixes::
 
