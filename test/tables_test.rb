@@ -1088,6 +1088,20 @@ context 'Tables' do
       assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p', output, 1
       assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(1).halign-left.valign-top p em', output, 0
       assert_css 'table > tbody > tr:nth-child(4) > td:nth-child(2).halign-right.valign-top[colspan="2"] p code', output, 1
+
+      table = ((document_from_string input).find_by context: :table)[0]
+      cells = []
+      table.rows.body.each do |row|
+        row.each do |cell|
+          cells << cell
+        end
+      end
+      assert_equal 'default', (cells[0].attr 'halign-source')
+      assert_equal 'cell', (cells[1].attr 'halign-source')
+      assert_equal 'column', (cells[2].attr 'halign-source')
+
+      assert_equal 'default', (cells[0].attr 'valign-source')
+      assert_equal 'cell', (cells[6].attr 'valign-source')
     end
 
     test 'sets up columns correctly if first row has cell that spans columns' do
