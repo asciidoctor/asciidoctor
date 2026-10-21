@@ -45,6 +45,7 @@ Enhancements::
   * Don't add highlight class to pre tag when `nohighlight` option is set (highlight.js only) (#4804)
   * Propogate role on document to h1 tag in embedded HTML output (#4837)
   * Add `nopip` option to video macro to disable picture in picture functionality (#3935)
+  * Introduce `create_base_formatter` method on Rouge adapter to create the undecorated formatter to allow it to be patched (#4885)
 
 Compliance::
 
