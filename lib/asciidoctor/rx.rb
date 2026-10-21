@@ -671,6 +671,8 @@ module Asciidoctor
   #
   #DataDelimiterRx = /[,;]/
 
+  DataUriRx = %r(^data:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
+
   # Matches whitespace (space, tab, newline) escaped by a backslash.
   #
   # Examples

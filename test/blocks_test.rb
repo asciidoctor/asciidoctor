@@ -3179,6 +3179,18 @@ This is just an open block.
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'can handle embedded data uri images when data-uri and allow-uri-read attributes are set in safe mode' do
+      input = <<~'EOS'
+      :data-uri:
+
+      image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
+      EOS
+
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
+      assert_empty @logger.messages
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
     test 'cleans reference to ancestor directories in imagesdir before reading image if safe mode level is at least SAFE' do
       input = <<~'EOS'
       :data-uri:
