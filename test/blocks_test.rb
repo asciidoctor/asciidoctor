@@ -3035,10 +3035,11 @@ context 'Blocks' do
     test 'can handle embedded data uri images' do
       input = 'image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]'
       output = convert_string_to_embedded input
+      assert_empty @logger.messages
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    test 'can handle embedded data uri images when data-uri attribute is set' do
+    test 'can handle embedded data uri images when data-uri attribute is set in secure mode' do
       input = <<~'EOS'
       :data-uri:
 
@@ -3046,6 +3047,19 @@ context 'Blocks' do
       EOS
 
       output = convert_string_to_embedded input
+      assert_empty @logger.messages
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'can handle embedded data uri images when data-uri attribute is set in safe mode' do
+      input = <<~'EOS'
+      :data-uri:
+
+      image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
+      EOS
+
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger.messages
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
