@@ -3075,7 +3075,7 @@ This is just an open block.
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    test '.only should cache remote image when allow-uri-read, cache-uri, and data-uri are set' do
+    test 'should cache remote image when allow-uri-read, cache-uri, and data-uri are set' do
       begin
         if OpenURI.respond_to? :cache_open_uri
           OpenURI.singleton_class.send :remove_method, :open_uri
