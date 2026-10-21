@@ -400,6 +400,7 @@ class AbstractNode
   # Returns A data URI string built from Base64 encoded data read from the URI
   # and the mime type specified in the Content Type header.
   def generate_data_uri_from_uri image_uri, cache_uri = false
+    return image_uri if Helpers.data_uri? image_uri
     Helpers.require_open_uri cache_uri
     begin
       mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
