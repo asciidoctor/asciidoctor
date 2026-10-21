@@ -2572,7 +2572,7 @@ This is just an open block.
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
-          thr[:requests].clear rescue nil
+          thr[:requests]&.clear
           Dir.mktmpdir do |cache_path|
             original_cache_path = OpenURI::Cache.cache_path
             begin
@@ -3075,7 +3075,7 @@ This is just an open block.
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    test 'should cache remote image when allow-uri-read, cache-uri, and data-uri are set' do
+    test '.only should cache remote image when allow-uri-read, cache-uri, and data-uri are set' do
       begin
         if OpenURI.respond_to? :cache_open_uri
           OpenURI.singleton_class.send :remove_method, :open_uri
@@ -3092,7 +3092,7 @@ This is just an open block.
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
-          thr[:requests].clear
+          thr[:requests]&.clear
           Dir.mktmpdir do |cache_path|
             original_cache_path = OpenURI::Cache.cache_path
             begin
