@@ -2409,6 +2409,32 @@ context 'Blocks' do
       refute_match(/<svg\s[^>]*style="[^>]*>/, output)
     end
 
+    test 'converts to inline SVG image when inline option is set on block and format attribute is SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      [%inline]
+      image::square-svg[Square,format=svg]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg /, output)
+      assert_match(/<rect /, output)
+    end
+
+    test 'should ignore link attribute if value is self and image target is inline SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      [%inline]
+      image::circle.svg[Tiger,100,link=self]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output)
+      refute_match(/<a href=/, output)
+    end
+
     test 'should honor percentage width for SVG image with inline option' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2472,6 +2498,16 @@ context 'Blocks' do
       assert_css 'svg[width="100"]', output, 1
       assert_css 'svg[height="100"]', output, 1
       assert_css 'svg circle', output, 1
+    end
+
+    test 'embeds remote SVG to inline when inline option is set on block, allow-uri-read is set on document, and format attribute is svg' do
+      input = %(image::http://#{resolve_localhost}:9876/fixtures/square-svg[Square,opts=inline,format=svg])
+      output = using_test_webserver do
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
+      end
+
+      assert_match(/<svg /, output)
+      assert_match(/<rect /, output)
     end
 
     test 'should cache remote SVG when allow-uri-read, cache-uri, and inline option are set' do

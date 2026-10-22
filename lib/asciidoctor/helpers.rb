@@ -150,10 +150,6 @@ module Helpers
     end
   end
 
-  def data_uri? str
-    (str.start_with? 'data:') && (DataUriRx.match? str)
-  end
-
   # Internal: Encode a URI component String for safe inclusion in a URI.
   #
   # str - the URI component String to encode
