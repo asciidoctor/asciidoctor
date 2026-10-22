@@ -501,6 +501,10 @@ class Reader
     @mark = @file, @dir, @path, @lineno
   end
 
+  def restore_mark mark
+    @mark = mark
+  end
+
   # Public: Get information about the last line read, including file name and line number.
   #
   # Returns A String summary of the last line read
