@@ -408,24 +408,43 @@ context 'API' do
       assert_equal 'sample.adoc', last_cell.file
       assert_equal 24, last_cell.lineno
 
-      last_block = section_2.blocks[-1]
-      assert_equal :ulist, last_block.context
-      refute_nil last_block.source_location
-      assert_equal 'sample.adoc', last_block.file
-      assert_equal 28, last_block.lineno
+      ulist_block = (doc.find_by context: :ulist)[0]
+      assert_equal :ulist, ulist_block.context
+      refute_nil ulist_block.source_location
+      assert_equal 'sample.adoc', ulist_block.file
+      assert_equal 28, ulist_block.lineno
 
-      list_items = last_block.blocks
-      refute_nil list_items[0].source_location
-      assert_equal 'sample.adoc', list_items[0].file
-      assert_equal 28, list_items[0].lineno
+      ulist_items = ulist_block.blocks
+      refute_nil ulist_items[0].source_location
+      assert_equal 'sample.adoc', ulist_items[0].file
+      assert_equal 28, ulist_items[0].lineno
 
-      refute_nil list_items[1].source_location
-      assert_equal 'sample.adoc', list_items[1].file
-      assert_equal 29, list_items[1].lineno
+      refute_nil ulist_items[1].source_location
+      assert_equal 'sample.adoc', ulist_items[1].file
+      assert_equal 29, ulist_items[1].lineno
 
-      refute_nil list_items[2].source_location
-      assert_equal 'sample.adoc', list_items[2].file
-      assert_equal 30, list_items[2].lineno
+      refute_nil ulist_items[2].source_location
+      assert_equal 'sample.adoc', ulist_items[2].file
+      assert_equal 30, ulist_items[2].lineno
+
+      colist_block = section_2.blocks.last
+      assert_equal :colist, colist_block.context
+      refute_nil colist_block.source_location
+      assert_equal 'sample.adoc', colist_block.file
+      assert_equal 37, colist_block.lineno
+
+      colist_items = colist_block.blocks
+      refute_nil colist_items[0].source_location
+      assert_equal 'sample.adoc', colist_items[0].file
+      assert_equal 37, colist_items[0].lineno
+
+      refute_nil colist_items[1].source_location
+      assert_equal 'sample.adoc', colist_items[1].file
+      assert_equal 38, colist_items[1].lineno
+
+      refute_nil colist_items[2].source_location
+      assert_equal 'sample.adoc', colist_items[2].file
+      assert_equal 39, colist_items[2].lineno
 
       doc = Asciidoctor.load_file fixture_path('main.adoc'), sourcemap: true, safe: :safe
 
