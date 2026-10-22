@@ -2921,7 +2921,7 @@ context 'Blocks' do
       :data-uri:
       :imagesdir: fixtures
 
-      image::dot[Dot]
+      image::dot-png[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
