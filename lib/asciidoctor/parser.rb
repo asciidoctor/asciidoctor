@@ -1251,6 +1251,7 @@ class Parser
     list_block = List.new(parent, :colist)
     next_index = 1
     autonum = 0
+    list_mark = reader.mark
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
       if (num = match[1]) == '.'
@@ -1272,6 +1273,7 @@ class Parser
       match = nil
     end
 
+    reader.restore_mark list_mark
     callouts.next_list
     list_block
   end
