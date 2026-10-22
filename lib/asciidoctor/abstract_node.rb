@@ -364,7 +364,9 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri target_image, asset_dir_key = nil
-    if (ext = Helpers.extname target_image, nil)
+    if !(format = attr 'format').nil_or_empty?
+      mimetype = format == 'svg' ? 'image/svg+xml' : %(image/#{format})
+    elsif (ext = Helpers.extname target_image, nil)
       mimetype = ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length})
     else
       mimetype = 'application/octet-stream'
@@ -400,10 +402,17 @@ class AbstractNode
   # Returns A data URI string built from Base64 encoded data read from the URI
   # and the mime type specified in the Content Type header.
   def generate_data_uri_from_uri image_uri, cache_uri = false
-    return image_uri if Helpers.data_uri? image_uri
+    return image_uri if (image_uri.start_with? 'data:') && (DataUriRx.match? image_uri)
     Helpers.require_open_uri cache_uri
     begin
-      mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
+      mimetype, bindata = ::OpenURI.open_uri image_uri, URI_READ_MODE do |f|
+        if (format = attr 'format').nil_or_empty?
+          content_type = f.content_type
+        else
+          content_type = format === 'svg' ? 'image/svg+xml' : %(image/#{format})
+        end
+        [content_type, f.read]
+      end
       # NOTE pack 'm0' is equivalent to Base64.strict_encode64
       %(data:#{mimetype};base64,#{[bindata].pack 'm0'})
     rescue
