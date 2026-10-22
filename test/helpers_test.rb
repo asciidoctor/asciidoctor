@@ -41,19 +41,19 @@ context 'Helpers' do
       refute Asciidoctor::Helpers.extname?('include.d/basename')
     end
 
-    test 'data_uri? should recognize an empty data URI' do
+    test 'DataUriRx should recognize an empty data URI' do
       input = 'data:image/png;base64,'
-      assert Asciidoctor::Helpers.data_uri? input
+      assert_match Asciidoctor::DataUriRx, input
     end
 
-    test 'data_uri? should recognize a valid data URI' do
+    test 'DataUriRx should recognize a valid data URI' do
       input = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
-      assert Asciidoctor::Helpers.data_uri? input
+      assert_match Asciidoctor::DataUriRx, input
     end
 
-    test 'data_uri? should not recognize an invalid data URI' do
+    test 'DataUriRx should not recognize an invalid data URI' do
       input = 'data:image/ppm;base64,yadayadayada'
-      refute Asciidoctor::Helpers.data_uri? input
+      refute_match Asciidoctor::DataUriRx, input
     end
 
     test 'UriSniffRx should detect URIs' do
