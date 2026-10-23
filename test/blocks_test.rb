@@ -2642,6 +2642,63 @@ This is just an open block.
       assert_message @logger, :WARN, '~<stdin>: SVG does not exist or cannot be read'
     end
 
+    test 'converts to inline SVG image when target is a base64-encoded data URI' do
+      svg_source = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg_source].pack 'm0'})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output, 1)
+      assert_includes output, '<circle r="1"/>'
+      refute_includes output, '<img'
+    end
+
+    test 'decodes UTF-8 characters when creating inline SVG image when target is a base64-encoded data URI' do
+      svg_source = '<svg xmlns="http://www.w3.org/2000/svg"><text>Café</text></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg_source].pack 'm0'})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger
+      assert_includes output, '<svg '
+      assert_includes output, '<text>Café</text>'
+      refute_includes output, '<span class="alt">'
+    end
+
+    test 'converts to alt text when SVG image is an invalid base64-encoded data URI' do
+      target = 'data:image/svg+xml;base64,invalid'
+      input = %(image::#{target}[svg,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_message @logger, :WARN, %(could not decode contents of SVG data URI: #{target})
+      refute_includes output, '<svg'
+      assert_includes output, '<span class="alt">svg</span>'
+    end
+
+    test 'infers SVG format from a data URI media type without an explicit format attribute' do
+      svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg].pack 'm0'})
+      doc = document_from_string %(image::#{data_uri}[Circle,opts=inline]), safe: :safe
+      image_block = doc.blocks[0]
+      image_target = image_block.attr 'target'
+      assert_equal 'svg', (image_block.image_format image_target)
+    end
+
+    test 'converts to inline SVG image when remote SVG is not served as image/svg+xml and data-uri is set' do
+      output = using_test_webserver mimetypes: { '.svg' => 'text/plain' } do |base_url|
+        input = %(image::#{base_url}/fixtures/circle.svg[circle,opts=inline])
+        convert_string_to_embedded input, safe: :safe, attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      end
+      assert_includes output, '<svg'
+      refute_includes output, '<img'
+    end
+
+    test 'does not convert to inline SVG image when remote SVG is not served as image/svg+xml and data-uri is set' do
+      output = using_test_webserver mimetypes: { '.svg' => nil } do |base_url|
+        input = %(image::#{base_url}/fixtures/square-svg[square,opts=inline])
+        convert_string_to_embedded input, safe: :safe, attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      end
+      assert_includes output, '<img src="data:application/octet-stream;base64,'
+    end
+
     test 'can convert block image with alt text defined in macro containing square bracket' do
       input = 'image::images/tiger.png[A [Bengal] Tiger]'
       output = convert_string input
