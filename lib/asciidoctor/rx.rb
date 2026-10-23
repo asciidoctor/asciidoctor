@@ -670,8 +670,6 @@ module Asciidoctor
   #
   #DataDelimiterRx = /[,;]/
 
-  DataUriRx = %r(^data:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
-
   # Matches whitespace (space, tab, newline) escaped by a backslash.
   #
   # Examples
@@ -679,6 +677,15 @@ module Asciidoctor
   #   three\ blind\ mice
   #
   EscapedSpaceRx = /\\([ \t\n])/
+
+  # Matches an image target defined using a base64-encoded data URI
+  #
+  # Examples
+  #
+  #   data:image/png;base64
+  #   data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=
+  #
+  ImageDataUriRx = %r(^data:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
 
   # Detects if text is a possible candidate for the replacements substitution.
   #
