@@ -639,20 +639,20 @@ Your browser does not support the audio tag.
   end
 
   def convert_image node
-    target = node.attr 'target'
+    src = node.image_uri node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+    if (node.image_mimetype src) == 'image/svg+xml' && node.document.safe < SafeMode::SECURE
       if node.option? 'inline'
-        img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+        img = (read_svg_contents node, src, true) || %(<span class="alt">#{node.alt}</span>)
       elsif node.option? 'interactive'
         fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-        img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+        img = %(<object type="image/svg+xml" data="#{src}"#{width_attr}#{height_attr}>#{fallback}</object>)
       else
-        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+        img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       end
     else
-      img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     end
     if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
       img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
@@ -1238,20 +1238,21 @@ Your browser does not support the video tag.
         img = %([#{node.alt}&#93;)
       end
     else
+      src = node.image_uri target
       attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
       attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
       attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
-      if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      if (node.image_mimetype src) == 'image/svg+xml' && node.document.safe < SafeMode::SECURE
         if node.option? 'inline'
-          img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+          img = (read_svg_contents node, src, true) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
           fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-          img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{attrs}>#{fallback}</object>)
+          img = %(<object type="image/svg+xml" data="#{src}"#{attrs}>#{fallback}</object>)
         else
-          img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+          img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
       else
-        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
     end
     if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
@@ -1314,9 +1315,23 @@ Your browser does not support the video tag.
     end
   end
 
-  # NOTE expose read_svg_contents for Bespoke converter
-  def read_svg_contents node, target
-    if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true)
+  def read_svg_contents node, target, resolved = false
+    if resolved
+      if (target.start_with? 'data:') && (ImageDataUriRx.match? target)
+        begin
+          svg = ((target.slice (target.index ',') + 1, target.length).unpack1 'm').force_encoding UTF_8
+          svg = svg.valid_encoding? ? svg.rstrip : nil
+        rescue
+          svg = nil
+        end
+        logger.warn %(could not decode contents of SVG data URI: #{target}) unless svg
+      else
+        svg = node.read_contents target, normalize: true, label: 'SVG', warn_if_empty: true
+      end
+    else
+      svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true
+    end
+    if svg
       return if svg.empty?
       svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
       old_start_tag = new_start_tag = start_tag_match = nil
