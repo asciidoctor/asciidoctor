@@ -393,7 +393,7 @@ class Minitest::Test
     end
   end
 
-  def using_test_webserver host = resolve_localhost, port = 9876
+  def using_test_webserver host: resolve_localhost, port: 9876, mimetypes: { '.adoc' => 'text/plain' }
     base_dir = testdir
     server = TCPServer.new host, port
     server_thread = Thread.start do
@@ -412,10 +412,10 @@ class Minitest::Test
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
         elsif File.file?(resource_file = (File.join base_dir, resource))
-          mimetype = if (ext = File.extname(resource_file)[1..-1])
-            ext == 'adoc' ? 'text/plain' : %(image/#{ext})
+          if (ext = File.extname resource_file)
+            mimetype = mimetypes[ext] || %(image/#{ext.slice 1, ext.length})
           else
-            'text/plain'
+            mimetype = 'text/plain'
           end
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: #{mimetype}\r\n\r\n)
           File.open resource_file, Asciidoctor::FILE_READ_MODE do |fd|
