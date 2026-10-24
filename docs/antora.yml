@@ -30,4 +30,5 @@ nav:
 - modules/extensions/nav.adoc
 - modules/ROOT/nav-lang.adoc
 - modules/ROOT/nav-errors.adoc
+- modules/ROOT/nav-recommended-practices.adoc
 - modules/migrate/nav.adoc
