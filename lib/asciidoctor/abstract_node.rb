@@ -363,7 +363,7 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri target_image, asset_dir_key = nil
-    image_path = normalize_system_path target_image, asset_dir_key ? (attr asset_dir_key) : nil, nil, target_name: 'image'
+    image_path = normalize_system_path target_image, asset_dir_key ? (@document.attr asset_dir_key) : nil, nil, target_name: 'image'
     if !(format = attr 'format').nil_or_empty?
       mimetype = format == 'svg' ? 'image/svg+xml' : %(image/#{format})
     elsif (ext = Helpers.extname target_image, nil)
