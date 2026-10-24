@@ -39,3 +39,17 @@ The STEM integrations are activated when the xref:asciidoc:stem:stem.adoc[stem d
 You can explore these integrations in depth on the xref:mathjax.adoc[], xref:mathematical.adoc[], and xref:asciimath-gem.adoc[] pages.
 
 If you're planning to convert to DocBook to leverage the DocBook toolchain, be sure to consider xref:docbook.adoc[] when deciding which STEM notation to use in your AsciiDoc document.
+
+== STEM adapter facility
+
+When converting to HTML, Asciidoctor uses a pluggable STEM adapter to handle STEM processing.
+The built-in adapter integrates with MathJax.
+You can replace it with an alternate adapter — such as one for KaTeX — by setting the `stem-adapter` document attribute.
+
+ :stem-adapter: katex
+
+If `stem-adapter` is not set, Asciidoctor uses the built-in MathJax adapter by default whenever the `stem` attribute is set.
+
+A STEM adapter controls three integration points: how the STEM content is converted (including delimiters), how the enclosing block element is formatted, and what markup is injected into the document head and footer (e.g., a stylesheet or rendering script).
+
+See xref:custom-adapter.adoc[] to learn how to implement and register a custom STEM adapter.

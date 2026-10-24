@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 
 Enhancements::
 
+  * Introduce a pluggable STEM adapter facility, following the syntax highlighter pattern, to allow alternate STEM renderers (e.g., KaTeX) to be integrated into AsciiDoc processing; select the adapter using the `stem-adapter` document attribute (default: `mathjax` for the html5 backend) (#4522)
   * Introduce 4+ tilde (`~`) delimiter for open blocks; restrict masquerading to partintro and abstract (#1121)
   * Allow the CLI to control the logging level using the `--log-level` option (#3868)
   * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
