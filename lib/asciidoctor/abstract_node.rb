@@ -363,6 +363,7 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri target_image, asset_dir_key = nil
+    image_path = normalize_system_path target_image, asset_dir_key ? (attr asset_dir_key, nil, true) : nil, nil, target_name: 'image'
     if !(format = attr 'format').nil_or_empty?
       mimetype = format == 'svg' ? 'image/svg+xml' : %(image/#{format})
     elsif (ext = Helpers.extname target_image, nil)
@@ -370,13 +371,6 @@ class AbstractNode
     else
       mimetype = 'application/octet-stream'
     end
-
-    if asset_dir_key
-      image_path = normalize_system_path(target_image, @document.attr(asset_dir_key), nil, target_name: 'image')
-    else
-      image_path = normalize_system_path(target_image)
-    end
-
     if ::File.readable? image_path
       # NOTE pack 'm0' is equivalent to Base64.strict_encode64
       %(data:#{mimetype};base64,#{[(::File.binread image_path)].pack 'm0'})
