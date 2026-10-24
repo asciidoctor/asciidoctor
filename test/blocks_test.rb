@@ -3068,6 +3068,13 @@ context 'Blocks' do
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
+    test 'image_uri should return the target as-is if the target is already a data uri when data-uri attribute is set' do
+      target = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGJhc2VQcm9maWxlPSJmdWxsIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjgwIiBmaWxsPSIjZTkxZTYzIiAvPjwvc3ZnPg=='
+      doc = document_from_string %(image::#{target}[]), safe: 'safe', attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      image = doc.blocks[0]
+      assert_equal target, (image.image_uri image.attr 'target')
+    end
+
     test 'can handle embedded data uri images' do
       input = 'image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]'
       output = convert_string_to_embedded input
