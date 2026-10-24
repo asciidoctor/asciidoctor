@@ -176,6 +176,27 @@ module Helpers
     end
   end
 
+  # Internal: Decode a percent-encoded URI component String.
+  #
+  # str - the URI component String to decode
+  #
+  # Returns the String with all percent-encoded octets decoded (e.g., %20 becomes a space). Unlike
+  # CGI.unescape, a literal plus sign (+) is preserved rather than decoded to a space, which matches
+  # the behavior of the JavaScript decodeURIComponent function.
+  if RUBY_ENGINE == 'opal'
+    def decode_uri_component str
+      %x(return decodeURIComponent(str))
+    end
+  elsif ::CGI.respond_to? :unescapeURIComponent
+    def decode_uri_component str
+      ::CGI.unescapeURIComponent str
+    end
+  else
+    def decode_uri_component str
+      ::CGI.unescape (str.include? '+') ? (str.gsub '+', '%2B') : str
+    end
+  end
+
   # Internal: Apply URI path encoding to spaces in the specified string (i.e., convert spaces to %20).
   #
   # str - the String to encode
