@@ -300,12 +300,33 @@ class AbstractNode
     image_uri icon, 'iconsdir'
   end
 
+  # Public: Determine the mimetype of the image URI.
+  #
+  # If the format attribute is specified on the current node and non-empty,
+  # derive the mimetype from that value. Otherwise, if the image is a data URI,
+  # read the mimetype from the URI. Otherwise, derive the mimetype from the file
+  # extension of the URI, if it has one (tolerating a query string or fragment
+  # in the case of SVG). Otherwise, assume the mimetype is
+  # application/octet-stream.
+  def image_mimetype uri, fallback_value = 'application/octet-stream'
+    if !(format = attr 'format').nil_or_empty?
+      format == 'svg' ? 'image/svg+xml' : 'image/' + format
+    elsif (uri.start_with? 'data:') && (ImageDataUriRx.match? uri)
+      uri.slice 5, ((uri.index ';') - 5)
+    elsif (ext = Helpers.extname uri, nil)
+      (ext.start_with? '.svg') ? 'image/svg+xml' : 'image/' + (ext.slice 1, ext.length)
+    else
+      fallback_value
+    end
+  end
+
   # Public: Construct a URI reference or data URI to the target image.
   #
-  # If the target image is a URI reference, then leave it untouched.
+  # If the target image is a URI reference (including a data URI), return it.
   #
   # The target image is resolved relative to the directory retrieved from the
-  # specified attribute key, if provided.
+  # specified attribute key, if provided. If the resolved image target is a URI
+  # reference (including a data URI), then return that value.
   #
   # If the 'data-uri' attribute is set on the document, and the safe mode level
   # is less than SafeMode::SECURE, the image will be safely converted to a data URI
@@ -365,13 +386,7 @@ class AbstractNode
   # Returns A String data URI containing the content of the target image
   def generate_data_uri target_image, asset_dir_key = nil
     image_path = normalize_system_path target_image, asset_dir_key ? (attr asset_dir_key, nil, true) : nil, nil, target_name: 'image'
-    if !(format = attr 'format').nil_or_empty?
-      mimetype = format == 'svg' ? 'image/svg+xml' : %(image/#{format})
-    elsif (ext = Helpers.extname target_image, nil)
-      mimetype = ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length})
-    else
-      mimetype = 'application/octet-stream'
-    end
+    mimetype = image_mimetype image_path
     if ::File.readable? image_path
       # NOTE pack 'm0' is equivalent to Base64.strict_encode64
       %(data:#{mimetype};base64,#{[(::File.binread image_path)].pack 'm0'})
@@ -400,12 +415,7 @@ class AbstractNode
     Helpers.require_open_uri cache_uri
     begin
       mimetype, bindata = ::OpenURI.open_uri image_uri, URI_READ_MODE do |f|
-        if (format = attr 'format').nil_or_empty?
-          content_type = f.content_type
-        else
-          content_type = format === 'svg' ? 'image/svg+xml' : %(image/#{format})
-        end
-        [content_type, f.read]
+        [(image_mimetype image_uri, nil) || f.content_type, f.read]
       end
       # NOTE pack 'm0' is equivalent to Base64.strict_encode64
       %(data:#{mimetype};base64,#{[bindata].pack 'm0'})
