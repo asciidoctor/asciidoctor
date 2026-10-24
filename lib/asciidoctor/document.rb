@@ -921,6 +921,34 @@ class Document < AbstractBlock
     @attribute_overrides.key? name
   end
 
+  # Public: Determine if the attribute has never been set or unset, neither in the document (e.g., :!name: in the
+  # header) nor in the API/CLI attributes, including in the parent document of a nested document.
+  #
+  # Unlike attr?, this method distinguishes between an attribute that was never set and one that was explicitly unset.
+  #
+  # name - The String attribute name to check
+  #
+  # Returns true if the attribute has never been set or unset, false otherwise
+  def attr_unspecified? name
+    if (attribute_locked? name) || (@attributes_modified.include? name)
+      false
+    elsif nested?
+      @parent_document.attr_unspecified? name
+    else
+      (@options[:attributes] || {}).each_pair.none? do |key, val|
+        if key == name
+          true
+        elsif val == '@'
+          key == %(!#{name}) || key == %(#{name}!)
+        elsif key.end_with? '@'
+          (key = key.chop) == name || key == %(!#{name}) || key == %(#{name}!)
+        else
+          false
+        end
+      end
+    end
+  end
+
   # Public: Assign a value to the specified attribute in the document header.
   #
   # The assignment will be visible when the header attributes are restored,
