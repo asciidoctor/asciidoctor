@@ -20,6 +20,7 @@ This project utilizes semantic versioning.
 
 Enhancements::
 
+  * Generate an index in HTML output when an index section is present; add an index term catalog to the document model (#450, PR #4872) (*@dunyakirkali*)
   * Introduce 4+ tilde (`~`) delimiter for open blocks; restrict masquerading to partintro and abstract (#1121)
   * Allow the CLI to control the logging level using the `--log-level` option (#3868)
   * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
