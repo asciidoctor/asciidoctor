@@ -686,7 +686,11 @@ module Asciidoctor
   #   data:image/png;base64
   #   data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=
   #
-  ImageDataUriRx = %r(^data:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
+  if RUBY_ENGINE == 'opal'
+    ImageDataUriRx = %r(^data:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
+  else
+    ImageDataUriRx = %r(\Adata:image/(?:png|jpe?g|gif|bmp|tiff|svg\+xml|webp);base64,)
+  end
 
   # Detects if text is a possible candidate for the replacements substitution.
   #
