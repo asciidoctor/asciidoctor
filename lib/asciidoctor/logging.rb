@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 unless RUBY_ENGINE == 'opal'
-  require 'logger' if Gem.loaded_specs.key? 'logger'
+  require 'logger' if (defined? Gem) && (Gem.loaded_specs.key? 'logger')
 end
 
 module Asciidoctor
