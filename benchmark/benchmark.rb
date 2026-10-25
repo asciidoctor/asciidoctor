@@ -34,9 +34,6 @@ Execute Ruby using the `--disable=gems` flag to speed up the initial load time, 
 
 =end
 
-require 'benchmark'
-include Benchmark
-
 bench = ARGV[0]
 $repeat = ARGV[1].to_i || 10000
 
@@ -76,6 +73,7 @@ when 'userguide'
   sample_file = ENV['BENCH_TEST_FILE'] || 'sample-data/userguide.adoc'
   backend = ENV['BENCH_BACKEND'] || 'html5'
   fetch_userguide if sample_file == 'sample-data/userguide.adoc' && !(File.exist? sample_file)
+  require 'benchmark'
   result = Benchmark.bmbm {|bm|
     bm.report(%(Convert #{sample_file} (x#{$repeat}))) {
       $repeat.times {
