@@ -251,6 +251,19 @@ context 'Logger' do
       assert_equal Asciidoctor::Logger::Severity::ERROR, logger.max_severity
     end
 
+    test 'should extend BasicLogger if RubyGems are disabled' do
+      script = <<~'EOS'
+        $stdout.sync = true
+        require 'asciidoctor'
+        puts defined?(::Logger).inspect
+        puts Asciidoctor::Logger.superclass
+        Asciidoctor::LoggerManager.logger.warn 'basic logger works'
+        puts Asciidoctor::LoggerManager.logger.max_severity
+      EOS
+      output = run_command(Gem.ruby, '--disable-gems', '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read }
+      assert_equal %(nil\nAsciidoctor::BasicLogger\nasciidoctor: WARNING: basic logger works\n2\n), output
+    end
+
     if Gem.loaded_specs.key? 'logger'
       test 'should extend Logger from logger gem if gem is loaded' do
         script = <<~'EOS'
