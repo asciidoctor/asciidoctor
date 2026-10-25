@@ -20,25 +20,51 @@ context 'Helpers' do
 
   context 'URIs and Paths' do
     test 'rootname should return file name without extension' do
-      assert_equal 'main', Asciidoctor::Helpers.rootname('main.adoc')
-      assert_equal 'docs/main', Asciidoctor::Helpers.rootname('docs/main.adoc')
+      assert_equal 'main', (Asciidoctor::Helpers.rootname 'main.adoc')
+      assert_equal 'docs/main', (Asciidoctor::Helpers.rootname 'docs/main.adoc')
     end
 
     test 'rootname should file name if it has no extension' do
-      assert_equal 'main', Asciidoctor::Helpers.rootname('main')
-      assert_equal 'docs/main', Asciidoctor::Helpers.rootname('docs/main')
+      assert_equal 'main', (Asciidoctor::Helpers.rootname 'main')
+      assert_equal 'docs/main', (Asciidoctor::Helpers.rootname 'docs/main')
+    end
+
+    test 'rootname should file name if it ends in dot' do
+      assert_equal 'main.', (Asciidoctor::Helpers.rootname 'main.')
+      assert_equal 'docs/main.', (Asciidoctor::Helpers.rootname 'docs/main.')
     end
 
     test 'rootname should ignore dot not in last segment' do
-      assert_equal 'include.d/main', Asciidoctor::Helpers.rootname('include.d/main')
-      assert_equal 'include.d/main', Asciidoctor::Helpers.rootname('include.d/main.adoc')
+      assert_equal 'include.d/main', (Asciidoctor::Helpers.rootname 'include.d/main')
+      assert_equal 'include.d/main', (Asciidoctor::Helpers.rootname 'include.d/main.adoc')
+    end
+
+    test '.only basename should return last file segment' do
+      assert_equal 'main.adoc', (Asciidoctor::Helpers.basename 'main.adoc')
+      assert_equal 'main.adoc', (Asciidoctor::Helpers.basename 'docs/main.adoc')
+    end
+
+    test 'basename should drop extname if requested' do
+      assert_equal 'main', (Asciidoctor::Helpers.basename 'main.adoc', true)
+      assert_equal 'main.', (Asciidoctor::Helpers.basename 'main.', true)
+      assert_equal 'main', (Asciidoctor::Helpers.basename 'main.adoc', '.adoc')
     end
 
     test 'extname? should return whether path contains an extname' do
-      assert Asciidoctor::Helpers.extname?('document.adoc')
-      assert Asciidoctor::Helpers.extname?('path/to/document.adoc')
-      assert_nil Asciidoctor::Helpers.extname?('basename')
-      refute Asciidoctor::Helpers.extname?('include.d/basename')
+      assert Asciidoctor::Helpers.extname? 'document.adoc'
+      assert Asciidoctor::Helpers.extname? 'path/to/document.adoc'
+      assert_nil Asciidoctor::Helpers.extname? 'basename'
+      refute Asciidoctor::Helpers.extname? 'include.d/basename'
+      refute Asciidoctor::Helpers.extname? 'path.'
+    end
+
+    test 'extname should return file extension' do
+      assert_equal '.adoc', (Asciidoctor::Helpers.extname 'document.adoc')
+      assert_equal '.adoc', (Asciidoctor::Helpers.extname 'path/to/document.adoc')
+      assert_equal '', (Asciidoctor::Helpers.extname 'basename')
+      assert_equal '', (Asciidoctor::Helpers.extname 'include.d/basename')
+      assert_equal '', (Asciidoctor::Helpers.extname 'path.')
+      assert_nil (Asciidoctor::Helpers.extname 'basename', nil)
     end
 
     test 'ImageDataUriRx should recognize an empty data URI' do
