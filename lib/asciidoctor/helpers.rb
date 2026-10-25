@@ -195,8 +195,8 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def rootname filename
-    if (last_dot_idx = filename.rindex '.')
-      (filename.index '/', last_dot_idx) ? filename : (filename.slice 0, last_dot_idx)
+    if (idx = filename.rindex '.') && (idx + 1) < filename.length
+      (filename.index '/', idx + 1) ? filename : (filename.slice 0, idx)
     else
       filename
     end
@@ -231,7 +231,7 @@ module Helpers
   #
   # Returns true if the path has a file extension, false otherwise
   def extname? path
-    (last_dot_idx = path.rindex '.') && !(path.index '/', last_dot_idx)
+    (idx = path.rindex '.') && (idx + 1) < path.length && !(path.index '/', idx + 1)
   end
 
   # Public: Retrieves the file extension of the specified path. The file extension is the portion of the path in the
@@ -245,16 +245,16 @@ module Helpers
   # Returns the String file extension (with the leading dot included) or the fallback value if the path has no file extension.
   if ::File::ALT_SEPARATOR
     def extname path, fallback = ''
-      if (last_dot_idx = path.rindex '.')
-        (path.index '/', last_dot_idx) || (path.index ::File::ALT_SEPARATOR, last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      if (idx = path.rindex '.') && (idx + 1) < (len = path.length)
+        (path.index '/', idx + 1) || (path.index ::File::ALT_SEPARATOR, idx + 1) ? fallback : (path.slice idx, len)
       else
         fallback
       end
     end
   else
     def extname path, fallback = ''
-      if (last_dot_idx = path.rindex '.')
-        (path.index '/', last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      if (idx = path.rindex '.') && (idx + 1) < (len = path.length)
+        (path.index '/', idx + 1) ? fallback : (path.slice idx, len)
       else
         fallback
       end
