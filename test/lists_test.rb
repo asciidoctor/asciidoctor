@@ -2109,6 +2109,7 @@ context 'Ordered lists (:olist)' do
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
         assert_css 'ol[start=7]', output, 1
+        assert_css 'ol[type]', output, 0
         assert_css 'ol.arabic', output, 1
         assert_css 'ol li', output, 2
         assert_empty logger.messages
@@ -2126,6 +2127,7 @@ context 'Ordered lists (:olist)' do
       using_memory_logger do |logger|
         output = convert_string_to_embedded input
         assert_css 'ol[start=4]', output, 1
+        assert_css 'ol[type=I]', output, 1
         assert_css 'ol.upperroman', output, 1
         assert_css 'ol li', output, 2
         assert_empty logger.messages
