@@ -97,6 +97,7 @@ Bug Fixes::
   * Don't attempt to create data URI from data URI when embedding image (#4887)
   * Fix lineno of colist when sourcemap is enabled (#4892)
   * Honor format attribute when generating data URI for image (#4894)
+  * Output type attribute on `ol` tag in HTML output when list has explicit numbering (#4882)
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
