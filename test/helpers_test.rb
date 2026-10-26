@@ -38,7 +38,7 @@ context 'Helpers' do
       assert_equal 'include.d/main', (Asciidoctor::Helpers.rootname 'include.d/main.adoc')
     end
 
-    test '.only basename should return last file segment' do
+    test 'basename should return last file segment' do
       assert_equal 'main.adoc', (Asciidoctor::Helpers.basename 'main.adoc')
       assert_equal 'main.adoc', (Asciidoctor::Helpers.basename 'docs/main.adoc')
     end
