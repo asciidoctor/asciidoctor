@@ -279,9 +279,10 @@ class PathResolver
   # the breach of a jail, for instance).
   #
   # path - the String path to partition
-  # web  - a Boolean indicating whether the path should be handled a web path
+  # web  - a Boolean indicating whether the path should be handled as a web path
   #        (optional, default: false)
   #
+  # Returns a 2-item Array containing the Array of String path segments and the
   # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is
   # absolute.
   def partition_path path, web = nil
