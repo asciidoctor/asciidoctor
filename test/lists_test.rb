@@ -1865,6 +1865,19 @@ context "Ordered lists (:olist)" do
       assert_css '.olist.lowerroman .olist.loweralpha .olist.arabic', output, 1
     end
 
+    test 'should allow list style to be implied when using markers with implicit style' do
+      input = <<~'EOS'
+      i) 1
+      ii) 2
+      iii) 3
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.olist', output, 1
+      assert_css '.olist.lowerroman', output, 1
+      assert_css '.olist.lowerroman ol.lowerroman[type=i]', output, 1
+    end
+
     test 'should allow list style to be specified explicitly when using markers with implicit style' do
       input = <<~'EOS'
       [loweralpha]
