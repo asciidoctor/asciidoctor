@@ -1331,22 +1331,20 @@ Your browser does not support the video tag.
     else
       svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true
     end
-    if svg
-      return if svg.empty?
-      svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
-      old_start_tag = new_start_tag = start_tag_match = nil
-      # NOTE width, height and style attributes are removed if either width or height is specified
-      %w(width height).each do |dim|
-        next unless node.attr? dim
-        unless new_start_tag
-          next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match
-          new_start_tag = (old_start_tag = start_tag_match[0]).gsub DimensionAttributeRx, ''
-        end
-        # NOTE a unitless value in HTML is assumed to be px, so we can pass the value straight through
-        new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}">)
+    return if svg.nil_or_empty?
+    svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
+    old_start_tag = new_start_tag = start_tag_match = nil
+    # NOTE width, height and style attributes are removed if either width or height is specified
+    %w(width height).each do |dim|
+      next unless node.attr? dim
+      unless new_start_tag
+        next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match
+        new_start_tag = (old_start_tag = start_tag_match[0]).gsub DimensionAttributeRx, ''
       end
-      svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
+      # NOTE a unitless value in HTML is assumed to be px, so we can pass the value straight through
+      new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}">)
     end
+    svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
     svg
   end
 
