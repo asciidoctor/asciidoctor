@@ -40,8 +40,9 @@ context 'Path Resolver' do
     test 'target with relative path appended to start path' do
       assert_equal 'assets/images', @resolver.web_path('images', 'assets')
       assert_equal '/assets/images', @resolver.web_path('images', '/assets')
-      assert_equal '/assets//images/tiger.png', @resolver.web_path('tiger.png', '/assets//images')
+      assert_equal '/assets/images/tiger.png', @resolver.web_path('tiger.png', '/assets//images')
       assert_equal './assets/images', @resolver.web_path('images', './assets')
+      assert_equal './assets/images', @resolver.web_path('images', './/assets')
       assert_equal '/theme.css', @resolver.web_path('theme.css', '/')
       assert_equal '/css/theme.css', @resolver.web_path('theme.css', '/css/')
     end
@@ -63,6 +64,7 @@ context 'Path Resolver' do
 
     test 'normalize target' do
       assert_equal '../images', @resolver.web_path('../images/../images')
+      assert_equal '../images', @resolver.web_path('../images//../images')
     end
 
     test 'append target to start path and normalize' do
@@ -253,7 +255,8 @@ context 'Path Resolver' do
     end
 
     test 'expands parent references in absolute path if jail is not specified' do
-      assert_equal '/etc/stylesheet.css', @resolver.system_path('/usr/share/../../etc/stylesheet.css')
+      assert_equal '/etc/stylesheet.css', (@resolver.system_path '/usr/share/../../etc/stylesheet.css')
+      assert_equal '/etc/stylesheet.css', (@resolver.system_path '/usr/share//../../etc//stylesheet.css')
     end
 
     test 'resolves absolute directory if jail is not specified' do
@@ -306,6 +309,7 @@ context 'Path Resolver' do
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
+      assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('.//images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do

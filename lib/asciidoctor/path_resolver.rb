@@ -270,8 +270,9 @@ class PathResolver
     end
   end
 
-  # Public: Partition the path into path segments, removing any self reference
-  # segments (.). Prior to partitioning, the path is converted to a posix path.
+  # Public: Partition the path into path segments, removing any empty or self
+  # reference (.) segments. Prior to partitioning, the path is converted to a
+  # posix path.
   #
   # Parent references are not resolved by this method since the consumer
   # typically needs to handle this resolution in a certain context (checking for
@@ -289,7 +290,8 @@ class PathResolver
       return result
     end
 
-    posix_path = posixify path
+    posix_path = raw_posix_path = posixify path
+    posix_path = posix_path.squeeze SLASH if posix_path.include? DOUBLE_SLASH
 
     if web
       # ex. /sample/path
@@ -304,9 +306,9 @@ class PathResolver
       # otherwise ex. sample/path
     elsif root? posix_path
       # ex. //sample/path
-      if posix_path.start_with? DOUBLE_SLASH
+      if raw_posix_path.start_with? DOUBLE_SLASH
         root = DOUBLE_SLASH
-        root_len = 2
+        root_len = 1
       # ex. /sample/path
       elsif posix_path.start_with? SLASH
         root = SLASH

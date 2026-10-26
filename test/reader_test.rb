@@ -773,7 +773,7 @@ class ReaderTest < Minitest::Test
           doc = Asciidoctor.load input, safe: :safe, base_dir: fixturedir
           lines = doc.blocks[0].lines
           assert_equal [%(Unresolved directive in <stdin> - include::not-a-file.adoc +\nhttp://example.org/team.adoc[])], lines
-          assert_message logger, :ERROR, %(<stdin>: line 4: include file not found: #{fixture_path 'not-a-file.adoc'} +\nhttp://example.org/team.adoc), Hash
+          assert_message logger, :ERROR, %(<stdin>: line 4: include file not found: #{fixture_path 'not-a-file.adoc'} +\nhttp:/example.org/team.adoc), Hash
         end
       end
 
