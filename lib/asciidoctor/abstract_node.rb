@@ -412,8 +412,8 @@ class AbstractNode
     rescue
       logger.warn %(could not retrieve image data from URI: #{image_uri})
       image_uri
-      # uncomment to return empty data (however, mimetype needs to be resolved)
-      #%(data:#{mimetype}:base64,)
+      # uncomment to return empty data
+      #%(data:#{mimetype};base64,)
       # uncomment to return 1 pixel white dot instead
       #'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
