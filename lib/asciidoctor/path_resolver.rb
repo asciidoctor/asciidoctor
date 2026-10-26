@@ -270,18 +270,20 @@ class PathResolver
     end
   end
 
-  # Public: Partition the path into path segments and remove self references (.) and the trailing
-  # slash, if present. Prior to being partitioned, the path is converted to a posix path.
+  # Public: Partition the path into path segments, removing any self reference
+  # segments (.). Prior to partitioning, the path is converted to a posix path.
   #
-  # Parent references are not resolved by this method since the consumer often needs to handle this
-  # resolution in a certain context (checking for the breach of a jail, for instance).
+  # Parent references are not resolved by this method since the consumer
+  # typically needs to handle this resolution in a certain context (checking for
+  # the breach of a jail, for instance).
   #
   # path - the String path to partition
-  # web  - a Boolean indicating whether the path should be handled
-  #        as a web path (optional, default: false)
+  # web  - a Boolean indicating whether the path should be handled as a web path
+  #        (optional, default: false)
   #
   # Returns a 2-item Array containing the Array of String path segments and the
-  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is absolute.
+  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is
+  # absolute.
   def partition_path path, web = nil
     if (result = (cache = web ? @_partition_path_web : @_partition_path_sys)[path])
       return result
@@ -291,36 +293,41 @@ class PathResolver
 
     if web
       # ex. /sample/path
-      if web_root? posix_path
+      if posix_path.start_with? SLASH
         root = SLASH
+        root_len = 1
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
         root = DOT_SLASH
+        root_len = 2
       end
       # otherwise ex. sample/path
     elsif root? posix_path
       # ex. //sample/path
-      if unc? posix_path
+      if posix_path.start_with? DOUBLE_SLASH
         root = DOUBLE_SLASH
+        root_len = 2
       # ex. /sample/path
       elsif posix_path.start_with? SLASH
         root = SLASH
+        root_len = 1
       # ex. uri:classloader:sample/path (or uri:classloader:/sample/path)
       elsif posix_path.start_with? URI_CLASSLOADER
-        root = posix_path.slice 0, URI_CLASSLOADER.length
+        root = URI_CLASSLOADER
+        root_len = 16
       # ex. C:/sample/path (or file:///sample/path in browser environment)
       else
-        root = posix_path.slice 0, (posix_path.index SLASH) + 1
+        root = posix_path.slice 0, (root_len = (posix_path.index SLASH) + 1)
       end
     # ex. ./sample/path
     elsif posix_path.start_with? DOT_SLASH
       root = DOT_SLASH
+      root_len = 2
     end
     # otherwise ex. sample/path
 
-    path_segments = (root ? (posix_path.slice root.length, posix_path.length) : posix_path).split SLASH
-    # strip out all dot entries
-    path_segments.delete DOT
+    posix_path = posix_path.slice root_len, posix_path.length if root
+    (path_segments = posix_path.split SLASH).delete DOT
     cache[path] = [path_segments, root]
   end
 
