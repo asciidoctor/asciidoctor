@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 # NOTE remove once minimum required Ruby version is at least 2.4
-String.send :prepend, (Module.new do
+String.prepend (Module.new do
   def unpack1 format
     (unpack format)[0]
   end
