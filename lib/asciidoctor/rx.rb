@@ -731,9 +731,9 @@ module Asciidoctor
   #   not c:/sample.adoc or c:\sample.adoc
   #
   if RUBY_ENGINE == 'opal'
-    UriSniffRx = %r(^#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+    UriSniffRx = %r(^(?:https://|http://|file://|data:|#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2}))
   else
-    UriSniffRx = %r(\A#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2})
+    UriSniffRx = %r(\A(?:https://|http://|file://|data:|#{CG_ALPHA}[#{CC_ALNUM}.+-]+:/{0,2}))
   end
 
   # Detects XML tags
