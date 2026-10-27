@@ -3339,6 +3339,38 @@ This is just an open block.
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
     end
 
+    test 'should convert video macro to videoobject in DocBook' do
+      input = 'video::cats-vs-dogs.avi[]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
+    end
+
+    test 'should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
+      input = <<~'EOS'
+      :imagesdir: assets
+      [#cats-vs-dogs]
+      .Cats vs Dogs
+      video::cats-vs-dogs.avi[width=200,height=300,align=center]
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '/figure[@xml:id="cats-vs-dogs"]/title[text()="Cats vs Dogs"]', output, 1
+      assert_xpath '/figure/mediaobject/videoobject/videodata[@fileref="assets/cats-vs-dogs.avi"]', output, 1
+      assert_xpath '//videodata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
+    end
+
+    test 'should append time anchor to fileref of videodata in DocBook if start or end attribute is set' do
+      input = 'video::cats-vs-dogs.avi[start=10,end=20]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=10,20"]', output, 1
+    end
+
+    test 'should not convert video hosted by a third-party service in DocBook' do
+      %w(youtube vimeo wistia).each do |service|
+        output = convert_string_to_embedded %(video::abc123[#{service}]), backend: 'docbook'
+        assert_empty output
+      end
+    end
+
     test 'should detect and convert video macro with positional attributes for poster and dimensions' do
       input = 'video::cats-vs-dogs.avi[cats-and-dogs.png, 200, 300]'
       output = convert_string_to_embedded input

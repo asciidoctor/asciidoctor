@@ -487,7 +487,29 @@ class Converter::DocBook5Converter < Converter::Base
     blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
   end
 
-  alias convert_video skip
+  def convert_video node
+    # NOTE videos hosted by a third-party service are not yet supported
+    return '' if (poster = node.attr 'poster') == 'vimeo' || poster == 'youtube' || poster == 'wistia'
+    start_t = node.attr 'start'
+    end_t = node.attr 'end'
+    time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+    align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
+    mediaobject = %(<mediaobject>
+<videoobject>
+<videodata fileref="#{node.media_uri node.attr 'target'}#{time_anchor}"#{image_size_attributes node.attributes}#{align_attribute}/>
+</videoobject>
+</mediaobject>)
+    if node.title?
+      %(<figure#{common_attributes node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{mediaobject}
+</figure>)
+    else
+      %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
+#{mediaobject}
+</informalfigure>)
+    end
+  end
 
   def convert_inline_anchor node
     case node.type
