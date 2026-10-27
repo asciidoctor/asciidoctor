@@ -486,6 +486,22 @@ context 'Document' do
       assert_xpath '//code[text()="content"]', result, 0
     end
 
+    test 'should not enable compat mode in header if unset from API' do
+      input = <<~'EOS'
+      = Document Title
+      :name: pass:n['quoted string']
+
+      {name}
+      EOS
+
+      doc = document_from_string input, attributes: { 'compat-mode' => nil }
+      refute doc.compat_mode
+      assert doc.attribute_locked? 'compat-mode'
+      assert_nil doc.attr 'compat-mode'
+      result = doc.convert
+      assert_xpath '//p[text()="\'quoted string\'"]', result, 1
+    end
+
     test 'should apply max-width to each top-level container' do
       input = <<~'EOS'
       = Document Title

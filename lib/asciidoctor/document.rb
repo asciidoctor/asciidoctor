@@ -326,7 +326,7 @@ class Document < AbstractBlock
         @safe = (SafeMode.value_for_name safe_mode) || SafeMode::SECURE
       end
       input_mtime = options.delete :input_mtime
-      @compat_mode = attr_overrides.key? 'compat-mode'
+      @compat_mode = (attr_overrides.key? 'compat-mode') && !attr_overrides['compat-mode'].nil?
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new

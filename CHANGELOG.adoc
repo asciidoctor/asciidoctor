@@ -101,6 +101,7 @@ Bug Fixes::
   * Honor format attribute when generating data URI for image (#4894)
   * Output type attribute on `ol` tag in HTML output when list has explicit numbering (#4882)
   * Rework path cleaning to handle repeat slashes in path (#4419)
+  * Set compat mode correctly in document header when `compat-mode` attribute is unset from API/CLI
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
