@@ -1050,7 +1050,7 @@ class PreprocessorReader < Reader
     elsif doc.safe >= SafeMode::SECURE
       # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
       expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
-      link_attrlist = (doc.attr? 'compat-mode') ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+      link_attrlist = doc.compat_mode ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
       replace_next_line %(link:#{expanded_target}[#{link_attrlist}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
@@ -1253,7 +1253,7 @@ class PreprocessorReader < Reader
         logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
         # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
         target = %(pass:c[#{target}]) if target.include? ' '
-        link_attrlist = (doc.attr? 'compat-mode') ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+        link_attrlist = doc.compat_mode ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
         return replace_next_line %(link:#{target}[#{link_attrlist}])
       end
       Helpers.require_open_uri doc.attr? 'cache-uri'

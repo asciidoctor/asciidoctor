@@ -62,6 +62,7 @@ Compliance::
   * Set default severity level for MemoryLogger and NullLogger to unknown instead of warn
   * Add seemingly meaningless referrerpolicy="strict-origin-when-cross-origin" attribute to iframe of embedded YouTube video (#4711)
   * Include keywords in info element of DocBook output (#4866)
+  * Enforce that `compat-mode` is a header only attribute (#4898)
 
 Improvements::
 

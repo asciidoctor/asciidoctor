@@ -873,7 +873,7 @@ context 'Attributes' do
       assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
 
-    test 'should allow compat-mode to be set and unset in middle of document' do
+    test 'should not allow compat-mode to be set and unset in middle of document' do
       input = <<~'EOS'
       :foo: bar
 
@@ -893,7 +893,7 @@ context 'Attributes' do
 
       result = convert_string_to_embedded input, attributes: { 'compat-mode' => '@' }
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
-      assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
+      assert_xpath '/*[@id="paragraph-b"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
     end
 
