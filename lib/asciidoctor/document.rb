@@ -262,6 +262,7 @@ class Document < AbstractBlock
       # QUESTION should we support setting attribute in parent document from nested document?
       @attribute_overrides = attr_overrides = (parent_doc.instance_variable_get :@attribute_overrides).merge parent_doc.attributes
       attr_overrides.delete 'compat-mode'
+      @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       parent_doctype = attr_overrides.delete 'doctype'
       attr_overrides.delete 'notitle'
       attr_overrides.delete 'showtitle'
@@ -270,7 +271,6 @@ class Document < AbstractBlock
       @attributes['toc-placement'] = (attr_overrides.delete 'toc-placement') || 'auto'
       attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
-      @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       @outfilesuffix = parent_doc.outfilesuffix
       @sourcemap = parent_doc.sourcemap
       @timings = nil
@@ -324,7 +324,7 @@ class Document < AbstractBlock
         @safe = (SafeMode.value_for_name safe_mode) rescue SafeMode::SECURE
       end
       input_mtime = options.delete :input_mtime
-      @compat_mode = (attr_overrides.key? 'compat-mode') && !attr_overrides['compat-mode'].nil?
+      @compat_mode = attr_overrides['compat-mode'] ? true : false
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
@@ -1226,9 +1226,7 @@ class Document < AbstractBlock
       end
     end
 
-    if (@compat_mode = attrs.key? 'compat-mode') && (attrs.key? 'language')
-      attrs['source-language'] = attrs['language']
-    end
+    attrs['source-language'] = attrs['language'] if (@compat_mode = attrs.key? 'compat-mode') && (attrs.key? 'language')
 
     unless @parent_document
       if (basebackend = attrs['basebackend']) == 'html'
