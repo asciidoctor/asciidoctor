@@ -850,10 +850,8 @@ class Document < AbstractBlock
       name = entry.name
       if entry.negate
         @attributes.delete name
-        @compat_mode = false if name == 'compat-mode'
       else
         @attributes[name] = entry.value
-        @compat_mode = true if name == 'compat-mode'
       end
     end
   end
@@ -885,6 +883,8 @@ class Document < AbstractBlock
       case name
       when 'backend'
         update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
+      when 'compat-mode'
+        @attributes[name] = (@compat_mode = true) && value
       when 'doctype'
         update_doctype_attributes value
       else
@@ -908,7 +908,10 @@ class Document < AbstractBlock
     else
       @attributes.delete name
       # NOTE if @header_attributes is set, we're beyond the document header
-      @attributes_modified << name unless @header_attributes
+      unless @header_attributes
+        @attributes_modified << name
+        @compat_mode = false if name == 'compat-mode'
+      end
       true
     end
   end
@@ -1234,7 +1237,7 @@ class Document < AbstractBlock
       end
     end
 
-    attrs['source-language'] = attrs['language'] if (@compat_mode = attrs.key? 'compat-mode') && (attrs.key? 'language')
+    attrs['source-language'] = attrs['language'] if @compat_mode && (attrs.key? 'language')
 
     unless @parent_document
       if (basebackend = attrs['basebackend']) == 'html'
