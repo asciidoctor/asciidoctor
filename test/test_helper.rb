@@ -204,27 +204,31 @@ class Minitest::Test
   end
 
   def convert_string src, opts = {}
-    keep_namespaces = opts.delete :keep_namespaces
-    if keep_namespaces
-      (document_from_string src, opts).convert
-    else
-      # this is required because nokogiri is easily confused by namespaces
-      result = (document_from_string src, opts).convert
-      result ? (result.sub RE_XMLNS_ATTRIBUTE, '') : result
+    # this is required because nokogiri is easily confused by namespaces
+    keep_namespaces = (opts.key? :keep_namespaces) ? (opts.delete :keep_namespaces) : false
+    plain_sectnums = (opts.key? :plain_sectnums) ? (opts.delete :plain_sectnums) : true
+    if (result = (document_from_string src, opts).convert)
+      result = result.sub RE_XMLNS_ATTRIBUTE, '' unless keep_namespaces
+      result = unwrap_sectnums result if plain_sectnums
     end
+    result
   end
 
   def convert_string_to_embedded src, opts = {}
-    (document_from_string src, (opts.merge standalone: false)).convert
+    convert_string src, (opts.merge keep_namespaces: true, standalone: false)
   end
 
   def convert_inline_string src, opts = {}
-    (document_from_string src, (opts.merge doctype: :inline)).convert
+    convert_string src, (opts.merge doctype: :inline, keep_namespaces: true)
   end
 
   def parse_header_metadata source, doc = nil
     reader = Asciidoctor::Reader.new source.split Asciidoctor::LF
     Asciidoctor::Parser.parse_header_metadata reader, doc
+  end
+
+  def unwrap_sectnums html
+    html.gsub %r/<span class="sectnum">(.*?)<\/span><span class="sp">&nbsp;<\/span>/, '\1 '
   end
 
   def assign_default_test_options opts

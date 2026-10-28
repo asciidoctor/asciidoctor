@@ -1179,12 +1179,18 @@ Feature: Cross References
     Then the result should match the HTML structure
       """
       .sect1
-        h2#_foo 1. Foo
+        h2#_foo
+          span.sectnum 1.
+          span.sp &nbsp;
+          |Foo
         .sectionbody: .paragraph: p
           |refer to
           a< href='#_bar' Chapter 2, <em>Bar</em>
       .sect1
-        h2#_bar 2. Bar
+        h2#_bar
+          span.sectnum 2.
+          span.sp &nbsp;
+          |Bar
         .sectionbody: .paragraph: p
           |refer to
           a< href='#_foo' Chapter 1
@@ -1211,10 +1217,16 @@ Feature: Cross References
     Then the result should match the HTML structure
       """
       .sect1
-        h2#_foo 1. Foo
+        h2#_foo
+          span.sectnum 1.
+          span.sp &nbsp;
+          |Foo
         .sectionbody: .paragraph: p content
       .sect1
-        h2#_bar 2. Bar
+        h2#_bar
+          span.sectnum 2.
+          span.sp &nbsp;
+          |Bar
         .sectionbody
           .paragraph: p
             |refer to

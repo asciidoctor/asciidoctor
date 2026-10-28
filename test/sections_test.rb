@@ -1520,13 +1520,17 @@ context 'Sections' do
       text
       EOS
 
-      output = convert_string input
-      assert_xpath '//h2[@id="_section_1"][starts-with(text(), "1. ")]', output, 1
-      assert_xpath '//h3[@id="_section_1_1"][starts-with(text(), "1.1. ")]', output, 1
-      assert_xpath '//h4[@id="_section_1_1_1"][starts-with(text(), "1.1.1. ")]', output, 1
-      assert_xpath '//h2[@id="_section_2"][starts-with(text(), "2. ")]', output, 1
-      assert_xpath '//h3[@id="_section_2_1"][starts-with(text(), "2.1. ")]', output, 1
-      assert_xpath '//h3[@id="_section_2_2"][starts-with(text(), "2.2. ")]', output, 1
+      output = convert_string input, plain_sectnums: false
+      assert_css 'h2#_section_1 > span.sectnum:first-child', output, 1
+      assert_css 'h2#_section_1 > span.sectnum:first-child + .sp', output, 1
+      assert_xpath '//h2[@id="_section_1"]/span[@class="sectnum"][text()="1."]', output, 1
+      assert_xpath %(//h2[@id="_section_1"]/span[@class="sp"][text()="\u00a0"]), output, 1
+      assert_xpath %(//h2[@id="_section_1"][normalize-space()="1.\u00a0Section_1"]), output, 1
+      assert_xpath %(//h3[@id="_section_1_1"][starts-with(normalize-space(), "1.1.\u00a0")]), output, 1
+      assert_xpath %(//h4[@id="_section_1_1_1"][starts-with(normalize-space(), "1.1.1.\u00a0")]), output, 1
+      assert_xpath %(//h2[@id="_section_2"][starts-with(normalize-space(), "2.\u00a0")]), output, 1
+      assert_xpath %(//h3[@id="_section_2_1"][starts-with(normalize-space(), "2.1.\u00a0")]), output, 1
+      assert_xpath %(//h3[@id="_section_2_2"][starts-with(normalize-space(), "2.2.\u00a0")]), output, 1
     end
 
     test 'should output section numbers when numbered attribute is set' do
@@ -2019,7 +2023,7 @@ context 'Sections' do
         end
       end
 
-      output = doc.convert standalone: false
+      output = unwrap_sectnums doc.convert standalone: false
       assert_xpath '//h2[text()="2. Somewhere in the Middle"]', output, 1
       assert_xpath '//h2[text()="3. A Bit Later"]', output, 1
       assert_xpath '//h2[text()="4. Nearing the End"]', output, 1
@@ -2989,16 +2993,20 @@ context 'Sections' do
 
       That's all she wrote!
       EOS
-      output = convert_string input
+      output = convert_string input, plain_sectnums: false
       assert_xpath '//*[@id="header"]//*[@id="toc"][@class="toc"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Table of Contents"]', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul', output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]//ul', output, 2
       assert_xpath '//*[@id="header"]//*[@id="toc"]//li', output, 4
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][text()="1. Section One"]', output, 1
+      assert_css '#header #toc ul > li:first-child > a[href="#_section_one"] > .sectnum:first-child', output, 1
+      assert_css '#header #toc ul > li:first-child > a[href="#_section_one"] > .sectnum:first-child + .sp', output, 1
+      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"]/span[@class="sectnum"][text()="1."]', output, 1
+      assert_xpath %(//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"]/span[@class="sp"][text()="\u00a0"]), output, 1
+      assert_xpath %(//*[@id="header"]//*[@id="toc"]/ul/li[1]/a[@href="#_section_one"][normalize-space()="1.\u00a0Section One"]), output, 1
       assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li', output, 1
-      assert_xpath '//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][text()="2.1. Interlude"]', output, 1
-      assert_xpath '((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][text()="3. Section Three"]', output, 1
+      assert_xpath %(//*[@id="header"]//*[@id="toc"]/ul/li/ul/li/a[@href="#_interlude"][normalize-space()="2.1.\u00a0Interlude"]), output, 1
+      assert_xpath %(((//*[@id="header"]//*[@id="toc"]/ul)[1]/li)[3]/a[@href="#_section_three"][normalize-space()="3.\u00a0Section Three"]), output, 1
     end
 
     test 'should output a table of contents that honors numbered setting at position of section in document' do
