@@ -159,7 +159,7 @@ class Parser
       end
       document.header.source_location = source_location if source_location
       # default to compat-mode if document has setext doctitle
-      doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
+      document.set_attribute 'compat-mode' unless atx
       if (separator = block_attrs['separator'])
         doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
       end
