@@ -907,7 +907,8 @@ class Document < AbstractBlock
       false
     else
       @attributes.delete name
-      @attributes_modified << name
+      # NOTE if @header_attributes is set, we're beyond the document header
+      @attributes_modified << name unless @header_attributes
       true
     end
   end
