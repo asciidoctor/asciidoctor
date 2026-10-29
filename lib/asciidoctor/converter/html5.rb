@@ -364,15 +364,12 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         if slevel < 2 && node.document.doctype == 'book'
           case section.sectname
           when 'chapter'
-            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
+            stitle = %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{sectnum_span section.sectnum}#{section.title})
           when 'part'
-            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
-          else
-            stitle = %(#{section.sectnum} #{section.title})
+            stitle = %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{sectnum_span section.sectnum nil, ':'}#{section.title})
           end
-        else
-          stitle = %(#{section.sectnum} #{section.title})
         end
+        stitle ||= %(#{sectnum_span section.sectnum}#{section.title})
       else
         stitle = section.title
       end
@@ -399,15 +396,12 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       if level < 2 && node.document.doctype == 'book'
         case node.sectname
         when 'chapter'
-          title = %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{node.sectnum} #{node.title})
+          title = %(#{(signifier = doc_attrs['chapter-signifier']) ? "#{signifier} " : ''}#{sectnum_span node.sectnum}#{node.title})
         when 'part'
-          title = %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{node.sectnum nil, ':'} #{node.title})
-        else
-          title = %(#{node.sectnum} #{node.title})
+          title = %(#{(signifier = doc_attrs['part-signifier']) ? "#{signifier} " : ''}#{sectnum_span node.sectnum nil, ':'}#{node.title})
         end
-      else
-        title = %(#{node.sectnum} #{node.title})
       end
+      title ||= %(#{sectnum_span node.sectnum}#{node.title})
     else
       title = node.title
     end
@@ -1395,6 +1389,10 @@ Your browser does not support the video tag.
 
   def respond_to_missing? id, *options
     !((name = id.to_s).start_with? 'convert_') && (handles? name)
+  end
+
+  def sectnum_span sectnum
+    %(<span class="sectnum">#{sectnum}</span><span class="sp">&nbsp;</span>)
   end
 end
 end

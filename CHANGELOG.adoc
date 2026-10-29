@@ -45,6 +45,7 @@ Enhancements::
   * Propogate role on document to h1 tag in embedded HTML output (#4837)
   * Add `nopip` option to video macro to disable picture in picture functionality (#3935)
   * Introduce `create_base_formatter` method on Rouge adapter to create the undecorated formatter to allow it to be patched (#4885)
+  * Enclose section number in `span.sectnum` tag and use no-break space enclosed in `span.sp` tag instead of raw space after section number to prevent wrap (#4905)
 
 Compliance::
 
