@@ -297,6 +297,8 @@ class Document < AbstractBlock
       # a direct assignment effectively makes the attribute a constant
       # a nil value or name with leading or trailing ! will result in the attribute being unassigned
       @attribute_overrides = attr_overrides = {}
+      # track names of attributes specified via the API, since soft set/unset attributes are removed from overrides
+      @api_attribute_names = api_attr_names = ::Set.new
       (options[:attributes] || {}).each do |key, val|
         if key.end_with? '@'
           if key.start_with? '!'
@@ -311,7 +313,8 @@ class Document < AbstractBlock
         elsif key.end_with? '!'
           key, val = key.chop, val == '@' ? false : nil
         end
-        attr_overrides[key.downcase] = val
+        api_attr_names << (key = key.downcase)
+        attr_overrides[key] = val
       end
       if ::String === (to_file = options[:to_file])
         attr_overrides['outfilesuffix'] = Helpers.extname to_file
@@ -338,6 +341,9 @@ class Document < AbstractBlock
     @parsed = @reftexts = @header = @header_attributes = nil
     @counters = {}
     @attributes_modified = ::Set.new
+    # NOTE @attributes_modified only tracks attributes assigned in the header (and some entries get removed internally);
+    # @attributes_specified tracks every attribute set or unset in the document (header or body) for attr_specified?
+    @attributes_specified = ::Set.new
     @docinfo_processor_extensions = {}
     standalone = options[:standalone]
     (@options = options).freeze
@@ -875,6 +881,7 @@ class Document < AbstractBlock
   # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
     return if attribute_locked? name
+    @attributes_specified << name
     value = apply_attribute_value_subs value unless value.empty?
     # NOTE if @header_attributes is set, we're beyond the document header
     if @header_attributes
@@ -907,6 +914,7 @@ class Document < AbstractBlock
       false
     else
       @attributes.delete name
+      @attributes_specified << name
       # NOTE if @header_attributes is set, we're beyond the document header
       unless @header_attributes
         @attributes_modified << name
@@ -923,6 +931,19 @@ class Document < AbstractBlock
   # Returns true if the attribute is locked, false otherwise
   def attribute_locked? name
     @attribute_overrides.key? name
+  end
+
+  # Public: Determine if the attribute has been set or unset, either in the document (e.g., :!name: in the header)
+  # or in the API/CLI attributes, including in the parent document of a nested document.
+  #
+  # Unlike attr?, this method distinguishes between an attribute that was never set and one that was explicitly unset.
+  #
+  # name - The String attribute name to check
+  #
+  # Returns true if the attribute has been set or unset, false otherwise
+  def attr_specified? name
+    (attribute_locked? name) || (@attributes_specified.include? name) ||
+      (nested? ? (@parent_document.attr_specified? name) : (@api_attribute_names.include? name))
   end
 
   # Public: Assign a value to the specified attribute in the document header.

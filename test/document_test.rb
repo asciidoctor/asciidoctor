@@ -502,6 +502,76 @@ context 'Document' do
       assert_xpath '//p[text()="\'quoted string\'"]', result, 1
     end
 
+    test 'attr_specified? should return false if attribute is never set or unset' do
+      doc = document_from_string 'content'
+      refute doc.attr_specified? 'show-link-uri'
+    end
+
+    test 'attr_specified? should return true if attribute is set or unset in document' do
+      input = <<~'EOS'
+      = Document Title
+      :show-link-uri:
+      :!hyphens:
+
+      content
+      EOS
+
+      doc = document_from_string input
+      assert doc.attr_specified? 'show-link-uri'
+      assert doc.attr_specified? 'hyphens'
+      refute doc.attr_specified? 'outline'
+    end
+
+    test 'attr_specified? should return true if attribute is set or unset in body of document' do
+      input = <<~'EOS'
+      = Document Title
+
+      :!show-link-uri:
+
+      content
+      EOS
+
+      doc = document_from_string input
+      assert doc.attr_specified? 'show-link-uri'
+    end
+
+    test 'attr_specified? should return true if attribute is set or unset via API' do
+      doc = document_from_string 'content', attributes: { 'show-link-uri' => '', 'hyphens' => nil, '!outline' => '' }
+      assert doc.attr_specified? 'show-link-uri'
+      assert doc.attr_specified? 'hyphens'
+      assert doc.attr_specified? 'outline'
+      refute doc.attr_specified? 'pagenums'
+    end
+
+    test 'attr_specified? should return true if attribute is soft set or soft unset via API' do
+      attributes = { 'show-link-uri' => '@', 'hyphens@' => '', '!outline@' => '', 'pagenums!' => '@', 'preface-title!@' => '' }
+      doc = document_from_string 'content', attributes: attributes
+      assert doc.attr_specified? 'show-link-uri'
+      assert doc.attr_specified? 'hyphens'
+      assert doc.attr_specified? 'outline'
+      assert doc.attr_specified? 'pagenums'
+      assert doc.attr_specified? 'preface-title'
+      refute doc.attr_specified? 'chapter-signifier'
+    end
+
+    test 'attr_specified? should consult parent document of nested document' do
+      input = <<~'EOS'
+      = Document Title
+      :!show-link-uri:
+
+      |===
+      a|nested content
+      |===
+      EOS
+
+      doc = document_from_string input, attributes: { 'hyphens@' => '' }
+      nested_doc = (doc.find_by context: :table)[0].rows.body[0][0].inner_document
+      assert nested_doc.nested?
+      assert nested_doc.attr_specified? 'show-link-uri'
+      assert nested_doc.attr_specified? 'hyphens'
+      refute nested_doc.attr_specified? 'outline'
+    end
+
     test 'should apply max-width to each top-level container' do
       input = <<~'EOS'
       = Document Title
