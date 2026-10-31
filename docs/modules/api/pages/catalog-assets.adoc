@@ -15,7 +15,7 @@ When this feature is enabled, the processor catalogs the following assets:
 * links (but not xrefs) (key: `:links`)
 * block or inline images (key: `:images`)
 
-The processor always cataloged the following assets, regardless of this setting:
+The processor always catalogs the following assets, regardless of this setting:
 
 * block or inline anchors (key: `:refs`)
 * footnotes (key: `:footnotes`)
