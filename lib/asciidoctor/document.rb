@@ -289,6 +289,7 @@ class Document < AbstractBlock
         footnotes: [],
         links: [],
         images: [],
+        indexterms: IndexCatalog.new,
         callouts: Callouts.new,
         includes: {},
       }
@@ -601,6 +602,8 @@ class Document < AbstractBlock
       ref
     when :footnotes
       @catalog[type] << value
+    when :indexterms
+      @catalog[:indexterms].store_term value.pop, value
     else
       @catalog[type] << (type == :images ? (ImageReference.new value, @attributes['imagesdir']) : value) if @options[:catalog_assets]
     end

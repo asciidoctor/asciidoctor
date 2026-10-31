@@ -445,7 +445,10 @@ module Substitutors
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm:[Tigers,Big cats]
-          if (attrlist = normalize_text $2, true, true).include? '='
+          if (attrlist = normalize_text $2, true, true).include? '<'
+            attrlist = (attrlist.gsub XmlSanitizeRx, '').squeeze(' ').strip
+          end
+          if attrlist.include? '='
             if (primary = (attrs = (AttributeList.new attrlist, self).parse)[1])
               terms = [primary]
               if (secondary = attrs[2])
@@ -462,21 +465,27 @@ module Substitutors
               attrs = { 'terms' => attrlist }
             end
           else
-            attrs = { 'terms' => (split_simple_csv attrlist) }
+            attrs = { 'terms' => (terms = split_simple_csv attrlist) }
           end
-          (Inline.new self, :indexterm, nil, attributes: attrs).convert
+          (Inline.new self, :indexterm, nil, id: (doc.register :indexterms, (terms << self)), attributes: attrs).convert
         when 'indexterm2'
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
           # indexterm2:[Tigers]
-          if (term = normalize_text $2, true, true).include? '='
+          if (term = visible_term = normalize_text $2, true, true).include? '<'
+            term = (visible_term.gsub XmlSanitizeRx, '').squeeze(' ').strip
+          end
+          if term.include? '='
             term = (attrs = (AttributeList.new term, self).parse)[1] || (attrs = nil) || term
-            if attrs && (see_also = attrs['see-also'])
-              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
+            if attrs
+              if (see_also = attrs['see-also'])
+                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
+              end
+              visible_term = (AttributeList.new visible_term, self).parse[1]
             end
           end
-          (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
+          (Inline.new self, :indexterm, visible_term, id: (doc.register :indexterms, [term, self]), attributes: attrs, type: :visible).convert
         else
           encl_text = $3
           # honor the escape
@@ -502,20 +511,28 @@ module Substitutors
           end
           if visible
             # ((Tigers))
-            if (term = normalize_text encl_text, true).include? ';&'
+            if (term = visible_term = normalize_text encl_text, true).include? '<'
+              term = (visible_term.gsub XmlSanitizeRx, '').squeeze(' ').strip
+            end
+            if term.include? ';&'
               if term.include? ' &gt;&gt; '
                 term, _, see = term.partition ' &gt;&gt; '
+                visible_term = (visible_term.split ' &gt;&gt; ', 2)[0]
                 attrs = { 'see' => see }
               elsif term.include? ' &amp;&gt; '
                 term, *see_also = term.split ' &amp;&gt; '
+                visible_term = (visible_term.split ' &amp;&gt; ', 2)[0]
                 attrs = { 'see-also' => see_also }
               end
             end
-            subbed_term = (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
+            subbed_term = (Inline.new self, :indexterm, visible_term, id: (doc.register :indexterms, [term, self]), attributes: attrs, type: :visible).convert
           else
             # (((Tigers,Big cats)))
             attrs = {}
-            if (terms = normalize_text encl_text, true).include? ';&'
+            if (terms = normalize_text encl_text, true).include? '<'
+              terms = (terms.gsub XmlSanitizeRx, '').squeeze(' ').strip
+            end
+            if terms.include? ';&'
               if terms.include? ' &gt;&gt; '
                 terms, _, see = terms.partition ' &gt;&gt; '
                 attrs['see'] = see
@@ -524,8 +541,8 @@ module Substitutors
                 attrs['see-also'] = see_also
               end
             end
-            attrs['terms'] = split_simple_csv terms
-            subbed_term = (Inline.new self, :indexterm, nil, attributes: attrs).convert
+            attrs['terms'] = terms = split_simple_csv terms
+            subbed_term = (Inline.new self, :indexterm, nil, id: (doc.register :indexterms, (terms << self)), attributes: attrs).convert
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end
