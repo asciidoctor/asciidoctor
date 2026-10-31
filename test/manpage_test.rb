@@ -28,6 +28,7 @@ context 'Manpage' do
       assert_equal 'man', doc.attributes['filetype']
       assert_equal '', doc.attributes['filetype-man']
       assert_equal '1', doc.attributes['manvolnum']
+      assert_equal '', doc.attributes['manvoldir']
       assert_equal '.1', doc.attributes['outfilesuffix']
       assert_equal 'command', doc.attributes['manname']
       assert_equal 'command', doc.attributes['mantitle']
