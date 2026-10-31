@@ -388,7 +388,7 @@ module Asciidoctor
   #
   #   1*h,2*,^3e
   #
-  ColumnSpecRx = /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?|~)?([a-z])?$/
+  ColumnSpecRx = /^(?:(\d+)\*)?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?(\d+%?|~)?([a-z])?(?:\[(#{CC_ANY}+)\])?$/
 
   # Parses the start and end of a cell spec (i.e., cellspec) for a table.
   #
@@ -397,8 +397,8 @@ module Asciidoctor
   #   2.3+<.>m
   #
   # FIXME use step-wise scan (or treetop) rather than this mega-regexp
-  CellSpecStartRx = /^[ \t]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
-  CellSpecEndRx = /[ \t]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?$/
+  CellSpecStartRx = /^[ \t]*(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?(?:\[(#{CC_ANY}+)\])?$/
+  CellSpecEndRx = /[ \t]+(?:(\d+(?:\.\d*)?|(?:\d*\.)?\d+)([*+]))?([<^>](?:\.[<^>]?)?|(?:[<^>]?\.)?[<^>])?([a-z])?(?:\[(#{CC_ANY}+)\])?$/
 
   # Block macros
 
