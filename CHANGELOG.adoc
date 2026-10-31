@@ -94,6 +94,7 @@ Improvements::
 
 Bug Fixes::
 
+  * Don't generate an empty section ID when the title contains no word characters (#4877)
   * When skip-front-matter document attribute is set, only skip front matter in primary document, not included content (#3437)
   * When normalizing toclevels, detect part even when book starts with special section (#4814)
   * Add parts at correct level in TOC even when book starts with special section (#2262)
