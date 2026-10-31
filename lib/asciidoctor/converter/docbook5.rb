@@ -488,8 +488,8 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_video node
-    # NOTE videos hosted by a third-party service are not yet supported
-    return '' if (poster = node.attr 'poster') == 'vimeo' || poster == 'youtube' || poster == 'wistia'
+    # NOTE videos hosted by a third-party service are not supported
+    return if (poster = node.attr 'poster') == 'vimeo' || poster == 'youtube' || poster == 'wistia'
     start_t = node.attr 'start'
     end_t = node.attr 'end'
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''

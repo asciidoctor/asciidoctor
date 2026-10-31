@@ -3358,10 +3358,16 @@ This is just an open block.
       assert_xpath '//videodata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
     end
 
-    test 'should append time anchor to fileref of videodata in DocBook if start or end attribute is set' do
-      input = 'video::cats-vs-dogs.avi[start=10,end=20]'
+    test 'should append time anchor to fileref of videodata in DocBook if start attribute is set' do
+      input = 'video::cats-vs-dogs.avi[start=10]'
       output = convert_string_to_embedded input, backend: 'docbook'
-      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=10,20"]', output, 1
+      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=10"]', output, 1
+    end
+
+    test 'should append time anchor to fileref of videodata in DocBook if end attribute is set' do
+      input = 'video::cats-vs-dogs.avi[end=20]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=,20"]', output, 1
     end
 
     test 'should not convert video hosted by a third-party service in DocBook' do
