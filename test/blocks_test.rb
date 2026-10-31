@@ -3345,17 +3345,19 @@ This is just an open block.
       assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
     end
 
-    test 'should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
+    test 'wip should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
       input = <<~'EOS'
       :imagesdir: assets
       [#cats-vs-dogs]
       .Cats vs Dogs
-      video::cats-vs-dogs.avi[width=200,height=300,align=center]
+      video::cats-vs-dogs.avi[poster=cats-vs-dogs.jpg,width=200,height=300,align=center]
       EOS
       output = convert_string_to_embedded input, backend: 'docbook'
       assert_xpath '/figure[@xml:id="cats-vs-dogs"]/title[text()="Cats vs Dogs"]', output, 1
       assert_xpath '/figure/mediaobject/videoobject/videodata[@fileref="assets/cats-vs-dogs.avi"]', output, 1
       assert_xpath '//videodata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
+      assert_xpath '/figure/mediaobject/imageobject/imagedata[@fileref="assets/cats-vs-dogs.jpg"]', output, 1
+      assert_xpath '//imagedata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
     end
 
     test 'should append time anchor to fileref of videodata in DocBook if start attribute is set' do

@@ -489,15 +489,22 @@ class Converter::DocBook5Converter < Converter::Base
 
   def convert_video node
     # NOTE videos hosted by a third-party service are not supported
-    return if (poster = node.attr 'poster') == 'vimeo' || poster == 'youtube' || poster == 'wistia'
+    case node.attr 'poster'
+    when 'vimeo', 'youtube', 'wistia'
+      return
+    end
     start_t = node.attr 'start'
     end_t = node.attr 'end'
     time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
+    image_size_attrs = image_size_attributes node.attributes
     mediaobject = %(<mediaobject>
 <videoobject>
-<videodata fileref="#{node.media_uri node.attr 'target'}#{time_anchor}"#{image_size_attributes node.attributes}#{align_attribute}/>
-</videoobject>
+<videodata fileref="#{node.media_uri node.attr 'target'}#{time_anchor}"#{image_size_attrs}#{align_attribute}/>
+</videoobject>#{(poster = node.attr 'poster').nil_or_empty? ? '' : %(
+<imageobject>
+<imagedata fileref="#{node.media_uri poster}"#{image_size_attrs}#{align_attribute}/>
+</imageobject>)}
 </mediaobject>)
     if node.title?
       %(<figure#{common_attributes node.id, node.role, node.reftext}>

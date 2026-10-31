@@ -20,7 +20,6 @@ This project utilizes semantic versioning.
 
 Enhancements::
 
-  * Convert video block to `<videoobject>` in DocBook converter when video is a local file or URL (#3607)
   * Introduce 4+ tilde (`~`) delimiter for open blocks; restrict masquerading to partintro and abstract (#1121)
   * Allow the CLI to control the logging level using the `--log-level` option (#3868)
   * Ignore `--log-level` CLI option if `-q` is specified; ignore `-v` CLI option if `--log-level` is specified (#3868)
@@ -46,6 +45,7 @@ Enhancements::
   * Propogate role on document to h1 tag in embedded HTML output (#4837)
   * Add `nopip` option to video macro to disable picture in picture functionality (#3935)
   * Introduce `create_base_formatter` method on Rouge adapter to create the undecorated formatter to allow it to be patched (#4885)
+  * Convert video block to `<videoobject>` in DocBook converter when video is a local file or URL (#3607) (*@ggrossetie*)
 
 Compliance::
 
