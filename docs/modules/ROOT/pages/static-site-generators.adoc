@@ -1,0 +1,103 @@
+= Static Site Generators
+
+Asciidoctor fundamentally converts one source document into one output document.
+To convert more than one document, you need some amount of infrastructure.
+Simple situations may find it convenient to use built-in Asciidoctor capabilities or scripts, but are unlikely to be appropriate for any but the smallest sites.
+A `'static site generator`' (SSG) organizes the conversion of multiple source documents into a functioning static web site.
+
+== What does a static site generator do?
+
+A static site generator gathers sources from one or more locations, transforms them, and organizes the resulting static assets into a complete site ready for deployment directly to a web server.
+Typical source locations are the local file system, remote Git repositories, and artifact repositories such as those used by Maven, e.g. Nexus.
+The most common transformations are converting source from text representations such as AsciiDoc or Markdown to HTML and embedding the results in additional HTML markup to supply a site theme and navigation.
+Other transformations include generating diagram images from text sources and optimizing images.
+Navigation resources can be generated from explicit source or automatically.
+
+Some static site generators include features specifically targeted to particular website styles such as blogs.
+
+== What is Asciidoctor's role in static site generation?
+
+Asciidoctor is used in static site generators to transform source documents in AsciiDoc into HTML.
+Usually this is embedded in "outer HTML" supplied by a template to produce an output page.
+Some static site generators also use specific AsciiDoc input for novel purposes, such as to generate navigation resources.
+It would also be possible to utilize the Document Object Model block structure generated before conversion to HTML, but this is likely to tie a static site generator too tightly to AsciiDoc.
+
+From this point of view, Asciidoctor should not be concerned in any way with file system references, treating them as uninterpreted tokens and delegating interpretation to the static site generator.
+Since this is not currently the case, a variety of workarounds are often needed to produce correct outputs from correct inputs.
+
+AsciiDoc natively has (page) attributes which may be supplied from the code calling Asciidoctor or set in the document header or body.
+Site generators have information about the context of page conversion and can translate this information into contextual page attributes, thus providing the ability to show page context in the transformed page itself.
+On the other hand, the template system wrapping the embedded HTML produced by Asciidoctor generally has some concept of variables to display in the template. Usually certain AsciiDoc attributes defined in the header are made available as such "page variables".
+
+== Static site generators associated with the Asciidoctor project
+
+=== https://docs.antora.org[Antora]
+
+Antora (written in JavaScript/Node, using Asciidoctor.js) has the distinction of being the only static site generator constructed originally to natively support Asciidoctor.
+It is designed around a processing pipeline with well-defined stages.
+While there are several ways it could be extensible solely through configuration, currently modifying or extending it involves a straightforward code modification of the pipeline and adding a stage or modifying one of the existing stages.
+
+Sources can be in any number of Git repositories or local file system trees.
+These are combined, independent of the source, into components which end up as top-level divisions of the generated site.
+Source trees are laid out in a logical arrangement that well separates concerns and the source arrangement is mapped to the site structure.
+
+Antora supplies Asciidoctor extensions with extensive context information about the file being processed and the set of source files.
+
+AsciiDoc pages transformed to embeddable HTML are wrapped using resources, including templates, from a separately constructed UI bundle.
+Header attributes beginning with `page-` are made available as variables in the template system.
+The UI bundle may contain additional Javascript helper functions that can access variables from the page as well as global context information.
+
+Antora does not support multi-language sites and support is not amenable to implementation through an extension.
+
+Antora does not support blog-like sites natively but support can easily be added through the extension mechanism.
+
+=== xref:jekyll-integration::index.adoc[Jekyll integration]
+
+The Asciidoctor Jekyll integration (Ruby) consists of a Jekyll plugin that uses Asciidoctor to transform source to HTML.
+
+Jekyll supports sources from a single file system tree.
+There is limited location mapping support using a `permalink` page variable.
+
+Layout templates, in the `Liquid` template system, are part of a Jekyll site project.
+Header attributes beginning with `page-` are made available to the template system.
+
+Jekyll does not support multi-language sites in any obvious way.
+
+Jekyll has some native blog support, although this does not affect it's use of Asciidoctor.
+
+=== xref:maven-tools::index.adoc[Maven-tools] and https://asciidoctor.github.io/asciidoctor-gradle-plugin/development-3.x/user-guide/[Gradle Plugin]
+
+Maven is a very flexible build system and the maven-tools project allows use as a somewhat limited site generator in several ways.
+The more direct usage is page-by-page of generation complete pages by AsciidoctorJ, with no surrounding templating.
+It is also possible to use the, for practical purposes undocumented, Doxia site generator, generating embeddable HTML wrapped with Velocity templates configured by some combination of xml and Java code.
+I have been unable to determine whether any "page catalog" information is available to assist in generating the wrapper.
+
+Using suitable maven plugins it's possible to pull sources in as artifacts from a maven repository.
+
+There appears to be no way to use document header attributes as template variables.
+
+Similarly, for the comparably flexible Gradle build system, the Gradle plugin provides very extensive configuration for AsciidoctorJ via Groovy code and supports page-by-page generation.
+There appears to be no support for generating embeddable HTML with AsciidoctorJ and wrapping it in "outer HTML" from a template system.
+The Gradle plugin supports some multi-language capabilities.
+
+Neither plugin provides blog support.
+
+=== https://github.com/middleman/middleman-asciidoc[Middleman integration]
+
+The Asciidoctor Middleman integration (Ruby) consists of a Middleman plugin that uses Asciidoctor to transform source to HTML.
+
+Configuration of Middleman is done through ruby scripting.
+
+Middleman supports sources from a single file system tree.
+It is possible to install an extension providing limited location mapping support using a `permalink` page variable.
+
+Layout templates are part of a Middleman site project.
+Header attributes beginning with `page-` are made available to the template system.
+
+Middleman does not support multi-language sites in any obvious way.
+
+Middleman has some native blog support, although this does not affect it's use of Asciidoctor.
+
+=== Unaffiliated site generators
+
+A community-maintained list of site generators using Asciidoctor in some capability is https://gist.github.com/briandominick/e5754cc8438dd9503d936ef65fffbb2d[here].
