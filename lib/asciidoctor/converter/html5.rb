@@ -15,16 +15,10 @@ class Converter::Html5Converter < Converter::Base
     mark: ['<mark>', '</mark>', true],
     superscript: ['<sup>', '</sup>', true],
     subscript: ['<sub>', '</sub>', true],
-    asciimath: ['\$', '\$'],
-    latexmath: ['\(', '\)'],
-    # Opal can't resolve these constants when referenced here
-    #asciimath: INLINE_MATH_DELIMITERS[:asciimath] + [false],
-    #latexmath: INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
   LeadingAnchorsRx = %r(^(?:<a id="[^"]+"></a>)+)
-  StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
     SvgPreambleRx = /^#{CC_ALL}*?(?=<svg[\s>])/
@@ -159,9 +153,8 @@ class Converter::Html5Converter < Converter::Base
     if (syntax_hl = node.syntax_highlighter)
       result << (syntax_hl_docinfo_head_idx = result.size)
     end
-    if (stem_adpt = node.stem_adapter)
-      result << (stem_adpt_docinfo_head_idx = result.size)
-    end
+    stem_it = resolve_stem_interpreter node
+    result << (stem_it_docinfo_head_idx = result.size)
 
     unless (docinfo_content = node.docinfo).empty?
       result << docinfo_content
@@ -260,22 +253,21 @@ class Converter::Html5Converter < Converter::Base
         result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
       else
         result.delete_at syntax_hl_docinfo_head_idx
-        stem_adpt_docinfo_head_idx -= 1 if stem_adpt
+        stem_it_docinfo_head_idx -= 1
       end
       if syntax_hl.docinfo? :footer
         result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
-    if stem_adpt
-      if stem_adpt.docinfo? :head
-        result[stem_adpt_docinfo_head_idx] = stem_adpt.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
-      else
-        result.delete_at stem_adpt_docinfo_head_idx
-      end
-      if stem_adpt.docinfo? :footer
-        result << (stem_adpt.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
-      end
+    # NOTE only insert docinfo if stem attribute is still set (an extension may unset it if it handles STEM content)
+    if (stem_enabled = node.attr? 'stem') && (stem_it.docinfo? :head)
+      result[stem_it_docinfo_head_idx] = stem_it.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
+    else
+      result.delete_at stem_it_docinfo_head_idx
+    end
+    if stem_enabled && (stem_it.docinfo? :footer)
+      result << (stem_it.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -694,26 +686,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    return node.document.stem_adapter.format node if node.document.stem_adapter
-    id_attribute = node.id ? %( id="#{node.id}") : ''
-    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
-    if (equation = node.content)
-      if style == :asciimath && (equation.include? LF)
-        br = %(#{LF}<br#{@void_element_slash}>)
-        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
-      end
-      unless (equation.start_with? open) && (equation.end_with? close)
-        equation = %(#{open}#{equation}#{close})
-      end
-    else
-      equation = ''
-    end
-    %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
-#{title_element}<div class="content">
-#{equation}
-</div>
-</div>)
+    (resolve_stem_interpreter node).format node
   end
 
   def convert_olist node
@@ -1281,33 +1254,23 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_quoted node
-    if (node.type == :asciimath || node.type == :latexmath) && (stem_adpt = node.document.stem_adapter)
-      content = stem_adpt.convert node
-      if node.id
-        %(<span id="#{node.id}"#{node.role ? %( class="#{node.role}") : ''}>#{content}</span>)
-      elsif node.role
-        %(<span class="#{node.role}">#{content}</span>)
+    open, close, tag = QUOTE_TAGS[type = node.type]
+    text = type == :asciimath || type == :latexmath ? ((resolve_stem_interpreter node).convert node) : node.text
+    if node.id
+      class_attr = node.role ? %( class="#{node.role}") : ''
+      if tag
+        %(#{open.chop} id="#{node.id}"#{class_attr}>#{text}#{close})
       else
-        content
+        %(<span id="#{node.id}"#{class_attr}>#{open}#{text}#{close}</span>)
+      end
+    elsif node.role
+      if tag
+        %(#{open.chop} class="#{node.role}">#{text}#{close})
+      else
+        %(<span class="#{node.role}">#{open}#{text}#{close}</span>)
       end
     else
-      open, close, tag = QUOTE_TAGS[node.type]
-      if node.id
-        class_attr = node.role ? %( class="#{node.role}") : ''
-        if tag
-          %(#{open.chop} id="#{node.id}"#{class_attr}>#{node.text}#{close})
-        else
-          %(<span id="#{node.id}"#{class_attr}>#{open}#{node.text}#{close}</span>)
-        end
-      elsif node.role
-        if tag
-          %(#{open.chop} class="#{node.role}">#{node.text}#{close})
-        else
-          %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
-        end
-      else
-        %(#{open}#{node.text}#{close})
-      end
+      %(#{open}#{text}#{close})
     end
   end
 
@@ -1387,6 +1350,11 @@ Your browser does not support the video tag.
   # NOTE adapt to older converters that relied on unprefixed method names
   def method_missing id, *args
     !((name = id.to_s).start_with? 'convert_') && (handles? name) ? (send %(convert_#{name}), *args) : super
+  end
+
+  # NOTE the document only precomputes the interpreter if the basebackend is html and the header has been processed
+  def resolve_stem_interpreter node
+    node.document.stem_interpreter || (StemInterpreter.create 'mathjax2', @backend, document: node.document)
   end
 
   def respond_to_missing? id, *options

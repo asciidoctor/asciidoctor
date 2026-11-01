@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Asciidoctor
-class StemAdapter::MathJaxAdapter
-  include StemAdapter
+class StemInterpreter::MathJax2Adapter
+  include StemInterpreter
 
-  register_for 'mathjax'
+  register_for 'mathjax2'
 
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
 

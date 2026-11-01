@@ -40,16 +40,17 @@ You can explore these integrations in depth on the xref:mathjax.adoc[], xref:mat
 
 If you're planning to convert to DocBook to leverage the DocBook toolchain, be sure to consider xref:docbook.adoc[] when deciding which STEM notation to use in your AsciiDoc document.
 
-== STEM adapter facility
+== STEM interpreter
 
-When converting to HTML, Asciidoctor uses a pluggable STEM adapter to handle STEM processing.
-The built-in adapter integrates with MathJax.
-You can replace it with an alternate adapter — such as one for KaTeX — by setting the `stem-adapter` document attribute.
+When converting to HTML, Asciidoctor delegates the processing of STEM expressions to a STEM interpreter.
+The default interpreter, `mathjax2`, integrates with MathJax 2.
+You can replace it with an alternate interpreter, such as KaTeX, by setting the `stem-interpreter` document attribute to the name the interpreter's adapter is registered for.
 
- :stem-adapter: katex
+ :stem-interpreter: katex
 
-If `stem-adapter` is not set, Asciidoctor uses the built-in MathJax adapter by default whenever the `stem` attribute is set.
+If the `stem-interpreter` attribute is not set, or its value doesn't match a registered adapter, Asciidoctor uses the `mathjax2` interpreter.
 
-A STEM adapter controls three integration points: how the STEM content is converted (including delimiters), how the enclosing block element is formatted, and what markup is injected into the document head and footer (e.g., a stylesheet or rendering script).
+A STEM interpreter adapter controls three integration points: how the STEM content is converted (including delimiters), how the enclosing block element is formatted, and what markup is injected into the document head and footer (e.g., a stylesheet or rendering script).
+This markup is only injected if the `stem` attribute is set.
 
-See xref:custom-adapter.adoc[] to learn how to implement and register a custom STEM adapter.
+See xref:custom-adapter.adoc[] to learn how to implement and register a STEM interpreter adapter.
