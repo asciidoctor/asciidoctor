@@ -49,6 +49,7 @@ You can replace it with an alternate interpreter, such as KaTeX, by setting the 
  :stem-interpreter: katex
 
 If the `stem-interpreter` attribute is not set, or its value doesn't match a registered adapter, Asciidoctor uses the `mathjax2` interpreter.
+If the safe mode is `SERVER` or higher, the document can't set this attribute, so you must set it from the CLI or API.
 
 A STEM interpreter adapter controls three integration points: how the STEM content is converted (including delimiters), how the enclosing block element is formatted, and what markup is injected into the document head and footer (e.g., a stylesheet or rendering script).
 This markup is only injected if the `stem` attribute is set.

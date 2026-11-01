@@ -49,8 +49,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
       if (equation = node.content)
         if style == :asciimath && (equation.include? LF)
-          void_element_slash = node.document.attr('htmlsyntax') == 'xml' ? '/' : ''
-          br = %(#{LF}<br#{void_element_slash}>)
+          br = %(#{LF}<br#{opts[:self_closing_tag_slash]}>)
           equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
         end
         unless (equation.start_with? open) && (equation.end_with? close)

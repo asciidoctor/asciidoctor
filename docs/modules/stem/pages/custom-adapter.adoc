@@ -9,15 +9,17 @@ This allows you to replace the built-in MathJax 2 adapter with another library s
 
 To implement a new adapter, create a class that includes the `Asciidoctor::StemInterpreter` module, register the adapter for a name, and implement the required methods.
 
-A STEM interpreter adapter can implement three integration points:
+A STEM interpreter adapter has three integration points.
+The `convert` and `format` methods are required, and the `docinfo?` and `docinfo` methods are optional:
 
 `convert(node, opts = {})`::
 Converts the STEM content of a block or inline node, including adding delimiters.
 Called for both block and inline STEM nodes.
+The `opts` Hash includes `:self_closing_tag_slash`, which is `/` if the converter emits self-closing tags.
 
 `format(node, opts = {})`::
 Formats the enclosing element of a STEM block (e.g., the outer `<div>`).
-Typically calls `convert` internally.
+Typically calls `convert` internally, passing on `opts`.
 
 `docinfo?(location)`::
 Returns `true` if the adapter needs to inject markup at the given location (`:head` or `:footer`).
@@ -28,6 +30,7 @@ Only called if `docinfo?` returns `true` for that location.
 
 Here's an example of a STEM interpreter adapter for the https://katex.org[KaTeX^] rendering library.
 KaTeX is a client-side STEM interpreter, so the adapter injects a stylesheet in the `<head>` and a script at the end of `<body>`, and wraps each STEM expression in the delimiters KaTeX expects.
+Since KaTeX only understands TeX, this adapter only works for the latexmath notation.
 
 .STEM interpreter adapter for KaTeX
 [,ruby]
@@ -66,9 +69,9 @@ class KaTeXAdapter
   def format node, opts = {}
     id_attribute = node.id ? %( id="#{node.id}") : ''
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    %(<div#{id_attribute} class="stemblock">
+    %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
-#{convert node}
+#{convert node, opts}
 </div>
 </div>)
   end
@@ -76,15 +79,15 @@ end
 ----
 
 Save this code to a file named [.path]_katex-stem-interpreter.rb_.
-Then, require this file when invoking Asciidoctor, set `stem` to activate STEM processing, and set `stem-interpreter=katex` to use your adapter:
+Then, require this file when invoking Asciidoctor, set `stem` to `latexmath` to activate STEM processing using that notation, and set `stem-interpreter=katex` to use your adapter:
 
- $ asciidoctor -r ./katex-stem-interpreter.rb -a stem -a stem-interpreter=katex document.adoc
+ $ asciidoctor -r ./katex-stem-interpreter.rb -a stem=latexmath -a stem-interpreter=katex document.adoc
 
 Or, declare the attributes in the document header:
 
 [,asciidoc]
 ----
-:stem:
+:stem: latexmath
 :stem-interpreter: katex
 ----
 

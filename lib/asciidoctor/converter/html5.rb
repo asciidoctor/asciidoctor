@@ -686,7 +686,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    (resolve_stem_interpreter node).format node
+    (resolve_stem_interpreter node).format node, self_closing_tag_slash: @void_element_slash
   end
 
   def convert_olist node
@@ -1255,7 +1255,7 @@ Your browser does not support the video tag.
 
   def convert_inline_quoted node
     open, close, tag = QUOTE_TAGS[type = node.type]
-    text = type == :asciimath || type == :latexmath ? ((resolve_stem_interpreter node).convert node) : node.text
+    text = type == :asciimath || type == :latexmath ? ((resolve_stem_interpreter node).convert node, self_closing_tag_slash: @void_element_slash) : node.text
     if node.id
       class_attr = node.role ? %( class="#{node.role}") : ''
       if tag

@@ -413,9 +413,10 @@ class Document < AbstractBlock
     end
 
     if @safe >= SafeMode::SERVER
-      # restrict document from setting copycss, source-highlighter and backend
+      # restrict document from setting copycss, source-highlighter, stem-interpreter and backend
       attr_overrides['copycss'] ||= nil
       attr_overrides['source-highlighter'] ||= nil
+      attr_overrides['stem-interpreter'] ||= nil
       attr_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
       if !parent_doc && (attr_overrides.key? 'docfile')
@@ -1256,15 +1257,14 @@ class Document < AbstractBlock
           end
         end
         # NOTE not dependent on stem attribute since STEM blocks and inline macros are always converted by the interpreter
-        stem_it_name = (stem_it_val = attrs['stem-interpreter']).nil_or_empty? ? 'mathjax2' : stem_it_val
-        if (stem_it_factory = @options[:stem_interpreter_factory])
-          @stem_interpreter = stem_it_factory.create stem_it_name, @backend, document: self
-        elsif (stem_its = @options[:stem_interpreters])
-          @stem_interpreter = (StemInterpreter::DefaultFactoryProxy.new stem_its).create stem_it_name, @backend, document: self
-        else
-          @stem_interpreter = StemInterpreter.create stem_it_name, @backend, document: self
+        stem_it_name = attrs['stem-interpreter'].to_s
+        stem_it_name = 'mathjax2' if stem_it_name.empty?
+        unless (stem_it_factory = @options[:stem_interpreter_factory])
+          stem_it_factory = (stem_its = @options[:stem_interpreters]) ? (StemInterpreter::DefaultFactoryProxy.new stem_its) : StemInterpreter
         end
-        @stem_interpreter ||= StemInterpreter.create 'mathjax2', @backend, document: self
+        @stem_interpreter = (stem_it_factory.create stem_it_name, @backend, document: self) ||
+          (stem_it_factory.create 'mathjax2', @backend, document: self) ||
+          (StemInterpreter.create 'mathjax2', @backend, document: self)
       # enable toc and sectnums (i.e., numbered) by default in DocBook backend
       elsif basebackend == 'docbook'
         # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility

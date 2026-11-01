@@ -90,6 +90,55 @@ context 'Stem Interpreter' do
     assert_kind_of interpreter, doc.stem_interpreter
   end
 
+  test 'should not allow document to set stem-interpreter attribute if safe mode is SERVER or higher' do
+    Class.new do
+      include Asciidoctor::StemInterpreter
+      register_for 'katex'
+    end
+
+    [:server, :secure].each do |safe|
+      doc = document_from_string ':stem-interpreter: katex', safe: safe, parse: true
+      assert_equal 'mathjax2', doc.stem_interpreter.name
+      doc = document_from_string '', safe: safe, attributes: { 'stem-interpreter' => 'katex' }, parse: true
+      assert_equal 'katex', doc.stem_interpreter.name
+    end
+  ensure
+    Asciidoctor::StemInterpreter.register nil, 'katex'
+  end
+
+  test 'should not add unknown stem interpreter name to registry' do
+    registry = Asciidoctor::StemInterpreter.send :registry
+    document_from_string '', safe: :safe, attributes: { 'stem-interpreter' => 'never-registered' }, parse: true
+    assert_nil Asciidoctor::StemInterpreter.for 'never-registered'
+    refute_includes (Asciidoctor::StemInterpreter.send :registry).keys, 'never-registered'
+    assert_same registry, (Asciidoctor::StemInterpreter.send :registry)
+  end
+
+  test 'should not fail to load document if value of stem-interpreter attribute is not a String' do
+    Class.new do
+      include Asciidoctor::StemInterpreter
+      register_for 'katex'
+    end
+
+    doc = document_from_string '', safe: :safe, attributes: { 'stem-interpreter' => :katex }, parse: true
+    assert_equal 'katex', doc.stem_interpreter.name
+    doc = document_from_string '', safe: :safe, attributes: { 'stem-interpreter' => true }, parse: true
+    assert_equal 'mathjax2', doc.stem_interpreter.name
+  ensure
+    Asciidoctor::StemInterpreter.register nil, 'katex'
+  end
+
+  test 'should fall back to mathjax2 provided by same factory if stem interpreter is not found' do
+    interpreter = Class.new do
+      include Asciidoctor::StemInterpreter
+    end
+    factory = Asciidoctor::StemInterpreter::CustomFactory.new 'mathjax2' => interpreter
+    doc = document_from_string '', safe: :safe, stem_interpreter_factory: factory, attributes: { 'stem-interpreter' => 'unknown' }, parse: true
+    assert_kind_of interpreter, doc.stem_interpreter
+    doc = document_from_string '', safe: :safe, stem_interpreters: { 'mathjax2' => interpreter }, attributes: { 'stem-interpreter' => 'unknown' }, parse: true
+    assert_kind_of interpreter, doc.stem_interpreter
+  end
+
   test 'should be able to register stem interpreter from interpreter class itself' do
     interpreter = Class.new do
       include Asciidoctor::StemInterpreter
@@ -198,6 +247,22 @@ context 'Stem Interpreter' do
       EOS
       output = convert_string_to_embedded input, safe: :safe, backend: 'xhtml5'
       assert_includes output, %(\\$x^2\\$\n<br/>\n\\$y^2\\$)
+    end
+
+    test 'should use syntax of converter to split multiline asciimath block regardless of htmlsyntax attribute' do
+      input = <<~'EOS'
+      :stem:
+      :htmlsyntax: html
+
+      [stem]
+      ++++
+      x^2
+
+      y^2
+      ++++
+      EOS
+      output = convert_string_to_embedded input, safe: :safe, backend: 'xhtml5'
+      assert_includes output, '<br/>'
     end
 
     test 'should inject MathJax config script before MathJax script' do

@@ -3,12 +3,12 @@
 module Asciidoctor
 # Public: A pluggable adapter for integrating a STEM interpreter into AsciiDoc processing.
 #
-# There are two types of STEM interpreters. The first performs STEM processing during the convert phase.
-# This adapter type must define a convert method to process the content, including adding delimiters,
-# and a format method to generate the enclosing block element. The second assumes STEM processing is
-# performed on the client (e.g., when the HTML document is loaded). This adapter type must define a
-# docinfo? method that returns true. The companion docinfo method will then be called to insert markup
-# into the output document. The docinfo functionality is available to both adapter types.
+# Every adapter must define a convert method to process the content, including adding delimiters, and a
+# format method to generate the enclosing block element. If STEM processing is performed during the convert
+# phase, these methods generate the processed output. If it's performed on the client (e.g., when the HTML
+# document is loaded), these methods only need to prepare the content for the client. In this case, the
+# adapter must also define a docinfo? method that returns true. The companion docinfo method will then be
+# called to insert markup into the output document. The docinfo functionality is available to both cases.
 #
 # Asciidoctor provides a built-in adapter for MathJax 2 (mathjax2), which is used by default. Additional
 # adapters can be registered using StemInterpreter.register or by supplying a custom factory.
@@ -46,7 +46,8 @@ module StemInterpreter
   # Called for both inline STEM nodes (Inline) and block STEM nodes (Block).
   #
   # node - The STEM Block or Inline node being converted.
-  # opts - An optional Hash of options.
+  # opts - An optional Hash of options:
+  #        :self_closing_tag_slash - The String '/' if the converter emits self-closing tags.
   #
   # Returns the converted STEM content [String].
   def convert node, opts = {}
@@ -56,7 +57,8 @@ module StemInterpreter
   # Public: Formats the enclosing element for a STEM block node.
   #
   # node - The STEM Block node being formatted.
-  # opts - An optional Hash of options.
+  # opts - An optional Hash of options:
+  #        :self_closing_tag_slash - The String '/' if the converter emits self-closing tags.
   #
   # Returns the formatted STEM block [String] including the enclosing element and converted content.
   def format node, opts = {}
@@ -149,29 +151,8 @@ module StemInterpreter
       public
 
       def register stem_interpreter, *names
-        @@mutex.owned? ? names.each {|name| @@registry = @@registry.merge name => stem_interpreter } :
-            @@mutex.synchronize { register stem_interpreter, *names }
+        @@mutex.synchronize { names.each {|name| @@registry = @@registry.merge name => stem_interpreter } }
       end
-
-      # This method will lazy require and register additional built-in implementations.
-      # Refer to {Factory#for} for parameters and return value.
-      def for name
-        @@registry.fetch name do
-          @@mutex.synchronize do
-            @@registry.fetch name do
-              if (require_path = PROVIDED[name])
-                require require_path
-                @@registry[name]
-              else
-                @@registry = @@registry.merge name => nil
-                nil
-              end
-            end
-          end
-        end
-      end
-
-      PROVIDED = {}
 
       @@mutex = ::Mutex.new
     end
