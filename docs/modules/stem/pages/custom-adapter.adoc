@@ -96,11 +96,15 @@ Look up the built-in adapter using `Asciidoctor::StemInterpreter.for`, extend it
 
 [,ruby]
 ----
-class CustomMathJaxAdapter < (Asciidoctor::StemInterpreter.for 'mathjax')
-  register_for 'mathjax'
+class CustomMathJaxAdapter < (Asciidoctor::StemInterpreter.for 'mathjax2')
+  register_for 'mathjax2'
+
+  def docinfo? location
+    location == :head || super
+  end
 
   def docinfo location, doc, opts
-    # prepend custom styles then delegate to built-in MathJax docinfo
+    # add custom styles to head then delegate to built-in MathJax docinfo for footer
     location == :head ? '<style>.stemblock { border-left: 3px solid #ccc; }</style>' : super
   end
 end
