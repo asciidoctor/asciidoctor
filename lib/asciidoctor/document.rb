@@ -233,9 +233,6 @@ class Document < AbstractBlock
   # Public: Get the Converter associated with this document
   attr_reader :converter
 
-  # Public: Get the StemInterpreter associated with this document
-  attr_reader :stem_interpreter
-
   # Public: Get the SyntaxHighlighter associated with this document
   attr_reader :syntax_highlighter
 
@@ -283,7 +280,6 @@ class Document < AbstractBlock
       @converter = parent_doc.converter
       initialize_extensions = nil
       @extensions = parent_doc.extensions
-      @stem_interpreter = parent_doc.stem_interpreter
       @syntax_highlighter = parent_doc.syntax_highlighter
     else
       @parent_document = nil
@@ -339,7 +335,7 @@ class Document < AbstractBlock
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 
-    @parsed = @reftexts = @header = @header_attributes = nil
+    @parsed = @reftexts = @header = @header_attributes = @stem_interpreter = nil
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -563,6 +559,26 @@ class Document < AbstractBlock
   # Public: Returns whether the source lines of the document have been parsed.
   def parsed?
     @parsed
+  end
+
+  # Public: Get the StemInterpreter associated with this document, resolving it on first use.
+  #
+  # The interpreter is selected by the value of the stem-interpreter attribute in the document header. If that
+  # attribute is not set, or its value doesn't match a registered adapter, the mathjax2 interpreter is used. A nested
+  # document uses the interpreter of its parent document.
+  #
+  # Returns the [StemInterpreter] for this document.
+  def stem_interpreter
+    return @parent_document.stem_interpreter if @parent_document
+    return @stem_interpreter if @stem_interpreter
+    name = (@header_attributes || @attributes)['stem-interpreter'].to_s
+    name = 'mathjax2' if name.empty?
+    unless (factory = @options[:stem_interpreter_factory])
+      factory = (stem_its = @options[:stem_interpreters]) ? (StemInterpreter::DefaultFactoryProxy.new stem_its) : StemInterpreter
+    end
+    @stem_interpreter = (factory.create name, @backend, document: self) ||
+      (factory.create 'mathjax2', @backend, document: self) ||
+      (StemInterpreter.create 'mathjax2', @backend, document: self)
   end
 
   # Public: Get the named counter and take the next number in the sequence.
@@ -1256,15 +1272,6 @@ class Document < AbstractBlock
             @syntax_highlighter = SyntaxHighlighter.create syntax_hl_name, @backend, document: self
           end
         end
-        # NOTE not dependent on stem attribute since STEM blocks and inline macros are always converted by the interpreter
-        stem_it_name = attrs['stem-interpreter'].to_s
-        stem_it_name = 'mathjax2' if stem_it_name.empty?
-        unless (stem_it_factory = @options[:stem_interpreter_factory])
-          stem_it_factory = (stem_its = @options[:stem_interpreters]) ? (StemInterpreter::DefaultFactoryProxy.new stem_its) : StemInterpreter
-        end
-        @stem_interpreter = (stem_it_factory.create stem_it_name, @backend, document: self) ||
-          (stem_it_factory.create 'mathjax2', @backend, document: self) ||
-          (StemInterpreter.create 'mathjax2', @backend, document: self)
       # enable toc and sectnums (i.e., numbered) by default in DocBook backend
       elsif basebackend == 'docbook'
         # NOTE the attributes_modified should go away once we have a proper attribute storage & tracking facility

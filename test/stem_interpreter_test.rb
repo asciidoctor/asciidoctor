@@ -3,7 +3,19 @@
 require_relative 'test_helper'
 
 context 'Stem Interpreter' do
-  test 'should set stem_interpreter property on document if stem attribute is set and basebackend is html' do
+  # Returns a factory that provides the mathjax2 interpreter and tracks how many times it's asked to create one
+  def counting_stem_interpreter_factory
+    Class.new Asciidoctor::StemInterpreter::CustomFactory do
+      attr_reader :count
+
+      def create *args
+        @count = @count.to_i + 1
+        super
+      end
+    end.new 'mathjax2' => (Asciidoctor::StemInterpreter.for 'mathjax2')
+  end
+
+  test 'should resolve stem_interpreter on first use if stem attribute is set' do
     input = ':stem:'
     doc = document_from_string input, safe: :safe, parse: true
     assert doc.basebackend? 'html'
@@ -11,16 +23,85 @@ context 'Stem Interpreter' do
     assert_kind_of Asciidoctor::StemInterpreter, doc.stem_interpreter
   end
 
-  test 'should set stem_interpreter property on document if stem attribute is not set and basebackend is html' do
+  test 'should resolve stem_interpreter on first use if stem attribute is not set' do
     doc = document_from_string '', safe: :safe, parse: true
     assert_equal 'mathjax2', doc.stem_interpreter.name
   end
 
-  test 'should not set stem_interpreter property on document if basebackend is not html' do
+  test 'should resolve stem_interpreter on first use if basebackend is not html' do
     input = ':stem:'
     doc = document_from_string input, safe: :safe, backend: 'docbook', parse: true
     refute doc.basebackend? 'html'
-    assert_nil doc.stem_interpreter
+    assert_equal 'mathjax2', doc.stem_interpreter.name
+  end
+
+  test 'should not create stem interpreter if stem attribute is not set and document has no STEM content' do
+    factory = counting_stem_interpreter_factory
+    convert_string 'content', safe: :safe, stem_interpreter_factory: factory
+    assert_nil factory.count
+  end
+
+  test 'should not create stem interpreter if basebackend is not html' do
+    factory = counting_stem_interpreter_factory
+    input = <<~'EOS'
+    :stem:
+
+    stem:[x^2]
+    EOS
+    convert_string input, safe: :safe, backend: 'docbook', stem_interpreter_factory: factory
+    assert_nil factory.count
+  end
+
+  test 'should create stem interpreter if stem attribute is set and document has no STEM content' do
+    factory = counting_stem_interpreter_factory
+    output = convert_string %(:stem:\n\ncontent), safe: :safe, stem_interpreter_factory: factory
+    assert_equal 1, factory.count
+    assert_css 'script[src*="MathJax.js"]', output, 1
+  end
+
+  test 'should create stem interpreter on first use if stem attribute is not set and document has STEM content' do
+    factory = counting_stem_interpreter_factory
+    convert_string 'latexmath:[x^2] latexmath:[y^2]', safe: :safe, stem_interpreter_factory: factory
+    assert_equal 1, factory.count
+  end
+
+  test 'should create stem interpreter once per document including AsciiDoc table cells' do
+    factory = counting_stem_interpreter_factory
+    input = <<~'EOS'
+    :stem:
+
+    stem:[x^2]
+
+    |===
+    a|
+    stem:[y^2]
+
+    stem:[z^2]
+    |===
+    EOS
+    convert_string input, safe: :safe, stem_interpreter_factory: factory
+    assert_equal 1, factory.count
+  end
+
+  test 'should ignore stem-interpreter attribute defined in body of document' do
+    interpreter = Class.new do
+      include Asciidoctor::StemInterpreter
+
+      def convert node, opts = {}
+        %(custom:#{node.text})
+      end
+    end
+    input = <<~'EOS'
+    :stem:
+
+    stem:[x^2]
+
+    :stem-interpreter: custom
+
+    stem:[y^2]
+    EOS
+    output = convert_string input, safe: :safe, stem_interpreters: { 'custom' => interpreter }
+    refute_includes output, 'custom:'
   end
 
   test 'should use mathjax2 interpreter by default when stem attribute is set' do
@@ -223,7 +304,6 @@ context 'Stem Interpreter' do
       block.style = 'latexmath'
       inline = Asciidoctor::Inline.new doc, :quoted, 'y^2', type: :latexmath
       converter = Asciidoctor::Converter.create 'html5'
-      assert_nil doc.stem_interpreter
       assert_includes (converter.convert block, 'stem'), '\[x^2\]'
       assert_equal '\(y^2\)', (converter.convert inline, 'inline_quoted')
     end

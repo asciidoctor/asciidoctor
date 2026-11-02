@@ -153,7 +153,6 @@ class Converter::Html5Converter < Converter::Base
     if (syntax_hl = node.syntax_highlighter)
       result << (syntax_hl_docinfo_head_idx = result.size)
     end
-    stem_it = resolve_stem_interpreter node
     result << (stem_it_docinfo_head_idx = result.size)
 
     unless (docinfo_content = node.docinfo).empty?
@@ -261,13 +260,18 @@ class Converter::Html5Converter < Converter::Base
     end
 
     # NOTE only insert docinfo if stem attribute is still set (an extension may unset it if it handles STEM content)
-    if (stem_enabled = node.attr? 'stem') && (stem_it.docinfo? :head)
-      result[stem_it_docinfo_head_idx] = stem_it.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
+    if node.attr? 'stem'
+      stem_it = node.stem_interpreter
+      if stem_it.docinfo? :head
+        result[stem_it_docinfo_head_idx] = stem_it.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
+      else
+        result.delete_at stem_it_docinfo_head_idx
+      end
+      if stem_it.docinfo? :footer
+        result << (stem_it.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
+      end
     else
       result.delete_at stem_it_docinfo_head_idx
-    end
-    if stem_enabled && (stem_it.docinfo? :footer)
-      result << (stem_it.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -686,7 +690,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    (resolve_stem_interpreter node).format node, self_closing_tag_slash: @void_element_slash
+    node.document.stem_interpreter.format node, self_closing_tag_slash: @void_element_slash
   end
 
   def convert_olist node
@@ -1255,7 +1259,7 @@ Your browser does not support the video tag.
 
   def convert_inline_quoted node
     open, close, tag = QUOTE_TAGS[type = node.type]
-    text = type == :asciimath || type == :latexmath ? ((resolve_stem_interpreter node).convert node, self_closing_tag_slash: @void_element_slash) : node.text
+    text = type == :asciimath || type == :latexmath ? (node.document.stem_interpreter.convert node, self_closing_tag_slash: @void_element_slash) : node.text
     if node.id
       class_attr = node.role ? %( class="#{node.role}") : ''
       if tag
@@ -1350,11 +1354,6 @@ Your browser does not support the video tag.
   # NOTE adapt to older converters that relied on unprefixed method names
   def method_missing id, *args
     !((name = id.to_s).start_with? 'convert_') && (handles? name) ? (send %(convert_#{name}), *args) : super
-  end
-
-  # NOTE the document only precomputes the interpreter if the basebackend is html and the header has been processed
-  def resolve_stem_interpreter node
-    node.document.stem_interpreter || (StemInterpreter.create 'mathjax2', @backend, document: node.document)
   end
 
   def respond_to_missing? id, *options
