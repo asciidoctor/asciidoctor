@@ -10,6 +10,9 @@ module Asciidoctor
 # adapter must also define a docinfo? method that returns true. The companion docinfo method will then be
 # called to insert markup into the output document. The docinfo functionality is available to both cases.
 #
+# The convert and format methods are called for any STEM content, even if the stem attribute is not set. The
+# docinfo? and docinfo methods are only called if the stem attribute is set when the document is converted.
+#
 # Asciidoctor provides a built-in adapter for MathJax 2 (mathjax2), which is used by default. Additional
 # adapters can be registered using StemInterpreter.register or by supplying a custom factory.
 module StemInterpreter
@@ -21,7 +24,8 @@ module StemInterpreter
   end
 
   # Public: Indicates whether this STEM interpreter has docinfo (i.e., markup) to insert into the output
-  # document at the specified location. Should be called by converter after main content has been converted.
+  # document at the specified location. Should be called by converter after main content has been converted,
+  # and only if the stem attribute is set on the document.
   #
   # location - The Symbol representing the location slot (:head or :footer).
   #
@@ -29,7 +33,8 @@ module StemInterpreter
   def docinfo? location; end
 
   # Public: Generates docinfo markup for this STEM interpreter to insert at the specified location in the
-  # output document. Should be called by converter after main content has been converted.
+  # output document. Should be called by converter after main content has been converted, and only if the
+  # stem attribute is set on the document.
   #
   # location - The Symbol representing the location slot (:head or :footer).
   # doc      - The Document in which this STEM interpreter is being used.
@@ -74,7 +79,7 @@ module StemInterpreter
     # Public: Statically register the current class in the registry for the specified names.
     #
     # names - one or more String or Symbol names with which to register the current class as a STEM
-    #         adapter implementation. Symbol arguments are coerced to Strings.
+    #         interpreter implementation. Symbol arguments are coerced to Strings.
     #
     # Returns nothing.
     def register_for *names
@@ -86,7 +91,7 @@ module StemInterpreter
     # Public: Associates the STEM interpreter class or object with the specified names.
     #
     # stem_interpreter - the STEM interpreter implementation to register
-    # names        - one or more String names with which to register this STEM interpreter implementation.
+    # names            - one or more String names with which to register this STEM interpreter implementation.
     #
     # Returns nothing.
     def register stem_interpreter, *names

@@ -28,6 +28,10 @@ Returns `true` if the adapter needs to inject markup at the given location (`:he
 Returns the markup to inject at the specified location.
 Only called if `docinfo?` returns `true` for that location.
 
+The `convert` and `format` methods are called for any STEM content, even if the `stem` attribute isn't set.
+The `docinfo?` and `docinfo` methods are only called if the `stem` attribute is set when the document is converted.
+Therefore, if your adapter relies on its docinfo (e.g., a rendering script), the document must set the `stem` attribute.
+
 Here's an example of a STEM interpreter adapter for the https://katex.org[KaTeX^] rendering library.
 KaTeX is a client-side STEM interpreter, so the adapter injects a stylesheet in the `<head>` and a script at the end of `<body>`, and wraps each STEM expression in the delimiters KaTeX expects.
 Since KaTeX only understands TeX, this adapter only works for the latexmath notation.

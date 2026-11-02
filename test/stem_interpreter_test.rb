@@ -15,20 +15,32 @@ context 'Stem Interpreter' do
     end.new 'mathjax2' => (Asciidoctor::StemInterpreter.for 'mathjax2')
   end
 
-  test 'should resolve stem_interpreter on first use if stem attribute is set' do
-    input = ':stem:'
-    doc = document_from_string input, safe: :safe, parse: true
-    assert doc.basebackend? 'html'
-    refute_nil doc.stem_interpreter
-    assert_kind_of Asciidoctor::StemInterpreter, doc.stem_interpreter
+  test 'should resolve stem_interpreter on first use and cache it' do
+    factory = counting_stem_interpreter_factory
+    doc = document_from_string ':stem:', safe: :safe, parse: true, stem_interpreter_factory: factory
+    assert_nil factory.count
+    stem_interpreter = doc.stem_interpreter
+    assert_equal 1, factory.count
+    assert_same stem_interpreter, doc.stem_interpreter
+    assert_equal 1, factory.count
   end
 
-  test 'should resolve stem_interpreter on first use if stem attribute is not set' do
+  test 'should not load stem interpreter facility if stem attribute is not set and document has no STEM content' do
+    script = %(require 'asciidoctor'; Asciidoctor.convert 'content', safe: :safe, standalone: true; print (Asciidoctor.autoload? :StemInterpreter) ? 'pending' : 'loaded')
+    assert_equal 'pending', (run_command(Gem.ruby, '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read })
+  end
+
+  test 'should load stem interpreter facility if stem attribute is set' do
+    script = %(require 'asciidoctor'; Asciidoctor.convert ':stem:', safe: :safe, standalone: true; print (Asciidoctor.autoload? :StemInterpreter) ? 'pending' : 'loaded')
+    assert_equal 'loaded', (run_command(Gem.ruby, '-I', ASCIIDOCTOR_LIB_DIR, '-e', script) {|out| out.read })
+  end
+
+  test 'should use mathjax2 interpreter by default when stem attribute is not set' do
     doc = document_from_string '', safe: :safe, parse: true
     assert_equal 'mathjax2', doc.stem_interpreter.name
   end
 
-  test 'should resolve stem_interpreter on first use if basebackend is not html' do
+  test 'should provide stem_interpreter on document if basebackend is not html' do
     input = ':stem:'
     doc = document_from_string input, safe: :safe, backend: 'docbook', parse: true
     refute doc.basebackend? 'html'
@@ -107,6 +119,7 @@ context 'Stem Interpreter' do
   test 'should use mathjax2 interpreter by default when stem attribute is set' do
     input = ':stem:'
     doc = document_from_string input, safe: :safe, parse: true
+    assert_kind_of Asciidoctor::StemInterpreter, doc.stem_interpreter
     assert_equal 'mathjax2', doc.stem_interpreter.name
   end
 
