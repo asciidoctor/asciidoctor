@@ -386,6 +386,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         result << %(#{otag}<a href="##{section.id}">#{stitle}</a></li>)
       end
     end
+    return if result.size == 1
     result << '</ul>'
     result.join LF
   end

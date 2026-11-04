@@ -91,6 +91,7 @@ Improvements::
   * Look up asset dir attribute (i.e., `imagesdir` or `iconsdir`) on node to resolve asset path prefix, inheriting from document if not otherwise set (#3660) (*@mogztter*)
   * Add full support for image target defined as a base64-encoded data URI; add `image_format` helper to determine image format (#3791)
   * Only use content type sent by server if mimetype cannot be determined from image target (#3791)
+  * Don't include enclosure for TOC level in HTML output if level has no entries (#4908)
 
 Bug Fixes::
 
