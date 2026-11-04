@@ -1070,7 +1070,7 @@ module Substitutors
         end
       end
 
-      %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]

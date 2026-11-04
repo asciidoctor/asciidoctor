@@ -474,7 +474,7 @@ class Converter::DocBook5Converter < Converter::Base
       node.items.each do |item|
         text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
         result << %(<listitem#{common_attributes item.id, item.role}>)
-        result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
+        result << %(<simpara>#{text_marker}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'
       end
@@ -495,7 +495,7 @@ class Converter::DocBook5Converter < Converter::Base
     end
     start_t = node.attr 'start'
     end_t = node.attr 'end'
-    time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+    time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
     image_size_attrs = image_size_attributes node.attributes
     mediaobject = %(<mediaobject>
