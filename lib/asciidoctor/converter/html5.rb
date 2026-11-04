@@ -476,7 +476,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     start_t = node.attr 'start'
     end_t = node.attr 'end'
-    time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+    time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
 <audio src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
@@ -1109,7 +1109,7 @@ Your browser does not support the audio tag.
       preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
       start_t = node.attr 'start'
       end_t = node.attr 'end'
-      time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+      time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
 <video src="#{node.media_uri(node.attr 'target')}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>

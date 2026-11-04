@@ -472,7 +472,7 @@ class Converter::DocBook5Converter < Converter::Base
       node.items.each do |item|
         text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
         result << %(<listitem#{common_attributes item.id, item.role}>)
-        result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
+        result << %(<simpara>#{text_marker}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'
       end
