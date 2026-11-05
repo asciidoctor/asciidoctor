@@ -15,16 +15,10 @@ class Converter::Html5Converter < Converter::Base
     mark: ['<mark>', '</mark>', true],
     superscript: ['<sup>', '</sup>', true],
     subscript: ['<sub>', '</sub>', true],
-    asciimath: ['\$', '\$'],
-    latexmath: ['\(', '\)'],
-    # Opal can't resolve these constants when referenced here
-    #asciimath: INLINE_MATH_DELIMITERS[:asciimath] + [false],
-    #latexmath: INLINE_MATH_DELIMITERS[:latexmath] + [false],
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
   LeadingAnchorsRx = %r(^(?:<a id="[^"]+"></a>)+)
-  StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
     SvgPreambleRx = /^#{CC_ALL}*?(?=<svg[\s>])/
@@ -159,6 +153,7 @@ class Converter::Html5Converter < Converter::Base
     if (syntax_hl = node.syntax_highlighter)
       result << (syntax_hl_docinfo_head_idx = result.size)
     end
+    result << (stem_it_docinfo_head_idx = result.size)
 
     unless (docinfo_content = node.docinfo).empty?
       result << docinfo_content
@@ -257,41 +252,26 @@ class Converter::Html5Converter < Converter::Base
         result[syntax_hl_docinfo_head_idx] = syntax_hl.docinfo :head, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash
       else
         result.delete_at syntax_hl_docinfo_head_idx
+        stem_it_docinfo_head_idx -= 1
       end
       if syntax_hl.docinfo? :footer
         result << (syntax_hl.docinfo :footer, node, cdn_base_url: cdn_base_url, linkcss: linkcss, self_closing_tag_slash: slash)
       end
     end
 
+    # NOTE only insert docinfo if stem attribute is still set (an extension may unset it if it handles STEM content)
     if node.attr? 'stem'
-      eqnums_val = node.attr 'eqnums', 'none'
-      eqnums_val = 'AMS' if eqnums_val.empty?
-      eqnums_opt = %( equationNumbers: { autoNumber: "#{eqnums_val}" } )
-      # IMPORTANT inspect calls on delimiter arrays are intentional for JavaScript compat (emulates JSON.stringify)
-      result << %(<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [#{INLINE_MATH_DELIMITERS[:latexmath].inspect}],
-    displayMath: [#{BLOCK_MATH_DELIMITERS[:latexmath].inspect}],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [#{BLOCK_MATH_DELIMITERS[:asciimath].inspect}],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: {#{eqnums_opt}}
-})
-MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
-  MathJax.InputJax.AsciiMath.postfilterHooks.Add(function (data, node) {
-    if ((node = data.script.parentNode) && (node = node.parentNode) && node.classList.contains("stemblock")) {
-      data.math.root.display = "block"
-    }
-    return data
-  })
-})
-</script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_CHTML"></script>)
+      stem_it = node.stem_interpreter
+      if stem_it.docinfo? :head
+        result[stem_it_docinfo_head_idx] = stem_it.docinfo :head, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash
+      else
+        result.delete_at stem_it_docinfo_head_idx
+      end
+      if stem_it.docinfo? :footer
+        result << (stem_it.docinfo :footer, node, cdn_base_url: cdn_base_url, self_closing_tag_slash: slash)
+      end
+    else
+      result.delete_at stem_it_docinfo_head_idx
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -710,25 +690,7 @@ Your browser does not support the audio tag.
   end
 
   def convert_stem node
-    id_attribute = node.id ? %( id="#{node.id}") : ''
-    title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
-    open, close = BLOCK_MATH_DELIMITERS[style = node.style.to_sym]
-    if (equation = node.content)
-      if style == :asciimath && (equation.include? LF)
-        br = %(#{LF}<br#{@void_element_slash}>)
-        equation = equation.gsub(StemBreakRx) { %(#{close}#{br * (($&.count LF) - 1)}#{LF}#{open}) }
-      end
-      unless (equation.start_with? open) && (equation.end_with? close)
-        equation = %(#{open}#{equation}#{close})
-      end
-    else
-      equation = ''
-    end
-    %(<div#{id_attribute} class="stemblock#{(role = node.role) ? " #{role}" : ''}">
-#{title_element}<div class="content">
-#{equation}
-</div>
-</div>)
+    node.document.stem_interpreter.format node, self_closing_tag_slash: @void_element_slash
   end
 
   def convert_olist node
@@ -1296,22 +1258,23 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_quoted node
-    open, close, tag = QUOTE_TAGS[node.type]
+    open, close, tag = QUOTE_TAGS[type = node.type]
+    text = type == :asciimath || type == :latexmath ? (node.document.stem_interpreter.convert node, self_closing_tag_slash: @void_element_slash) : node.text
     if node.id
       class_attr = node.role ? %( class="#{node.role}") : ''
       if tag
-        %(#{open.chop} id="#{node.id}"#{class_attr}>#{node.text}#{close})
+        %(#{open.chop} id="#{node.id}"#{class_attr}>#{text}#{close})
       else
-        %(<span id="#{node.id}"#{class_attr}>#{open}#{node.text}#{close}</span>)
+        %(<span id="#{node.id}"#{class_attr}>#{open}#{text}#{close}</span>)
       end
     elsif node.role
       if tag
-        %(#{open.chop} class="#{node.role}">#{node.text}#{close})
+        %(#{open.chop} class="#{node.role}">#{text}#{close})
       else
-        %(<span class="#{node.role}">#{open}#{node.text}#{close}</span>)
+        %(<span class="#{node.role}">#{open}#{text}#{close}</span>)
       end
     else
-      %(#{open}#{node.text}#{close})
+      %(#{open}#{text}#{close})
     end
   end
 
