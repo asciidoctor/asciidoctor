@@ -3617,18 +3617,19 @@ context 'Sections' do
       [#ch1-s1]
       === Chapter Section
 
-      [appendix#app1,toclevels=0]
+      [appendix#app1]
       == Lorem Ipsum
 
-      [#app1-s1]
+      [#app1-s1,toclevels=1]
       === Appendix Section
       EOS
 
       output = convert_string input
       assert_css '#toc a[href="#ch1"]', output, 1
       assert_css '#toc a[href="#ch1-s1"]', output, 1
-      assert_css '#toc a[href="#app1"]', output, 0
+      assert_css '#toc a[href="#app1"]', output, 1
       assert_css '#toc a[href="#app1-s1"]', output, 0
+      assert_includes output, '<li><a href="#app1">Appendix A: Lorem Ipsum</a></li>'
     end
 
     test 'child toc levels should not have additional bullet at parent level in html' do
