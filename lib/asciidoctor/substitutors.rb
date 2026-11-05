@@ -434,6 +434,8 @@ module Substitutors
     end
 
     if ((text.include? '((') && (text.include? '))')) || (found_macroish_short && (text.include? 'dexterm'))
+      indexterm_source = text
+      indexterm_idx = 0
       # (((Tigers,Big cats)))
       # indexterm:[Tigers,Big cats]
       # ((Tigers))
@@ -464,7 +466,8 @@ module Substitutors
           else
             attrs = { 'terms' => (split_simple_csv attrlist) }
           end
-          (Inline.new self, :indexterm, nil, attributes: attrs).convert
+          id = doc.register :indexterms, [attrs['terms'], self, attrs, [object_id, indexterm_source, indexterm_idx += 1]]
+          (Inline.new self, :indexterm, nil, id: id, attributes: attrs).convert
         when 'indexterm2'
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
@@ -476,7 +479,8 @@ module Substitutors
               attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
             end
           end
-          (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
+          id = doc.register :indexterms, [[term], self, attrs, [object_id, indexterm_source, indexterm_idx += 1]]
+          (Inline.new self, :indexterm, term, id: id, attributes: attrs, type: :visible).convert
         else
           encl_text = $3
           # honor the escape
@@ -511,7 +515,8 @@ module Substitutors
                 attrs = { 'see-also' => see_also }
               end
             end
-            subbed_term = (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
+            id = doc.register :indexterms, [[term], self, attrs, [object_id, indexterm_source, indexterm_idx += 1]]
+            subbed_term = (Inline.new self, :indexterm, term, id: id, attributes: attrs, type: :visible).convert
           else
             # (((Tigers,Big cats)))
             attrs = {}
@@ -525,7 +530,8 @@ module Substitutors
               end
             end
             attrs['terms'] = split_simple_csv terms
-            subbed_term = (Inline.new self, :indexterm, nil, attributes: attrs).convert
+            id = doc.register :indexterms, [attrs['terms'], self, attrs, [object_id, indexterm_source, indexterm_idx += 1]]
+            subbed_term = (Inline.new self, :indexterm, nil, id: id, attributes: attrs).convert
           end
           before ? %(#{before}#{subbed_term}#{after}) : subbed_term
         end

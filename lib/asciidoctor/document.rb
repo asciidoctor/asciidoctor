@@ -291,6 +291,7 @@ class Document < AbstractBlock
         images: [],
         callouts: Callouts.new,
         includes: {},
+        indexterms: IndexCatalog.new,
       }
       # copy attributes map and normalize keys
       # attribute overrides are attributes that can only be set from the commandline
@@ -601,6 +602,18 @@ class Document < AbstractBlock
       ref
     when :footnotes
       @catalog[type] << value
+    when :indexterms
+      terms, source, attrs, occurrence = value
+      index = @catalog[:indexterms]
+      anchor = index.next_anchor_name occurrence
+      associations = {}
+      if attrs
+        associations[:see] = attrs['see'] || attrs[:see]
+        if (see_also = attrs['see-also'] || attrs[:see_also])
+          associations[:see_also] = ::Array === see_also ? see_also : [see_also]
+        end
+      end
+      (index.store_term terms, { anchor: anchor, node: source }, associations) ? anchor : nil
     else
       @catalog[type] << (type == :images ? (ImageReference.new value, @attributes['imagesdir']) : value) if @options[:catalog_assets]
     end
