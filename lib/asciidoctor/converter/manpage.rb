@@ -25,6 +25,7 @@ class Converter::ManPageConverter < Converter::Base
   EscapedMacroRx = /^(?:#{ESC}\\c\n)?#{ESC}\.((?:URL|MTO) "#{CC_ANY}*?" "#{CC_ANY}*?" )( |[^\s]*)(#{CC_ANY}*?)(?: *#{ESC}\\c)?$/
   MalformedEscapedMacroRx = /(#{ESC}\\c) (#{ESC}\.(?:URL|MTO) )/
   MockMacroRx = %r(</?(#{ESC}\\[^>]+)>)
+  InlineFontMarkerRx = %r(</?#{Regexp.escape ESC_BS}f(B|I|\(CR|P)>)
   EmDashCharRefRx = /&#8212;(?:&#8203;)?/
   EllipsisCharRefRx = /&#8230;(?:&#8203;)?/
   WrappedIndentRx = /#{CG_BLANK}*#{LF}#{CG_BLANK}*/
@@ -696,6 +697,9 @@ r lw(\n(.lu*75u/100u).'
   #          space (default: :collapse)
   #        * :append_newline a Boolean that indicates whether to append a newline to the result (default: false)
   def manify str, opts = {}
+    # Nested inline substitutions are complete by this point. Flatten their protected font markers before converting
+    # them to roff escapes since \fP only remembers one previous font; it does not maintain a font stack.
+    str = flatten_inline_fonts str
     case opts.fetch :whitespace, :collapse
     when :preserve
       str = (str.gsub TAB, ET).gsub(/(^)?  +/) { $1 ? $& : %(#{ESC_BS}&#{$&}) }
@@ -737,6 +741,36 @@ r lw(\n(.lu*75u/100u).'
       .gsub(ESC_FS, '.')        # unescape full stop in troff commands (NOTE must take place after gsub(LeadingPeriodRx))
       .rstrip                   # strip trailing space
     opts[:append_newline] ? %(#{str}#{LF}) : str
+  end
+
+  # Rewrite nested font spans as independent runs, restoring the enclosing font explicitly after each nested span.
+  # For example, B("outer " I("inner") " outer") becomes B("outer ") I("inner") B(" outer").
+  def flatten_inline_fonts str
+    return str unless InlineFontMarkerRx.match? str
+
+    result = []
+    fonts = []
+    offset = 0
+    str.to_enum(:scan, InlineFontMarkerRx).each do
+      match = Regexp.last_match
+      segment = str[offset...match.begin(0)]
+      result << (fonts.empty? ? segment : inline_font_run(segment, fonts[-1]))
+      if match[1] == 'P'
+        raise 'unbalanced inline font markers' if fonts.empty?
+        fonts.pop
+      else
+        fonts << match[1]
+      end
+      offset = match.end 0
+    end
+    segment = str[offset..-1]
+    result << (fonts.empty? ? segment : inline_font_run(segment, fonts[-1]))
+    raise 'unbalanced inline font markers' unless fonts.empty?
+    result.join
+  end
+
+  def inline_font_run str, font
+    str.empty? ? '' : %(<#{ESC_BS}f#{font}>#{str}</#{ESC_BS}fP>)
   end
 
   def uppercase_pcdata string
