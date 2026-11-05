@@ -215,6 +215,8 @@ class Section < AbstractBlock
       # ensure id doesn't begin with idseparator if idprefix is empty (assuming idseparator is not empty)
       gen_id = gen_id.slice 1, gen_id.length if pre.empty? && (gen_id.start_with? sep)
     end
+    # a title without word characters leaves nothing, so fall back to the prefix
+    gen_id = pre.empty? ? '_' : pre if gen_id.empty?
     if document.catalog[:refs].key? gen_id
       ids = document.catalog[:refs]
       cnt = Compliance.unique_id_start_index
