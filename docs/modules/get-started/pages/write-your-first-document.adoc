@@ -1,0 +1,363 @@
+= Write Your First AsciiDoc Document
+:navtitle: Write Your First Document
+:description: A gentle, hands-on introduction to writing your first AsciiDoc document: paragraphs, formatting, lists, links, structure, and blocks.
+:page-description: {description}
+:source-language: asciidoc
+
+This guide is a gentle, hands-on introduction to AsciiDoc, a _plain text_ writing *syntax* that the Asciidoctor *processor* turns into HTML, PDF, DocBook, and more.
+It's for anyone who wants to spend less effort writing and publishing content, whether that's technical documentation, articles, web pages, or plain prose.
+
+By the end you'll be able to:
+
+- recognize the basic structure of an AsciiDoc document,
+- write your first document using paragraphs and formatting,
+- add lists, links, images, and other structural elements, and
+- know where to look when you need a feature this guide doesn't cover.
+
+[TIP]
+====
+This guide teaches the *on-ramp*.
+For the complete, authoritative description of every element, see the xref:asciidoc::index.adoc[AsciiDoc language documentation].
+For a one-page survey of the syntax, keep the xref:asciidoc::syntax-quick-reference.adoc[AsciiDoc Syntax Quick Reference] handy.
+====
+
+Already know how to run Asciidoctor?
+If not, start with xref:get-started:index.adoc[Convert Your First File], then come back here to learn the syntax.
+
+Let's dive in.
+
+== It's just text
+
+AsciiDoc is _plain text_, so you can write it in _any_ text editor.
+You don't need a word processor like Microsoft Word or Google Docs--in fact, those add invisible formatting that makes conversion harder.
+
+An editor with AsciiDoc syntax highlighting makes writing more comfortable: the color brings contrast to the text and confirms when you've typed an element correctly.
+Most modern editors have an AsciiDoc extension or plugin available.
+
+Open your editor and get ready to write some AsciiDoc!
+
+== Content is king
+
+The bulk of any document is paragraph text, so AsciiDoc requires no special markup for it.
+You just start typing.
+
+Adjacent lines of text form a single paragraph.
+To start a new paragraph, separate it from the previous content with a blank line.
+
+.Two paragraphs in an AsciiDoc document
+[source]
+----
+This journey begins one late Monday afternoon in Antwerp.
+Our team desperately needs coffee, but none of us dare open the office door.
+
+To leave means code dismemberment and certain death.
+----
+
+.Rendered using the default (html5) converter and stylesheet
+====
+This journey begins one late Monday afternoon in Antwerp.
+Our team desperately needs coffee, but none of us dare open the office door.
+
+To leave means code dismemberment and certain death.
+====
+
+Just like that, *you're writing in AsciiDoc!*
+Save the file with the `.adoc` extension and you're ready to convert it.
+
+=== Wrapped text and hard line breaks
+
+Because adjacent lines are joined into one paragraph, you're free to wrap text or put each sentence on its own line--the line breaks won't appear in the output.
+
+When you _do_ want a line break preserved, end the line with a space followed by a plus sign (`{plus}`), or set the `hardbreaks` option on the paragraph.
+
+[source]
+----
+Rubies are red, +
+Topazes are blue.
+----
+
+====
+Rubies are red, +
+Topazes are blue.
+====
+
+To preserve every line break in a document, set the `:hardbreaks:` attribute in the document header.
+
+== Admonitions
+
+An admonition pulls a statement out of the content flow and labels it with a priority.
+AsciiDoc provides five labels: `NOTE`, `TIP`, `IMPORTANT`, `CAUTION`, and `WARNING`.
+
+To create one, start a paragraph with an uppercase label followed by a colon and a space.
+
+.Admonition paragraph syntax
+[source]
+----
+WARNING: Wolpertingers are known to nest in server racks.
+Enter at your own risk.
+----
+
+.Result
+====
+WARNING: Wolpertingers are known to nest in server racks.
+Enter at your own risk.
+====
+
+The admonition renders in a callout box with the label--or its icon, when the `icons` attribute is set--in the gutter.
+Admonitions can also wrap richer block content; see <<blocks>>.
+
+[TIP]
+====
+Confusing _caution_ and _warning_?
+Use *CAUTION* to advise the reader to _act_ carefully; use *WARNING* to flag real danger, harm, or consequences.
+====
+
+For the full reference, see the xref:asciidoc:blocks:admonitions.adoc[admonitions documentation].
+
+== Text formatting
+
+Just as we stress words when we speak, we emphasize them in text by surrounding them with punctuation.
+AsciiDoc calls this _quoted text_.
+
+Wrap a word in asterisks to make it *bold*, underscores to make it _italic_, and backticks to render it `monospace`.
+When you need to format only _part_ of a word, double the punctuation (the _unconstrained_ form).
+
+.Formatting syntax
+[source]
+----
+bold *constrained* & **un**constrained
+italic _constrained_ & __un__constrained
+monospace `constrained` & ``un``constrained
+bold italic *_constrained_*
+----
+
+.Result
+====
+bold *constrained* & **un**constrained +
+italic _constrained_ & __un__constrained +
+monospace `constrained` & ``un``constrained +
+bold italic *_constrained_*
+====
+
+You can prefix quoted text with an attribute list whose first positional value is a role, which becomes a CSS class in HTML output (for example, `+[.userinput]#asciidoc#+`).
+
+To stop AsciiDoc from interpreting punctuation as markup, escape it with a backslash (`+\*not bold*+`) or wrap it in a passthrough.
+The passthrough family (the `pass` macro, single/double/triple plus) and the substitution system are powerful but rarely needed at first; when you reach for them, see the xref:asciidoc:pass:pass-macro.adoc[passthroughs] and xref:asciidoc:subs:index.adoc[substitutions] documentation.
+
+AsciiDoc also replaces textual shorthands automatically--for example `(C)`, `(R)`, and `(TM)` become &#169;, &#174;, and &#8482;, `--` becomes an em dash, `...` an ellipsis, and `+->+` an arrow.
+See xref:asciidoc:subs:replacements.adoc[character replacements] for the full list.
+
+== Lists, lists, lists
+
+AsciiDoc supports three kinds of lists: *unordered*, *ordered*, and *description*.
+
+Mark unordered items with an asterisk (or a hyphen for a single-level list).
+Mark ordered items with a period.
+Nest a list by adding another marker character for each level.
+A blank line is required before and after every list.
+
+.Unordered, ordered, and nested lists
+[source]
+----
+.Kizmet's favorite authors
+* Edgar Allan Poe
+* Sheri S. Tepper
+** Grass
+** Raising the Stones
+
+.Steps
+. Write the document
+. Convert it
+. Publish it
+----
+
+.Result
+====
+.Kizmet's favorite authors
+* Edgar Allan Poe
+* Sheri S. Tepper
+** Grass
+** Raising the Stones
+
+.Steps
+. Write the document
+. Convert it
+. Publish it
+====
+
+A _description list_ pairs a term with its definition using a double colon:
+
+[source]
+----
+CPU:: The brain of the computer.
+RAM:: Short-term memory.
+----
+
+To attach complex content (extra paragraphs, nested lists, blocks) to a list item, use a _list continuation_: a `+` on its own line between the item and the attached block.
+For nesting rules, mixed lists, and continuations, see the xref:asciidoc:lists:index.adoc[lists documentation].
+
+== Links and images
+
+AsciiDoc autolinks bare URLs.
+To give a link custom text, follow the URL with the text in square brackets:
+
+[source]
+----
+https://asciidoctor.org[Asciidoctor]
+----
+
+Add an image with the `image::` block macro (for a standalone image) or the `image:` inline macro (within a line of text):
+
+[source]
+----
+image::sunset.jpg[Sunset, 300, 200]
+----
+
+The first positional attribute is the alt text; the optional numbers set width and height.
+For relative links, cross references, link attributes, and image options, see the documentation on xref:asciidoc:macros:links.adoc[links] and xref:asciidoc:macros:images.adoc[images].
+
+== The structure of a document
+
+This is where AsciiDoc earns its keep for longer documents.
+A document is made of an optional *header*, an optional *preamble*, and a hierarchy of *sections*.
+
+=== Document header and title
+
+The header sits at the top of the file.
+Its most visible part is the document title: the first line, starting with a single equals sign and a space.
+
+[source]
+----
+= Lightweight Markup Languages
+Doc Writer <doc.writer@example.org>
+v1.0, 2012-01-01
+
+According to Wikipedia...
+----
+
+The two optional lines below the title hold the author (name and optional email) and revision information (version, date, optional remark).
+A blank line separates the header from the body.
+
+NOTE: The header is optional.
+Without one, the processor still converts whatever content is present--it's only used when generating a standalone document.
+
+=== Document attributes
+
+Attributes set AsciiDoc apart from other lightweight markup languages.
+They toggle features and store reusable content.
+Define one in the header as a name wrapped in colons, followed by a value:
+
+[source]
+----
+= User Guide
+:appversion: 1.0.0
+----
+
+Reference it anywhere with curly braces--`+{appversion}+`--and the processor substitutes the value.
+Attributes also configure the processor: `:toc:` adds a table of contents, `:sectnums:` numbers the sections, and appending `!` to a name unsets it (for example `:linkcss!:`).
+For the catalog of built-in attributes, see xref:asciidoc:attributes:document-attributes.adoc[document attributes].
+
+=== Sections
+
+Sections partition a document into a hierarchy.
+A section title uses the same syntax as the document title, but with two to six equals signs--the count sets the nesting level.
+
+[source]
+----
+= Document Title
+
+== Level 1 Section
+
+=== Level 2 Section
+
+== Another Level 1 Section
+----
+
+Two rules apply: only a `book` doctype may have more than one level-0 section, and you can't skip levels when nesting.
+Content between the title and the first section is the _preamble_.
+
+TIP: Asciidoctor also accepts Markdown's `#` heading markers, so a Markdown outline converts cleanly.
+
+=== Block titles
+
+Give any paragraph, list, or block a title (used as its caption) by putting a line above it that starts with a dot, immediately followed by the title text:
+
+[source]
+----
+.TODO list
+- Learn the AsciiDoc syntax
+- Write my document in AsciiDoc
+----
+
+For the complete rules on titles, sections, and levels, see the xref:asciidoc::document-structure.adoc[document structure documentation].
+
+[#blocks]
+== Building blocks
+
+Beyond paragraphs, AsciiDoc provides _delimited blocks_ for content such as code listings, quotes, sidebars, and tables.
+A block is wrapped in matching delimiter lines, and the delimiter determines how its content is processed.
+
+[cols="1,2"]
+|===
+|Delimiter |Block type
+
+|++----++ |Listing / source code
+|++....++ |Literal (shown verbatim)
+|++====++ |Example
+|++****++ |Sidebar
+|++____++ |Quote
+|pass:[++++] |Passthrough (emitted as-is)
+|++--++ |Open (a generic container)
+|===
+
+.A source block
+[source]
+....
+[source,ruby]
+----
+puts 'Hello, AsciiDoc!'
+----
+....
+
+You can attach metadata to a block on the lines just above it: a block title (`.Title`), an ID and roles (`[#id.role]`), and a block attribute list (`[source,ruby]`).
+For every block type and its options, see the xref:asciidoc::blocks.adoc[blocks documentation].
+
+== Tables
+
+A table is delimited by `|===`.
+Each cell starts with a `|`, and the optional `cols` attribute defines the columns.
+
+.A basic table
+[source]
+----
+[cols="1,1,2"]
+|===
+|Name |Type |Description
+
+|hardbreaks |option |Preserve line breaks in paragraphs
+|toc |attribute |Generate a table of contents
+|===
+----
+
+.Result
+[cols="1,1,2"]
+|===
+|Name |Type |Description
+
+|hardbreaks |option |Preserve line breaks in paragraphs
+|toc |attribute |Generate a table of contents
+|===
+
+Tables support spans, alignment, header/footer rows, cell formatting, and CSV/DSV data.
+For all of it, see the xref:asciidoc:tables:build-a-basic-table.adoc[tables documentation].
+
+== Where to go next
+
+You now know enough AsciiDoc to write anything from a README to a full user guide.
+From here:
+
+* *Convert your document* -- see xref:get-started:index.adoc[Convert Your First File] for the CLI, and xref:api:index.adoc[] for the API.
+* *Other output formats* -- Asciidoctor also produces xref:docbook-backend:index.adoc[DocBook] and, via related projects, PDF and EPUB.
+* *Go deeper into the syntax* -- footnotes, cross references, includes, conditional content, math, and diagrams are all covered in the xref:asciidoc::index.adoc[AsciiDoc language documentation].
+
+Writing in AsciiDoc should feel no harder than writing an email: open an editor, type paragraphs, and reach for markup only when you need extra structure or semantics.
