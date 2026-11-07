@@ -105,6 +105,7 @@ Bug Fixes::
   * Rework path cleaning to handle repeat slashes in path (#4419)
   * Set compat mode correctly in document header when `compat-mode` attribute is unset from API/CLI
   * Don't track document attribute unset from body as a modified (header) attribute
+  * Use attrlist as indexterm if primary term not specified
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
