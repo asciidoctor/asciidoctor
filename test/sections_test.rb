@@ -2844,6 +2844,122 @@ context 'Sections' do
         assert_xpath '/dedication/title', output, 0
       end
     end
+
+    test 'should generate index in HTML output if index section is found' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) (Panthera tigris) is the largest ((cat)) species.
+      (((Big cats,Tigers,Panthera tigris)))
+
+      == https://institutes.example.org[Institutes]
+
+      National Institute of Science and Technology \(((NIST)))
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      assert_css '.index a.indexterm', output, 4
+      assert_css '.indexblock > .title', output, 4
+      assert_xpath '//*[@class="indexblock"]//dl//dl//dl/dt[starts-with(text(),"Panthera tigris,")]', output, 1
+      assert_xpath '//*[@class="indexblock"]//dl//dl//dl/dt[starts-with(text(),"Panthera tigris,")]/a[text()="Animals"]', output, 1
+      assert_includes output, '<a class="indexterm" href="#_indexterm_4">Institutes</a>'
+    end
+
+    test 'should honor xrefstyle when generating references in HTML index' do
+      input = <<~'EOS'
+      = Document Title
+      :xrefstyle: short
+      :sectnums:
+      :doctype: book
+
+      = Part 1
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+
+      = Reference
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      assert_xpath '//*[@class="index"]//a[@class="indexterm"][text()="Chapter 1"]', output, 2
+    end
+
+    test 'should honor locale when sorting entries in index in HTML output' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Unicode Party
+
+      ((étudier)) means to study.
+      ((être)) means to be.
+      ((abc)) vs ((ab©))
+      ((æ)) ((bå)) ((bæ)) ((bø))
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      if Gem.loaded_specs.key? 'ffi-icu'
+        assert_xpath '//*[@class="index"]//div[@class="title"][text()="AE"]', output, 1
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bå, Unicode Party, bæ, Unicode Party, bø, Unicode Party', b_terms
+        output = convert_string_to_embedded input, attributes: { 'lang' => 'nb' }
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bæ, Unicode Party, bø, Unicode Party, bå, Unicode Party', b_terms
+      else
+        assert_xpath '//*[@class="index"]//div[@class="title"][text()="Æ"]', output, 1
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bå, Unicode Party, bæ, Unicode Party, bø, Unicode Party', b_terms
+      end
+    end
+
+    test 'should not generate HTML index if index section is not level 1' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+
+      == Reference
+
+      [index]
+      === Index
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css '.index', output, 0
+        assert_message logger, :WARN, '<stdin>: line 10: index section can only be defined at level 0 (when doctype is book) or level 1', Hash
+      end
+    end
+
+    test 'should output anchors for index terms in HTML output even if index section is not present' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'a#_indexterm_1', output, 1
+      assert_css 'a#_indexterm_2', output, 1
+    end
   end
 
   context 'heading patterns in blocks' do

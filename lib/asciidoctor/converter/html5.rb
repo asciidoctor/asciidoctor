@@ -439,7 +439,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       %(<div class="sect#{level}#{(role = node.role) ? " #{role}" : ''}">
 <h#{level + 1}#{id_attr}>#{title}</h#{level + 1}>
 #{level == 1 ? %(<div class="sectionbody">
-#{node.content}
+#{node.special && node.sectname == 'index' ? (generate_index_section_content node) : node.content}
 </div>) : node.content}
 </div>)
     end
@@ -1270,7 +1270,7 @@ Your browser does not support the video tag.
   end
 
   def convert_inline_indexterm node
-    node.type == :visible ? node.text : ''
+    %(<a id="#{node.id}"></a>#{node.type == :visible ? node.text : ''})
   end
 
   def convert_inline_kbd node
@@ -1368,6 +1368,55 @@ Your browser does not support the video tag.
 
   def encode_attribute_value val
     (val.include? '"') ? (val.gsub '"', '&quot;') : val
+  end
+
+  def generate_index_section_content node
+    lines = ['<div class="index">']
+    if (index_catalog = (doc = node.document).catalog[:indexterms])
+      index_catalog.link_associations
+      xrefstyle = doc.attr 'xrefstyle', nil, true
+      index_catalog.categories.each do |category|
+        lines << '<div class="indexblock">'
+        lines << %(<div class="title">#{category.name}</div>)
+        lines << '<dl>'
+        category.terms.each {|term| generate_index_term lines, term, xrefstyle }
+        lines << '</dl>'
+        lines << '</div>'
+      end
+    end
+    lines << '</div>'
+    lines.join LF
+  end
+
+  def generate_index_term lines, term, xrefstyle
+    if term.container?
+      text = term.name
+    elsif (see = term.see)
+      text = %(#{term.name} (see #{see.name})</dt>)
+    else
+      term_targets = term.dests_by_section.map do |section, dests|
+        if (text = section.xreftext xrefstyle).include? '<a'
+          text = text.gsub DropAnchorRx, ''
+        end
+        links = %(<a class="indexterm" href="##{dests[0].id}">#{text}</a>)
+        (dests.drop 1).each_with_index {|dest, idx| links += %(&#8201;[<a class="indexterm" href="##{dest.id}">#{idx + 2}</a>]) } if dests.size > 1
+        links
+      end
+      text = %(#{term.name}, #{term_targets.join ', '})
+      see_also = term.see_also
+    end
+    lines << [%(<dt>#{text}</dt>)]
+    unless term.leaf?
+      lines << '<dd>'
+      lines << '<dl>'
+      see_also.each do |also_term|
+        lines << %(<dt>(see also #{::String === also_term ? also_term : also_term.name})</dt>)
+      end if see_also
+      term.subterms.each {|subterm| generate_index_term lines, subterm, xrefstyle }
+      lines << '</dl>'
+      lines << '</dd>'
+    end
+    nil
   end
 
   def generate_manname_section node
