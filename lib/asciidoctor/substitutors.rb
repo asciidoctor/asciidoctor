@@ -457,7 +457,7 @@ module Substitutors
                 attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
               end
             else
-              attrs = { 'terms' => attrlist }
+              attrs = { 'terms' => [attrlist] }
             end
           else
             attrs = { 'terms' => (split_simple_csv attrlist) }

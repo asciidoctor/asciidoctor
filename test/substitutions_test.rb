@@ -1631,6 +1631,17 @@ context 'Substitutions' do
       assert_includes output, indexterm_html5
     end
 
+    test 'should use attrlist as primary term if no primary term is specified' do
+      sentence = 'Flashindexterm:[see-also=HTML 5]'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm = <<~'EOS'.chop
+      <indexterm>
+      <primary>see-also=HTML 5</primary>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm
+    end
+
     test 'should honor secondary and tertiary index terms when primary index term is quoted and contains equals sign' do
       sentence = 'Assigning variables.'
       expected = %(#{sentence}<indexterm><primary>name=value</primary><secondary>variable</secondary><tertiary>assignment</tertiary></indexterm>)
