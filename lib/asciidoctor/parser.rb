@@ -1620,8 +1620,13 @@ class Parser
     sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
 
     if sect_style
-      if book && sect_style == 'abstract'
-        sect_name, sect_level = 'chapter', 1
+      if sect_style == 'abstract'
+        if book
+          sect_name, sect_level = 'chapter', 1
+        else
+          sect_name, sect_special = sect_style, true
+          sect_level = 1 if sect_level == 0
+        end
       elsif (sect_style.start_with? 'sect') && (SectionLevelStyleRx.match? sect_style)
         sect_name = 'section'
       else
