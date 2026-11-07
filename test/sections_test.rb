@@ -2714,6 +2714,28 @@ context 'Sections' do
       assert_xpath '/article/info/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
     end
 
+    test 'demote abstract section to level 1 in article if defined at level 0' do
+      input = <<~'EOS'
+      = Article
+
+      [abstract]
+      = Abstract Title
+
+      Abstract content
+
+      == Section Title
+
+      Section content
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string input
+        assert_css 'h2#_abstract_title', output, 1
+        assert_css 'h2#_section_title', output, 1
+        assert_message logger, :ERROR, '<stdin>: line 4: level 0 sections can only be used when doctype is book', Hash
+      end
+    end
+
     test 'should allow a special section to be nested at arbitrary depth in DocBook output' do
       input = <<~'EOS'
       = Document Title
