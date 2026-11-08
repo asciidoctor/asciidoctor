@@ -3345,7 +3345,7 @@ This is just an open block.
       assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
     end
 
-    test 'wip should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
+    test 'should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
       input = <<~'EOS'
       :imagesdir: assets
       [#cats-vs-dogs]
