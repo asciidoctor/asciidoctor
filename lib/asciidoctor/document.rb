@@ -601,8 +601,13 @@ class Document < AbstractBlock
       ref
     when :footnotes
       @catalog[type] << value
+    when :images
+      if @options[:catalog_assets]
+        target, imagesdir = ::Array === value ? value : [value, (@attributes['imagesdir'])]
+        @catalog[type] << (ImageReference.new target, imagesdir)
+      end
     else
-      @catalog[type] << (type == :images ? (ImageReference.new value, @attributes['imagesdir']) : value) if @options[:catalog_assets]
+      @catalog[type] << value if @options[:catalog_assets]
     end
   end
 
