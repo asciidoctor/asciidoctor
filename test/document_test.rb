@@ -1596,12 +1596,52 @@ context 'Document' do
       assert_nil doc.register :refs, ref
     end
 
-    test 'should record imagesdir when image is registered with catalog' do
+    test 'should record imagesdir from document when image is registered in catalog using legacy arguments' do
       doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
       doc.register :images, 'diagram.svg'
       assert_equal 1, doc.catalog[:images].size
       assert_equal 'diagram.svg', doc.catalog[:images][0].target
       assert_equal 'img', doc.catalog[:images][0].imagesdir
+    end
+
+    test 'should record imagesdir as specified when image is registered in catalog' do
+      doc = empty_document attributes: { 'imagesdir' => 'images@' }, catalog_assets: true
+      doc.register :images, ['diagram.svg', 'img']
+      assert_equal 1, doc.catalog[:images].size
+      assert_equal 'diagram.svg', doc.catalog[:images][0].target
+      assert_equal 'img', doc.catalog[:images][0].imagesdir
+    end
+
+    test 'should record imagesdir from document when image macro is parsed' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::picture.png[]
+      EOS
+
+      doc = document_from_string input, catalog_assets: true
+      images = doc.catalog[:images]
+      refute_empty images
+      assert_equal 1, images.size
+      assert_equal 'picture.png', images[0].target
+      assert_equal 'img', images[0].imagesdir
+      assert_equal 'img', doc.blocks[0].attributes['imagesdir']
+    end
+
+    test 'should record imagesdir from image macro when image macro with imagesdir attribute is parsed' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::picture.png[imagesdir=i]
+      EOS
+
+      doc = document_from_string input, catalog_assets: true
+      images = doc.catalog[:images]
+      refute_empty images
+      assert_equal 1, images.size
+      assert_equal 'picture.png', images[0].target
+      assert_equal 'i', images[0].imagesdir
+      assert_equal 'i', doc.blocks[0].attributes['imagesdir']
     end
 
     test 'should catalog assets inside nested document' do
