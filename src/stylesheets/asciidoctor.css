@@ -2067,6 +2067,32 @@ p.tableblock {
   font-size: 1em;
 }
 
+.index {
+  column-count: 2;
+  margin-bottom: 0.75em;
+}
+
+.indexblock > .title {
+  break-after: avoid;
+  font-weight: bold;
+  font-size: 1.125em;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+}
+
+.indexblock dl dt {
+  font-weight: normal;
+}
+
+.indexblock dl dt,
+.indexblock dl dd {
+  margin-bottom: 0;
+}
+
+.indexblock dl dd + dt {
+  margin-top: 0.25em;
+}
+
 .print-only {
   display: none !important;
 }

@@ -1627,6 +1627,15 @@ class Parser
           sect_name, sect_special = sect_style, true
           sect_level = 1 if sect_level == 0
         end
+      elsif sect_style == 'index'
+        if sect_level == 0
+          sect_name, sect_special = 'index', true
+          sect_level = 1
+        elsif sect_level == 1
+          sect_name, sect_special = 'index', true
+        else
+          logger.warn message_with_context 'index section can only be defined at level 0 (when doctype is book) or level 1', source_location: (reader.cursor_at_line reader.lineno - (sect_atx ? 1 : 2))
+        end
       elsif (sect_style.start_with? 'sect') && (SectionLevelStyleRx.match? sect_style)
         sect_name = 'section'
       else
