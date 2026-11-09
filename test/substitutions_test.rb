@@ -59,7 +59,7 @@ context 'Substitutions' do
       assert_equal '&#8220;a few quoted words&#8221;', para.sub_quotes(para.source)
 
       para = block_from_string '"`a few quoted words`"', backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="double">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line double-quoted string' do
@@ -116,7 +116,7 @@ context 'Substitutions' do
       assert_equal '&#8216;a few quoted words&#8217;', para.sub_quotes(para.source)
 
       para = block_from_string %q('`a few quoted words`'), backend: 'docbook'
-      assert_equal '<quote>a few quoted words</quote>', para.sub_quotes(para.source)
+      assert_equal '<quote role="single">a few quoted words</quote>', para.sub_quotes(para.source)
     end
 
     test 'escaped single-line single-quoted string' do
@@ -201,6 +201,16 @@ context 'Substitutions' do
     test 'single-line constrained marked string with role' do
       para = block_from_string '[statement]#a few words#'
       assert_equal '<span class="statement">a few words</span>', para.sub_quotes(para.source)
+    end
+
+    test 'does not recognize attribute list with left square bracket on formatted text' do
+      para = block_from_string 'key: [ *before [.redacted]#redacted# after* ]'
+      assert_equal 'key: [ <strong>before <span class="redacted">redacted</span> after</strong> ]', para.sub_quotes(para.source)
+    end
+
+    test 'should ignore enclosing square brackets when processing formatted text with attribute list' do
+      doc = document_from_string 'nums = [1, 2, 3, [.blue]#4#]', doctype: :inline
+      assert_equal 'nums = [1, 2, 3, <span class="blue">4</span>]', doc.convert
     end
 
     test 'single-line constrained strong string' do
@@ -335,6 +345,24 @@ context 'Substitutions' do
     end
 
     # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'should ignore role that ends with transitional role on constrained monospace span' do
+      para = block_from_string %([foox-]`leave it alone`)
+      assert_equal '<code class="foox-">leave it alone</code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained monospace string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}`leave it alone`)
+      assert_equal '[x-]`leave it alone`', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped forced compat role on single-line constrained monospace string' do
+      para = block_from_string %(#{BACKSLASH}[x-]`just *mono*`)
+      assert_equal '[x-]<code>just <strong>mono</strong></code>', para.apply_subs(para.source)
+    end
+
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
     test 'multi-line constrained monospaced string' do
       para = block_from_string %(`a few\n<{monospaced}> words`), attributes: { 'monospaced' => 'monospaced', 'compat-mode' => '' }
       assert_equal "<code>a few\n&lt;{monospaced}&gt; words</code>", para.apply_subs(para.source)
@@ -458,6 +486,12 @@ context 'Substitutions' do
       assert_equal %(call #{BACKSLASH}[method]`save()` to persist the changes), para.sub_quotes(para.source)
     end
 
+    # NOTE must use apply_subs because constrained monospaced is handled as a passthrough
+    test 'escaped single-line constrained passthrough string with forced compat role' do
+      para = block_from_string %([x-]#{BACKSLASH}+leave it alone+)
+      assert_equal '[x-]+leave it alone+', para.apply_subs(para.source)
+    end
+
     test 'single-line unconstrained monospaced chars' do
       para = block_from_string 'Git++Hub++', attributes: { 'compat-mode' => '' }
       assert_equal 'Git<code>Hub</code>', para.sub_quotes(para.source)
@@ -578,7 +612,7 @@ context 'Substitutions' do
 
     test 'quoted text with id and role shorthand using docbook backend' do
       para = block_from_string '[#bond.white.red-background]#007#', backend: 'docbook'
-      assert_equal '<anchor xml:id="bond" xreflabel="007"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.source)
+      assert_equal '<anchor xml:id="bond"/><phrase role="white red-background">007</phrase>', para.sub_quotes(para.source)
     end
 
     test 'should not assign role attribute if shorthand style has no roles' do
@@ -589,6 +623,12 @@ context 'Substitutions' do
     test 'should remove trailing spaces from role defined using shorthand' do
       para = block_from_string '[.rolename ]*blah*'
       assert_equal '<strong class="rolename">blah</strong>', para.content
+    end
+
+    test 'should allow role to be defined using attribute reference' do
+      input = '[{rolename}]#phrase#'
+      result = convert_string_to_embedded input, doctype: 'inline', attributes: { 'rolename' => 'red' }
+      assert_equal '<span class="red">phrase</span>', result
     end
 
     test 'should ignore attributes after comma' do
@@ -637,17 +677,17 @@ context 'Substitutions' do
 
     test 'a mailto macro with text and subject should be interpreted as a mailto link' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[Doc Writer, Pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request">Doc Writer</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request">Doc Writer</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro with text, subject and body should be interpreted as a mailto link' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[Doc Writer, Pull request, Please accept my pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">Doc Writer</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">Doc Writer</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro with subject and body only should use e-mail as text' do
       para = block_from_string 'mailto:doc.writer@asciidoc.org[,Pull request,Please accept my pull request]'
-      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull+request&amp;body=Please+accept+my+pull+request">doc.writer@asciidoc.org</a>', para.sub_macros(para.source)
+      assert_equal '<a href="mailto:doc.writer@asciidoc.org?subject=Pull%20request&amp;body=Please%20accept%20my%20pull%20request">doc.writer@asciidoc.org</a>', para.sub_macros(para.source)
     end
 
     test 'a mailto macro supports id and role attributes' do
@@ -734,6 +774,17 @@ context 'Substitutions' do
       assert_equal '<span class="image"><img src="tiger.png" alt="tiger"></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'should use the imagesdir attribute defined on image macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      Great job! image:rainbow.png[imagesdir=stickers]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="stickers/rainbow.png"'
+    end
+
     test 'should replace underscore and hyphen with space in generated alt text for an inline image' do
       para = block_from_string 'image:tiger-with-family_1.png[]'
       assert_equal '<span class="image"><img src="tiger-with-family_1.png" alt="tiger with family 1"></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
@@ -809,6 +860,18 @@ context 'Substitutions' do
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'a single-line image macro with scaledwidth attribute should be supported in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,scaledwidth=25%]', backend: 'docbook'
+      assert_equal '<inlinemediaobject><imageobject><imagedata fileref="tiger.png" width="25%"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'a single-line image macro with scaled attribute should be supported in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,scale=200]', backend: 'docbook'
+      assert_equal '<inlinemediaobject><imageobject><imagedata fileref="tiger.png" scale="200"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'should pass through role on image macro to DocBook output' do
       para = block_from_string 'image:tiger.png[Tiger,200,role=animal]', backend: 'docbook'
       result = para.sub_macros para.source
@@ -821,9 +884,21 @@ context 'Substitutions' do
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
+    test 'an inline image macro with link should be interpreted as a linked image in docbook' do
+      para = block_from_string 'image:apache license 2_0.png[Apache License 2.0,link=http://www.apache.org/licenses/LICENSE-2.0]', backend: 'docbook'
+      assert_equal '<link xl:href="http://www.apache.org/licenses/LICENSE-2.0"><inlinemediaobject><imageobject><imagedata fileref="apache%20license%202_0.png"/></imageobject><textobject><phrase>Apache License 2.0</phrase></textobject></inlinemediaobject></link>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
     test 'a single-line image macro with text and link to self should be interpreted as a self-referencing image with alt text' do
       para = block_from_string 'image:tiger.png[Tiger, link=self]', attributes: { 'imagesdir' => 'img' }
       assert_equal '<span class="image"><a class="image" href="img/tiger.png"><img src="img/tiger.png" alt="Tiger"></a></span>',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'an inline image macro with text and link to self should be interpreted as a self-referencing image in docbook' do
+      para = block_from_string 'image:tiger.png[Tiger,link=self]', attributes: { 'imagesdir' => 'img' }, backend: 'docbook'
+      assert_equal '<link xl:href="img/tiger.png"><inlinemediaobject><imageobject><imagedata fileref="img/tiger.png"/></imageobject><textobject><phrase>Tiger</phrase></textobject></inlinemediaobject></link>',
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
@@ -867,6 +942,18 @@ context 'Substitutions' do
     test 'an inline image macro with a float attribute should be interpreted as a floating image' do
       para = block_from_string %(image:http://example.com/images/tiger.png[tiger, float="right"] Beware of the tigers!)
       assert_equal '<span class="image right"><img src="http://example.com/images/tiger.png" alt="tiger"></span> Beware of the tigers!',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should propagate id attribute on inline image' do
+      para = block_from_string %(image:ruby.png[Ruby logo,id=ruby-logo] is the Ruby logo)
+      assert_equal '<span id="ruby-logo" class="image"><img src="ruby.png" alt="Ruby logo"></span> is the Ruby logo',
+        para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should propagate id attribute on inline image and use alt text as reftext when converting to DocBook' do
+      para = block_from_string %(image:ruby.png[Ruby logo,id=ruby-logo] is the Ruby logo), backend: 'docbook'
+      assert_equal '<inlinemediaobject xml:id="ruby-logo"><imageobject><imagedata fileref="ruby.png"/></imageobject><textobject><phrase>Ruby logo</phrase></textobject></inlinemediaobject> is the Ruby logo',
         para.sub_macros(para.source).gsub(/>\s+</, '><')
     end
 
@@ -978,6 +1065,13 @@ context 'Substitutions' do
     test 'an icon macro with a role and title should be interpreted as a font-based icon with a class and title when icons=font' do
       para = block_from_string 'icon:heart[role="red", title="Heart me"]', attributes: { 'icons' => 'font' }
       assert_equal '<span class="icon red"><i class="fa fa-heart" title="Heart me"></i></span>', para.sub_macros(para.source).gsub(/>\s+</, '><')
+    end
+
+    test 'should use the imagesdir attribute on the node when resolving the icon path' do
+      doc = empty_document attributes: { 'iconsdir' => 'assets/icons', 'icons' => 'image' }
+      icon = Asciidoctor::Inline.new doc, :image, nil, type: 'icon', attributes: { 'iconsdir' => 'chapter-1/icons' }
+      icon_uri = icon.icon_uri 'wave'
+      assert_equal 'chapter-1/icons/wave.png', icon_uri
     end
 
     test 'a single-line footnote macro should be registered and output as a footnote' do
@@ -1264,6 +1358,26 @@ context 'Substitutions' do
       assert_include '<a href="#_footnoteref_1">1</a>. See <a href="#gof">[gof]</a> to find a collection of design patterns.', result
     end
 
+    test 'footnotes in headings are expected to be numbered out of sequence' do
+      input = <<~'EOS'
+      == Section 1
+
+      para.footnote:[first footnote]
+
+      == Section 2footnote:[second footnote]
+
+      para.footnote:[third footnote]
+      EOS
+
+      result = convert_string_to_embedded input
+      footnote_refs = xmlnodes_at_css 'a.footnote', result
+      footnote_defs = xmlnodes_at_css 'div.footnote', result
+      assert_equal 3, footnote_refs.length
+      assert_equal %w(1 1 2), footnote_refs.map(&:text)
+      assert_equal 3, footnote_defs.length
+      assert_equal ['1. second footnote', '1. first footnote', '2. third footnote'], footnote_defs.map(&:text).map(&:strip)
+    end
+
     test 'a single-line index term macro with a primary term should be registered as an index reference' do
       sentence = "The tiger (Panthera tigris) is the largest cat species.\n"
       macros = ['indexterm:[Tigers]', '(((Tigers)))']
@@ -1481,7 +1595,7 @@ context 'Substitutions' do
       #assert_equal ['<strong>tiger</strong>'], para.document.catalog[:indexterms].first
     end
 
-    test 'index term 2 macro with round bracket syntex should not interfer with index term macro with round bracket syntax' do
+    test 'index term 2 macro with round bracket syntax should not interfere with index term macro with round bracket syntax' do
       sentence = "The ((panthera tigris)) is the largest cat species.\n(((Big cats,Tigers)))"
       para = block_from_string sentence
       output = para.sub_macros para.source
@@ -1570,6 +1684,28 @@ context 'Substitutions' do
       EOS
       assert_includes output, indexterm_flash
       assert_includes output, indexterm_html5
+    end
+
+    test 'should use attrlist as primary term if no primary term is specified' do
+      sentence = 'Flashindexterm:[see-also=HTML 5]'
+      output = convert_string_to_embedded sentence, backend: 'docbook'
+      indexterm = <<~'EOS'.chop
+      <indexterm>
+      <primary>see-also=HTML 5</primary>
+      </indexterm>
+      EOS
+      assert_includes output, indexterm
+    end
+
+    test 'should honor secondary and tertiary index terms when primary index term is quoted and contains equals sign' do
+      sentence = 'Assigning variables.'
+      expected = %(#{sentence}<indexterm><primary>name=value</primary><secondary>variable</secondary><tertiary>assignment</tertiary></indexterm>)
+      macros = ['indexterm:["name=value",variable,assignment]', '(((name=value,variable,assignment)))']
+      macros.each do |macro|
+        para = block_from_string %(#{sentence}#{macro}), backend: 'docbook'
+        output = (para.sub_macros para.source).tr ?\n, ''
+        assert_equal expected, output
+      end
     end
 
     context 'Button macro' do
@@ -1915,6 +2051,16 @@ context 'Substitutions' do
       end
     end
 
+    test 'should warn if substitutions on pass macro are invalid' do
+      subs = 'bogus'
+      input = %(pass:#{subs}[++])
+      using_memory_logger do |logger|
+        para = block_from_string input, attributes: { 'stem' => 'asciimath' }
+        assert_equal '++', para.content
+        assert_message logger, :WARN, %(invalid substitution type for passthrough macro: #{subs})
+      end
+    end
+
     test 'should allow content of inline pass macro to be empty' do
       para = block_from_string 'pass:[]'
       result = para.extract_passthroughs para.source
@@ -1978,6 +2124,66 @@ context 'Substitutions' do
     test 'inline pass macro with a composite sub' do
       para = block_from_string %(pass:verbatim[<{backend}>])
       assert_equal '&lt;{backend}&gt;', para.content
+    end
+
+    test 'should support constrained passthrough in middle of monospace span' do
+      input = 'a `foo +bar+ baz` kind of thing'
+      para = block_from_string input
+      assert_equal 'a <code>foo bar baz</code> kind of thing', para.content
+    end
+
+    test 'should support constrained passthrough in monospace span preceded by escaped boxed attrlist with transitional role' do
+      input = %(#{BACKSLASH}[x-]`foo +bar+ baz`)
+      para = block_from_string input
+      assert_equal '[x-]<code>foo bar baz</code>', para.content
+    end
+
+    test 'should treat monospace phrase with escaped boxed attrlist with transitional role as monospace' do
+      input = %(#{BACKSLASH}[x-]`*foo* +bar+ baz`)
+      para = block_from_string input
+      assert_equal '[x-]<code><strong>foo</strong> bar baz</code>', para.content
+    end
+
+    test 'should ignore escaped attrlist with transitional role on monospace phrase if not proceeded by [' do
+      input = %(#{BACKSLASH}x-]`*foo* +bar+ baz`)
+      para = block_from_string input
+      assert_equal %(#{BACKSLASH}x-]<code><strong>foo</strong> bar baz</code>), para.content
+    end
+
+    test 'should not process passthrough inside transitional literal monospace span' do
+      input = 'a [x-]`foo +bar+ baz` kind of thing'
+      para = block_from_string input
+      assert_equal 'a <code>foo +bar+ baz</code> kind of thing', para.content
+    end
+
+    test 'should support constrained passthrough in monospace phrase with attrlist' do
+      input = '[.role]`foo +bar+ baz`'
+      para = block_from_string input
+      assert_equal '<code class="role">foo bar baz</code>', para.content
+    end
+
+    test 'should support attrlist on a literal monospace phrase' do
+      input = '[.baz]`+foo--bar+`'
+      para = block_from_string input
+      assert_equal '<code class="baz">foo--bar</code>', para.content
+    end
+
+    test 'should not process an escaped passthrough macro inside a monospaced phrase' do
+      input = 'use the `\pass:c[]` macro'
+      para = block_from_string input
+      assert_equal 'use the <code>pass:c[]</code> macro', para.content
+    end
+
+    test 'should not process an escaped passthrough macro inside a monospaced phrase with attributes' do
+      input = 'use the [syntax]`\pass:c[]` macro'
+      para = block_from_string input
+      assert_equal 'use the <code class="syntax">pass:c[]</code> macro', para.content
+    end
+
+    test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
+      input = 'use `\+{author}+` to show an attribute reference'
+      para = block_from_string input, attributes: { 'author' => 'Dan' }
+      assert_equal 'use <code>+Dan+</code> to show an attribute reference', para.content
     end
 
     context 'Math macros' do
@@ -2094,30 +2300,6 @@ context 'Substitutions' do
         assert_equal 'the text <code>asciimath:[x = y]</code> should be passed through as <code>literal</code> text', para.content
       end
 
-      test 'should support attrlist on a literal monospace phrase' do
-        input = '[.baz]`+foo--bar+`'
-        para = block_from_string input
-        assert_equal '<code class="baz">foo--bar</code>', para.content
-      end
-
-      test 'should not process an escaped passthrough macro inside a monospaced phrase' do
-        input = 'use the `\pass:c[]` macro'
-        para = block_from_string input
-        assert_equal 'use the <code>pass:c[]</code> macro', para.content
-      end
-
-      test 'should not process an escaped passthrough macro inside a monospaced phrase with attributes' do
-        input = 'use the [syntax]`\pass:c[]` macro'
-        para = block_from_string input
-        assert_equal 'use the <code class="syntax">pass:c[]</code> macro', para.content
-      end
-
-      test 'should honor an escaped single plus passthrough inside a monospaced phrase' do
-        input = 'use `\+{author}+` to show an attribute reference'
-        para = block_from_string input
-        assert_equal 'use <code>+{author}+</code> to show an attribute reference', para.content
-      end
-
       test 'should not recognize stem macro with no content' do
         input = 'stem:[]'
         para = block_from_string input
@@ -2185,6 +2367,16 @@ context 'Substitutions' do
           input = %(stem:#{subs}[x^2])
           para = block_from_string input, attributes: { 'stem' => 'asciimath' }
           assert_equal %(stem:#{subs}[x^2]), para.content
+        end
+      end
+
+      test 'should warn if substitutions on stem macro are invalid' do
+        subs = 'bogus'
+        input = %(stem:#{subs}[x^2])
+        using_memory_logger do |logger|
+          para = block_from_string input, attributes: { 'stem' => 'asciimath' }
+          assert_equal '\\$x^2\\$', para.content
+          assert_message logger, :WARN, %(invalid substitution type for stem macro: #{subs})
         end
       end
     end

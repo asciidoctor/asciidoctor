@@ -28,6 +28,9 @@ class SamplePreprocessor < Asciidoctor::Extensions::Preprocessor
 end
 
 class SampleIncludeProcessor < Asciidoctor::Extensions::IncludeProcessor
+  def handles? target
+    'affirmative'
+  end
 end
 
 class SampleDocinfoProcessor < Asciidoctor::Extensions::DocinfoProcessor
@@ -345,6 +348,19 @@ context 'Extensions' do
       end
     end
 
+    test 'should not fail to unregister extension group if not registered' do
+      refute_nil Asciidoctor::Extensions.groups
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+      Asciidoctor::Extensions.unregister :sample
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
+    test 'should not fail to unregister extension group if extension groups are not initialized' do
+      Asciidoctor::Extensions.remove_instance_variable :@groups
+      Asciidoctor::Extensions.unregister :sample
+      assert_equal 0, Asciidoctor::Extensions.groups.size
+    end
+
     test 'should raise NameError if extension class cannot be resolved from string' do
       begin
         Asciidoctor::Extensions.register do
@@ -393,6 +409,27 @@ context 'Extensions' do
       end
     end
 
+    test 'should reset registry if activate is called again' do
+      begin
+        Asciidoctor::Extensions.register :sample, SampleExtensionGroup
+        doc = Asciidoctor::Document.new
+        registry = Asciidoctor::Extensions::Registry.new
+        registry.activate doc
+        assert doc.attr? 'activate-method-called'
+        assert registry.preprocessors?
+        assert_equal 1, registry.preprocessors.size
+        assert_same doc, registry.document
+        doc = Asciidoctor::Document.new
+        registry.activate doc
+        assert doc.attr? 'activate-method-called'
+        assert registry.preprocessors?
+        assert_equal 1, registry.preprocessors.size
+        assert_same doc, registry.document
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should invoke extension block' do
       begin
         doc = Asciidoctor::Document.new
@@ -431,6 +468,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePreprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -443,6 +481,10 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleIncludeProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
+      # verify that legacy handles? method is adapted
+      assert_equal 2, (extensions.first.instance.method :handles?).arity
+      assert_equal 'affirmative', (extensions.first.instance.handles? nil, 'include.adoc')
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -456,6 +498,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleDocinfoProcessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -469,6 +512,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SampleTreeprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -481,6 +525,7 @@ context 'Extensions' do
       assert_equal 1, extensions.size
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extensions.first
       assert_kind_of SamplePostprocessor, extensions.first.instance
+      refute extensions.first.instance.frozen?
       assert_kind_of Method, extensions.first.process_method
     end
 
@@ -493,6 +538,7 @@ context 'Extensions' do
       extension = registry.find_block_extension :sample
       assert_kind_of Asciidoctor::Extensions::ProcessorExtension, extension
       assert_kind_of SampleBlock, extension.instance
+      refute extension.instance.frozen?
       assert_kind_of Method, extension.process_method
     end
 
@@ -539,6 +585,20 @@ context 'Extensions' do
   end
 
   context 'Integration' do
+    test 'does not crash when querying for extensions if none are registered' do
+      registry = Asciidoctor::Extensions.create
+
+      doc = document_from_string %(= Document Title\n\ncontent), extension_registry: registry
+      refute_nil doc.extensions
+      assert_equal false, (doc.extensions.registered_for_block? :unknown, :paragraph) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_block_extension :unknown
+      assert_equal false, (doc.extensions.registered_for_block_macro? :unknown) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_block_macro_extension :unknown
+      assert_equal false, (doc.extensions.registered_for_inline_macro? :unknown) # rubocop:disable Minitest/RefuteFalse
+      assert_nil doc.extensions.find_inline_macro_extension :unknown
+      assert_empty doc.extensions.inline_macros
+    end
+
     test 'can provide extension registry as an option' do
       registry = Asciidoctor::Extensions.create do
         tree_processor SampleTreeProcessor
@@ -637,7 +697,7 @@ context 'Extensions' do
       end
     end
 
-    test 'should invoke include processor if it offers to handle include directive' do
+    test 'should invoke include processor if it requests to handle include directive' do
       input = <<~'EOS'
       include::skip-me.adoc[]
       line after skip
@@ -651,7 +711,8 @@ context 'Extensions' do
 
       registry = Asciidoctor::Extensions.create do
         include_processor do
-          handles? do |target|
+          # test handles? registered as block
+          handles? do |_doc, target|
             target == 'skip-me.adoc'
           end
 
@@ -661,7 +722,8 @@ context 'Extensions' do
         end
 
         include_processor do
-          handles? do |target|
+          # tests handles? defined as method
+          def handles? _doc, target
             target == 'include-file.adoc'
           end
 
@@ -692,6 +754,35 @@ context 'Extensions' do
       assert_match(/^middle line$/, source)
       assert_match(/^last line of grandchild$/, source)
       assert_match(/^last line$/, source)
+    end
+
+    test 'should invoke include processor if it requests to handle include directive using legacy method' do
+      input = %(include::include-file.adoc[]\ninclude::include-file.adoc[])
+      content_cache = {}
+
+      registry = Asciidoctor::Extensions.create do
+        include_processor do
+          handles? do |target|
+            target == 'include-file.adoc'
+          end
+
+          process do |_doc, reader, target, attributes|
+            # demonstrate that we can use instance variables
+            @content_cache ||= content_cache
+            content = (@content_cache['include-file.adoc'] ||= 'contents of include-file.adoc')
+            reader.push_include content, target, target, 1, attributes
+          end
+        end
+      end
+      # safe mode only required for built-in include processor
+      document = empty_document base_dir: testdir, extension_registry: registry, safe: :safe
+      reader = Asciidoctor::PreprocessorReader.new document, input, nil, normalize: true
+      lines = []
+      lines << reader.read_line
+      lines << reader.read_line
+      assert_equal 'contents of include-file.adoc', lines.last
+      assert_equal 1, content_cache.size
+      assert_equal content_cache['include-file.adoc'], lines.last
     end
 
     test 'should invoke tree processors after parsing document' do
@@ -1002,6 +1093,54 @@ context 'Extensions' do
       end
     end
 
+    test 'should not parse attributes on custom block macro when resolve attributes is false' do
+      input = 'log::[hello, world!]'
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :log do
+            resolve_attributes false
+            process do |parent, _, attrs|
+              parent.logger.info attrs['text']
+              nil
+            end
+          end
+        end
+
+        using_memory_logger :INFO do |logger|
+          output = convert_string_to_embedded input
+          assert_empty output
+          assert_message logger, :INFO, 'hello, world!'
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not parse attributes on custom block macro when content model is :text' do
+      input = 'log::[hello, world!]'
+
+      begin
+        Asciidoctor::Extensions.register do
+          block_macro :log do
+            content_model :text
+            process do |parent, _, attrs|
+              parent.logger.info attrs['text']
+              nil
+            end
+          end
+        end
+
+        using_memory_logger :INFO do |logger|
+          output = convert_string_to_embedded input
+          assert_empty output
+          assert_message logger, :INFO, 'hello, world!'
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should substitute attributes in target of custom block macro' do
       input = 'snippet::{gist-id}[mode=edit]'
 
@@ -1019,9 +1158,42 @@ context 'Extensions' do
 
     test 'should log debug message if custom block macro is unknown' do
       input = 'unknown::[]'
-      using_memory_logger Logger::Severity::DEBUG do |logger|
-        convert_string_to_embedded input
+      using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
+        result = convert_string_to_embedded input
         assert_message logger, :DEBUG, '<stdin>: line 1: unknown name for block macro: unknown', Hash
+        assert_xpath %(/*[@class="paragraph"]/p[text()="#{input}"]), result, 1
+      end
+    end
+
+    test 'should log debug message if custom block macro is unknown when custom block macros are registered' do
+      begin
+        input = 'unknown::[]'
+        Asciidoctor::Extensions.register do
+          block_macro SampleBlockMacro, :sample
+        end
+        using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
+          result = convert_string_to_embedded input
+          assert_message logger, :DEBUG, '<stdin>: line 1: unknown name for block macro: unknown', Hash
+          assert_xpath %(/*[@class="paragraph"]/p[text()="#{input}"]), result, 1
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not log debug message if line is not a custom block macro and block macros are registered' do
+      begin
+        input = '* xref:component::page.adoc[link text]'
+        Asciidoctor::Extensions.register do
+          block_macro SampleBlockMacro, :sample
+        end
+        using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
+          result = convert_string_to_embedded input
+          assert_empty logger.messages
+          assert_css 'ul li a[href="component::page.html"]', result, 1
+        end
+      ensure
+        Asciidoctor::Extensions.unregister_all
       end
     end
 
@@ -1201,6 +1373,48 @@ context 'Extensions' do
       end
     end
 
+    test 'should not parse attributes on custom inline macro when resolve attributes is false' do
+      input = 'Line is del:[good]great.'
+
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :del do
+            match_format :short
+            resolve_attributes false
+            process do |parent, _, attrs|
+              create_inline parent, :quoted, attrs['text'], type: :unquoted, attributes: { 'role' => 'line-through' }
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_includes output, '<span class="line-through">good</span>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should not parse attributes on custom inline macro when content model is text' do
+      input = 'Line is del:[good]great.'
+
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :del do
+            match_format :short
+            content_model :text
+            process do |parent, _, attrs|
+              create_inline parent, :quoted, attrs['text'], type: :unquoted, attributes: { 'role' => 'line-through' }
+            end
+          end
+        end
+
+        output = convert_string_to_embedded input
+        assert_includes output, '<span class="line-through">good</span>'
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
     test 'should resolve regexp for inline macro lazily' do
       begin
         Asciidoctor::Extensions.register do
@@ -1330,17 +1544,17 @@ context 'Extensions' do
         ++++
         EOS
         expected = <<~'EOS'.chop
-        target="", attributes={}
-        target="value,key=val", attributes={1=>"value", "key"=>"val", "name"=>"value"}
-        target="", attributes={"text"=>""}
-        target="[text]", attributes={"text"=>"[text]"}
-        target="target", attributes={}
-        target="target", attributes={1=>"value", "key"=>"val", "name"=>"value"}
-        target="target", attributes={"text"=>""}
-        target="target", attributes={"text"=>"[text]"}
-        target="target", attributes={}
+        target="",attributes={}
+        target="value,key=val",attributes={1=>"value","key"=>"val","name"=>"value"}
+        target="",attributes={"text"=>""}
+        target="[text]",attributes={"text"=>"[text]"}
+        target="target",attributes={}
+        target="target",attributes={1=>"value","key"=>"val","name"=>"value"}
+        target="target",attributes={"text"=>""}
+        target="target",attributes={"text"=>"[text]"}
+        target="target",attributes={}
         EOS
-        output = convert_string_to_embedded input
+        output = ((convert_string_to_embedded input).gsub ' => ', '=>').gsub ', ', ','
         assert_equal expected, output
       ensure
         Asciidoctor::Extensions.unregister_all
@@ -1500,6 +1714,25 @@ context 'Extensions' do
         output = convert_string_to_embedded 'attrs:[A,foo=bar]', doctype: :inline
         # NOTE default attributes aren't considered when mapping positional attributes
         assert_equal 'a=A,2=b,b=nil,foo=bar', output
+      ensure
+        Asciidoctor::Extensions.unregister_all
+      end
+    end
+
+    test 'should coerce names of positional attributes to strings' do
+      begin
+        Asciidoctor::Extensions.register do
+          inline_macro :attrs do
+            match_format :short
+            positional_attributes :a, 'b'
+            process do |parent, _, attrs|
+              create_inline_pass parent, %(a=#{attrs['a']},b=#{attrs['b']})
+            end
+          end
+        end
+
+        output = convert_string_to_embedded 'attrs:[A,B]', doctype: :inline
+        assert_equal 'a=A,b=B', output
       ensure
         Asciidoctor::Extensions.unregister_all
       end
@@ -1954,6 +2187,48 @@ context 'Extensions' do
       ensure
         Asciidoctor::Extensions.unregister_all
       end
+    end
+
+    test 'should raise exception if document processor extension does not provide process method' do
+      extension_registry = Asciidoctor::Extensions.create do
+        tree_processor do # rubocop:disable Lint/EmptyBlock
+        end
+      end
+      exception = assert_raises NoMethodError do
+        convert_string_to_embedded 'content', extension_registry: extension_registry
+      end
+      assert_match %r/No block specified to process tree processor extension at .*extensions_test\.rb:\d+/, exception.message
+    end
+
+    test 'should raise exception if syntax processor extension does not provide process method' do
+      extension_registry = Asciidoctor::Extensions.create do
+        block_macro :foo do # rubocop:disable Lint/EmptyBlock
+        end
+      end
+      exception = assert_raises NoMethodError do
+        convert_string_to_embedded 'foo::bar[]', extension_registry: extension_registry
+      end
+      assert_match %r/No block specified to process block macro extension at .*extensions_test\.rb:\d+/, exception.message
+    end
+
+    test 'should raise exception if syntax processor extension does not provide a name' do
+      macro_name = (Class.new String do
+        def to_sym
+          nil
+        end
+      end).new 'foo'
+      extension_registry = Asciidoctor::Extensions.create do
+        block_macro do
+          named macro_name
+          process do
+            nil
+          end
+        end
+      end
+      exception = assert_raises ArgumentError do
+        convert_string_to_embedded 'foo::bar[]', extension_registry: extension_registry
+      end
+      assert_match %r/No name specified for block macro extension at .*extensions_test\.rb:\d+/, exception.message
     end
 
     test 'should raise an exception if mandatory target attribute is not provided for image block' do

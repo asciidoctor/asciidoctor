@@ -4,23 +4,29 @@
 
 These extensions are registered per document using a callback that feels like a DSL:
 
-[source,ruby]
+[,ruby]
 ----
-Asciidoctor::Extensions.register do |document|
+Asciidoctor::Extensions.register do
   preprocessor FrontMatterPreprocessor
   tree_processor ShellSessionTreeProcessor
   postprocessor CopyrightFooterPostprocessor
-  docinfo_processor TrackingCodeDocinfoProcessor if document.basebackend? 'html'
+  docinfo_processor TrackingCodeDocinfoProcessor if @document.basebackend? 'html'
   block ShoutBlock
-  block_macro GistBlockMacro if document.basebackend? 'html'
+  block_macro GistBlockMacro if @document.basebackend? 'html'
   inline_macro ManInlineMacro
   include_processor UriIncludeProcessor
 end
 ----
 
+Each registered class is instantiated when the [.class]#Asciidoctor::Document# is created.
+Alternately, you can pass an instance of the class when registering the extension.
+
 CAUTION: Extension classes must be defined outside of the register block.
-Once an extension class is registered, it is frozen, preventing further modification.
 If you define an extension class inside the register block, it will result in an error on subsequent invocations.
 
+NOTE: Once an extension class is registered, it is frozen, preventing further modification.
+
+TIP: If you need to store state on a class-based extension instance, assign a new Hash to an instance variable named `@state` in the constructor, then assign data to the keys of that Hash.
+If you need other extensions to be able to access that state, define a reader for that instance variable (i.e., `attr_reader :state`).
+
 You can register more than one processor of each type, though you can only have one processor per custom block or macro.
-Each registered class is instantiated when the [.class]#Asciidoctor::Document# is created.

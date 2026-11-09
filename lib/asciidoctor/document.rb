@@ -259,10 +259,12 @@ class Document < AbstractBlock
       @parent_document = parent_doc
       options[:base_dir] ||= parent_doc.base_dir
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
+      options[:to_dir] = parent_doc.options[:to_dir] if parent_doc.options[:to_dir]
       @catalog = parent_doc.catalog.merge footnotes: []
       # QUESTION should we support setting attribute in parent document from nested document?
       @attribute_overrides = attr_overrides = (parent_doc.instance_variable_get :@attribute_overrides).merge parent_doc.attributes
       attr_overrides.delete 'compat-mode'
+      @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       parent_doctype = attr_overrides.delete 'doctype'
       attr_overrides.delete 'notitle'
       attr_overrides.delete 'showtitle'
@@ -271,7 +273,6 @@ class Document < AbstractBlock
       @attributes['toc-placement'] = (attr_overrides.delete 'toc-placement') || 'auto'
       attr_overrides.delete 'toc-position'
       @safe = parent_doc.safe
-      @attributes['compat-mode'] = '' if (@compat_mode = parent_doc.compat_mode)
       @outfilesuffix = parent_doc.outfilesuffix
       @sourcemap = parent_doc.sourcemap
       @timings = nil
@@ -322,10 +323,10 @@ class Document < AbstractBlock
         # be permissive in case API user wants to define new levels
         @safe = safe_mode
       else
-        @safe = (SafeMode.value_for_name safe_mode) rescue SafeMode::SECURE
+        @safe = (SafeMode.value_for_name safe_mode) || SafeMode::SECURE
       end
       input_mtime = options.delete :input_mtime
-      @compat_mode = attr_overrides.key? 'compat-mode'
+      @compat_mode = attr_overrides['compat-mode'] ? true : false
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
@@ -600,8 +601,13 @@ class Document < AbstractBlock
       ref
     when :footnotes
       @catalog[type] << value
+    when :images
+      if @options[:catalog_assets]
+        target, imagesdir = ::Array === value ? value : [value, (@attributes['imagesdir'])]
+        @catalog[type] << (ImageReference.new target, imagesdir)
+      end
     else
-      @catalog[type] << (type == :images ? (ImageReference.new value, @attributes['imagesdir']) : value) if @options[:catalog_assets]
+      @catalog[type] << value if @options[:catalog_assets]
     end
   end
 
@@ -638,6 +644,18 @@ class Document < AbstractBlock
   # Returns A [Boolean] to indicate whether this Document has child Section objects
   def sections?
     @next_section_index > 0
+  end
+
+  def multipart?
+    return unless @doctype == 'book'
+    @blocks.any? do |b|
+      next unless b.context == :section
+      if b.level == 0
+        true
+      elsif !b.special
+        break
+      end
+    end
   end
 
   def footnotes?
@@ -770,6 +788,14 @@ class Document < AbstractBlock
     end
   end
 
+  # Public: Convenience method to retrieve the keywords of this document as an Array of keyword strings.
+  #
+  # returns the keywords as an Array of String objects, or an empty Array if no keywords are defined
+  def keywords
+    return [] unless (val = @attributes['keywords'])
+    (val.to_s.split ',').each_with_object([]) {|kw, accum| accum << kw unless (kw = kw.strip).empty? }
+  end
+
   # Public: Convenience method to retrieve the document attribute 'revdate'
   #
   # returns the date of last revision for the document as a String
@@ -829,10 +855,8 @@ class Document < AbstractBlock
       name = entry.name
       if entry.negate
         @attributes.delete name
-        @compat_mode = false if name == 'compat-mode'
       else
         @attributes[name] = entry.value
-        @compat_mode = true if name == 'compat-mode'
       end
     end
   end
@@ -864,6 +888,8 @@ class Document < AbstractBlock
       case name
       when 'backend'
         update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
+      when 'compat-mode'
+        @attributes[name] = (@compat_mode = true) && value
       when 'doctype'
         update_doctype_attributes value
       else
@@ -886,7 +912,11 @@ class Document < AbstractBlock
       false
     else
       @attributes.delete name
-      @attributes_modified << name
+      # NOTE if @header_attributes is set, we're beyond the document header
+      unless @header_attributes
+        @attributes_modified << name
+        @compat_mode = false if name == 'compat-mode'
+      end
       true
     end
   end
@@ -922,7 +952,7 @@ class Document < AbstractBlock
   end
 
   # Public: Convert the AsciiDoc document using the templates
-  # loaded by the Converter. If a :template_dir is not specified,
+  # loaded by the Converter. If :template_dirs is not specified,
   # or a template is missing, the converter will fall back to
   # using the appropriate built-in template.
   def convert opts = {}
@@ -1037,7 +1067,7 @@ class Document < AbstractBlock
           docinfo = docinfo ? ['private'] : nil
         end
       else
-        docinfo = docinfo.split(',').map {|it| it.strip }
+        docinfo = docinfo.split(',').map {|keyword| keyword.strip }
       end
 
       if docinfo
@@ -1212,9 +1242,7 @@ class Document < AbstractBlock
       end
     end
 
-    if (@compat_mode = attrs.key? 'compat-mode') && (attrs.key? 'language')
-      attrs['source-language'] = attrs['language']
-    end
+    attrs['source-language'] = attrs['language'] if @compat_mode && (attrs.key? 'language')
 
     unless @parent_document
       if (basebackend = attrs['basebackend']) == 'html'
@@ -1255,7 +1283,7 @@ class Document < AbstractBlock
   # localdatetime, docdate, docyear, doctime, and docdatetime. Honor the SOURCE_DATE_EPOCH environment variable, if set.
   def fill_datetime_attributes attrs, input_mtime
     # See https://reproducible-builds.org/specs/source-date-epoch/
-    now = (::ENV.key? 'SOURCE_DATE_EPOCH') ? (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc) : ::Time.now
+    now = ::ENV['SOURCE_DATE_EPOCH'].nil_or_empty? ? ::Time.now : (source_date_epoch = (::Time.at Integer ::ENV['SOURCE_DATE_EPOCH']).utc)
     if (localdate = attrs['localdate'])
       attrs['localyear'] ||= (localdate.index '-') == 4 ? (localdate.slice 0, 4) : nil
     else

@@ -16,8 +16,8 @@ class Converter::DocBook5Converter < Converter::Base
     monospaced: ['<literal>', '</literal>'],
     emphasis: ['<emphasis>', '</emphasis>', true],
     strong: ['<emphasis role="strong">', '</emphasis>', true],
-    double: ['<quote>', '</quote>', true],
-    single: ['<quote>', '</quote>', true],
+    double: ['<quote role="double">', '</quote>', true],
+    single: ['<quote role="single">', '</quote>', true],
     mark: ['<emphasis role="marked">', '</emphasis>'],
     superscript: ['<superscript>', '</superscript>'],
     subscript: ['<subscript>', '</subscript>'],
@@ -40,18 +40,36 @@ class Converter::DocBook5Converter < Converter::Base
     result << ((node.attr? 'sectnumlevels') ? %(<?asciidoc-numbered maxdepth="#{node.attr 'sectnumlevels'}"?>) : '<?asciidoc-numbered?>') if node.attr? 'sectnums'
     lang_attribute = (node.attr? 'nolang') ? '' : %( xml:lang="#{node.attr 'lang', 'en'}")
     if (root_tag_name = node.doctype) == 'manpage'
-      root_tag_name = 'refentry'
+      manpage = true
+      root_tag_name = 'article'
     end
     root_tag_idx = result.size
     id = node.id
-    result << (document_info_tag node) unless node.noheader
+    abstract = find_root_abstract node
+    result << (document_info_tag node, abstract) unless node.noheader
+    if manpage
+      result << '<refentry>'
+      result << '<refmeta>'
+      result << %(<refentrytitle>#{node.apply_reftext_subs node.attr 'mantitle'}</refentrytitle>) if node.attr? 'mantitle'
+      result << %(<manvolnum>#{node.attr 'manvolnum'}</manvolnum>) if node.attr? 'manvolnum'
+      result << %(<refmiscinfo class="source">#{node.attr 'mansource', '&#160;'}</refmiscinfo>)
+      result << %(<refmiscinfo class="manual">#{node.attr 'manmanual', '&#160;'}</refmiscinfo>)
+      result << '</refmeta>'
+      result << '<refnamediv>'
+      result += (node.attr 'mannames').map {|n| %(<refname>#{n}</refname>) } if node.attr? 'mannames'
+      result << %(<refpurpose>#{node.attr 'manpurpose'}</refpurpose>) if node.attr? 'manpurpose'
+      result << '</refnamediv>'
+    end
     unless (docinfo_content = node.docinfo :header).empty?
       result << docinfo_content
     end
-    result << node.content if node.blocks?
+    abstract = extract_abstract node, abstract if abstract
+    result << (node.blocks.map {|block| block.convert }.compact.join LF) if node.blocks?
+    restore_abstract abstract if abstract
     unless (docinfo_content = node.docinfo :footer).empty?
       result << docinfo_content
     end
+    result << '</refentry>' if manpage
     id, node.id = node.id, nil unless id
     # defer adding root tag in case document ID is auto-generated on demand
     result.insert root_tag_idx, %(<#{root_tag_name} xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0"#{lang_attribute}#{common_attributes id}>)
@@ -59,7 +77,15 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  alias convert_embedded content_only
+  def convert_embedded node
+    # NOTE in DocBook 5, the root abstract must be in the info tag and is thus not part of the body
+    if @backend == 'docbook5' && (abstract = find_root_abstract node)
+      abstract = extract_abstract node, abstract
+    end
+    result = node.blocks.map {|block| block.convert }.compact.join LF
+    restore_abstract abstract if abstract
+    result
+  end
 
   def convert_section node
     if node.document.doctype == 'manpage'
@@ -67,7 +93,7 @@ class Converter::DocBook5Converter < Converter::Base
     else
       tag_name = node.sectname
     end
-    title_el = node.special && (node.option? 'untitled') ? '' : %(<title>#{node.title}</title>\n)
+    title_el = node.special && ((node.option? 'notitle') || (node.option? 'untitled')) ? '' : %(<title>#{node.title}</title>\n)
     %(<#{tag_name}#{common_attributes node.id, node.role, node.reftext}>
 #{title_el}#{node.content}
 </#{tag_name}>)
@@ -169,31 +195,16 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_image node
-    # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
-    # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
-    if node.attr? 'scaledwidth'
-      width_attribute = %( width="#{node.attr 'scaledwidth'}")
-      depth_attribute = ''
-      scale_attribute = ''
-    elsif node.attr? 'scale'
-      # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
-      #width_attribute = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
-      #depth_attribute = (node.attr? 'height') ? %( depth="#{node.attr 'height'}") : ''
-      scale_attribute = %( scale="#{node.attr 'scale'}")
-    else
-      width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
-      depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
-      scale_attribute = ''
-    end
     align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
-
     mediaobject = %(<mediaobject>
 <imageobject>
-<imagedata fileref="#{node.image_uri node.attr 'target'}"#{width_attribute}#{depth_attribute}#{scale_attribute}#{align_attribute}/>
+<imagedata fileref="#{fileref_attr_val = node.image_uri node.attr 'target'}"#{image_size_attributes node.attributes}#{align_attribute}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </mediaobject>)
-
+    if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = fileref_attr_val))
+      mediaobject = %(<link xl:href="#{href_attr_val}">#{mediaobject}</link>)
+    end
     if node.title?
       %(<figure#{common_attributes node.id, node.role, node.reftext}>
 <title>#{node.title}</title>
@@ -250,10 +261,10 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_stem node
     if (idx = node.subs.index :specialcharacters)
       node.subs.delete_at idx
-      equation = node.content || ''
+      equation = node.content
       idx > 0 ? (node.subs.insert idx, :specialcharacters) : (node.subs.unshift :specialcharacters)
     else
-      equation = node.content || ''
+      equation = node.content
     end
     if node.style == 'asciimath'
       # NOTE fop requires jeuclid to process mathml markup
@@ -295,13 +306,17 @@ class Converter::DocBook5Converter < Converter::Base
   def convert_open node
     case node.style
     when 'abstract'
-      if node.parent == node.document && node.document.doctype == 'book'
-        logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+      if (parent = node.parent) == node.document && node.document.doctype == 'book'
+        logger.warn 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
         ''
       else
-        %(<abstract>
+        result = %(<abstract>
 #{title_tag node}#{enclose_content node}
 </abstract>)
+        if @backend == 'docbook5' && !(node.option? 'root') && (parent.context == :open ? parent.style == 'partintro' : parent.context == :section && parent.sectname == 'partintro') && node == parent.blocks[0]
+          result = %(<info>\n#{result}\n</info>)
+        end
+        result
       end
     when 'partintro'
       if node.level == 0 && node.parent.context == :section && node.document.doctype == 'book'
@@ -459,7 +474,7 @@ class Converter::DocBook5Converter < Converter::Base
       node.items.each do |item|
         text_marker = (item.attr? 'checked') ? '&#10003; ' : '&#10063; ' if checklist && (item.attr? 'checkbox')
         result << %(<listitem#{common_attributes item.id, item.role}>)
-        result << %(<simpara>#{text_marker || ''}#{item.text}</simpara>)
+        result << %(<simpara>#{text_marker}#{item.text}</simpara>)
         result << item.content if item.blocks?
         result << '</listitem>'
       end
@@ -472,7 +487,36 @@ class Converter::DocBook5Converter < Converter::Base
     blockquote_tag(node, (node.has_role? 'epigraph') && 'epigraph') { %(<literallayout>#{node.content}</literallayout>) }
   end
 
-  alias convert_video skip
+  def convert_video node
+    # NOTE videos hosted by a third-party service are not supported
+    case node.attr 'poster'
+    when 'vimeo', 'youtube', 'wistia'
+      return
+    end
+    start_t = node.attr 'start'
+    end_t = node.attr 'end'
+    time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
+    align_attribute = (node.attr? 'align') ? %( align="#{node.attr 'align'}") : ''
+    image_size_attrs = image_size_attributes node.attributes
+    mediaobject = %(<mediaobject>
+<videoobject>
+<videodata fileref="#{node.media_uri node.attr 'target'}#{time_anchor}"#{image_size_attrs}#{align_attribute}/>
+</videoobject>#{(poster = node.attr 'poster').nil_or_empty? ? '' : %(
+<imageobject>
+<imagedata fileref="#{node.media_uri poster}"#{image_size_attrs}#{align_attribute}/>
+</imageobject>)}
+</mediaobject>)
+    if node.title?
+      %(<figure#{common_attributes node.id, node.role, node.reftext}>
+<title>#{node.title}</title>
+#{mediaobject}
+</figure>)
+    else
+      %(<informalfigure#{common_attributes node.id, node.role, node.reftext}>
+#{mediaobject}
+</informalfigure>)
+    end
+  end
 
   def convert_inline_anchor node
     case node.type
@@ -523,14 +567,17 @@ class Converter::DocBook5Converter < Converter::Base
   end
 
   def convert_inline_image node
-    width_attribute = (node.attr? 'width') ? %( contentwidth="#{node.attr 'width'}") : ''
-    depth_attribute = (node.attr? 'height') ? %( contentdepth="#{node.attr 'height'}") : ''
-    %(<inlinemediaobject#{common_attributes nil, node.role}>
+    img = %(<inlinemediaobject#{common_attributes node.id, node.role}>
 <imageobject>
-<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (node.image_uri node.target)}"#{width_attribute}#{depth_attribute}/>
+<imagedata fileref="#{node.type == 'icon' ? (node.icon_uri node.target) : (fileref_attr_val = node.image_uri node.target)}"#{image_size_attributes node.attributes}/>
 </imageobject>
 <textobject><phrase>#{node.alt}</phrase></textobject>
 </inlinemediaobject>)
+    if fileref_attr_val && (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = fileref_attr_val))
+      %(<link xl:href="#{href_attr_val}">#{img}</link>)
+    else
+      img
+    end
   end
 
   def convert_inline_indexterm node
@@ -610,7 +657,7 @@ class Converter::DocBook5Converter < Converter::Base
         quoted_text = %(#{open}#{text}#{close})
       end
 
-      node.id ? %(<anchor#{common_attributes node.id, nil, text}/>#{quoted_text}) : quoted_text
+      node.id ? %(<anchor#{common_attributes node.id}/>#{quoted_text}) : quoted_text
     end
   end
 
@@ -635,6 +682,23 @@ class Converter::DocBook5Converter < Converter::Base
     end
   end
 
+  def image_size_attributes attributes
+    # NOTE according to the DocBook spec, content area, scaling, and scaling to fit are mutually exclusive
+    # See http://tdg.docbook.org/tdg/4.5/imagedata-x.html#d0e79635
+    if attributes.key? 'scaledwidth'
+      %( width="#{attributes['scaledwidth']}")
+    elsif attributes.key? 'scale'
+      # QUESTION should we set the viewport using width and depth? (the scaled image would be contained within this box)
+      #width_attribute = (attributes.key? 'width') ? %( width="#{attributes['width']}") : ''
+      #depth_attribute = (attributes.key? 'height') ? %( depth="#{attributes['height']}") : ''
+      %( scale="#{attributes['scale']}")
+    else
+      width_attribute = (attributes.key? 'width') ? %( contentwidth="#{attributes['width']}") : ''
+      depth_attribute = (attributes.key? 'height') ? %( contentdepth="#{attributes['height']}") : ''
+      %(#{width_attribute}#{depth_attribute})
+    end
+  end
+
   def author_tag doc, author
     result = []
     result << '<author>'
@@ -648,7 +712,7 @@ class Converter::DocBook5Converter < Converter::Base
     result.join LF
   end
 
-  def document_info_tag doc
+  def document_info_tag doc, abstract
     result = ['<info>']
     unless doc.notitle
       if (title = doc.doctitle partition: true, use_fallback: true).subtitle?
@@ -698,26 +762,44 @@ class Converter::DocBook5Converter < Converter::Base
         end
       end
       result << %(<orgname>#{doc.attr 'orgname'}</orgname>) if doc.attr? 'orgname'
+      unless (keywords = doc.keywords).empty?
+        result << '<keywordset>'
+        keywords.each {|keyword| result << %(<keyword>#{keyword}</keyword>) }
+        result << '</keywordset>'
+      end
       unless (docinfo_content = doc.docinfo).empty?
         result << docinfo_content
       end
     end
+    if abstract
+      abstract.set_option 'root'
+      result << (convert abstract, abstract.node_name)
+      abstract.remove_attr 'root-option'
+    end
     result << '</info>'
 
-    if doc.doctype == 'manpage'
-      result << '<refmeta>'
-      result << %(<refentrytitle>#{doc.attr 'mantitle'}</refentrytitle>) if doc.attr? 'mantitle'
-      result << %(<manvolnum>#{doc.attr 'manvolnum'}</manvolnum>) if doc.attr? 'manvolnum'
-      result << %(<refmiscinfo class="source">#{doc.attr 'mansource', '&#160;'}</refmiscinfo>)
-      result << %(<refmiscinfo class="manual">#{doc.attr 'manmanual', '&#160;'}</refmiscinfo>)
-      result << '</refmeta>'
-      result << '<refnamediv>'
-      result += (doc.attr 'mannames').map {|n| %(<refname>#{n}</refname>) } if doc.attr? 'mannames'
-      result << %(<refpurpose>#{doc.attr 'manpurpose'}</refpurpose>) if doc.attr? 'manpurpose'
-      result << '</refnamediv>'
-    end
-
     result.join LF
+  end
+
+  def find_root_abstract doc
+    return unless doc.blocks?
+    if (first_block = doc.blocks[0]).context == :preamble
+      return unless (first_block = first_block.blocks[0])
+    elsif first_block.context == :section
+      return first_block if first_block.sectname == 'abstract'
+      return unless first_block.sectname == 'preface' && (first_block = first_block.blocks[0])
+    end
+    first_block.style == 'abstract' && first_block.context == :open ? first_block : nil
+  end
+
+  def extract_abstract document, abstract
+    parent = abstract.parent
+    parent = parent.parent while parent != document && parent.blocks.length == 1
+    parent.blocks.delete_at 0
+  end
+
+  def restore_abstract abstract
+    abstract.parent.blocks.insert 0, abstract
   end
 
   def get_root_document node
@@ -742,26 +824,18 @@ class Converter::DocBook5Converter < Converter::Base
 
   def cover_tag doc, face, use_placeholder = false
     if (cover_image = doc.attr %(#{face}-cover-image))
-      width_attr = ''
-      depth_attr = ''
       if (cover_image.include? ':') && ImageMacroRx =~ cover_image
-        attrlist = $2
-        cover_image = doc.image_uri $1
-        if attrlist
-          attrs = (AttributeList.new attrlist).parse %w(alt width height)
-          if attrs.key? 'scaledwidth'
-            # NOTE scalefit="1" is the default in this case
-            width_attr = %( width="#{attrs['scaledwidth']}")
-          else
-            width_attr = %( contentwidth="#{attrs['width']}") if attrs.key? 'width'
-            depth_attr = %( contentdepth="#{attrs['height']}") if attrs.key? 'height'
-          end
-        end
+        target, attrlist = $1, $2
+        cover_image = doc.image_uri target
+        # NOTE scalefit="1" is the default for a cover image
+        size_attrs = image_size_attributes (AttributeList.new attrlist).parse %w(alt width height) if attrlist
+      else
+        size_attrs = ''
       end
       %(<cover role="#{face}">
 <mediaobject>
 <imageobject>
-<imagedata fileref="#{cover_image}"#{width_attr}#{depth_attr}/>
+<imagedata fileref="#{cover_image}"#{size_attrs}/>
 </imageobject>
 </mediaobject>
 </cover>)

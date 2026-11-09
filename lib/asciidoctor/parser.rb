@@ -44,6 +44,12 @@ class Parser
 
   AuthorKeys = ::Set['author', 'authorinitials', 'firstname', 'middlename', 'lastname', 'email']
 
+  ListContinuationMarker = ::Module.new
+
+  ListContinuationPlaceholder = ::String.new.extend ListContinuationMarker
+
+  ListContinuationString = (::String.new LIST_CONTINUATION).extend ListContinuationMarker
+
   # Internal: A Hash mapping horizontal alignment abbreviations to alignments
   # that can be applied to a table cell (or to all cells in a column)
   TableCellHorzAlignments = {
@@ -153,7 +159,7 @@ class Parser
       end
       document.header.source_location = source_location if source_location
       # default to compat-mode if document has setext doctitle
-      doc_attrs['compat-mode'] = '' unless atx || (document.attribute_locked? 'compat-mode')
+      document.set_attribute 'compat-mode' unless atx
       if (separator = block_attrs['separator'])
         doc_attrs['title-separator'] = separator unless document.attribute_locked? 'title-separator'
       end
@@ -399,18 +405,22 @@ class Parser
           # REVIEW this may be doing too much
           if part
             if !section.blocks?
-              # if this block wasn't marked as [partintro], emulate behavior as if it had
+              # if this not a [partintro] open block, enclose it in a [partintro] open block
               if new_block.style != 'partintro'
-                # emulate [partintro] paragraph
-                if new_block.context == :paragraph
-                  new_block.context = :open
+                # if this is already a normal open block, simply add the partintro style
+                if new_block.style == 'open' && new_block.context == :open
                   new_block.style = 'partintro'
-                # emulate [partintro] open block
                 else
                   new_block.parent = (intro = Block.new section, :open, content_model: :compound)
                   intro.style = 'partintro'
                   section.blocks << intro
                 end
+              # if this is a [partintro] paragraph, convert it to a [partintro] open block w/ single paragraph
+              elsif new_block.content_model == :simple
+                new_block.content_model = :compound
+                new_block << (Block.new new_block, :paragraph, source: new_block.lines, subs: new_block.subs)
+                new_block.lines.clear
+                new_block.subs.clear
               end
             elsif section.blocks.size == 1
               first_block = section.blocks[0]
@@ -420,12 +430,11 @@ class Parser
               # rebuild [partintro] paragraph as an open block
               elsif first_block.content_model != :compound
                 new_block.parent = (intro = Block.new section, :open, content_model: :compound)
-                intro.style = 'partintro'
-                section.blocks.shift
-                if first_block.style == 'partintro'
+                if first_block.style == (intro.style = 'partintro')
                   first_block.context = :paragraph
                   first_block.style = nil
                 end
+                section.blocks.shift
                 intro << first_block
                 section.blocks << intro
               end
@@ -553,6 +562,7 @@ class Parser
       # process lines verbatim
       if style && Compliance.strict_verbatim_paragraphs && (VERBATIM_STYLES.include? style)
         block_context = style.to_sym
+        cloaked_context = :paragraph
         reader.unshift_line this_line
         # advance to block parsing =>
         break
@@ -614,8 +624,7 @@ class Parser
                 end
               end
               if blk_ctx == :image
-                document.register :images, target
-                attributes['imagesdir'] = doc_attrs['imagesdir']
+                document.register :images, [target, (attributes['imagesdir'] ||= doc_attrs['imagesdir'])]
                 # NOTE style is the value of the first positional attribute in the block attribute line
                 attributes['alt'] ||= style || (attributes['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
                 unless (scaledwidth = attributes.delete 'scaledwidth').nil_or_empty?
@@ -632,11 +641,11 @@ class Parser
 
             elsif ch0 == 't' && (this_line.start_with? 'toc:') && BlockTocMacroRx =~ this_line
               block = Block.new parent, :toc, content_model: :empty
-              block.parse_attributes $1, [], into: attributes if $1
+              block.parse_attributes $1, [], sub_input: true, into: attributes if $1
               break
 
-            elsif block_macro_extensions ? (CustomBlockMacroRx =~ this_line &&
-                (extension = extensions.registered_for_block_macro? $1) || (report_unknown_block_macro = logger.debug?)) :
+            elsif block_macro_extensions ? CustomBlockMacroRx =~ this_line &&
+                ((extension = extensions.registered_for_block_macro? $1) || (report_unknown_block_macro = logger.debug?)) :
                 (logger.debug? && (report_unknown_block_macro = CustomBlockMacroRx =~ this_line))
               if report_unknown_block_macro
                 logger.debug message_with_context %(unknown name for block macro: #{$1}), source_location: reader.cursor_at_mark
@@ -688,7 +697,7 @@ class Parser
 
       elsif OrderedListRx.match? this_line
         reader.unshift_line this_line
-        block = parse_list reader, :olist, parent, style
+        block = parse_list reader, :olist, parent, style, start: (attributes.delete 'start')
         attributes['style'] = block.style if block.style
         break
 
@@ -810,16 +819,17 @@ class Parser
     unless block
       case block_context
       when :listing, :source
-        if block_context == :source || (!attributes[1] && (language = attributes[2] || doc_attrs['source-language']))
-          if language
+        if block_context == :source || (language = attributes[1] ? nil : attributes[2] || doc_attrs['source-language'])
+          if language # :listing
             attributes['style'] = 'source'
             attributes['language'] = language
             AttributeList.rekey attributes, [nil, nil, 'linenums']
-          else
+          else # :source
             AttributeList.rekey attributes, [nil, 'language', 'linenums']
             if doc_attrs.key? 'source-language'
               attributes['language'] = doc_attrs['source-language']
             end unless attributes.key? 'language'
+            attributes['cloaked-context'] = cloaked_context unless cloaked_context == :listing
           end
           if (attributes.key? 'linenums') || (doc_attrs.key? 'source-linenums-option')
             attributes['linenums-option'] = ''
@@ -848,6 +858,7 @@ class Parser
         else
           attributes['language'] = language
         end
+        attributes['cloaked-context'] = cloaked_context
         if (attributes.key? 'linenums') || (doc_attrs.key? 'source-linenums-option')
           attributes['linenums-option'] = ''
         end unless attributes.key? 'linenums-option'
@@ -1097,8 +1108,10 @@ class Parser
   # style     - The block style assigned to this list (optional, default: nil)
   #
   # Returns the Block encapsulating the parsed unordered or ordered list
-  def self.parse_list reader, list_type, parent, style
-    list_block = List.new parent, list_type
+  def self.parse_list reader, list_type, parent, style, start: nil
+    list_block = start && (start = start.to_i) != 1 ?
+      (List.new parent, list_type, attributes: { 'start' => start }) :
+      (List.new parent, list_type)
     list_rx = ListRxMap[list_type]
 
     while reader.has_more_lines? && list_rx =~ reader.peek_line
@@ -1165,8 +1178,8 @@ class Parser
           if reftext.include? ']'
             reftext = reftext.gsub '\]', ']'
             reftext = document.sub_attributes reftext if reftext.include? ATTR_REF_HEAD
-          elsif (reftext.include? ATTR_REF_HEAD) && (reftext = document.sub_attributes reftext).empty?
-            next
+          elsif reftext.include? ATTR_REF_HEAD
+            reftext = nil if (reftext = document.sub_attributes reftext).empty?
           end
         end
       end
@@ -1236,6 +1249,7 @@ class Parser
     list_block = List.new parent, :colist
     next_index = 1
     autonum = 0
+    list_mark = reader.mark
     # NOTE skip the match on the first time through as we've already done it (emulates begin...while)
     while match || ((match = CalloutListRx.match reader.peek_line) && reader.mark)
       if (num = match[1]) == '.'
@@ -1257,6 +1271,7 @@ class Parser
       match = nil
     end
 
+    reader.restore_mark list_mark
     callouts.next_list
     list_block
   end
@@ -1320,12 +1335,21 @@ class Parser
           end
         end
       when :olist
-        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, (ordinal = list_block.items.size), true, reader
+        first = (ordinal = list_block.items.size) == 0
+        validate = true
+        if (start = list_block.attributes['start'])
+          ordinal += start.pred
+        elsif first && (start = resolve_ordered_list_start sibling_trait) != 1
+          list_block.attributes['start'] = start
+          ordinal += start.pred
+          validate = false
+        end
+        sibling_trait, implicit_style = resolve_ordered_list_marker sibling_trait, ordinal, validate, reader
         list_item.marker = sibling_trait
-        if ordinal == 0 && !style
+        if first && !style
           # using list level makes more sense, but we don't track it
           # basing style on marker level is compliant with AsciiDoc.py
-          list_block.style = implicit_style || (ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s
+          list_block.style = (implicit_style || ORDERED_LIST_STYLES[sibling_trait.length - 1] || 'arabic').to_s
         end
         if (item_text.start_with? '[[') && LeadingInlineAnchorRx =~ item_text
           catalog_inline_anchor $1, $2, list_item, reader
@@ -1414,17 +1438,18 @@ class Parser
       # the termination of the list
       break if is_sibling_list_item? this_line, list_type, sibling_trait
 
+      this_line = ListContinuationString if this_line == LIST_CONTINUATION
       prev_line = buffer.empty? ? nil : buffer[-1]
 
-      if prev_line == LIST_CONTINUATION
+      if ListContinuationMarker === prev_line
         if continuation == :inactive
           continuation = :active
           has_text = true
-          buffer[-1] = '' unless within_nested_list
+          buffer[-1] = ListContinuationPlaceholder unless within_nested_list
         end
 
         # dealing with adjacent list continuations (which is really a syntax error)
-        if this_line == LIST_CONTINUATION
+        if ListContinuationMarker === this_line
           if continuation != :frozen
             continuation = :frozen
             buffer << this_line
@@ -1443,11 +1468,27 @@ class Parser
         # we're being more strict here about the terminator, but I think that's a good thing
         buffer.concat reader.read_lines_until terminator: match.terminator, read_last_line: true, context: nil
         continuation = :inactive
-      # technically BlockAttributeLineRx only breaks if ensuing line is not a list item
-      # which really means BlockAttributeLineRx only breaks if it's acting as a block delimiter
-      # FIXME to be AsciiDoc compliant, we shouldn't break if style in attribute line is "literal" (i.e., [literal])
-      elsif dlist && continuation != :active && (BlockAttributeLineRx.match? this_line)
-        break
+      # BlockAttributeLineRx only breaks dlist if ensuing line is not a list item
+      elsif dlist && continuation != :active && (this_line.start_with? '[') && (BlockAttributeLineRx.match? this_line)
+        block_attribute_lines = [this_line]
+        while (next_line = reader.peek_line)
+          if is_delimited_block? next_line
+            interrupt = true
+          elsif next_line.empty? || ((next_line.start_with? '[') && (BlockAttributeLineRx.match? next_line))
+            block_attribute_lines << reader.read_line
+            next
+          elsif (AnyListRx.match? next_line) && !(is_sibling_list_item? next_line, list_type, sibling_trait)
+            buffer.concat block_attribute_lines
+          else # rubocop:disable Lint/DuplicateBranch
+            interrupt = true
+          end
+          break
+        end
+        if interrupt
+          this_line = nil
+          reader.unshift_lines block_attribute_lines
+          break
+        end
       elsif continuation == :active && !this_line.empty?
         # literal paragraphs have special considerations (and this is one of
         # two entry points into one)
@@ -1464,10 +1505,11 @@ class Parser
           end
           continuation = :inactive
         # let block metadata play out until we find the block
-        elsif (BlockTitleRx.match? this_line) || (BlockAttributeLineRx.match? this_line) || (AttributeEntryRx.match? this_line)
+        elsif ((ch0 = this_line.chr) == '.' && (BlockTitleRx.match? this_line)) ||
+            (ch0 == '[' && (BlockAttributeLineRx.match? this_line)) || (ch0 == ':' && (AttributeEntryRx.match? this_line))
           buffer << this_line
         else
-          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx].match? this_line })
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
             within_nested_list = true
             if nested_list_type == :dlist && $3.nil_or_empty?
               # get greedy again
@@ -1488,7 +1530,7 @@ class Parser
 
         if this_line == LIST_CONTINUATION
           detached_continuation = buffer.size
-          buffer << this_line
+          buffer << ListContinuationString
         elsif has_text # has_text only relevant for dlist, which is more greedy until it has text for an item; has_text is always true for all other lists
           # in this block, we have to see whether we stay in the list
           # TODO any way to combine this with the check after skipping blank lines?
@@ -1520,13 +1562,18 @@ class Parser
           buffer << this_line
           has_text = true
         end
+      elsif ListContinuationMarker === this_line
+        has_text = true
+        buffer << this_line
       else
-        has_text = true unless this_line.empty?
-        if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
-          within_nested_list = true
-          if nested_list_type == :dlist && $3.nil_or_empty?
-            # get greedy again
-            has_text = false
+        unless this_line.empty?
+          has_text = true
+          if (nested_list_type = (within_nested_list ? [:dlist] : NESTABLE_LIST_CONTEXTS).find {|ctx| ListRxMap[ctx] =~ this_line })
+            within_nested_list = true
+            if nested_list_type == :dlist && $3.nil_or_empty?
+              # get greedy again
+              has_text = false
+            end
           end
         end
         buffer << this_line
@@ -1536,16 +1583,17 @@ class Parser
 
     reader.unshift_line this_line if this_line
 
-    buffer[detached_continuation] = '' if detached_continuation
+    buffer[detached_continuation] = ListContinuationPlaceholder if detached_continuation
 
     until buffer.empty?
+      # drop optional trailing continuation
+      if ListContinuationMarker === (last_line = buffer[-1])
+        buffer.pop
+        break
       # strip trailing blank lines to prevent empty blocks
-      if (last_line = buffer[-1]).empty?
+      elsif last_line.empty?
         buffer.pop
       else
-        # drop optional trailing continuation
-        # (a blank line would have served the same purpose in the document)
-        buffer.pop if last_line == LIST_CONTINUATION
         break
       end
     end
@@ -1571,8 +1619,13 @@ class Parser
     sect_id, sect_reftext, sect_title, sect_level, sect_atx = parse_section_title reader, document, attributes['id']
 
     if sect_style
-      if book && sect_style == 'abstract'
-        sect_name, sect_level = 'chapter', 1
+      if sect_style == 'abstract'
+        if book
+          sect_name, sect_level = 'chapter', 1
+        else
+          sect_name, sect_special = sect_style, true
+          sect_level = 1 if sect_level == 0
+        end
       elsif (sect_style.start_with? 'sect') && (SectionLevelStyleRx.match? sect_style)
         sect_name = 'section'
       else
@@ -1866,7 +1919,7 @@ class Parser
               implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
               implicit_author_metadata[%(middlename_#{name_idx})],
               implicit_author_metadata[%(lastname_#{name_idx})],
-            ].compact.map {|it| it.tr ' ', '_' }.join ' '
+            ].compact.map {|name| name.tr ' ', '_' }.join ' '
           end if sparse
           # process as names only
           author_metadata = process_authors authors, true, false
@@ -2037,7 +2090,7 @@ class Parser
           return true
         end
       elsif !normal || (next_line.start_with? '/')
-        if next_line == '//' # rubocop:disable Style/GuardClause
+        if next_line == '//'
           return true
         elsif normal && (uniform? next_line, '/', (ll = next_line.length))
           unless ll == 3
@@ -2074,7 +2127,7 @@ class Parser
       value = ''
     elsif value.end_with? LINE_CONTINUATION, LINE_CONTINUATION_LEGACY
       con, value = (value.slice value.length - 2, 2), (value.slice 0, value.length - 2).rstrip
-      while reader.advance && !(next_line = reader.peek_line || '').empty?
+      while reader.advance && !(next_line = reader.peek_line).nil_or_empty?
         next_line = next_line.lstrip
         next_line = (next_line.slice 0, next_line.length - 2).rstrip if (keep_open = next_line.end_with? con)
         value = %(#{value}#{(value.end_with? HARD_LINE_BREAK) ? LF : ' '}#{next_line})
@@ -2152,16 +2205,14 @@ class Parser
   #
   # list_type  - The Symbol context of the list
   # marker     - The String marker for this list item
-  # ordinal    - The position of this list item in the list
-  # validate   - Whether to validate the value of the marker
   #
   # Returns the String 0-index marker for this list item
-  def self.resolve_list_marker list_type, marker, ordinal = 0, validate = false, reader = nil
+  def self.resolve_list_marker list_type, marker
     case list_type
     when :ulist
       marker
     when :olist
-      (resolve_ordered_list_marker marker, ordinal, validate, reader)[0]
+      (resolve_ordered_list_marker marker)[0]
     else # :colist
       '<1>'
     end
@@ -2177,7 +2228,7 @@ class Parser
   # so that they can be compared against other list items.
   #
   # marker   - The marker used for this list item
-  # ordinal  - The 0-based index of the list item (default: 0)
+  # ordinal  - The 0-based index of the list item; must be provided if validate is true
   # validate - Perform validation that the marker provided is the proper
   #            marker in the sequence (default: false)
   #
@@ -2192,8 +2243,8 @@ class Parser
   #  # => ['.']
   #
   # Returns a tuple that contains the String of the first marker in this number
-  # series and the implicit list style, if applicable
-  def self.resolve_ordered_list_marker marker, ordinal = 0, validate = false, reader = nil
+  # series and, if the ordinal is specified, the implicit list style when applicable
+  def self.resolve_ordered_list_marker marker, ordinal = nil, validate = false, reader = nil
     return [marker] if marker.start_with? '.'
     # NOTE case statement is guaranteed to match one of the conditions
     case (style = ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker })
@@ -2205,13 +2256,13 @@ class Parser
       marker = '1.'
     when :loweralpha
       if validate
-        expected = ('a'[0].ord + ordinal).chr
+        expected = (97 + ordinal).chr # 97 is a
         actual = marker.chop # remove trailing .
       end
       marker = 'a.'
     when :upperalpha
       if validate
-        expected = ('A'[0].ord + ordinal).chr
+        expected = (65 + ordinal).chr # 65 is A
         actual = marker.chop # remove trailing .
       end
       marker = 'A.'
@@ -2229,11 +2280,32 @@ class Parser
       marker = 'I)'
     end
 
-    if validate && expected != actual
-      logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor
+    if ordinal
+      if validate && expected != actual
+        logger.warn message_with_context %(list item index: expected #{expected}, got #{actual}), source_location: reader.cursor
+      end
+      [marker, style]
+    else
+      [marker]
     end
+  end
 
-    [marker, style]
+  def self.resolve_ordered_list_start marker
+    start = 1
+    return start if marker.start_with? '.'
+    case ORDERED_LIST_STYLES.find {|s| OrderedListMarkerRxMap[s].match? marker }
+    when :arabic
+      start = marker.to_i # remove trailing . and coerce to int
+    when :loweralpha
+      start = marker.chop.ord - 96 # remove trailing .
+    when :upperalpha
+      start = marker.chop.ord - 64 # remove trailing .
+    when :lowerroman
+      start = Helpers.roman_to_int marker.chop.upcase # remove trailing )
+    when :upperroman
+      start = Helpers.roman_to_int marker.chop # remove trailing )
+    end
+    start
   end
 
   # Internal: Determine whether the this line is a sibling list item
@@ -2381,6 +2453,7 @@ class Parser
       end
     end
 
+    parser_ctx.close_table
     table.assign_column_widths unless (table.attributes['colcount'] ||= table.columns.size) == 0 || explicit_colspecs
     table.has_header_option = true if implicit_header
     table.partition_header_footer attributes
@@ -2419,9 +2492,11 @@ class Parser
           colspec, rowspec = m[2].split '.'
           if !colspec.nil_or_empty? && (TableCellHorzAlignments.key? colspec)
             spec['halign'] = TableCellHorzAlignments[colspec]
+            spec['halign-source'] = 'column'
           end
           if !rowspec.nil_or_empty? && (TableCellVertAlignments.key? rowspec)
             spec['valign'] = TableCellVertAlignments[rowspec]
+            spec['valign-source'] = 'column'
           end
         end
 
@@ -2492,9 +2567,11 @@ class Parser
       colspec, rowspec = m[3].split '.'
       if !colspec.nil_or_empty? && (TableCellHorzAlignments.key? colspec)
         spec['halign'] = TableCellHorzAlignments[colspec]
+        spec['halign-source'] = 'cell'
       end
       if !rowspec.nil_or_empty? && (TableCellVertAlignments.key? rowspec)
         spec['valign'] = TableCellVertAlignments[rowspec]
+        spec['valign-source'] = 'cell'
       end
     end
 
@@ -2610,7 +2687,7 @@ class Parser
   # This method preserves the significant indentation (that exceeding the block indent) on each line.
   #
   # lines       - The Array of String lines to process (no trailing newlines)
-  # indent_size - The Integer number of spaces to readd to the start of non-empty lines after removing the indentation.
+  # indent_size - The Integer number of spaces to re-add to the start of non-empty lines after removing the indentation.
   #               If this value is < 0, the existing indentation is preserved (optional, default: 0)
   # tab_size    - the Integer number of spaces to use in place of a tab. A value of <= 0 disables the replacement
   #               (optional, default: 0)

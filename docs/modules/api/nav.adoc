@@ -5,4 +5,5 @@
 ** xref:set-safe-mode.adoc[]
 ** xref:sourcemap.adoc[]
 ** xref:catalog-assets.adoc[]
+** xref:find-blocks.adoc[]
 ** xref:options.adoc[]

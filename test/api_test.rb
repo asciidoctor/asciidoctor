@@ -58,7 +58,7 @@ context 'API' do
       end
     end
 
-    test 'should not load file with unrecognized encoding' do
+    test 'should not load file with unrecognized encoding', unless: jruby? do
       begin
         tmp_input = Tempfile.new %w(test- .adoc), encoding: Encoding::IBM437
         # NOTE using a character whose code differs between UTF-8 and IBM437
@@ -408,24 +408,43 @@ context 'API' do
       assert_equal 'sample.adoc', last_cell.file
       assert_equal 24, last_cell.lineno
 
-      last_block = section_2.blocks[-1]
-      assert_equal :ulist, last_block.context
-      refute_nil last_block.source_location
-      assert_equal 'sample.adoc', last_block.file
-      assert_equal 28, last_block.lineno
+      ulist_block = (doc.find_by context: :ulist)[0]
+      assert_equal :ulist, ulist_block.context
+      refute_nil ulist_block.source_location
+      assert_equal 'sample.adoc', ulist_block.file
+      assert_equal 28, ulist_block.lineno
 
-      list_items = last_block.blocks
-      refute_nil list_items[0].source_location
-      assert_equal 'sample.adoc', list_items[0].file
-      assert_equal 28, list_items[0].lineno
+      ulist_items = ulist_block.blocks
+      refute_nil ulist_items[0].source_location
+      assert_equal 'sample.adoc', ulist_items[0].file
+      assert_equal 28, ulist_items[0].lineno
 
-      refute_nil list_items[1].source_location
-      assert_equal 'sample.adoc', list_items[1].file
-      assert_equal 29, list_items[1].lineno
+      refute_nil ulist_items[1].source_location
+      assert_equal 'sample.adoc', ulist_items[1].file
+      assert_equal 29, ulist_items[1].lineno
 
-      refute_nil list_items[2].source_location
-      assert_equal 'sample.adoc', list_items[2].file
-      assert_equal 30, list_items[2].lineno
+      refute_nil ulist_items[2].source_location
+      assert_equal 'sample.adoc', ulist_items[2].file
+      assert_equal 30, ulist_items[2].lineno
+
+      colist_block = section_2.blocks.last
+      assert_equal :colist, colist_block.context
+      refute_nil colist_block.source_location
+      assert_equal 'sample.adoc', colist_block.file
+      assert_equal 37, colist_block.lineno
+
+      colist_items = colist_block.blocks
+      refute_nil colist_items[0].source_location
+      assert_equal 'sample.adoc', colist_items[0].file
+      assert_equal 37, colist_items[0].lineno
+
+      refute_nil colist_items[1].source_location
+      assert_equal 'sample.adoc', colist_items[1].file
+      assert_equal 38, colist_items[1].lineno
+
+      refute_nil colist_items[2].source_location
+      assert_equal 'sample.adoc', colist_items[2].file
+      assert_equal 39, colist_items[2].lineno
 
       doc = Asciidoctor.load_file fixture_path('main.adoc'), sourcemap: true, safe: :safe
 
@@ -549,7 +568,7 @@ context 'API' do
     end
 
     # FIXME see #3966
-    test 'should assign incorrect lineno for single-line paragraph inside a conditional preprocessor directive' do
+    test 'should assign incorrect lineno for paragraph inside a conditional preprocessor directive' do
       input = <<~'EOS'
       :conditional-attribute:
 
@@ -565,6 +584,27 @@ context 'API' do
       doc = document_from_string input, sourcemap: true
       # FIXME the second line number should be 6 instead of 7
       assert_equal [3, 7, 9], (doc.find_by context: :paragraph).map(&:lineno)
+    end
+
+    # related to #3966
+    test 'should assign correct lineno for paragraph inside a conditional preprocessor directive when underline style off' do
+      input = <<~'EOS'
+      :conditional-attribute:
+
+      before
+
+      ifdef::conditional-attribute[]
+      subject
+      endif::[]
+
+      after
+      EOS
+
+      Asciidoctor::Compliance.underline_style_section_titles = false
+      doc = document_from_string input, sourcemap: true
+      assert_equal [3, 6, 9], (doc.find_by context: :paragraph).map(&:lineno)
+    ensure
+      Asciidoctor::Compliance.underline_style_section_titles = true
     end
 
     test 'should assign correct lineno for multi-line paragraph inside a conditional preprocessor directive' do
@@ -684,8 +724,8 @@ context 'API' do
       EOS
 
       doc = Asciidoctor.load input
-      result = doc.find_by context: :list_item do |it|
-        it.text == 'yin' ? :prune : false
+      result = doc.find_by context: :list_item do |li|
+        li.text == 'yin' ? :prune : false
       end
       assert_equal 1, result.size
       assert_equal 'yin', result[0].text
@@ -1179,13 +1219,13 @@ context 'API' do
       assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
     end
 
-    test 'lines in output should be separated by line feed' do
+    test 'lines in output should be separated by line feed (universal newline)' do
       sample_input_path = fixture_path 'sample.adoc'
 
       output = Asciidoctor.convert_file sample_input_path, standalone: true, to_file: false
       refute_empty output
-      lines = output.split "\n"
-      assert_equal lines.size, output.split(/\r\n|\r|\n/).size
+      refute_includes output, ?\r
+      lines = output.split ?\n
       assert_equal lines.map(&:length), lines.map(&:rstrip).map(&:length)
     end
 
@@ -1348,6 +1388,22 @@ context 'API' do
       assert_include 'color: green', styles
     end
 
+    test 'should embed custom stylesheet read from classloader URI', if: jruby? do
+      require fixture_path 'assets.jar'
+      input = <<~'EOS'
+      = Document Title
+
+      text
+      EOS
+
+      output = Asciidoctor.convert input, safe: :unsafe, standalone: true, attributes: { 'stylesdir' => 'uri:classloader:/styles-in-jar', 'stylesheet' => 'custom.css' }
+      stylenode = xmlnodes_at_css 'html:root > head > style', output, 1
+      styles = stylenode.content
+      refute_nil styles
+      refute_empty styles.strip
+      assert_include 'color: green', styles
+    end
+
     test 'should embed custom stylesheet in remote stylesdir if SafeMode is less than SECURE and allow-uri-read is set' do
       input = <<~'EOS'
       = Document Title
@@ -1395,6 +1451,63 @@ context 'API' do
         assert_path_exists custom_stylesheet_output_path
         output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
         assert_xpath '/html/head/link[@rel="stylesheet"][@href="./custom.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a path string' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => 'custom.css' }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a Pathname object' do
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_src_path = Pathname.new fixture_path 'custom.css'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :safe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => custom_stylesheet_src_path }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
+        assert_xpath 'style', output, 0
+      ensure
+        FileUtils.rm_r output_dir, force: true, secure: true
+      end
+    end
+
+    test 'should copy custom stylesheet to destination dir if copycss is a classloader URI', if: jruby? do
+      require fixture_path 'assets.jar'
+      begin
+        output_dir = fixture_path 'output'
+        sample_input_path = fixture_path 'sample.adoc'
+        sample_output_path = File.join output_dir, 'sample.html'
+        custom_stylesheet_src_path = 'uri:classloader:/styles-in-jar/custom.css'
+        custom_stylesheet_output_path = File.join output_dir, 'styles.css'
+        Asciidoctor.convert_file sample_input_path,
+          safe: :unsafe, to_dir: output_dir, mkdirs: true, attributes: { 'stylesheet' => 'styles.css', 'linkcss' => true, 'copycss' => custom_stylesheet_src_path }
+        assert_path_exists sample_output_path
+        assert_path_exists custom_stylesheet_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        assert_xpath '/html/head/link[@rel="stylesheet"][@href="./styles.css"]', output, 1
         assert_xpath 'style', output, 0
       ensure
         FileUtils.rm_r output_dir, force: true, secure: true
@@ -1472,6 +1585,23 @@ context 'API' do
         assert_xpath '/html/body/*[@id="header"]/h1[text() = "Document Title"]', output, 1
       ensure
         FileUtils.rm sample_output_path, force: true
+      end
+    end
+
+    test 'should write file in bin mode and thus not convert line feeds to system-dependent newline' do
+      sample_input_path = fixture_path 'sample.adoc'
+      sample_output_path = fixture_path 'sample.html'
+      begin
+        Asciidoctor.convert_file sample_input_path
+        assert_path_exists sample_output_path
+        output = File.read sample_output_path, mode: Asciidoctor::FILE_READ_MODE
+        refute_empty output
+        assert_includes output, ?\n
+        refute_includes output, ?\r
+        assert_includes output, %(<\/body>\n<\/html>)
+        refute output.end_with? ?\n
+      ensure
+        FileUtils.rm sample_output_path
       end
     end
 
@@ -2003,6 +2133,16 @@ context 'API' do
       doc = document_from_string input
       refute doc.blocks[0].sections?
       refute doc.blocks[1].sections?
+    end
+  end
+
+  context 'SafeMode' do
+    test 'should return nil if safe mode value not recognized' do
+      assert_nil Asciidoctor::SafeMode.name_for_value 99
+    end
+
+    test 'should return nil if safe mode name not recognized' do
+      assert_nil Asciidoctor::SafeMode.value_for_name 'unknown'
     end
   end
 end

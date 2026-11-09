@@ -7,7 +7,10 @@
 |`:attributes`
 |Sets document attributes, which override equivalently-named attributes defined in the document unless soft set.
 No substitutions are applied to the value of these attributes.
-In the hash format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
+In the Hash format, the name *must* be a String, not a Symbol (e.g., `name: 'value'` is *invalid*).
+In this format, a `nil` value hard unsets the attribute and a `false` value soft unsets the attribute.
+In the String format, entries are separated by a space.
+To include a space in the value, place a backslash in front of it.
 |_not set_
 a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the following formats:
 
@@ -17,7 +20,7 @@ a|xref:asciidoc:attributes:document-attributes.adoc[Document attributes] in the 
 *Array* +
 `[ 'name=value' ]`
 
-*String* (space separated) +
+*String* +
 `'name=value'`
 
 |`:backend`
@@ -66,7 +69,14 @@ Instead of providing a Ruby block containing extensions to register, this option
 |_not set_
 |`Extensions::Registry` instance
 
-|`:header_only`
+|`:logger`
+|Shorthand to assign a new value to the global `LoggerManager.logger`.
+This is persistent change, so you either have to reset the value afterwards or pass the option each time you call the API.
+If value is falsy, it assigns a null logger, effectively turning off logging.
+|_not set_
+|`Logger` instance
+
+|`:parse_header_only`
 |If `true`, the parser stops after reading the header.
 |`false`
 |_Boolean_
@@ -75,8 +85,8 @@ Instead of providing a Ruby block containing extensions to register, this option
 |If `true`, generates a standalone output document (which includes the shell around the body content, such as the header and footer).
 When converting to a file, the default value is `true`.
 Otherwise, the default value is `false`.
-The deprecated alias for this option is `:header_footer`.
 The default value for this option is opposite of the default value for the CLI.
+The deprecated alias for this option is `:header_footer`.
 |_Varies_
 |_Boolean_
 

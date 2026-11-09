@@ -48,14 +48,21 @@ One way is to set the following attributes in the document header or by passing 
 |Appendix
 |
 
+|`appendix-refsig`
+|Appendix
+|Used when referencing an appendix.
+
 |`caution-caption`
 |Caution
 |
 
-|`chapter-label`
+|`chapter-signifier`
 |Chapter
-|Applies only when `doctype` is `book`.
-PDF converter only.
+|Only applies when `doctype` is `book`.
+
+|`chapter-refsig`
+|Chapter
+|Used when referencing a chapter.
 
 |`example-caption`
 |Example
@@ -76,19 +83,31 @@ PDF converter only.
 |`listing-caption`
 |_not set_
 |By default, listing blocks do not have captions.
-Specify `listing-caption` to turn on listing block captions.
+Specify `listing-caption` to turn on captions for listing blocks.
 
 |`manname-title`
 |NAME
-|Applies only when `doctype` is `manpage`.
+|Only applies when `doctype` is `manpage`.
 
 |`note-caption`
 |Note
 |
 
+|`part-signifier`
+|Part
+|
+
+|`part-refsig`
+|Part
+|Used when referencing a part.
+
 |`preface-title`
 |_not set_
-|Applies only when `doctype` is `book`.
+|Only applies when `doctype` is `book`.
+
+|`section-refsig`
+|Section
+|Used when referencing a section.
 
 |`table-caption`
 |Table
@@ -118,7 +137,7 @@ Specify `listing-caption` to turn on listing block captions.
 If you plan to support multiple languages, you'll want to define the attributes for each language inside a xref:asciidoc:directives:conditionals.adoc[conditional preprocessor directive].
 For example:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 \ifeval::["{lang}" == "de"]
 :caution-caption: Achtung
@@ -130,7 +149,7 @@ Of course, you're probably hoping this has already been done for you.
 Indeed, it has!
 
 You can find an {url-lang-attributes}[AsciiDoc file^] in the Asciidoctor repository that provides translations of these attributes for most major languages.
-Thus far, the built-in labels have been translated into the following languages: Arabic, Belarusian, Bulgarian, Catalan, Czech, Danish, Dutch, German, Spanish, Persian (Farsi), Finnish, French, Hungarian, Bahasa Indonesian, Italian, Japanese, Korean, Norweign Bokmål, Norwegian Nynorsk, Polish, Portuguese, Brazilian Portuguese, Romanian, Russian, Serbian Cyrillic, Serbian Latin, Swedish, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese.
+Thus far, the built-in labels have been translated into the following languages: Arabic, Belarusian, Bulgarian, Catalan, Czech, Danish, Dutch, German, Spanish, Persian (Farsi), Finnish, French, Hungarian, Bahasa Indonesian, Italian, Japanese, Korean, Norwegian Bokmål, Norwegian Nynorsk, Polish, Portuguese, Brazilian Portuguese, Romanian, Russian, Serbian Cyrillic, Serbian Latin, Swedish, Turkish, Ukrainian, Vietnamese, Simplified Chinese, and Traditional Chinese.
 The translations are defined using AsciiDoc attribute entries inside conditional preprocessor blocks, just as suggested above.
 
 To use this file to translate the built-in labels according the value of the `lang` attribute (just like the DocBook toolchain does), follow these steps:
@@ -139,7 +158,7 @@ To use this file to translate the built-in labels according the value of the `la
 . Put the file in the folder [.path]_locale_ relative to your document.
 . Add the following line to the header of your AsciiDoc document:
 +
-[source,asciidoc]
+[,asciidoc]
 ----
 \include::locale/attributes.adoc[]
 ----

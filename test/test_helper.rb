@@ -35,12 +35,8 @@ class Minitest::Test
     RUBY_ENGINE == 'jruby'
   end
 
-  def self.jruby_9_1_windows?
-    RUBY_ENGINE == 'jruby' && windows? && (JRUBY_VERSION.start_with? '9.1.')
-  end
-
-  def jruby_9_1_windows?
-    Minitest::Test.jruby_9_1_windows?
+  def self.rouge_2_1?
+    (Gem::Version.new Rouge.version) >= (Gem::Version.new '2.1.0')
   end
 
   def self.windows?
@@ -139,17 +135,13 @@ class Minitest::Test
     results = xmlnodes_at_path type, path, content
 
     if count == true || count == false
-      if count == results
-        assert true
-      else
+      unless count == results
         flunk %(#{type_name} #{path} yielded #{results} rather than #{count} for:\n#{content})
       end
     elsif count && results.size != count
       flunk %(#{type_name} #{path} yielded #{results.size} elements rather than #{count} for:\n#{content})
     elsif count.nil? && results.empty?
       flunk %(#{type_name} #{path} not found in:\n#{content})
-    else
-      assert true
     end
   end
 
@@ -266,6 +258,10 @@ class Minitest::Test
     [number].pack 'U1'
   end
 
+  def haml_template_class
+    (defined? Haml::Template) ? Haml::Template : Tilt::HamlTemplate
+  end
+
   def invoke_cli_with_filenames argv = [], filenames = [], &block
     filepaths = []
 
@@ -329,7 +325,7 @@ class Minitest::Test
 
   def in_verbose_mode
     begin
-      old_logger_level, Asciidoctor::LoggerManager.logger.level = Asciidoctor::LoggerManager.logger.level, Logger::Severity::DEBUG
+      old_logger_level, Asciidoctor::LoggerManager.logger.level = Asciidoctor::LoggerManager.logger.level, Asciidoctor::Logger::Severity::DEBUG
       yield
     ensure
       Asciidoctor::LoggerManager.logger.level = old_logger_level
@@ -340,8 +336,6 @@ class Minitest::Test
     [Gem.ruby, *ruby_args, (File.join bindir, 'asciidoctor')]
   end
 
-  # NOTE run_command fails on JRuby 9.1 for Windows with the following error:
-  # Java::JavaLang::ClassCastException at org.jruby.util.ShellLauncher.getModifiedEnv(ShellLauncher.java:271)
   def run_command cmd, *args, &block
     if Array === cmd
       args.unshift(*cmd)
@@ -350,21 +344,9 @@ class Minitest::Test
     kw_args = Hash === args[-1] ? args.pop : {}
     env = kw_args[:env]
     (env ||= {})['RUBYOPT'] = nil unless kw_args[:use_bundler]
-    # JRuby 9.1 on Windows doesn't support popen options; therefore, test cannot capture / assert on stderr
-    opts = jruby_9_1_windows? ? {} : { err: [:child, :out] }
+    opts = { err: [:child, :out] }
     if env
-      # NOTE while JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child
-      #if jruby? && (Gem::Version.new JRUBY_VERSION) < (Gem::Version.new '9.2.10.0')
-      if jruby?
-        begin
-          old_env, env = ENV.merge, (ENV.merge env)
-          env.each {|key, val| env.delete key if val.nil? } if env.value? nil
-          ENV.replace env
-          popen [cmd, *args, opts], &block
-        ensure
-          ENV.replace old_env
-        end
-      elsif env.value? nil
+      if env.value? nil
         env = env.each_with_object ENV.to_h do |(key, val), accum|
           val.nil? ? (accum.delete key) : (accum[key] = val)
         end
@@ -378,11 +360,18 @@ class Minitest::Test
   end
 
   def popen args, &block
-    # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
     if jruby? && windows?
       result = nil
+      # While JRuby 9.2.10.0 implements support for unsetenv_others, it doesn't work in child process
+      if Hash === args[-1] && args[-1][:unsetenv_others] && Hash === (env = args[0])
+        old_env = ENV.to_h
+        ENV.replace env
+      end
+      # When block is passed to IO.popen, JRuby for Windows does not return value of block as return value
       IO.popen args do |io|
         result = yield io
+      ensure
+        ENV.replace old_env if old_env
       end
       result
     else
@@ -390,7 +379,7 @@ class Minitest::Test
     end
   end
 
-  def using_test_webserver host = resolve_localhost, port = 9876
+  def using_test_webserver host: resolve_localhost, port: 9876, mimetypes: { '.adoc' => 'text/plain' }
     base_dir = testdir
     server = TCPServer.new host, port
     server_thread = Thread.start do
@@ -408,9 +397,9 @@ class Minitest::Test
         if resource == '/name/asciidoctor'
           session.print %(HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n)
           session.print %({"name": "asciidoctor"}\n)
-        elsif File.file? resource_file = (File.join base_dir, resource)
-          if (ext = File.extname(resource_file)[1..-1])
-            mimetype = ext == 'adoc' ? 'text/plain' : %(image/#{ext})
+        elsif (resource_file = File.join base_dir, resource) && (File.file? resource_file)
+          if (ext = File.extname resource_file)
+            mimetype = mimetypes[ext] || %(image/#{ext.slice 1, ext.length})
           else
             mimetype = 'text/plain'
           end
@@ -496,11 +485,11 @@ class Minitest::Test
     private
 
     def context_name name
-      %(Test#{(sanitize_name name).gsub(/(^| )(\w)/) { $2.upcase }}).to_sym
+      %(Test#{(sanitize_name name).gsub(/(^| )(\w)/) { $2.upcase }})
     end
 
     def test_name name
-      %(test_#{(sanitize_name name).gsub %r/\s+/, '_'}).to_sym
+      %(test_#{(sanitize_name name).gsub %r/\s+/, '_'})
     end
 
     def sanitize_name name

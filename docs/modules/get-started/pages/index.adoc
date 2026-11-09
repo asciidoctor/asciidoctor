@@ -3,8 +3,8 @@
 
 Assumptions:
 
-- [x] You've installed Asciidoctor.
-- [x] You've confirmed that the Asciidoctor command line interface (CLI) is available on your PATH.
+* [x] You've installed Asciidoctor.
+* [x] You've confirmed that the Asciidoctor command line interface (CLI) is available on your PATH.
 
 On this page, you'll learn how to run Asciidoctor on an AsciiDoc document and convert it to HTML.
 
@@ -15,7 +15,7 @@ Let's generate HTML 5 using Asciidoctor's default converter and stylesheet from 
 . To follow along with the steps below, copy the contents of <<ex-my-doc>> into a new plain text file or use your own AsciiDoc document.
 +
 .my-document.adoc
-[source#ex-my-doc,asciidoc]
+[#ex-my-doc,asciidoc]
 ----
 include::html-backend:example$my-document.adoc[tags=title;body]
 ----

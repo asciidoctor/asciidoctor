@@ -563,8 +563,7 @@ context 'Parser' do
   end
 
   test 'parse rev remark only' do
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    input = <<~EOS
+    input = <<~'EOS'
     Joe Cool
      :Must start revremark-only line with space
     EOS
@@ -652,8 +651,7 @@ context 'Parser' do
     \x20   end
     EOS
 
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    expected = <<~EOS.chop
+    expected = <<~'EOS'.chop
     def names
 
       @name.split

@@ -39,6 +39,21 @@ Instead of creating a new adapter, you can customize a built-in adapter by exten
 
 To extend an adapter, you need to look up a reference to the built-in adapter by name using the {apidoc-syntax-highlighter-for}[Asciidoctor::SyntaxHighlighter.for] method, create a class that extends it, register the adapter with a unique name (or the same name, if you want to replace it), and override any methods that provide the behavior you want to modify.
 
+Here's the basic template for customizing an existing adapter:
+
+[,ruby]
+----
+class CustomAdapter < (Asciidoctor::SyntaxHighlighter.for 'rouge')
+  register_for 'rouge'
+
+  # override methods go here
+end
+----
+
+Let's look at some examples of how to customize a built-in adapter.
+
+=== docinfo
+
 Let's override the adapter for Pygments to prevent it from adding a stylesheet to the HTML (presumably because the styles will be provided by a different stylesheet).
 
 .Extended syntax highlighter adapter for Pygments
@@ -61,6 +76,8 @@ include::example$pygments-syntax-highlighter-with-custom-stylesheet.rb[]
 
 If you want to decorate built-in behavior, you can invoke the `super` method anywhere inside the method to delegate to the behavior provided by the built-in adapter.
 
+=== highlight
+
 Let's say you always want lines to be numbered, regardless of the setting in the document.
 You can do so by overriding the `highlight` method, setting the `:number_lines` key on the `opts` argument, then delegating back to the built-in adapter using `super`.
 
@@ -68,5 +85,22 @@ You can do so by overriding the `highlight` method, setting the `:number_lines` 
 ----
 include::example$always-number-lines.rb[]
 ----
+
+=== create_formatter (Rouge)
+
+When using Rouge as the syntax highlighter, you can customize the formatter by overriding the `create_formatter` method.
+This allows you to add custom logic for handling certain tokens in the source language.
+
+Let's assume that you want to look for bare URLs in code comments and translate them into links (i.e., autolinks), just like in AsciiDoc.
+You can do that by weaving extra logic into the formatter that looks for tokens in the `Comment` category and applies a substitution to the value.
+
+[,ruby]
+----
+include::example$autolink-urls-in-comments.rb[]
+----
+
+Since the formatter has access to all the tokens in the code identified by the syntax highlighter, this technique opens up a lot of possibilities.
+For example, you could look for the `Type` token in the `Keyword` category in Java code and create a link to the API docs.
+The `lang` argument to the `create_formatter` method lets you know the source language (e.g., `java`) to which the tokens belong.
 
 To study the logic you may be interesting in overriding, browse the code for the https://github.com/asciidoctor/asciidoctor/tree/{page-origin-refname}/lib/asciidoctor/syntax_highlighter[built-in syntax highlighter adapters].

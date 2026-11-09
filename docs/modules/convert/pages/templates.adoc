@@ -4,7 +4,7 @@
 :apidoc-abstract-node: {apidoc-root}/AbstractNode
 :apidoc-block: {apidoc-root}/Block
 :url-pry: http://pry.github.io
-:url-slim: http://slim-lang.com
+:url-slim: https://slim-template.github.io
 :url-tilt: https://github.com/rtomayko/tilt
 :!listing-caption:
 
@@ -341,7 +341,7 @@ Refer to the documentation for the template engine for details.
 
 If you find yourself putting a lot of logic in the template, you may want to extract that logic into custom helper functions.
 When using Haml or Slim, you can define these helper functions in the file [.path]_helper.rb_ located in the same folder as the templates.
-These helper functions can simplify reoccuring elements that appear across multiple templates.
+These helper functions can simplify reoccurring elements that appear across multiple templates.
 
 The helper file must define the Ruby module `Haml::Helpers` or `Slim::Helpers`, depending on which template engine your templates target.
 Every method defined in that module becomes a top-level function in the template.
@@ -466,7 +466,7 @@ To use Pry, you first need to install it, either using `gem install`:
 
  $ gem install pry
 
-or by adding it to your [.path]_Gemfile_ and running `bundle`.
+or by adding it to your [.path]_Gemfile_ and running `bundle install`.
 
 In order to be dropped into the debugger at a specific point in a template, add the following two lines to the template you want to inspect:
 
@@ -561,7 +561,7 @@ gem 'slim'
 
 Then, you install the gems using Bundler:
 
- $ bundle
+ $ bundle install
 
 If you're not using Bundler, and you have configured Ruby to install gems in your user/home directory, then you can use the `gem` command instead:
 
@@ -574,11 +574,16 @@ Either way, the *tilt* and *slim* gems must be available on the load path when r
 Instructing Asciidoctor to apply your templates is the easiest part.
 You only need to tell Asciidoctor where the templates are located and which template engine you're using.
 (Technically, you don't need to specify the template engine.
-But, by doing so, it makes the scan more efficient and deterministic.)
+However, by doing so, it makes the scan more efficient and deterministic.)
 
 If you're using the CLI, you specify the template directory using the `-T` option (longhand: `--template-dir`) and the template engine using the `-E` option (longhand: `--template-engine`).
 
  $ asciidoctor -T /path/to/templates -E slim doc.adoc
+
+When using JRuby, you can refer to a directory on the classpath by prefixing the path with `uri:classloader:`.
+For example:
+
+ $ asciidoctor -r /path/to/templates.jar -T uri:classloader:/path/to/templates -E slim doc.adoc
 
 If you're using the API, you specify the template directory (or directories) using the `:template_dirs` option and the template engine using the `:template_engine` option.
 
@@ -601,7 +606,7 @@ To load templates from multiple directories when using the CLI, you can pass eac
 
  $ asciidoctor -T /path/to/common-templates -T /path/to/specialized-templates -E slim doc.adoc
 
-When using the API, you add all the template directories to the array value of the `:templates_dir` option:
+When using the API, you add all the template directories to the array value of the `:template_dirs` option:
 
 [,ruby]
 ----
@@ -623,23 +628,29 @@ You'll then observe the result of this customization by using the template when 
 You first need to install the required libraries (i.e., gems) for the template engine.
 Since you'll be using Slim, you need to install the *slim* gem.
 You also need to install the *tilt* gem, which provides Tilt, the generic interface for Ruby template engines that Asciidoctor uses to load and invoke templates.
+Although not required, Asciidoctor will prompt you to also install the *concurrent-ruby* gem to properly implement the template cache.
 
 The preferred way of installing a gem is to add it to the [.path]_Gemfile_ in your project.
 
 .Gemfile
 [,ruby]
 ----
+source 'https://rubygems.org'
+
+gem 'asciidoctor'
+# ...any other gems you are using
 gem 'tilt'
 gem 'slim'
+gem 'concurrent-ruby'
 ----
 
 Run Bundler to install the gems into your project.
 
- $ bundle
+ $ bundle install
 
 If you're not using Bundler, and you have configured Ruby to install gems in your user/home directory, then you can use the `gem` command instead:
 
- $ gem install tilt slim
+ $ gem install tilt slim concurrent-ruby
 
 Now that you've installed Tilt and the Slim template engine, you can get started writing templates.
 
@@ -649,6 +660,8 @@ Next, create a new folder named [.path]_templates_ to store your templates.
 We also recommend creating a nested folder named [.path]_html5_ to organize the templates by backend.
 
  $ mkdir -p templates/html5
+
+You can further organize templates into folders by engine, though that's not required.
 
 === Compose a template
 
@@ -679,7 +692,22 @@ Since the context for unordered lists is `:ulist` (see xref:contexts-ref.adoc[])
 === Apply the templates
 
 The final step is to use the templates when you invoke Asciidoctor.
-You can do so by passing the directory containing the templates using the `-T` option and the name of the template engine using the `-E` option.
+Create an AsciiDoc file named [.path]_doc.adoc_ that contains an unordered list.
+
+.doc.adoc
+[,asciidoc]
+----
+* cats
+* dogs
+* birds
+----
+
+You can now instruct Asciidoctor to convert this list using your template by passing the directory containing the templates using the `-T` option and the name of the template engine using the `-E` option.
+If you used Bundler to install gems, run Asciidoctor as follows:
+
+ $ bundle exec asciidoctor -T templates -E slim doc.adoc
+
+Otherwise, you can drop the `bundle exec` prefix:
 
  $ asciidoctor -T templates -E slim doc.adoc
 
@@ -689,7 +717,7 @@ Now that you've created your first converter template, you're well on your way t
 
 Here's a quick review for how to start using templates written in Slim to customize the output of the built-in HTML 5 converter.
 
-. Install the `tilt` and `slim` gems using `bundle` or `gem install`.
+. Install the `tilt`, `slim`, and `concurrent-ruby` gems using `bundle install` or `gem install`.
 . Create a folder named [.path]_templates/html5_ to store the templates.
 . Create a template named [.path]_paragraph.html.slim_ in that folder.
 . Populate the template with your own template logic.
@@ -703,8 +731,12 @@ p id=id role=role =content
 
 . Load the templates using the -T flag from the CLI:
 
- $ asciidoctor -T path/to/templates -E slim doc.adoc
+ $ bundle exec asciidoctor -T path/to/templates -E slim doc.adoc
 +
-When invoking Asciidoctor via the API, you load the templates by passing the path to the `:templates` option.
+or
+
+ $ asciidoctor -T path/to/templates -E slim doc.adoc
+
+TIP: When invoking Asciidoctor via the API, you load the templates by passing the path to the `:templates` option.
 
 We hope you'll agree that using templates makes it easy to customize the output that Asciidoctor produces.

@@ -14,12 +14,13 @@ Gem::Specification.new do |s|
   s.homepage = 'https://asciidoctor.org'
   s.license = 'MIT'
   # NOTE required ruby version is informational only; it's not enforced since it can't be overridden and can cause builds to break
-  #s.required_ruby_version = '>= 2.3.0'
+  #s.required_ruby_version = '>= 2.7.0'
   s.metadata = {
     'bug_tracker_uri' => 'https://github.com/asciidoctor/asciidoctor/issues',
     'changelog_uri' => 'https://github.com/asciidoctor/asciidoctor/blob/HEAD/CHANGELOG.adoc',
-    'mailing_list_uri' => 'https://discuss.asciidoctor.org',
-    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor'
+    'mailing_list_uri' => 'https://chat.asciidoctor.org',
+    'source_code_uri' => 'https://github.com/asciidoctor/asciidoctor',
+    'funding_uri' => 'https://opencollective.com/asciidoctor'
   }
 
   # NOTE the logic to build the list of files is designed to produce a usable package even when the git command is not available
@@ -34,14 +35,14 @@ Gem::Specification.new do |s|
   #s.test_files = files.grep %r/^(?:features|test)\/.+$/
 
   # concurrent-ruby, haml, slim, and tilt are needed for testing custom templates
-  s.add_development_dependency 'concurrent-ruby', '~> 1.1.0'
-  s.add_development_dependency 'cucumber', '~> 3.1.0'
+  s.add_development_dependency 'concurrent-ruby', '~> 1.3.0'
+  s.add_development_dependency 'cucumber', '~> 11.1.0'
   # erubi is needed for testing alternate eRuby impls
-  s.add_development_dependency 'erubi', '~> 1.10.0'
-  s.add_development_dependency 'haml', '~> 5.2.0'
-  s.add_development_dependency 'minitest', '~> 5.14.0'
-  s.add_development_dependency 'nokogiri', '~> 1.10.0'
-  s.add_development_dependency 'rake', '~> 12.3.0'
-  s.add_development_dependency 'slim', '~> 4.1.0'
-  s.add_development_dependency 'tilt', '~> 2.0.0'
+  s.add_development_dependency 'erubi', '~> 1.13.0'
+  s.add_development_dependency 'haml', '~> 6.4.0'
+  s.add_development_dependency 'minitest', '~> 6.0.0'
+  s.add_development_dependency 'nokogiri', '~> 1.15.0'
+  s.add_development_dependency 'rake', '~> 13.3.0'
+  # slim pulls in tilt dependency
+  s.add_development_dependency 'slim', '~> 5.2.0'
 end

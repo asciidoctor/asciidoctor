@@ -200,7 +200,7 @@ context 'Sections' do
       assert_equal 'Section One <a id="one"></a>', sec.title
     end
 
-    test 'should apply substititons to title with attribute references when registering section with auto-generated ID' do
+    test 'should apply substitutions to title with attribute references when registering section with auto-generated ID' do
       input = <<~'EOS'
       = Document Title
       :foo: bar
@@ -222,7 +222,7 @@ context 'Sections' do
       assert_xpath '//h2[@id="_section_baz"][text()="Section baz"]', output, 1
     end
 
-    test 'should apply substititons to title with attribute references when registering section with explicit ID' do
+    test 'should apply substitutions to title with attribute references when registering section with explicit ID' do
       input = <<~'EOS'
       = Document Title
       :foo: bar
@@ -245,7 +245,7 @@ context 'Sections' do
       assert_xpath '//h2[@id="explicit"][text()="Section baz"]', output, 1
     end
 
-    test 'should not apply substititons to title with attribute references when parsing section with empty ID' do
+    test 'should not apply substitutions to title with attribute references when parsing section with empty ID' do
       input = <<~'EOS'
       = Document Title
       :attribute-missing: warn
@@ -2087,6 +2087,22 @@ context 'Sections' do
       assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a[@class="link"][@href="#_linux"]', output, 1
       assert_xpath '//*[@class="sect2"]/h3[@id="_linux"]/a[text()="Linux"]', output, 1
     end
+
+    test 'should start section link after supplemental anchors when sectlinks is set' do
+      input = <<~'EOS'
+      :sectlinks:
+
+      [#foo]
+      == [[fu]]Foo
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a', output, 2
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@id="fu"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@class="link"]', output, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="foo"]/a[@id="fu"]/following-sibling::a[@class="link"]', output, 1
+    end
   end
 
   context 'Special sections' do
@@ -2759,9 +2775,31 @@ context 'Sections' do
       Abstract content
       EOS
 
-      output = convert_string_to_embedded input, backend: 'docbook'
-      assert_xpath '/abstract[@xml:id="abstract_title"]', output, 1
-      assert_xpath '/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '/article/info/abstract[@xml:id="abstract_title"]', output, 1
+      assert_xpath '/article/info/abstract[@xml:id="abstract_title"]/title[text()="Abstract Title"]', output, 1
+    end
+
+    test 'demote abstract section to level 1 in article if defined at level 0' do
+      input = <<~'EOS'
+      = Article
+
+      [abstract]
+      = Abstract Title
+
+      Abstract content
+
+      == Section Title
+
+      Section content
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string input
+        assert_css 'h2#_abstract_title', output, 1
+        assert_css 'h2#_section_title', output, 1
+        assert_message logger, :ERROR, '<stdin>: line 4: level 0 sections can only be used when doctype is book', Hash
+      end
     end
 
     test 'should allow a special section to be nested at arbitrary depth in DocBook output' do
@@ -2792,17 +2830,19 @@ context 'Sections' do
       assert_xpath '//glossary/glossentry', output, 2
     end
 
-    test 'should drop title on special section in DocBook output if untitled option is set' do
-      input = <<~'EOS'
-      [dedication%untitled]
-      == Dedication
+    test 'should drop title on special section in DocBook output if notitle or untitled option is set' do
+      %w(notitle untitled).each do |option|
+        input = <<~EOS
+        [dedication%#{option}]
+        == Dedication
 
-      content
-      EOS
+        content
+        EOS
 
-      output = convert_string_to_embedded input, backend: :docbook
-      assert_xpath '/dedication', output, 1
-      assert_xpath '/dedication/title', output, 0
+        output = convert_string_to_embedded input, backend: :docbook
+        assert_xpath '/dedication', output, 1
+        assert_xpath '/dedication/title', output, 0
+      end
     end
   end
 
@@ -3212,6 +3252,134 @@ context 'Sections' do
       assert_xpath '//*[@id="header"]//*[@id="toc"]/*[@id="toctitle"][text()="Contents"]', output, 1
     end
 
+    test 'should only show parts in toc if toclevels is 0' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc a', output, 2
+      assert_css '#toc a[href="#_part_1"]', output, 1
+      assert_css '#toc a[href="#_part_2"]', output, 1
+      assert_css '#toc a[href="#_chapter_1"]', output, 0
+      assert_css '#toc a[href="#_chapter_2"]', output, 0
+    end
+
+    test 'should only show parts in toc if toclevels is 0 and book starts with special section' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      [dedication]
+      = Dedication
+
+      For my family.
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc a', output, 2
+      assert_css '#toc a[href="#_part_1"]', output, 1
+      assert_css '#toc a[href="#_part_2"]', output, 1
+      assert_css '#toc a[href="#_chapter_1"]', output, 0
+      assert_css '#toc a[href="#_chapter_2"]', output, 0
+    end
+
+    test 'should not move parts down a level in toc if book starts with special section' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      [dedication]
+      = Dedication
+
+      For my family.
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc > ul.sectlevel0', output, 1
+      assert_css '#toc > ul.sectlevel0 > li:not([class])', output, 2
+      assert_css '#toc a', output, 2
+      assert_css '#toc a[href="#_part_1"]', output, 1
+      assert_css '#toc a[href="#_part_2"]', output, 1
+    end
+
+    test 'should add class to special sections in TOC that precede first part' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+      :toc:
+      :toclevels: 1
+
+      [dedication]
+      = Dedication
+
+      For my family.
+
+      = Part 1
+
+      == Chapter 1
+
+      = Part 2
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc > ul.sectlevel0', output, 1
+      assert_css '#toc a', output, 5
+      assert_css '#toc > ul.sectlevel0 > li.sectlevel1', output, 1
+      assert_css '#toc > ul.sectlevel0 > li.sectlevel1 a[href="#_dedication"]', output, 1
+      assert_css '#toc > ul.sectlevel0 ul.sectlevel1', output, 2
+    end
+
+    test 'should coerce minimum toclevels to 1 if first section of document is not a part' do
+      input = <<~'EOS'
+      = Article
+      :doctype: book
+      :toc:
+      :toclevels: 0
+
+      == Chapter 1
+
+      == Chapter 2
+      EOS
+      output = convert_string input
+      assert_css '#toc', output, 1
+      assert_css '#toc a[href="#_chapter_1"]', output, 1
+      assert_css '#toc a[href="#_chapter_2"]', output, 1
+    end
+
     test 'should not output table of contents if toc-placement attribute is unset' do
       input = <<~'EOS'
       = Article
@@ -3400,15 +3568,14 @@ context 'Sections' do
       :toc-placement: macro
       :toc-title: Ignored
       :toc-class: ignored
-      :toclevels: 5
-      :tocdepth: 1
+      :tocmacrolevels: 3
 
       Preamble.
 
       [[contents]]
       [role="contents"]
       .Contents
-      toc::[levels={tocdepth}]
+      toc::[levels={tocmacrolevels}]
 
       == Section 1
 
@@ -3431,9 +3598,60 @@ context 'Sections' do
       assert_css '#preamble #contents', output, 1
       assert_css '#preamble #contents.contents', output, 1
       assert_xpath '//*[@id="contents"]/*[@class="title"][text() = "Contents"]', output, 1
-      assert_css '#contents li', output, 2
-      assert_xpath '(//*[@id="contents"]//li)[1]/a[text() = "Section 1"]', output, 1
-      assert_xpath '(//*[@id="contents"]//li)[2]/a[text() = "Section 2"]', output, 1
+      assert_css '#contents li', output, 6
+      assert_css '#contents a[href="#_section_1"]', output, 1
+      assert_css '#contents a[href="#_section_1_1"]', output, 1
+      assert_css '#contents a[href="#_section_1_1_1"]', output, 1
+    end
+
+    test 'should allow section to override toclevels for descendant sections' do
+      input = <<~'EOS'
+      = Document Title
+      :toc:
+      :toclevels: 1
+      :nofooter:
+
+      == Level 1
+
+      === Level 2
+
+      [toclevels=2]
+      == Another Level 1
+
+      === Another Level 2
+      EOS
+
+      output = convert_string input
+      assert_css '#toc a[href="#_level_2"]', output, 0
+      assert_css '#toc a[href="#_another_level_2"]', output, 1
+    end
+
+    test 'should allow section to remove itself from toc by setting toclevels to less than own section level' do
+      input = <<~'EOS'
+      = Document Title
+      :doctype: book
+      :toc:
+      :toclevels: 3
+
+      [#ch1]
+      == Chapter
+
+      [#ch1-s1]
+      === Chapter Section
+
+      [appendix#app1]
+      == Lorem Ipsum
+
+      [#app1-s1,toclevels=1]
+      === Appendix Section
+      EOS
+
+      output = convert_string input
+      assert_css '#toc a[href="#ch1"]', output, 1
+      assert_css '#toc a[href="#ch1-s1"]', output, 1
+      assert_css '#toc a[href="#app1"]', output, 1
+      assert_css '#toc a[href="#app1-s1"]', output, 0
+      assert_includes output, '<li><a href="#app1">Appendix A: Lorem Ipsum</a></li>'
     end
 
     test 'child toc levels should not have additional bullet at parent level in html' do
@@ -3631,6 +3849,8 @@ context 'Sections' do
       assert_xpath '//h1[@id="_chapter_one"][text() = "Chapter One"]', output, 1
       assert_xpath '//h1[@id="_chapter_two"][text() = "Chapter Two"]', output, 1
       assert_xpath '//h1[@id="_chapter_three"][text() = "Chapter Three"]', output, 1
+      assert_css '#_chapter_one + .openblock.partintro p', output, 1
+      assert_css '#_chapter_two + .openblock.partintro p', output, 1
     end
 
     test 'should print error if level 0 section comes after nested section and doctype is not book' do
@@ -3739,7 +3959,7 @@ context 'Sections' do
 
       = Part 1
 
-      part intro
+      part intro--a summary
 
       == Chapter 1
       EOS
@@ -3747,7 +3967,53 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
+      assert_empty partintro.lines
+      assert_empty partintro.subs
       assert_equal 'partintro', partintro.style
+      assert_equal :paragraph, partintro.blocks[0].context
+      assert_equal ['part intro--a summary'], partintro.blocks[0].lines
+      assert_include 'part intro&#8212;&#8203;a summary', partintro.convert
+    end
+
+    test 'should preserve title on partintro defined as partintro paragraph' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      .Intro
+      [partintro]
+      Read this first.
+
+      == Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_equal 'Intro', partintro.title
+    end
+
+    test 'should not promote title on partintro defined as normal paragraph' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      .Intro
+      Read this first.
+
+      == Chapter 1
+      EOS
+
+      doc = document_from_string input
+      partintro = doc.blocks.first.blocks.first
+      assert_equal :open, partintro.context
+      assert_nil partintro.title
+      assert_equal 'Intro', partintro.blocks[0].title
     end
 
     test 'should add partintro style to child open block of part' do
@@ -3767,7 +4033,9 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
       assert_equal 'partintro', partintro.style
+      assert_equal :paragraph, partintro.blocks[0].context
     end
 
     test 'should wrap child paragraphs of part in partintro open block' do
@@ -3787,10 +4055,55 @@ context 'Sections' do
       doc = document_from_string input
       partintro = doc.blocks.first.blocks.first
       assert_equal :open, partintro.context
+      assert_equal :compound, partintro.content_model
       assert_equal 'partintro', partintro.style
       assert_equal 2, partintro.blocks.size
       assert_equal :paragraph, partintro.blocks[0].context
       assert_equal :paragraph, partintro.blocks[1].context
+    end
+
+    test 'should wrap abstract in implicit part intro in info tag when converting to DocBook' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      [abstract]
+      Abstract of part.
+
+      more part intro
+
+      == Chapter 1
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '//abstract', output, 1
+      assert_xpath '//partintro/info/abstract', output, 1
+    end
+
+    test 'should wrap abstract in part intro section in info tag when converting to DocBook' do
+      input = <<~'EOS'
+      = Book
+      :doctype: book
+
+      = Part 1
+
+      [partintro]
+      == Part Intro
+
+      [abstract]
+      Abstract of part.
+
+      more part intro
+
+      == Chapter 1
+      EOS
+
+      output = convert_string input, backend: 'docbook'
+      assert_xpath '//abstract', output, 1
+      assert_xpath '//partintro/info/abstract', output, 1
+      assert_xpath '//partintro/simpara', output, 1
     end
 
     test 'should warn if part has no sections' do

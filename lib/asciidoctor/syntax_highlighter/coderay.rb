@@ -17,14 +17,15 @@ class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
   def highlight node, source, lang, opts
     @requires_stylesheet = true if (css_mode = opts[:css_mode]) == :class
     lang = lang ? (::CodeRay::Scanners[lang = lang.to_sym] && lang rescue :text) : :text
-    highlighted = ::CodeRay::Duo[lang, :html,
+    highlighter_opts = {
       css: css_mode,
       line_numbers: (line_numbers = opts[:number_lines]),
       line_number_start: opts[:start_line_number],
       line_number_anchors: false,
       highlight_lines: opts[:highlight_lines],
       bold_every: false,
-    ].highlight source
+    }
+    highlighted = ::CodeRay::Duo[lang, :html, highlighter_opts].highlight source
     if line_numbers == :table && opts[:callouts]
       [highlighted, (idx = highlighted.index CodeCellStartTagCs) ? idx + CodeCellStartTagCs.length : nil]
     else
@@ -38,7 +39,7 @@ class SyntaxHighlighter::CodeRayAdapter < SyntaxHighlighter::Base
 
   def docinfo location, doc, opts
     if opts[:linkcss]
-      %(<link rel="stylesheet" href="#{doc.normalize_web_path stylesheet_basename, (doc.attr 'stylesdir', ''), false}"#{opts[:self_closing_tag_slash]}>)
+      %(<link rel="stylesheet" href="#{doc.normalize_web_path stylesheet_basename, (doc.attr 'stylesdir'), false}"#{opts[:self_closing_tag_slash]}>)
     else
       %(<style>
 #{read_stylesheet}

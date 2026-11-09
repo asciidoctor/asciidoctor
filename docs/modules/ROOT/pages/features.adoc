@@ -7,8 +7,8 @@
 
 Asciidoctor is written in Ruby, which means it must be run on a Ruby language runtime (including JRuby).
 But that's its only requirement.
-Asciidoctor is packaged and distributed as a {url-rubygems}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
-The gem can be installed on *any operating system* Ruby supports using Ruby's package management tools (gem or bundle).
+Asciidoctor is packaged and distributed as a gem named {url-rubygems}/asciidoctor[asciidoctor^] to the package repository at {url-rubygems}[RubyGems.org^].
+The gem can be installed on *any operating system* that Ruby supports using Ruby's package management tools (gem or bundle).
 Asciidoctor itself has no dependencies.
 
 But what if you aren't familiar with Ruby or, for whatever reason, prefer not to install it?
@@ -38,7 +38,7 @@ So there is plenty of room to grow.
 Asciidoctor provides converters for three output formats by default: xref:html-backend:index.adoc[HTML 5], xref:docbook-backend:index.adoc[DocBook 5], and xref:manpage-backend:index.adoc[man page] (short for manual page).
 These converters are designed to cover a majority of users`' needs for basic preview and publishing.
 
-The *HTML* converter provides a result you can publish the web straight away without any tweaking.
+The *HTML* converter provides a result you can publish to the web straight away without any tweaking.
 The *DocBook* converter allows you to leverage an existing publishing toolchain or migrate the content to a different authoring format (without the tool needing to know how to parse AsciiDoc).
 The *man page* converter drastically lowers the barrier to making system help files.
 
@@ -73,7 +73,7 @@ If you're writing technical documentation that presents snippets of source code 
 Syntax highlighting is the practice of colorizing (or otherwise emphasizing) keywords and syntax elements in a structured programming or configuration language.
 Here's an example to give you an idea:
 
-[source,ruby]
+[,ruby]
 ----
 phrase = "I love AsciiDoc"
 puts phrase
@@ -92,8 +92,8 @@ Asciidoctor offers two interfaces for processing AsciiDoc content: a commandline
 
 The *CLI* is designed as a simple tool for non-programmers who want to convert AsciiDoc without having to write a program or for converting content in an automated environment such as CI.
 Many of the processing options are accessible from the CLI using option flags.
-When you're first starting out with Asciidoctor, you'll mostly likely interact with it via the CLI.
-Although the CLI itself does not require any programming, it can still load extension code that auguments processing.
+When you're first starting out with Asciidoctor, you'll most likely interact with it via the CLI.
+Although the CLI itself does not require any programming, it can still load extension code that augments processing.
 
 NOTE: If you're migrating from AsciiDoc.py, the `asciidoctor` CLI is a drop-in replacement for the `asciidoc` CLI.
 

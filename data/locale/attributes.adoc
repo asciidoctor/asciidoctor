@@ -4,7 +4,7 @@
 // If you're introducing a new translation, create a file named attributes-<iana-subtag>.adoc, where <iana-subtag> is the IANA subtag for the language.
 // Next, assign a translation for each attribute, using attributes-en.adoc as a reference.
 //
-// IMPORTANT: Do not include any blank lines in the transation file.
+// IMPORTANT: Do not include any blank lines in the translation file.
 //
 // NOTE: Please wrap the listing-caption and preface-title entries in a preprocessor conditional directive.
 // These attributes should only be updated if set explicitly by the user.

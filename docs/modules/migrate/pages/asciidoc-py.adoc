@@ -2,6 +2,7 @@
 :url-writing-tests: https://github.com/asciidoctor/asciidoctor/blob/HEAD/CONTRIBUTING.adoc#writing-and-executing-tests
 :url-doctest: {url-org}/asciidoctor-doctest
 :url-asciidoctor-1: {url-project}/man/asciidoctor
+:description: This page covers the differences between Asciidoctor and the legacy Python-based AsciiDoc processor, AsciiDoc.py, and provides guidance for migrating your content and processor settings from AsciiDoc.py to Asciidoctor.
 
 AsciiDoc.py is the original and legacy Python-based processor for the AsciiDoc language.
 It has been superseded by Asciidoctor.
@@ -61,7 +62,7 @@ There are similar attributes to control how additional resources are resolved.
 As the steward of the AsciiDoc language, Asciidoctor reworked some of the AsciiDoc syntax originally introduced by AsciiDoc.py in an effort to make it more consistent, easier to learn, and, in some cases, more concise.
 This section outlines those improvements to the modern AsciiDoc syntax and how it differs from the legacy AsciiDoc recognized by AsciiDoc.py.
 
-*If a feature or attribute isn't mentioned in the following tables, than it works in Asciidoctor just like it worked in AsciiDoc.py.*
+*If a feature or attribute isn't mentioned in the following tables, then it works in Asciidoctor just like it worked in AsciiDoc.py.*
 
 === Inline formatting
 
@@ -177,7 +178,6 @@ Asciidoctor is more careful when deriving automatic IDs for sections from the se
 
 To ensure your IDs have maximum portability, it's best to define them explicitly if the section title contains special characters or formatting.
 
-
 === Tables
 
 [cols="~,~,~,~"]
@@ -279,18 +279,27 @@ For all other text, Asciidoctor tabs are fixed at 4 spaces by the CSS.
 See xref:asciidoc:directives:include-with-indent.adoc[normalize block indentation].
 |===
 
+=== docinfo attributes
+
+`docinfo` attribute values were introduced into AsciiDoc by Asciidoctor 1.5.5 to replace the less descriptive `docinfo1` and `docinfo2` attributes.
+Here are the equivalents of the old attributes using the new values:
+
+* `:docinfo:` = `:docinfo: private`
+* `:docinfo1:` = `:docinfo: shared`
+* `:docinfo2:` = `:docinfo: shared,private`
+
 === showcomments
 
 In AsciiDoc.py, single line comments could be turned into DocBook `<remark>` elements using `showcomments`.
 This feature isn't implemented in Asciidoctor, but you can send remarks to the output, using an extension, or ifdef directives and passthrough blocks like the example shown below.
 
-[source,asciidoc]
+[,asciidoc]
 ----
- ifdef::showcomments+basebackend-docbook[]
- ++++
- <remark>Your comment here</remark>
- ++++
- endif::[]
+\ifdef::showcomments+basebackend-docbook[]
+++++
+<remark>Your comment here</remark>
+++++
+\endif::[]
 ----
 
 == Compatibility mode
@@ -305,14 +314,25 @@ If you can't migrate right now, you can activate compat mode by setting the `com
 
  $ asciidoctor -a compat-mode document.adoc
 
-You can also enable compat mode implicitly by beginning the document with an setext-style (i.e., two-line) document title:
+You can also enable compat mode implicitly by beginning the document with a setext-style (i.e., two-line) document title:
 
 [,asciidoc]
 ----
 Compat Mode
 ===========
 
-ifdef::compat-mode[Compat mode is on!]
+\ifdef::compat-mode[Compat mode is on!]
+----
+
+If you prefer the setext-style document title, but don't want compat mode to be enabled, you must unset the `compat-mode` attribute explicitly.
+
+[,asciidoc]
+----
+Not Compat Mode
+===============
+:!compat-mode:
+
+\ifndef::compat-mode[Compat mode is not on.]
 ----
 
 When compat mode is enabled, Asciidoctor adapts some of its behavior and its interpretation of AsciiDoc to more closely align with AsciiDoc.py.
@@ -330,6 +350,10 @@ Literal monospace is signified using a compound markup that combines an inline p
 | Literal monospace
 | pass:[`+1...10+`]
 | `+1...10+`
+
+| Italic
+| pass:['text']
+| _text_
 |===
 
 To learn more about the adaptations that are activated by compat mode, refer to <<inline-formatting,inline formatting>>.
@@ -343,7 +367,7 @@ Instead, Asciidoctor provides an xref:extensions:register.adoc[extension API] th
 
 === Localization
 
-AsciiDoc.py had built-in [.path]_.conf_ files that translated built-in labels.
+AsciiDoc.py has built-in [.path]_.conf_ files that translated built-in labels.
 In Asciidoctor, you must define the translations for these labels explicitly.
 See xref:ROOT:localization-support.adoc[] for details.
 
@@ -376,6 +400,63 @@ a|
 
 AsciiDoc.py custom extensions are Python commands, so they don't work with Asciidoctor.
 Depending on the Asciidoctor processor you choose, you can re-write your xref:extensions:index.adoc[extensions in Ruby, Java, or JavaScript].
+
+== Extract text
+
+AsciiDoc.py provides a frontend to the DocBook toolchain named a2x.py.
+This script can produce various output formats from an AsciiDoc document.
+One of those formats is text (aka "`plain text`").
+In order to extract the text, the DocBook toolchain first converts the AsciiDoc to HTML, then extracts the text from that document using lynx.
+
+There are numerous approaches to extracting text from AsciiDoc in Asciidoctor.
+One way is to write an Asciidoctor converter mapped to the `text` backend that xref:convert:custom.adoc#convert-to-text-only[converts AsciiDoc to text only].
+Another approach is to convert the AsciiDoc to HTML, then extract text from the HTML output document using a text-based browser, just like the DocBook toolchain does.
+
+Before continuing, it's worth noting that there's no universal definition of "`plain text`".
+It all depends on what information you are trying to extract.
+That's why you won't find a text backend provided by Asciidoctor core.
+Let's consider what tools are available.
+
+As an alternative to lynx, the text-based browser w3m does a nice job of extracting text from an HTML document.
+For example:
+
+ $ w3m -dump -cols 120 doc.html > doc.txt
+
+You can set the number of columns so lines aren't hard wrapped at a fixed line width.
+The upper bounds for this value is MAX_INT (2147483647).
+You can retrieve that value dynamically using Perl.
+
+ $ w3m -dump -cols $(perl -MPOSIX -e 'print INT_MAX') doc.html > doc.txt
+
+It doesn't seem possible to configure w3m to preserve markup that indicates headings.
+However, the text-based browser `elinks` offers this behavior by default through indentation.
+
+ $ elinks -dump 1 -no-references -no-numbering -dump-width 50000 doc.html > doc.txt
+
+Yet another option is the https://www.npmjs.com/package/html-to-text[html-to-text^] module for Node.js, which parses HTML and returns beautiful text.
+
+If you want to extract the text during AsciiDoc conversion, you can do so using an Asciidoctor postprocessor extension.
+
+[,ruby]
+----
+require 'open3'
+
+Asciidoctor::Extensions.register do
+  postprocessor do
+    process do |doc, output|
+      outfile = (doc.attr 'outfile').sub %r/\.\S+$/, '.txt'
+      Open3.popen2 'elinks -dump 1 -no-references -no-numbering' do |is, os|
+        is.print output
+        is.close
+        File.write outfile, os.read
+      end
+      output
+    end
+  end
+end
+----
+
+This extension will write a file with a .txt extension adjacent to the document written by the converter.
 
 == Doctest
 
@@ -414,7 +495,7 @@ This content needs to be move to the specific subject docs pages if applicable
 Asciidoctor has shorthand for id, role, style and options.
 The following longhand syntax in AsciiDoc.py:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 [[id]]
 [style,role="role",options="option1,option2"]
@@ -422,7 +503,7 @@ The following longhand syntax in AsciiDoc.py:
 
 can be written using the shorthand supported by Asciidoctor:
 
-[source,asciidoc]
+[,asciidoc]
 ----
 [style#id.role%option1%option2]
 ----

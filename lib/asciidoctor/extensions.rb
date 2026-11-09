@@ -201,6 +201,20 @@ module Extensions
       block
     end
 
+    # Public: Creates an inline node and binds it to the specified parent.
+    #
+    # parent  - The parent Block of this new inline node.
+    # context - The context of the inline node to create (e.g., :quoted, :anchor, etc).
+    # text    - The text of the inline node.
+    # opts    - An optional Hash of options (default: {}):
+    #           :type - The subtype of the inline node context. For a :quoted node, this can be
+    #                   :strong, :emphasis, :monospaced, etc. For an :anchor node, this can be
+    #                   :xref, :link, :ref, etc.
+    #           :attributes - The attributes to set on the inline node. If the "subs" attribute is
+    #                         specified, the convert will apply the specified substitutions to the
+    #                         text of the inline node.
+    #
+    # Returns an [Inline] node with all properties properly initialized.
     def create_inline parent, context, text, opts = {}
       Inline.new parent, context, text, context == :quoted ? ({ type: :unquoted }.merge opts) : opts
     end
@@ -308,7 +322,7 @@ module Extensions
     alias parse_content_as content_model
 
     def positional_attributes *value
-      option :positional_attrs, value.flatten
+      option :positional_attrs, (value.flatten.map {|name| name.to_s })
     end
     alias name_positional_attributes positional_attributes
     # NOTE positional_attrs alias is deprecated
@@ -448,7 +462,7 @@ module Extensions
       raise ::NotImplementedError, %(#{IncludeProcessor} subclass #{self.class} must implement the ##{__method__} method)
     end
 
-    def handles? target
+    def handles? doc, target
       true
     end
   end
@@ -459,20 +473,26 @@ module Extensions
     def handles? *args, &block
       if block_given?
         raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
-        @handles_block = block
+        @handles_block = block.arity == 1 ? proc {|_doc, target| block[target] } : block
       # TODO enable if we want to support passing proc or lambda as argument instead of block
       #elsif ::Proc === args[0]
       #  block = args.shift
       #  raise ::ArgumentError, %(wrong number of arguments (given #{args.size}, expected 0)) unless args.empty?
       #  @handles_block = block
       elsif defined? @handles_block
-        @handles_block.call args[0]
+        @handles_block.call args[0], args[1]
       else
         true
       end
     end
   end
   IncludeProcessor::DSL = IncludeProcessorDsl
+
+  module LegacyHandlesMethodAdapter
+    def handles? _doc, target
+      super target
+    end
+  end
 
   # Public: DocinfoProcessors are used to add additional content to
   # the header and/or footer of the generated document.
@@ -484,7 +504,7 @@ module Extensions
   # to add content to the header.
   class DocinfoProcessor < Processor
     def initialize config = {}
-      super config
+      super
       @config[:location] ||= :head
     end
 
@@ -604,7 +624,7 @@ module Extensions
   #
   # If the process method returns an instance of Block, the content model of that
   # Block is :compound, and the Block contains at least one line, the parser will
-  # parse those lines into blocks an assigned them to the returned block.
+  # parse those lines into blocks and assign them to the returned block.
   #
   # BlockMacroProcessor implementations must extend BlockMacroProcessor.
   class BlockMacroProcessor < MacroProcessor
@@ -720,8 +740,7 @@ module Extensions
 
     def initialize groups = {}
       @groups = groups
-      @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
-      @document = nil
+      reset
     end
 
     # Public: Activates all the global extension {Group}s and the extension {Group}s
@@ -731,6 +750,7 @@ module Extensions
     #
     # Returns the instance of this [Registry].
     def activate document
+      reset if @document
       @document = document
       unless (ext_groups = Extensions.groups.values + @groups.values).empty?
         ext_groups.each do |group|
@@ -1027,7 +1047,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def docinfo_processors location = nil
-      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : @docinfo_processor_extensions
+      @docinfo_processor_extensions && location ? @docinfo_processor_extensions.select {|ext| ext.config[:location] == location } : (@docinfo_processor_extensions || [])
     end
 
     # Public: Registers a {BlockProcessor} with the extension registry to
@@ -1042,7 +1062,7 @@ module Extensions
     # * A method block (i.e., Proc) that conforms to the BlockProcessor contract
     #
     # Unless the BlockProcessor is passed as the method block, it must be the
-    # first argument to this method. The second argument is the name (coersed
+    # first argument to this method. The second argument is the name (coerced
     # to a Symbol) of the AsciiDoc block content (i.e., delimited block or
     # paragraph) that this processor is registered to handle. If a block name
     # is not passed as an argument, it gets read from the name property of the
@@ -1103,22 +1123,18 @@ module Extensions
     # Returns the [Extension] proxy object for the BlockProcessor that matches
     # the block name and context or false if no match is found.
     def registered_for_block? name, context
-      if (ext = @block_extensions[name.to_sym])
-        (ext.config[:contexts].include? context) ? ext : false
-      else
-        false
-      end
+      (ext = @block_extensions&.[] name.to_sym) ? (ext.config[:contexts].include? context) && ext : false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockProcessor registered
     # to handle block content with the name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockProcessor or nil if a match is not found.
     def find_block_extension name
-      @block_extensions[name.to_sym]
+      @block_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {BlockMacroProcessor} with the extension registry to
@@ -1133,7 +1149,7 @@ module Extensions
     #
     # Unless the BlockMacroProcessor is passed as the method block, it must be
     # the first argument to this method. The second argument is the name
-    # (coersed to a Symbol) of the AsciiDoc block macro that this processor is
+    # (coerced to a Symbol) of the AsciiDoc block macro that this processor is
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the BlockMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
@@ -1189,25 +1205,25 @@ module Extensions
     # Public: Checks whether any {BlockMacroProcessor} extensions are registered to
     # handle the block macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # Returns the [Extension] proxy object for the BlockMacroProcessor that matches
     # the macro name or false if no match is found.
     #--
     # TODO only allow blank target if format is :short
     def registered_for_block_macro? name
-      (ext = @block_macro_extensions[name.to_sym]) ? ext : false
+      (@block_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the BlockMacroProcessor registered
     # to handle a block macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding BlockMacroProcessor or nil if a match is not found.
     def find_block_macro_extension name
-      @block_macro_extensions[name.to_sym]
+      @block_macro_extensions&.[] name.to_sym
     end
 
     # Public: Registers a {InlineMacroProcessor} with the extension registry to
@@ -1222,7 +1238,7 @@ module Extensions
     #
     # Unless the InlineMacroProcessor is passed as the method block, it must be
     # the first argument to this method. The second argument is the name
-    # (coersed to a Symbol) of the AsciiDoc block macro that this processor is
+    # (coerced to a Symbol) of the AsciiDoc block macro that this processor is
     # registered to handle. If a block macro name is not passed as an argument,
     # it gets read from the name property of the InlineMacroProcessor instance.
     # If a name still cannot be determined, an error is raised.
@@ -1278,23 +1294,23 @@ module Extensions
     # Public: Checks whether any {InlineMacroProcessor} extensions are registered to
     # handle the inline macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # Returns the [Extension] proxy object for the InlineMacroProcessor that matches
     # the macro name or false if no match is found.
     def registered_for_inline_macro? name
-      (ext = @inline_macro_extensions[name.to_sym]) ? ext : false
+      (@inline_macro_extensions&.[] name.to_sym) || false
     end
 
     # Public: Retrieves the {Extension} proxy object for the InlineMacroProcessor registered
     # to handle an inline macro with the specified name.
     #
-    # name - the String or Symbol (coersed to a Symbol) macro name
+    # name - the String or Symbol (coerced to a Symbol) macro name
     #
     # Returns the [Extension] object stored in the registry that proxies the
     # corresponding InlineMacroProcessor or nil if a match is not found.
     def find_inline_macro_extension name
-      @inline_macro_extensions[name.to_sym]
+      @inline_macro_extensions&.[] name.to_sym
     end
 
     # Public: Retrieves the {Extension} proxy objects for all
@@ -1302,7 +1318,7 @@ module Extensions
     #
     # Returns an [Array] of Extension proxy objects.
     def inline_macros
-      @inline_macro_extensions.values
+      (@inline_macro_extensions || {}).values
     end
 
     # Public: Inserts the document processor {Extension} instance as the first
@@ -1320,7 +1336,7 @@ module Extensions
     # of this processor.
     def prefer *args, &block
       extension = ProcessorExtension === (arg0 = args.shift) ? arg0 : (send arg0, *args, &block)
-      extensions_store = instance_variable_get %(@#{extension.kind}_extensions).to_sym
+      extensions_store = instance_variable_get %(@#{extension.kind}_extensions)
       extensions_store.unshift extensions_store.delete extension
       extension
     end
@@ -1329,10 +1345,10 @@ module Extensions
 
     def add_document_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = kind_name.split.map {|it| it.capitalize }.join.to_sym
+      kind_class_symbol = kind_name.split.map {|segment| segment.capitalize }.join.to_sym
       kind_class = Extensions.const_get kind_class_symbol, false
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
-      kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, [])
+      kind_store = (instance_variable_get %(@#{kind}_extensions)) || (instance_variable_set %(@#{kind}_extensions), [])
       # style 1: specified as block
       if block_given?
         config = resolve_args args, 1
@@ -1343,10 +1359,9 @@ module Extensions
           yield processor
         end
         unless processor.process_block_given?
-          raise ::ArgumentError, %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
-        processor.freeze
-        extension = ProcessorExtension.new kind, processor
+        processor_instance = processor
       else
         processor, config = resolve_args args, 2
         # style 2: specified as Class or String class name
@@ -1355,28 +1370,28 @@ module Extensions
             raise ::ArgumentError, %(Invalid type for #{kind_name} extension: #{processor})
           end
           processor_instance = processor_class.new config
-          processor_instance.freeze
-          extension = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
-          processor.freeze
-          extension = ProcessorExtension.new kind, processor
+          processor_instance = processor
         else
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
-
+      if kind == :include_processor && (processor_instance.method :handles?)&.arity == 1
+        processor_instance.singleton_class.prepend LegacyHandlesMethodAdapter
+      end
+      extension = ProcessorExtension.new kind, processor_instance
       extension.config[:position] == :>> ? (kind_store.unshift extension) : (kind_store << extension)
       extension
     end
 
     def add_syntax_processor kind, args, &block
       kind_name = kind.to_s.tr '_', ' '
-      kind_class_symbol = (kind_name.split.map {|it| it.capitalize } << 'Processor').join.to_sym
+      kind_class_symbol = (kind_name.split.map {|segment| segment.capitalize } << 'Processor').join.to_sym
       kind_class = Extensions.const_get kind_class_symbol, false
       kind_java_class = (defined? ::AsciidoctorJ) ? (::AsciidoctorJ::Extensions.const_get kind_class_symbol, false) : nil
-      kind_store = instance_variable_get(%(@#{kind}_extensions).to_sym) || instance_variable_set(%(@#{kind}_extensions).to_sym, {})
+      kind_store = (instance_variable_get %(@#{kind}_extensions)) || (instance_variable_set %(@#{kind}_extensions), {})
       # style 1: specified as block
       if block_given?
         name, config = resolve_args args, 2
@@ -1387,13 +1402,12 @@ module Extensions
           yield processor
         end
         unless (name = as_symbol processor.name)
-          raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location})
+          raise ::ArgumentError, %(No name specified for #{kind_name} extension at #{block.source_location.join ':'})
         end
         unless processor.process_block_given?
-          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location})
+          raise ::NoMethodError, %(No block specified to process #{kind_name} extension at #{block.source_location.join ':'})
         end
-        processor.freeze
-        kind_store[name] = ProcessorExtension.new kind, processor
+        processor_instance = processor
       else
         processor, name, config = resolve_args args, 3
         # style 2: specified as Class or String class name
@@ -1405,8 +1419,6 @@ module Extensions
           unless (name = as_symbol processor_instance.name)
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
-          processor_instance.freeze
-          kind_store[name] = ProcessorExtension.new kind, processor_instance
         # style 3: specified as instance
         elsif kind_class === processor || (kind_java_class && kind_java_class === processor)
           processor.update_config config
@@ -1414,12 +1426,17 @@ module Extensions
           unless (name = name ? (processor.name = as_symbol name) : (as_symbol processor.name))
             raise ::ArgumentError, %(No name specified for #{kind_name} extension: #{processor})
           end
-          processor.freeze
-          kind_store[name] = ProcessorExtension.new kind, processor
+          processor_instance = processor
         else
           raise ::ArgumentError, %(Invalid arguments specified for registering #{kind_name} extension: #{args})
         end
       end
+      kind_store[name] = ProcessorExtension.new kind, processor_instance
+    end
+
+    def reset
+      @preprocessor_extensions = @tree_processor_extensions = @postprocessor_extensions = @include_processor_extensions = @docinfo_processor_extensions = @block_extensions = @block_macro_extensions = @inline_macro_extensions = nil
+      @document = nil
     end
 
     def resolve_args args, expect
@@ -1526,7 +1543,7 @@ module Extensions
     #
     # Returns nothing
     def unregister *names
-      names.each {|group| @groups.delete group.to_sym }
+      names.each_with_object(groups) {|group, catalog| catalog.delete group.to_sym }
       nil
     end
   end

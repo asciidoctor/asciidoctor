@@ -174,7 +174,7 @@ module Substitutors
     CGI = ::CGI
     def sub_specialchars text
       if (text.include? ?>) || (text.include? ?&) || (text.include? ?<)
-        (text.include? ?') || (text.include? ?") ? (text.gsub SpecialCharsRx, SpecialCharsTr) : (CGI.escape_html text)
+        (text.include? ?') || (text.include? ?") ? (text.gsub SpecialCharsRx, SpecialCharsTr) : (CGI.escapeHTML text)
       else
         text
       end
@@ -385,7 +385,7 @@ module Substitutors
           if (items = $2)
             items = items.gsub ESC_R_SB, R_SB if items.include? R_SB
             if (delim = (items.include? '&gt;') ? '&gt;' : ((items.include? ',') ? ',' : nil))
-              submenus = items.split(delim).map {|it| it.strip }
+              submenus = items.split(delim).map {|item| item.strip }
               menuitem = submenus.pop
             else
               submenus, menuitem = [], items.rstrip
@@ -403,7 +403,7 @@ module Substitutors
           # honor the escape
           next $&.slice 1, $&.length if $&.start_with? RS
 
-          menu, *submenus = $1.split('&gt;').map {|it| it.strip }
+          menu, *submenus = $1.split('&gt;').map {|item| item.strip }
           menuitem = submenus.pop
           Inline.new(self, :menu, nil, attributes: { 'menu' => menu, 'submenus' => submenus, 'menuitem' => menuitem }).convert
         end
@@ -424,11 +424,11 @@ module Substitutors
         target = $1
         attrs = parse_attributes $2, posattrs, unescape_input: true
         unless type == 'icon'
-          doc.register :images, target
-          attrs['imagesdir'] = doc_attrs['imagesdir']
+          id = attrs['id']
+          doc.register :images, [target, (attrs['imagesdir'] ||= doc_attrs['imagesdir'])]
         end
         attrs['alt'] ||= (attrs['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
-        Inline.new(self, :image, nil, type: type, target: target, attributes: attrs).convert
+        Inline.new(self, :image, nil, type: type, target: target, id: id, attributes: attrs).convert
       end
     end
 
@@ -446,12 +446,19 @@ module Substitutors
           # indexterm:[Tigers,Big cats]
           if (attrlist = normalize_text $2, true, true).include? '='
             if (primary = (attrs = (AttributeList.new attrlist, self).parse)[1])
-              attrs['terms'] = [primary]
+              terms = [primary]
+              if (secondary = attrs[2])
+                terms << secondary
+                if (tertiary = attrs[3])
+                  terms << tertiary
+                end
+              end
+              attrs['terms'] = terms
               if (see_also = attrs['see-also'])
-                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+                attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
               end
             else
-              attrs = { 'terms' => attrlist }
+              attrs = { 'terms' => [attrlist] }
             end
           else
             attrs = { 'terms' => (split_simple_csv attrlist) }
@@ -465,7 +472,7 @@ module Substitutors
           if (term = normalize_text $2, true, true).include? '='
             term = (attrs = (AttributeList.new term, self).parse)[1] || (attrs = nil) || term
             if attrs && (see_also = attrs['see-also'])
-              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|it| it.lstrip } : [see_also]
+              attrs['see-also'] = (see_also.include? ',') ? (see_also.split ',').map {|item| item.lstrip } : [see_also]
             end
           end
           (Inline.new self, :indexterm, term, attributes: attrs, type: :visible).convert
@@ -525,105 +532,100 @@ module Substitutors
     end
 
     if found_colon && (text.include? '://')
-      # inline urls, target[text] (optionally prefixed with link: and optionally surrounded by <>)
+      # inline urls, target[text] (optionally prefixed with link: or enclosed in <>)
       text = text.gsub InlineLinkRx do
-        if (target = $2).start_with? RS
-          # honor the escape
-          next %(#{$1}#{target.slice 1, target.length}#{$4})
-        end
-
-        prefix, suffix = $1, ''
-        # NOTE if $4 is set, we're looking at a formal macro (e.g., https://example.org[])
-        if $4
-          prefix = '' if prefix == 'link:'
-          link_text = nil if (link_text = $4).empty?
+        if $2 && !$5
+          # honor the escapes
+          next $&.slice 1, $&.length if $1.start_with? RS
+          next %(#{$1}#{$&.slice $1.length + 1, $&.length}) if $3.start_with? RS
+          next $& unless $6
+          doc.register :links, (target = $3 + $6)
+          link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+          (Inline.new self, :anchor, link_text, type: :link, target: target, attributes: { 'role' => 'bare' }).convert
         else
-          # invalid macro syntax (link: prefix w/o trailing square brackets or enclosed in double quotes)
-          # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
-          case prefix
-          when 'link:', ?", ?'
-            next $&
-          end
-          case $3
-          when ')', '?', '!'
-            target = target.chop
-            if (suffix = $3) == ')' && (target.end_with? '.', '?', '!')
-              suffix = target[-1] + suffix
-              target = target.chop
+          # honor the escape
+          next %(#{$1}#{$&.slice $1.length + 1, $&.length}) if $3.start_with? RS
+          prefix, target, suffix = $1, $3 + ($4 || $7), ''
+          # NOTE if $5 is set (the attrlist), we're looking at a formal macro (e.g., https://example.org[])
+          if $5
+            prefix = '' if prefix == 'link:'
+            link_text = nil if (link_text = $5).empty?
+          else
+            case prefix
+            # invalid macro syntax (link: prefix w/o trailing square brackets or URL enclosed in quotes)
+            # FIXME we probably shouldn't even get here when the link: prefix is present; the regex is doing too much
+            when 'link:', ?", ?'
+              next $&
             end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
-          when ';'
-            if (prefix.start_with? '&lt;') && (target.end_with? '&gt;')
-              # move surrounding <> out of URL
-              prefix = prefix.slice 4, prefix.length
-              target = target.slice 0, target.length - 4
-            elsif (target = target.chop).end_with? ')'
-              # move trailing ); out of URL
-              target = target.chop
-              suffix = ');'
-            else
-              # move trailing ; out of URL
-              suffix = ';'
-            end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
-          when ':'
-            if (target = target.chop).end_with? ')'
-              # move trailing ): out of URL
-              target = target.chop
-              suffix = '):'
-            else
-              # move trailing : out of URL
-              suffix = ':'
-            end
-            # NOTE handle case when modified target is a URI scheme (e.g., http://)
-            next $& if target.end_with? '://'
-          end
-        end
-
-        attrs, link_opts = nil, { type: :link }
-
-        if link_text
-          new_link_text = link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
-          if !doc.compat_mode && (link_text.include? '=')
-            # NOTE if an equals sign (=) is present, extract attributes from link text
-            link_text, attrs = extract_attributes_from_text link_text, ''
-            new_link_text = link_text
-            link_opts[:id] = attrs['id']
-          end
-
-          if link_text.end_with? '^'
-            new_link_text = link_text = link_text.chop
-            if attrs
-              attrs['window'] ||= '_blank'
-            else
-              attrs = { 'window' => '_blank' }
+            case $8
+            when ';'
+              if (target = target.chop).end_with? ')'
+                # move trailing ); out of URL
+                target = target.chop
+                suffix = ');'
+              else
+                # move trailing ; out of URL
+                suffix = ';'
+              end
+              # NOTE handle case when modified target is a bare URI scheme (e.g., http://)
+              next $& if target == $3
+            when ':'
+              if (target = target.chop).end_with? ')'
+                # move trailing ): out of URL
+                target = target.chop
+                suffix = '):'
+              else
+                # move trailing : out of URL
+                suffix = ':'
+              end
+              # NOTE handle case when modified target is a bare URI scheme (e.g., http://)
+              next $& if target == $3
             end
           end
 
-          if new_link_text && new_link_text.empty?
-            # NOTE it's not possible for the URI scheme to be bare in this case
+          link_opts = { type: :link }
+
+          if link_text
+            new_link_text = link_text = link_text.gsub ESC_R_SB, R_SB if link_text.include? R_SB
+            if !doc.compat_mode && (link_text.include? '=')
+              # NOTE if an equals sign (=) is present, extract attributes from link text
+              link_text, attrs = extract_attributes_from_text link_text, ''
+              new_link_text = link_text
+              link_opts[:id] = attrs['id']
+            end
+
+            if link_text.end_with? '^'
+              new_link_text = link_text = link_text.chop
+              if attrs
+                attrs['window'] ||= '_blank'
+              else
+                attrs = { 'window' => '_blank' }
+              end
+            end
+
+            if new_link_text && new_link_text.empty?
+              # NOTE the modified target will not be a bare URI scheme (e.g., http://) in this case
+              link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
+              bare = true
+            end
+          else
+            # NOTE the modified target will not be a bare URI scheme (e.g., http://) in this case
             link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
             bare = true
           end
-        else
-          # NOTE it's not possible for the URI scheme to be bare in this case
-          link_text = (doc_attrs.key? 'hide-uri-scheme') ? (target.sub UriSniffRx, '') : target
-          bare = true
-        end
 
-        if bare
-          if attrs
-            attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
-          else
-            attrs = { 'role' => 'bare' }
+          if bare
+            if attrs
+              attrs['role'] = (attrs.key? 'role') ? %(bare #{attrs['role']}) : 'bare'
+            else
+              attrs = { 'role' => 'bare' }
+            end
           end
-        end
 
-        doc.register :links, (link_opts[:target] = target)
-        link_opts[:attributes] = attrs if attrs
-        %(#{prefix}#{(Inline.new self, :anchor, link_text, link_opts).convert}#{suffix})
+          doc.register :links, (link_opts[:target] = target)
+          link_opts[:attributes] = attrs if attrs
+          %(#{prefix}#{(Inline.new self, :anchor, link_text, link_opts).convert}#{suffix})
+        end
       end
     end
 
@@ -756,7 +758,7 @@ module Substitutors
 
         if doc.compat_mode
           fragment = refid
-        elsif (hash_idx = refid.index '#')
+        elsif (hash_idx = refid.index '#') && refid[hash_idx - 1] != '&'
           if hash_idx > 0
             if (fragment_len = refid.length - 1 - hash_idx) > 0
               path, fragment = (refid.slice 0, hash_idx), (refid.slice hash_idx + 1, fragment_len)
@@ -1004,7 +1006,7 @@ module Substitutors
     end
     # If the start attribute is defined, then the lines to highlight specified by the provided spec should be relative to the start value.
     unless (shift = start ? start - 1 : 0) == 0
-      lines = lines.map {|it| it - shift }
+      lines = lines.map {|l| l - shift }
     end
     lines.sort
   end
@@ -1028,11 +1030,17 @@ module Substitutors
             next %(#{$1}[#{attrlist}]#{RS * (escape_count - 1)}#{boundary}#{$5}#{boundary})
           elsif $1 == RS
             preceding = %([#{attrlist}])
-          else
-            if boundary == '++' && (attrlist.end_with? 'x-')
+          elsif boundary == '++'
+            if attrlist == 'x-'
               old_behavior = true
-              attrlist = attrlist.slice 0, attrlist.length - 2
+              attributes = {}
+            elsif attrlist.end_with? ' x-'
+              old_behavior = true
+              attributes = parse_quoted_text_attributes attrlist.slice 0, attrlist.length - 3
+            else
+              attributes = parse_quoted_text_attributes attrlist
             end
+          else
             attributes = parse_quoted_text_attributes attrlist
           end
         elsif (escape_count = $3.length) > 0
@@ -1061,47 +1069,49 @@ module Substitutors
         end
       end
 
-      %(#{preceding || ''}#{PASS_START}#{passthru_key}#{PASS_END})
+      %(#{preceding}#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? '++') || (text.include? '$$') || (text.include? 'ss:')
 
     pass_inline_char1, pass_inline_char2, pass_inline_rx = InlinePassRx[compat_mode]
     text = text.gsub pass_inline_rx do
       preceding = $1
-      attrlist = $2
-      escape_mark = RS if (quoted_text = $3).start_with? RS
-      format_mark = $4
-      content = $5
+      attrlist = $4 || $3
+      escaped = true if $5
+      quoted_text = $6
+      format_mark = $7
+      content = $8
 
       if compat_mode
         old_behavior = true
-      elsif (old_behavior = attrlist && (attrlist.end_with? 'x-'))
-        attrlist = attrlist.slice 0, attrlist.length - 2
+      elsif attrlist && (attrlist == 'x-' || (attrlist.end_with? ' x-'))
+        old_behavior = old_behavior_forced = true
       end
 
       if attrlist
-        if format_mark == '`' && !old_behavior
-          next extract_inner_passthrough content, %(#{preceding}[#{attrlist}]#{escape_mark})
-        elsif escape_mark
+        if escaped
           # honor the escape of the formatting mark
           next %(#{preceding}[#{attrlist}]#{quoted_text.slice 1, quoted_text.length})
         elsif preceding == RS
           # honor the escape of the attributes
+          next %(#{preceding}[#{attrlist}]#{quoted_text}) if old_behavior_forced && format_mark == '`'
           preceding = %([#{attrlist}])
+        elsif old_behavior_forced
+          attributes = attrlist == 'x-' ? {} : (parse_quoted_text_attributes attrlist.slice 0, attrlist.length - 3)
         else
           attributes = parse_quoted_text_attributes attrlist
         end
-      elsif format_mark == '`' && !old_behavior
-        next extract_inner_passthrough content, %(#{preceding}#{escape_mark})
-      elsif escape_mark
+      elsif escaped
         # honor the escape of the formatting mark
         next %(#{preceding}#{quoted_text.slice 1, quoted_text.length})
+      elsif compat_mode && preceding == RS
+        next quoted_text
       end
 
       if compat_mode
         passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :monospaced }
       elsif attributes
         if old_behavior
-          subs = (format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS)
+          subs = format_mark == '`' ? BASIC_SUBS : NORMAL_SUBS
           passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, attributes: attributes, type: :monospaced }
         else
           passthrus[passthru_key = passthrus.size] = { text: content, subs: BASIC_SUBS, attributes: attributes, type: :unquoted }
@@ -1125,7 +1135,7 @@ module Substitutors
       content = normalize_text $3, nil, true
       # NOTE drop enclosing $ signs around latexmath for backwards compatibility with AsciiDoc.py
       content = content.slice 1, content.length - 2 if type == :latexmath && (content.start_with? '$') && (content.end_with? '$')
-      subs = subs ? (resolve_pass_subs subs) : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
+      subs = subs ? (resolve_pass_subs subs, 'stem macro') : ((@document.basebackend? 'html') ? BASIC_SUBS : nil)
       passthrus[passthru_key = passthrus.size] = { text: content, subs: subs, type: type }
       %(#{PASS_START}#{passthru_key}#{PASS_END})
     end if (text.include? ':') && ((text.include? 'stem:') || (text.include? 'math:'))
@@ -1233,8 +1243,8 @@ module Substitutors
   end
 
   # Public: Call resolve_subs for the :inline type with the subject set as passthrough macro.
-  def resolve_pass_subs subs
-    resolve_subs subs, :inline, nil, 'passthrough macro'
+  def resolve_pass_subs subs, subject = 'passthrough macro'
+    resolve_subs subs, :inline, nil, subject
   end
 
   # Public: Expand all groups in the subs list and return. If no subs are resolved, return nil.
@@ -1279,7 +1289,6 @@ module Substitutors
       when :simple
         default_subs = NORMAL_SUBS
       when :verbatim
-        # NOTE block with :literal context and listparagraph-option gets folded into text of list item later
         default_subs = @context == :verse ? NORMAL_SUBS : VERBATIM_SUBS
       when :raw
         # TODO make pass subs a compliance setting; AsciiDoc.py performs :attributes and :macros on a pass block
@@ -1295,7 +1304,7 @@ module Substitutors
       @subs = default_subs.drop 0
     end
 
-    # QUESION delegate this logic to a method?
+    # QUESTION delegate this logic to a method?
     if @context == :listing && @style == 'source' && (syntax_hl = @document.syntax_highlighter) &&
         syntax_hl.highlight? && (idx = @subs.index :specialcharacters)
       @subs[idx] = :highlight
@@ -1400,20 +1409,6 @@ module Substitutors
     end.join LF)
   end
 
-  # Internal: Extract nested single-plus passthrough; otherwise return unprocessed
-  def extract_inner_passthrough text, pre
-    if (text.end_with? '+') && (text.start_with? '+', '\+') && SinglePlusInlinePassRx =~ text
-      if $1
-        %(#{pre}`+#{$2}+`)
-      else
-        @passthroughs[passthru_key = @passthroughs.size] = { text: $2, subs: BASIC_SUBS }
-        %(#{pre}`#{PASS_START}#{passthru_key}#{PASS_END}`)
-      end
-    else
-      %(#{pre}`#{text}`)
-    end
-  end
-
   # Internal: Convert a quoted text region
   #
   # match  - The MatchData for the quoted text region
@@ -1468,8 +1463,12 @@ module Substitutors
     end
   end
 
-  # Internal: Inserts text into a formatted text enclosure; used by xreftext
-  alias sub_placeholder sprintf unless RUBY_ENGINE == 'opal'
+  unless RUBY_ENGINE == 'opal'
+    include ::Kernel
+
+    # Internal: Inserts text into a formatted text enclosure; used by xreftext
+    alias sub_placeholder sprintf
+  end
 
   # Internal: Parse the attributes that are defined on quoted (aka formatted) text
   #
@@ -1546,7 +1545,7 @@ module Substitutors
       end
       values << accum.strip
     else
-      str.split(',').map {|it| it.strip }
+      str.split(',').map {|item| item.strip }
     end
   end
 end

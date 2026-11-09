@@ -1,3 +1,4 @@
+# backtick_javascript: true
 # frozen_string_literal: true
 
 module Asciidoctor
@@ -45,6 +46,25 @@ module Helpers
       when :warn
         logger.warn %(#{$!.message.chomp '.'}. Functionality disabled.)
       end
+    end
+    nil
+  end
+
+  # Internal: Require the OpenURI library.
+  #
+  # Attempts to load `open-uri-cached` if the cache argument is true otherwise autoload `open-uri`.
+  #
+  # cache - A Boolean flag indicating whether to activate content cache URI
+  #
+  # Returns nothing
+  def require_open_uri cache = false
+    if cache
+      # caching requires the open-uri-cached gem to be installed
+      # processing will be automatically aborted if these libraries can't be opened
+      require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
+    else
+      # autoload open-uri
+      ::OpenURI
     end
     nil
   end
@@ -121,8 +141,14 @@ module Helpers
   # str - the String to check
   #
   # returns true if the String is a URI, false if it is not
-  def uriish? str
-    (str.include? ':') && (UriSniffRx.match? str)
+  if ::RUBY_ENGINE == 'jruby'
+    def uriish? str
+      (str.include? ':') && !(str.start_with? 'uri:classloader:') && (UriSniffRx.match? str)
+    end
+  else
+    def uriish? str
+      (str.include? ':') && (UriSniffRx.match? str)
+    end
   end
 
   # Internal: Encode a URI component String for safe inclusion in a URI.
@@ -140,10 +166,13 @@ module Helpers
         })
       )
     end
-  else
-    CGI = ::CGI
+  elsif (CGI = ::CGI).respond_to? :escapeURIComponent
     def encode_uri_component str
-      CGI.escape str
+      CGI.escapeURIComponent str
+    end
+  else
+    def encode_uri_component str
+      (CGI.escape str).gsub '+', '%20'
     end
   end
 
@@ -167,8 +196,8 @@ module Helpers
   #
   # Returns the String filename with the file extension removed
   def rootname filename
-    if (last_dot_idx = filename.rindex '.')
-      (filename.index '/', last_dot_idx) ? filename : (filename.slice 0, last_dot_idx)
+    if (idx = filename.rindex '.') && (idx + 1) < filename.length
+      (filename.index '/', idx + 1) ? filename : (filename.slice 0, idx)
     else
       filename
     end
@@ -203,7 +232,7 @@ module Helpers
   #
   # Returns true if the path has a file extension, false otherwise
   def extname? path
-    (last_dot_idx = path.rindex '.') && !(path.index '/', last_dot_idx)
+    (idx = path.rindex '.') && (idx + 1) < path.length && !(path.index '/', idx + 1)
   end
 
   # Public: Retrieves the file extension of the specified path. The file extension is the portion of the path in the
@@ -217,16 +246,16 @@ module Helpers
   # Returns the String file extension (with the leading dot included) or the fallback value if the path has no file extension.
   if ::File::ALT_SEPARATOR
     def extname path, fallback = ''
-      if (last_dot_idx = path.rindex '.')
-        (path.index '/', last_dot_idx) || (path.index ::File::ALT_SEPARATOR, last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      if (idx = path.rindex '.') && (idx + 1) < (len = path.length)
+        (path.index '/', idx + 1) || (path.index ::File::ALT_SEPARATOR, idx + 1) ? fallback : (path.slice idx, len)
       else
         fallback
       end
     end
   else
     def extname path, fallback = ''
-      if (last_dot_idx = path.rindex '.')
-        (path.index '/', last_dot_idx) ? fallback : (path.slice last_dot_idx, path.length)
+      if (idx = path.rindex '.') && (idx + 1) < (len = path.length)
+        (path.index '/', idx + 1) ? fallback : (path.slice idx, len)
       else
         fallback
       end
@@ -246,11 +275,11 @@ module Helpers
     end
   end
 
-  ROMAN_NUMERALS = {
+  ROMAN_NUMERALS_WITH_REDUCERS = {
     'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
     'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1,
   }
-  private_constant :ROMAN_NUMERALS
+  private_constant :ROMAN_NUMERALS_WITH_REDUCERS
 
   # Internal: Converts an integer to a Roman numeral.
   #
@@ -258,10 +287,27 @@ module Helpers
   #
   # Returns the [String] roman numeral for this integer
   def int_to_roman val
-    ROMAN_NUMERALS.map do |l, i|
+    ROMAN_NUMERALS_WITH_REDUCERS.map do |l, i|
       repeat, val = val.divmod i
       l * repeat
     end.join
+  end
+
+  ROMAN_NUMERALS = { 'I' => 1, 'V' => 5, 'X' => 10, 'L' => 50, 'C' => 100, 'D' => 500, 'M' => 1000 }
+  private_constant :ROMAN_NUMERALS
+
+  # Internal: Converts an uppercase Roman numeral to an integer.
+  #
+  # val - the [String] Roman numeral in uppercase to convert
+  #
+  # Returns the [Integer] integer for this Roman numeral
+  def roman_to_int val
+    result = 0
+    valmap = val.each_char.map {|c| ROMAN_NUMERALS[c] }
+    valmap.each_with_index do |v, idx|
+      (succ = valmap[idx + 1]) && succ > v ? (result -= v) : (result += v)
+    end
+    result
   end
 
   # Internal: Get the next value in the sequence.

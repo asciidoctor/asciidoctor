@@ -12,7 +12,10 @@ The sourcemap provides line and file information for all blocks in the parsed do
 Specifically, it provides information about the start of each block.
 The start of the block does not include any block metadata (block anchor and block attributes) above the block.
 
-The sourcemap only works for blocks.
+TIP: The sourcemap also tracks the start line of every preprocessor conditional directive so its position can be reported if the directive isn't closed.
+If the sourcemap isn't enabled, the location at the end of the document is used instead.
+
+The sourcemap only adds source location information to blocks.
 It does not track the source location for inline elements, such as formatted text or an inline image, or for attribute entries.
 
 The sourcemap information is available on the `source_location` property of the block.
@@ -31,7 +34,7 @@ IMPORTANT: The sourcemap is not perfect.
 There are certain edge cases, such as when the block is split across multiple files or the block starts and ends on the last line of an include file, when the sourcemap may report the wrong file or line information.
 If you're writing a processor that relies on the sourcemap, it's a good idea to verify that the line at the cursor is the one you expect to find, then adjust accordingly.
 
-== Set :sourcemap option
+== Enable using :sourcemap option
 
 The sourcemap feature can be controlled from the API using the `:sourcemap` option.
 The value of this option is a boolean.
@@ -46,7 +49,29 @@ Here's an example of how to enable the sourcemap using the API:
 doc = Asciidoctor.load_file 'doc.adoc', safe: :safe, sourcemap: true
 ----
 
-Now that the sourcemap is enabled, you can access the source location of the block elements in the parsed document.
+== Enable from extension
+
+You can enable the sourcemap using an Asciidoctor preprocessor extension.
+This technique is useful if your extension needs access to the source location of blocks, but you don't want to require users to pass an additional option to Asciidoctor.
+
+[,ruby]
+----
+Asciidoctor::Document.prepend (Module.new do
+  attr_writer :sourcemap
+end) unless Asciidoctor::Document.method_defined? :sourcemap=
+
+# A preprocessor that enables the sourcemap feature if not already enabled via the API.
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      doc.sourcemap = true
+      nil
+    end
+  end
+end
+----
+
+Now that the sourcemap is enabled, your extension can access the source location of the block elements in the parsed document.
 
 == Use the sourcemap
 
@@ -151,4 +176,4 @@ The lineno of the paragraph in the source location is now one greater than befor
 ....
 
 If you're writing a custom converter, the source location is not available for inline elements.
-However, you can access the source location of the parent element (e.g., `node.parent.source_location`), which should at leasat get you close to the location of the element.
+However, you can access the source location of the parent element (e.g., `node.parent.source_location`), which should at least get you close to the location of the element.

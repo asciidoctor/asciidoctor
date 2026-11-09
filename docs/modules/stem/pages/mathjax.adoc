@@ -15,7 +15,7 @@ If you convert your document to HTML using the HTML converter, and the `stem` do
 There's nothing you have to install.
 Specifically, it loads the MathJax bundle that includes support for both TeX and AsciiMath, as shown here:
 
-[source,html]
+[,html]
 ----
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 ----

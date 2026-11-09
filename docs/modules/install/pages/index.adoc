@@ -1,7 +1,7 @@
 = Install and Update
 
-To simplify installation, Asciidoctor is packaged and published as a {url-rubygems}/asciidoctor[RubyGem to the package repository at RubyGems.org^].
-It's also distributed as a package for popular Linux distributions and macOS.
+To simplify installation, Asciidoctor is packaged as a gem and published to the gem hosting service at {url-rubygems}/asciidoctor[RubyGems.org^].
+Asciidoctor is also distributed as a managed package for popular Linux distributions and macOS.
 
 TIP: In addition to running on Ruby, Asciidoctor can be executed on a JVM using xref:asciidoctorj::index.adoc[AsciidoctorJ] or in any JavaScript environment (including the browser) using xref:asciidoctor.js::index.adoc[Asciidoctor.js].
 
@@ -15,10 +15,11 @@ Asciidoctor can be installed using:
 * the `gem install` command (recommended for Windows users), or
 * the Asciidoctor Docker image
 
-Bundler is the preferred method of installation as it keeps the gems scoped to your project or workspace.
-However, it does not make the `asciidoctor` command globally available in your terminal.
-That's when a package manager is more appropriate.
-The benefit of using your operating system's package manager to install the gem is that it adds the `asciidoctor` command to your PATH and it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
-On the other hand, if you're familiar with Docker, using the Asciidoctor Docker image gives you the best isolation from your system.
+IMPORTANT: To update or uninstall Asciidoctor, you should use the same method you used to install it.
 
-You should use the same method to update and uninstall Asciidoctor as you use to install it.
+Bundler is the preferred method of installation as it keeps the gems scoped to your project or workspace.
+However, this method of installation does not make the `asciidoctor` command available globally in your terminal.
+That's when a package manager is more appropriate.
+
+The benefit of using your operating system's package manager to install the gem is that it adds the `asciidoctor` command to your PATH and it handles installing Ruby and the RubyGems library if those packages are not already installed on your machine.
+On the other hand, if you're familiar with Docker, using the Asciidoctor Docker image may give you the best isolation from your system.

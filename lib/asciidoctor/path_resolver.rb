@@ -110,6 +110,7 @@ class PathResolver
   SLASH = '/'
   BACKSLASH = '\\'
   DOUBLE_SLASH = '//'
+  URI_CLASSLOADER = 'uri:classloader:'
   WindowsRootRx = %r(^(?:[a-zA-Z]:)?[\\/])
 
   attr_accessor :file_separator
@@ -149,8 +150,9 @@ class PathResolver
   # Public: Check if the specified path is an absolute root path (or, in the
   # browser environment, an absolute URI as well)
   #
-  # This operation considers both posix paths and Windows paths. If the JavaScript IO
-  # module is xmlhttprequest, this operation also considers absolute URIs.
+  # This operation considers both POSIX and Windows paths. If the JavaScript IO module
+  # is xmlhttprequest, this operation also considers absolute URIs. If running on JRuby,
+  # this operation also considers classloader URIs (starts with uri:classloader:).
   #
   # Unix absolute paths and UNC paths start with slash. Windows roots can
   # start with a drive letter. When the IO module is xmlhttprequest (Opal
@@ -164,6 +166,10 @@ class PathResolver
   if RUBY_ENGINE == 'opal' && ::JAVASCRIPT_IO_MODULE == 'xmlhttprequest'
     def root? path
       (absolute_path? path) || (path.start_with? 'file://', 'http://', 'https://')
+    end
+  elsif ::RUBY_ENGINE == 'jruby'
+    def root? path
+      (absolute_path? path) || (path.start_with? URI_CLASSLOADER)
     end
   else
     alias root? absolute_path?
@@ -265,54 +271,66 @@ class PathResolver
     end
   end
 
-  # Public: Partition the path into path segments and remove self references (.) and the trailing
-  # slash, if present. Prior to being partitioned, the path is converted to a posix path.
+  # Public: Partition the path into path segments, removing any empty or self
+  # reference (.) segments. Prior to partitioning, the path is converted to a
+  # posix path.
   #
-  # Parent references are not resolved by this method since the consumer often needs to handle this
-  # resolution in a certain context (checking for the breach of a jail, for instance).
+  # Parent references are not resolved by this method since the consumer
+  # typically needs to handle this resolution in a certain context (checking for
+  # the breach of a jail, for instance).
   #
   # path - the String path to partition
-  # web  - a Boolean indicating whether the path should be handled
-  #        as a web path (optional, default: false)
+  # web  - a Boolean indicating whether the path should be handled as a web path
+  #        (optional, default: false)
   #
   # Returns a 2-item Array containing the Array of String path segments and the
-  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is absolute.
+  # path root (e.g., '/', './', 'c:/', or '//'), which is nil unless the path is
+  # absolute.
   def partition_path path, web = nil
     if (result = (cache = web ? @_partition_path_web : @_partition_path_sys)[path])
       return result
     end
 
-    posix_path = posixify path
+    posix_path = raw_posix_path = posixify path
+    posix_path = posix_path.squeeze SLASH if posix_path.include? DOUBLE_SLASH
 
     if web
       # ex. /sample/path
-      if web_root? posix_path
+      if posix_path.start_with? SLASH
         root = SLASH
+        root_len = 1
       # ex. ./sample/path
       elsif posix_path.start_with? DOT_SLASH
         root = DOT_SLASH
+        root_len = 2
       end
       # otherwise ex. sample/path
     elsif root? posix_path
       # ex. //sample/path
-      if unc? posix_path
+      if raw_posix_path.start_with? DOUBLE_SLASH
         root = DOUBLE_SLASH
+        root_len = 1
       # ex. /sample/path
       elsif posix_path.start_with? SLASH
         root = SLASH
+        root_len = 1
+      # ex. uri:classloader:sample/path (or uri:classloader:/sample/path)
+      elsif posix_path.start_with? URI_CLASSLOADER
+        root = URI_CLASSLOADER
+        root_len = 16
       # ex. C:/sample/path (or file:///sample/path in browser environment)
       else
-        root = posix_path.slice 0, (posix_path.index SLASH) + 1
+        root = posix_path.slice 0, (root_len = (posix_path.index SLASH) + 1)
       end
     # ex. ./sample/path
     elsif posix_path.start_with? DOT_SLASH
       root = DOT_SLASH
+      root_len = 2
     end
     # otherwise ex. sample/path
 
-    path_segments = (root ? (posix_path.slice root.length, posix_path.length) : posix_path).split SLASH
-    # strip out all dot entries
-    path_segments.delete DOT
+    posix_path = posix_path.slice root_len, posix_path.length if root
+    (path_segments = posix_path.split SLASH).delete DOT
     cache[path] = [path_segments, root]
   end
 
@@ -378,7 +396,7 @@ class PathResolver
     end
 
     if target_segments.empty?
-      if start.nil_or_empty? # rubocop:disable Style/GuardClause
+      if start.nil_or_empty?
         return jail || @working_dir
       elsif root? start
         return expand_path start unless jail

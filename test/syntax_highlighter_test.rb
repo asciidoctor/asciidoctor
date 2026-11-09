@@ -461,7 +461,7 @@ context 'Syntax Highlighter' do
 
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE
       # NOTE notice there's a newline before the closing </pre> tag
-      assert_match(/\n# <b class="conum">\(1\)<\/b>\n<\/pre>/, output)
+      assert_match %r/\n# <b class="conum">\(1\)<\/b>\n<\/pre>/, output
     end
 
     test 'should preserve space before callout on final line' do
@@ -612,6 +612,20 @@ context 'Syntax Highlighter' do
       assert_css 'code.language-none', output, 1
     end
 
+    test 'should not add highlight class if nohighlight option is set' do
+      input = <<~'EOS'
+      :source-highlighter: highlight.js
+
+      [%nohighlight,ruby]
+      ----
+      puts "hi"
+      ----
+      EOS
+      output = convert_string_to_embedded input, safe: :safe
+      assert_css 'pre.highlightjs', output, 1
+      assert_css 'pre.highlight', output, 0
+    end
+
     test 'should load additional languages specified by highlightjs-languages' do
       input = <<~'EOS'
       :source-highlighter: highlight.js
@@ -749,7 +763,7 @@ context 'Syntax Highlighter' do
       assert_include '<span class="cp">&lt;?php</span>', output
     end
 
-    test 'should preserve cgi-style options on language when setting start_inline option for PHP', if: (Rouge.version >= '2.1.0') do
+    test 'should preserve cgi-style options on language when setting start_inline option for PHP', if: rouge_2_1? do
       input = <<~'EOS'
       [,php?funcnamehighlighting=0]
       ----
@@ -795,7 +809,7 @@ context 'Syntax Highlighter' do
       assert_xpath %(//code[text()='CAN HAS STDIO?\nPLZ OPEN FILE "LOLCATS.TXT"?\nKTHXBYE']), output, 1
     end
 
-    test 'should honor cgi-style options on language', if: (Rouge.version >= '2.1.0') do
+    test 'should honor cgi-style options on language', if: rouge_2_1? do
       input = <<~'EOS'
       :source-highlighter: rouge
 
@@ -1061,8 +1075,8 @@ context 'Syntax Highlighter' do
       EOS
       output = convert_string input, safe: :safe, linkcss_default: true
       assert_css 'pre.rouge', output, 1
-      assert_includes output, 'pre.rouge .no {'
-      assert_match %r/pre\.rouge \{\s*background-color: #f8f8f8;/m, output
+      expected_css = (Asciidoctor::SyntaxHighlighter.for 'rouge').read_stylesheet 'github'
+      assert_includes output, expected_css
     end
 
     test 'should restore isolated callout mark on last line of source' do
@@ -1143,7 +1157,7 @@ context 'Syntax Highlighter' do
       assert_includes css, 'background-color: #49483e;'
     end
 
-    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace', unless: jruby_9_1_windows? do
+    test 'should not fail to load rouge if the Asciidoctor module is included into the global namespace' do
       result = run_command(asciidoctor_cmd, '-r', (fixture_path 'include-asciidoctor.rb'), '-s', '-o', '-', '-a', 'source-highlighter=rouge', (fixture_path 'source-block.adoc'), use_bundler: true) {|out| out.read }
       assert_xpath '//pre[@class="rouge highlight"]', result, 1
     end

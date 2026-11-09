@@ -1,3 +1,0 @@
-* xref:docinfo.adoc[]
-//** Adding Header Content
-//** Adding Footer Content

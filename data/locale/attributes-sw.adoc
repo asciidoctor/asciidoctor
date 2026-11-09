@@ -1,0 +1,23 @@
+// Kiswahili translation, Benson Muite
+:appendix-caption: Kiambatisho
+:appendix-refsig: {appendix-caption}
+:caution-caption: Hatari
+:chapter-signifier: Somo
+:chapter-refsig: {chapter-signifier}
+:example-caption: Mfano
+:figure-caption: Picha
+:important-caption: Muhimu
+:last-update-label: Geuza la mwisho
+ifdef::listing-caption[:listing-caption: Orodha]
+ifdef::manname-title[:manname-title: Jina]
+:note-caption: Muhtasari
+:part-signifier: Sehemu
+:part-refsig: {part-signifier}
+ifdef::preface-title[:preface-title: Dibaji]
+:section-refsig: Fungu
+:table-caption: Ratiba
+:tip-caption: Shauri
+:toc-title: Fahirisi
+:untitled-label: Bila kichwa
+:version-label: Toleo
+:warning-caption: Onyo

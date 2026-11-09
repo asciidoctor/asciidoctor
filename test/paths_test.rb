@@ -41,8 +41,9 @@ context 'Path Resolver' do
     test 'target with relative path appended to start path' do
       assert_equal 'assets/images', @resolver.web_path('images', 'assets')
       assert_equal '/assets/images', @resolver.web_path('images', '/assets')
-      #assert_equal '/assets/images/tiger.png', @resolver.web_path('tiger.png', '/assets//images')
+      assert_equal '/assets/images/tiger.png', @resolver.web_path('tiger.png', '/assets//images')
       assert_equal './assets/images', @resolver.web_path('images', './assets')
+      assert_equal './assets/images', @resolver.web_path('images', './/assets')
       assert_equal '/theme.css', @resolver.web_path('theme.css', '/')
       assert_equal '/css/theme.css', @resolver.web_path('theme.css', '/css/')
     end
@@ -58,17 +59,13 @@ context 'Path Resolver' do
     end
 
     # enable if we want to allow web_path to detect and preserve a target URI
-    #test 'target with file url appended to relative path' do
-    #  assert_equal 'file:///home/username/styles/asciidoctor.css', @resolver.web_path('file:///home/username/styles/asciidoctor.css', '.')
-    #end
-
-    # enable if we want to allow web_path to detect and preserve a target URI
     #test 'target with http url appended to relative path' do
     #  assert_equal 'http://example.com/asciidoctor.css', @resolver.web_path('http://example.com/asciidoctor.css', '.')
     #end
 
     test 'normalize target' do
       assert_equal '../images', @resolver.web_path('../images/../images')
+      assert_equal '../images', @resolver.web_path('../images//../images')
     end
 
     test 'append target to start path and normalize' do
@@ -248,7 +245,8 @@ context 'Path Resolver' do
     end
 
     test 'expands parent references in absolute path if jail is not specified' do
-      assert_equal '/etc/stylesheet.css', @resolver.system_path('/usr/share/../../etc/stylesheet.css')
+      assert_equal '/etc/stylesheet.css', (@resolver.system_path '/usr/share/../../etc/stylesheet.css')
+      assert_equal '/etc/stylesheet.css', (@resolver.system_path '/usr/share//../../etc//stylesheet.css')
     end
 
     test 'resolves absolute directory if jail is not specified' do
@@ -284,11 +282,24 @@ context 'Path Resolver' do
       assert_equal '//server/docs/output.html', @resolver.system_path('//server/docs/output.html')
     end
 
+    test 'resolves classloader path if start is classloader path and target is relative', if: jruby? do
+      assert_equal 'uri:classloader:images/sample.png', @resolver.system_path('sample.png', 'uri:classloader:images')
+    end
+
+    test 'resolves classloader path if start is root-relative classloader path and target is relative', if: jruby? do
+      assert_equal 'uri:classloader:/images/sample.png', @resolver.system_path('sample.png', 'uri:classloader:/images')
+    end
+
+    test 'preserves classloader path if start is absolute path and target is classloader path', if: jruby? do
+      assert_equal 'uri:classloader:/images/sample.png', @resolver.system_path('uri:classloader:/images/sample.png', '/home/doctor/docs')
+    end
+
     test 'resolves relative target relative to current directory if start is empty' do
       pwd = File.expand_path Dir.pwd
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', '')
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png', nil)
       assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('images/tiger.png')
+      assert_equal "#{pwd}/images/tiger.png", @resolver.system_path('.//images/tiger.png')
     end
 
     test 'resolves relative hidden target relative to current directory if start is empty' do

@@ -10,7 +10,11 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
   end
 
   def format node, lang, opts
-    super node, lang, (opts.merge transform: proc {|_, code| code['class'] = %(language-#{lang || 'none'} hljs) })
+    transform = proc do |pre, code|
+      pre['class'] = pre['class'].sub ' highlight', '' if node.attr? 'nohighlight-option'
+      code['class'] = %(language-#{lang || 'none'} hljs)
+    end
+    super node, lang, (opts.merge transform: transform)
   end
 
   def docinfo? location
@@ -26,7 +30,7 @@ class SyntaxHighlighter::HighlightJsAdapter < SyntaxHighlighter::Base
 #{(doc.attr? 'highlightjs-languages') ? ((doc.attr 'highlightjs-languages').split ',').map {|lang| %(<script src="#{base_url}/languages/#{lang.lstrip}.min.js"></script>\n) }.join : ''}<script>
 if (!hljs.initHighlighting.called) {
   hljs.initHighlighting.called = true
-  ;[].slice.call(document.querySelectorAll('pre.highlight > code')).forEach(function (el) { hljs.highlightBlock(el) })
+  ;[].slice.call(document.querySelectorAll('pre.highlight > code[data-lang]')).forEach(function (el) { hljs.highlightBlock(el) })
 }
 </script>)
     end

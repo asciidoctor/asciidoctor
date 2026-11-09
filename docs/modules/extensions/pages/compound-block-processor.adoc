@@ -21,7 +21,7 @@ Register a custom block named `collapsible` that transforms a listing block into
 ....
 
 .collapsible-block.rb
-[source,ruby]
+[,ruby]
 ----
 class CollapsibleBlock < Asciidoctor::Extensions::BlockProcessor
   enable_dsl

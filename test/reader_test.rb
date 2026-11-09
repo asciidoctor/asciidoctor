@@ -146,6 +146,10 @@ class ReaderTest < Minitest::Test
         assert reader.next_line_empty?
       end
 
+      test 'peek_line should return nil if next entry is nil' do
+        assert_nil (Asciidoctor::Reader.new [nil]).peek_line
+      end
+
       test 'peek_line should return next line if there are lines remaining' do
         reader = Asciidoctor::Reader.new SAMPLE_DATA
         assert_equal SAMPLE_DATA.first, reader.peek_line
@@ -511,6 +515,25 @@ class ReaderTest < Minitest::Test
         reader = doc.reader
         refute doc.attributes.key?('front-matter')
         assert_equal '---', reader.peek_line
+        assert_equal 1, reader.lineno
+      end
+
+      test 'should not skip front matter if ending delimiter is not found' do
+        input = <<~'EOS'
+        ---
+        title: Document Title
+        tags: [ first, second ]
+        = Document Title
+        Author Name
+
+        preamble
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'skip-front-matter' => '' }
+        reader = doc.reader
+        assert_equal '---', reader.peek_line
+        refute doc.attributes.key? 'front-matter'
+        assert_equal 1, reader.lineno
       end
 
       test 'should skip front matter if specified by skip-front-matter attribute' do
@@ -535,6 +558,69 @@ class ReaderTest < Minitest::Test
         reader = doc.reader
         assert_equal '= Document Title', reader.peek_line
         assert_equal front_matter, doc.attributes['front-matter']
+        assert_equal 7, reader.lineno
+      end
+
+      test 'should skip TOML front matter if specified by skip-front-matter attribute' do
+        front_matter = <<~'EOS'.chop
+        layout = 'post'
+        title = 'Document Title'
+        author = 'username'
+        tags = ['first', 'second']
+        EOS
+
+        input = <<~EOS
+        +++
+        #{front_matter}
+        +++
+        = Document Title
+        Author Name
+
+        preamble
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'skip-front-matter' => '' }
+        reader = doc.reader
+        assert_equal '= Document Title', reader.peek_line
+        assert_equal front_matter, doc.attributes['front-matter']
+        assert_equal 7, reader.lineno
+      end
+
+      test 'should not skip front matter in include file if skip-front-matter attribute is set' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/with-front-matter.adoc[]
+        ....
+        EOS
+        doc = document_from_string input, safe: :safe, parse: false, base_dir: DIRNAME
+        reader = doc.reader
+        expected = [
+          '....',
+          '---',
+          'name: value',
+          '---',
+          'content',
+          '....',
+        ]
+        assert_equal expected, reader.readlines
+        refute doc.attr? 'front-matter'
+      end
+
+      test 'should skip front matter in include file if skip-front-matter option is set on include directiv' do
+        input = <<~'EOS'
+        ....
+        include::fixtures/with-front-matter.adoc[opts=skip-front-matter]
+        ....
+        EOS
+        doc = document_from_string input, safe: :safe, parse: false, base_dir: DIRNAME
+        reader = doc.reader
+        expected = [
+          '....',
+          'content',
+          '....',
+        ]
+        assert_equal expected, reader.readlines
+        refute doc.attr? 'front-matter'
       end
     end
 
@@ -621,11 +707,92 @@ class ReaderTest < Minitest::Test
     end
 
     context 'Include Directive' do
-      test 'include directive is disabled by default and becomes a link' do
+      test 'should replace include directive with link macro in default safe mode' do
         input = 'include::include-file.adoc[]'
         doc = Asciidoctor::Document.new input
         reader = doc.reader
+        assert_equal 'link:include-file.adoc[role=include]', reader.read_line
+      end
+
+      test 'should not add role to link macro used to replace include directive in compat mode' do
+        input = 'include::include-file.adoc[]'
+        doc = Asciidoctor::Document.new input, attributes: { 'compat-mode' => '' }
+        reader = doc.reader
         assert_equal 'link:include-file.adoc[]', reader.read_line
+      end
+
+      test 'should escape spaces in target when generating link from include directive' do
+        input = 'include::foo bar baz.adoc[]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:pass:c[foo bar baz.adoc][role=include]', reader.read_line
+      end
+
+      test 'should preserve attrlist when replacing include directive with link macro' do
+        input = 'include::include-file.adoc[leveloffset=+1]'
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 'link:include-file.adoc[role=include,leveloffset=+1]', reader.read_line
+      end
+
+      test 'should replace include directive with link macro if safe mode allows it, but allow-uri-read is not set' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/dist/info.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should not add role to link macro that replaces include directive with remote target in compat mode' do
+        input = 'include::https://example.org/dist/info.adoc[]'
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input, safe: :safe, attributes: { 'compat-mode' => '' }
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should escape spaces in target when generating link from remote include directive' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/no such file.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:pass:c[https://example.org/no such file.adoc][role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/no such file.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'should preserve attrlist when replacing remove include directive with link macro' do
+        using_memory_logger do |logger|
+          input = 'include::https://example.org/dist/info.adoc[leveloffset=+1]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:https://example.org/dist/info.adoc[role=include,leveloffset=+1]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: https://example.org/dist/info.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'include directive with remote target is converted to a link when allow-uri-read is not set' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :safe
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
+          assert_message logger, :WARN, '<stdin>: line 1: cannot include contents of URI: http://example.org/team.adoc (allow-uri-read attribute not enabled)', Hash
+        end
+      end
+
+      test 'include directive with remote target is converted to a link when safe mode is secure' do
+        using_memory_logger do |logger|
+          input = 'include::http://example.org/team.adoc[]'
+          doc = Asciidoctor::Document.new input, safe: :secure
+          reader = doc.reader
+          assert_equal 'link:http://example.org/team.adoc[role=include]', reader.read_line
+          assert_empty logger.messages
+        end
       end
 
       test 'include directive is enabled when safe mode is less than SECURE' do
@@ -642,6 +809,15 @@ class ReaderTest < Minitest::Test
         assert_css '.paragraph', output, 0
         assert_css 'h1', output, 1
         assert_match(/<h1>人<\/h1>/, output)
+      end
+
+      test 'should include content from a file on the classloader', if: jruby? do
+        require fixture_path 'assets.jar'
+        input = 'include::uri:classloader:/includes-in-jar/include-file.adoc[]'
+        doc = document_from_string input, safe: :unsafe, standalone: false, base_dir: DIRNAME
+        output = doc.convert
+        assert_match(/included from a file/, output)
+        assert doc.catalog[:includes]['uri:classloader:/includes-in-jar/include-file']
       end
 
       test 'should not track include in catalog for non-AsciiDoc include files' do
@@ -680,6 +856,29 @@ class ReaderTest < Minitest::Test
           assert_match(/included content/, output)
         ensure
           FileUtils.rm include_file_with_sp
+        end
+      end
+
+      test 'include directive should not match if target is empty or starts or ends with space' do
+        ['include::[]', 'include:: []', 'include:: not-include[]', 'include::not-include []'].each do |input|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          assert_equal input, reader.read_line
+        end
+      end
+
+      test 'include directive should not attempt to resolve target as remote if allow-uri-read is set and URL is not on first line' do
+        using_memory_logger do |logger|
+          input = <<~'EOS'
+          :target: not-a-file.adoc + \
+          http://example.org/team.adoc
+
+          include::{target}[]
+          EOS
+          doc = Asciidoctor.load input, safe: :safe, base_dir: fixturedir
+          lines = doc.blocks[0].lines
+          assert_equal [%(Unresolved directive in <stdin> - include::not-a-file.adoc +\nhttp://example.org/team.adoc[])], lines
+          assert_message logger, :ERROR, %(<stdin>: line 4: include file not found: #{fixture_path 'not-a-file.adoc'} +\nhttp:/example.org/team.adoc), Hash
         end
       end
 
@@ -979,8 +1178,7 @@ class ReaderTest < Minitest::Test
           convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
         end
 
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         <code class="language-ruby" data-lang="ruby">def initialize breed
           @breed = breed
         end</code>
@@ -1146,7 +1344,7 @@ class ReaderTest < Minitest::Test
           input = %(include::#{tmp_include_path}[tag=include-me])
           using_memory_logger do |logger|
             output = convert_string_to_embedded input, safe: :safe, base_dir: tmp_include_dir
-            assert_empty logger.messages
+            assert_empty logger
             assert_includes output, 'line included'
             refute_includes output, 'line not included'
           end
@@ -1181,8 +1379,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1200,8 +1397,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1227,8 +1423,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1246,8 +1441,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1298,8 +1492,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1326,8 +1519,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1373,8 +1565,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1407,8 +1598,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1456,8 +1646,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
           def initialize breed
             @breed = breed
@@ -1483,8 +1672,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1508,8 +1696,7 @@ class ReaderTest < Minitest::Test
           EOS
 
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-          # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-          expected = <<~EOS.chop
+          expected = <<~'EOS'.chop
           class Dog
             def initialize breed
               @breed = breed
@@ -1528,8 +1715,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         class Dog
 
           def bark
@@ -1617,8 +1803,7 @@ class ReaderTest < Minitest::Test
         EOS
 
         output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
-        # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-        expected = <<~EOS.chop
+        expected = <<~'EOS'.chop
         def bark
           if @breed == 'beagle'
             'woof woof woof woof woof'
@@ -1660,7 +1845,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1702,7 +1887,7 @@ class ReaderTest < Minitest::Test
         using_memory_logger do |logger|
           output = convert_string_to_embedded input, safe: :safe, base_dir: DIRNAME
           assert_includes output, %(<pre>#{expected}</pre>)
-          assert_empty logger.messages
+          assert_empty logger
         end
       end
 
@@ -1868,7 +2053,7 @@ class ReaderTest < Minitest::Test
 
       test 'include is dropped if target contains missing attribute and attribute-missing is drop-line' do
         input = 'include::{foodir}/include-file.adoc[]'
-        using_memory_logger Logger::INFO do |logger|
+        using_memory_logger Asciidoctor::Logger::INFO do |logger|
           doc = empty_safe_document base_dir: DIRNAME, attributes: { 'attribute-missing' => 'drop-line' }
           reader = Asciidoctor::PreprocessorReader.new doc, input, nil, normalize: true
           line = reader.read_line
@@ -2099,6 +2284,19 @@ class ReaderTest < Minitest::Test
         assert_equal 1, reader.lineno
         assert_nil reader.peek_line
         assert_equal 4, reader.lineno
+      end
+
+      test 'peek_line returns nil if contents of skipped conditional is empty line' do
+        input = <<~'EOS'
+        ifdef::foobar[]
+
+        endif::foobar[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        assert_equal 1, reader.lineno
+        assert_nil reader.peek_line
       end
 
       test 'ifdef with defined attribute includes content' do
@@ -2410,6 +2608,19 @@ class ReaderTest < Minitest::Test
         assert_equal 'Our quest is complete!', result
       end
 
+      test 'ifdef around empty line does not introduce extra line' do
+        input = <<~'EOS'
+        before
+        ifdef::no-such-attribute[]
+
+        endif::[]
+        after
+        EOS
+
+        result = (Asciidoctor::Document.new input).reader.read
+        assert_equal %(before\nafter), result
+      end
+
       test 'should log warning if endif is unmatched' do
         input = <<~'EOS'
         Our quest is complete!
@@ -2431,9 +2642,12 @@ class ReaderTest < Minitest::Test
         EOS
 
         using_memory_logger do |logger|
-          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
+          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }, sourcemap: true).reader.read
           assert_equal 'Our quest is complete!', result
-          assert_message logger, :ERROR, '~<stdin>: line 3: mismatched preprocessor directive: endif::on-journey[]', Hash
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 3: mismatched preprocessor directive: endif::on-journey[]', Hash],
+            [:ERROR, '~<stdin>: line 1: detected unterminated preprocessor conditional directive: ifdef::on-quest[]', Hash],
+          ]
         end
       end
 
@@ -2442,12 +2656,16 @@ class ReaderTest < Minitest::Test
         ifdef::on-quest[]
         Our quest is complete!
         endif::on-quest[complete!]
+        fin
         EOS
 
         using_memory_logger do |logger|
-          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }).reader.read
-          assert_equal 'Our quest is complete!', result
-          assert_message logger, :ERROR, '~<stdin>: line 3: malformed preprocessor directive - text not permitted: endif::on-quest[complete!]', Hash
+          result = (Asciidoctor::Document.new input, attributes: { 'on-quest' => '' }, sourcemap: true).reader.read
+          assert_equal %(Our quest is complete!\nfin), result
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 3: malformed preprocessor directive - text not permitted: endif::on-quest[complete!]', Hash],
+            [:ERROR, '~<stdin>: line 1: detected unterminated preprocessor conditional directive: ifdef::on-quest[]', Hash],
+          ]
         end
       end
 
@@ -2633,7 +2851,7 @@ class ReaderTest < Minitest::Test
         assert_equal 'One ring to rule them all!', (lines * Asciidoctor::LF)
       end
 
-      test 'should warn if ifeval has target' do
+      test 'should log error if ifeval has target' do
         input = <<~'EOS'
         ifeval::target[1 == 1]
         content
@@ -2649,7 +2867,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should warn if ifeval has invalid expression' do
+      test 'should log error if ifeval has invalid expression' do
         input = <<~'EOS'
         ifeval::[1 | 2]
         content
@@ -2665,7 +2883,7 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should warn if ifeval is missing expression' do
+      test 'should log error if ifeval is missing expression' do
         input = <<~'EOS'
         ifeval::[]
         content
@@ -2697,20 +2915,136 @@ class ReaderTest < Minitest::Test
         end
       end
 
-      test 'should not warn if preprocessor directive is invalid if already skipping' do
+      test 'should not warn about invalid ifdef preprocessor directive if already skipping' do
         input = <<~'EOS'
         ifdef::attribute-not-set[]
         foo
         ifdef::[]
         bar
         endif::[]
+        baz
         EOS
 
         using_memory_logger do |logger|
           result = (Asciidoctor::Document.new input).reader.read
-          assert_empty result
+          assert_equal 'baz', result
           assert_empty logger
         end
+      end
+
+      test 'should not warn about invalid ifeval preprocessor directive if already skipping' do
+        input = <<~'EOS'
+        ifdef::attribute-not-set[]
+        foo
+        ifeval::[]
+        bar
+        endif::[]
+        baz
+        EOS
+
+        using_memory_logger do |logger|
+          result = (Asciidoctor::Document.new input).reader.read
+          assert_equal 'baz', result
+          assert_empty logger
+        end
+      end
+
+      test 'should log error with end position if preprocessor conditional directive is unterminated' do
+        input = <<~'EOS'
+        before
+        ifdef::not-set[]
+        skip
+        these
+        lines
+        fin
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'before', (lines * Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 6: detected unterminated preprocessor conditional directive: ifdef::not-set[]', Hash
+        end
+      end
+
+      test 'should log error with start location if preprocessor conditional directive is unterminated and sourcemap is set' do
+        input = <<~'EOS'
+        before
+        ifdef::not-set[]
+        skip
+        these
+        lines
+        fin
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input, sourcemap: true
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'before', (lines * Asciidoctor::LF)
+          assert_message logger, :ERROR, '~<stdin>: line 2: detected unterminated preprocessor conditional directive: ifdef::not-set[]', Hash
+        end
+      end
+
+      test 'should log error if multiple preprocessor conditional directives are unterminated' do
+        input = <<~'EOS'
+        before
+        ifdef::not-set[]
+        skip
+        these
+        lines
+        ifeval::[1 == 2]
+        {asciidoctor-version}
+        fin
+        EOS
+
+        using_memory_logger do |logger|
+          doc = Asciidoctor::Document.new input, sourcemap: true
+          reader = doc.reader
+          lines = []
+          lines << reader.read_line while reader.has_more_lines?
+          assert_equal 'before', (lines * Asciidoctor::LF)
+          assert_messages logger, [
+            [:ERROR, '~<stdin>: line 2: detected unterminated preprocessor conditional directive: ifdef::not-set[]', Hash],
+            [:ERROR, '~<stdin>: line 6: detected unterminated preprocessor conditional directive: ifeval::[1 == 2]', Hash],
+          ]
+        end
+      end
+
+      test 'should not fail to process preprocessor directive that evaluates to false and has a large number of lines' do
+        lines = (%w(data) * 5000) * ?\n
+        input = <<~EOS
+        before
+
+        ifdef::attribute-not-set[]
+        #{lines}
+        endif::attribute-not-set[]
+
+        after
+        EOS
+
+        doc = Asciidoctor.load input
+        assert_equal 2, doc.blocks.size
+        assert_equal 'before', doc.blocks[0].source
+        assert_equal 'after', doc.blocks[1].source
+      end
+
+      test 'should not fail to process lines if reader contains a nil entry' do
+        input = ['before', '', '', '', 'after']
+        doc = Asciidoctor.load input, extensions: proc {
+          preprocessor do
+            process do |_, reader|
+              reader.source_lines[2] = nil
+              nil
+            end
+          end
+        }
+        assert_equal 2, doc.blocks.size
+        assert_equal 'before', doc.blocks[0].source
+        assert_equal 'after', doc.blocks[1].source
       end
     end
   end

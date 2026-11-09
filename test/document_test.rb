@@ -408,7 +408,6 @@ context 'Document' do
 
     test 'convert methods on built-in converter are registered when backend is docbook5' do
       doc = document_from_string '', attributes: { 'backend' => 'docbook5' }
-      converter = doc.converter
       assert_equal 'docbook5', doc.attributes['backend']
       assert doc.attributes.key? 'backend-docbook5'
       assert_equal 'docbook', doc.attributes['basebackend']
@@ -485,6 +484,22 @@ context 'Document' do
       assert_nil doc.attr 'compat-mode'
       result = doc.convert
       assert_xpath '//code[text()="content"]', result, 0
+    end
+
+    test 'should not enable compat mode in header if unset from API' do
+      input = <<~'EOS'
+      = Document Title
+      :name: pass:n['quoted string']
+
+      {name}
+      EOS
+
+      doc = document_from_string input, attributes: { 'compat-mode' => nil }
+      refute doc.compat_mode
+      assert doc.attribute_locked? 'compat-mode'
+      assert_nil doc.attr 'compat-mode'
+      result = doc.convert
+      assert_xpath '//p[text()="\'quoted string\'"]', result, 1
     end
 
     test 'should apply max-width to each top-level container' do
@@ -857,15 +872,17 @@ context 'Document' do
       :description: AsciiDoc user guide
       :keywords: asciidoc,documentation
       :copyright: Stuart Rackham
+      :app-name: AsciiDoc
 
       == Version 8.6.8
 
       more info...
       EOS
       output = convert_string input
-      assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
+      assert_xpath '//meta[@name="application-name"][@content="AsciiDoc"]', output, 1
       assert_xpath '//meta[@name="description"][@content="AsciiDoc user guide"]', output, 1
       assert_xpath '//meta[@name="keywords"][@content="asciidoc,documentation"]', output, 1
+      assert_xpath '//meta[@name="author"][@content="Stuart Rackham"]', output, 1
       assert_xpath '//meta[@name="copyright"][@content="Stuart Rackham"]', output, 1
       assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="author"][text()="Stuart Rackham"]', output, 1
       assert_xpath '//*[@id="header"]/*[@class="details"]/span[@id="email"]/a[@href="mailto:founder@asciidoc.org"][text()="founder@asciidoc.org"]', output, 1
@@ -940,6 +957,8 @@ context 'Document' do
       input = <<~'EOS'
       = AsciiDoc
       Stuart Rackham <founder@asciidoc.org>
+      :orgname: AsciiDoc Makers
+      :keywords: text, markup,,processor, asciidoc , documentation
 
       == Version 8.6.8
 
@@ -952,6 +971,10 @@ context 'Document' do
       assert_xpath '/article/info/author/personname/firstname[text()="Stuart"]', output, 1
       assert_xpath '/article/info/author/personname/surname[text()="Rackham"]', output, 1
       assert_xpath '/article/info/author/email[text()="founder@asciidoc.org"]', output, 1
+      assert_xpath '/article/info/orgname[text()="AsciiDoc Makers"]', output, 1
+      assert_xpath '/article/info/keywordset', output, 1
+      assert_xpath '/article/info/keywordset/keyword', output, 5
+      assert_xpath '(/article/info/keywordset/keyword)[4][text()="asciidoc"]', output, 1
       assert_css 'article:root:not([xml|id])', output, 1
       assert_css 'article:root[xml|lang="en"]', output, 1
     end
@@ -1413,6 +1436,20 @@ context 'Document' do
       end
     end
 
+    test 'should add role on document to heading tag of embedded document' do
+      input = <<~'EOS'
+      [.rolename]
+      = Document Title
+      :showtitle:
+
+      content
+      EOS
+
+      result = convert_string_to_embedded input
+      assert_xpath '/h1', result, 1
+      assert_xpath '/h1[@class="rolename"]', result, 1
+    end
+
     test 'parse header only' do
       input = <<~'EOS'
       = Document Title
@@ -1552,12 +1589,59 @@ context 'Document' do
       assert_equal 'foobar', (doc.resolve_id 'Foo Bar')
     end
 
-    test 'should record imagesdir when image is registered with catalog' do
+    test 'should return nil if there is already an entry for ID in the :refs table' do
+      doc = empty_document
+      ref = ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', type: :ref, target: 'tigers'), '[tigers]']
+      assert_equal ref[1], (doc.register :refs, ref)
+      assert_nil doc.register :refs, ref
+    end
+
+    test 'should record imagesdir from document when image is registered in catalog using legacy arguments' do
       doc = empty_document attributes: { 'imagesdir' => 'img' }, catalog_assets: true
       doc.register :images, 'diagram.svg'
       assert_equal 1, doc.catalog[:images].size
       assert_equal 'diagram.svg', doc.catalog[:images][0].target
       assert_equal 'img', doc.catalog[:images][0].imagesdir
+    end
+
+    test 'should record imagesdir as specified when image is registered in catalog' do
+      doc = empty_document attributes: { 'imagesdir' => 'images@' }, catalog_assets: true
+      doc.register :images, ['diagram.svg', 'img']
+      assert_equal 1, doc.catalog[:images].size
+      assert_equal 'diagram.svg', doc.catalog[:images][0].target
+      assert_equal 'img', doc.catalog[:images][0].imagesdir
+    end
+
+    test 'should record imagesdir from document when image macro is parsed' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::picture.png[]
+      EOS
+
+      doc = document_from_string input, catalog_assets: true
+      images = doc.catalog[:images]
+      refute_empty images
+      assert_equal 1, images.size
+      assert_equal 'picture.png', images[0].target
+      assert_equal 'img', images[0].imagesdir
+      assert_equal 'img', doc.blocks[0].attributes['imagesdir']
+    end
+
+    test 'should record imagesdir from image macro when image macro with imagesdir attribute is parsed' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::picture.png[imagesdir=i]
+      EOS
+
+      doc = document_from_string input, catalog_assets: true
+      images = doc.catalog[:images]
+      refute_empty images
+      assert_equal 1, images.size
+      assert_equal 'picture.png', images[0].target
+      assert_equal 'i', images[0].imagesdir
+      assert_equal 'i', doc.blocks[0].attributes['imagesdir']
     end
 
     test 'should catalog assets inside nested document' do
@@ -1769,22 +1853,23 @@ context 'Document' do
       section body
       EOS
       result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
-      assert_xpath '/xmlns:refentry', result, 1
-      doc = xmlnodes_at_xpath '/xmlns:refentry', result, 1
+      assert_xpath '/xmlns:article', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry', result, 1
+      doc = xmlnodes_at_xpath '/xmlns:article', result, 1
       assert_equal 'http://docbook.org/ns/docbook', doc.namespaces['xmlns']
       assert_equal 'http://www.w3.org/1999/xlink', doc.namespaces['xmlns:xl']
-      assert_xpath '/xmlns:refentry[@version="5.0"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:info/xmlns:title[text()="asciidoctor(1)"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text()="1"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="Asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="Asciidoctor Manual"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text()="asciidoctor"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text()="Process text"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text()="some text"]', result, 1
-      assert_xpath '/xmlns:refentry/xmlns:refsection', result, 1
-      assert_css 'refentry:root > refsection[xml|id="_first_section"]', result, 1
+      assert_equal '5.0', (doc.attr 'version')
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text()="asciidoctor(1)"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:manvolnum[text()="1"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="Asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="Asciidoctor Manual"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refnamediv/xmlns:refname[text()="asciidoctor"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refnamediv/xmlns:refpurpose[text()="Process text"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsynopsisdiv', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsynopsisdiv/xmlns:simpara[text()="some text"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refsection', result, 1
+      assert_css 'article:root > refentry > refsection[xml|id="_first_section"]', result, 1
     end
 
     test 'should output non-breaking space for source and manual in docbook manpage output if absent from source' do
@@ -1800,8 +1885,28 @@ context 'Document' do
       some text
       EOS
       result = convert_string input, keep_namespaces: true, attributes: { 'backend' => 'docbook5', 'doctype' => 'manpage' }
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
-      assert_xpath %(/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="source"][text()="#{decode_char 160}"]), result, 1
+      assert_xpath %(/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refmiscinfo[@class="manual"][text()="#{decode_char 160}"]), result, 1
+    end
+
+    test 'should apply replacements substitution to value of mantitle attribute used in DocBook output' do
+      input = <<~'EOS'
+      = foo\--bar(1)
+      Author Name
+      :doctype: manpage
+      :man manual: Foo Bar Manual
+      :man source: Foo Bar 1.0
+
+      == NAME
+
+      foo--bar - puts the foo in your bar
+      EOS
+
+      doc = Asciidoctor.load input, backend: :docbook, standalone: true
+      assert_equal 'foo\\--bar', (doc.attr 'mantitle')
+      result = doc.convert
+      assert_xpath '/xmlns:article/xmlns:info/xmlns:title[text()="foo--bar(1)"]', result, 1
+      assert_xpath '/xmlns:article/xmlns:refentry/xmlns:refmeta/xmlns:refentrytitle[text()="foo--bar"]', result, 1
     end
 
     test 'should be able to set doctype to book when converting to DocBook' do
@@ -1854,9 +1959,9 @@ context 'Document' do
       EOS
 
       result = convert_string input, backend: 'docbook5'
-      assert_xpath '/refentry/refnamediv/refname', result, 2
-      assert_xpath '(/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
-      assert_xpath '(/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
+      assert_xpath '/article/refentry/refnamediv/refname', result, 2
+      assert_xpath '(/article/refentry/refnamediv/refname)[1][text()="eve"]', result, 1
+      assert_xpath '(/article/refentry/refnamediv/refname)[2][text()="islifeform"]', result, 1
     end
 
     test 'adds a front and back cover image to DocBook 5 when doctype is book' do

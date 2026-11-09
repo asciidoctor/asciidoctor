@@ -14,6 +14,10 @@ To confirm that the CLI is available, execute the following command in your term
 
  $ asciidoctor --version
 
+Alternately, you can shorten the `--version` CLI option flag to `-v`:
+
+ $ asciidoctor -v
+
 If this command completes successfully, information about Asciidoctor and the runtime environment will be printed to the standard output of your terminal:
 
 [subs=attributes+]
@@ -30,6 +34,11 @@ To invoke Asciidoctor from the CLI and convert an `.adoc` file, execute:
 
 This will use the built-in defaults for options and create a new file in the same directory as the input file, with the same base name, but with the `.html` extension.
 
+The Asciidoctor CLI accepts numerous options that control the behavior of the processor, from setting additional attributes (`-a`) to where the output file is written (`-o`).
+Most options have both a longhand (e.g., `--out-file`) and shorthand form (e.g., `-o`).
+The shorthand form is used throughout this documentation.
+Once you're familiar with the options, the shorthand form is preferred and most common since it requires a lot less typing.
+
 xref:man1/asciidoctor.adoc#options[CLI Options] describes the available options and parameters for the Asciidoctor CLI.
 
 == Help topics
@@ -38,6 +47,10 @@ The `--help` option provides self-describing documentation for the `asciidoctor`
 If you don't specify a topic, the `--help` option prints the usage statement for the `asciidoctor` command:
 
  $ asciidoctor --help
+
+Alternately, you can shorten the `--help` CLI option flag to `-h`:
+
+ $ asciidoctor -h
 
 You can generate the full documentation (i.e., man page) for the `asciidoctor` command by passing the `manpage` topic to the `--help` option.
 You can pipe that output to the `man` pager to view it:

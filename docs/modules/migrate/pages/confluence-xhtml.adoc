@@ -9,7 +9,7 @@ You'll need Pandoc installed before running this script.
 If you have trouble running this script, you can use the Pandoc command referenced inside the script to convert XHTML files to AsciiDoc manually.
 
 .convert.groovy
-[source,groovy]
+[,groovy]
 ----
 include::example$convert.groovy[]
 ----

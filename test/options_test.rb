@@ -146,6 +146,14 @@ context 'Options' do
     assert_nil options[:attributes]
   end
 
+  test 'should gracefully force encoding to UTF-8 if encoding on string is mislabeled' do
+    args = ['-a', ((%w(platform-name 云平台).join '=').force_encoding Encoding::ASCII_8BIT), '-']
+    options = Asciidoctor::Cli::Options.parse! args
+
+    assert_equal '云平台', options[:attributes]['platform-name']
+    assert_equal Encoding::UTF_8, options[:attributes]['platform-name'].encoding
+  end
+
   test 'should allow safe mode to be specified' do
     options = Asciidoctor::Cli::Options.parse! %w(-S safe test/fixtures/sample.adoc)
     assert_equal Asciidoctor::SafeMode::SAFE, options[:safe]
@@ -197,13 +205,13 @@ context 'Options' do
     end
   end
 
-  test '-r flag with multiple values requires specified libraries' do
+  test '-r flag with multiple values separated by commas is treated as a single path' do
     options = Asciidoctor::Cli::Options.new
     redirect_streams do |_, stderr|
-      exitval = options.parse! %w(-r foobar,foobaz test/fixtures/sample.adoc)
-      assert_match %(asciidoctor: FAILED: 'foobar' could not be loaded), stderr.string
+      exitval = options.parse! %w(-r /no-such-folder/a,b,c/ext.rb test/fixtures/sample.adoc)
+      assert_include %(asciidoctor: FAILED: '/no-such-folder/a,b,c/ext.rb' could not be loaded), stderr.string
       assert_equal 1, exitval
-      assert_equal %w(foobar foobaz), options[:requires]
+      assert_equal %w(/no-such-folder/a,b,c/ext.rb), options[:requires]
     end
   end
 
@@ -239,27 +247,27 @@ context 'Options' do
 
   test 'should set failure level to FATAL by default' do
     options = Asciidoctor::Cli::Options.parse! %w(test/fixtures/sample.adoc)
-    assert_equal Logger::Severity::FATAL, options[:failure_level]
+    assert_equal Asciidoctor::Logger::Severity::FATAL, options[:failure_level]
   end
 
   test 'should allow failure level to be set to FATAL using any recognized abbreviation' do
     %w(f fatal FATAL).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal Logger::Severity::FATAL, options[:failure_level]
+      assert_equal Asciidoctor::Logger::Severity::FATAL, options[:failure_level]
     end
   end
 
   test 'should allow failure level to be set to ERROR using any recognized abbreviation' do
     %w(e err ERR error ERROR).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal Logger::Severity::ERROR, options[:failure_level]
+      assert_equal Asciidoctor::Logger::Severity::ERROR, options[:failure_level]
     end
   end
 
   test 'should allow failure level to be set to WARN using any recognized abbreviation' do
     %w(w warn WARN warning WARNING).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--failure-level=#{val} test/fixtures/sample.adoc)
-      assert_equal Logger::Severity::WARN, options[:failure_level]
+      assert_equal Asciidoctor::Logger::Severity::WARN, options[:failure_level]
     end
   end
 
@@ -273,13 +281,13 @@ context 'Options' do
 
   test 'should set log level to DEBUG when --log-level option is specified' do
     options = Asciidoctor::Cli::Options.parse! %w(--log-level debug test/fixtures/sample.adoc)
-    assert_equal Logger::Severity::DEBUG, options[:log_level]
+    assert_equal Asciidoctor::Logger::Severity::DEBUG, options[:log_level]
   end
 
   test 'should allow log level to be set to WARN using any recognized abbreviation' do
     %w(w warn WARN warning WARNING).each do |val|
       options = Asciidoctor::Cli::Options.parse! %W(--log-level=#{val} test/fixtures/sample.adoc)
-      assert_equal Logger::Severity::WARN, options[:log_level]
+      assert_equal Asciidoctor::Logger::Severity::WARN, options[:log_level]
     end
   end
 

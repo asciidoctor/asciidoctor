@@ -1,14 +1,14 @@
 = Load and Convert Strings Using the API
 :navtitle: Load and Convert Strings
 
-This page explains how to load and convert AsciiDoc-formatted strings using the API.
+This page explains how to load and convert AsciiDoc strings using the API.
 A string is the bare AsciiDoc content (often the contents of a file).
 
 == Load an AsciiDoc string
 
-To parse an AsciiDoc-formatted string into a document object model, use:
+To parse an AsciiDoc string into a document object model, use:
 
-[source,ruby]
+[,ruby]
 ----
 doc = Asciidoctor.load '*This* is Asciidoctor.'
 ----
@@ -32,16 +32,16 @@ However, if you're only interested in converting the AsciiDoc source when using 
 
 == Convert an AsciiDoc string
 
-To convert the AsciiDoc-formatted string directly to HTML, use:
+To convert the AsciiDoc string directly to HTML, use:
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.'
 ----
 
 Here's the output you will see:
 
-[source,html]
+[,html]
 ----
 <div class="paragraph">
 <p><strong>This</strong> is Asciidoctor.</p>
@@ -70,10 +70,13 @@ This default was chosen to make Asciidoctor consistent with other lightweight ma
 
 Here's what's included in an embedded document:
 
-* The document title, but only if the `showtitle` attribute is set (no attribution and revision information)
-* The table of contents if the `toc` attribute is enabled (and not macro or preamble)
+* The document title if the `showtitle` attribute is set
+* The table of contents if the `toc` attribute is set and the value is not `preamble`
 * The converted document body
 * The footnotes unless the `nofootnotes` attribute is set
+
+The author and revision information is never shown in an embedded document.
+If you need to display that information, you can use attribute references such as `\{author}` and `\{revnumber}`.
 
 The embedded document is intended to be included in a template, such as one provided by a static site generator.
 That template is responsible for providing the styles and library integrations needed for the content to render properly.
@@ -83,7 +86,7 @@ That template is responsible for providing the styles and library integrations n
 You can still generate a standalone document when converting a string.
 To convert from an AsciiDoc string to a standalone output document, you need to explicitly set the `:standalone` option to `true`.
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true
 ----
@@ -95,10 +98,13 @@ If you don't set the `:standalone` option to `true`, you only get the embedded d
 When the input or output is a file, the `:standalone` option is enabled by default.
 Thus, to instruct Asciidoctor to write standalone HTML to a file from an AsciiDoc string, the `:to_file` option is mandatory. 
 
-[source,ruby]
+[,ruby]
 ----
 Asciidoctor.convert '*This* is Asciidoctor.', to_file: 'out.html'
 ----
+
+NOTE: When converting standalone output to a file, additional files may be written.
+For example, if the `linkcss` and `copycss` attributes are both set, the processor will write the default stylesheet to a file as well.
 
 If you want to generate embedded output when starting with a file, set the `:standalone` option to `false`.
 However, most of the time you'll want to generate a standalone document when converting a file (which is why it's default).
@@ -110,7 +116,7 @@ However, you can force it to be included without the header and footer by settin
 
 If you only want the inline markup to be returned, set the `:doctype` option to `'inline'`:
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', doctype: 'inline'
 ----
@@ -122,7 +128,7 @@ In this mode, Asciidoctor will only process the first block (e.g., paragraph) in
 You can produce DocBook 5.0 by setting the `:backend` option to `'docbook'`.
 Since embedded DocBook isn't that useful, we also enable the standalone document (i.e., header and footer) by setting the `:standalone` option to `true`.
 
-[source,ruby]
+[,ruby]
 ----
 puts Asciidoctor.convert '*This* is Asciidoctor.', standalone: true, backend: 'docbook'
 ----

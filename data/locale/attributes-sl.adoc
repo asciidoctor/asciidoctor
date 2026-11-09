@@ -1,0 +1,23 @@
+// Slovenian translation, courtesy of Peter Kokot <peterkokot@gmail.com>
+:appendix-caption: Dodatek
+:appendix-refsig: {appendix-caption}
+:caution-caption: Pozor
+:chapter-signifier: Poglavje
+:chapter-refsig: {chapter-signifier}
+:example-caption: Primer
+:figure-caption: Slika
+:important-caption: Pomembno
+:last-update-label: Nazadnje posodobljeno
+ifdef::listing-caption[:listing-caption: Seznam]
+ifdef::manname-title[:manname-title: Ime]
+:note-caption: Opomba
+:part-signifier: Del
+:part-refsig: {part-signifier}
+ifdef::preface-title[:preface-title: Predgovor]
+:section-refsig: Razdelek
+:table-caption: Tabela
+:tip-caption: Namig
+:toc-title: Kazalo
+:untitled-label: Brez naslova
+:version-label: Različica
+:warning-caption: Opozorilo

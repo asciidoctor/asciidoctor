@@ -300,12 +300,33 @@ class AbstractNode
     image_uri icon, 'iconsdir'
   end
 
+  # Public: Determine the format of the image URI.
+  #
+  # The format is the value that follows image/ in the mimetype, except for an
+  # SVG, which is svg.
+  #
+  # If the format attribute is specified on the current node and non-empty, use
+  # that value. Otherwise, if the image is a data URI, derive the format from
+  # the mimetype in the URI. Otherwise, derive the format from the file
+  # extension of the URI, if it has one (tolerating a query string or fragment
+  # in the case of SVG). Otherwise, assume the format is nil.
+  def image_format uri
+    if !(format = attr 'format').nil_or_empty?
+      format == 'jpg' ? 'jpeg' : format
+    elsif (uri.start_with? 'data:') && (ImageDataUriRx.match? uri) && (format = uri.slice 11, ((uri.index ';') - 11))
+      format == 'svg+xml' ? 'svg' : format
+    elsif (ext = Helpers.extname uri, nil)
+      ext == '.svg' || ((ext.start_with? '.svg') && ((q = ext[4]) == '?' || q == '#')) ? 'svg' : (ext.slice 1, ext.length)
+    end
+  end
+
   # Public: Construct a URI reference or data URI to the target image.
   #
-  # If the target image is a URI reference, then leave it untouched.
+  # If the target image is a URI reference (including a data URI), return it.
   #
   # The target image is resolved relative to the directory retrieved from the
-  # specified attribute key, if provided.
+  # specified attribute key, if provided. If the resolved image target is a URI
+  # reference (including a data URI), then return that value.
   #
   # If the 'data-uri' attribute is set on the document, and the safe mode level
   # is less than SafeMode::SECURE, the image will be safely converted to a data URI
@@ -322,14 +343,14 @@ class AbstractNode
   def image_uri target_image, asset_dir_key = 'imagesdir'
     if (doc = @document).safe < SafeMode::SECURE && (doc.attr? 'data-uri')
       if ((Helpers.uriish? target_image) && (target_image = Helpers.encode_spaces_in_uri target_image)) ||
-          (asset_dir_key && (images_base = doc.attr asset_dir_key) && (Helpers.uriish? images_base) &&
+          (asset_dir_key && (images_base = attr asset_dir_key, nil, true) && (Helpers.uriish? images_base) &&
           (target_image = normalize_web_path target_image, images_base, false))
         (doc.attr? 'allow-uri-read') ? (generate_data_uri_from_uri target_image, (doc.attr? 'cache-uri')) : target_image
       else
         generate_data_uri target_image, asset_dir_key
       end
     else
-      normalize_web_path target_image, (asset_dir_key ? (doc.attr asset_dir_key) : nil)
+      normalize_web_path target_image, (asset_dir_key ? (attr asset_dir_key, nil, true) : nil)
     end
   end
 
@@ -348,15 +369,15 @@ class AbstractNode
   #
   # Returns A String reference for the target media
   def media_uri target, asset_dir_key = 'imagesdir'
-    normalize_web_path target, (asset_dir_key ? (@document.attr asset_dir_key) : nil)
+    normalize_web_path target, (asset_dir_key ? (attr asset_dir_key, nil, true) : nil)
   end
 
   # Public: Generate a data URI that can be used to embed an image in the output document
   #
   # First, and foremost, the target image path is cleaned if the document safe mode level
   # is set to at least SafeMode::SAFE (a condition which is true by default) to prevent access
-  # to ancestor paths in the filesystem. The image data is then read and converted to
-  # Base64. Finally, a data URI is built which can be used in an image tag.
+  # to ancestor paths in the filesystem. The image data is then read and converted to base64.
+  # Finally, a data URI is built which can be used in an image tag.
   #
   # target_image - A String path to the target image
   # asset_dir_key - The String attribute key used to lookup the directory where
@@ -364,21 +385,11 @@ class AbstractNode
   #
   # Returns A String data URI containing the content of the target image
   def generate_data_uri target_image, asset_dir_key = nil
-    if (ext = Helpers.extname target_image, nil)
-      mimetype = ext == '.svg' ? 'image/svg+xml' : %(image/#{ext.slice 1, ext.length})
-    else
-      mimetype = 'application/octet-stream'
-    end
-
-    if asset_dir_key
-      image_path = normalize_system_path target_image, (@document.attr asset_dir_key), nil, target_name: 'image'
-    else
-      image_path = normalize_system_path target_image
-    end
-
+    image_path = normalize_system_path target_image, asset_dir_key ? (attr asset_dir_key, nil, true) : nil, nil, target_name: 'image'
+    mimetype = (format = image_format image_path) ? (format == 'svg' ? 'image/svg+xml' : 'image/' + format) : 'application/octet-stream'
     if ::File.readable? image_path
-      # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.strict_encode64 ::File.binread image_path})
+      # NOTE pack 'm0' is equivalent to Base64.strict_encode64
+      %(data:#{mimetype};base64,#{[(::File.binread image_path)].pack 'm0'})
     else
       logger.warn %(image to embed not found or not readable: #{image_path})
       %(data:#{mimetype};base64,)
@@ -400,24 +411,19 @@ class AbstractNode
   # Returns A data URI string built from Base64 encoded data read from the URI
   # and the mime type specified in the Content Type header.
   def generate_data_uri_from_uri image_uri, cache_uri = false
-    if cache_uri
-      # caching requires the open-uri-cached gem to be installed
-      # processing will be automatically aborted if these libraries can't be opened
-      Helpers.require_library 'open-uri/cached', 'open-uri-cached'
-    elsif !RUBY_ENGINE_OPAL
-      # autoload open-uri
-      ::OpenURI
-    end
-
+    return image_uri if (image_uri.start_with? 'data:') && (ImageDataUriRx.match? image_uri)
+    Helpers.require_open_uri cache_uri
     begin
-      mimetype, bindata = ::OpenURI.open_uri(image_uri, URI_READ_MODE) {|f| [f.content_type, f.read] }
-      # NOTE base64 is autoloaded by reference to ::Base64
-      %(data:#{mimetype};base64,#{::Base64.strict_encode64 bindata})
+      mimetype, bindata = ::OpenURI.open_uri image_uri, URI_READ_MODE do |f|
+        [(format = image_format image_uri) ? (format == 'svg' ? 'image/svg+xml' : 'image/' + format) : f.content_type || 'application/octet-stream', f.read]
+      end
+      # NOTE pack 'm0' is equivalent to Base64.strict_encode64
+      %(data:#{mimetype};base64,#{[bindata].pack 'm0'})
     rescue
       logger.warn %(could not retrieve image data from URI: #{image_uri})
       image_uri
-      # uncomment to return empty data (however, mimetype needs to be resolved)
-      #%(data:#{mimetype}:base64,)
+      # uncomment to return empty data
+      #%(data:#{mimetype};base64,)
       # uncomment to return 1 pixel white dot instead
       #'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
     end
@@ -507,7 +513,7 @@ class AbstractNode
       # QUESTION should we chomp content if normalize is false?
       opts[:normalize] ? ((Helpers.prepare_source_string ::File.read path, mode: FILE_READ_MODE).join LF) : (::File.read path, mode: FILE_READ_MODE)
     elsif opts[:warn_on_failure]
-      logger.warn %(#{(attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
+      logger.warn %(#{(@document.attr 'docfile') || '<stdin>'}: #{opts[:label] || 'file'} does not exist or cannot be read: #{path})
       nil
     end
   end

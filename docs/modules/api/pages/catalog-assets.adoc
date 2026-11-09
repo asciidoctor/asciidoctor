@@ -15,13 +15,18 @@ When this feature is enabled, the processor catalogs the following assets:
 * links (but not xrefs) (key: `:links`)
 * block or inline images (key: `:images`)
 
-The processor always cataloged the following assets, regardless of this setting:
+The processor always catalogs the following assets, regardless of this setting:
 
 * block or inline anchors (key: `:refs`)
 * footnotes (key: `:footnotes`)
 
-Inline elements are not cataloged until conversion.
+Generally speaking, inline elements are not cataloged until conversion.
 Therefore, they're only available after the document has been converted, not after it has been loaded.
+However, inline anchors are an exception.
+
+Inline anchors in paragraphs and list items are cataloged when the document is parsed.
+However, the scan for inline anchors happens before inline passthroughs are processed.
+Therefore, to escape an inline anchor, you must use a backslash instead of an inline passthrough.
 
 == Set :catalog_assets option
 
@@ -40,6 +45,21 @@ doc = Asciidoctor.convert_file 'doc.adoc', safe: :safe, catalog_assets: true
 
 Notice that we've used the `convert_file` method instead of the `load_file` method.
 This ensures that inline assets are included in the catalog as well.
+
+If you need to enable the `:catalog_assets` option when using the CLI, you'll need to require the following extension:
+
+.enable-catalog-assets-preprocessor.rb
+[,ruby]
+----
+Asciidoctor::Extensions.register do
+  preprocessor do
+    process do |doc, reader|
+      doc.instance_variable_set :@options, ((doc.instance_variable_get :@options).merge catalog_assets: true)
+      nil
+    end
+  end
+end
+----
 
 Now that you've configured the processor to catalog assets, you can access them from the document object.
 Let's explore it.
@@ -176,7 +196,7 @@ In the output, the image references will be shown as absolute paths.
 === :refs
 
 In addition to images and links, you can also access all targetable references (i.e., elements that have an ID).
-First, let's add some referencable elements to our document.
+First, let's add some referenceable elements to our document.
 
 [,asciidoc]
 ----

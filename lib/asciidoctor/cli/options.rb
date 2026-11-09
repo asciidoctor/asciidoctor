@@ -3,7 +3,7 @@
 module Asciidoctor
   module Cli
     FS = ?/
-    RS = ?\\
+    RS = '\\'
 
     # Public: List of options that can be specified on the command line
     class Options < ::Hash
@@ -26,7 +26,8 @@ module Asciidoctor
         self[:source_dir] = options[:source_dir]
         self[:destination_dir] = options[:destination_dir]
         self[:log_level] = options[:log_level]
-        self[:failure_level] = ::Logger::Severity::FATAL
+        self[:failure_level] = Logger::Severity::FATAL
+        self[:sourcemap] = options[:sourcemap]
         self[:trace] = false
         self[:timings] = false
       end
@@ -86,15 +87,20 @@ module Asciidoctor
             self[:eruby] = eruby
           end
           opts.on '-a', '--attribute name[=value]', 'a document attribute to set in the form of name, name!, or name=value pair',
-            'this attribute takes precedence over the same attribute defined in the source document',
-            'unless either the name or value ends in @ (i.e., name@=value or name=value@)' do |attr|
+            'that takes precedence over the same attribute defined in the source document',
+            'unless either the name or value ends in @ (i.e., name@=value or name=value@)',
+            'may be specified more than once' do |attr|
             next if (attr = attr.rstrip).empty? || attr == '='
-            attr = attr.encode UTF_8 unless attr.encoding == UTF_8
+            begin
+              attr = attr.encode UTF_8
+            rescue ::EncodingError
+              attr = attr.force_encoding UTF_8
+            end unless attr.encoding == UTF_8
             name, _, val = attr.partition '='
             self[:attributes][name] = val
           end
           opts.on '-T', '--template-dir DIR', 'a directory containing custom converter templates that override the built-in converter (requires tilt gem)',
-            'may be specified multiple times' do |template_dir|
+            'may be specified more than once' do |template_dir|
             if self[:template_dirs].nil?
               self[:template_dirs] = [template_dir]
             elsif ::Array === self[:template_dirs]
@@ -121,15 +127,15 @@ module Asciidoctor
           end
           opts.on '-rLIBRARY', '--require LIBRARY', 'require the specified library before executing the processor (using require)',
             'may be specified more than once' do |path|
-            (self[:requires] ||= []).concat path.split ','
+            (self[:requires] ||= []) << path
           end
           opts.on '--log-level LEVEL', %w(debug DEBUG info INFO warning WARNING error ERROR fatal FATAL), 'set minimum level of log messages that get logged: [DEBUG, INFO, WARN, ERROR, FATAL] (default: WARN)' do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
-            self[:log_level] = ::Logger::Severity.const_get level
+            self[:log_level] = Logger::Severity.const_get level
           end
           opts.on '--failure-level LEVEL', %w(info INFO warning WARNING error ERROR fatal FATAL), 'set minimum log level that yields a non-zero exit code: [INFO, WARN, ERROR, FATAL] (default: FATAL)' do |level|
             level = 'WARN' if (level = level.upcase) == 'WARNING'
-            self[:failure_level] = ::Logger::Severity.const_get level
+            self[:failure_level] = Logger::Severity.const_get level
           end
           opts.on '-q', '--quiet', 'silence application log messages and script warnings (default: false)' do
             self[:verbose] = 0

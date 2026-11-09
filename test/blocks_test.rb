@@ -1070,6 +1070,29 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       assert_xpath '/*[@class="admonitionblock tip"]//*[@class="icon"]/*[@class="title"][text()="Tip"]', output, 1
     end
+
+    test 'should generate appropriate tag based on admonition type in DocBook output' do
+      input = <<~'EOS'
+      NOTE: Remember the oat milk.
+
+      IMPORTANT: Don't forget the children!
+
+      [caption=Pro Tip]
+      TIP: Look for the warp under the bridge.
+
+      CAUTION: Slippery when wet.
+
+      WARNING: The software you're about to use has *not* been tested.
+      EOS
+
+      output = convert_string_to_embedded input, backend: :docbook
+      %w(note important tip caution warning).each do |type|
+        assert_css type, output, 1
+        assert_css %(#{type} > simpara), output, 1
+      end
+      assert_xpath '/tip/simpara[text()="Look for the warp under the bridge."]', output, 1
+      refute_includes output, 'Pro Tip'
+    end
   end
 
   context 'Preformatted Blocks' do
@@ -1105,14 +1128,19 @@ context 'Blocks' do
       assert_message @logger, :WARN, '<stdin>: line 3: unterminated listing block', Hash
     end
 
-    test 'should not crash if listing block has no lines' do
-      input = <<~'EOS'
-      ----
-      ----
-      EOS
-      output = convert_string_to_embedded input
-      assert_css 'pre', output, 1
-      assert_css 'pre:empty', output, 1
+    test 'should not crash when converting verbatim block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        output = convert_string_to_embedded input
+        assert_css 'pre', output, 1
+        assert_css 'pre:empty', output, 1
+      end
+    end
+
+    test 'should return content as empty string for verbatim or raw block that has no lines' do
+      [%(----\n----), %(....\n....)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should preserve newlines in literal block' do
@@ -1191,9 +1219,8 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting verbatim block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
-      [subs="attributes"]
+      input = <<~'EOS'
+      [subs=attributes+]
       ....
 
 
@@ -1227,8 +1254,7 @@ context 'Blocks' do
     end
 
     test 'should remove block indent if indent attribute is 0' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="0"]
       ----
           def names
@@ -1239,8 +1265,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
         @names.split
@@ -1256,8 +1281,7 @@ context 'Blocks' do
     end
 
     test 'should not remove block indent if indent attribute is -1' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="-1"]
       ----
           def names
@@ -1278,8 +1302,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [indent="1"]
       ----
           def names
@@ -1300,8 +1323,7 @@ context 'Blocks' do
     end
 
     test 'should set block indent to value specified by indent document attribute' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       :source-indent: 1
 
       [source,ruby]
@@ -1337,8 +1359,7 @@ context 'Blocks' do
       ----
       EOS
 
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      expected = <<~EOS.chop
+      expected = <<~'EOS'.chop
       def names
 
           @names.split
@@ -1463,9 +1484,19 @@ context 'Blocks' do
       EOS
 
       output2 = convert_string_to_embedded input2
-      # FIXME JRuby is adding extra trailing newlines in the second document,
-      # for now, rstrip is necessary
-      assert_equal output.rstrip, output2.rstrip
+      assert_equal output, output2
+    end
+
+    test 'should not mangle array that contains formatted text with role in listing block with quotes sub enabled' do
+      input = <<~'EOS'
+      [,ruby,subs=+quotes]
+      ----
+      nums = [1, 2, 3, [.added]#4#]
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_includes output, 'nums = [1, 2, 3, <span class="added">4</span>]'
     end
 
     test 'first character of block title may be a period if not followed by space' do
@@ -1659,6 +1690,39 @@ context 'Blocks' do
       assert_xpath '//*[@class="openblock"]//*[@class="quoteblock"]', output, 1
     end
 
+    test 'can nest open blocks using ~ variant' do
+      input = <<-EOS
+[.tabs]
+~~~~
+[.tab]
+~~~~~~
+tab one
+~~~~~~
+
+[.tab]
+~~~~~~
+tab two
+~~~~~~
+~~~~
+      EOS
+
+      output = convert_string input
+      assert_css '.openblock', output, 3
+      assert_css '.openblock .openblock', output, 2
+    end
+
+    test 'open block ~ variant cannot masquerade as another block context' do
+      input = <<-EOS
+[sidebar]
+~~~~
+This is just an open block.
+~~~~
+      EOS
+      output = convert_string input
+      assert_css '.openblock', output, 1
+      assert_css '.sidebarblock', output, 0
+    end
+
     test 'should transfer id and reftext on open block to DocBook output' do
       input = <<~'EOS'
       Check out that <<open>>!
@@ -1816,8 +1880,7 @@ context 'Blocks' do
     end
 
     test 'should strip leading and trailing blank lines when converting raw block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       ++++
       line above
       ++++
@@ -1846,7 +1909,7 @@ context 'Blocks' do
   end
 
   context 'Math blocks' do
-    test 'should not crash when converting to HTML if stem block is empty' do
+    test 'should not crash when converting stem block that has no lines' do
       input = <<~'EOS'
       [stem]
       ++++
@@ -1855,6 +1918,13 @@ context 'Blocks' do
 
       output = convert_string_to_embedded input
       assert_css '.stemblock', output, 1
+    end
+
+    test 'should return content as empty string for stem or pass block that has no lines' do
+      [%(++++\n++++), %([stem]\n++++\n++++)].each do |input|
+        doc = document_from_string input
+        assert_equal '', doc.blocks[0].content
+      end
     end
 
     test 'should add LaTeX math delimiters around latexmath block content' do
@@ -2225,7 +2295,7 @@ context 'Blocks' do
       bar
       --
       EOS
-      using_memory_logger Logger::Severity::DEBUG do |logger|
+      using_memory_logger Asciidoctor::Logger::Severity::DEBUG do |logger|
         convert_string_to_embedded input
         assert_message logger, :DEBUG, '<stdin>: line 2: unknown style for open block: foo', Hash
       end
@@ -2408,6 +2478,19 @@ context 'Blocks' do
       refute_match(/<svg\s[^>]*style="[^>]*>/, output)
     end
 
+    test 'converts to inline SVG image when inline option is set on block and format attribute is SVG' do
+      input = <<~'EOS'
+      :imagesdir: fixtures
+
+      [%inline]
+      image::square-svg[Square,format=svg]
+      EOS
+
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER, attributes: { 'docdir' => testdir }
+      assert_match(/<svg /, output)
+      assert_match(/<rect /, output)
+    end
+
     test 'should ignore link attribute if value is self and image target is inline SVG' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2486,6 +2569,16 @@ context 'Blocks' do
       assert_css 'svg circle', output, 1
     end
 
+    test 'embeds remote SVG to inline when inline option is set on block, allow-uri-read is set on document, and format attribute is svg' do
+      input = %(image::http://#{resolve_localhost}:9876/fixtures/square-svg[Square,opts=inline,format=svg])
+      output = using_test_webserver do
+        convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
+      end
+
+      assert_match(/<svg /, output)
+      assert_match(/<rect /, output)
+    end
+
     test 'should cache remote SVG when allow-uri-read, cache-uri, and inline option are set' do
       begin
         if OpenURI.respond_to? :cache_open_uri
@@ -2502,7 +2595,7 @@ context 'Blocks' do
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
-          thr[:requests].clear
+          thr[:requests]&.clear
           Dir.mktmpdir do |cache_path|
             original_cache_path = OpenURI::Cache.cache_path
             begin
@@ -2533,9 +2626,77 @@ context 'Blocks' do
       image::no-such-image.svg[Alt Text]
       EOS
 
+      output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docfile' => 'document.adoc' }
+      assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
+      assert_message @logger, :WARN, '~document.adoc: SVG does not exist or cannot be read'
+    end
+
+    test 'reports document as <stdin> if SVG to inline cannot be read and document is string' do
+      input = <<~'EOS'
+      [%inline]
+      image::no-such-image.svg[Alt Text]
+      EOS
+
       output = convert_string_to_embedded input, safe: Asciidoctor::SafeMode::SERVER
       assert_xpath '//span[@class="alt"][text()="Alt Text"]', output, 1
-      assert_message @logger, :WARN, '~SVG does not exist or cannot be read'
+      assert_message @logger, :WARN, '~<stdin>: SVG does not exist or cannot be read'
+    end
+
+    test 'converts to inline SVG image when target is a base64-encoded data URI' do
+      svg_source = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg_source].pack 'm0'})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger
+      assert_match(/<svg\s[^>]*width="100"[^>]*>/, output, 1)
+      assert_includes output, '<circle r="1"/>'
+      refute_includes output, '<img'
+    end
+
+    test 'decodes UTF-8 characters when creating inline SVG image when target is a base64-encoded data URI' do
+      svg_source = '<svg xmlns="http://www.w3.org/2000/svg"><text>Café</text></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg_source].pack 'm0'})
+      input = %(image::#{data_uri}[Circle,100,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger
+      assert_includes output, '<svg '
+      assert_includes output, '<text>Café</text>'
+      refute_includes output, '<span class="alt">'
+    end
+
+    test 'converts to alt text when SVG image is an invalid base64-encoded data URI' do
+      target = 'data:image/svg+xml;base64,invalid'
+      input = %(image::#{target}[svg,opts=inline])
+      output = convert_string_to_embedded input, safe: :safe
+      assert_message @logger, :WARN, %(could not decode contents of SVG data URI: #{target})
+      refute_includes output, '<svg'
+      assert_includes output, '<span class="alt">svg</span>'
+    end
+
+    test 'infers SVG format from a data URI media type without an explicit format attribute' do
+      svg = '<svg xmlns="http://www.w3.org/2000/svg"><circle r="1"/></svg>'
+      data_uri = %(data:image/svg+xml;base64,#{[svg].pack 'm0'})
+      doc = document_from_string %(image::#{data_uri}[Circle,opts=inline]), safe: :safe
+      image_block = doc.blocks[0]
+      image_target = image_block.attr 'target'
+      assert_equal 'svg', (image_block.image_format image_target)
+    end
+
+    test 'converts to inline SVG image when remote SVG is not served as image/svg+xml and data-uri is set' do
+      output = using_test_webserver mimetypes: { '.svg' => 'text/plain' } do |base_url|
+        input = %(image::#{base_url}/fixtures/circle.svg[circle,opts=inline])
+        convert_string_to_embedded input, safe: :safe, attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      end
+      assert_includes output, '<svg'
+      refute_includes output, '<img'
+    end
+
+    test 'does not convert to inline SVG image when remote SVG is not served as image/svg+xml and data-uri is set' do
+      output = using_test_webserver mimetypes: { '.svg' => nil } do |base_url|
+        input = %(image::#{base_url}/fixtures/square-svg[square,opts=inline])
+        convert_string_to_embedded input, safe: :safe, attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      end
+      assert_includes output, '<img src="data:application/octet-stream;base64,'
     end
 
     test 'can convert block image with alt text defined in macro containing square bracket' do
@@ -2736,6 +2897,22 @@ context 'Blocks' do
       assert_xpath '//imagedata[@align="right"]', output, 1
     end
 
+    test 'can convert block image with link in DocBook backend' do
+      input = 'image::images/tiger.png[Tiger, link="http://en.wikipedia.org/wiki/Tiger"]'
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_match '<link xl:href="http://en.wikipedia.org/wiki/Tiger"><mediaobject>', output
+    end
+
+    test 'can convert block image with link to self in DocBook backend' do
+      input = <<~'EOS'
+      :imagesdir: img
+
+      image::tiger.png[Tiger, link=self]
+      EOS
+      output = convert_string_to_embedded input, backend: :docbook
+      assert_match '<link xl:href="img/tiger.png"><mediaobject>', output
+    end
+
     test 'should set content width and depth in DocBook backend if no scaling' do
       input = 'image::images/sunset.jpg[Sunset,500,332]'
       output = convert_string_to_embedded input, backend: :docbook
@@ -2880,6 +3057,21 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
+    test 'embeds base64-encoded data uri for image in classloader when data-uri attribute is set', if: jruby? do
+      require fixture_path 'assets.jar'
+      input = <<~'EOS'
+      :data-uri:
+      :imagesdir: uri:classloader:/images-in-jar
+
+      image::dot.gif[Dot]
+      EOS
+
+      doc = document_from_string input, safe: Asciidoctor::SafeMode::UNSAFE, attributes: { 'docdir' => testdir }
+      assert_equal 'uri:classloader:/images-in-jar', doc.attributes['imagesdir']
+      output = doc.convert
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
     test 'embeds SVG image with image/svg+xml mimetype when file extension is .svg' do
       input = <<~'EOS'
       :imagesdir: fixtures
@@ -2925,7 +3117,7 @@ context 'Blocks' do
       :data-uri:
       :imagesdir: fixtures
 
-      image::dot[Dot]
+      image::dot-png[Dot]
       EOS
 
       doc = document_from_string input, safe: Asciidoctor::SafeMode::SAFE, attributes: { 'docdir' => testdir }
@@ -2980,7 +3172,7 @@ context 'Blocks' do
           # NOTE we can't assert here since this is using the system-wide cache
           #assert_equal thr[:requests].size, 1
           #assert_equal thr[:requests][0], image_url
-          thr[:requests].clear
+          thr[:requests]&.clear
           Dir.mktmpdir do |cache_path|
             original_cache_path = OpenURI::Cache.cache_path
             begin
@@ -3036,13 +3228,21 @@ context 'Blocks' do
       assert_xpath %(/*[@class="imageblock"]//img[@src="#{image_uri}"][@alt="Dot"]), output, 1
     end
 
+    test 'image_uri should return the target as-is if the target is already a data uri when data-uri attribute is set' do
+      target = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGJhc2VQcm9maWxlPSJmdWxsIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjgwIiBmaWxsPSIjZTkxZTYzIiAvPjwvc3ZnPg=='
+      doc = document_from_string %(image::#{target}[]), safe: 'safe', attributes: { 'data-uri' => '', 'allow-uri-read' => '' }
+      image = doc.blocks[0]
+      assert_equal target, (image.image_uri image.attr 'target')
+    end
+
     test 'can handle embedded data uri images' do
       input = 'image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]'
       output = convert_string_to_embedded input
+      assert_empty @logger.messages
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
-    test 'can handle embedded data uri images when data-uri attribute is set' do
+    test 'can handle embedded data uri images when data-uri attribute is set in secure mode' do
       input = <<~'EOS'
       :data-uri:
 
@@ -3050,6 +3250,31 @@ context 'Blocks' do
       EOS
 
       output = convert_string_to_embedded input
+      assert_empty @logger.messages
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'can handle embedded data uri images when data-uri attribute is set in safe mode' do
+      input = <<~'EOS'
+      :data-uri:
+
+      image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
+      EOS
+
+      output = convert_string_to_embedded input, safe: :safe
+      assert_empty @logger.messages
+      assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
+    end
+
+    test 'can handle embedded data uri images when data-uri and allow-uri-read attributes are set in safe mode' do
+      input = <<~'EOS'
+      :data-uri:
+
+      image::data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=[Dot]
+      EOS
+
+      output = convert_string_to_embedded input, safe: :safe, attributes: { 'allow-uri-read' => '' }
+      assert_empty @logger.messages
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
     end
 
@@ -3086,6 +3311,24 @@ context 'Blocks' do
       assert_xpath '//img[@src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="][@alt="Dot"]', output, 1
       assert_message @logger, :WARN, 'image has illegal reference to ancestor of jail; recovering automatically'
     end
+
+    test 'should use the imagesdir attribute set on the node when resolving the image path' do
+      image = block_from_string 'image::rainbow.png[]', attributes: { 'imagesdir' => 'images' }
+      image.set_attr 'imagesdir', 'chapter-1/images'
+      image_uri = image.image_uri image.attr 'target'
+      assert_equal 'chapter-1/images/rainbow.png', image_uri
+    end
+
+    test 'should use the imagesdir attribute defined on image macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      image::rainbow.png[imagesdir=chapter-1/images]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="chapter-1/images/rainbow.png"'
+    end
   end
 
   context 'Media' do
@@ -3094,6 +3337,46 @@ context 'Blocks' do
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[src="cats-vs-dogs.avi"]', output, 1
+    end
+
+    test 'should convert video macro to videoobject in DocBook' do
+      input = 'video::cats-vs-dogs.avi[]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '/informalfigure/mediaobject/videoobject/videodata[@fileref="cats-vs-dogs.avi"]', output, 1
+    end
+
+    test 'should convert video macro with title, id, dimensions, align, and imagesdir to videoobject in DocBook' do
+      input = <<~'EOS'
+      :imagesdir: assets
+      [#cats-vs-dogs]
+      .Cats vs Dogs
+      video::cats-vs-dogs.avi[poster=cats-vs-dogs.jpg,width=200,height=300,align=center]
+      EOS
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '/figure[@xml:id="cats-vs-dogs"]/title[text()="Cats vs Dogs"]', output, 1
+      assert_xpath '/figure/mediaobject/videoobject/videodata[@fileref="assets/cats-vs-dogs.avi"]', output, 1
+      assert_xpath '//videodata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
+      assert_xpath '/figure/mediaobject/imageobject/imagedata[@fileref="assets/cats-vs-dogs.jpg"]', output, 1
+      assert_xpath '//imagedata[@contentwidth="200"][@contentdepth="300"][@align="center"]', output, 1
+    end
+
+    test 'should append time anchor to fileref of videodata in DocBook if start attribute is set' do
+      input = 'video::cats-vs-dogs.avi[start=10]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=10"]', output, 1
+    end
+
+    test 'should append time anchor to fileref of videodata in DocBook if end attribute is set' do
+      input = 'video::cats-vs-dogs.avi[end=20]'
+      output = convert_string_to_embedded input, backend: 'docbook'
+      assert_xpath '//videodata[@fileref="cats-vs-dogs.avi#t=,20"]', output, 1
+    end
+
+    test 'should not convert video hosted by a third-party service in DocBook' do
+      %w(youtube vimeo wistia).each do |service|
+        output = convert_string_to_embedded %(video::abc123[#{service}]), backend: 'docbook'
+        assert_empty output
+      end
     end
 
     test 'should detect and convert video macro with positional attributes for poster and dimensions' do
@@ -3123,13 +3406,14 @@ context 'Blocks' do
     end
 
     test 'video macro should honor all options' do
-      input = 'video::cats-vs-dogs.avi[options="autoplay,muted,nocontrols,loop",preload="metadata"]'
+      input = 'video::cats-vs-dogs.avi[options="autoplay,muted,nocontrols,loop,nopip",preload="metadata"]'
       output = convert_string_to_embedded input
       assert_css 'video', output, 1
       assert_css 'video[autoplay]', output, 1
       assert_css 'video[muted]', output, 1
       assert_css 'video:not([controls])', output, 1
       assert_css 'video[loop]', output, 1
+      assert_css 'video[disablepictureinpicture]', output, 1
       assert_css 'video[preload=metadata]', output, 1
     end
 
@@ -3231,6 +3515,26 @@ context 'Blocks' do
       assert_css 'iframe[height="360"]', output, 1
     end
 
+    test 'video macro should output custom HTML with iframe for wistia service' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,loop,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=loop&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
+    test 'video macro should output custom HTML with iframe for wistia service with loop behavior set' do
+      input = 'video::be5gtsbaco[wistia,640,360,start=60,options="autoplay,reset,muted"]'
+      output = convert_string_to_embedded input
+      assert_css 'video', output, 0
+      assert_css 'iframe', output, 1
+      assert_css 'iframe[src="https://fast.wistia.com/embed/iframe/be5gtsbaco?time=60&autoPlay=true&endVideoBehavior=reset&muted=true"]', output, 1
+      assert_css 'iframe[width="640"]', output, 1
+      assert_css 'iframe[height="360"]', output, 1
+    end
+
     test 'should detect and convert audio macro' do
       input = 'audio::podcast.mp3[]'
       output = convert_string_to_embedded input
@@ -3278,6 +3582,24 @@ context 'Blocks' do
       assert_css 'audio[controls]', output, 1
       assert_css 'audio[src="podcast.mp3#t=1,2"]', output, 1
     end
+
+    test 'should use the imagesdir attribute on the node when resolving the video path' do
+      video = block_from_string 'video::promo.mp4[]', attributes: { 'imagesdir' => 'images' }
+      video.set_attr 'imagesdir', 'chapter-1/videos'
+      video_uri = video.media_uri video.attr 'target'
+      assert_equal 'chapter-1/videos/promo.mp4', video_uri
+    end
+
+    test 'should use the imagesdir attribute defined on video macro when resolving image path' do
+      input = <<~'EOS'
+      :imagesdir: images
+
+      video::promo.mp4[imagesdir=chapter-1/videos]
+      '''
+      EOS
+      output = convert_string_to_embedded input
+      assert_includes output, 'src="chapter-1/videos/promo.mp4"'
+    end
   end
 
   context 'Admonition icons' do
@@ -3290,7 +3612,7 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
-      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@alt="Tip"]', output, 1
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="./images/icons/tip.png"][@title="Tip"][@alt="Tip"]', output, 1
     end
 
     test 'can resolve icon relative to custom iconsdir' do
@@ -3299,6 +3621,18 @@ context 'Blocks' do
       :iconsdir: icons
 
       [TIP]
+      You can use icons for admonitions by setting the 'icons' attribute.
+      EOS
+
+      output = convert_string input, safe: Asciidoctor::SafeMode::SERVER
+      assert_xpath '//*[@class="admonitionblock tip"]//*[@class="icon"]/img[@src="icons/tip.png"][@alt="Tip"]', output, 1
+    end
+
+    test 'should use iconsdir attribute set on admonition block in document to resolve icon path' do
+      input = <<~'EOS'
+      :icons:
+
+      [TIP,iconsdir=icons]
       You can use icons for admonitions by setting the 'icons' attribute.
       EOS
 
@@ -3508,6 +3842,11 @@ context 'Blocks' do
       ```
       EOS
 
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :fenced_code, (block.attr 'cloaked-context')
+      assert_nil (block.attr 'language')
       output = convert_string_to_embedded input
       assert_css '.listingblock', output, 1
       assert_css '.listingblock pre code', output, 1
@@ -3540,6 +3879,11 @@ context 'Blocks' do
       ```
       EOS
 
+      block = (document_from_string input).blocks[0]
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :fenced_code, (block.attr 'cloaked-context')
+      assert_equal 'ruby', (block.attr 'language')
       output = convert_string_to_embedded input
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
@@ -3561,6 +3905,46 @@ context 'Blocks' do
       assert_css '.listingblock', output, 2
       assert_css '.listingblock pre code.language-ruby[data-lang=ruby]', output, 1
       assert_css '.listingblock pre code.language-javascript[data-lang=javascript]', output, 1
+    end
+
+    test 'should allow source style to be specified on literal block' do
+      input = <<~'EOS'
+      [source]
+      ....
+      console.log('Hello, World!')
+      ....
+      EOS
+
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :literal, (block.attr 'cloaked-context')
+      assert_nil (block.attr 'language')
+      output = convert_string_to_embedded input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code[data-lang]', output, 0
+    end
+
+    test 'should allow source style and language to be specified on literal block' do
+      input = <<~'EOS'
+      [source,js]
+      ....
+      console.log('Hello, World!')
+      ....
+      EOS
+
+      block = block_from_string input
+      assert_equal :listing, block.context
+      assert_equal 'source', (block.attr 'style')
+      assert_equal :literal, (block.attr 'cloaked-context')
+      assert_equal 'js', (block.attr 'language')
+      output = convert_string_to_embedded input
+      assert_css '.listingblock', output, 1
+      assert_css '.listingblock pre', output, 1
+      assert_css '.listingblock pre code', output, 1
+      assert_css '.listingblock pre code[data-lang]', output, 1
     end
   end
 
@@ -3636,7 +4020,7 @@ context 'Blocks' do
 
       output = convert_string input
       assert_css '.abstract', output, 0
-      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
     end
 
     test 'should make abstract on open block without title converted to DocBook' do
@@ -3652,8 +4036,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
-      assert_css 'abstract > simpara', output, 2
+      assert_css 'info > abstract', output, 1
+      assert_css 'info > abstract > simpara', output, 2
     end
 
     test 'should make abstract on open block with title converted to DocBook' do
@@ -3668,9 +4052,9 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
-      assert_css 'abstract > title', output, 1
-      assert_css 'abstract > title + simpara', output, 1
+      assert_css 'info > abstract', output, 1
+      assert_css 'info > abstract > title', output, 1
+      assert_css 'info > abstract > title + simpara', output, 1
     end
 
     test 'should allow abstract in document with title if doctype is book converted to DocBook' do
@@ -3683,7 +4067,8 @@ context 'Blocks' do
       EOS
 
       output = convert_string input, backend: 'docbook'
-      assert_css 'abstract', output, 1
+      assert_css 'info > abstract', output, 1
+      assert_css 'preface', output, 0
     end
 
     test 'should not allow abstract as direct child of document if doctype is book converted to DocBook' do
@@ -3696,7 +4081,7 @@ context 'Blocks' do
 
       output = convert_string input, backend: 'docbook'
       assert_css 'abstract', output, 0
-      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+      assert_message @logger, :WARN, 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
     end
 
     # TODO partintro shouldn't be recognized if doctype is not book, should be in proper place

@@ -129,16 +129,20 @@ class Reader
   # Returns the next line of the source data as a String if there are lines remaining.
   # Returns nothing if there is no more data.
   def peek_line direct = false
-    if direct || @look_ahead > 0
-      @unescape_next_line ? ((line = @lines[-1]).slice 1, line.length) : @lines[-1]
-    elsif @lines.empty?
-      @look_ahead = 0
-      nil
-    else
-      # FIXME the problem with this approach is that we aren't
-      # retaining the modified line (hence the @unescape_next_line tweak)
-      # perhaps we need a stack of proxied lines
-      (process_line @lines[-1]) || peek_line
+    while true
+      next_line = @lines[-1]
+      return @unescape_next_line ? (next_line.slice 1, next_line.length) : next_line if direct || @look_ahead > 0
+      if next_line
+        # FIXME the problem with this approach is that we aren't
+        # retaining the modified line (hence the @unescape_next_line tweak)
+        # perhaps we need a stack of proxied lines
+        if (line = process_line next_line)
+          return line
+        end
+      else
+        @look_ahead = 0
+        return
+      end
     end
   end
 
@@ -454,7 +458,7 @@ class Reader
       if lines_to_restore.respond_to? :reverse
         @lines.push(*lines_to_restore.reverse)
       else
-        lines_to_restore.reverse_each {|it| @lines.push it }
+        lines_to_restore.reverse_each {|l| @lines.push l }
       end
       nil
     end
@@ -495,6 +499,10 @@ class Reader
 
   def mark
     @mark = @file, @dir, @path, @lineno
+  end
+
+  def restore_mark mark
+    @mark = mark
   end
 
   # Public: Get information about the last line read, including file name and line number.
@@ -602,7 +610,8 @@ class PreprocessorReader < Reader
 
   # Public: Initialize the PreprocessorReader object
   def initialize document, data = nil, cursor = nil, opts = {}
-    @document = document
+    @sourcemap = (@document = document).sourcemap
+    opts = opts.merge skip_front_matter: true if document.attributes['skip-front-matter'] && (!opts.key? :skip_front_matter)
     super data, cursor, opts
     if (default_include_depth = (document.attributes['max-include-depth'] || 64).to_i) > 0
       # track absolute max depth, current max depth for comparing to include stack size, and relative max depth for reporting
@@ -640,6 +649,11 @@ class PreprocessorReader < Reader
     if (line = super)
       line
     elsif @include_stack.empty?
+      end_cursor = nil
+      @conditional_stack.delete_if do |conditional|
+        logger.error message_with_context %(detected unterminated preprocessor conditional directive: #{conditional[:name]}::#{conditional[:target] || ''}[#{conditional[:expr] || ''}]), source_location: conditional[:source_location] || (end_cursor ||= cursor_at_prev_line)
+        true
+      end
       nil
     else
       pop_include
@@ -678,7 +692,7 @@ class PreprocessorReader < Reader
       # only process lines in AsciiDoc files
       if (@process_lines = file.end_with?(*ASCIIDOC_EXTENSIONS.keys))
         # NOTE registering the include with a nil value tracks it while not making it visible to interdocument xrefs
-        @includes[path.slice 0, (path.rindex '.')] = attributes['partial-option'] ? nil : true
+        @includes[path.slice 0, (path.rindex '.')] ||= attributes['partial-option'] ? nil : true
       end
     else
       @dir = '.'
@@ -686,7 +700,7 @@ class PreprocessorReader < Reader
       @process_lines = true
       if (@path = path)
         # NOTE registering the include with a nil value tracks it while not making it visible to interdocument xrefs
-        @includes[Helpers.rootname path] = attributes['partial-option'] ? nil : true
+        @includes[Helpers.rootname path] ||= attributes['partial-option'] ? nil : true
       else
         @path = '<stdin>'
       end
@@ -707,7 +721,7 @@ class PreprocessorReader < Reader
     end
 
     # effectively fill the buffer
-    if (@lines = prepare_lines data, normalize: @process_lines || :chomp, condense: false, indent: attributes['indent']).empty?
+    if (@lines = prepare_lines data, include: true, normalize: @process_lines || :chomp, indent: attributes['indent'], skip_front_matter: attributes['skip-front-matter-option']).empty?
       pop_include
     else
       # FIXME we eventually want to handle leveloffset without affecting the lines
@@ -754,8 +768,8 @@ class PreprocessorReader < Reader
 
   def include_processors?
     if @include_processor_extensions.nil?
-      if @document.extensions? && @document.extensions.include_processors?
-        (@include_processor_extensions = @document.extensions.include_processors) ? true : false
+      if @document.extensions? && (@include_processor_extensions = @document.extensions.include_processors)
+        true
       else
         @include_processor_extensions = false
       end
@@ -785,16 +799,15 @@ class PreprocessorReader < Reader
   def prepare_lines data, opts = {}
     result = super
 
-    # QUESTION should this work for AsciiDoc table cell content? Currently it does not.
-    if @document && @document.attributes['skip-front-matter'] && (front_matter = skip_front_matter! result)
-      @document.attributes['front-matter'] = front_matter.join LF
+    if opts[:skip_front_matter] && (front_matter = skip_front_matter! result)
+      @document.attributes['front-matter'] = front_matter.join LF unless opts[:include]
     end
 
-    if opts.fetch :condense, true
+    if opts[:include]
+      Parser.adjust_indentation! result, opts[:indent].to_i, (@document.attr 'tabsize').to_i if opts[:indent]
+    else
       result.pop while (last = result[-1]) && last.empty?
     end
-
-    Parser.adjust_indentation! result, opts[:indent].to_i, (@document.attr 'tabsize').to_i if opts[:indent]
 
     result
   end
@@ -803,6 +816,10 @@ class PreprocessorReader < Reader
     return line unless @process_lines
 
     if line.empty?
+      if @skipping
+        shift
+        return
+      end
       @look_ahead += 1
       return line
     end
@@ -869,7 +886,7 @@ class PreprocessorReader < Reader
   # preprocessing recursively until the next line of available content is
   # found.
   #
-  # keyword   - The conditional inclusion directive (ifdef, ifndef, ifeval, endif)
+  # name      - The name of the conditional inclusion directive (ifdef, ifndef, ifeval, endif)
   # target    - The target, which is the name of one or more attributes that are
   #             used in the condition (blank in the case of the ifeval directive)
   # delimiter - The conditional delimiter for multiple attributes ('+' means all
@@ -880,27 +897,32 @@ class PreprocessorReader < Reader
   #             ifndef directives, and for the conditional expression for the ifeval directive.
   #
   # Returns a Boolean indicating whether the cursor should be advanced
-  def preprocess_conditional_directive keyword, target, delimiter, text
+  def preprocess_conditional_directive name, target, delimiter, text
     # attributes are case insensitive
     target = target.downcase unless (no_target = target.empty?)
 
-    if keyword == 'endif'
+    if name == 'endif'
       if text
         logger.error message_with_context %(malformed preprocessor directive - text not permitted: endif::#{target}[#{text}]), source_location: cursor
       elsif @conditional_stack.empty?
         logger.error message_with_context %(unmatched preprocessor directive: endif::#{target}[]), source_location: cursor
-      elsif no_target || target == (pair = @conditional_stack[-1])[:target]
+      elsif no_target || target == @conditional_stack[-1][:target]
         @conditional_stack.pop
         @skipping = @conditional_stack.empty? ? false : @conditional_stack[-1][:skipping]
       else
-        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{pair[:target]}[]), source_location: cursor
+        logger.error message_with_context %(mismatched preprocessor directive: endif::#{target}[], expected endif::#{@conditional_stack[-1][:target] || ''}[]), source_location: cursor
       end
       return true
     elsif @skipping
+      if name === 'ifeval'
+        return true unless no_target && text && (EvalExpressionRx.match? text.strip)
+      elsif no_target
+        return true
+      end
       skip = false
     else
       # QUESTION any way to wrap ifdef & ifndef logic up together?
-      case keyword
+      case name
       when 'ifdef'
         if no_target
           logger.error message_with_context %(malformed preprocessor directive - missing target: ifdef::[#{text}]), source_location: cursor
@@ -909,10 +931,10 @@ class PreprocessorReader < Reader
         case delimiter
         when ','
           # skip if no attribute is defined
-          skip = target.split(',', -1).none? {|name| @document.attributes.key? name }
+          skip = target.split(',', -1).none? {|attr_name| @document.attributes.key? attr_name }
         when '+'
           # skip if any attribute is undefined
-          skip = target.split('+', -1).any? {|name| !@document.attributes.key? name }
+          skip = target.split('+', -1).any? {|attr_name| !@document.attributes.key? attr_name }
         else
           # if the attribute is undefined, then skip
           skip = !(@document.attributes.key? target)
@@ -925,10 +947,10 @@ class PreprocessorReader < Reader
         case delimiter
         when ','
           # skip if any attribute is defined
-          skip = target.split(',', -1).any? {|name| @document.attributes.key? name }
+          skip = target.split(',', -1).any? {|attr_name| @document.attributes.key? attr_name }
         when '+'
           # skip if all attributes are defined
-          skip = target.split('+', -1).all? {|name| @document.attributes.key? name }
+          skip = target.split('+', -1).all? {|attr_name| @document.attributes.key? attr_name }
         else
           # if the attribute is defined, then skip
           skip = @document.attributes.key? target
@@ -944,11 +966,11 @@ class PreprocessorReader < Reader
     end
 
     # conditional inclusion block
-    if keyword == 'ifeval' || !text
+    if name == 'ifeval'
       @skipping = true if skip
-      @conditional_stack << { target: target, skip: skip, skipping: @skipping }
+      @conditional_stack << { name: name, expr: text, skip: skip, skipping: @skipping, source_location: @sourcemap ? cursor : nil }
     # single line conditional inclusion
-    else
+    elsif text
       unless @skipping || skip
         replace_next_line text.rstrip
         # HACK push dummy line to stand in for the opening conditional directive that's subsequently dropped
@@ -957,6 +979,10 @@ class PreprocessorReader < Reader
         # QUESTION should we just call preprocess_include_directive here?
         @look_ahead -= 1 if text.start_with? 'include::'
       end
+    # conditional inclusion block
+    else
+      @skipping = true if skip
+      @conditional_stack << { name: name, target: target, skip: skip, skipping: @skipping, source_location: @sourcemap ? cursor : nil }
     end
 
     true
@@ -1014,7 +1040,7 @@ class PreprocessorReader < Reader
         # QUESTION should this line include target or expanded_target (or escaped target?)
         replace_next_line %(Unresolved directive in #{@path} - include::#{target}[#{attrlist}])
       end
-    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? expanded_target })
+    elsif include_processors? && (ext = @include_processor_extensions.find {|candidate| candidate.instance.handles? doc, expanded_target })
       shift
       # FIXME parse attributes only if requested by extension
       ext.process_method[doc, self, expanded_target, (doc.parse_attributes attrlist, [], sub_input: true)]
@@ -1022,8 +1048,10 @@ class PreprocessorReader < Reader
     # if running in SafeMode::SECURE or greater, don't process this directive
     # however, be friendly and at least make it a link to the source document
     elsif doc.safe >= SafeMode::SECURE
-      # FIXME we don't want to use a link macro if we are in a verbatim context
-      replace_next_line %(link:#{expanded_target}[])
+      # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
+      expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
+      link_attrlist = doc.compat_mode ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+      replace_next_line %(link:#{expanded_target}[#{link_attrlist}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1185,15 +1213,16 @@ class PreprocessorReader < Reader
           push_include inc_lines, inc_path, relpath, inc_offset, parsed_attrs
         end
       else
+        inc_content = nil
         begin
           # NOTE read content before shift so cursor is only advanced if IO operation succeeds
           inc_content = reader.call(inc_path, read_mode) {|f| f.read }
           shift
-          push_include inc_content, inc_path, relpath, 1, parsed_attrs
         rescue
           logger.error message_with_context %(include #{target_type} not readable: #{inc_path}), source_location: cursor
           return replace_next_line %(Unresolved directive in #{@path} - include::#{expanded_target}[#{attrlist}])
         end
+        push_include inc_content, inc_path, relpath, 1, parsed_attrs
       end
       true
     end
@@ -1220,15 +1249,14 @@ class PreprocessorReader < Reader
   def resolve_include_path target, attrlist, attributes
     doc = @document
     if (Helpers.uriish? target) || (::String === @dir ? nil : (target = %(#{@dir}/#{target})))
-      return replace_next_line %(link:#{target}[#{attrlist}]) unless doc.attr? 'allow-uri-read'
-      if doc.attr? 'cache-uri'
-        # caching requires the open-uri-cached gem to be installed
-        # processing will be automatically aborted if these libraries can't be opened
-        Helpers.require_library 'open-uri/cached', 'open-uri-cached' unless defined? ::OpenURI::Cache
-      elsif !RUBY_ENGINE_OPAL
-        # autoload open-uri
-        ::OpenURI
+      unless doc.attr? 'allow-uri-read'
+        logger.warn message_with_context %(cannot include contents of URI: #{target} (allow-uri-read attribute not enabled)), source_location: cursor
+        # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
+        target = %(pass:c[#{target}]) if target.include? ' '
+        link_attrlist = doc.compat_mode ? attrlist : %(role=include#{attrlist ? ',' + attrlist : ''})
+        return replace_next_line %(link:#{target}[#{link_attrlist}])
       end
+      Helpers.require_open_uri doc.attr? 'cache-uri'
       [(::URI.parse target), :uri, target]
     else
       # include file is resolved relative to dir of current include, or base_dir if within original docfile
@@ -1267,27 +1295,22 @@ class PreprocessorReader < Reader
 
   # Private: Ignore front-matter, commonly used in static site generators
   def skip_front_matter! data, increment_linenos = true
-    front_matter = nil
-    if data[0] == '---'
-      original_data = data.drop 0
-      data.shift
-      front_matter = []
+    return unless (delim = data[0]) == '---' || delim == '+++'
+    original_data = data.drop 0
+    data.shift
+    front_matter = []
+    @lineno += 1 if increment_linenos
+    until (eof = data.empty?) || data[0] == delim
+      front_matter << data.shift
       @lineno += 1 if increment_linenos
-      while !data.empty? && data[0] != '---'
-        front_matter << data.shift
-        @lineno += 1 if increment_linenos
-      end
-
-      if data.empty?
-        data.unshift(*original_data)
-        @lineno = 0 if increment_linenos
-        front_matter = nil
-      else
-        data.shift
-        @lineno += 1 if increment_linenos
-      end
     end
-
+    if eof
+      data.unshift(*original_data)
+      @lineno -= original_data.size if increment_linenos
+      return
+    end
+    data.shift
+    @lineno += 1 if increment_linenos
     front_matter
   end
 

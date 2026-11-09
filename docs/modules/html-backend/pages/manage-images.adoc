@@ -8,7 +8,7 @@ If you have image references in your document, you'll have to save the image fil
 As an alternative, you can embed the images directly into the document by setting the `data-uri` document attribute.
 
 .data-uri attribute set in document header
-[source,asciidoc]
+[,asciidoc]
 ----
 include::example$my-document.adoc[tag=title]
 :imagesdir: my-images
@@ -30,4 +30,4 @@ If the target of one or more images in the document is a URI, you must also set 
 
  $ asciidoctor -a data-uri -a allow-uri-read my-document.adoc
 
-The same is true when converting the document to PDF using Asciidoctor PDF, even if the `allow-uri-read` attribute is not set (since the behavior is implied).
+The same is true when converting the document to PDF using Asciidoctor PDF, regardless of whether the `data-uri` attribute is set since this behavior is implicit.

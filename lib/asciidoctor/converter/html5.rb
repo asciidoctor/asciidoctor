@@ -23,6 +23,7 @@ class Converter::Html5Converter < Converter::Base
   }).default = ['', '']
 
   DropAnchorRx = %r(<(?:a\b[^>]*|/a)>)
+  LeadingAnchorsRx = %r(^(?:<a id="[^"]+"></a>)+)
   StemBreakRx = / *\\\n(?:\\?\n)*|\n\n+/
   if RUBY_ENGINE == 'opal'
     # NOTE In JavaScript, ^ matches the start of the string when the m flag is not set
@@ -127,10 +128,10 @@ class Converter::Html5Converter < Converter::Base
 
     if DEFAULT_STYLESHEET_KEYS.include? node.attr 'stylesheet'
       if (webfonts = node.attr 'webfonts')
-        result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700' : webfonts}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{asset_uri_scheme}//fonts.googleapis.com/css?family=#{webfonts.empty? ? 'Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CNoto+Sans+Mono:400,700' : webfonts}"#{slash}>)
       end
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path DEFAULT_STYLESHEET_NAME, (node.attr 'stylesdir'), false}"#{slash}>)
       else
         result << %(<style>
 #{Stylesheets.instance.primary_stylesheet_data}
@@ -138,7 +139,7 @@ class Converter::Html5Converter < Converter::Base
       end
     elsif node.attr? 'stylesheet'
       if linkcss
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir', '')}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path (node.attr 'stylesheet'), (node.attr 'stylesdir')}"#{slash}>)
       else
         result << %(<style>
 #{node.read_contents (node.attr 'stylesheet'), start: (node.attr 'stylesdir'), warn_on_failure: true, label: 'stylesheet'}
@@ -151,7 +152,7 @@ class Converter::Html5Converter < Converter::Base
         result << %(<link rel="stylesheet" href="#{node.attr 'iconfont-cdn', %(#{cdn_base_url}/font-awesome/#{FONT_AWESOME_VERSION}/css/font-awesome.min.css)}"#{slash}>)
       else
         iconfont_stylesheet = %(#{node.attr 'iconfont-name', 'font-awesome'}.css)
-        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir', ''), false}"#{slash}>)
+        result << %(<link rel="stylesheet" href="#{node.normalize_web_path iconfont_stylesheet, (node.attr 'stylesdir'), false}"#{slash}>)
       end
     end
 
@@ -290,7 +291,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
   })
 })
 </script>
-<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>)
+<script src="#{cdn_base_url}/mathjax/#{MATHJAX_VERSION}/MathJax.js?config=TeX-MML-AM_CHTML"></script>)
     end
 
     unless (docinfo_content = node.docinfo :footer).empty?
@@ -308,12 +309,14 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       # QUESTION should notitle control the manual page title?
       unless node.notitle
         id_attr = node.id ? %( id="#{node.id}") : ''
-        result << %(<h1#{id_attr}>#{node.doctitle} Manual Page</h1>)
+        class_attr = node.role ? %( class="#{node.role}") : ''
+        result << %(<h1#{id_attr}#{class_attr}>#{node.doctitle} Manual Page</h1>)
       end
       result << (generate_manname_section node) if node.attr? 'manpurpose'
     elsif node.header? && !node.notitle
       id_attr = node.id ? %( id="#{node.id}") : ''
-      result << %(<h1#{id_attr}>#{node.header.title}</h1>)
+      class_attr = node.role ? %( class="#{node.role}") : ''
+      result << %(<h1#{id_attr}#{class_attr}>#{node.header.title}</h1>)
     end
 
     if node.sections? && (node.attr? 'toc') && (toc_p = node.attr 'toc-placement') != 'macro' && toc_p != 'preamble'
@@ -341,22 +344,29 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
 
   def convert_outline node, opts = {}
     return unless node.sections?
-    sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
-    toclevels = opts[:toclevels] || (node.document.attributes['toclevels'] || 2).to_i
     sections = node.sections
-    # FIXME top level is incorrect if a multipart book starts with a special section defined at level 0
-    result = [%(<ul class="sectlevel#{sections[0].level}">)]
+    sectlevel = (parts = node.context == :document && node.multipart?) ? 0 : sections[0].level
+    sectnumlevels = opts[:sectnumlevels] || (node.document.attributes['sectnumlevels'] || 3).to_i
+    unless (toclevels = opts[:toclevels])
+      if (toclevels = node.document.attributes['toclevels'])
+        toclevels = 1 if (toclevels = toclevels.to_i) < 1 && !parts
+      else
+        toclevels = 2
+      end
+    end
+    result = [%(<ul class="sectlevel#{sectlevel}">)]
     sections.each do |section|
-      slevel = section.level
-      if section.caption
+      if (slevel = section.level) > (stoclevels = (section.attr? 'toclevels') ? (section.attr 'toclevels').to_i : toclevels)
+        next
+      elsif section.caption
         stitle = section.captioned_title
       elsif section.numbered && slevel <= sectnumlevels
         if slevel < 2 && node.document.doctype == 'book'
           case section.sectname
           when 'chapter'
-            stitle =  %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
+            stitle = %(#{(signifier = node.document.attributes['chapter-signifier']) ? "#{signifier} " : ''}#{section.sectnum} #{section.title})
           when 'part'
-            stitle =  %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
+            stitle = %(#{(signifier = node.document.attributes['part-signifier']) ? "#{signifier} " : ''}#{section.sectnum nil, ':'} #{section.title})
           else
             stitle = %(#{section.sectnum} #{section.title})
           end
@@ -367,14 +377,16 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
         stitle = section.title
       end
       stitle = stitle.gsub DropAnchorRx, '' if stitle.include? '<a'
-      if slevel < toclevels && (child_toc_level = convert_outline section, toclevels: toclevels, sectnumlevels: sectnumlevels)
-        result << %(<li><a href="##{section.id}">#{stitle}</a>)
+      otag = slevel == sectlevel ? '<li>' : %(<li class="sectlevel#{slevel}">)
+      if slevel < stoclevels && (child_toc_level = convert_outline section, toclevels: stoclevels, sectnumlevels: sectnumlevels)
+        result << %(#{otag}<a href="##{section.id}">#{stitle}</a>)
         result << child_toc_level
         result << '</li>'
       else
-        result << %(<li><a href="##{section.id}">#{stitle}</a></li>)
+        result << %(#{otag}<a href="##{section.id}">#{stitle}</a></li>)
       end
     end
+    return if result.size == 1
     result << '</ul>'
     result.join LF
   end
@@ -403,7 +415,11 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     if node.id
       id_attr = %( id="#{id = node.id}")
       if doc_attrs['sectlinks']
-        title = %(<a class="link" href="##{id}">#{title}</a>)
+        if (title.start_with? '<a ') && LeadingAnchorsRx =~ title
+          title = %(#{$&}<a class="link" href="##{id}">#{title.slice $&.length, title.length}</a>)
+        else
+          title = %(<a class="link" href="##{id}">#{title}</a>)
+        end
       end
       if doc_attrs['sectanchors']
         # QUESTION should we add a font-based icon in anchor if icons=font?
@@ -437,7 +453,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
       if (node.document.attr? 'icons', 'font') && !(node.attr? 'icon')
         label = %(<i class="fa icon-#{name}" title="#{node.attr 'textlabel'}"></i>)
       else
-        label = %(<img src="#{node.icon_uri name}" alt="#{node.attr 'textlabel'}"#{@void_element_slash}>)
+        label = %(<img src="#{node.icon_uri name}" title="#{node.attr 'textlabel'}" alt="#{node.attr 'textlabel'}"#{@void_element_slash}>)
       end
     else
       label = %(<div class="title">#{node.attr 'textlabel'}</div>)
@@ -464,7 +480,7 @@ MathJax.Hub.Register.StartupHook("AsciiMath Jax Ready", function () {
     title_element = node.title? ? %(<div class="title">#{node.title}</div>\n) : ''
     start_t = node.attr 'start'
     end_t = node.attr 'end'
-    time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+    time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
     %(<div#{id_attribute}#{class_attribute}>
 #{title_element}<div class="content">
 <audio src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}>
@@ -624,20 +640,20 @@ Your browser does not support the audio tag.
   end
 
   def convert_image node
-    target = node.attr 'target'
+    src = node.image_uri node.attr 'target'
     width_attr = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
     height_attr = (node.attr? 'height') ? %( height="#{node.attr 'height'}") : ''
-    if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+    if (node.image_format src) == 'svg' && node.document.safe < SafeMode::SECURE
       if node.option? 'inline'
-        img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+        img = (read_svg_contents node, src, true) || %(<span class="alt">#{node.alt}</span>)
       elsif node.option? 'interactive'
         fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-        img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{width_attr}#{height_attr}>#{fallback}</object>)
+        img = %(<object type="image/svg+xml" data="#{src}"#{width_attr}#{height_attr}>#{fallback}</object>)
       else
-        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+        img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
       end
     else
-      img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
+      img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{width_attr}#{height_attr}#{@void_element_slash}>)
     end
     if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
       img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
@@ -678,7 +694,7 @@ Your browser does not support the audio tag.
     title_element = node.title? ? %(<div class="title">#{node.captioned_title}</div>\n) : ''
     %(<div#{id_attribute} class="listingblock#{(role = node.role) ? " #{role}" : ''}">
 #{title_element}<div class="content">
-#{syntax_hl ? (syntax_hl.format node, lang, opts) : pre_open + (node.content || '') + pre_close}
+#{syntax_hl ? (syntax_hl.format node, lang, opts) : pre_open + node.content + pre_close}
 </div>
 </div>)
   end
@@ -751,7 +767,7 @@ Your browser does not support the audio tag.
   def convert_open node
     if (style = node.style) == 'abstract'
       if node.parent == node.document && node.document.doctype == 'book'
-        logger.warn 'abstract block cannot be used in a document without a title when doctype is book. Excluding block content.'
+        logger.warn 'abstract block cannot be used in a document without a doctitle when doctype is book. Excluding block content.'
         ''
       else
         id_attr = node.id ? %( id="#{node.id}") : ''
@@ -1092,7 +1108,22 @@ Your browser does not support the audio tag.
 
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" frameborder="0"#{fs_attribute}></iframe>
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//www.youtube.com/embed/#{target}?rel=#{rel_param_val}#{start_param}#{end_param}#{autoplay_param}#{loop_param}#{mute_param}#{controls_param}#{list_param}#{fs_param}#{modest_param}#{theme_param}#{hl_param}" referrerpolicy="strict-origin-when-cross-origin" frameborder="0"#{fs_attribute}></iframe>
+</div>
+</div>)
+    when 'wistia'
+      unless (asset_uri_scheme = node.document.attr 'asset-uri-scheme', 'https').empty?
+        asset_uri_scheme = %(#{asset_uri_scheme}:)
+      end
+      delimiter = ['?']
+      start_anchor = (node.attr? 'start') ? %(#{delimiter.pop || '&amp;'}time=#{node.attr 'start'}) : ''
+      end_video_behavior_param = (node.option? 'loop') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=loop) : ((node.option? 'reset') ? %(#{delimiter.pop || '&amp;'}endVideoBehavior=reset) : '')
+      target = (node.attr 'target')
+      autoplay_param = (node.option? 'autoplay') ? %(#{delimiter.pop || '&amp;'}autoPlay=true) : ''
+      muted_param = (node.option? 'muted') ? %(#{delimiter.pop || '&amp;'}muted=true) : ''
+      %(<div#{id_attribute}#{class_attribute}>#{title_element}
+<div class="content">
+<iframe#{width_attribute}#{height_attribute} src="#{asset_uri_scheme}//fast.wistia.com/embed/iframe/#{target}#{start_anchor}#{autoplay_param}#{end_video_behavior_param}#{muted_param}" frameborder="0"#{(node.option? 'nofullscreen') ? '' : (append_boolean_attribute 'allowfullscreen', xml)} class="wistia_embed" name="wistia_embed"></iframe>
 </div>
 </div>)
     else
@@ -1100,10 +1131,10 @@ Your browser does not support the audio tag.
       preload_attribute = (val = node.attr 'preload').nil_or_empty? ? '' : %( preload="#{val}")
       start_t = node.attr 'start'
       end_t = node.attr 'end'
-      time_anchor = (start_t || end_t) ? %(#t=#{start_t || ''}#{end_t ? ",#{end_t}" : ''}) : ''
+      time_anchor = (start_t || end_t) ? %(#t=#{start_t}#{end_t ? ",#{end_t}" : ''}) : ''
       %(<div#{id_attribute}#{class_attribute}>#{title_element}
 <div class="content">
-<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{preload_attribute}>
+<video src="#{node.media_uri node.attr 'target'}#{time_anchor}"#{width_attribute}#{height_attribute}#{poster_attribute}#{(node.option? 'autoplay') ? (append_boolean_attribute 'autoplay', xml) : ''}#{(node.option? 'muted') ? (append_boolean_attribute 'muted', xml) : ''}#{(node.option? 'nocontrols') ? '' : (append_boolean_attribute 'controls', xml)}#{(node.option? 'loop') ? (append_boolean_attribute 'loop', xml) : ''}#{(node.option? 'nopip') ? (append_boolean_attribute 'disablepictureinpicture', xml) : ''}#{preload_attribute}>
 Your browser does not support the video tag.
 </video>
 </div>
@@ -1208,32 +1239,34 @@ Your browser does not support the video tag.
         img = %([#{node.alt}&#93;)
       end
     else
+      src = node.image_uri target
       attrs = (node.attr? 'width') ? %( width="#{node.attr 'width'}") : ''
       attrs = %(#{attrs} height="#{node.attr 'height'}") if node.attr? 'height'
       attrs = %(#{attrs} title="#{node.attr 'title'}") if node.attr? 'title'
-      if ((node.attr? 'format', 'svg') || (target.include? '.svg')) && node.document.safe < SafeMode::SECURE
+      if (node.image_format src) == 'svg' && node.document.safe < SafeMode::SECURE
         if node.option? 'inline'
-          img = (read_svg_contents node, target) || %(<span class="alt">#{node.alt}</span>)
+          img = (read_svg_contents node, src, true) || %(<span class="alt">#{node.alt}</span>)
         elsif node.option? 'interactive'
           fallback = (node.attr? 'fallback') ? %(<img src="#{node.image_uri node.attr 'fallback'}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>) : %(<span class="alt">#{node.alt}</span>)
-          img = %(<object type="image/svg+xml" data="#{src = node.image_uri target}"#{attrs}>#{fallback}</object>)
+          img = %(<object type="image/svg+xml" data="#{src}"#{attrs}>#{fallback}</object>)
         else
-          img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+          img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
         end
       else
-        img = %(<img src="#{src = node.image_uri target}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
+        img = %(<img src="#{src}" alt="#{encode_attribute_value node.alt}"#{attrs}#{@void_element_slash}>)
       end
     end
     if (node.attr? 'link') && ((href_attr_val = node.attr 'link') != 'self' || (href_attr_val = src))
       img = %(<a class="image" href="#{href_attr_val}"#{(append_link_constraint_attrs node).join}>#{img}</a>)
     end
+    id_attr = node.id ? %( id="#{node.id}") : ''
     class_attr_val = type
     if (role = node.role)
       class_attr_val = (node.attr? 'float') ? %(#{class_attr_val} #{node.attr 'float'} #{role}) : %(#{class_attr_val} #{role})
     elsif node.attr? 'float'
       class_attr_val = %(#{class_attr_val} #{node.attr 'float'})
     end
-    %(<span class="#{class_attr_val}">#{img}</span>)
+    %(<span#{id_attr} class="#{class_attr_val}">#{img}</span>)
   end
 
   def convert_inline_indexterm node
@@ -1283,24 +1316,36 @@ Your browser does not support the video tag.
     end
   end
 
-  # NOTE expose read_svg_contents for Bespoke converter
-  def read_svg_contents node, target
-    if (svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true)
-      return if svg.empty?
-      svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
-      old_start_tag = new_start_tag = start_tag_match = nil
-      # NOTE width, height and style attributes are removed if either width or height is specified
-      %w(width height).each do |dim|
-        next unless node.attr? dim
-        unless new_start_tag
-          next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match
-          new_start_tag = (old_start_tag = start_tag_match[0]).gsub DimensionAttributeRx, ''
+  def read_svg_contents node, target, resolved = false
+    if resolved
+      if (target.start_with? 'data:') && (ImageDataUriRx.match? target)
+        begin
+          svg = ((target.slice (target.index ',') + 1, target.length).unpack1 'm').force_encoding UTF_8
+          svg = svg.valid_encoding? ? svg.rstrip : nil
+        rescue
+          svg = nil
         end
-        # NOTE a unitless value in HTML is assumed to be px, so we can pass the value straight through
-        new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}">)
+        logger.warn %(could not decode contents of SVG data URI: #{target}) unless svg
+      else
+        svg = node.read_contents target, normalize: true, label: 'SVG', warn_if_empty: true
       end
-      svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
+    else
+      svg = node.read_contents target, start: (node.document.attr 'imagesdir'), normalize: true, label: 'SVG', warn_if_empty: true
     end
+    return if svg.nil_or_empty?
+    svg = svg.sub SvgPreambleRx, '' unless svg.start_with? '<svg'
+    old_start_tag = new_start_tag = start_tag_match = nil
+    # NOTE width, height and style attributes are removed if either width or height is specified
+    %w(width height).each do |dim|
+      next unless node.attr? dim
+      unless new_start_tag
+        next if (start_tag_match ||= (svg.match SvgStartTagRx) || :no_match) == :no_match
+        new_start_tag = (old_start_tag = start_tag_match[0]).gsub DimensionAttributeRx, ''
+      end
+      # NOTE a unitless value in HTML is assumed to be px, so we can pass the value straight through
+      new_start_tag = %(#{new_start_tag.chop} #{dim}="#{node.attr dim}">)
+    end
+    svg = %(#{new_start_tag}#{svg[old_start_tag.length..-1]}) if new_start_tag
     svg
   end
 

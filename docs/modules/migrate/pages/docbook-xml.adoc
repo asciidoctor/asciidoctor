@@ -1,12 +1,12 @@
 = Migrate from DocBook XML to Asciidoctor
 :navtitle: Migrate from DocBook XML
 :url-docbookrx: https://github.com/asciidoctor/docbookrx
-// docbookrx.adoc, included in user-manual: Convert DocBook XML to AsciiDoc
 
-One of the things Asciidoctor excels at is converting AsciiDoc source into valid and well-formed DocBook XML content.
-
-What if you're in the position where you need to go the other way: migrate all your legacy DocBook XML content to AsciiDoc?
+A task Asciidoctor excels at is converting AsciiDoc source into valid and well-formed DocBook XML content.
+But what if you're in the position where you need to go the other way, to migrate your legacy DocBook XML content to AsciiDoc?
 The prescription (℞) you need to get rid of your DocBook pains could be {url-docbookrx}[DocBookRx^].
+
+== DocBookRx
 
 DocBookRx is an early version of a DocBook to AsciiDoc converter written in Ruby.
 This converter is far from perfect at the moment, but it improves with each document it converts.
@@ -17,3 +17,18 @@ You can read more about this initiative in the {url-docbookrx}#readme[README^].
 The best thing about this tool is all the active users who are putting it through its paces.
 The more advanced the DocBook XML this tool tackles, and the more feedback we receive, the better the tool will become.
 Use it today to escape from XML hell!
+
+== From doxygen
+
+Doxygen can generate documentation in various output formats.
+One of those formats is (DocBook) XML.
+That means there's a pathway from doxygen to AsciiDoc by way of DocBookRx.
+
+To enable this feature (off by default), set the `GENERATE_DOCBOOK` tag to `YES` in the Doxygen configuration file.
+When enabled, Doxygen will generate XML files that capture the structure of the code including all documentation.
+
+To begin the migration, first run the doxygen command to generate the DocBook XML output.
+Then run DocBookRx on the XML files to generate AsciiDoc files.
+You can now use Asciidoctor to convert the AsciiDoc files to a consumable output format such as HTML.
+
+Note that some post processing of the generated AsciiDoc may be necessary.

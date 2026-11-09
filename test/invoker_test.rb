@@ -4,6 +4,37 @@ require_relative 'test_helper'
 require File.join Asciidoctor::LIB_DIR, 'asciidoctor/cli'
 
 context 'Invoker' do
+  test 'should allow Options to be passed as first argument of constructor' do
+    opts = Asciidoctor::Cli::Options.new attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true
+    invoker = Asciidoctor::Cli::Invoker.new opts
+    assert_same invoker.options, opts
+  end
+
+  test 'should allow options Hash to be passed as first argument of constructor' do
+    opts = { attributes: { 'toc' => '' }, doctype: 'book', sourcemap: true }
+    invoker = Asciidoctor::Cli::Invoker.new opts
+    resolved_opts = invoker.options
+    assert_equal opts[:attributes], resolved_opts[:attributes]
+    assert_equal 'book', resolved_opts[:attributes]['doctype']
+    assert resolved_opts[:sourcemap]
+  end
+
+  test 'should parse options from array passed as first argument of constructor' do
+    input_file = fixture_path 'basic.adoc'
+    invoker = Asciidoctor::Cli::Invoker.new ['-s', input_file]
+    resolved_options = invoker.options
+    refute resolved_options[:standalone]
+    assert_equal [input_file], resolved_options[:input_files]
+  end
+
+  test 'should parse options from multiple arguments passed to constructor' do
+    input_file = fixture_path 'basic.adoc'
+    invoker = Asciidoctor::Cli::Invoker.new '-s', input_file
+    resolved_options = invoker.options
+    refute resolved_options[:standalone]
+    assert_equal [input_file], resolved_options[:input_files]
+  end
+
   test 'should parse source and convert to html5 article by default' do
     invoker = nil
     output = nil
@@ -152,7 +183,7 @@ context 'Invoker' do
 
   test 'should print warnings to stderr by default' do
     input = <<~'EOS'
-    2. second
+    1. first
     3. third
     EOS
     warnings = nil
@@ -161,6 +192,12 @@ context 'Invoker' do
       warnings = err.string
     end
     assert_match(/WARNING/, warnings)
+  end
+
+  test 'should not emit any unexpected warnings' do
+    input_path = fixture_path 'basic.adoc'
+    output = run_command(asciidoctor_cmd, '-o', '/dev/null', '-w', input_path) {|out| out.read }
+    assert_empty output
   end
 
   test 'should change level on logger when --log-level is specified' do
@@ -263,7 +300,7 @@ context 'Invoker' do
 
   test 'should return non-zero exit code if failure level is reached' do
     input = <<~'EOS'
-    2. second
+    1. first
     3. third
     EOS
     exit_code, messages = redirect_streams do |_, err|
@@ -307,7 +344,7 @@ context 'Invoker' do
   test 'should show backtrace when --trace option is specified and program raises error', unless: (jruby? && windows?) do
     result = run_command(asciidoctor_cmd, '-r', 'no-such-module', '--trace', (fixture_path 'basic.adoc')) {|out| out.read }
     if jruby?
-      assert_match(/LoadError: no such file to load -- no-such-module\n *require at /, result)
+      assert_match(/LoadError: (?:no such file to load|cannot load such file) -- no-such-module\n *require at /, result)
     else
       assert_match(/cannot load such file -- no-such-module \(LoadError\)\n\tfrom /, result)
     end
@@ -395,6 +432,12 @@ context 'Invoker' do
       assert_path_exists sample_outpath
       assert_path_exists asciidoctor_stylesheet
       assert_path_exists coderay_stylesheet
+      [sample_outpath, asciidoctor_stylesheet, coderay_stylesheet].each do |path|
+        contents = File.read path, mode: Asciidoctor::FILE_READ_MODE
+        assert_includes contents, ?\n
+        refute_includes contents, ?\r
+        refute contents.end_with? ?\n
+      end
     ensure
       FileUtils.rm_f sample_outpath
       FileUtils.rm_f asciidoctor_stylesheet
@@ -672,7 +715,7 @@ context 'Invoker' do
     assert_kind_of Asciidoctor::Converter::CompositeConverter, doc.converter
     selected = doc.converter.find_converter 'paragraph'
     assert_kind_of Asciidoctor::Converter::TemplateConverter, selected
-    assert_kind_of Tilt::HamlTemplate, selected.templates['paragraph']
+    assert_kind_of haml_template_class, selected.templates['paragraph']
   end
 
   test 'should load custom templates from multiple template directories' do
@@ -806,7 +849,7 @@ context 'Invoker' do
   test 'should show timezone as UTC if system TZ is set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'UTC', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' UTC')
     assert localtime.end_with?(' UTC')
   end
@@ -814,7 +857,7 @@ context 'Invoker' do
   test 'should show timezone as offset if system TZ is not set to UTC' do
     input_path = fixture_path 'doctime-localtime.adoc'
     output = run_command(asciidoctor_cmd, '-d', 'inline', '-o', '-', '-e', input_path, env: { 'TZ' => 'EST+5', 'SOURCE_DATE_EPOCH' => nil, 'IGNORE_SOURCE_DATE_EPOCH' => '1' }) {|out| out.read }
-    doctime, localtime = output.lines.map(&:chomp)
+    doctime, localtime = output.lines.slice(-2, 2).map(&:chomp)
     assert doctime.end_with?(' -0500')
     assert localtime.end_with?(' -0500')
   end
@@ -832,6 +875,24 @@ context 'Invoker' do
       assert_equal '2009-02-08', (doc.attr 'localdate')
       assert_equal '2009', (doc.attr 'localyear')
       assert_match(/2009-02-08 20:03:32 UTC/, (doc.attr 'localdatetime'))
+    ensure
+      if old_source_date_epoch
+        ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch
+      else
+        ENV.delete 'SOURCE_DATE_EPOCH'
+      end
+    end
+  end
+
+  test 'should ignore SOURCE_DATE_EPOCH is value is empty' do
+    old_source_date_epoch = ENV.delete 'SOURCE_DATE_EPOCH'
+    begin
+      ENV['SOURCE_DATE_EPOCH'] = ''
+      sample_filepath = fixture_path 'sample.adoc'
+      invoker = invoke_cli_to_buffer %w(-o /dev/null), sample_filepath
+      doc = invoker.document
+      current_year = Time.now.strftime '%F'
+      assert (doc.attr 'localyear').to_i >= (current_year.to_i - 1)
     ensure
       if old_source_date_epoch
         ENV['SOURCE_DATE_EPOCH'] = old_source_date_epoch

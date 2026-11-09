@@ -17,7 +17,7 @@ ifdef::preface-title[:preface-title: Prefácio]
 :section-refsig: Seção
 :table-caption: Tabela
 :tip-caption: Dica
-:toc-title: Índice
+:toc-title: Sumário
 :untitled-label: Sem título
 :version-label: Versão
 :warning-caption: Aviso

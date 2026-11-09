@@ -225,8 +225,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'wrapped list item with hanging indent followed by non-indented line' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       - list item 1
@@ -246,8 +245,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a list item with a nested marker terminates indented paragraph for text of list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       - Foo
         Bar
       * Foo
@@ -271,8 +269,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a list item for a different list terminates indented paragraph for text of list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Example 1
 
       - Foo
@@ -294,8 +291,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a literal paragraph offset by blank lines in list content is appended as a literal block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -316,8 +312,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'should escape special characters in all literal paragraphs attached to list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       * first item
 
         <code>text</code>
@@ -337,8 +332,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a literal paragraph offset by a blank line in list content followed by line with continuation is appended as two blocks' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -363,8 +357,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'an admonition paragraph attached by a line continuation to a list item with wrapped text should produce admonition' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       - first-line text
         wrapped text
       +
@@ -380,9 +373,8 @@ context 'Bulleted lists (:ulist)' do
       assert_xpath '//ul/li/*[@class="admonitionblock note"]//td[@class="content"][normalize-space(text())="This is a note."]', output, 1
     end
 
-    test 'paragraph-like blocks attached to an ancestry list item by a list continuation should produce blocks' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+    test 'paragraph-like blocks attached to an ancestor list item by a list continuation should produce blocks' do
+      input = <<~'EOS'
       * parent
        ** child
 
@@ -465,8 +457,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a literal paragraph with a line that appears as a list item that is followed by a continuation should create two blocks' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       * Foo
       +
         literal
@@ -488,8 +479,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'consecutive literal paragraph offset by blank lines in list content are appended as a literal blocks' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -514,8 +504,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'a literal paragraph without a trailing blank line consumes following list items' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -809,8 +798,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'word ending sentence on continuing line not treated as a list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       A. This is the story about
          AsciiDoc. It begins here.
       B. And it ends here.
@@ -1021,8 +1009,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'level of unordered list should match section level' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Parent Section
 
       * item 1.1
@@ -1095,8 +1082,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'level of ordered list should match section level' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Parent Section
 
       . item 1.1
@@ -1191,8 +1177,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'list item with literal content should not consume nested list of different type' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -1217,8 +1202,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'nested list item does not eat the title of the following detached block' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       List
       ====
 
@@ -1362,14 +1346,14 @@ context 'Bulleted lists (:ulist)' do
 
     test 'trailing block title line attached by continuation should not create block' do
       input = <<~'EOS'
-    Lists
-    =====
+      Lists
+      =====
 
-    * Item one, paragraph one
-    +
-    .Disappears into the ether
+      * Item one, paragraph one
+      +
+      .Disappears into the ether
 
-    * Item two
+      * Item two
       EOS
       output = convert_string input
       assert_xpath '//ul', output, 1
@@ -1403,8 +1387,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'list item with hanging indent followed by block attached by list continuation' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       . list item 1
@@ -1689,8 +1672,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'indented outline list item with different marker offset by a blank line should be recognized as a nested list' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       * item 1
 
         . item 1.1
@@ -1722,8 +1704,7 @@ context 'Bulleted lists (:ulist)' do
     end
 
     test 'indented description list item inside outline list item offset by a blank line should be recognized as a nested list' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       * item 1
 
         term a:: description a
@@ -1815,6 +1796,7 @@ context 'Ordered lists (:olist)' do
       EOS
       output = convert_string input
       assert_xpath '//ol', output, 1
+      assert_css 'ol[start]', output, 0
       assert_xpath '//ol/li', output, 3
     end
 
@@ -1864,6 +1846,19 @@ context 'Ordered lists (:olist)' do
       assert_css '.olist.lowerroman', output, 1
       assert_css '.olist.lowerroman .olist.loweralpha', output, 1
       assert_css '.olist.lowerroman .olist.loweralpha .olist.arabic', output, 1
+    end
+
+    test 'should allow list style to be implied when using markers with implicit style' do
+      input = <<~'EOS'
+      i) 1
+      ii) 2
+      iii) 3
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.olist', output, 1
+      assert_css '.olist.lowerroman', output, 1
+      assert_css '.olist.lowerroman ol.lowerroman[type=i]', output, 1
     end
 
     test 'should allow list style to be specified explicitly when using markers with implicit style' do
@@ -1949,8 +1944,7 @@ context 'Ordered lists (:olist)' do
     end
 
     test 'should escape special characters in all literal paragraphs attached to list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       . first item
 
         <code>text</code>
@@ -2040,6 +2034,50 @@ context 'Ordered lists (:olist)' do
       assert_xpath '(//ol)[2]/li', output, 1
     end
 
+    test 'should honor start attribute on ordered list' do
+      input = <<~'EOS'
+      == List
+
+      [start=7]
+      . item 7
+      . item 8
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=7]', output, 1
+    end
+
+    test 'should allow value of start attribute to be 0' do
+      input = <<~'EOS'
+      == List
+
+      [start=0]
+      . item 0
+      . item 1
+      . item 2
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=0]', output, 1
+    end
+
+    test 'should allow value of start attribute to be negative' do
+      input = <<~'EOS'
+      == List
+
+      [start=-10]
+      . -10
+      . -9
+      . -8
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'ol.arabic', output, 1
+      assert_css 'ol[start=-10]', output, 1
+    end
+
     test 'should use start number in docbook5 backend' do
       input = <<~'EOS'
       == List
@@ -2053,6 +2091,77 @@ context 'Ordered lists (:olist)' do
       assert_xpath '//orderedlist', output, 1
       assert_xpath '(//orderedlist)/listitem', output, 2
       assert_xpath '(//orderedlist)[@startingnumber = "7"]', output, 1
+    end
+
+    test 'should not warn if explicit numbering starts at value of start attribute' do
+      input = <<~'EOS'
+      == List
+
+      [start=7]
+      7. item 7
+      8. item 8
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=7]', output, 1
+        assert_css 'ol.arabic', output, 1
+        assert_css 'ol li', output, 2
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should implicitly set start on ordered list if explicit arabic numbering does not start at 1' do
+      input = <<~'EOS'
+      == List
+
+      7. item 7
+      8. item 8
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=7]', output, 1
+        assert_css 'ol[type]', output, 0
+        assert_css 'ol.arabic', output, 1
+        assert_css 'ol li', output, 2
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should implicitly set start on ordered list if explicit roman numbering does not start at 1' do
+      input = <<~'EOS'
+      == List
+
+      IV) item 4
+      V) item 5
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=4]', output, 1
+        assert_css 'ol[type=I]', output, 1
+        assert_css 'ol.upperroman', output, 1
+        assert_css 'ol li', output, 2
+        assert_empty logger.messages
+      end
+    end
+
+    test 'should warn if item with explicit numbering in ordered list is out of sequence' do
+      input = <<~'EOS'
+      == List
+
+      x. x
+      z. z
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css 'ol[start=24]', output, 1
+        assert_css 'ol.loweralpha', output, 1
+        assert_css 'ol li', output, 2
+        assert_message logger, :WARN, '<stdin>: line 4: list item index: expected y, got z', Hash
+      end
     end
 
     test 'should match trailing line separator in text of list item' do
@@ -2129,6 +2238,22 @@ context 'Description lists (:dlist)' do
       assert_css 'dl > dt:empty', output, 1
     end
 
+    test 'should parse a dlist if term is include and principal text is []' do
+      input = 'include:: []'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "[]"]', output, 1
+    end
+
+    test 'should parse a dlist if term is include and principal text matches macro form' do
+      input = 'include:: pass:[${placeholder}]'
+      output = convert_string_to_embedded input
+      assert_css 'dl', output, 1
+      assert_css 'dl > dt', output, 1
+      assert_xpath '(//dl/dt)[1]/following-sibling::dd/p[text() = "${placeholder}"]', output, 1
+    end
+
     test 'single-line adjacent elements' do
       input = <<~'EOS'
       term1:: def1
@@ -2171,8 +2296,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'single-line indented adjacent elements' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1:: def1
        term2:: def2
       EOS
@@ -2277,8 +2401,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'multi-line elements with indented paragraph content' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
        def1
       term2::
@@ -2295,8 +2418,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'multi-line elements with indented paragraph content that includes comment lines' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
        def1
       // comment
@@ -2316,8 +2438,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should not strip comment line in literal paragraph block attached to list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
       +
        line 1
@@ -2330,8 +2451,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should escape special characters in all literal paragraphs attached to list item' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term:: desc
 
         <code>text</code>
@@ -2354,8 +2474,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'multi-line element with paragraph starting with multiple dashes should not be seen as list' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
         def1
         -- and a note
@@ -2426,8 +2545,7 @@ context 'Description lists (:dlist)' do
 
     test 'multi-line elements with paragraph and literal content' do
       # blank line following literal paragraph is required or else it will gobble up the second term
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
       def1
 
@@ -2695,8 +2813,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should only grab one literal line following last item if item has no inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
 
       def1
@@ -2720,8 +2837,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should append subsequent paragraph literals to list item as block content' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
 
       def1
@@ -2895,8 +3011,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should not parse a nested indented dlist delimiter without a term as a dlist' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       t::
       desc
         ;;
@@ -3035,8 +3150,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'multi-line element with indented nested element' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1::
         def1
         label1;;
@@ -3059,8 +3173,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'mixed single and multi-line elements with indented nested elements' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       term1:: def1
         label1:::
          detail1
@@ -3092,6 +3205,39 @@ context 'Description lists (:dlist)' do
       assert_xpath '(//dl)[1]/dt[1]/following-sibling::dd/p[contains(text(), "continued")]', output, 1
       assert_xpath '//dl//dl/dt[normalize-space(text()) = "label1"]', output, 1
       assert_xpath '//dl//dl/dt/following-sibling::dd/p[text() = "detail1"]', output, 1
+    end
+
+    test 'nested dlist attached by list continuation should not consume detached paragraph' do
+      input = <<~'EOS'
+      term:: text
+      +
+      nested term::: text
+
+      paragraph
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_css '.dlist .paragraph', output, 0
+      assert_css '.dlist + .paragraph', output, 1
+    end
+
+    test 'nested dlist with attached block offset by empty line' do
+      input = <<~'EOS'
+      category::
+
+      term 1:::
+      +
+      --
+      def 1
+      --
+      EOS
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '//dl//dl', output, 1
+      assert_xpath '(//dl)[1]/dt[1][normalize-space(text()) = "category"]', output, 1
+      assert_xpath '(//dl)[1]//dl/dt[1][normalize-space(text()) = "term 1"]', output, 1
+      assert_xpath '(//dl)[1]//dl/dt[1]/following-sibling::dd//p[starts-with(text(), "def 1")]', output, 1
     end
   end
 
@@ -3251,8 +3397,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should convert qanda list in HTML with proper semantics' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [qanda]
       Question 1::
               Answer 1.
@@ -3276,8 +3421,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should convert qanda list in DocBook with proper semantics' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [qanda]
       Question 1::
               Answer 1.
@@ -3319,8 +3463,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should convert bibliography list with proper semantics' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [bibliography]
       - [[[taoup]]] Eric Steven Raymond. _The Art of Unix
         Programming_. Addison-Wesley. ISBN 0-13-142901-9.
@@ -3339,8 +3482,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should convert bibliography list with proper semantics to DocBook' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [bibliography]
       - [[[taoup]]] Eric Steven Raymond. _The Art of Unix
         Programming_. Addison-Wesley. ISBN 0-13-142901-9.
@@ -3378,8 +3520,7 @@ context 'Description lists (:dlist)' do
     end
 
     test 'should automatically add bibliography style to top-level lists in bibliography section' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       [bibliography]
       == Bibliography
 
@@ -3581,8 +3722,7 @@ context 'Description lists redux' do
     end
 
     test 'folds text from subsequent indented line' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3596,8 +3736,7 @@ context 'Description lists redux' do
     end
 
     test 'folds text from indented line after blank line' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3721,8 +3860,7 @@ context 'Description lists redux' do
     end
 
     test 'folds text of first literal line offset by blank line appends subsequent literals offset by blank line as blocks' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3744,8 +3882,7 @@ context 'Description lists redux' do
     end
 
     test 'folds text of subsequent line and appends following literal line offset by blank line as block if term has no inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3765,8 +3902,7 @@ context 'Description lists redux' do
     end
 
     test 'appends literal line attached by continuation as block if item has no inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3783,8 +3919,7 @@ context 'Description lists redux' do
     end
 
     test 'appends literal line attached by continuation as block if item has no inline description followed by ruler' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -3909,8 +4044,7 @@ context 'Description lists redux' do
     end
 
     test 'appends indented list to first term that is adjacent to second term' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       label 1::
@@ -3938,8 +4072,7 @@ context 'Description lists redux' do
     end
 
     test 'appends indented list to first term that is attached by a continuation and adjacent to second term' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       label 1::
@@ -4015,8 +4148,7 @@ context 'Description lists redux' do
     end
 
     test 'literal line attached by continuation swallows adjacent line that looks like term' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1::
@@ -4154,7 +4286,23 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="exampleblock"]//p[text()="detached"]', output, 1
     end
 
-    test 'attribute line breaks list even when term has no inline description' do
+    test 'block attribute line above delimited block that breaks a dlist is not duplicated' do
+      input = <<~'EOS'
+      == Lists
+
+      term:: desc
+      [.rolename]
+      ----
+      detached
+      ----
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//*[@class="dlist"]/dl', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="listingblock rolename"]', output, 1
+    end
+
+    test 'block attribute line above paragraph breaks list even when term has no inline description' do
       input = <<~'EOS'
       == Lists
 
@@ -4170,7 +4318,21 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="verseblock"]/pre[text()="detached"]', output, 1
     end
 
-    test 'id line breaks list even when term has no inline description' do
+    test 'block attribute line above paragraph that breaks a dlist is not duplicated' do
+      input = <<~'EOS'
+      == Lists
+
+      term:: desc
+      [.rolename]
+      detached
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//*[@class="dlist"]/dl', output, 1
+      assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph rolename"]', output, 1
+    end
+
+    test 'block anchor line breaks list even when term has no inline description' do
       input = <<~'EOS'
       == Lists
 
@@ -4184,6 +4346,89 @@ context 'Description lists redux' do
       assert_xpath '//*[@class="dlist"]//dd', output, 0
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]', output, 1
       assert_xpath '//*[@class="dlist"]/following-sibling::*[@class="paragraph"]/p[text()="detached"]', output, 1
+    end
+
+    test 'block attribute lines above nested horizontal list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'block attribute lines above nested list with style does not break list' do
+      input = <<~'EOS'
+      TODO List::
+      * get groceries
+      Grocery List::
+      [square]
+      * bread
+      * milk
+      * lettuce
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '((//dl)[1]/dd)[2]//ul[@class="square"]', output, 1
+    end
+
+    test 'multiple block attribute lines above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+      [horizontal]
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
+    end
+
+    test 'multiple block attribute lines separated by empty line above nested list does not break list' do
+      input = <<~'EOS'
+      Operating Systems::
+      [[variants]]
+
+      [horizontal]
+
+        Linux::: Fedora
+        BSD::: OpenBSD
+
+      Cloud Providers::
+        PaaS::: OpenShift
+        IaaS::: AWS
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_xpath '//dl', output, 2
+      assert_xpath '/*[@class="dlist"]/dl', output, 1
+      assert_xpath '(//dl)[1]/dd', output, 2
+      assert_xpath '(//dl)[1]/dd/*[@id="variants"]', output, 1
+      assert_xpath '((//dl)[1]/dd)[1]//table', output, 1
+      assert_xpath '((//dl)[1]/dd)[2]//table', output, 0
     end
   end
 
@@ -4233,8 +4478,7 @@ context 'Description lists redux' do
     end
 
     test 'folds text from inline description and subsequent indented line' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == List
 
       term1:: def1
@@ -4248,8 +4492,7 @@ context 'Description lists redux' do
     end
 
     test 'appends literal line offset by blank line as block if item has inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1:: def1
@@ -4266,8 +4509,7 @@ context 'Description lists redux' do
     end
 
     test 'appends literal line offset by blank line as block and appends line after continuation as block if item has inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1:: def1
@@ -4288,8 +4530,7 @@ context 'Description lists redux' do
     end
 
     test 'appends line after continuation as block and literal line offset by blank line as block if item has inline description' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1:: def1
@@ -4328,8 +4569,7 @@ context 'Description lists redux' do
     end
 
     test 'appends literal line attached by continuation as block if item has inline description followed by ruler' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term1:: def1
@@ -4366,8 +4606,7 @@ context 'Description lists redux' do
     end
 
     test 'nested term with description does not consume following heading' do
-      # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-      input = <<~EOS
+      input = <<~'EOS'
       == Lists
 
       term::
@@ -4880,8 +5119,7 @@ context 'Callout lists' do
   end
 
   test 'should not recognize callouts in an indented description list paragraph' do
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    input = <<~EOS
+    input = <<~'EOS'
     foo::
       bar <1>
 
@@ -4897,8 +5135,7 @@ context 'Callout lists' do
   end
 
   test 'should not recognize callouts in an indented outline list paragraph' do
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    input = <<~EOS
+    input = <<~'EOS'
     * foo
       bar <1>
 
@@ -5012,8 +5249,7 @@ context 'Callout lists' do
   end
 
   test 'should allow line comment chars that precede callout number to be specified' do
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    input = <<~EOS
+    input = <<~'EOS'
     [source,erlang,line-comment=%]
     ----
     hello_world() -> % <1>
@@ -5334,8 +5570,7 @@ context 'Lists model' do
   end
 
   test 'simple? should return true for list item with nested outline list' do
-    # NOTE cannot use single-quoted heredoc because of https://github.com/jruby/jruby/issues/4260
-    input = <<~EOS
+    input = <<~'EOS'
     * one
       ** more about one
       ** and more

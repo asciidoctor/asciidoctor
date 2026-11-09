@@ -873,7 +873,7 @@ context 'Attributes' do
       assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
 
-    test 'should allow compat-mode to be set and unset in middle of document' do
+    test 'should not allow compat-mode to be set and unset in middle of document' do
       input = <<~'EOS'
       :foo: bar
 
@@ -893,7 +893,7 @@ context 'Attributes' do
 
       result = convert_string_to_embedded input, attributes: { 'compat-mode' => '@' }
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
-      assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
+      assert_xpath '/*[@id="paragraph-b"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
     end
 
@@ -996,7 +996,7 @@ context 'Attributes' do
 
   context 'Intrinsic attributes' do
     test 'substitute intrinsics' do
-      Asciidoctor::INTRINSIC_ATTRIBUTES.each_pair do |key, value|
+      Asciidoctor::INTRINSIC_ATTRIBUTES.each do |key, value|
         html = convert_string %(Look, a {#{key}} is here)
         # can't use Nokogiri because it interprets the HTML entities and we can't match them
         assert_match(/Look, a #{Regexp.escape value} is here/, html)

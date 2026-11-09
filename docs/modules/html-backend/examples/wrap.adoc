@@ -1,5 +1,5 @@
 // tag::nowrap[]
-[source%nowrap,java]
+[%nowrap,java]
 ----
 public class ApplicationConfigurationProvider extends HttpConfigurationProvider
 {

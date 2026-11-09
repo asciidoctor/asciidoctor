@@ -78,7 +78,46 @@ context 'Links' do
   end
 
   test 'qualified url surrounded by angled brackets' do
-    assert_xpath '//a[@href="http://asciidoc.org"][text()="http://asciidoc.org"]', convert_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('<http://asciidoc.org> is the project page for AsciiDoc.'), 1
+  end
+
+  test 'qualified url surrounded by double angled brackets should preserve outer angled brackets' do
+    assert_includes convert_string_to_embedded('<<https://asciidoc.org>>'), '&lt;<a href="https://asciidoc.org" class="bare">https://asciidoc.org</a>&gt;'
+  end
+
+  test 'qualified url macro inside angled brackets' do
+    assert_includes convert_string_to_embedded('<https://asciidoc.org[]>'), '&lt;<a href="https://asciidoc.org" class="bare">https://asciidoc.org</a>&gt;'
+  end
+
+  test 'qualified url surrounded by angled brackets in unconstrained context' do
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('URLは<http://asciidoc.org>。fin'), 1
+  end
+
+  test 'multiple qualified urls surrounded by angled brackets in unconstrained context' do
+    assert_xpath '//a[@href="http://asciidoc.org"][@class="bare"][text()="http://asciidoc.org"]', convert_string('URLは<http://asciidoc.org>。URLは<http://asciidoc.org>。'), 2
+  end
+
+  test 'qualified url surrounded by escaped angled brackets should escape form' do
+    assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('\\<http://asciidoc.org>'), 1
+  end
+
+  test 'escaped qualified url surrounded by angled brackets should escape autolink' do
+    assert_xpath '//p[text()="<http://asciidoc.org>"]', convert_string('<\\http://asciidoc.org>'), 1
+  end
+
+  test 'xref shorthand with target that starts with URL protocol and has space after comma should not crash parser' do
+    output = convert_string_to_embedded '<<https://example.com, Example>>'
+    assert_include '<a href="#https://example.com">Example</a>', output
+  end
+
+  test 'xref shorthand with link macro as target should be ignored' do
+    output = convert_string_to_embedded '<<link:https://example.com[], Example>>'
+    assert_include '&lt;&lt;<a href="https://example.com" class="bare">https://example.com</a>, Example&gt;&gt;', output
+  end
+
+  test 'autolink containing text enclosed in angle brackets' do
+    output = convert_string_to_embedded 'https://github.com/<org>/'
+    assert_include '<a href="https://github.com/&lt;org&gt;/" class="bare">https://github.com/&lt;org&gt;/</a>', output
   end
 
   test 'qualified url surrounded by round brackets' do
@@ -164,16 +203,31 @@ context 'Links' do
   end
 
   test 'URI scheme with trailing characters should not be converted to a link' do
-    input_sources = %w(
-      (https://)
+    comma = ','
+    input_sources = %W(
       http://;
       file://:
+      irc://#{comma}
+    )
+    expected_outputs = %W(
+      http://;
+      file://:
+      irc://#{comma}
+    )
+    input_sources.each_with_index do |input_source, i|
+      expected_output = expected_outputs[i]
+      actual = block_from_string input_source
+      assert_equal expected_output, actual.content
+    end
+  end
+
+  test 'bare URI scheme enclosed in brackets should not be converted to link' do
+    input_sources = %w(
+      (https://)
       <ftp://>
     )
     expected_outputs = %w(
       (https://)
-      http://;
-      file://:
       &lt;ftp://&gt;
     )
     input_sources.each_with_index do |input_source, i|
@@ -214,12 +268,23 @@ context 'Links' do
     assert_include '\'<a href="https://asciidoctor.org" class="bare">https://asciidoctor.org</a>\'', output
   end
 
+  test 'should convert qualified url as macro with trailing period' do
+    result = convert_string_to_embedded 'Information about the https://symbols.example.org/.[.] character.'
+    assert_xpath '//a[@href="https://symbols.example.org/."][text()="."]', result, 1
+  end
+
   test 'qualified url using invalid link macro should not create link' do
     assert_xpath '//a', convert_string('link:http://asciidoc.org is the project page for AsciiDoc.'), 0
   end
 
   test 'escaped inline qualified url should not create link' do
     assert_xpath '//a', convert_string('\http://asciidoc.org is the project page for AsciiDoc.'), 0
+  end
+
+  test 'escaped inline qualified url as macro should not create link' do
+    output = convert_string '\http://asciidoc.org[asciidoc.org] is the project page for AsciiDoc.'
+    assert_xpath '//a', output, 0
+    assert_xpath '//p[starts-with(text(), "http://asciidoc.org[asciidoc.org]")]', output, 1
   end
 
   test 'url in link macro with at (@) sign should not create mailto link' do
@@ -377,6 +442,24 @@ context 'Links' do
     assert_xpath '//a[@id = "1-install"]', output, 0
   end
 
+  test 'reftext of shorthand inline ref cannot resolve to empty' do
+    input = '[[no-such-id,{empty}]]text'
+    doc = document_from_string input
+    assert_empty doc.catalog[:refs]
+    output = doc.convert standalone: false
+    assert_includes output, (input.sub '{empty}', '')
+  end
+
+  test 'reftext of macro inline ref can resolve to empty' do
+    input = 'anchor:id-only[{empty}]text\n\nsee <<id-only>>'
+    doc = document_from_string input
+    assert doc.catalog[:refs].key? 'id-only'
+    output = doc.convert standalone: false
+    assert_xpath '//a[@id="id-only"]', output, 1
+    assert_xpath '//a[@href="#id-only"]', output, 1
+    assert_xpath '//a[@href="#id-only"][text()="[id-only]"]', output, 1
+  end
+
   test 'inline ref with reftext' do
     %w([[tigers,Tigers]] anchor:tigers[Tigers]).each do |anchor|
       doc = document_from_string %(Here you can read about tigers.#{anchor})
@@ -414,7 +497,7 @@ context 'Links' do
   end
 
   test 'does not match bibliography anchor in prose when scanning for inline anchor' do
-    doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry.'
+    doc = document_from_string 'Use [[[label]]] to assign a label to a bibliography entry, but not in a paragraph.'
     refute doc.catalog[:refs].key? 'label'
   end
 
@@ -435,6 +518,26 @@ context 'Links' do
       result = convert_inline_string input, backend: :docbook
       assert_equal '<anchor xml:id="foo" xreflabel="[foo]"/>bar', result
     end
+  end
+
+  test 'should remove trailing space on reftext of inline anchor shorthand' do
+    input = <<~'EOS'
+    see <<foo>>
+
+    [[foo,[FOO] ]]foo
+    EOS
+    result = convert_string_to_embedded input
+    assert_includes result, 'see <a href="#foo">[FOO]</a>'
+  end
+
+  test 'should remove trailing space on reftext of inline anchor shorthand when converting to DocBook' do
+    input = <<~'EOS'
+    see <<foo>>
+
+    [[foo,[FOO] ]]foo
+    EOS
+    result = convert_string_to_embedded input, backend: 'docbook'
+    assert_includes result, ' xreflabel="[FOO]"'
   end
 
   test 'unescapes square bracket in reftext of anchor macro' do
@@ -940,6 +1043,30 @@ context 'Links' do
     assert_xpath '//a[@href="other-chapters.html#ch2"][text()="the next chapter"]', output, 1
   end
 
+  test 'should produce an internal anchor for inter-document xref to file included fully and partially' do
+    input = <<~'EOS'
+    = Book Title
+    :doctype: book
+
+    [#ch1]
+    == Chapter 1
+
+    So it begins.
+
+    Read <<other-chapters.adoc#ch2,the next chapter>> to find out what happens next!
+
+    include::other-chapters.adoc[]
+
+    include::other-chapters.adoc[tag=ch2-noid]
+    EOS
+
+    doc = document_from_string input, safe: :safe, base_dir: fixturedir
+    assert doc.catalog[:includes].key?('other-chapters')
+    assert doc.catalog[:includes]['other-chapters']
+    output = doc.convert
+    assert_xpath '//a[@href="#ch2"][text()="the next chapter"]', output, 1
+  end
+
   test 'should warn and create link if debug mode is enabled, inter-document xref points to current doc, and reference not found' do
     input = <<~'EOS'
     [#foobar]
@@ -1186,6 +1313,25 @@ context 'Links' do
     output = convert_string_to_embedded input
     assert_xpath '//a[@href="#s1"]', output, 1
     assert_xpath '//a[@href="#s1"][text()="Section Title"]', output, 1
+  end
+
+  test 'should not match numeric character references while searching for fragment in xref target' do
+    input = <<~'EOS'
+    see <<Cub => Tiger>>
+
+    == Cub => Tiger
+    EOS
+    output = convert_string_to_embedded input
+    assert_xpath '//a[@href="#_cub_tiger"]', output, 1
+    assert_xpath %(//a[@href="#_cub_tiger"][text()="Cub #{decode_char 8658} Tiger"]), output, 1
+  end
+
+  test 'should not match numeric character references in path of interdocument xref' do
+    input = <<~'EOS'
+    see xref:{cpp}[{cpp}].
+    EOS
+    output = convert_string_to_embedded input
+    assert_includes output, '<a href="#C&#43;&#43;">C&#43;&#43;</a>'
   end
 
   test 'anchor creates reference' do

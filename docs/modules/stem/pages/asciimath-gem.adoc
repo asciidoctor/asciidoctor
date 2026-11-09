@@ -41,7 +41,7 @@ First, activate STEM support in AsciiDoc by setting the `stem` document attribut
 This attribute must be set by the end of the document header.
 
 .Activate STEM support by setting the stem document attribute
-[source,asciidoc]
+[,asciidoc]
 ----
 = Document Title
 :stem:
@@ -55,7 +55,7 @@ Now let's convert this document to DocBook using the DocBook converter:
 
 The DocBook converter will emit the following XML into the generated document:
 
-[source,xml]
+[,xml]
 ----
 <inlineequation><mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:msqrt><mml:mn>4</mml:mn></mml:msqrt></mml:math></inlineequation>
 ----
