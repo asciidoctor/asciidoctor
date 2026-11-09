@@ -46,7 +46,7 @@ Its integer value is `1`.
 The `SERVER` safe mode level disallows the document from setting attributes that would affect conversion of the document.
 This level trims `docfile` to its relative path and prevents the document from:
 
-* setting `source-highlighter`, `doctype`, `docinfo` and `backend`
+* setting `source-highlighter`, `stem-interpreter`, `doctype`, `docinfo` and `backend`
 * seeing `docdir` (as it can reveal information about the host filesystem)
 
 It allows `icons` and `linkcss`.

@@ -335,7 +335,7 @@ class Document < AbstractBlock
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 
-    @parsed = @reftexts = @header = @header_attributes = nil
+    @parsed = @reftexts = @header = @header_attributes = @stem_interpreter = nil
     @counters = {}
     @attributes_modified = ::Set.new
     @docinfo_processor_extensions = {}
@@ -409,9 +409,10 @@ class Document < AbstractBlock
     end
 
     if @safe >= SafeMode::SERVER
-      # restrict document from setting copycss, source-highlighter and backend
+      # restrict document from setting copycss, source-highlighter, stem-interpreter and backend
       attr_overrides['copycss'] ||= nil
       attr_overrides['source-highlighter'] ||= nil
+      attr_overrides['stem-interpreter'] ||= nil
       attr_overrides['backend'] ||= DEFAULT_BACKEND
       # restrict document from seeing the docdir and trim docfile to relative path
       if !parent_doc && (attr_overrides.key? 'docfile')
@@ -558,6 +559,26 @@ class Document < AbstractBlock
   # Public: Returns whether the source lines of the document have been parsed.
   def parsed?
     @parsed
+  end
+
+  # Public: Get the StemInterpreter associated with this document, resolving it on first use.
+  #
+  # The interpreter is selected by the value of the stem-interpreter attribute in the document header. If that
+  # attribute is not set, or its value doesn't match a registered adapter, the mathjax2 interpreter is used. A nested
+  # document uses the interpreter of its parent document.
+  #
+  # Returns the [StemInterpreter] for this document.
+  def stem_interpreter
+    return @parent_document.stem_interpreter if @parent_document
+    return @stem_interpreter if @stem_interpreter
+    name = (@header_attributes || @attributes)['stem-interpreter'].to_s
+    name = 'mathjax2' if name.empty?
+    unless (factory = @options[:stem_interpreter_factory])
+      factory = (stem_its = @options[:stem_interpreters]) ? (StemInterpreter::DefaultFactoryProxy.new stem_its) : StemInterpreter
+    end
+    @stem_interpreter = (factory.create name, @backend, document: self) ||
+      (factory.create 'mathjax2', @backend, document: self) ||
+      (StemInterpreter.create 'mathjax2', @backend, document: self)
   end
 
   # Public: Get the named counter and take the next number in the sequence.
