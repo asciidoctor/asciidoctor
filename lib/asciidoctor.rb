@@ -584,3 +584,5 @@ if RUBY_ENGINE == 'opal'
   # this require is satisfied by the Asciidoctor.js build; it supplies compile and runtime overrides for Asciidoctor.js
   require 'asciidoctor/js/postscript'
 end
+
+require_relative 'asciidoctor/ifeval_parser'
