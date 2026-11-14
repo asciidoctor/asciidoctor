@@ -108,6 +108,7 @@ Bug Fixes::
   * Set compat mode correctly in document header when `compat-mode` attribute is unset from API/CLI
   * Don't track document attribute unset from body as a modified (header) attribute
   * Use attrlist as indexterm if primary term not specified
+  * Remove trailing quote of quoted value in ifeval expression before comparison (#4914)
 
 == 2.0.26 (2025-10-24) - @mojavelinux
 
