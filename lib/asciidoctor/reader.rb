@@ -1348,7 +1348,7 @@ class PreprocessorReader < Reader
     if ((val.start_with? '"') && (val.end_with? '"')) ||
         ((val.start_with? '\'') && (val.end_with? '\''))
       quoted = true
-      val = val.slice 1, (val.length - 1)
+      val = val.slice 1, (val.length - 2)
     else
       quoted = false
     end
