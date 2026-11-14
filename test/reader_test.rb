@@ -2772,6 +2772,20 @@ class ReaderTest < Minitest::Test
         assert_equal '', (lines * ::Asciidoctor::LF)
       end
 
+      test 'ifeval comparing double-quoted attribute to single quoted string includes content' do
+        input = <<~'EOS'
+        ifeval::["{gem}" == 'asciidoctor']
+        Asciidoctor it is!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input, attributes: { 'gem' => 'asciidoctor' }
+        reader = doc.reader
+        lines = []
+        lines << reader.read_line while reader.has_more_lines?
+        assert_equal 'Asciidoctor it is!', (lines * ::Asciidoctor::LF)
+      end
+
       test 'ifeval comparing attribute to lower version number includes content' do
         input = <<~'EOS'
         ifeval::['{asciidoctor-version}' >= '0.1.0']
