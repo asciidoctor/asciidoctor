@@ -2683,7 +2683,21 @@ class ReaderTest < Minitest::Test
         assert_equal "ifdef::holygrail[]\ncontent\nendif::holygrail[]", (lines * Asciidoctor::LF)
       end
 
-      test 'ifeval comparing missing attribute to nil includes content' do
+      test 'ifeval comparing bare reference to missing attribute to nil does not include content' do
+        input = <<~'EOS'
+        ifeval::[{foo} == '']
+        No foo for you!
+        endif::[]
+        EOS
+
+        doc = Asciidoctor::Document.new input
+        reader = doc.reader
+        lines = []
+        lines << reader.read_line while reader.has_more_lines?
+        assert_empty lines
+      end
+
+      test 'ifeval comparing quoted reference to missing attribute to nil includes content' do
         input = <<~'EOS'
         ifeval::['{foo}' == '']
         No foo for you!
