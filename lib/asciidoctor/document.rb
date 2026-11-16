@@ -281,7 +281,6 @@ class Document < AbstractBlock
       @timings = nil
       @path_resolver = parent_doc.path_resolver
       @converter = parent_doc.converter
-      initialize_extensions = nil
       @extensions = parent_doc.extensions
       @syntax_highlighter = parent_doc.syntax_highlighter
     else
@@ -333,8 +332,8 @@ class Document < AbstractBlock
       @sourcemap = options[:sourcemap]
       @timings = options.delete :timings
       @path_resolver = PathResolver.new
-      initialize_extensions = (defined? ::Asciidoctor::Extensions) || (options.key? :extensions) ? ::Asciidoctor::Extensions : nil
-      @extensions = nil # initialize further down if initialize_extensions is true
+      initialize_extensions = (defined? ::Asciidoctor::Extensions) ? true : options[:extensions] && ::Asciidoctor::Extensions
+      @extensions = nil
       options[:standalone] = options[:header_footer] if (options.key? :header_footer) && !(options.key? :standalone)
     end
 
