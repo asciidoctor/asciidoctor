@@ -93,6 +93,7 @@ Improvements::
   * Add full support for image target defined as a base64-encoded data URI; add `image_format` helper to determine image format (#3791)
   * Only use content type sent by server if mimetype cannot be determined from image target (#3791)
   * Don't include enclosure for TOC level in HTML output if level has no entries (#4908)
+  * Add `parent_cell` attr reader to `Document` class; assign table cell property for AsciiDoc table cell (#4380)
 
 Bug Fixes::
 
