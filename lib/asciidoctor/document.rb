@@ -221,6 +221,9 @@ class Document < AbstractBlock
   # Public: Get the outfilesuffix defined at the end of the header.
   attr_reader :outfilesuffix
 
+  # Public: Get a reference to the parent Table::Cell of this nested document.
+  attr_reader :parent_cell
+
   # Public: Get a reference to the parent Document of this nested document.
   attr_reader :parent_document
 
@@ -255,8 +258,8 @@ class Document < AbstractBlock
   def initialize data = nil, options = {}
     super self, :document
 
-    if (parent_doc = options.delete :parent)
-      @parent_document = parent_doc
+    if (parent_doc = @parent_document = options.delete :parent)
+      @parent_cell = options.delete :parent_cell
       options[:base_dir] ||= parent_doc.base_dir
       options[:catalog_assets] = true if parent_doc.options[:catalog_assets]
       options[:to_dir] = parent_doc.options[:to_dir] if parent_doc.options[:to_dir]
@@ -282,7 +285,6 @@ class Document < AbstractBlock
       @extensions = parent_doc.extensions
       @syntax_highlighter = parent_doc.syntax_highlighter
     else
-      @parent_document = nil
       @catalog = {
         ids: {}, # deprecated; kept for backwards compatibility with converters
         refs: {},
