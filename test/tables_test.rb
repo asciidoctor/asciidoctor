@@ -1694,6 +1694,7 @@ context 'Tables' do
       refute_nil body_cell_1_3.inner_document
       assert body_cell_1_3.inner_document.nested?
       assert_equal doc, body_cell_1_3.inner_document.parent_document
+      assert_equal body_cell_1_3, body_cell_1_3.inner_document.parent_cell
       assert_equal doc.converter, body_cell_1_3.inner_document.converter
       assert_equal 5, body_cell_1_3.lineno
       assert_equal 6, body_cell_1_3.inner_document.lineno
