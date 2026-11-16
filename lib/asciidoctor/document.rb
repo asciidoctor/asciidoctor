@@ -282,7 +282,6 @@ class Document < AbstractBlock
       @extensions = parent_doc.extensions
       @syntax_highlighter = parent_doc.syntax_highlighter
     else
-      @parent_cell = @parent_document = nil
       @catalog = {
         ids: {}, # deprecated; kept for backwards compatibility with converters
         refs: {},
