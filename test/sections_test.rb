@@ -60,6 +60,16 @@ context 'Sections' do
       assert_equal '_section_1_1_1', sec.id
     end
 
+    test 'synthetic id is not empty when title has no word characters' do
+      doc = document_from_string %(== ...\n\n== ---\n\n== &)
+      assert_equal ['_', '__2', '__3'], doc.blocks.map(&:id)
+    end
+
+    test 'synthetic id is not empty when title has no word characters and idprefix is blank' do
+      sec = block_from_string ":idprefix:\n\n== ..."
+      assert_equal '_', sec.id
+    end
+
     test 'synthetic id prefix can be customized' do
       sec = block_from_string ":idprefix: id_\n\n== Section One"
       assert_equal 'id_section_one', sec.id
