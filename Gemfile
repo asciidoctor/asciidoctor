@@ -15,6 +15,7 @@ group :development do
   elsif (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.2.0')
     gem 'cucumber', '~> 9.2.0'
   end
+  gem 'ffi-icu', ENV['FFI_ICU_VERSION'], require: false if ENV.key? 'FFI_ICU_VERSION'
   gem 'minitest', '~> 5.25.0' if (Gem::Version.new RUBY_VERSION) < (Gem::Version.new '3.2.0')
   gem 'nokogiri', '~> 1.10.0' if RUBY_ENGINE == 'truffleruby'
   gem 'open-uri-cached', '~> 1.0.0'

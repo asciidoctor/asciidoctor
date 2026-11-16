@@ -607,6 +607,10 @@ class Document < AbstractBlock
         target, imagesdir = ::Array === value ? value : [value, (@attributes['imagesdir'])]
         @catalog[type] << (ImageReference.new target, imagesdir)
       end
+    when :indexterms
+      return unless (index_catalog = @catalog[:indexterms])
+      index_catalog.store_term value[0], (dest = index_catalog.create_dest value[1]), value[2]
+      dest.id
     else
       @catalog[type] << value if @options[:catalog_assets]
     end
@@ -1244,6 +1248,7 @@ class Document < AbstractBlock
 
     unless @parent_document
       if (basebackend = attrs['basebackend']) == 'html'
+        @catalog[:indexterms] = IndexCatalog.new attrs['lang']
         # QUESTION should we allow source-highlighter to be disabled in AsciiDoc table cell?
         if (syntax_hl_name = attrs['source-highlighter']) && !attrs[%(#{syntax_hl_name}-unavailable)]
           if (syntax_hl_factory = @options[:syntax_highlighter_factory])

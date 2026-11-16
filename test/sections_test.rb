@@ -2844,6 +2844,247 @@ context 'Sections' do
         assert_xpath '/dedication/title', output, 0
       end
     end
+
+    test 'should generate index in HTML output if index section is found' do
+      input_with_macros = <<~'EOS'
+      = Document Title
+
+      == indexterm2:[Animals]
+
+      The indexterm2:[tiger] (Panthera tigris) is the largest indexterm:[cat,see-also=Big cats] species.
+      indexterm:[Big cats, Tigers, Panthera tigris]indexterm:[Big cats,see-also=Animals]
+
+      The indexterm2:[cougar]indexterm:[puma,see=cougar] is the big indexterm2:[cat,see-also="Big cats, Big cats"] of the Americas.
+
+      == https://institutes.example.org[Institutes]
+
+      National Institute of Science and Technology (indexterm2:[NIST])
+
+      [index]
+      == Index
+      EOS
+
+      input_with_shorthand = <<~'EOS'
+      = Document Title
+
+      == ((Animals))
+
+      The ((tiger)) (Panthera tigris) is the largest ((cat &> Big cats)) species.
+      (((Big cats,Tigers,Panthera tigris)))(((Big cats &> Animals)))
+
+      The ((cougar))(((puma >> cougar))) is the big ((cat &> Big cats &> Big cats)) of the Americas.
+
+      == https://institutes.example.org[Institutes]
+
+      National Institute of Science and Technology \(((NIST)))
+
+      [index]
+      == Index
+      EOS
+
+      expected = <<~'EOS'
+      <div class="index">
+      <div class="indexblock">
+      <div class="title">A</div>
+      <dl>
+      <dt>Animals, <a class="indexterm" href="#_indexterm_1">Animals</a></dt>
+      </dl>
+      </div>
+      <div class="indexblock">
+      <div class="title">B</div>
+      <dl>
+      <dt>Big cats, <a class="indexterm" href="#_indexterm_5">Animals</a></dt>
+      <dd>
+      <dl>
+      <dt>(see also Animals)</dt>
+      <dt>Tigers</dt>
+      <dd>
+      <dl>
+      <dt>Panthera tigris, <a class="indexterm" href="#_indexterm_4">Animals</a></dt>
+      </dl>
+      </dd>
+      </dl>
+      </dd>
+      </dl>
+      </div>
+      <div class="indexblock">
+      <div class="title">C</div>
+      <dl>
+      <dt>cat, <a class="indexterm" href="#_indexterm_3">Animals</a>&#8201;[<a class="indexterm" href="#_indexterm_8">2</a>]</dt>
+      <dd>
+      <dl>
+      <dt>(see also Big cats)</dt>
+      </dl>
+      </dd>
+      <dt>cougar, <a class="indexterm" href="#_indexterm_6">Animals</a></dt>
+      </dl>
+      </div>
+      <div class="indexblock">
+      <div class="title">N</div>
+      <dl>
+      <dt>NIST, <a class="indexterm" href="#_indexterm_9">Institutes</a></dt>
+      </dl>
+      </div>
+      <div class="indexblock">
+      <div class="title">P</div>
+      <dl>
+      <dt>puma (see cougar)</dt>
+      </dl>
+      </div>
+      <div class="indexblock">
+      <div class="title">T</div>
+      <dl>
+      <dt>tiger, <a class="indexterm" href="#_indexterm_2">Animals</a></dt>
+      </dl>
+      </div>
+      </div>
+      EOS
+
+      [input_with_macros, input_with_shorthand].each do |input|
+        output = convert_string_to_embedded input
+        assert_css '.index', output, 1
+        assert_css '.index a.indexterm', output, 8
+        assert_css '.indexblock > .title', output, 6
+        assert_includes output, expected
+      end
+    end
+
+    test 'should add indexterm inside AsciiDoc table cell to generated index in HTML output' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      [cols=2*]
+      |===
+      |Name |Species
+
+      a|
+      ((tiger)) (Panthera tigris)
+      |((cat))
+      |===
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      assert_css '.index a.indexterm', output, 2
+      assert_xpath '(//*[@class="indexblock"]//dt)[1][starts-with(text(),"cat,")]/a[text()="Animals"]', output, 1
+      assert_xpath '(//*[@class="indexblock"]//dt)[2][starts-with(text(),"tiger,")]/a[text()="Animals"]', output, 1
+    end
+
+    test 'should honor xrefstyle when generating references in HTML index' do
+      input = <<~'EOS'
+      = Document Title
+      :xrefstyle: short
+      :sectnums:
+      :doctype: book
+
+      = Part 1
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+
+      = Reference
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      assert_xpath '//*[@class="index"]//a[@class="indexterm"][text()="Chapter 1"]', output, 2
+    end
+
+    test 'should honor locale when sorting entries in index in HTML output' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Unicode Party
+
+      ((étudier)) means to study.
+      ((être)) means to be.
+      ((abc)) vs ((ab©))
+      ((æ)) ((bå)) ((bæ)) ((bø))
+
+      [index]
+      == Index
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css '.index', output, 1
+      if Gem.loaded_specs.key? 'ffi-icu'
+        assert_xpath '//*[@class="index"]//div[@class="title"][text()="AE"]', output, 1
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bå, Unicode Party, bæ, Unicode Party, bø, Unicode Party', b_terms
+        output = convert_string_to_embedded input, attributes: { 'lang' => 'nb' }
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bæ, Unicode Party, bø, Unicode Party, bå, Unicode Party', b_terms
+      else
+        assert_xpath '//*[@class="index"]//div[@class="title"][text()="Æ"]', output, 1
+        b_terms = (xmlnodes_at_xpath '//*[@class="index"]//div[@class="title"][text()="B"]/following-sibling::dl/dt', output).map {|t| t.text }.join ', '
+        assert_equal 'bå, Unicode Party, bæ, Unicode Party, bø, Unicode Party', b_terms
+      end
+    end
+
+    test 'should not generate HTML index if index section is not level 1' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+
+      == Reference
+
+      [index]
+      === Index
+      EOS
+
+      using_memory_logger do |logger|
+        output = convert_string_to_embedded input
+        assert_css '.index', output, 0
+        assert_css '#_index + *', output, 0
+        assert_message logger, :WARN, '<stdin>: line 10: index section can only be defined at level 0 (when doctype is book) or level 1', Hash
+      end
+    end
+
+    test 'should not generate HTML index if no index terms found' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The tiger is the largest cat species.
+
+      [index]
+      == Index
+      EOS
+
+      doc = document_from_string input
+      output = doc.convert
+      assert_empty doc.catalog[:indexterms]
+      assert_css '.index', output, 0
+      assert_css '#_index + .sectionbody', output, 1
+      assert_css '#_index + .sectionbody *', output, 0
+    end
+
+    test 'should output anchors for index terms in HTML output even if index section is not present' do
+      input = <<~'EOS'
+      = Document Title
+
+      == Animals
+
+      The ((tiger)) is the largest ((cat)) species.
+      EOS
+
+      output = convert_string_to_embedded input
+      assert_css 'a#_indexterm_1', output, 1
+      assert_css 'a#_indexterm_2', output, 1
+    end
   end
 
   context 'heading patterns in blocks' do
