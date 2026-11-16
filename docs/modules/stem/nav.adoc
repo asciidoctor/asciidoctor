@@ -3,3 +3,4 @@
 ** xref:mathematical.adoc[]
 ** xref:docbook.adoc[]
 ** xref:asciimath-gem.adoc[]
+** xref:custom-adapter.adoc[]
