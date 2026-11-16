@@ -45,8 +45,6 @@ class AbstractBlock < AbstractNode
       @next_section_ordinal = 1
     elsif AbstractBlock === parent
       @level = parent.level
-    else
-      @level = nil
     end
   end
 
