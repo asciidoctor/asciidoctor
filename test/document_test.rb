@@ -1564,7 +1564,6 @@ context 'Document' do
 
       doc = document_from_string input
       refute_nil doc.catalog
-      #assert_equal [:footnotes, :ids, :images, :includes, :indexterms, :links, :refs, :callouts].sort, doc.catalog.keys.sort
       assert_equal [:footnotes, :ids, :images, :includes, :links, :refs, :callouts].sort, doc.catalog.keys.sort
       assert_same doc.catalog, doc.references
       assert_same doc.catalog[:footnotes], doc.references[:footnotes]
@@ -1594,6 +1593,11 @@ context 'Document' do
       ref = ['tigers', (Asciidoctor::Inline.new doc, :anchor, '[tigers]', type: :ref, target: 'tigers'), '[tigers]']
       assert_equal ref[1], (doc.register :refs, ref)
       assert_nil doc.register :refs, ref
+    end
+
+    test 'should not initialize :indexterms in catalog by default' do
+      doc = empty_document
+      assert_nil doc.catalog[:indexterms]
     end
 
     test 'should record imagesdir from document when image is registered in catalog using legacy arguments' do

@@ -607,6 +607,14 @@ class Document < AbstractBlock
         target, imagesdir = ::Array === value ? value : [value, (@attributes['imagesdir'])]
         @catalog[type] << (ImageReference.new target, imagesdir)
       end
+    when :indexterms
+      unless (index_catalog = @catalog[:indexterms])
+        index_catalog = @catalog[:indexterms] = @parent_document ?
+          (@parent_document.catalog[:indexterms] ||= IndexCatalog.new @parent_document.attr 'lang')
+          : (IndexCatalog.new attr 'lang')
+      end
+      index_catalog.store_term value[0], (dest = index_catalog.create_dest value[1]), value[2]
+      dest.id
     else
       @catalog[type] << value if @options[:catalog_assets]
     end
