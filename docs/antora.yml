@@ -31,3 +31,4 @@ nav:
 - modules/ROOT/nav-lang.adoc
 - modules/ROOT/nav-errors.adoc
 - modules/migrate/nav.adoc
+- modules/ROOT/nav-ssg.adoc
