@@ -873,24 +873,23 @@ class Document < AbstractBlock
   #
   # Returns the substituted value if the attribute was set or nil if it was not because it's locked.
   def set_attribute name, value = ''
-    unless attribute_locked? name
-      value = apply_attribute_value_subs value unless value.empty?
-      # NOTE if @header_attributes is set, we're beyond the document header
-      if @header_attributes
-        @attributes[name] = value
+    return if attribute_locked? name
+    value = apply_attribute_value_subs value unless value.empty?
+    # NOTE if @header_attributes is set, we're beyond the document header
+    if @header_attributes
+      @attributes[name] = value
+    else
+      case name
+      when 'backend'
+        update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
+      when 'doctype'
+        update_doctype_attributes value
       else
-        case name
-        when 'backend'
-          update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
-        when 'doctype'
-          update_doctype_attributes value
-        else
-          @attributes[name] = value
-        end
-        @attributes_modified << name
+        @attributes[name] = value
       end
-      value
+      @attributes_modified << name
     end
+    value
   end
 
   # Public: Delete the specified attribute from the document if the name is not locked
