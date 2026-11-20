@@ -840,17 +840,16 @@ class Document < AbstractBlock
   end
 
   # Public: Replay attribute assignments at the block level
-  def playback_attributes(block_attributes)
-    if block_attributes.key? :attribute_entries
-      block_attributes[:attribute_entries].each do |entry|
-        name = entry.name
-        if entry.negate
-          @attributes.delete name
-          @compat_mode = false if name == 'compat-mode'
-        else
-          @attributes[name] = entry.value
-          @compat_mode = true if name == 'compat-mode'
-        end
+  def playback_attributes block_attributes
+    return unless block_attributes.key? :attribute_entries
+    block_attributes[:attribute_entries].each do |entry|
+      name = entry.name
+      if entry.negate
+        @attributes.delete name
+        @compat_mode = false if name == 'compat-mode'
+      else
+        @attributes[name] = entry.value
+        @compat_mode = true if name == 'compat-mode'
       end
     end
   end
