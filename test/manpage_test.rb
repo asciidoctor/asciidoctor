@@ -561,6 +561,141 @@ context 'Manpage' do
     end
   end
 
+  context 'Nested inline fonts' do
+    test 'should preserve independent font spans' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      *bold* _italic_ `mono` after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fBbold\fP \fIitalic\fP \f(CRmono\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore bold after nested italic text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      *bold _italic_ bold* after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fBbold \fP\fIitalic\fP\fB bold\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore bold after nested monospaced text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      *bold `mono` bold* after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fBbold \fP\f(CRmono\fP\fB bold\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore italic after nested bold text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      _italic *bold* italic_ after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fIitalic \fP\fBbold\fP\fI italic\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore italic after nested monospaced text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      _italic `mono` italic_ after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fIitalic \fP\f(CRmono\fP\fI italic\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore monospaced after nested bold text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      `mono **bold** mono` after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\f(CRmono \fP\fBbold\fP\f(CR mono\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore monospaced after nested italic text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      `mono __italic__ mono` after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\f(CRmono \fP\fIitalic\fP\f(CR mono\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore outer font between sibling nested spans' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      `mono **bold** and __italic__ mono` after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\f(CRmono \fP\fBbold\fP\f(CR and \fP\fIitalic\fP\f(CR mono\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore each outer font across three levels of nesting' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      `mono **bold _italic_ bold** mono` after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\f(CRmono \fP\fBbold \fP\fIitalic\fP\fB bold\fP\f(CR mono\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore italic around a button' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+      :experimental:
+
+      _press btn:[OK] now_ after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fIpress \fP\fB[\0OK\0]\fP\fI now\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore bold around a key sequence' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+      :experimental:
+
+      *press kbd:[Ctrl+C] now* after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fBpress \fP\f(CRCtrl\0+\0C\fP\fB now\fP after', output.lines.last.chomp
+    end
+
+    test 'should restore italic around a menu selection' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+      :experimental:
+
+      _choose menu:File[Save] now_ after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_equal '\fIchoose \fP\fIFile\0\(fc\0Save\fP\fI now\fP after', output.lines.last.chomp
+    end
+
+    test 'should flatten nested fonts in link text' do
+      input = <<~EOS.chop
+      #{SAMPLE_MANPAGE_HEADER}
+
+      link:example.com[`mono __italic__ mono`] after
+      EOS
+      output = Asciidoctor.convert input, backend: :manpage
+      assert_includes output, '.URL "example.com" "\f(CRmono \fP\fIitalic\fP\f(CR mono\fP" ""'
+    end
+  end
+
   context 'Backslash' do
     test 'should not escape spaces for empty manual or source fields' do
       input = SAMPLE_MANPAGE_HEADER.lines.reject {|l| l.start_with? ':man ' }
