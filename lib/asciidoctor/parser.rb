@@ -1364,6 +1364,7 @@ class Parser
 
     # first skip the line with the marker / term (it gets put back onto the reader by next_block)
     reader.shift
+    reader.skip_blank_lines if dlist && !has_text
     block_cursor = reader.cursor
     list_item_reader = Reader.new (read_lines_for_list_item reader, list_type, sibling_trait, has_text), block_cursor
     if list_item_reader.has_more_lines?

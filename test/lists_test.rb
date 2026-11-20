@@ -5688,4 +5688,19 @@ context 'Lists model' do
     assert_equal 3, list_items[2].lineno
     assert_equal 4, list_items[3].lineno
   end
+
+  test 'should account for blank lines before description list content in sourcemap' do
+    (0..3).each do |blank_lines|
+      ['* item', '. item', 'nested:: text', 'description'].each do |content|
+        input = %(term::\n#{"\n" * blank_lines}#{content}\n)
+        doc = document_from_string input, sourcemap: true
+        description = doc.blocks[0].items[0][1]
+        expected_lineno = blank_lines + 2
+        assert_equal expected_lineno, description.lineno
+        description.find_by.each do |block|
+          assert_equal expected_lineno, block.lineno
+        end
+      end
+    end
+  end
 end
