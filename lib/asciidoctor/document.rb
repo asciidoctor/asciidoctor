@@ -899,11 +899,11 @@ class Document < AbstractBlock
   # name  - the String attribute name
   #
   # returns true if the attribute was deleted, false if it was not because it's locked
-  def delete_attribute(name)
-    if attribute_locked?(name)
+  def delete_attribute name
+    if attribute_locked? name
       false
     else
-      @attributes.delete(name)
+      @attributes.delete name
       # NOTE if @header_attributes is set, we're beyond the document header
       @attributes_modified << name unless @header_attributes
       true
