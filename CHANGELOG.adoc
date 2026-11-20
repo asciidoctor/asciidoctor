@@ -36,6 +36,7 @@ Improvements::
   * Add full support for image target defined as a base64-encoded data URI; add `image_format` helper to determine image format (#3791)
   * Only use content type sent by server if mimetype cannot be determined from image target (#3791)
   * Add `parent_cell` attr reader to `Document` class; assign property on Document for AsciiDoc table cell (#4380)
+  * Apply compat mode on document as soon as compat-mode attribute is set or unset
 
 Bug Fixes::
 

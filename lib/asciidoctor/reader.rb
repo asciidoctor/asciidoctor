@@ -1063,7 +1063,7 @@ class PreprocessorReader < Reader
     elsif doc.safe >= SafeMode::SECURE
       # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
       expanded_target = %(pass:c[#{expanded_target}]) if expanded_target.include? ' '
-      replace_next_line %(link:#{expanded_target}[#{(doc.attr? 'compat-mode') ? '' : 'role=include'}])
+      replace_next_line %(link:#{expanded_target}[#{doc.compat_mode ? '' : 'role=include'}])
     elsif @maxdepth
       if @include_stack.size >= @maxdepth[:curr]
         logger.error message_with_context %(maximum include depth of #{@maxdepth[:rel]} exceeded), source_location: cursor
@@ -1264,7 +1264,7 @@ class PreprocessorReader < Reader
       unless doc.attr? 'allow-uri-read'
        # FIXME we don't want to use a passthrough or link macro if we're in a verbatim context
         target = %(pass:c[#{target}]) if target.include? ' '
-        return replace_next_line %(link:#{target}[#{(doc.attr? 'compat-mode') ? '' : 'role=include'}])
+        return replace_next_line %(link:#{target}[#{doc.compat_mode ? '' : 'role=include'}])
       end
       Helpers.require_open_uri doc.attr? 'cache-uri'
       [(::URI.parse target), :uri, target]

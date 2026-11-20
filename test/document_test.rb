@@ -505,6 +505,32 @@ context 'Document' do
       assert_xpath '//p[text()="\'quoted string\'"]', result, 1
     end
 
+    test 'should enable compat mode immediately when compat-mode attribute is implied' do
+      input = <<~'EOS'
+      Document Title
+      ==============
+      :name: pass:n['italic']
+
+      {name}
+      EOS
+
+      output = convert_string input
+      assert_xpath '//p/em[text()="italic"]', output, 1
+    end
+
+    test 'should enable compat mode immediately when compat-mode attribute is set' do
+      input = <<~'EOS'
+      = Document Title
+      :compat-mode:
+      :name: pass:n['italic']
+
+      {name}
+      EOS
+
+      output = convert_string input
+      assert_xpath '//p/em[text()="italic"]', output, 1
+    end
+
     test 'should apply max-width to each top-level container' do
       input = <<~'EOS'
       = Document Title
