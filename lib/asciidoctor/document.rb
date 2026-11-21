@@ -909,17 +909,14 @@ class Document < AbstractBlock
   #
   # returns true if the attribute was deleted, false if it was not because it's locked
   def delete_attribute name
-    if attribute_locked? name
-      false
-    else
-      @attributes.delete name
-      # NOTE if @header_attributes is set, we're beyond the document header
-      unless @header_attributes
-        @attributes_modified << name
-        @compat_mode = false if name == 'compat-mode'
-      end
-      true
+    return false if attribute_locked? name
+    @attributes.delete name
+    # NOTE if @header_attributes is set, we're beyond the document header
+    unless @header_attributes
+      @attributes_modified << name
+      @compat_mode = false if name == 'compat-mode'
     end
+    true
   end
 
   # Public: Determine if the attribute has been locked by being assigned in document options
