@@ -229,7 +229,7 @@ class Minitest::Test
     (document_from_string src, (opts.merge doctype: :inline)).convert
   end
 
-  def parse_header_metadata source, doc = nil
+  def parse_header_metadata source, doc = empty_document
     reader = Asciidoctor::Reader.new source.split Asciidoctor::LF
     [(Asciidoctor::Parser.parse_header_metadata reader, doc), reader]
   end

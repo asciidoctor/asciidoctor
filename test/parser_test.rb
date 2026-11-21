@@ -407,16 +407,10 @@ context "Parser" do
   end
 
   test 'sets authorcount to 0 if document has no authors' do
-    input = ''
-    doc = empty_document
-    metadata, _ = parse_header_metadata input, doc
+    metadata, _ = parse_header_metadata '', (doc = empty_document)
     assert_equal 0, doc.attributes['authorcount']
-    assert_equal 0, metadata['authorcount']
-  end
-
-  test 'returns empty hash if document has no authors and invoked without document' do
-    metadata, _ = parse_header_metadata ''
-    assert_empty metadata
+    expected = { 'authorcount' => 0 }
+    assert_equal expected, metadata
   end
 
   test 'does not drop name joiner when using multiple authors' do
