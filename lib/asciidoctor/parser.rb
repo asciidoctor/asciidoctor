@@ -175,7 +175,7 @@ class Parser
       end
       block_attrs.clear
       (modified_attrs = document.instance_variable_get :@attributes_modified).delete 'doctitle'
-      parse_header_metadata reader, document, nil
+      parse_header_metadata reader, document, false
       if modified_attrs.include? 'doctitle'
         if (val = doc_attrs['doctitle']).nil_or_empty? || val == doctitle_attr_val
           doc_attrs['doctitle'] = doctitle_attr_val
