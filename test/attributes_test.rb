@@ -884,6 +884,7 @@ context 'Attributes' do
 
       [[paragraph-b]]
       `{foo}`
+      include::https://example.org/partial.adoc[]
 
       :compat-mode:
 
@@ -894,6 +895,7 @@ context 'Attributes' do
       result = convert_string_to_embedded input, attributes: { 'compat-mode' => '@' }
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
+      assert_xpath '/*[@id="paragraph-b"]//a[@class="bare include"]', result, 1
       assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
     end
 

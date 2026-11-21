@@ -875,14 +875,13 @@ class Document < AbstractBlock
     return if attribute_locked? name
     value = apply_attribute_value_subs value unless value.empty?
     # NOTE if @header_attributes is set, we're beyond the document header
+    @compat_mode = true if name == 'compat-mode'
     if @header_attributes
       @attributes[name] = value
     else
       case name
       when 'backend'
         update_backend_attributes value, (@attributes_modified.delete? 'htmlsyntax') && value == @backend
-      when 'compat-mode'
-        @attributes[name] = (@compat_mode = true) && value
       when 'doctype'
         update_doctype_attributes value
       else
@@ -904,12 +903,10 @@ class Document < AbstractBlock
     if attribute_locked? name
       false
     else
+      @compat_mode = false if name == 'compat-mode'
       @attributes.delete name
       # NOTE if @header_attributes is set, we're beyond the document header
-      unless @header_attributes
-        @attributes_modified << name
-        @compat_mode = false if name == 'compat-mode'
-      end
+      @attributes_modified << name unless @header_attributes
       true
     end
   end
