@@ -2142,16 +2142,11 @@ class Parser
       value = nil
     end
 
-    if (name = sanitize_attribute_name name) == 'numbered'
+    case (name = sanitize_attribute_name name)
+    when 'numbered'
       name = 'sectnums'
-    elsif name == 'hardbreaks'
-      name = 'hardbreaks-option'
-    elsif name == 'showtitle'
-      store_attribute 'notitle', (value ? nil : ''), doc, attrs
-    end
-
-    if value
-      if name == 'leveloffset'
+    when 'leveloffset'
+      if value
         # support relative leveloffset values
         if value.start_with? '+'
           value = ((doc.attr 'leveloffset', 0).to_i + (value.slice 1, value.length).to_i).to_s
@@ -2159,6 +2154,13 @@ class Parser
           value = ((doc.attr 'leveloffset', 0).to_i - (value.slice 1, value.length).to_i).to_s
         end
       end
+    when 'hardbreaks'
+      name = 'hardbreaks-option'
+    when 'showtitle'
+      store_attribute 'notitle', (value ? nil : ''), doc, attrs
+    end
+
+    if value
       # QUESTION should we set value to locked value if set_attribute returns false?
       if (resolved_value = doc.set_attribute name, value)
         value = resolved_value
