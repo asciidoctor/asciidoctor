@@ -1811,6 +1811,7 @@ class Parser
   #
   # reader   - the Reader holding the source lines of the document
   # document - the Document we are building (default: nil)
+  # retrieve - whether to retrieve the metadata as a Hash (default: true)
   #
   # Examples
   #
