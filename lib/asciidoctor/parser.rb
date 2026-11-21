@@ -1825,7 +1825,7 @@ class Parser
   # is applied directly to the attributes of the Document.
   #
   # reader   - the Reader holding the source lines of the document
-  # document - the Document we are building (default: nil)
+  # document - the Document we are building
   # retrieve - whether to retrieve the metadata as a Hash (default: true)
   #
   # Examples
@@ -1834,14 +1834,14 @@ class Parser
   #  parse_header_metadata(Reader.new data, nil, normalize: true)
   #  # => { 'author' => 'Author Name', 'firstname' => 'Author', 'lastname' => 'Name', 'email' => 'author@example.org',
   #  #       'revnumber' => '1.0', 'revdate' => '2012-12-21', 'revremark' => 'Coincide w/ end of world.' }
-  def self.parse_header_metadata reader, document = nil, retrieve = true
-    doc_attrs = document && document.attributes
+  def self.parse_header_metadata reader, document, retrieve = true
+    doc_attrs = document.attributes
     # NOTE this will discard any comment lines, but not skip blank lines
     process_attribute_entries reader, document
 
     if reader.has_more_lines? && !reader.next_line_empty?
       authorcount = (implicit_author_metadata = process_authors reader.read_line).delete 'authorcount'
-      if document && (doc_attrs['authorcount'] = authorcount) > 0
+      if (doc_attrs['authorcount'] = authorcount) > 0
         implicit_author_metadata.each do |key, val|
           # apply header subs and assign to document; attributes substitution only relevant for email
           doc_attrs[key] = document.apply_header_subs val unless doc_attrs.key? key
@@ -1869,7 +1869,7 @@ class Parser
             end
           end
           rev_metadata['revremark'] = match[3].rstrip if match[3]
-          if document && !rev_metadata.empty?
+          unless rev_metadata.empty?
             # apply header subs and assign to document
             rev_metadata.each do |key, val|
               doc_attrs[key] = document.apply_header_subs val unless doc_attrs.key? key
@@ -1890,59 +1890,54 @@ class Parser
     end
 
     # process author attribute entries that override (or stand in for) the implicit author line
-    if document
-      if (doc_attrs.key? 'author') && (author_line = doc_attrs['author']) != implicit_author
-        # do not allow multiple, process as names only
-        author_metadata = process_authors author_line, true, false
-        author_metadata.delete 'authorinitials' if doc_attrs['authorinitials'] != implicit_authorinitials
-      elsif (doc_attrs.key? 'authors') && (author_line = doc_attrs['authors']) != implicit_authors
-        # allow multiple, process as names only
-        author_metadata = process_authors author_line, true
-      else
-        authors, author_idx, author_key, explicit, sparse = [], 1, 'author_1', false, false
-        while doc_attrs.key? author_key
-          # only use indexed author attribute if value is different
-          # leaves corner case if line matches with underscores converted to spaces; use double space to force
-          if (author_override = doc_attrs[author_key]) == implicit_author_metadata[author_key]
-            authors << nil
-            sparse = true
-          else
-            authors << author_override
-            explicit = true
-          end
-          author_key = %(author_#{author_idx += 1})
-        end
-        if explicit
-          # rebuild implicit author names to reparse
-          authors.each_with_index do |author, idx|
-            next if author
-            authors[idx] = [
-              implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
-              implicit_author_metadata[%(middlename_#{name_idx})],
-              implicit_author_metadata[%(lastname_#{name_idx})],
-            ].compact.map {|name| name.tr ' ', '_' }.join ' '
-          end if sparse
-          # process as names only
-          author_metadata = process_authors authors, true, false
+    if (doc_attrs.key? 'author') && (author_line = doc_attrs['author']) != implicit_author
+      # do not allow multiple, process as names only
+      author_metadata = process_authors author_line, true, false
+      author_metadata.delete 'authorinitials' if doc_attrs['authorinitials'] != implicit_authorinitials
+    elsif (doc_attrs.key? 'authors') && (author_line = doc_attrs['authors']) != implicit_authors
+      # allow multiple, process as names only
+      author_metadata = process_authors author_line, true
+    else
+      authors, author_idx, author_key, explicit, sparse = [], 1, 'author_1', false, false
+      while doc_attrs.key? author_key
+        # only use indexed author attribute if value is different
+        # leaves corner case if line matches with underscores converted to spaces; use double space to force
+        if (author_override = doc_attrs[author_key]) == implicit_author_metadata[author_key]
+          authors << nil
+          sparse = true
         else
-          author_metadata = { 'authorcount' => 0 }
+          authors << author_override
+          explicit = true
         end
+        author_key = %(author_#{author_idx += 1})
       end
-
-      if author_metadata['authorcount'] == 0
-        if authorcount
-          author_metadata = nil
-        else
-          doc_attrs['authorcount'] = 0
-        end
+      if explicit
+        # rebuild implicit author names to reparse
+        authors.each_with_index do |author, idx|
+          next if author
+          authors[idx] = [
+            implicit_author_metadata[%(firstname_#{name_idx = idx + 1})],
+            implicit_author_metadata[%(middlename_#{name_idx})],
+            implicit_author_metadata[%(lastname_#{name_idx})],
+          ].compact.map {|name| name.tr ' ', '_' }.join ' '
+        end if sparse
+        # process as names only
+        author_metadata = process_authors authors, true, false
       else
-        doc_attrs.update author_metadata
-
-        # special case
-        if !(doc_attrs.key? 'email') && (doc_attrs.key? 'email_1')
-          doc_attrs['email'] = doc_attrs['email_1']
-        end
+        author_metadata = { 'authorcount' => 0 }
       end
+    end
+
+    if author_metadata['authorcount'] == 0
+      if authorcount
+        author_metadata = {}
+      else
+        doc_attrs['authorcount'] = 0
+      end
+    else
+      doc_attrs.update author_metadata
+      # special case
+      doc_attrs['email'] = doc_attrs['email_1'] if !(doc_attrs.key? 'email') && (doc_attrs.key? 'email_1')
     end
 
     implicit_author_metadata.merge rev_metadata.to_h, author_metadata.to_h if retrieve
