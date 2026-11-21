@@ -2130,7 +2130,7 @@ class Parser
   # attrs - the attributes for the current context
   #
   # returns a 2-element array containing the resolved attribute name (minus the ! indicator) and value
-  def self.store_attribute name, value, doc = nil, attrs = nil
+  def self.store_attribute name, value, doc, attrs = nil
     # TODO move processing of attribute value to utility method
     if name.end_with? '!'
       # a nil value signals the attribute should be deleted (unset)
@@ -2150,25 +2150,21 @@ class Parser
       store_attribute 'notitle', (value ? nil : ''), doc, attrs
     end
 
-    if doc
-      if value
-        if name == 'leveloffset'
-          # support relative leveloffset values
-          if value.start_with? '+'
-            value = ((doc.attr 'leveloffset', 0).to_i + (value.slice 1, value.length).to_i).to_s
-          elsif value.start_with? '-'
-            value = ((doc.attr 'leveloffset', 0).to_i - (value.slice 1, value.length).to_i).to_s
-          end
+    if value
+      if name == 'leveloffset'
+        # support relative leveloffset values
+        if value.start_with? '+'
+          value = ((doc.attr 'leveloffset', 0).to_i + (value.slice 1, value.length).to_i).to_s
+        elsif value.start_with? '-'
+          value = ((doc.attr 'leveloffset', 0).to_i - (value.slice 1, value.length).to_i).to_s
         end
-        # QUESTION should we set value to locked value if set_attribute returns false?
-        if (resolved_value = doc.set_attribute name, value)
-          value = resolved_value
-          (Document::AttributeEntry.new name, value).save_to attrs if attrs
-        end
-      elsif (doc.delete_attribute name) && attrs
-        (Document::AttributeEntry.new name, value).save_to attrs
       end
-    elsif attrs
+      # QUESTION should we set value to locked value if set_attribute returns false?
+      if (resolved_value = doc.set_attribute name, value)
+        value = resolved_value
+        (Document::AttributeEntry.new name, value).save_to attrs if attrs
+      end
+    elsif (doc.delete_attribute name) && attrs
       (Document::AttributeEntry.new name, value).save_to attrs
     end
 

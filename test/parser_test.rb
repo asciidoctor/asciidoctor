@@ -14,14 +14,14 @@ context "Parser" do
   end
 
   test 'store attribute with value' do
-    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar'
+    attr_name, attr_value = Asciidoctor::Parser.store_attribute 'foo', 'bar', empty_document
     assert_equal 'foo', attr_name
     assert_equal 'bar', attr_value
   end
 
   test 'store attribute with negated value' do
     { 'foo!' => nil, '!foo' => nil, 'foo' => nil }.each do |name, value|
-      attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value
+      attr_name, attr_value = Asciidoctor::Parser.store_attribute name, value, empty_document
       assert_equal name.sub('!', ''), attr_name
       assert_nil attr_value
     end
