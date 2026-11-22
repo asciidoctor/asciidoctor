@@ -888,6 +888,9 @@ context 'Attributes' do
 
       :compat-mode:
 
+      [[section-a]]
+      == `{foo}`
+
       [[paragraph-c]]
       `{foo}`
       EOS
@@ -896,7 +899,8 @@ context 'Attributes' do
       assert_xpath '/*[@id="paragraph-a"]//code[text()="{foo}"]', result, 1
       assert_xpath '/*[@id="paragraph-b"]//code[text()="bar"]', result, 1
       assert_xpath '/*[@id="paragraph-b"]//a[@class="bare include"]', result, 1
-      assert_xpath '/*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
+      assert_xpath '/*[@class="sect1"]/h2[@id="section-a"]//code[text()="{foo}"]', result, 1
+      assert_xpath '/*[@class="sect1"]//*[@id="paragraph-c"]//code[text()="{foo}"]', result, 1
     end
 
     test 'does not disturb attribute-looking things escaped with backslash' do
