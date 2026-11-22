@@ -873,7 +873,7 @@ context 'Attributes' do
       assert_xpath '//p[text()="Belly up to the bar."]', output, 0
     end
 
-    test 'should not allow compat-mode to be set and unset in middle of document' do
+    test 'should not allow compat-mode to be set and unset in body of document' do
       input = <<~'EOS'
       :foo: bar
 
