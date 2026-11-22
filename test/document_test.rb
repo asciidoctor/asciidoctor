@@ -489,6 +489,24 @@ context 'Document' do
       assert_xpath '//code[text()="content"]', result, 0
     end
 
+    test 'should not enable compat mode in body of document if compat mode is locked by API' do
+      input = <<~'EOS'
+      = Document Title
+
+      before
+
+      :compat-mode:
+
+      +content+
+      EOS
+
+      doc = document_from_string input, attributes: { 'compat-mode' => nil }
+      assert(doc.attribute_locked? 'compat-mode')
+      assert_nil(doc.attr 'compat-mode')
+      result = doc.convert
+      assert_xpath '//code[text()="content"]', result, 0
+    end
+
     test 'should not enable compat mode in header if unset from API' do
       input = <<~'EOS'
       = Document Title
