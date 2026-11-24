@@ -3,6 +3,21 @@
 Images are not embedded in the HTML output by default.
 If you have image references in your document, you'll have to save the image files in the same directory as your converted document.
 
+== Open an image link in a new window
+
+Append a caret (`^`) to the value of the `link` attribute to open an image link in a new window.
+The caret is shorthand for `window=_blank` and is not included in the link URL.
+This shorthand works on both block and inline image macros.
+
+[,asciidoc]
+----
+image::download.png[Download,link=https://example.org/download^]
+image:screenshot.png[Screenshot,link=self^]
+----
+
+The `self^` value links to the image's resolved URL, including the `imagesdir` prefix when set.
+An explicit `window` attribute takes precedence over the caret shorthand.
+
 == Embed images with the data-uri attribute
 
 As an alternative, you can embed the images directly into the document by setting the `data-uri` document attribute.

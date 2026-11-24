@@ -909,6 +909,28 @@ context 'Substitutions' do
       assert_xpath '//img[starts-with(@src,"data:image/svg+xml;base64,")]', output, 1
     end
 
+    test 'should honor caret shorthand in inline image link' do
+      output = convert_string_to_embedded 'image:tiger.png[Tiger,link=https://example.org/download^]'
+      assert_xpath '//a[@href="https://example.org/download"][@target="_blank"][@rel="noopener"]/img[@src="tiger.png"]', output, 1
+    end
+
+    test 'should honor caret shorthand in inline image link to self' do
+      output = convert_string_to_embedded 'image:tiger.png[Tiger,link=self^]', attributes: { 'imagesdir' => 'img' }
+      assert_xpath '//a[@href="img/tiger.png"][@target="_blank"]/img[@src="img/tiger.png"]', output, 1
+    end
+
+    test 'should preserve explicit window when inline image link uses caret shorthand' do
+      output = convert_string_to_embedded 'image:tiger.png[Tiger,link=https://example.org/download^,window=preview]'
+      assert_xpath '//a[@href="https://example.org/download"][@target="preview"]', output, 1
+    end
+
+    test 'should remove caret shorthand from inline image link in DocBook output' do
+      { 'https://example.org/download^' => 'https://example.org/download', 'self^' => 'img/tiger.png' }.each do |link, expected|
+        output = convert_string_to_embedded %(image:tiger.png[Tiger,link=#{link}]), backend: 'docbook', attributes: { 'imagesdir' => 'img' }
+        assert_includes output, %(<link xl:href="#{expected}"><inlinemediaobject>)
+      end
+    end
+
     test 'rel=noopener should be added to an image with a link that targets the _blank window' do
       para = block_from_string 'image:tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]'
       assert_equal '<span class="image"><a class="image" href="http://en.wikipedia.org/wiki/Tiger" target="_blank" rel="noopener"><img src="tiger.png" alt="Tiger"></a></span>',

@@ -424,6 +424,10 @@ module Substitutors
         target = $1
         attrs = parse_attributes $2, posattrs, unescape_input: true
         unless type == 'icon'
+          if (link = attrs['link']) && (link.end_with? '^')
+            attrs['link'] = link.chop
+            attrs['window'] ||= '_blank'
+          end
           id = attrs['id']
           doc.register :images, [target, (attrs['imagesdir'] ||= doc_attrs['imagesdir'])]
         end
