@@ -2843,6 +2843,28 @@ This is just an open block.
       assert_xpath '/*[@class="imageblock"]//a[@class="image"][@href="img/tiger.png"]/img[@src="img/tiger.png"][@alt="Tiger"]', output, 1
     end
 
+    test 'should honor caret shorthand in block image link' do
+      output = convert_string_to_embedded 'image::tiger.png[Tiger,link=https://example.org/download^]'
+      assert_xpath '//a[@href="https://example.org/download"][@target="_blank"][@rel="noopener"]/img[@src="tiger.png"]', output, 1
+    end
+
+    test 'should honor caret shorthand in block image link to self' do
+      output = convert_string_to_embedded 'image::tiger.png[Tiger,link=self^]', attributes: { 'imagesdir' => 'img' }
+      assert_xpath '//a[@href="img/tiger.png"][@target="_blank"]/img[@src="img/tiger.png"]', output, 1
+    end
+
+    test 'should preserve explicit window when block image link uses caret shorthand' do
+      output = convert_string_to_embedded 'image::tiger.png[Tiger,link=https://example.org/download^,window=preview]'
+      assert_xpath '//a[@href="https://example.org/download"][@target="preview"]', output, 1
+    end
+
+    test 'should remove caret shorthand from block image link in DocBook output' do
+      { 'https://example.org/download^' => 'https://example.org/download', 'self^' => 'img/tiger.png' }.each do |link, expected|
+        output = convert_string_to_embedded %(image::tiger.png[Tiger,link=#{link}]), backend: 'docbook', attributes: { 'imagesdir' => 'img' }
+        assert_includes output, %(<link xl:href="#{expected}"><mediaobject>)
+      end
+    end
+
     test 'adds rel=noopener attribute to block image with link that targets _blank window' do
       input = 'image::images/tiger.png[Tiger,link=http://en.wikipedia.org/wiki/Tiger,window=_blank]'
       output = convert_string_to_embedded input

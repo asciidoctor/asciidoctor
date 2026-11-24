@@ -624,6 +624,10 @@ class Parser
                 end
               end
               if blk_ctx == :image
+                if (link = attributes['link']) && (link.end_with? '^')
+                  attributes['link'] = link.chop
+                  attributes['window'] ||= '_blank'
+                end
                 document.register :images, [target, (attributes['imagesdir'] ||= doc_attrs['imagesdir'])]
                 # NOTE style is the value of the first positional attribute in the block attribute line
                 attributes['alt'] ||= style || (attributes['default-alt'] = (Helpers.basename target, true).tr '_-', ' ')
